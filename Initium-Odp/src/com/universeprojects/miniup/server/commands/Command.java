@@ -3,6 +3,8 @@ package com.universeprojects.miniup.server.commands;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
+
 public abstract class Command 
 {
 	private CachedDatastoreService ds;
