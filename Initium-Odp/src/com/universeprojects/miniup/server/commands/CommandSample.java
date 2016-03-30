@@ -9,10 +9,22 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
+
+/**
+ * This is a sample command you can use as a reference for creating new commands.
+ * 
+ * Usage notes:
+ * Make sure to pass in an argument called 'test'. It is expected to have a value of 1 or 2, but you can
+ * make it have any value (or leave it out) and it will actually show what it's like when an exception is thrown
+ * on the server (which is also useful).
+ * 
+ * @author Nik
+ *
+ */
 public class CommandSample extends Command {
 
-	public CommandSample(CachedDatastoreService ds, HttpServletRequest request,
-			HttpServletResponse response) {
+	public CommandSample(CachedDatastoreService ds, HttpServletRequest request, HttpServletResponse response) 
+	{
 		super(ds, request, response);
 	}
 

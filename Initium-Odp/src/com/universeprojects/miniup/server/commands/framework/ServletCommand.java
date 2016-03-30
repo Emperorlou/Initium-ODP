@@ -12,10 +12,12 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.universeprojects.miniup.server.ODPGameFunctions;
 
 @SuppressWarnings("serial")
 public class ServletCommand extends HttpServlet 
@@ -25,8 +27,11 @@ public class ServletCommand extends HttpServlet
 		String cmd = request.getParameter("cmd");
 		try
 		{
+			if (isLoggedIn(request)==false)
+				throw new UserErrorMessage("You are not currently logged in. <a href='login.jsp'>Click here</a> to log in before doing anything else.");
 			
-			// Reflectively get the command...
+			
+			// Reflectively get the command class...
 			String className = "Command"+cmd;
 			Class c = null;
 			try 
@@ -38,7 +43,7 @@ public class ServletCommand extends HttpServlet
 				throw new IllegalArgumentException("Failed to execute command. Class name 'com.universeprojects.miniup.server.commands.Command"+cmd+"' does not exist.");
 			}
 			
-			
+			// Reflectively get the constructor for the command...
 			Constructor<Command> constructor = null;
 			try 
 			{
@@ -50,8 +55,9 @@ public class ServletCommand extends HttpServlet
 			}
 			
 			
-			CachedDatastoreService ds = new CachedDatastoreService();
+			ODPGameFunctions ds = new ODPGameFunctions();
 			
+			// Now create the command instance...
 			Command command = null;
 			try 
 			{
@@ -87,9 +93,10 @@ public class ServletCommand extends HttpServlet
 			// Now return some result that is parsed on the client side.
 			JSONObject result = new JSONObject();
 			response.setContentType("application/json");
-			
+			//
+			result.put("javascriptResponse", command.getJavascriptResponse().toString());
 			result.put("message", command.getPopupMessage());
-			
+			//
 			PrintWriter out = response.getWriter();
 			out.print(result.toString());
 			out.flush();
@@ -142,6 +149,21 @@ public class ServletCommand extends HttpServlet
 			out.close();
 			Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
 		}
+	}
+	
+
+	
+	
+	public boolean isLoggedIn(HttpServletRequest request)
+	{
+		HttpSession session = request.getSession(true);
+		
+		Long authenticatedInstantCharacterId = (Long)session.getAttribute("instantCharacterId");
+		Long userId = (Long)session.getAttribute("userId");
+		if (userId==null && authenticatedInstantCharacterId==null)
+			return false;
+		
+		return true;
 	}
 	
 	
