@@ -1,10 +1,13 @@
-package com.universeprojects.miniup.server.commands;
+package com.universeprojects.miniup.server.commands.framework;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,10 +22,6 @@ public class ServletCommand extends HttpServlet
 {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException 
 	{
-//		resp.setContentType("text/plain");
-//		resp.getWriter().println("Hello, world");
-		
-		
 		String cmd = request.getParameter("cmd");
 		try
 		{
@@ -75,11 +74,17 @@ public class ServletCommand extends HttpServlet
 				throw new RuntimeException("Error in command constructor.", e);
 			}
 			
-			
-			Map<String, String> params = request.getParameterMap();
+
+			// Get all the parameters for this request, they will be included in the command...
+			Map<String, String> params = new HashMap<String, String>();
+			for(Object name:request.getParameterMap().keySet())
+				params.put((String)name, request.getParameter((String)name));
 	
+			// Run the command!
 			command.run(params);
 				
+			
+			// Now return some result that is parsed on the client side.
 			JSONObject result = new JSONObject();
 			response.setContentType("application/json");
 			
@@ -135,7 +140,7 @@ public class ServletCommand extends HttpServlet
 			out.print(result.toString());
 			out.flush();
 			out.close();
-			throw new RuntimeException(e);
+			Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 	

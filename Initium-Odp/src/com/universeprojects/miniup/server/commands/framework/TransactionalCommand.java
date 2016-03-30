@@ -1,4 +1,4 @@
-package com.universeprojects.miniup.server.commands;
+package com.universeprojects.miniup.server.commands.framework;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

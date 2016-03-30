@@ -1,4 +1,4 @@
-package com.universeprojects.miniup.server.commands;
+package com.universeprojects.miniup.server.commands.framework;
 
 public class UserErrorMessage extends Exception {
 	private static final long serialVersionUID = -3317374960212093965L;
