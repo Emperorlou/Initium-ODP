@@ -24,5 +24,10 @@ public abstract class Command
 		//TODO: Set the appropriate attribute for this
 	}
 	
+	void setPopupError(String errorMessage)
+	{
+		//TODO: Set the appropriate attribute for this
+	}
+	
 	
 }
