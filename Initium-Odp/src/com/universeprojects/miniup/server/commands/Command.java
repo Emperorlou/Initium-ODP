@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,6 +13,8 @@ public abstract class Command
 	private HttpServletRequest request;
 	private HttpServletResponse response;
 	
+	private String popupMessage;
+	
 	public Command(CachedDatastoreService ds, HttpServletRequest request, HttpServletResponse response)
 	{
 		this.ds = ds;
@@ -21,13 +25,21 @@ public abstract class Command
 	
 	void setPopupMessage(String message)
 	{
-		//TODO: Set the appropriate attribute for this
+		this.popupMessage = message;
 	}
 	
-	void setPopupError(String errorMessage)
+	
+	String getPopupMessage()
 	{
-		//TODO: Set the appropriate attribute for this
+		return popupMessage;
 	}
+	
+	
+	/**
+	 * The command's execution logic is done here. 
+	 */
+	public abstract void run(Map<String, String> parameters) throws UserErrorMessage;
+	
 	
 	
 }
