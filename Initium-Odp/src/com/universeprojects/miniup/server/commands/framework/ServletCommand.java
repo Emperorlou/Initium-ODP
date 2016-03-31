@@ -55,7 +55,7 @@ public class ServletCommand extends HttpServlet
 			}
 			
 			
-			ODPGameFunctions ds = new ODPGameFunctions();
+			CachedDatastoreService ds = new CachedDatastoreService();
 			
 			// Now create the command instance...
 			Command command = null;
@@ -88,7 +88,7 @@ public class ServletCommand extends HttpServlet
 	
 			// Run the command!
 			command.run(params);
-				
+		
 			
 			// Now return some result that is parsed on the client side.
 			JSONObject result = new JSONObject();

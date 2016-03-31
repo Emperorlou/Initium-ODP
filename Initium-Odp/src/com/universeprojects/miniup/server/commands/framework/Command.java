@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.universeprojects.miniup.server.ODPGameFunctions;
 
 public abstract class Command 
 {
@@ -15,6 +16,7 @@ public abstract class Command
 		FullPageRefresh,
 		ReloadPagePopup
 	}
+	private ODPGameFunctions db;
 	private CachedDatastoreService ds;
 	private HttpServletRequest request;
 	private HttpServletResponse response;
@@ -27,6 +29,13 @@ public abstract class Command
 		this.ds = ds;
 		this.request = request;
 		this.response = response;
+		
+		this.db = new ODPGameFunctions(ds);
+	}
+	
+	protected ODPGameFunctions getDB()
+	{
+		return db;
 	}
 	
 	/**

@@ -18,6 +18,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  * make it have any value (or leave it out) and it will actually show what it's like when an exception is thrown
  * on the server (which is also useful).
  * 
+ * Parameters:
+ * 		test (optional) - Value of 1 or 2 expected. Anything else throws an exception. 
+ * 
  * @author Nik
  *
  */
@@ -31,6 +34,7 @@ public class CommandSample extends Command {
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
+		
 		String test = parameters.get("test");
 		if (test==null)
 			test = "1";
