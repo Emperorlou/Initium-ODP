@@ -18,7 +18,7 @@ public abstract class Command
 	}
 	private ODPDBAccess db;
 	private CachedDatastoreService ds;
-	private HttpServletRequest request;
+	protected HttpServletRequest request;
 	private HttpServletResponse response;
 	
 	private String popupMessage;

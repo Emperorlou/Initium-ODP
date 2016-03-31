@@ -46,7 +46,7 @@ public class ServletCommand extends HttpServlet
 			Constructor<Command> constructor = null;
 			try 
 			{
-				constructor = c.getConstructor(CachedDatastoreService.class, HttpServletRequest.class, HttpServletResponse.class);
+				constructor = c.getConstructor(HttpServletRequest.class, HttpServletResponse.class);
 			} 
 			catch (NoSuchMethodException | SecurityException e) 
 			{
@@ -60,7 +60,7 @@ public class ServletCommand extends HttpServlet
 			Command command = null;
 			try 
 			{
-				command = constructor.newInstance(ds, request, response);
+				command = constructor.newInstance(request, response);
 			} 
 			catch (InstantiationException e) 
 			{

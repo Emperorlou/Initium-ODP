@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -34,16 +35,41 @@ public class CommandSample extends Command {
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
+		// Get the DB access object. We use this for most DB communication. It is a place for reusable methods that access the DB.
 		ODPDBAccess db = getDB();
-		String test = parameters.get("test");
-		if (test==null)
-			test = "1";
+
+		// Check if we're logged in or not. We shouldn't be able to see this since commands cannot be used unless the user is logged in.
+		if (db.isLoggedIn(request)==false)
+			throw new UserErrorMessage("You are not currently logged in and canont do this.");
 		
-		if (test.equals("1"))
+		// We're going to use both the user and character entities of the logged in user
+		// Needing at least the character is VERY common in commands since most commands
+		// deal with the user who is activating them in one way or another
+		CachedEntity user = db.getCurrentUser(request);
+		CachedEntity character = db.getCurrentCharacter(request);
+
+		// We're going to output whether or not we have a full account or a throwaway, just for fun
+		boolean hasUser = false;
+		if (user!=null) hasUser = true;
+		
+		// Grab the character name for output as well
+		// IMPORTANT: The available properties on the character can be found in the editors!
+		String characterName = (String)character.getProperty("name");
+		
+		// Lets get the parameter that was passed in, we'll do different things depending on what it is
+		String test = parameters.get("test");
+		
+		
+		// Now we'll poupup different messages (or throw exceptions) depending on what the 'test' parameter equals...
+		if ("1".equals(test))
 		{
-			setPopupMessage("The first test here is a message.");
+			if (hasUser==true)
+				setPopupMessage("The first test here is a message.<br>You are using a full account. Your character name is "+characterName+".");
+			else
+				setPopupMessage("The first test here is a message.<br>You are using a throwaway saccount. Your character name is "+characterName+".");
+				
 		}
-		else if (test.equals("2"))
+		else if ("2".equals(test))
 		{
 			throw new UserErrorMessage("The second test here is an error message that halts execution of the command.");
 		}

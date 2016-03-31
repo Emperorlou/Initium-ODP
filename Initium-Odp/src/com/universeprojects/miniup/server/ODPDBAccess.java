@@ -131,7 +131,24 @@ public class ODPDBAccess
 		request.setAttribute("userEntity", null);
 		request.setAttribute("characterEntity", null);
 	}
-	
+
+	/**
+	 * Returns true if the player is currently logged in using either a regular account or a throwaway character.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public boolean isLoggedIn(HttpServletRequest request)
+	{
+		HttpSession session = request.getSession(true);
+		
+		Long authenticatedInstantCharacterId = (Long)session.getAttribute("instantCharacterId");
+		Long userId = (Long)session.getAttribute("userId");
+		if (userId==null && authenticatedInstantCharacterId==null)
+			return false;
+		
+		return true;
+	}
 	
 	/**
 	 * Gets the key of the user who is currently logged in (if they are logged in). 
