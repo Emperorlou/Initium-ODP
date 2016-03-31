@@ -8,9 +8,9 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 public abstract class TransactionalCommand extends Command
 {
 
-	public TransactionalCommand(CachedDatastoreService ds,
-			HttpServletRequest request, HttpServletResponse response) {
-		super(ds, request, response);
+	public TransactionalCommand(HttpServletRequest request, HttpServletResponse response) 
+	{
+		super(request, response);
 		// TODO Auto-generated constructor stub
 	}
 	

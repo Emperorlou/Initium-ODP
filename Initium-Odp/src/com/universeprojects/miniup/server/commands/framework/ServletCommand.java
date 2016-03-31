@@ -17,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
-import com.universeprojects.miniup.server.ODPGameFunctions;
 
 @SuppressWarnings("serial")
 public class ServletCommand extends HttpServlet 

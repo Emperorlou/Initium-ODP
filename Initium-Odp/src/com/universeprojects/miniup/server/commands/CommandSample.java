@@ -26,9 +26,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  */
 public class CommandSample extends Command {
 
-	public CommandSample(CachedDatastoreService ds, HttpServletRequest request, HttpServletResponse response) 
+	public CommandSample(HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(ds, request, response);
+		super(request, response);
 	}
 
 	@Override
