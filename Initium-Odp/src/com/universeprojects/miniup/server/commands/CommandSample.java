@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
@@ -34,7 +34,7 @@ public class CommandSample extends Command {
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
-		
+		ODPDBAccess db = getDB();
 		String test = parameters.get("test");
 		if (test==null)
 			test = "1";

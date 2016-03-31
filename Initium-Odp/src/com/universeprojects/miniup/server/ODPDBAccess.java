@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
@@ -102,6 +105,127 @@ public class ODPDBAccess
 			}
 		}
 		while(true);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Fur the methods that look like getCurrentXXX() we store the entities returned
+	 * in the request for quick subsequent access. In some cases, this might make
+	 * the view we redirect to (like a jsp) stale. For example, if we switch characters
+	 * the old character will be shown in the view until a the player refreshes the page.
+	 * 
+	 *  To combat this, for the specific cases where this issue might arise, call this
+	 *  method to clear all the request-level cached entities.
+	 *  
+	 * @param request
+	 */
+	public void clearRequestCache(HttpServletRequest request)
+	{
+		request.setAttribute("userEntity", null);
+		request.setAttribute("characterEntity", null);
+	}
+	
+	
+	/**
+	 * Gets the key of the user who is currently logged in (if they are logged in). 
+	 * 
+	 * This will return null if:
+	 *   1. The user is not currently logged in.
+	 *   2. The user is currently using a throwaway account and so only has a throwaway character but no user entity.
+	 *   
+	 * @param request
+	 * @return
+	 */
+	public Key getCurrentUserKey(HttpServletRequest request)
+	{
+		HttpSession session = request.getSession(true);
+		
+		Long userId = (Long)session.getAttribute("userId");
+		
+		return createKey("User", userId);
+	}
+	
+	
+	/**
+	 * Gets the user entity of the user who is currently logged in (if they are logged in). 
+	 * 
+	 * This will return null if:
+	 *   1. The user is not currently logged in.
+	 *   2. The user is currently using a throwaway account and so only has a throwaway character but no user entity.
+	 *   
+	 * @param request
+	 * @return
+	 */
+	public CachedEntity getCurrentUser(HttpServletRequest request)
+	{
+		if (request.getAttribute("userEntity")!=null)
+			return (CachedEntity)request.getAttribute("userEntity");
+		
+		Key userKey = getCurrentUserKey(request);
+		
+		if (userKey==null) return null;
+		
+		CachedEntity user = getEntity(userKey);
+		
+		// For efficiency, we're going to keep the user entity in the request so we don't have to fetch it from the DB more than once in a single request
+		request.setAttribute("userEntity", user);
+		
+		return user;
+	}
+	
+	/**
+	 * Gets the character entity of the user who is currently logged in (if they are logged in). 
+	 * 
+	 * This will return null if The user is not currently logged in or if the user has no character on his account for some reason.
+	 *   
+	 * @param request
+	 * @return
+	 */
+	public CachedEntity getCurrentCharacter(HttpServletRequest request)
+	{
+		if (request.getAttribute("characterEntity")!=null)
+			return (CachedEntity)request.getAttribute("characterEntity");
+		
+		HttpSession session = request.getSession(true);
+		
+		Long authenticatedInstantCharacterId = (Long)session.getAttribute("instantCharacterId");
+		Long userId = (Long)session.getAttribute("userId");
+		if (userId!=null)
+		{
+			CachedEntity user = getCurrentUser(request);
+			Key characterKey = (Key)user.getProperty("characterKey");
+			CachedEntity character = getEntity(characterKey);
+		
+			if (character!=null)
+			{
+				request.setAttribute("characterEntity", character);
+				
+				return character;
+			}
+		}
+		
+		if (authenticatedInstantCharacterId!=null)
+		{
+			Key characterKey = createKey("Character", authenticatedInstantCharacterId);
+			CachedEntity character = getEntity(characterKey);
+		
+			if (character!=null)
+			{
+				request.setAttribute("characterEntity", character);
+				
+				return character;
+			}
+		}
+		
+		return null;
+		
 	}
 	
 	
