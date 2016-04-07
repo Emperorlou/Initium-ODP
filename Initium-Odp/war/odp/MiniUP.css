@@ -689,6 +689,13 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 }
 
+.big-link
+{
+	font-size:20px;
+	text-align:center;
+	margin-left:30px;	
+}
+
 .main-forgetPath
 {
 	margin-top:11px;
@@ -1426,7 +1433,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 .page-popup::before
 {
   position:absolute;
-  background:url('images/ui/large-popup-top.jpg');
+  background:url('/images/ui/large-popup-top.jpg');
   background-position:center;
   width:100%;
   height:18px;
@@ -1441,7 +1448,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	max-width:750px;
 	margin: 0 auto;
 	position:relative;
-	background-image:url('images/ui/large-popup-middle.jpg');
+	background-image:url('/images/ui/large-popup-middle.jpg');
   	background-position:center;
 	width:100%;
 	color:#FFFFFF;
@@ -1460,7 +1467,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .page-popup::after
 {
-  background-image:url('images/ui/large-popup-bottom.jpg');
+  background-image:url('/images/ui/large-popup-bottom.jpg');
   background-position:center;
 	position:absolute;
   content:" ";
@@ -1725,7 +1732,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 		.main-banner-textonly
 		{
 			width:100%;
-			background:url('images/banner-backing.jpg') no-repeat center;
+			background:url('/images/banner-backing.jpg') no-repeat center;
 			height:240px;
 		}
 	

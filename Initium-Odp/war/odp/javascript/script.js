@@ -784,7 +784,7 @@ function popupPremiumReminder()
 				"When you donate at least 5 dollars, you get a premium account for life!<br>" +
 				"Premium member's characters always remember their house when they die, and " +
 				"their names show up as red in chat.<br>" +
-				"There are a lot more benefits coming for premium members <a href='profile.jsp'>" +
+				"There are a lot more benefits coming for premium members <a onclick='viewProfile()'>" +
 				"so check out more details here!</a>" +
 				"</p>");
 	}
@@ -969,9 +969,15 @@ function closePagePopup()
     	$("#page-popup"+(currentPopupStackIndex-1)).show();
     
     currentPopupStackIndex--;
-
-
 }
+
+function closeAllPagePopups()
+{
+	// Clear all popups before opening inventory
+	for(var i = 0; i<currentPopupStackIndex; i++)
+		closePagePopup();
+}
+
 
 function reloadPagePopup(quietly)
 {
@@ -1026,7 +1032,12 @@ function viewSettings()
 	pagePopup("ajax_settings.jsp");
 }
 
-
+function viewProfile()
+{
+	closeAllPopups();
+	closeAllTooltips();
+	pagePopup("ajax_profile.jsp");
+}
 
 
 
@@ -1065,7 +1076,7 @@ function viewSettings()
 ////////////////////////////////////////////////////////
 // COMMANDS
 
-function doCommand(eventObject, commandName, parameters)
+function doCommand(eventObject, commandName, parameters, callback)
 {
 	// Collapse the parameters into a single string
 	var parametersStr = "";
@@ -1105,6 +1116,8 @@ function doCommand(eventObject, commandName, parameters)
 		if (data.errorMessage!=null && data.errorMessage.length>0)
 			popupMessage("System Message", data.errorMessage);
 			
+		if (callback==null)
+			callback(data);
 		
 		$(eventObject.target).text(originalText);
 	})
@@ -1414,8 +1427,7 @@ $(document).keyup(function(event){
 		
 		if (event.which==80)
 		{
-			window.disableShortcuts = true;
-			window.location.href='profile.jsp';
+			viewProfile();
 		}
 		else if (event.which==73)
 		{

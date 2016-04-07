@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands.framework;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ public abstract class Command
 	
 	private String popupMessage;
 	private JavascriptResponse jsResponse = JavascriptResponse.None;
+	private Map<String, Object> callbackData = new HashMap<String, Object>();
 	
 	public Command(HttpServletRequest request, HttpServletResponse response)
 	{
@@ -71,6 +73,34 @@ public abstract class Command
 		return jsResponse;
 	}
 	
+	
+	/**
+	 * Use this to pass data back to the calling javascript of this command.
+	 * 
+	 * @param field
+	 * @param value
+	 */
+	protected void addCallbackData(String field, Object value)
+	{
+		if (field.matches("[A-Za-z0-9_]")==false)
+			throw new RuntimeException("Callback fields must be valid javascript field identifiers. They can only contain letters, numbers, and underscores.");
+		
+		callbackData.put(field,  value);
+	}
+	
+	/**
+	 * Use this to get data you previously added using .addCallbackData().
+	 * 
+	 * @param field
+	 * @return
+	 */
+	protected Object getCallbackData(String field)
+	{
+		if (field.matches("[A-Za-z0-9_]")==false)
+			throw new RuntimeException("Callback fields must be valid javascript field identifiers. They can only contain letters, numbers, and underscores.");
+		
+		return callbackData.get(field);
+	}
 	
 	/**
 	 * The command's execution logic is done here. 
