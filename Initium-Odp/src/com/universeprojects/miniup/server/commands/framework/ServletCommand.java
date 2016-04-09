@@ -95,6 +95,7 @@ public class ServletCommand extends HttpServlet
 			//
 			result.put("javascriptResponse", command.getJavascriptResponse().toString());
 			result.put("message", command.getPopupMessage());
+			result.put("callbackData", command.getCallbackDataMap());
 			//
 			PrintWriter out = response.getWriter();
 			out.print(result.toString());

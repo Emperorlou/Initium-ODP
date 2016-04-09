@@ -1116,8 +1116,10 @@ function doCommand(eventObject, commandName, parameters, callback)
 		if (data.errorMessage!=null && data.errorMessage.length>0)
 			popupMessage("System Message", data.errorMessage);
 			
-		if (callback==null)
-			callback(data);
+		if (callback==null && data!=null)
+			callback(data.callbackData);
+		else if (callback==null && data==null)
+			callback();
 		
 		$(eventObject.target).text(originalText);
 	})
