@@ -12,7 +12,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 
 public abstract class Command 
 {
-	enum JavascriptResponse
+	public enum JavascriptResponse
 	{
 		None,
 		FullPageRefresh,
