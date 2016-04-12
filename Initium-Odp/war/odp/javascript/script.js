@@ -955,6 +955,50 @@ function pagePopup(url)
     	$("#page-popup"+(currentPopupStackIndex-1)).hide();
 }
 
+function viewMap()
+{
+	pagePopupIframe('http://init-map.tumblr.com/');
+}
+
+function pagePopupIframe(url)
+{
+	
+	if (url.indexOf("?")>0)
+		url+="&ajax=true";
+	else
+		url+="?ajax=true";
+	
+	exitFullscreenChat();
+	
+	currentPopupStackIndex++;
+	var pagePopupId = "page-popup"+currentPopupStackIndex;
+	
+	$("#page-popup-root").append("<div id='"+pagePopupId+"'><iframe id='"+pagePopupId+"-content' src='"+url+"' class='page-popup' width='95%' height='90'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick=reloadPagePopupIframe('"+pagePopupId+"-content'); style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
+	
+    if (currentPopupStackIndex==1)
+    {
+	    $(document).bind("keydown",function(e) 
+	    {
+	    	if ((e.keyCode == 27)) 
+	    	{
+		        closePagePopup();
+	        }
+	    });
+    }
+
+    if (currentPopupStackIndex>1)
+    	$("#page-popup"+(currentPopupStackIndex-1)).hide();
+}
+
+function reloadPagePopupIframe(id)
+{
+	var iframe = document.getElementById(id);
+	if (iframe != null)
+	{
+		iframe.src = iframe.src;
+	}
+}
+
 function closePagePopup()
 {
 	if (currentPopupStackIndex==0)
