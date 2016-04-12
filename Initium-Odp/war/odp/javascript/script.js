@@ -1095,7 +1095,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 			}
 		}
 	
-	// Now generate the url
+	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "cmd?cmd="+commandName;
 	if (parametersStr.length>0)
 		url+="&"+parametersStr;
