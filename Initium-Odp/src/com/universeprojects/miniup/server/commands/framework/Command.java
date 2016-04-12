@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands.framework;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,6 +107,16 @@ public abstract class Command
 	 * The command's execution logic is done here. 
 	 */
 	public abstract void run(Map<String, String> parameters) throws UserErrorMessage;
+
+	
+	/**
+	 * Used to get all the callback data that was put into this command. 
+	 * @return
+	 */
+	public Map<String,Object> getCallbackDataMap() 
+	{
+		return callbackData;
+	}
 	
 	
 	
