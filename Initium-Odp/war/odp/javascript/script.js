@@ -1180,6 +1180,13 @@ function doCommand(eventObject, commandName, parameters, callback)
 	
 }
 
+function doSetLeader(eventObject, charId)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	doCommand(eventObject,"SetLeader",{"charId":charId});
+}
+
 
 
 
