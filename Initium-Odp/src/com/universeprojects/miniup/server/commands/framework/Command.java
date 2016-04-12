@@ -12,14 +12,13 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 
 public abstract class Command 
 {
-	enum JavascriptResponse
+	public enum JavascriptResponse
 	{
 		None,
 		FullPageRefresh,
 		ReloadPagePopup
 	}
 	private ODPDBAccess db;
-	private CachedDatastoreService ds;
 	protected HttpServletRequest request;
 	private HttpServletResponse response;
 	
@@ -29,7 +28,6 @@ public abstract class Command
 	
 	public Command(HttpServletRequest request, HttpServletResponse response)
 	{
-		this.ds = ds;
 		this.request = request;
 		this.response = response;
 		
@@ -39,6 +37,11 @@ public abstract class Command
 	protected ODPDBAccess getDB()
 	{
 		return db;
+	}
+	
+	protected CachedDatastoreService getDS()
+	{
+		return getDB().getDB();
 	}
 	
 	/**
