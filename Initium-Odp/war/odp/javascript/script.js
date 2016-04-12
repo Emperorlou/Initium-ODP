@@ -16,15 +16,6 @@ $(window).ready(function(e){
 		expandpopupMessage();
 	});
 
-	$("#btnNewCharacter").click(function (){
-		confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
-			if (charName==null)
-				charName = "";
-			promptPopup("New Character", "Ok, what will you call your new character?", charName, function(name){
-				window.location.href = "ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"";
-			});
-		});
-	});
 	
 	$(".boldBoxCollapsed > h4").click(function(){
 		$(this).parent().toggleClass("boldBoxCollapsed");
@@ -1039,9 +1030,21 @@ function viewProfile()
 	pagePopup("ajax_profile.jsp");
 }
 
+function deleteCharacter()
+{
+	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
+		if (charName==null)
+			charName = "";
+		promptPopup("New Character", "Ok, what will you call your new character?", charName, function(name){
+			window.location.href = "ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"";
+		});
+	});
+}
 
-
-
+function viewMap()
+{
+	popupMessage("SYSTEM", "This is where I would put my map <h1>IF I HAD ONE</h1>", false);
+}
 
 
 
@@ -1435,7 +1438,7 @@ $(document).keyup(function(event){
 		}
 		else if (event.which==77)
 		{
-			popupMessage("SYSTEM", "This is where I would put my map <h1>IF I HAD ONE</h1>", false);
+			viewMap();
 		}
 		else if (event.which==66)
 		{
