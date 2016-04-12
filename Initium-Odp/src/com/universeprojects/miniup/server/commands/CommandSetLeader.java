@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -54,9 +55,9 @@ public class CommandSetLeader extends Command {
 		// Verify that the caller is the current party leader
 		CachedEntity character = db.getCurrentCharacter(request);
 		String partyCode = (String)character.getProperty("partyCode");
-		if (partyCode==null || partyCode=="")
+		if (partyCode==null || "".equals(partyCode))
 			throw new UserErrorMessage("You are not currently in a party and thus cannot do this.");
-		if ((Boolean)character.getProperty("partyLeader")==false)
+		if (Boolean.FALSE.equals(character.getProperty("partyLeader")))
 			throw new UserErrorMessage("You are not currently the party leader and thus cannot do this.");
 		
 		// Quick sanity check that charId is not the current leader
@@ -64,13 +65,16 @@ public class CommandSetLeader extends Command {
 			throw new UserErrorMessage("You are already the leader of this party.");
 		
 		// Verify that charId is a member of the party
-		if (!partyCode.equals(member.getProperty("partyCode")))
+		if (partyCode.equals(member.getProperty("partyCode"))==false)
 			throw new UserErrorMessage("This character is not a member of your party and thus you cannot do this.");
 		
 		// Assign new leader status.
 		try {
 			character.setProperty("partyLeader", false);
 			member.setProperty("partyLeader", true);
+			CachedDatastoreService ds = getDS();
+			ds.put(character);
+			ds.put(member);
 		}
 		catch(Exception e){
 			throw new UserErrorMessage("Error while switching leader: "+e.getMessage());
