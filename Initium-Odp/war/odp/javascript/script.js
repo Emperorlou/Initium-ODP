@@ -1158,9 +1158,9 @@ function doCommand(eventObject, commandName, parameters, callback)
 		if (data.errorMessage!=null && data.errorMessage.length>0)
 			popupMessage("System Message", data.errorMessage);
 			
-		if (callback==null && data!=null)
+		if (callback!=null && data!=null)
 			callback(data.callbackData);
-		else if (callback==null && data==null)
+		else if (callback!=null && data==null)
 			callback();
 		
 		$(eventObject.target).text(originalText);
@@ -1182,6 +1182,11 @@ function doSetLeader(eventObject, charId)
 	doCommand(eventObject,"SetLeader",{"charId":charId});
 }
 
+function doSetLabel(eventObject, itemId, label)
+{
+	closeAllTooltips();
+	doCommand(eventObject,"SetLabel",{"itemId":itemId,"label":label});
+}
 
 
 
