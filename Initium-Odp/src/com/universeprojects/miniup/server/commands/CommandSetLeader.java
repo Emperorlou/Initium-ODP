@@ -45,7 +45,7 @@ public class CommandSetLeader extends Command {
 		Long charId;
 		try {
 			charId = Long.parseLong(parameters.get("charId"));
-		} catch (Exception e) {
+		} catch (NumberFormatException nfe) {
 			throw new RuntimeException("SetLeader invalid call format, 'charId' is not a valid id.");
 		}
 		CachedEntity member = db.getCharacterById(charId);
@@ -55,13 +55,14 @@ public class CommandSetLeader extends Command {
 		// Verify that the caller is the current party leader
 		CachedEntity character = db.getCurrentCharacter(request);
 		String partyCode = (String)character.getProperty("partyCode");
-		if (partyCode==null || "".equals(partyCode))
+		if (partyCode==null || partyCode.trim().equals(""))
 			throw new UserErrorMessage("You are not currently in a party and thus cannot do this.");
-		if (Boolean.FALSE.equals(character.getProperty("partyLeader")))
+		// partyLeader is stored as an enum of "TRUE","FALSE"
+		if ("TRUE".equals(character.getProperty("partyLeader"))==false)
 			throw new UserErrorMessage("You are not currently the party leader and thus cannot do this.");
 		
 		// Quick sanity check that charId is not the current leader
-		if (charId==character.getId())
+		if (charId.equals(character.getId()))
 			throw new UserErrorMessage("You are already the leader of this party.");
 		
 		// Verify that charId is a member of the party
@@ -70,8 +71,8 @@ public class CommandSetLeader extends Command {
 		
 		// Assign new leader status.
 		try {
-			character.setProperty("partyLeader", false);
-			member.setProperty("partyLeader", true);
+			character.setProperty("partyLeader", "FALSE");
+			member.setProperty("partyLeader", "TRUE");
 			CachedDatastoreService ds = getDS();
 			ds.put(character);
 			ds.put(member);
