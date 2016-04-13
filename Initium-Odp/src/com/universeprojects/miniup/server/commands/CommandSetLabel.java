@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
@@ -38,18 +38,13 @@ public class CommandSetLabel extends Command {
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
-		// Get the DB access object. We use this for most DB communication. It is a place for reusable methods that access the DB.
 		ODPDBAccess db = getDB();
 
-		// Check if we're logged in or not. We shouldn't be able to see this since commands cannot be used unless the user is logged in.
-		if (db.isLoggedIn(request)==false)
-			throw new UserErrorMessage("You are not currently logged in and canont do this.");
-		
 		// Verify itemId parameter sanity
 		Long itemId;
 		try {
 			itemId = Long.parseLong(parameters.get("itemId"));
-		} catch (NumberFormatException nfe) {
+		} catch (Exception e) {
 			throw new RuntimeException("SetLabel invalid call format, 'itemId' is not a valid id.");
 		}
 		CachedEntity item = db.getEntity("Item", itemId);
@@ -69,7 +64,7 @@ public class CommandSetLabel extends Command {
 		if (containerKey==null)
 			throw new UserErrorMessage("You can only relabel items in your immediate vicinity.");
 		CachedEntity character = db.getCurrentCharacter(request);
-		if (containerKey.equals(character.getKey())==false && containerKey.equals((Key)character.getProperty("locationKey"))==false)
+		if (GameUtils.equals(containerKey,character.getKey())==false && GameUtils.equals(containerKey,(Key)character.getProperty("locationKey"))==false)
 			throw new UserErrorMessage("You can only relabel items in your immediate vicinity.");
 		
 		// Assign new label.
@@ -78,7 +73,7 @@ public class CommandSetLabel extends Command {
 			if (label==null || label.trim().equals(""))
 				item.setProperty("label", null);
 			else
-				item.setProperty("label", WebUtils.htmlSafe(label.trim()));
+				item.setProperty("label", label.trim());
 			getDS().put(item);
 		}
 		catch(Exception e){

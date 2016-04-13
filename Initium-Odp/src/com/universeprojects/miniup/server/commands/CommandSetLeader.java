@@ -34,18 +34,13 @@ public class CommandSetLeader extends Command {
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
-		// Get the DB access object. We use this for most DB communication. It is a place for reusable methods that access the DB.
 		ODPDBAccess db = getDB();
 
-		// Check if we're logged in or not. We shouldn't be able to see this since commands cannot be used unless the user is logged in.
-		if (db.isLoggedIn(request)==false)
-			throw new UserErrorMessage("You are not currently logged in and thus cannot do this.");
-		
 		// Verify parameter sanity
 		Long charId;
 		try {
 			charId = Long.parseLong(parameters.get("charId"));
-		} catch (NumberFormatException nfe) {
+		} catch (Exception e) {
 			throw new RuntimeException("SetLeader invalid call format, 'charId' is not a valid id.");
 		}
 		CachedEntity member = db.getCharacterById(charId);
