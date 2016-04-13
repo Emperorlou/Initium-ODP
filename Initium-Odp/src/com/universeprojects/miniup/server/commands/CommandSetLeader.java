@@ -34,13 +34,8 @@ public class CommandSetLeader extends Command {
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
-		// Get the DB access object. We use this for most DB communication. It is a place for reusable methods that access the DB.
 		ODPDBAccess db = getDB();
 
-		// Check if we're logged in or not. We shouldn't be able to see this since commands cannot be used unless the user is logged in.
-		if (db.isLoggedIn(request)==false)
-			throw new UserErrorMessage("You are not currently logged in and thus cannot do this.");
-		
 		// Verify parameter sanity
 		Long charId;
 		try {
@@ -55,13 +50,14 @@ public class CommandSetLeader extends Command {
 		// Verify that the caller is the current party leader
 		CachedEntity character = db.getCurrentCharacter(request);
 		String partyCode = (String)character.getProperty("partyCode");
-		if (partyCode==null || "".equals(partyCode))
+		if (partyCode==null || partyCode.trim().equals(""))
 			throw new UserErrorMessage("You are not currently in a party and thus cannot do this.");
-		if (Boolean.FALSE.equals(character.getProperty("partyLeader")))
+		// partyLeader is stored as an enum of "TRUE","FALSE"
+		if ("TRUE".equals(character.getProperty("partyLeader"))==false)
 			throw new UserErrorMessage("You are not currently the party leader and thus cannot do this.");
 		
 		// Quick sanity check that charId is not the current leader
-		if (charId==character.getId())
+		if (charId.equals(character.getId()))
 			throw new UserErrorMessage("You are already the leader of this party.");
 		
 		// Verify that charId is a member of the party
@@ -70,8 +66,8 @@ public class CommandSetLeader extends Command {
 		
 		// Assign new leader status.
 		try {
-			character.setProperty("partyLeader", false);
-			member.setProperty("partyLeader", true);
+			character.setProperty("partyLeader", "FALSE");
+			member.setProperty("partyLeader", "TRUE");
 			CachedDatastoreService ds = getDS();
 			ds.put(character);
 			ds.put(member);
