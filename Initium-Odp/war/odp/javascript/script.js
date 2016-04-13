@@ -1084,11 +1084,7 @@ function deleteCharacter()
 	});
 }
 
-function viewMap()
-{
-	popupMessage("SYSTEM", "This is where I would put my map <h1>IF I HAD ONE</h1>", false);
-}
-
+ 	
 
 
 
