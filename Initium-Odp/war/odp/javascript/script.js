@@ -963,7 +963,7 @@ function pagePopupIframe(url)
 	
 	currentPopupStackIndex++;
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' class='page-popup'><iframe id='"+pagePopupId+"-iframe' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' class='page-popup'><iframe id='"+pagePopupId+"-iframe' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup(true)' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
 
     if (currentPopupStackIndex==1)
     {
@@ -1017,7 +1017,7 @@ function reloadPagePopup(quietly)
 
 	var url = content.attr("src");
 
-	if (quietly)
+	if (!quietly)
 		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
 
 	if (content.is("iframe"))
