@@ -15,26 +15,12 @@ function openMap()
 
 	exitFullscreenChat();
 	
-	currentPopupStackIndex++;
-	var pagePopupId = "page-popup"+currentPopupStackIndex;
+	var stackIndex = incrementStackIndex();
+	var pagePopupId = "page-popup"+stackIndex;
 	var mapId = pagePopupId+"-map";
 	
 	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div class='page-popup'><div id='"+mapId+"' class='page-popup-map'></div></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
 	createLocalMapViewer(mapId);
-
-    if (currentPopupStackIndex==1)
-    {
-	    $(document).bind("keydown",function(e) 
-	    {
-	    	if ((e.keyCode == 27)) 
-	    	{
-		        closePagePopup();
-	        }
-	    });
-    }
-    
-    if (currentPopupStackIndex>1)
-    	$("#page-popup"+(currentPopupStackIndex-1)).hide();
 }
 
 // Disposes of the viewer objecz

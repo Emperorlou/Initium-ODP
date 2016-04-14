@@ -914,23 +914,9 @@ function enterDefenceStructureSlot(slot)
 
 
 var currentPopupStackIndex = 0;
-
-function pagePopup(url)
+function incrementStackIndex()
 {
-	if (url.indexOf("?")>0)
-		url+="&ajax=true";
-	else
-		url+="?ajax=true";
-	
-	exitFullscreenChat();
-	
 	currentPopupStackIndex++;
-	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' src='"+url+"' class='page-popup'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
-	$("#"+pagePopupId+"-content").load(url);
-	
-	
     if (currentPopupStackIndex==1)
     {
 	    $(document).bind("keydown",function(e) 
@@ -943,7 +929,40 @@ function pagePopup(url)
     }
     
     if (currentPopupStackIndex>1)
+   	{
     	$("#page-popup"+(currentPopupStackIndex-1)).hide();
+   	}
+    return currentPopupStackIndex;
+}
+
+function decrementStackIndex()
+{
+	if (currentPopupStackIndex!=0)
+	{
+		currentPopupStackIndex--;
+		
+		if (currentPopupStackIndex>1)
+		{
+			$("#page-popup"+(currentPopupStackIndex-1)).show();
+		}
+	}
+    return currentPopupStackIndex;
+}
+
+function pagePopup(url)
+{
+	if (url.indexOf("?")>0)
+		url+="&ajax=true";
+	else
+		url+="?ajax=true";
+	
+	exitFullscreenChat();
+	
+	var stackIndex = incrementStackIndex();
+	var pagePopupId = "page-popup"+stackIndex;
+	
+	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' src='"+url+"' class='page-popup'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
+	$("#"+pagePopupId+"-content").load(url);
 }
 
 function pagePopupIframe(url)
@@ -956,30 +975,13 @@ function pagePopupIframe(url)
 	
 	exitFullscreenChat();
 	
-	currentPopupStackIndex++;
-	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' class='page-popup'><iframe id='"+pagePopupId+"-iframe' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup(true)' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
-
-    if (currentPopupStackIndex==1)
-    {
-	    $(document).bind("keydown",function(e) 
-	    {
-	    	if ((e.keyCode == 27)) 
-	    	{
-		        closePagePopup();
-	        }
-	    });
-    }
-
-    if (currentPopupStackIndex>1)
-    	$("#page-popup"+(currentPopupStackIndex-1)).hide();
+	var stackIndex = incrementStackIndex();
+	var pagePopupId = "page-popup"+stackIndex;
+	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' class='page-popup'><iframe id='"+pagePopupId+"-iframe' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
 }
 
 function closePagePopup()
 {
-	if (currentPopupStackIndex==0)
-		return;
-	
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
 	var map = $("#"+pagePopupId+"-map");
 	if (map!=null)
@@ -988,18 +990,16 @@ function closePagePopup()
 	}
 	$("#"+pagePopupId).remove();
 	
-    
-    if (currentPopupStackIndex>1)
-    	$("#page-popup"+(currentPopupStackIndex-1)).show();
-    
-    currentPopupStackIndex--;
+	decrementStackIndex();
 }
 
 function closeAllPagePopups()
 {
 	// Clear all popups before opening inventory
-	for(var i = 0; i<currentPopupStackIndex; i++)
+	while (currentPopupStackIndex>0)
+	{		
 		closePagePopup();
+	}
 }
 
 
@@ -1018,7 +1018,7 @@ function reloadPagePopup(quietly)
 
 	var url = content.attr("src");
 
-	if (!quietly)
+	if (quietly)
 		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
 
 	if (content.is("iframe"))
@@ -1052,8 +1052,7 @@ function loadInlineCollectables()
 function inventory()
 {
 	// Clear all popups before opening inventory
-	for(var i = 0; i<currentPopupStackIndex; i++)
-		closePagePopup();
+	closeAllPagePopups();
 	pagePopup("ajax_inventory.jsp");
 }
 
