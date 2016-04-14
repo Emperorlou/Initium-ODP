@@ -1023,7 +1023,7 @@ function reloadPagePopup(quietly)
 	else 
 	{
 		if (quietly)
-			$("#"+pagePopupId).html("<div id='"+pagePopupId+"-content' src='"+url+"' class='page-popup'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
+			$("#"+pagePopupId+"-content").html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
 		content.load(url);
 	}
 }
