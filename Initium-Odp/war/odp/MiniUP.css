@@ -1492,8 +1492,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 .page-popup-iframe
 {
 	margin-top: 32px;
-	width: 98%;
+	width: 98.5%;
 	height: 390px;
+	border: none;
 }
 
 .page-popup-X
