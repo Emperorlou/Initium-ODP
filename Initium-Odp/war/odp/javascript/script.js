@@ -465,7 +465,7 @@ function createCampsite()
 		if (name!=null && name!="")
 		{
 			window.location.href='ServletCharacterControl?type=createCampsite&name='+encodeURIComponent(name);
-			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it wont last long!");
+			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
 			localStorage.setItem("campsiteName", name);
 		}
 	});
@@ -514,6 +514,7 @@ function exitFullscreenChat()
 
 function loadLocationItems()
 {
+	closeAllPopups();
 	pagePopup("ajax_moveitems.jsp?preset=location");
 //	$("#main-itemlist").load("locationitemlist.jsp");
 //	$("#main-itemlist").click(function(){
@@ -523,6 +524,7 @@ function loadLocationItems()
 
 function loadLocationCharacters()
 {
+	closeAllPopups();
 	pagePopup("locationcharacterlist.jsp");
 //	$("#main-characterlist").click(function(){
 //		$("#main-characterlist").html("<div class='boldbox' onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby characters</h4></div>");
@@ -531,6 +533,7 @@ function loadLocationCharacters()
 
 function loadLocationMerchants()
 {
+	closeAllPopups();
 	pagePopup("locationmerchantlist.jsp");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
 //	$("#main-merchantlist").click(function(){
@@ -948,7 +951,8 @@ function pagePopup(url)
 
 function viewMap()
 {
-	pagePopupIframe('http://init-map.tumblr.com/');
+	closeAllPopups();
+	pagePopupIframe('https://init-map.tumblr.com/');
 }
 
 function pagePopupIframe(url)
@@ -964,7 +968,7 @@ function pagePopupIframe(url)
 	currentPopupStackIndex++;
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"'><iframe id='"+pagePopupId+"-content' src='"+url+"' class='page-popup' width='95%' height='90'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"'><iframe id='"+pagePopupId+"-content' src='"+url+"' class='page-popup' width='95%' height='390'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
 
     if (currentPopupStackIndex==1)
     {
@@ -999,7 +1003,6 @@ function closePagePopup()
 
 function closeAllPagePopups()
 {
-	// Clear all popups before opening inventory
 	for(var i = 0; i<currentPopupStackIndex; i++)
 		closePagePopup();
 }
@@ -1010,22 +1013,16 @@ function reloadPagePopup(quietly)
 	if (currentPopupStackIndex==0)
 		return;
 	
-	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	var content = $("#"+pagePopupId+"-content");
-	
+	var content = $("#page-popup"+currentPopupStackIndex+"-content");
 	var url = content.attr("src");
+	
+	if (quietly)
+		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
+	
 	if (content.is("iframe"))
-	{
-		if (quietly)
-			$("#"+pagePopupId).html("<iframe id='"+pagePopupId+"-content' src='"+url+"' class='page-popup' width='95%' height='90%'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
-		content.attr('src', url);
-	}
+		content.attr("src", url);
 	else 
-	{
-		if (quietly)
-			$("#"+pagePopupId+"-content").html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
 		content.load(url);
-	}
 }
 
 function moveItem(event, itemId, newContainerKind, newContainerId)
@@ -1048,9 +1045,7 @@ function loadInlineCollectables()
 
 function inventory()
 {
-	// Clear all popups before opening inventory
-	for(var i = 0; i<currentPopupStackIndex; i++)
-		closePagePopup();
+	closeAllPopups();
 	pagePopup("ajax_inventory.jsp");
 }
 
@@ -1082,11 +1077,6 @@ function deleteCharacter()
 			window.location.href = "ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"";
 		});
 	});
-}
-
-function viewMap()
-{
-	popupMessage("SYSTEM", "This is where I would put my map <h1>IF I HAD ONE</h1>", false);
 }
 
 
@@ -1207,6 +1197,7 @@ function doSetLabel(eventObject, itemId, label)
 
 function longOperation_fullPageRefresh(eventObject, operationName, operationDescription, operationBannerUrl, actionUrl, fullPageRefreshSeconds)
 {
+	window.disableShortcuts = true;
 	var originalText = $(eventObject.target).text();
 	$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
 	$.get(url)
@@ -1228,6 +1219,7 @@ function longOperation_fullPageRefresh(eventObject, operationName, operationDesc
 var lastLongOperationEventObject = null;
 function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 {
+	window.disableShortcuts = true;
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
 	$.get(actionUrl)
 	.done(function(data){
@@ -1236,7 +1228,13 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 			hideBannerLoadingIcon();
 			popupMessage("System Message", data.error, false);
 			if (data.refresh==true)
+				// It would probably be better to tie this to the Okay button, as currently the popup is kinda pointless here.
 				fullpageRefresh();
+			else
+			{
+				window.disableShortcuts = false;
+				lastLongOperationEventObject = null;
+			}
 			return;
 		}
 		if (data.refresh==true)
@@ -1254,6 +1252,8 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 				setTimeout(recallFunction, (data.timeLeft+1)*1000);
 				if (data.timeLeft>=5)
 					popupPremiumReminder();
+				lastLongOperationEventObject = null;
+				return;
 			}
 		}
 		else
@@ -1261,6 +1261,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 			if (data.description!=null)
 				$("#long-operation-complete-text").html(data.description);
 		}
+		window.disableShortcuts = false;
 		lastLongOperationEventObject = null;
 	})
 	.fail(function(xhr, textStatus, errorThrown){
@@ -1269,6 +1270,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 		else
 			popupMessage(errorThrown, "There was an error when trying to perform the action.");
 
+		window.disableShortcuts = false;
 		lastLongOperationEventObject = null;
 	});
 	
@@ -1481,23 +1483,28 @@ $(document).keyup(function(event){
 		var buttonToPress = $('[shortcut="'+event.which+'"]');
 		if (buttonToPress.length>0)
 		{
-			window.disableShortcuts = true;
+			if (buttonToPress[0].hasClass("main-button-half")==false)
+				window.disableShortcuts = true;
 			buttonToPress[0].click();
 		}
 		
-		if (event.which==80)
-		{
-			viewProfile();
-		}
-		else if (event.which==73)
+		else if (event.which==73) // I
 		{
 			inventory();
 		}
-		else if (event.which==77)
+		else if (event.which==77) // M
 		{
 			viewMap();
 		}
-		else if (event.which==66)
+		else if (event.which==79) // O
+		{
+			viewSettings();
+		}
+		else if (event.which==80) // P
+		{
+			viewProfile();
+		}
+		else if (event.which==76) // Changed to L since B is now for Nearby Characters list
 		{
 			window.disableShortcuts = true;
 			window.location.href='main.jsp';
