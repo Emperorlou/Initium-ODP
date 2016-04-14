@@ -963,8 +963,7 @@ function pagePopupIframe(url)
 	
 	currentPopupStackIndex++;
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"'><iframe id='"+pagePopupId+"-content' src='"+url+"' class='page-popup' width='95%' height='390'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' class='page-popup'><iframe id='"+pagePopupId+"-iframe' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
 
     if (currentPopupStackIndex==1)
     {
@@ -1009,21 +1008,24 @@ function reloadPagePopup(quietly)
 {
 	if (currentPopupStackIndex==0)
 		return;
-	
+
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
 	var content = $("#"+pagePopupId+"-content");
-	
+	var iframe = content.find("#"+pagePopupId+"-iframe");
+	if (iframe!=null)
+		content = iframe;
+
 	var url = content.attr("src");
+
+	if (quietly)
+		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
+
 	if (content.is("iframe"))
 	{
-		if (quietly)
-			$("#"+pagePopupId).html("<iframe id='"+pagePopupId+"-content' src='"+url+"' class='page-popup' width='95%' height='90%'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
 		content.attr('src', url);
 	}
 	else 
 	{
-		if (quietly)
-			$("#"+pagePopupId+"-content").html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
 		content.load(url);
 	}
 }
