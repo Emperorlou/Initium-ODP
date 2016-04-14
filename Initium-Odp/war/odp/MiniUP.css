@@ -1491,7 +1491,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .page-popup-iframe
 {
-	margin-top: 32px;
+	margin-top: 30px;
 	width: 98.5%;
 	height: 390px;
 	border: none;
@@ -1500,16 +1500,16 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 .page-popup-X
 {
 	position:absolute;
-	top:46px;
+	top:35px;
 	right:0px;
 	z-index:1100001;
-	font-size:48px;
+	font-size:50px;
 }
 
 .page-popup-Reload
 {
 	position:absolute;
-	top:32px;
+	top:30px;
 	left:0px;
 	z-index:1100001;
 	
