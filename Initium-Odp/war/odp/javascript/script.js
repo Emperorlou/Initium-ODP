@@ -1016,7 +1016,7 @@ function reloadPagePopup(quietly)
 	var content = $("#page-popup"+currentPopupStackIndex+"-content");
 	var url = content.attr("src");
 	
-	if (quietly)
+	if (quietly!=true)
 		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
 	
 	if (content.is("iframe"))
