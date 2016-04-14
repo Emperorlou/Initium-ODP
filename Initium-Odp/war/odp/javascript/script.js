@@ -983,8 +983,7 @@ function pagePopupIframe(url)
 function closePagePopup()
 {
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	var map = $("#"+pagePopupId+"-map");
-	if (map!=null)
+	if ($("#"+pagePopupId+"-map").length>0)
 	{
 		closeMap();
 	}
@@ -1010,7 +1009,8 @@ function reloadPagePopup(quietly)
 
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
 	var content = $("#"+pagePopupId+"-content");
-	if (content==null) return;
+	// We cannot reload the map, so we don't even try
+	if (content.find("#"+pagePopupId+"-map").length>0) return;
 
 	var iframe = content.find("#"+pagePopupId+"-iframe");
 	if (iframe!=null)
@@ -1018,7 +1018,7 @@ function reloadPagePopup(quietly)
 
 	var url = content.attr("src");
 
-	if (quietly)
+	if (quietly==false)
 		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
 
 	if (content.is("iframe"))
