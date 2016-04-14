@@ -233,7 +233,7 @@ function updateDayNightCycle(forceRefresh)
 		// Check if we have made significant changes to the banner lighting. If not, then just get out.
 		if (previousA!=null)
 		{
-			var diff = getDifference(previousA, a);
+			var diff = getDifference(previousA, amount);
 			if (diff<0.02)
 				return;
 			
