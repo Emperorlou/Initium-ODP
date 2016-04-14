@@ -1497,6 +1497,13 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	border: none;
 }
 
+.page-popup-map
+{
+    width: 98.5%;
+    height: 390px;
+    margin-top: 28px;
+}
+
 .page-popup-X
 {
 	position:absolute;

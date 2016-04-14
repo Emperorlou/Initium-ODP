@@ -946,11 +946,6 @@ function pagePopup(url)
     	$("#page-popup"+(currentPopupStackIndex-1)).hide();
 }
 
-function viewMap()
-{
-	pagePopupIframe('https://init-map.tumblr.com/');
-}
-
 function pagePopupIframe(url)
 {
 	
@@ -986,7 +981,11 @@ function closePagePopup()
 		return;
 	
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	
+	var map = $("#"+pagePopupId+"-map");
+	if (map!=null)
+	{
+		closeMap();
+	}
 	$("#"+pagePopupId).remove();
 	
     
@@ -1011,6 +1010,8 @@ function reloadPagePopup(quietly)
 
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
 	var content = $("#"+pagePopupId+"-content");
+	if (content==null) return;
+
 	var iframe = content.find("#"+pagePopupId+"-iframe");
 	if (iframe!=null)
 		content = iframe;
