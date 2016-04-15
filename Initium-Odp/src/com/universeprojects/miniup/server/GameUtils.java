@@ -816,15 +816,15 @@ public class GameUtils
     
     public static String renderItem(HttpServletRequest request, CachedEntity item, boolean popupEmbedded)
     {
-    	if (item==null)
-    		return "";
-    	
-    	String qualityClass = determineQuality(item.getProperties());
-    	String label = (String)item.getProperty("label"); 
-    	if (label==null || label.trim().equals(""))
-    		label = (String)item.getProperty("name");
-
-    	if (popupEmbedded)
+		if (item==null)
+			return "";
+		
+		String qualityClass = determineQuality(item.getProperties());
+		String label = (String)item.getProperty("label"); 
+		if (label==null || label.trim().equals(""))
+			label = (String)item.getProperty("name");
+		
+		if (popupEmbedded)
 			return "<a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a>";
 		else
 			return "<a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a>";
@@ -1083,7 +1083,7 @@ public class GameUtils
 			if (description!=null)
 			{
 				sb.append("<div class='buff-detail-description item-flavor-description'>");
-				sb.append(buff.getProperty("description"));
+				sb.append(description);
 				sb.append("</div>");
 			}
 			Date expiry = (Date)buff.getProperty("expiry");
