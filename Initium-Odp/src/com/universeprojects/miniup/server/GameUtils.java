@@ -820,12 +820,14 @@ public class GameUtils
     		return "";
     	
     	String qualityClass = determineQuality(item.getProperties());
-    	
-    	
+    	String label = (String)item.getProperty("label"); 
+    	if (label==null || label.trim().equals(""))
+    		label = (String)item.getProperty("name");
+
     	if (popupEmbedded)
-    		return "<a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+item.getProperty("name")+"</div></a>";
-    	else
-    		return "<a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+item.getProperty("name")+"</div></a>";
+			return "<a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a>";
+		else
+			return "<a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a>";
     }
 
     public static String renderCollectable(CachedEntity item)
@@ -1077,9 +1079,13 @@ public class GameUtils
 				}
 			}
 			sb.append("</div>");
-			sb.append("<div class='buff-detail-description item-flavor-description'>");
-			sb.append(""+buff.getProperty("description"));
-			sb.append("</div>");
+			String description = (String)buff.getProperty("description");
+			if (description!=null)
+			{
+				sb.append("<div class='buff-detail-description item-flavor-description'>");
+				sb.append(buff.getProperty("description"));
+				sb.append("</div>");
+			}
 			Date expiry = (Date)buff.getProperty("expiry");
 			if (expiry!=null)
 				sb.append("<div class='buff-detail-expiry'>Expires in "+getTimePassedShortString(expiry)+"</div>");
