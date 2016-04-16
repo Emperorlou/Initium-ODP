@@ -920,21 +920,16 @@ function enterDefenceStructureSlot(slot)
 
 
 var currentPopupStackIndex = 0;
+var popupKeydownHandler = function(e){if (e.keyCode == 27) closePagePopup();}
 function incrementStackIndex()
 {
 	currentPopupStackIndex++;
     if (currentPopupStackIndex==1)
     {
-	    $(document).bind("keydown",function(e) 
-	    {
-	    	if ((e.keyCode == 27)) 
-	    	{
-		        closePagePopup();
-	        }
-	    });
+		$("#page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
+	    $(document).bind("keydown", popupKeydownHandler);
     }
-    
-    if (currentPopupStackIndex>1)
+    else
    	{
     	$("#page-popup"+(currentPopupStackIndex-1)).hide();
    	}
@@ -943,16 +938,21 @@ function incrementStackIndex()
 
 function decrementStackIndex()
 {
-	if (currentPopupStackIndex!=0)
+	if (currentPopupStackIndex==0)
+		return 0;
+	
+	currentPopupStackIndex--;
+	if (currentPopupStackIndex==0)
 	{
-		currentPopupStackIndex--;
-		
-		if (currentPopupStackIndex>1)
-		{
-			$("#page-popup"+(currentPopupStackIndex-1)).show();
-		}
+		$("#page-popup-root").empty();
+		$(document).unbind("keydown", popupKeydownHandler);
 	}
-    return currentPopupStackIndex;
+	else
+	{
+		$("#page-popup"+currentPopupStackIndex).show();
+		$("#page-popup"+(currentPopupStackIndex+1)).remove();
+	}
+	return currentPopupStackIndex;
 }
 
 function pagePopup(url)
@@ -967,7 +967,7 @@ function pagePopup(url)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' src='"+url+"' class='page-popup'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 }
 
@@ -983,7 +983,7 @@ function pagePopupIframe(url)
 	
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
-	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div id='"+pagePopupId+"-content' class='page-popup'><iframe id='"+pagePopupId+"-iframe' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><iframe id='"+pagePopupId+"-content' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div>");
 }
 
 function closePagePopup()
@@ -993,7 +993,6 @@ function closePagePopup()
 	{
 		closeMap();
 	}
-	$("#"+pagePopupId).remove();
 	
 	decrementStackIndex();
 }
@@ -1013,14 +1012,12 @@ function reloadPagePopup(quietly)
 		return;
 
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
+
+	// Map can't be refreshed, but map popup will return empty content as well
 	var content = $("#"+pagePopupId+"-content");
-	// We cannot reload the map, so we don't even try
-	if (content.find("#"+pagePopupId+"-map").length>0) return;
-
-	var iframe = content.find("#"+pagePopupId+"-iframe");
-	if (iframe!=null)
-		content = iframe;
-
+	if (content.length==0)
+		return;
+	
 	var url = content.attr("src");
 
 	if (quietly==false)
@@ -1063,23 +1060,30 @@ function inventory()
 
 function viewChangelog()
 {
-	closeAllPopups();
+	closeAllPagePopups();
 	closeAllTooltips();
 	pagePopup("ajax_changelog.jsp");
 }
 
 function viewSettings()
 {
-	closeAllPopups();
+	closeAllPagePopups();
 	closeAllTooltips();
 	pagePopup("ajax_settings.jsp");
 }
 
 function viewProfile()
 {
-	closeAllPopups();
+	closeAllPagePopups();
 	closeAllTooltips();
 	pagePopup("ajax_profile.jsp");
+}
+
+function viewMap()
+{
+	closeAllPagePopups();
+	closeAllTooltips();
+	openMap();
 }
 
 function deleteCharacter()

@@ -1045,6 +1045,18 @@ public class ODPDBAccess
 	public void chatbanByIP(String characterName, String ip)
 	{
 		CachedDatastoreService db = getDB();
+		
+		// Ignore if char is Dev ("content-dev-nickname" needs to be set)
+		// Dev can still be banned by IP if on regular char
+		// See isChatbannedByIP for auto unban in that case
+		CachedEntity character = getCharacterByName(characterName);
+		if (character!=null)
+		{
+			String nameClass = (String)character.getProperty("nameClass");
+			if (nameClass!=null && nameClass.contains("content-dev-nickname"))
+				return;
+		}
+		
 		db.setStat("chatbanIP-" + ip, 1l, 3600 / 2);
 
 		db.setStat("chatban-" + characterName, 1l, 3600 / 2);
@@ -1061,8 +1073,24 @@ public class ODPDBAccess
 	public boolean isChatbannedByIP(CachedDatastoreService db, String characterName, String ip)
 	{
 		if (db == null) db = getDB();
+		
 		Long isChatbannedByIP = db.getStat("chatbanIP-" + ip);
-		if (isChatbannedByIP != null && 1l == isChatbannedByIP) return true;
+		if (isChatbannedByIP != null && 1l == isChatbannedByIP)
+		{
+			// Unban if char is Dev ("content-dev-nickname" needs to be set)
+			// This is possible if IP got banned by non Dev char
+			CachedEntity character = getCharacterByName(characterName);
+			if (character!=null)
+			{
+				String nameClass = (String)character.getProperty("nameClass");
+				if (nameClass!=null && nameClass.contains("content-dev-nickname"))
+				{
+					unchatban(characterName, ip);
+					return false;
+				}
+			}
+			return true;
+		}
 
 		return isChatbanned(db, characterName);
 	}
@@ -1431,8 +1459,9 @@ public class ODPDBAccess
 		Double str = (Double) character.getProperty("strength");
 
 		maxCarryWeight += (long) Math.round((str - 3d) * 50000d);
-
-		return maxCarryWeight;
+		
+		// Allow Buff maxCarryWeight
+		return getLongBuffableValue(character, "maxCarryWeight", maxCarryWeight);
 	}
 
 	public Long getItemCarryingWeight(CachedEntity character, List<CachedEntity> inventory)
@@ -1636,10 +1665,9 @@ public class ODPDBAccess
 		return false;
 	}
 
-	public Double getDoubleBuffableProperty(CachedEntity entity, String fieldName)
+	public Double getDoubleBuffableValue(CachedEntity entity, String fieldName, Double startValue)
 	{
-		Double field = (Double) entity.getProperty(fieldName);
-		if (field == null) return null;
+		if (startValue == null) return null;
 		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
 
 		for (String effect : buffEffects)
@@ -1650,43 +1678,52 @@ public class ODPDBAccess
 				effect = effect.substring(0, effect.length() - 1);
 				double val = new Double(effect);
 				val /= 100;
-				field *= (1 + val);
+				startValue *= (1 + val);
 			}
 			else
 			{
 				double val = new Double(effect);
-				field += val;
+				startValue += val;
 			}
 		}
 
-		return field;
+		return startValue;
+	}
+
+	public Double getDoubleBuffableProperty(CachedEntity entity, String fieldName)
+	{
+		return getDoubleBuffableValue(entity, fieldName, (Double)entity.getProperty(fieldName));
+	}
+
+	public Long getLongBuffableValue(CachedEntity entity, String fieldName, Long startValue)
+	{
+		if (startValue == null) return null;
+		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
+
+		for (String effect : buffEffects)
+		{
+			effect = effect.replace("+", "");
+			if (effect.endsWith("%"))
+			{
+
+				effect = effect.substring(0, effect.length() - 1);
+				double val = new Double(effect);
+				val /= 100;
+				startValue = Math.round(startValue.doubleValue() * val);
+			}
+			else
+			{
+				double val = new Double(effect);
+				startValue = Math.round(startValue.doubleValue() + val);
+			}
+		}
+
+		return startValue;
 	}
 
 	public Long getLongBuffableProperty(CachedEntity entity, String fieldName)
 	{
-		Long field = (Long) entity.getProperty("fieldName");
-		if (field == null) return null;
-		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
-
-		for (String effect : buffEffects)
-		{
-			effect = effect.replace("+", "");
-			if (effect.endsWith("%"))
-			{
-
-				effect = effect.substring(0, effect.length() - 1);
-				double val = new Double(effect);
-				val /= 100;
-				field = Math.round(field.doubleValue() * val);
-			}
-			else
-			{
-				double val = new Double(effect);
-				field = Math.round(field.doubleValue() + val);
-			}
-		}
-
-		return field;
+		return getLongBuffableValue(entity, fieldName, (Long)entity.getProperty(fieldName));
 	}
 
 	public List<String> getBuffEffectsFor(Key entityKey, String fieldName)
