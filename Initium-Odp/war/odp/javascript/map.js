@@ -26,7 +26,14 @@ function openMap()
 // Disposes of the viewer objecz
 function closeMap()
 {
-	viewer.destroy();
+	try
+	{
+		viewer.destroy();
+	}
+	catch(e)
+	{
+		
+	}
 }
 
 function createLocalMapViewer(id)
@@ -36,7 +43,7 @@ function createLocalMapViewer(id)
         prefixUrl: "https://s3.amazonaws.com/imappy/openseadragon/images/",
         springStiffness: 5,
         animationTime: 0.2,
-        tileSources: "javascript/images/map/map.xml"
+        tileSources: "odp/javascript/images/map/map.xml"
     });
 }
 
