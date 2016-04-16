@@ -1507,10 +1507,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 .page-popup-X
 {
 	position:absolute;
-	top:35px;
+	top:46px;
 	right:0px;
 	z-index:1100001;
-	font-size:50px;
+
+	font-family: Lucida Sans;
+	font-size:39px;
 }
 
 .page-popup-Reload
@@ -1519,7 +1521,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	top:30px;
 	left:0px;
 	z-index:1100001;
-	
+
+	font-family: Lucida Sans;
 	font-size:50px;
 }
 
