@@ -1067,12 +1067,14 @@ function viewChangelog()
 
 function viewSettings()
 {
+	closeAllPagePopups();
 	closeAllTooltips();
 	pagePopup("ajax_settings.jsp");
 }
 
 function viewProfile()
 {
+	closeAllPagePopups();
 	closeAllTooltips();
 	pagePopup("ajax_profile.jsp");
 }
