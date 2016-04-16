@@ -465,7 +465,7 @@ function createCampsite()
 		if (name!=null && name!="")
 		{
 			window.location.href='ServletCharacterControl?type=createCampsite&name='+encodeURIComponent(name);
-			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it wont last long!");
+			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
 			localStorage.setItem("campsiteName", name);
 		}
 	});
@@ -514,6 +514,8 @@ function exitFullscreenChat()
 
 function loadLocationItems()
 {
+	closeAllPagePopups();
+	closeAllTooltips();
 	pagePopup("ajax_moveitems.jsp?preset=location");
 //	$("#main-itemlist").load("locationitemlist.jsp");
 //	$("#main-itemlist").click(function(){
@@ -523,6 +525,8 @@ function loadLocationItems()
 
 function loadLocationCharacters()
 {
+	closeAllPagePopups();
+	closeAllTooltips();
 	pagePopup("locationcharacterlist.jsp");
 //	$("#main-characterlist").click(function(){
 //		$("#main-characterlist").html("<div class='boldbox' onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby characters</h4></div>");
@@ -531,6 +535,8 @@ function loadLocationCharacters()
 
 function loadLocationMerchants()
 {
+	closeAllPagePopups();
+	closeAllTooltips();
 	pagePopup("locationmerchantlist.jsp");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
 //	$("#main-merchantlist").click(function(){
@@ -983,8 +989,7 @@ function pagePopupIframe(url)
 function closePagePopup()
 {
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	var map = $("#"+pagePopupId+"-map");
-	if (map!=null)
+	if ($("#"+pagePopupId+"-map").length>0)
 	{
 		closeMap();
 	}
@@ -995,7 +1000,6 @@ function closePagePopup()
 
 function closeAllPagePopups()
 {
-	// Clear all popups before opening inventory
 	while (currentPopupStackIndex>0)
 	{		
 		closePagePopup();
@@ -1010,7 +1014,8 @@ function reloadPagePopup(quietly)
 
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
 	var content = $("#"+pagePopupId+"-content");
-	if (content==null) return;
+	// We cannot reload the map, so we don't even try
+	if (content.find("#"+pagePopupId+"-map").length>0) return;
 
 	var iframe = content.find("#"+pagePopupId+"-iframe");
 	if (iframe!=null)
@@ -1018,7 +1023,7 @@ function reloadPagePopup(quietly)
 
 	var url = content.attr("src");
 
-	if (quietly)
+	if (quietly==false)
 		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
 
 	if (content.is("iframe"))
@@ -1051,20 +1056,22 @@ function loadInlineCollectables()
 
 function inventory()
 {
-	// Clear all popups before opening inventory
 	closeAllPagePopups();
+	closeAllTooltips();
 	pagePopup("ajax_inventory.jsp");
 }
 
 function viewChangelog()
 {
 	closeAllPopups();
+	closeAllTooltips();
 	pagePopup("ajax_changelog.jsp");
 }
 
 function viewSettings()
 {
 	closeAllPopups();
+	closeAllTooltips();
 	pagePopup("ajax_settings.jsp");
 }
 
@@ -1472,34 +1479,31 @@ function fullpageRefresh()
 // Shortcut key bindings
 
 
-window.disableShortcuts = false;
 $(document).keyup(function(event){
-	if (window.disableShortcuts==false)
+	var buttonToPress = $('[shortcut="'+event.which+'"]');
+	if (buttonToPress.length>0)
 	{
-		var buttonToPress = $('[shortcut="'+event.which+'"]');
-		if (buttonToPress.length>0)
-		{
-			window.disableShortcuts = true;
-			buttonToPress[0].click();
-		}
-		
-		if (event.which==80)
-		{
-			viewProfile();
-		}
-		else if (event.which==73)
-		{
-			inventory();
-		}
-		else if (event.which==77)
-		{
-			viewMap();
-		}
-		else if (event.which==66)
-		{
-			window.disableShortcuts = true;
-			window.location.href='main.jsp';
-		}
+		buttonToPress[0].click();
+	}
+	else if (event.which==73) // I
+	{
+		inventory();
+	}
+	else if (event.which==77) // M
+	{
+		viewMap();
+	}
+	else if (event.which==79) // O
+	{
+		viewSettings();
+	}
+	else if (event.which==80) // P
+	{
+		viewProfile();
+	}
+	else if (event.which==76) // Changed to L since B is now for Nearby Characters list
+	{
+		window.location.href='main.jsp';
 	}
 });
 
