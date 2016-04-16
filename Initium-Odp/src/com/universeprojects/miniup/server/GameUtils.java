@@ -821,7 +821,7 @@ public class GameUtils
 		
 		String qualityClass = determineQuality(item.getProperties());
 		String label = (String)item.getProperty("label"); 
-		if (label==null || label.trim().equals(""))
+		if (label==null || label.trim().equals("") || (label=WebUtils.htmlSafe(label).trim()).equals(""))
 			label = (String)item.getProperty("name");
 		
 		if (popupEmbedded)
