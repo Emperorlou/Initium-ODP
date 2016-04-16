@@ -1198,7 +1198,10 @@ function doSetLeader(eventObject, charId)
 function doSetLabel(eventObject, itemId, label)
 {
 	closeAllTooltips();
-	doCommand(eventObject,"SetLabel",{"itemId":itemId,"label":label});
+	if (typeof label == "undefined")
+		doCommand(eventObject,"SetLabel",{"itemId":itemId});
+	else
+		doCommand(eventObject,"SetLabel",{"itemId":itemId,"label":label});
 }
 
 
