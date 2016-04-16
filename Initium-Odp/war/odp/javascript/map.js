@@ -3,12 +3,6 @@
 
 var viewer;
 
-// Present here for legacy purposes
-function viewMap()
-{
-	openMap();
-}
-
 function openMap()
 {
 	if (viewer!=null) viewer.destroy();
@@ -19,7 +13,7 @@ function openMap()
 	var pagePopupId = "page-popup"+stackIndex;
 	var mapId = pagePopupId+"-map";
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"'><div class='page-popup'><div id='"+mapId+"' class='page-popup-map'></div></div><div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+mapId+"' class='page-popup-map'></div></div>");
 	createLocalMapViewer(mapId);
 }
 
