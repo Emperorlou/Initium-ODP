@@ -289,7 +289,7 @@ public class GameUtils
 
     public static String getTimePassedShortString(Date startDate)
     {
-    	return getTimePassedShortString(DateToCalendar(startDate));
+        return getTimePassedShortString(Convert.DateToCalendar(startDate));
     }
     
     public static String getTimePassedShortString(GregorianCalendar startDate)
@@ -388,8 +388,6 @@ public class GameUtils
      */
     public static long elapsed(Calendar g1, Calendar g2, int type)
     {
-        long elapsed = 0;
-
         long milis1 = g1.getTimeInMillis();
         long milis2 = g2.getTimeInMillis();
 
@@ -399,36 +397,20 @@ public class GameUtils
             diff *= -1;
         }
 
-        if (type == Calendar.SECOND)
+        switch (type)
         {
-            return diff / 1000;
-        } else
-        {
-            if (type == Calendar.MINUTE)
-            {
-                return diff / 60000;
-            } else
-            {
-                if (type == Calendar.HOUR)
-                {
-                    return diff / 3600000;
-                } else
-                {
-                    if (type == Calendar.DATE)
-                    {
-                        return diff / 86400000;
-                    } else
-                    {
-                        if (type == Calendar.YEAR)
-                        {
-                            return diff / 31536000000l;
-                        } else
-                        {
-                            throw new RuntimeException("Utils.elapsed() was given a Calendar type that it does not support. (Type = " + type + ")");
-                        }
-                    }
-                }
-            }
+			case(Calendar.SECOND):
+			    return diff / 1000;
+			case (Calendar.MINUTE):
+			    return diff / 60000;
+			case (Calendar.HOUR):
+			    return diff / 3600000;
+			case (Calendar.DATE):
+			    return diff / 86400000;
+			case (Calendar.YEAR):
+			    return diff / 31536000000l;
+			default:
+				throw new RuntimeException("Utils.elapsed() was given a Calendar type that it does not support. (Type = " + type + ")");
         }
     }
 
@@ -466,15 +448,7 @@ public class GameUtils
         return elapsed(g1, g2, type);
     }
     
-    public static GregorianCalendar DateToCalendar(Date date)
-    {
-        if (date==null) return null;
-        
-        GregorianCalendar result = new GregorianCalendar();
-        result.setTime(date);
-        return result;
-    }
-    
+
     //TODO: Redo this whole thing. Needs to be simpler now that we don't need custom junk and it should be more precise.
     public static long determineQualityScore(Map<String, Object> entityProperties)
     {
