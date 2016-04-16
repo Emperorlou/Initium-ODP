@@ -289,7 +289,7 @@ public class GameUtils
 
     public static String getTimePassedShortString(Date startDate)
     {
-    	return getTimePassedShortString(DateToCalendar(startDate));
+        return getTimePassedShortString(Convert.DateToCalendar(startDate));
     }
     
     public static String getTimePassedShortString(GregorianCalendar startDate)
@@ -466,15 +466,7 @@ public class GameUtils
         return elapsed(g1, g2, type);
     }
     
-    public static GregorianCalendar DateToCalendar(Date date)
-    {
-        if (date==null) return null;
-        
-        GregorianCalendar result = new GregorianCalendar();
-        result.setTime(date);
-        return result;
-    }
-    
+
     //TODO: Redo this whole thing. Needs to be simpler now that we don't need custom junk and it should be more precise.
     public static long determineQualityScore(Map<String, Object> entityProperties)
     {
