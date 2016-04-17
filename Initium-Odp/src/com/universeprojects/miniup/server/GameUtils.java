@@ -1486,7 +1486,7 @@ public class GameUtils
 	{
 		if (damageFormula==null || damageFormula.trim().equals("")) return 0d;
 		if (critMultiplier==null) critMultiplier = 1d;
-		if (critChance==null) critChance = 1d;
+		if (critChance==null) critChance = 0d;
 		
 		String[] dmgParts = damageFormula.toString().substring(2).toLowerCase().split("d");
 		double firstPart = Double.parseDouble(dmgParts[0]);
@@ -1523,15 +1523,12 @@ public class GameUtils
 	{
 		if (damageFormula==null || damageFormula.trim().equals("")) return 0d;
 		if (critMultiplier==null) critMultiplier = 1d;
-		if (critChance==null) critChance = 1d;
+		if (critChance==null) critChance = 0d;
 		String[] dmgParts = damageFormula.toString().substring(2).toLowerCase().split("d");
 		double firstPart = Double.parseDouble(dmgParts[0]);
 		double secondPart = Double.parseDouble(dmgParts[1]);
 		
-		double weaponMaxDamage = firstPart*secondPart*critMultiplier*critChance;
-
-		
-		return (weaponMaxDamage-firstPart)/2+firstPart;
+		return firstPart*((secondPart-1d)/2d+secondPart)*(1d+critChance*(critMultiplier-1d));
 	}
 	
 	
