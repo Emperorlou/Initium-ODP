@@ -926,7 +926,7 @@ function incrementStackIndex()
 	currentPopupStackIndex++;
     if (currentPopupStackIndex==1)
     {
-		$("#page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()' style='font-family:Lucida Sans'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
+		$("#page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
 	    $(document).bind("keydown", popupKeydownHandler);
     }
     else
