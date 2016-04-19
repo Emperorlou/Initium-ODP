@@ -23,7 +23,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  * 
  * Parameters:
  * 		itemId - itemID of the chest to be relabelled 
- * 		label - the new label
+ * 		label - the new label, max 30 char
  * 
  * @author NJ
  *
@@ -50,6 +50,11 @@ public class CommandSetLabel extends Command {
 		CachedEntity item = db.getEntity("Item", itemId);
 		if (item==null)
 			throw new RuntimeException("SetLabel invalid call format, 'itemId' is not a valid id.");
+		
+		// Verify label parameter sanity
+		String label = parameters.get("label");
+		if (label!=null && label.length()>30)
+			throw new UserErrorMessage("Labels are limited to a maximum of 30 characters.");
 
 		// Verify that the item is an actual storage item
 		Long maxSpace = (Long)item.getProperty("maxSpace");
@@ -69,11 +74,10 @@ public class CommandSetLabel extends Command {
 		
 		// Assign new label.
 		try {
-			String label = parameters.get("label");
 			if (label==null || label.trim().equals(""))
 				item.setProperty("label", null);
 			else
-				item.setProperty("label", label.trim());
+				item.setProperty("label", label.replace("'", "`").trim());
 			getDS().put(item);
 		}
 		catch(Exception e){

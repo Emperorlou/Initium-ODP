@@ -20,9 +20,9 @@ import com.universeprojects.miniup.server.commands.framework.Command.JavascriptR
  * Does one of the following:
  *  - If has Buff Blessing of the Ebon Raven: Nothing
  *  - If not equipped Raven Guards: Nothing
- *  - If not full HP: Set Buff 1h with no modifiers, heals HP
+ *  - If not full HP: Set Buff 30m with no modifiers, heals HP
  *  - If dogecoins < 1000: Set Buff 1h with no modifiers, dogecoins +1000
- *  - If has Buff Well Rested+Buff Pumped: Set Buff 30m with all stats +1
+ *  - If has Buff Well Rested+Buff Pumped: Set Buff 20m with all stats +1
  *  - Set Buff 30m with random stat +1
  * 
  * Usage notes:
@@ -87,7 +87,7 @@ public class CommandRavenPayRespects extends Command {
 		Double maxHp = (Double)character.getProperty("maxHitpoints");
 		if (curHp!=null && maxHp!=null && curHp>0 && curHp<maxHp)
 		{
-			ds.put(db.awardBuff(ds, character.getKey(), "/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you restored.", 3600, null, null, null, null, null, null, 1));
+			ds.put(db.awardBuff(ds, character.getKey(), "/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you restored.", 1800, null, null, null, null, null, null, 1));
 			character.setProperty("hitpoints", maxHp);
 			ds.put(character);
 			return;
@@ -118,7 +118,7 @@ public class CommandRavenPayRespects extends Command {
 			}
 			if (trigger1 && trigger2)
 			{
-				ds.put(db.awardBuff(ds, character.getKey(), "/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you enchanted.", 1800, "strength", "+1", "dexterity", "+1", "intelligence", "+1", 1));
+				ds.put(db.awardBuff(ds, character.getKey(), "/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you enchanted.", 1200, "strength", "+1", "dexterity", "+1", "intelligence", "+1", 1));
 				return;
 			}
 		}
