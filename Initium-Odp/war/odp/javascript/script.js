@@ -515,6 +515,7 @@ function exitFullscreenChat()
 function loadLocationItems()
 {
 	closeAllPagePopups();
+	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("ajax_moveitems.jsp?preset=location");
 //	$("#main-itemlist").load("locationitemlist.jsp");
@@ -526,6 +527,7 @@ function loadLocationItems()
 function loadLocationCharacters()
 {
 	closeAllPagePopups();
+	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("locationcharacterlist.jsp");
 //	$("#main-characterlist").click(function(){
@@ -536,6 +538,7 @@ function loadLocationCharacters()
 function loadLocationMerchants()
 {
 	closeAllPagePopups();
+	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("locationmerchantlist.jsp");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
@@ -1054,6 +1057,7 @@ function loadInlineCollectables()
 function inventory()
 {
 	closeAllPagePopups();
+	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("ajax_inventory.jsp");
 }
@@ -1061,6 +1065,7 @@ function inventory()
 function viewChangelog()
 {
 	closeAllPagePopups();
+	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("ajax_changelog.jsp");
 }
@@ -1068,6 +1073,7 @@ function viewChangelog()
 function viewSettings()
 {
 	closeAllPagePopups();
+	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("ajax_settings.jsp");
 }
@@ -1075,6 +1081,7 @@ function viewSettings()
 function viewProfile()
 {
 	closeAllPagePopups();
+	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("ajax_profile.jsp");
 }
@@ -1082,6 +1089,7 @@ function viewProfile()
 function viewMap()
 {
 	closeAllPagePopups();
+	closeAllPopups();
 	closeAllTooltips();
 	openMap();
 }
@@ -1195,13 +1203,13 @@ function doSetLeader(eventObject, charId)
 	doCommand(eventObject,"SetLeader",{"charId":charId});
 }
 
-function doSetLabel(eventObject, itemId, label)
+function doSetLabel(eventObject, itemId)
 {
+	closeAllPopups();
 	closeAllTooltips();
-	if (typeof label == "undefined")
-		doCommand(eventObject,"SetLabel",{"itemId":itemId});
-	else
+	promptPopup("Relabel storage item", "Enter the new label for your item.<br>(Or leave blank to reset to the original name.)", null, function(label){
 		doCommand(eventObject,"SetLabel",{"itemId":itemId,"label":label});
+	});
 }
 
 
