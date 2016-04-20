@@ -173,7 +173,7 @@ public class GameUtils
 		return false;
 	}
 	
-	/**
+    /**
 	 * A value of 1 indicates night, a value of 0 indicates day.
 	 * @return
 	 */
@@ -1400,6 +1400,19 @@ public class GameUtils
 		
 		return false;
 	}
+
+    public static boolean isStorageItem(CachedEntity item)
+    {
+		if (item==null)
+			return false;
+		Long maxSpace = (Long)item.getProperty("maxSpace");
+		if (maxSpace==null || maxSpace<=0)
+			return false;
+		Long maxWeight = (Long)item.getProperty("maxWeight");
+		if (maxWeight==null || maxWeight<=0)
+			return false;
+		return true;
+    }
 
 	
 	public static boolean enumEquals(Object value, Enum e)
