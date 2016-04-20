@@ -57,11 +57,7 @@ public class CommandSetLabel extends Command {
 			throw new UserErrorMessage("Labels are limited to a maximum of 30 characters.");
 
 		// Verify that the item is an actual storage item
-		Long maxSpace = (Long)item.getProperty("maxSpace");
-		if (maxSpace==null || maxSpace<=0)
-			throw new UserErrorMessage("This is not a storage item and thus you cannot relabel it.");
-		Long maxWeight = (Long)item.getProperty("maxWeight");
-		if (maxWeight==null || maxWeight<=0)
+		if (GameUtils.isStorageItem(item)==false)
 			throw new UserErrorMessage("This is not a storage item and thus you cannot relabel it.");
 
 		// Verify that the item is either in the caller's inventory, or at the same location.
