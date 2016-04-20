@@ -45,7 +45,7 @@ function popupPermanentOverlay(title, content, popupClassOverride)
 {
 	if (popupClassOverride==null)
 		popupClassOverride = "popup";
-	closepopupMessage(null, "killAll");
+	closeAllPopups();
     window.popupsNum++;
     window.popupsOpen++;
     window.popupsArray[popupsNum-1] = "yes";
@@ -89,10 +89,13 @@ function currentPopup() {
     popupLastID = popupLast.attr("id");
     popupLastIDNum = popupLastID.split("_");
     return popupLastIDNum[1];
-    }
+}
 function closeAllPopups()
 {
-	closepopupMessage(null, "killAll");
+    $(".popupWrapperBackground").remove();
+    $("#popups").hide();
+    window.popupsOpen = 0;
+    window.documentBindEnter = false;
 }
 
 function closeAllTooltips()
@@ -100,24 +103,16 @@ function closeAllTooltips()
 	$(".cluetip").hide();
 }
 
-function closepopupMessage(popupID, all) {
-    if (all == "killAll") {
-        $(".popupWrapperBackground").remove();
-        $("#popups").hide();
-        window.popupsOpen = 0;
-        window.documentBindEnter = false;
-        }
-    else if (popupID >= 1) {
-        $("#popupWrapperBackground_" + popupID).remove();
-        	window.popupsOpen = window.popupsOpen-1;
-            window.popupsArray[popupID-1] = "no";
-            window.documentBindEnter = false;
-            if (window.popupsOpen<=0) {
-        		$("#popups").hide();
-                }
-            else enterPopupClose();
-        }
-    }
+function closepopupMessage(popupID) {
+    $("#popupWrapperBackground_" + popupID).remove();
+	window.popupsOpen = window.popupsOpen-1;
+    window.popupsArray[popupID-1] = "no";
+    window.documentBindEnter = false;
+    if (window.popupsOpen<=0)
+		$("#popups").hide();
+    else
+    	enterPopupClose();
+}
 function expandpopupMessage() 
 {
 	var win = $(window);
@@ -1094,13 +1089,13 @@ function viewMap()
 	openMap();
 }
 
-function deleteCharacter()
+function deleteCharacter(currentCharName, verifyCode)
 {
 	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
-		if (charName==null)
-			charName = "";
-		promptPopup("New Character", "Ok, what will you call your new character?", charName, function(name){
-			window.location.href = "ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"";
+		if (currentCharName==null)
+			currentCharName = "";
+		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
+			window.location.href = "ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+verifyCode;
 		});
 	});
 }
@@ -1629,7 +1624,7 @@ function confirmPopup(title, content, yesFunction, noFunction)
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
 		popupClassOverride = "popup";
-	closepopupMessage(null, "killAll");
+	closeAllPopups();
     window.popupsNum++;
     window.popupsOpen++;
     window.popupsArray[popupsNum-1] = "yes";
@@ -1703,7 +1698,7 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
 		popupClassOverride = "popup";
-	closepopupMessage(null, "killAll");
+	closeAllPopups();
     window.popupsNum++;
     window.popupsOpen++;
     window.popupsArray[popupsNum-1] = "yes";
