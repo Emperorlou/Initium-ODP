@@ -13,12 +13,18 @@ import javax.script.SimpleBindings;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.commands.jsaccessors.CommandAccessor;
+import com.universeprojects.miniup.server.commands.jsaccessors.DBAccessor;
 
 /**
  * Makes it possible to execute script associated with an item.
@@ -45,8 +51,10 @@ public class CommandExecuteScript extends Command {
 		CachedEntity sourceEntity = db.getEntity(sourceEntityKind, sourceEntityId);
 
 		Long scriptId = tryParseId(parameters, "scriptId");
+		String scriptName = parameters.get("scriptName");
 		CachedEntity scriptEntity = db.getEntity("script", scriptId);
 
+		//// SECURITY CHECKS
 		// Is this source of the right kind?
 		Set<String> allowedKinds = new HashSet<String> (Arrays.asList("item", "character"));
 		if (allowedKinds.contains(sourceEntity.getKind())==false)
@@ -106,24 +114,29 @@ public class CommandExecuteScript extends Command {
 			throw new UserErrorMessage("But nothing happened.", false);
 		}
 
-		// Executes the item script
-		ScriptEngineManager manager = new ScriptEngineManager();
-		ScriptEngine engine = manager.getEngineByName("JavaScript");
-
-		// Add variables to the script execution scope
-		// Note: Java objects will be wrapped into JS objects automatically
-		Bindings vars = new SimpleBindings();
-		vars.put("request", request);
-
-		// Run the script
-		try {
-			engine.eval(script, vars);
-		} catch (ScriptException e) {
-			throw new RuntimeException("ExecuteItemScript invalid JavaScript syntax:\n -> " + e.toString());
-		}
-
-		// It is possible to get variables out of the ScriptEngine, e.g.:
-		// <type> var = vars.get("variable_name");
-		// Note that you can access script-defined variables this way
+		//// SCRIPT EXECUTION
+	    Context ctx = Context.enter();
+	    try
+	    {
+	    	// This sandboxes the engine by preventing access to non-standard objects and some reflexion objects
+	    	// This is the simplest way to prevent access to top-level packages
+	    	Scriptable scope = ctx.initSafeStandardObjects();
+	    	
+	    	// Put accessor classes and other variables into scope
+	    	scope.put("request", scope, Context.toObject(request, scope));
+	    	scope.put("accessor", scope, Context.toObject(new DBAccessor(db, request), scope));
+	    	scope.put("commandAccessor", scope, Context.toObject(new CommandAccessor(this.request, this.response), scope));
+	    	
+	    	// Evaluate the 
+	    	ctx.evaluateString(scope, script, "scriptName", 0, null);
+	    }
+	    catch (Exception e)
+	    {
+	    	throw new RuntimeException("ExecuteItemScript: JavaScript engine exception\n -> " + e.toString());
+	    }
+	    finally
+	    {
+	        Context.exit();
+	    }
 	}
 }

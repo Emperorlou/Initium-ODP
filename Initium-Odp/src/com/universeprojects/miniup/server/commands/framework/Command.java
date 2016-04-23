@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.commands.framework;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,18 +17,13 @@ public abstract class Command
 		FullPageRefresh,
 		ReloadPagePopup
 	}
-	private ODPDBAccess db;
+	private final ODPDBAccess db;
 	protected HttpServletRequest request;
-	private HttpServletResponse response;
+	protected HttpServletResponse response;
 	
 	private String popupMessage;
 	private JavascriptResponse jsResponse = JavascriptResponse.None;
 	private Map<String, Object> callbackData = new HashMap<String, Object>();
-	
-	public Command()
-	{
-		this.db = new ODPDBAccess();
-	}
 	
 	public Command(HttpServletRequest request, HttpServletResponse response)
 	{
