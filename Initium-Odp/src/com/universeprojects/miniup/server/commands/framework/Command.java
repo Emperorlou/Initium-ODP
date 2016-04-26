@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.commands.framework;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,9 +17,9 @@ public abstract class Command
 		FullPageRefresh,
 		ReloadPagePopup
 	}
-	private ODPDBAccess db;
+	private final ODPDBAccess db;
 	protected HttpServletRequest request;
-	private HttpServletResponse response;
+	protected HttpServletResponse response;
 	
 	private String popupMessage;
 	private JavascriptResponse jsResponse = JavascriptResponse.None;
@@ -60,6 +59,22 @@ public abstract class Command
 		return popupMessage;
 	}
 	
+	/**
+	 * Tries to fetch fieldName from param list and throws if it cannot.
+	 * 
+	 * @param params
+	 * @param fieldName
+	 * @return Long id, parsed from param string
+	 */
+	protected Long tryParseId(Map<String,String> params, String fieldName)
+	{
+		try {
+			return Long.parseLong(params.get(fieldName));
+		} catch (Exception _) {
+			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid id.");
+		}
+	}
+
 	/**
 	 * When the command finishes, the javascript on the client side will have an opportunity 
 	 * to do something. There are a sent number of choices for this as represented in the
