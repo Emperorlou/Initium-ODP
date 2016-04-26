@@ -1,6 +1,8 @@
 package com.universeprojects.miniup.server;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,6 +27,7 @@ public class GameUtils
 {
 	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,###.##");
 	final static DecimalFormat noDigitFormat = new DecimalFormat("#,###");
+	final static DateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yyyy HH:mm:ss");
 	final static Random rnd = new Random();
 
 	public GameUtils() 
@@ -1545,5 +1548,14 @@ public class GameUtils
 	public static void setPopupError(HttpServletRequest request, String error)
 	{
 		request.setAttribute("error", error);
+	}
+	
+	
+	public static String formatDate_Long(Date joinDate)
+	{
+		if (joinDate==null)
+			return "";
+		
+		return longDateFormat.format(joinDate);
 	}
 }

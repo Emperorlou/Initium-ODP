@@ -203,7 +203,6 @@ hr:after {
 	height:20px;
 	text-align:left;
 	vertical-align: middle;
-	white-space:nowrap;
 	position:absolute;
 }
 .header-stats
@@ -451,6 +450,21 @@ p a, li a
 	color:#EBC354;
 	font-style:italic;
 	font-size:15px;
+}
+
+.backgroundcliptext .item-custom
+{
+    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+    color: transparent;
+    background-color: #FF0000;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+}
+
+.no-backgroundcliptext .item-custom
+{
+    text-shadow: 0px 0px 4px rgba(255, 0, 0, 0.7);
+    color: #FF0000;
 }
 
 
@@ -1604,20 +1618,21 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 /* ---------------------------------------------------------- */
  
 @media (max-width:480px)
+{
+	.main-splitScreen
 	{
-		.main-splitScreen
-		{
-			width:100%;
-			padding:0px;
-		}
-		.donatebox
-		{
-			max-width:50%;
-		}
+		width:100%;
+		padding:0px;
+	}
+	.donatebox
+	{
+		max-width:50%;
+	}
+		
 }
 @media (max-width:775px)
-	{
-		body
+{
+	body
 		{
 			margin:0px;
 		}
@@ -1858,6 +1873,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 			padding-right: 0px;
 			
 		}
-		
+
+	.header-location
+	{
+		font-size:11px;
+		width: 35%;
+	}
+
 	}
 	
