@@ -1996,5 +1996,32 @@ public class ODPDBAccess
 
 		ds.put(item);
 	}
+	
+	/**
+	 * This is for stuff that allows access to a given container (location, item, or character). Returns false if access should not be allowed.
+	 * @param character
+	 * @param container
+	 * @return
+	 */
+	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container)
+	{
+		// If the container is ourselves, it's ok
+		if (container.getKind().equals("Character") && GameUtils.equals(character.getKey(), container.getKey()))
+			return true;
+		
+		// If the container is our location, it's ok
+		if (container.getKind().equals("Location") && GameUtils.equals(character.getProperty("locationKey"), container.getKey()))
+			return true;
+		
+		// If the container is an item in our inventory, it's ok
+		if (container.getKind().equals("Item") && GameUtils.equals(character.getKey(), container.getProperty("containerKey")))
+			return true;
+		
+		// If the container is an item in our location, it's ok
+		if (container.getKind().equals("Item") && GameUtils.equals(character.getProperty("locationKey"), container.getProperty("containerKey")))
+			return true;
+		
+		return false;
+	}
 
 }
