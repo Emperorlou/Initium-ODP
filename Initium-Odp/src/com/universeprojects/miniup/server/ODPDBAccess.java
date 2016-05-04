@@ -1538,6 +1538,50 @@ public class ODPDBAccess
 		return buff;
 	}
 
+	public CachedEntity awardBuff(CachedDatastoreService ds, Key parentKey, CachedEntity buffDef)
+	{
+		if (buffDef==null)
+			return null;
+		
+		String name = (String)buffDef.getProperty("name");
+		List<CachedEntity> buffsAlreadyOn = getBuffsFor(parentKey);
+		int existingCount = 0;
+		for (CachedEntity b : buffsAlreadyOn)
+			if (name.equals(b.getProperty("name")))
+				existingCount++;
+		Long maxCount = (Long)buffDef.getProperty("maxCount"); 
+		if (maxCount!=null & existingCount >= maxCount)
+			return null;
+		
+		CachedEntity buff = new CachedEntity("Buff");
+		
+		// Should probably use the Schema to do this, but works for now.
+		buff.setProperty("_definitionKey", buffDef.getKey());
+		buff.setProperty("buffType", buffDef.getProperty("buffType"));
+		buff.setProperty("description", buffDef.getProperty("description"));
+		Long expiry = (Long)buffDef.getProperty("expiry");
+		if (expiry!=null)
+		{
+			Calendar cal = new GregorianCalendar();
+			cal.add(Calendar.SECOND, expiry.intValue());
+			buff.setProperty("expiry", cal.getTime());
+		}
+		buff.setProperty("field1Effect", buffDef.getProperty("field1Effect"));
+		buff.setProperty("field1Name", buffDef.getProperty("field1Name"));
+		buff.setProperty("field2Effect", buffDef.getProperty("field2Effect"));
+		buff.setProperty("field2Name", buffDef.getProperty("field2Name"));
+		buff.setProperty("field3Effect", buffDef.getProperty("field3Effect"));
+		buff.setProperty("field3Name", buffDef.getProperty("field3Name"));
+		buff.setProperty("icon", buffDef.getProperty("icon"));
+		buff.setProperty("internalName", buffDef.getProperty("internalName"));
+		buff.setProperty("name", name);
+		buff.setProperty("parentKey", parentKey);
+		buff.setProperty("trigger", buffDef.getProperty("trigger"));
+		
+		addBuffToBuffsCache(parentKey, buff);
+		return buff;
+	}
+
 	private void addBuffToBuffsCache(Key parentKey, CachedEntity buff)
 	{
 		List<CachedEntity> buffs = buffsCache.get(parentKey);
@@ -1551,28 +1595,41 @@ public class ODPDBAccess
 		buffs.add(buff);
 	}
 
-	public void awardBuff_Pumped(CachedDatastoreService ds, CachedEntity attackingCharacter)
+	public CachedEntity getBuffDefByName(CachedDatastoreService ds, String name)
+	{
+		if (ds == null)
+			ds = getDB();
+		return ds.fetchSingleEntity(new Query("BuffDef").setFilter(new FilterPredicate("name", FilterOperator.EQUAL, name)));
+	}
+	
+	public CachedEntity getBuffDefByInternalName(CachedDatastoreService ds, String internalName)
+	{
+		if (ds == null)
+			ds = getDB();
+		return ds.fetchSingleEntity(new Query("BuffDef").setFilter(new FilterPredicate("internalName", FilterOperator.EQUAL, internalName)));
+	}
+	
+	public void awardBuff_Drunk(CachedDatastoreService ds, CachedEntity character)
 	{
 		if (ds == null) ds = getDB();
-
-		CachedEntity buff = awardBuff(ds, attackingCharacter.getKey(), "images/small/Pixel_Art-Icons-Buffs-S_Buff14.png", "Pumped!",
-				"You're pumped! This buff is awarded when you kill a monster while still being full health. The effect lasts for 1 minute.", 60, "strength", "+10%", "dexterity", "+10%",
-				"intelligence", "+5%", 3);
-
+		CachedEntity buff = awardBuff(ds, character.getKey(), getBuffDefByName(ds, "Drunk"));
 		if (buff != null) ds.put(buff);
 	}
-
+	
+	public void awardBuff_Pumped(CachedDatastoreService ds, CachedEntity character)
+	{
+		if (ds == null) ds = getDB();
+		CachedEntity buff = awardBuff(ds, character.getKey(), getBuffDefByName(ds, "Pumped!"));
+		if (buff != null) ds.put(buff);
+	}
+	
 	public void awardBuff_WellRested(CachedDatastoreService ds, CachedEntity character)
 	{
 		if (ds == null) ds = getDB();
-
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Armor-Icons-Moon1.png", "Well Rested",
-				"You are well rested. This happens when you rest in a nice location (like at a house). The effect lasts for 15 minutes.", 900, "strength", "+10%", "movementSpeed", "+40%", null, null,
-				1);
-
+		CachedEntity buff = awardBuff(ds, character.getKey(), getBuffDefByName(ds, "Well Rested"));
 		if (buff != null) ds.put(buff);
 	}
-
+	
 	public List<CachedEntity> sortSaleItemList(List<CachedEntity> items)
 	{
 		List<CachedEntity> sorted = new ArrayList<CachedEntity>(items);
@@ -1665,34 +1722,71 @@ public class ODPDBAccess
 		return false;
 	}
 
+	/**
+	 * requires valid effect format
+	 */
+	public String getDDBuffEffect(String effect, String startValue)
+	{
+		if (startValue == null) return null;
+		if (startValue.matches("[dD][dD][0-9]+[dD][0-9]+")==false)
+			return null;
+		String[] startValues = startValue.substring(2).split("[dD]");
+		String[] effects = effect.substring(1).split("[dD]");
+		if (effect.startsWith("+"))
+			return "DD"+(Integer.parseInt(startValues[0])+Integer.parseInt(effects[0]))+"D"+(Integer.parseInt(startValues[1])+Integer.parseInt(effects[1]));
+		else
+			return "DD"+(Integer.parseInt(startValues[0])-Integer.parseInt(effects[0]))+"D"+(Integer.parseInt(startValues[1])-Integer.parseInt(effects[1]));
+	}
+	
+	/**
+	 * requires valid effect format
+	 */
+	public Double getDoubleBuffEffect(String effect, Double startValue)
+	{
+		if (startValue == null) return null;
+		effect = effect.replace("+", "");
+		if (effect.endsWith("%"))
+		{
+			effect = effect.substring(0, effect.length() - 1);
+			double val = new Double(effect);
+			return startValue * (1d + val/100);
+		}
+		else
+		{
+			double val = new Double(effect);
+			return startValue + val;
+		}
+	}
+
+	/**
+	 * requires valid effect format
+	 */
+	public Long getLongBuffEffect(String effect, Long startValue)
+	{
+		if (startValue == null) return null;
+		effect = effect.replace("+", "");
+		if (effect.endsWith("%"))
+		{
+			effect = effect.substring(0, effect.length() - 1);
+			double val = new Double(effect);
+			return Math.round(startValue.doubleValue() * (1d + val/100));
+		}
+		else
+		{
+			double val = new Double(effect);
+			return Math.round(startValue.doubleValue() + val);
+		}
+	}
+	
 	public Double getDoubleBuffableValue(CachedEntity entity, String fieldName, Double startValue)
 	{
 		if (startValue == null) return null;
 		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
 
 		for (String effect : buffEffects)
-		{
-			effect = effect.replace("+", "");
-			if (effect.endsWith("%"))
-			{
-				effect = effect.substring(0, effect.length() - 1);
-				double val = new Double(effect);
-				val /= 100;
-				startValue *= (1 + val);
-			}
-			else
-			{
-				double val = new Double(effect);
-				startValue += val;
-			}
-		}
+			startValue = getDoubleBuffEffect(effect, startValue);
 
 		return startValue;
-	}
-
-	public Double getDoubleBuffableProperty(CachedEntity entity, String fieldName)
-	{
-		return getDoubleBuffableValue(entity, fieldName, (Double)entity.getProperty(fieldName));
 	}
 
 	public Long getLongBuffableValue(CachedEntity entity, String fieldName, Long startValue)
@@ -1701,24 +1795,14 @@ public class ODPDBAccess
 		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
 
 		for (String effect : buffEffects)
-		{
-			effect = effect.replace("+", "");
-			if (effect.endsWith("%"))
-			{
-
-				effect = effect.substring(0, effect.length() - 1);
-				double val = new Double(effect);
-				val /= 100;
-				startValue = Math.round(startValue.doubleValue() * val);
-			}
-			else
-			{
-				double val = new Double(effect);
-				startValue = Math.round(startValue.doubleValue() + val);
-			}
-		}
+			startValue = getLongBuffEffect(effect, startValue);
 
 		return startValue;
+	}
+
+	public Double getDoubleBuffableProperty(CachedEntity entity, String fieldName)
+	{
+		return getDoubleBuffableValue(entity, fieldName, (Double)entity.getProperty(fieldName));
 	}
 
 	public Long getLongBuffableProperty(CachedEntity entity, String fieldName)
