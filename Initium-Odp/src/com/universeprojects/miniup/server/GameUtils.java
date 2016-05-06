@@ -19,6 +19,7 @@ import org.cheffo.jeplite.JEP;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.ShardedCounterService;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
@@ -852,8 +853,18 @@ public class GameUtils
     		return "<span class='"+nameClass+"'>"+name+"</span>";
     }
     
-    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, boolean isSelf, boolean leftSide)
+    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide)
     {
+    	return renderCharacterWidget(request, db, character, selfUser, leftSide, true);
+    }
+    
+    
+    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide, boolean showBuffs)
+    {
+    	boolean isSelf = false;
+    	if (selfUser!=null)
+    		isSelf = true;
+    	
 		CachedEntity equipmentHelmet = db.getEntity((Key)character.getProperty("equipmentHelmet"));
 		String equipmentHelmetUrl = null;
 		if (equipmentHelmet!=null) 
@@ -980,7 +991,23 @@ public class GameUtils
 		
 		if (isSelf)
 		{
+			ShardedCounterService cs = ShardedCounterService.getInstance(db.getDB());
+			Long referralViews = cs.readCounter(selfUser.getKey(), "referralViews");
+			Long referralSignups = cs.readCounter(selfUser.getKey(), "referralSignups");
+			Long referralDonations = cs.readCounter(selfUser.getKey(), "referralDonations");
+			if (referralViews==null) referralViews = 0L;
+			if (referralSignups==null) referralSignups = 0L;
+			if (referralDonations==null) referralDonations = 0L;
+			
 			sb.append("<div class='hiddenTooltip' id='profile'>");
+			sb.append("<h5 style='margin-top:0px;'>Your Referrals</h5>");
+			sb.append("<p><a href='"+determineReferralUrl(selfUser)+"' title='Share this link online and with your friends'>Your referral link (share this!)</a></p>");
+			sb.append("<div style='margin-left:10px'>");
+			sb.append("<p>Referral views: "+referralViews+"<br>");
+			sb.append("Referral signups: "+referralSignups+"<br>");
+			sb.append("Referral donations: $"+GameUtils.formatNumber(referralDonations.doubleValue()/100d, true)+"</p>");
+			sb.append("</div>");
+			sb.append("<br>");
 			sb.append("<h5 style='margin-top:0px;'>"+character.getProperty("name")+"'s Options</h5>");
 			sb.append("<p><a onclick='viewProfile()'>View "+character.getProperty("name")+"'s profile</a></p>");
 			sb.append("<p><a onclick='popupCharacterTransferService("+character.getKey().getId()+", \""+character.getProperty("name")+"\", \""+request.getAttribute("characterToTransfer")+"\")' style='cursor:pointer'>Open the Character Transfer Service</a></p>");
@@ -1001,6 +1028,9 @@ public class GameUtils
 			{
 				sb.append("<p>To enable multiple character support, <a href='profile.jsp'>upgrade to premium!</a></p>");
 			}
+			
+			
+			
 			sb.append("</div>");
 		}
 
@@ -1011,23 +1041,25 @@ public class GameUtils
 
 		
 		// Show the buffs
-		List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
-		if (buffs!=null && buffs.isEmpty()==false)
+		if (showBuffs)
 		{
-			sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
-			for(CachedEntity buff:buffs)
+			List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
+			if (buffs!=null && buffs.isEmpty()==false)
 			{
-				sb.append("<img src='"+buff.getProperty("icon")+"' border='0'>");
+				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
+				for(CachedEntity buff:buffs)
+				{
+					sb.append("<img src='"+buff.getProperty("icon")+"' border='0'>");
+				}
+				sb.append("</div>");
+				
+				sb.append("<div class='hiddenTooltip' id='buffDetails'>");
+				sb.append("<h4 style='margin-top:0px;'>Your buffs/debuffs</h4>");
+				sb.append(renderBuffsList(buffs));
+				sb.append("</div>");
+				
 			}
-			sb.append("</div>");
-			
-			sb.append("<div class='hiddenTooltip' id='buffDetails'>");
-			sb.append("<h4 style='margin-top:0px;'>Your buffs/debuffs</h4>");
-			sb.append(renderBuffsList(buffs));
-			sb.append("</div>");
-			
-		}
-		
+		}		
 		sb.append("</div>");							
 		
 		
@@ -1557,5 +1589,20 @@ public class GameUtils
 			return "";
 		
 		return longDateFormat.format(joinDate);
+	}
+	
+	
+	public static String determineReferralUrl(CachedEntity user)
+	{
+		if (user==null)
+			return null;
+		
+		String email = (String)user.getProperty("email");
+		
+		if (email!=null)
+		{
+			return "https://www.playinitium.com/login.jsp?game="+WebUtils.StringToEncryptedForUrl(email);
+		}
+		return null;
 	}
 }

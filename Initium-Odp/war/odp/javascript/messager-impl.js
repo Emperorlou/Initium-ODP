@@ -63,7 +63,7 @@ messager.onChatMessage = function(chatMessage)
 	}
 	else if (chatMessage.mode==null)
 	{
-		var meMode = chatMessage.message.startsWith("/me ");
+		var meMode = chatMessage.message.toLowerCase().startsWith("/me ");
 		html+="<span class='chatMessage-text'>";
 		if (chatMessage.characterId!=null && meMode==false)
 			html+=chatMessage.nicknameStyled;

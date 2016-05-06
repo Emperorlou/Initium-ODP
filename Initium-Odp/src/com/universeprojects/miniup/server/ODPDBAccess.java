@@ -437,6 +437,11 @@ public class ODPDBAccess
 		return getDB().fetchAsList(kind, f, 1000).size();
 	}
 
+	public List<CachedEntity> getFilteredList(String kind)
+	{
+		return getDB().fetchAsList(kind, null, 1000);
+	}
+
 	public List<CachedEntity> getFilteredList(String kind, String fieldName, Object equalToValue)
 	{
 		FilterPredicate f1 = new FilterPredicate(fieldName, FilterOperator.EQUAL, equalToValue);
@@ -1562,6 +1567,17 @@ public class ODPDBAccess
 		if (buff != null) ds.put(buff);
 	}
 
+	public void awardBuff_Drunk(CachedDatastoreService ds, CachedEntity character)
+	{
+		if (ds == null) ds = getDB();
+
+		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png", "Drunk",
+				"You're drunk! This effect is awarded when you drink at the Inn in Aera. The effect lasts for 20 minutes.", 1200, "strength", "+5%", "dexterity", "-10%",
+				"intelligence", "-10%", 6);
+
+		if (buff != null) ds.put(buff);
+	}
+
 	public void awardBuff_WellRested(CachedDatastoreService ds, CachedEntity character)
 	{
 		if (ds == null) ds = getDB();
@@ -2024,4 +2040,40 @@ public class ODPDBAccess
 		return false;
 	}
 
+	
+	public void doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		List<CachedEntity> buffs = getBuffsFor(character.getKey());
+		
+		// Look at the existing buffs to see if we're already maxed out on drinking
+		int drunkCount = 0;
+		for(CachedEntity buff:buffs)
+			if ("Drunk".equals(buff.getProperty("name")))
+				drunkCount++;
+		
+		if (drunkCount>=6)
+			throw new UserErrorMessage("The bar tender thinks you've had enough to drink.");
+		
+		awardBuff_Drunk(ds, character);
+		
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
