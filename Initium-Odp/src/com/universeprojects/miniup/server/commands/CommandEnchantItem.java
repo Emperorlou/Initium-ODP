@@ -55,18 +55,18 @@ public class CommandEnchantItem extends Command {
 		if (item==null)
 			throw new RuntimeException("EnchantItem invalid call format, 'itemId' is not a valid id.");
 		
+		// Check that caller status is set to Normal (or blank)
+		CachedEntity character = db.getCurrentCharacter(request);
+		String mode = (String)character.getProperty("mode");
+		if (mode!=null && mode.equals("NORMAL")==false)
+			throw new UserErrorMessage("You're too busy to enchant anything at the moment.");
+		
 		// Verify that the item is in the caller's inventory.
 		Key containerKey = (Key)item.getProperty("containerKey");
 		if (containerKey==null)
 			throw new UserErrorMessage("You can only enchant items you carry.");
-		CachedEntity character = db.getCurrentCharacter(request);
 		if (GameUtils.equals(containerKey,character.getKey())==false)
 			throw new UserErrorMessage("You can only enchant items you carry.");
-		
-		// Check that caller status is set to Normal (or blank)
-		String mode = (String)item.getProperty("mode");
-		if (mode!=null && mode.equals("NORMAL")==false)
-			throw new UserErrorMessage("You're too busy to enchant anything at the moment.");
 		
 		// Check if any enchantment buff exists for this item and type
 		String name = (String)item.getProperty("internalName");
