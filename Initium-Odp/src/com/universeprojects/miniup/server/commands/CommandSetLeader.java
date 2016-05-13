@@ -56,11 +56,6 @@ public class CommandSetLeader extends Command {
 		if ("TRUE".equals(character.getProperty("partyLeader"))==false)
 			throw new UserErrorMessage("You are not currently the party leader and thus cannot do this.");
 		
-		// Check that caller status is set to Normal (or blank)
-		String mode = (String)character.getProperty("mode");
-		if (mode!=null && mode.equals("NORMAL")==false)
-			throw new UserErrorMessage("You're too busy to swich leaders at the moment.");
-		
 		// Quick sanity check that charId is not the current leader
 		if (charId.equals(character.getId()))
 			throw new UserErrorMessage("You are already the leader of this party.");
