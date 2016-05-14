@@ -1,8 +1,5 @@
 package com.universeprojects.miniup.server.commands;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -72,72 +68,26 @@ public class CommandAttack extends Command {
 		if (GameUtils.isPlayerIncapacitated(character))
 			throw new UserErrorMessage("You're incapacitated at the moment.");
 		
+		// DB sanity check
+		GameUtils.normalizeDatabaseState_Character(ds, monster, location);
+		
 		// Check if monster is alive
-		Double hitpoints = (Double)monster.getProperty("hitpoints");
-		mode = (String)monster.getProperty("mode");
-		if (hitpoints==null || hitpoints<=0 || "DEAD".equals(mode))
-		{
-			// DB sanity check. Mode should be DEAD
-			if ("DEAD".equals(mode)==false)
-			{
-				monster.setProperty("mode", "DEAD");
-				monster.setProperty("combatType", null);
-				monster.setProperty("combatant", null);
-				String name = (String)monster.getProperty("name");
-				if (name.startsWith("Dead ")==false)
-					monster.setProperty("name", "Dead "+name);
-				ds.put(monster);
-				if ("TRUE".equals(location.getProperty("instanceModeEnabled")) && location.getProperty("instanceRespawnDate")==null)
-				{
-					Date instanceRespawnDate = (Date)location.getProperty("instanceRespawnDate");
-					Long instanceRespawnDelay = (Long)location.getProperty("instanceRespawnDelay");
-					if (instanceRespawnDate==null && instanceRespawnDelay!=null)
-					{
-						GregorianCalendar cal = new GregorianCalendar();
-						cal.add(Calendar.MINUTE, instanceRespawnDelay.intValue());
-						location.setProperty("instanceRespawnDate", cal.getTime());
-						ds.put(location);
-					}
-				}
-			}
+		if (GameUtils.isPlayerIncapacitated(monster))
 			throw new UserErrorMessage("This monster is already dead!");
-		}
 		
 		// All future checks are instance only, so exit if not in one
 		// instanceModeEnabled doesn't catch the hybrid setup, so test manually 
 		Key defenceStructure = (Key)location.getProperty("defenceStructure");
-		if ("Instance".equals(location.getProperty("combatType"))==false && (defenceStructure==null || defenceStructure.equals("")))
+		if (defenceStructure==null && "Instance".equals(location.getProperty("combatType"))==false)
 			return;
 
-		// Instance only: Check if monster is in combat, note that DEAD mode was checked beforehand
-		if (mode!=null && mode.equals("NORMAL")==false)
-		{
-			// DB sanity check. Monster mode should only be null, DEAD, NORMAL or COMBAT
-			if (mode.equals("COMBAT"))
-			{
-				// DB sanity check. Combatant should be alive and in combat with monster (location can legit be different)
-				CachedEntity combatant = null;
-				Key combatantKey = (Key)monster.getProperty("combatant");
-				if (combatantKey!=null && combatantKey.equals("")==false)
-				{
-					try {
-						combatant = ds.get(combatantKey);
-					} catch (EntityNotFoundException e) {
-						// Ignore
-					}
-				}
-				if (combatant!=null && GameUtils.isPlayerIncapacitated(combatant)==false && "COMBAT".equals(combatant.getProperty("mode")) && GameUtils.equals(monster.getKey(), combatant.getProperty("combatant")))
-					throw new UserErrorMessage("This monster is already in combat.");
-			}
-			monster.setProperty("mode", "NORMAL");
-			monster.setProperty("combatType", null);
-			monster.setProperty("combatant", null);
-			ds.put(monster);
-		}
+		// Instance only: Check if monster is in combat
+		if ("COMBAT".equals(monster.getProperty("mode")))
+			throw new UserErrorMessage("This monster is already in combat.");
 		
 		// Instance only: Check for party
 		String partyCode = (String)character.getProperty("partyCode");
-		if (partyCode!=null && partyCode.equals("")==false)
+		if (partyCode!=null && partyCode.trim().equals("")==false)
 			throw new UserErrorMessage("You're not able to party up here.");
 	}
 	
