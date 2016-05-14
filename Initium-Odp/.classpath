@@ -5,6 +5,6 @@
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CachedDatastore"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-codec-1.6.jar"/>
-	<classpathentry kind="lib" path="libs/rhino1.7.6/rhinojs.jar" sourcepath="libs/rhino1.7.6/src"/>
+	<classpathentry exported="true" kind="lib" path="libs/rhino1.7.6/rhinojs.jar" sourcepath="libs/rhino1.7.6/src"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
