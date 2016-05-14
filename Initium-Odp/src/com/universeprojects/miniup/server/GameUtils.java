@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.cheffo.jeplite.JEP;
 
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
@@ -1138,20 +1139,91 @@ public class GameUtils
     	return GameUtils.getTimePassedShortString(leaveTime);
     }
     
-    public static boolean isPlayerIncapacitated(CachedEntity character)
-    {
-    	if (character==null) throw new IllegalArgumentException("Character cannot be null.");
-    	
-    	if ("Zombie".equals(character.getProperty("status")))
-    			return true;
-    	
-    	if ((Double)character.getProperty("hitpoints")<=0)
-    		return true;
-    	
-    	return false;
-    }
-    
-    
+	public static boolean isPlayerIncapacitated(CachedEntity character)
+	{
+		if (character==null) throw new IllegalArgumentException("Character cannot be null.");
+		
+		// Only players are incapacitated as Zombie
+		if ("NPC".equals(character.getProperty("type"))==false)
+			if ("Zombie".equals(character.getProperty("status")))
+				return true;
+		
+		// Dead chars dropped in rest area still get hp set to 1, so check mode first
+		if ("DEAD".equals(character.getProperty("mode")))
+			return true;
+			
+		if ((Double)character.getProperty("hitpoints")<=0)
+			return true;
+		
+		return false;
+	}
+	
+	public static boolean normalizeDatabaseState_Character(CachedDatastoreService ds, CachedEntity character, CachedEntity location)
+	{
+		if (ds==null || character==null) return false;
+		if (location==null) location = ds.getIfExists((Key)character.getProperty("locationKey"));
+		
+		boolean changed = false;
+		boolean npc = "NPC".equals(character.getProperty("type"));
+		String mode = (String)character.getProperty("mode");
+		
+		// Check modes: Monster mode should only be null, NORMAL, DEAD or COMBAT
+		if (npc && mode!=null && isContainedInList("NORMAL,DEAD,COMBAT", mode)==false)
+		{
+			character.setProperty("mode", "NORMAL");
+			character.setProperty("combatType", null);
+			character.setProperty("combatant", null);
+			ds.put(character);
+			changed = true;
+		}
+		
+		// Check DEAD mode
+		if ((Double)character.getProperty("hitpoints")<=0 && "DEAD".equals(mode)==false && (npc || "UNCONSCIOUS".equals(mode)==false))
+		{
+			character.setProperty("mode", "DEAD");
+			character.setProperty("combatType", null);
+			character.setProperty("combatant", null);
+			String name = (String)character.getProperty("name");
+			if (name.startsWith("Dead ")==false)
+				character.setProperty("name", "Dead "+name);
+			ds.put(character);
+			changed = true;
+			if (npc && "TRUE".equals(location.getProperty("instanceModeEnabled")) && location.getProperty("instanceRespawnDate")==null)
+			{
+				Date instanceRespawnDate = (Date)location.getProperty("instanceRespawnDate");
+				Long instanceRespawnDelay = (Long)location.getProperty("instanceRespawnDelay");
+				if (instanceRespawnDate==null && instanceRespawnDelay!=null)
+				{
+					GregorianCalendar cal = new GregorianCalendar();
+					cal.add(Calendar.MINUTE, instanceRespawnDelay.intValue());
+					location.setProperty("instanceRespawnDate", cal.getTime());
+					ds.put(location);
+				}
+			}
+		}
+		
+		// Instance only: Check COMBAT mode
+		// instanceModeEnabled doesn't catch the hybrid setup, so test manually
+		Key defenceStructure = (Key)location.getProperty("defenceStructure");
+		if (defenceStructure!=null || "Instance".equals(location.getProperty("combatType")))
+		{
+			if ("COMBAT".equals(mode))
+			{
+				// Combatant should be alive and in combat with character (location can legit be different)
+				CachedEntity combatant = ds.getIfExists((Key)character.getProperty("combatant"));
+				if (combatant==null || isPlayerIncapacitated(combatant) || "COMBAT".equals(combatant.getProperty("mode"))==false || equals(character.getKey(), combatant.getProperty("combatant"))==false)
+				{
+					character.setProperty("mode", "NORMAL");
+					character.setProperty("combatType", null);
+					character.setProperty("combatant", null);
+					ds.put(character);
+					changed = true;
+				}
+			}
+		}
+		return changed;
+	}
+	
     public static double getAverageFromCurveFormula(String formula)
     {
     	if (formula.startsWith("DD"))
