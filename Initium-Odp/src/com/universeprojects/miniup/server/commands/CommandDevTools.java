@@ -220,7 +220,7 @@ public class CommandDevTools extends Command {
 			// walk the locations and reset them
 			for (CachedEntity loc : locList)
 			{
-				Filter filter = new FilterPredicate("locationKey", FilterOperator.EQUAL, location.getKey());
+				Filter filter = new FilterPredicate("locationKey", FilterOperator.EQUAL, loc.getKey());
 				List<CachedEntity> charList = ds.fetchAsList("Character", filter, 10000);
 				for (CachedEntity c : charList)
 				{
@@ -253,7 +253,7 @@ public class CommandDevTools extends Command {
 					}
 				}
 				// And finally trigger the respawn.
-				location.setProperty("instanceRespawnDate", new Date());
+				loc.setProperty("instanceRespawnDate", new Date());
 				ds.put(location);
 			}
 			
