@@ -596,6 +596,7 @@ function helpPopup()
 			"<li>/changelog - This displays the latest changes to the game. <a onclick='viewChangelog()'>View change log.</a></li>" +
 			"<li>/me - This allows you to say something in 3rd person</li>" +
 			"<li>/map - This shows a link to the community-created map which <a href='https://docs.google.com/drawings/d/1ZGBwTTrY5ATlJOWrPnwH2qWkee7kgdRTnTDPVHYZ3Ak/edit?usp=sharing'>you can also find here.</a>" +
+			"<li>/customize - This allows you to share a link to the iten customization page. <a onclick='customizeItemOrderPage()'>You can calso find it here</a>" +
 			"<li>/merchant - This allows you to share the link to your store with everyone in the location. Make sure to turn your store on first though! <a href='managestore.jsp'>You can do that here</a>" +
 			"<li>/quickstart - A quick start guide for new players who want to play efficiently as quick as possible! <a href='quickstart.jsp'>Open quick start page.</a></li>" +
 			"<li>/about - Easily share the link to the official 'about' page on this site. <a href='about.jsp'>Open about page.</a></li>" +
@@ -752,12 +753,12 @@ function refreshPopup(url, event)
 		event.stopPropagation();
 }
 
-function changeStoreSale()
+function changeStoreSale(verifyCode)
 {
 	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
 		if (sale!=null)
 		{
-			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale;
+			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+verifyCode;
 		}
 	});
 	
@@ -1109,12 +1110,42 @@ function doDrinkBeer()
 		
 }
 
- 	
+function resendVerificationEmail()
+{
+	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
+		location.href = "ServletUserControl?type=resendVerificationEmail";
+	});
+	
+}
 
+function changeEmailAddress(oldEmail)
+{
+	promptPopup("Change email", "What email address would you like to use for your account?", oldEmail, function(value){
+		location.href = "ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value);
+	});
+}
 
+function viewReferrals()
+{
+	pagePopup("ajax_referrals.jsp");
+}
 
+function customizeItemOrderPage(itemId)
+{
+	closeAllTooltips();
+	closeAllPopups();
+	closeAllPagePopups();
+	pagePopup("ajax_customizeitem.jsp?itemId="+itemId);
+}
 
-
+function orderItemCustomization(itemId, orderTypeId, requiredDetails, verifyCode)
+{
+	confirmPopup("Are you sure?", "This will send an email to a content developer notifying them that you'd like to customize an item.<br>You will be asked to provide some details in the next popup.", function(){
+		promptPopup("Customization Details", requiredDetails, "", function(value){
+			location.href="ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+verifyCode+"&requiredDetails="+encodeURIComponent(value);
+		});
+	});
+}
 
 
 

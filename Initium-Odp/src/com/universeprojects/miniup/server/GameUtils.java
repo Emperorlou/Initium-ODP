@@ -26,7 +26,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class GameUtils 
 {
-	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,###.##");
+	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,##0.00");
 	final static DecimalFormat noDigitFormat = new DecimalFormat("#,###");
 	final static DateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yyyy HH:mm:ss");
 	final static Random rnd = new Random();
@@ -47,7 +47,13 @@ public class GameUtils
 			return "";
 		
 		if (decimals==true)
-			return doubleDigitFormat.format(value);
+		{
+			String result = doubleDigitFormat.format(value);
+			if (result.endsWith(".00"))
+				return result.substring(0, result.length()-3);
+			else
+				return result;
+		}
 		else
 			return noDigitFormat.format(value);
 	}
@@ -621,6 +627,8 @@ public class GameUtils
 	    		qualityClass = "item-unique";
 	    	else if ("Epic".equals(qualityClassOverride))
 	    		qualityClass = "item-epic";
+	    	else if ("Custom".equals(qualityClassOverride))
+	    		qualityClass = "item-custom";
 	    	
 	    	if (qualityClass!=null)
 	    		return qualityClass;
