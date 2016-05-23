@@ -32,13 +32,13 @@ import com.universeprojects.miniup.server.commands.framework.Command.JavascriptR
  * Several Dev tool extensions
  * 
  * Usage notes:
- * Checks if caller is a Dev, and if so, executes the command
+ * Checks if caller is a Dev, and if so, executes the tool
  * 
  * Parameters:
- * 		cmd - the name of the command
- * 		[...] - params for the command
+ * 		tool - the name of the tool
+ * 		[...] - params for the tool
  *  
- * Valid commands:
+ * Valid tools:
  * 		ResetInstanceLocation - Fixes any issues with an instance
  * 			locId - locationID of the location to reset
  * 				default: character location
@@ -158,14 +158,14 @@ public class CommandDevTools extends Command {
 			throw new UserErrorMessage("This command is only available to Dev characters.");
 		
 		// Verify parameter sanity
-		String cmd = parameters.get("cmd");
-		if (cmd==null || (cmd=cmd.trim()).equals(""))
-			throw new RuntimeException("DevTools invalid call format, 'cmd' is not a valid command.");
+		String tool = parameters.get("tool");
+		if (tool==null || (tool=tool.trim()).equals(""))
+			throw new RuntimeException("DevTools invalid call format, 'tool' is not a valid tool.");
 		
 		CachedDatastoreService ds = getDS();
 
-		switch (cmd) {
-		// cmd=ResetInstanceLocation, locId=<xxx>, entireInstance=false|true
+		switch (tool) {
+		// tool=ResetInstanceLocation, locId=<xxx>, entireInstance=false|true
 		case "ResetInstanceLocation":
 		{
 			// Verify parameter sanity
@@ -259,7 +259,7 @@ public class CommandDevTools extends Command {
 			
 		} break;
 		
-		// cmd=RestockTutorial, amount=<xxx>
+		// tool=RestockTutorial, amount=<xxx>
 		case "RestockTutorial":
 		{
 			// Verify parameter sanity
@@ -332,7 +332,7 @@ public class CommandDevTools extends Command {
 			}
 		} break;
 		
-		// cmd=Teleport, locId=<xxx>
+		// tool=Teleport, locId=<xxx>
 		case "Teleport":
 		{
 			// Verify parameter sanity
@@ -346,7 +346,7 @@ public class CommandDevTools extends Command {
 			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 		} break;
 		
-		// cmd=UpdateItems, itemName=<name>, [<fieldName>=<newValue>]
+		// tool=UpdateItems, itemName=<name>, [<fieldName>=<newValue>]
 		case "UpdateItems":
 		{
 			// Verify parameter sanity
@@ -354,7 +354,7 @@ public class CommandDevTools extends Command {
 			if (itemName==null || (itemName=itemName.trim()).equals(""))
 				throw new RuntimeException("DevTools invalid call format, 'itemName' is not a valid name.");
 			
-			// cmd and itemName are already confirmed to exist, check whether there's at least 1 more param
+			// tool and itemName are already confirmed to exist, check whether there's at least 1 more param
 			if (parameters.size()==2)
 				throw new RuntimeException("DevTools invalid call format, No fieldNames specified.");
 			
@@ -385,10 +385,10 @@ public class CommandDevTools extends Command {
 								boolean changed = false;
 								for (Map.Entry<String, String> param : parameters.entrySet())
 								{
-									// Skip cmd and itemName param
+									// Skip tool and itemName param
 									// Note that paramKey should never be null or ""
 									fieldName = param.getKey();
-									if (fieldName.equals("cmd") || fieldName.equals("itemName"))
+									if (fieldName.equals("tool") || fieldName.equals("itemName"))
 										continue;
 									
 									// Set the new value
@@ -442,9 +442,9 @@ public class CommandDevTools extends Command {
 			} while (itemList.size()==100);
 		} break;
 		
-		// Unknown cmd
+		// Unknown tool
 		default:
-			throw new RuntimeException("DevTools invalid call format, 'cmd' is not a valid command.");
+			throw new RuntimeException("DevTools invalid call format, 'tool' is not a valid tool.");
 		}
 		
 	}
