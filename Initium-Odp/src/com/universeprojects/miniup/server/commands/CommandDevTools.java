@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.commands;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -104,7 +106,31 @@ public class CommandDevTools extends Command {
 		InputStream is = null;
 		String data = null;
 		try {
-			is = (new URL("https://www.playinitium.com/admin/editor/gef?type=testCurve&curve="+text)).openStream();
+			HttpURLConnection conn = (HttpURLConnection)(new URL("https://www.playinitium.com/admin/editor/gef?type=testCurve&curve="+text)).openConnection();
+			
+			// authenticate to the editor
+			Cookie[] cookies = request.getCookies();
+			String cookieString = null;
+			for (Cookie cookie : cookies)
+			{
+				if (cookieString==null)
+					cookieString = cookie.getName()+"="+cookie.getValue();
+				else
+					cookieString += "; "+cookie.getName()+"="+cookie.getValue();
+			}
+			if (cookieString!=null)
+				conn.setRequestProperty("Cookie", cookieString);
+			conn.connect();
+			
+			// Make sure we get an OK response
+			int respCode = conn.getResponseCode();
+			if (respCode==302)
+				throw new RuntimeException("Could not authenticate. Make sure you are logged into the editor.");
+			else if (respCode!=200)
+				throw new RuntimeException("Could not load resolver. Response code: "+respCode);
+			
+			// Actually get the data
+			is = conn.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			data = br.readLine();
 			if (data==null || (data=data.trim()).equals(""))
@@ -254,8 +280,9 @@ public class CommandDevTools extends Command {
 				}
 				// And finally trigger the respawn.
 				loc.setProperty("instanceRespawnDate", new Date());
-				ds.put(location);
+				ds.put(loc);
 			}
+			setPopupMessage("Successfully reset "+locList.size()+" location(s).");
 			
 		} break;
 		
@@ -330,6 +357,7 @@ public class CommandDevTools extends Command {
 				ds.put(item);
 				db.newSaleItem(ds, character, item, 1l);
 			}
+			setPopupMessage("Successfully restocked "+(amount-itemsRemaining)+" new items, making a total of "+amount+".");
 		} break;
 		
 		// tool=Teleport, locId=<xxx>
@@ -354,20 +382,23 @@ public class CommandDevTools extends Command {
 			if (itemName==null || (itemName=itemName.trim()).equals(""))
 				throw new RuntimeException("DevTools invalid call format, 'itemName' is not a valid name.");
 			
-			// tool and itemName are already confirmed to exist, check whether there's at least 1 more param
-			if (parameters.size()==2)
+			// cmd, tool and itemName are already confirmed to exist, check whether there's at least 1 more param
+			if (parameters.size()==3)
 				throw new RuntimeException("DevTools invalid call format, No fieldNames specified.");
 			
 			// As we can't really lock down the DB to do it all in 1 transaction, get the items in 20 item chunks.
 			Filter filter = new FilterPredicate("name", FilterOperator.EQUAL, itemName);
 			Cursor cursor = null;
+			final int chunkSize = 20;
+			int counter = -1;
 			List<CachedEntity> itemList;
 			do {
 				ds.beginTransaction();
 				try {
-					itemList = ds.fetchAsList("Item", filter, 20, cursor);
+					counter++;
+					itemList = ds.fetchAsList("Item", filter, chunkSize, cursor);
 					// On first run, check if any items exist at all. 
-					if (cursor==null && itemList.isEmpty())
+					if (counter==0 && itemList.isEmpty())
 						throw new UserErrorMessage("No items exist by that name.");
 					
 					// save cursor for next iteration
@@ -388,7 +419,7 @@ public class CommandDevTools extends Command {
 									// Skip tool and itemName param
 									// Note that paramKey should never be null or ""
 									fieldName = param.getKey();
-									if (fieldName.equals("tool") || fieldName.equals("itemName"))
+									if (fieldName.equals("cmd") || fieldName.equals("tool") || fieldName.equals("itemName"))
 										continue;
 									
 									// Set the new value
@@ -439,7 +470,8 @@ public class CommandDevTools extends Command {
 				} finally {
 					ds.rollbackIfActive();
 				}
-			} while (itemList.size()==100);
+			} while (itemList.size()==chunkSize);
+			setPopupMessage("Successfully updated "+(counter*chunkSize+itemList.size())+" items.");
 		} break;
 		
 		// Unknown tool
