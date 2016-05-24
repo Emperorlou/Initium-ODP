@@ -454,17 +454,19 @@ p a, li a
 
 .backgroundcliptext .item-custom
 {
+	font-size:20px;
     text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
     color: transparent;
-    background-color: #FF0000;
+    background-color: #00BB00;
     -webkit-background-clip: text;
     -moz-background-clip: text;
 }
 
 .no-backgroundcliptext .item-custom
 {
-    text-shadow: 0px 0px 4px rgba(255, 0, 0, 0.7);
-    color: #FF0000;
+	font-size:20px;
+	text-shadow: 0px 0px 4px rgba(0, 200, 0, 0.7);
+    color: #00BB00;
 }
 
 
@@ -1518,26 +1520,23 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
     margin-top: 28px;
 }
 
-.page-popup-X
-{
-	position:absolute;
-	top:46px;
-	right:0px;
-	z-index:1100001;
-
-	font-family: Lucida Sans;
-	font-size:39px;
-}
+.page-popup-X {
+   position: absolute;
+   top: 36px;
+   right: 0px;
+   z-index: 1100001;
+   font-family: Arial;
+   font-size: 39px;
+  }
 
 .page-popup-Reload
 {
-	position:absolute;
-	top:30px;
-	left:0px;
-	z-index:1100001;
-
-	font-family: Lucida Sans;
-	font-size:50px;
+   position: absolute;
+   top: 30px;
+   left: 0px;
+   z-index: 1100001;
+   font-family: Lucida Sans;
+   font-size: 50px;
 }
 
 .changelog-more
@@ -1573,6 +1572,20 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	content:"MAJOR - ";
 }
 
+.orders-open-order
+{
+	background-color:#000000; 
+	margin:7px; 
+	margin-top:0px; 
+	padding:7px;
+
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+
+	border: solid #CCCCCC 3px;	
+	
+}
 
 
 

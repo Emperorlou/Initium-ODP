@@ -1785,6 +1785,11 @@ public class ODPDBAccess
 		for (int i = buffs.size() - 1; i >= 0; i--)
 		{
 			CachedEntity buff = buffs.get(i);
+			if (buff==null)
+			{
+				buffs.remove(i);
+				continue;
+			}
 			Date expiry = (Date) buff.getProperty("expiry");
 			if (expiry != null && expiry.before(new Date()))
 			{
