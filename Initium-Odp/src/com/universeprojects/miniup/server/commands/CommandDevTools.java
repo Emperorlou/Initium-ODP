@@ -416,33 +416,39 @@ public class CommandDevTools extends Command {
 								boolean changed = false;
 								for (Map.Entry<String, String> param : parameters.entrySet())
 								{
-									// Skip tool and itemName param
+									// Skip cmd, tool and itemName param
 									// Note that paramKey should never be null or ""
 									fieldName = param.getKey();
-									if (fieldName.equals("cmd") || fieldName.equals("tool") || fieldName.equals("itemName"))
+									switch (fieldName) {
+									case "": case "cmd": case "tool": case "itemName":
 										continue;
+									}
 									
 									// Set the new value
 									// Nothing other than dataType.String should probably ever be set though
 									// as all items would otherwise have the exact same stat
 									// but the functionality is there just in case.
 									Object newVal = null;
-									switch (getDataType(fieldName)) {
-									case DD:
-										newVal = param.getValue();
-										break;
-									case Double:
-										newVal = Double.parseDouble(param.getValue());
-										break;
-									case Long:
-										newVal = Long.parseLong(param.getValue());
-										break;
-									case String:
-										newVal = param.getValue();
+									String strVal = param.getValue();
+									if (strVal!=null && (strVal=strVal.trim()).equals("")==false)
+									{
+										switch (getDataType(fieldName)) {
+										case DD:
+											newVal = strVal;
+											break;
+										case Double:
+											newVal = Double.parseDouble(strVal);
+											break;
+										case Long:
+											newVal = Long.parseLong(strVal);
+											break;
+										case String:
+											newVal = strVal;
+										}
 									}
 									
 									//No point in updating the DB if the value is the same
-									if (newVal.equals(item.getProperty(fieldName))==false) {
+									if (GameUtils.equals(newVal, item.getProperty(fieldName))==false) {
 										item.setProperty(fieldName, newVal);
 										changed = true;
 									}
