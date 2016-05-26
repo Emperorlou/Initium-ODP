@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -37,13 +38,7 @@ public class CommandSetLeader extends Command {
 		ODPDBAccess db = getDB();
 
 		// Verify parameter sanity
-		Long charId;
-		try {
-			charId = Long.parseLong(parameters.get("charId"));
-		} catch (Exception e) {
-			throw new RuntimeException("SetLeader invalid call format, 'charId' is not a valid id.");
-		}
-		CachedEntity member = db.getCharacterById(charId);
+		CachedEntity member = db.getCharacterById(tryParseId(parameters, "charId"));
 		if (member==null)
 			throw new RuntimeException("SetLeader invalid call format, 'charId' is not a valid id.");
 
@@ -56,8 +51,12 @@ public class CommandSetLeader extends Command {
 		if ("TRUE".equals(character.getProperty("partyLeader"))==false)
 			throw new UserErrorMessage("You are not currently the party leader and thus cannot do this.");
 		
+		// Can't switch leader when incapacitated
+		if (GameUtils.isPlayerIncapacitated(character))
+			throw new UserErrorMessage("You are incapacitated and thus cannot do this.");
+		
 		// Quick sanity check that charId is not the current leader
-		if (charId.equals(character.getId()))
+		if (GameUtils.equals(character.getKey(), member.getKey()))
 			throw new UserErrorMessage("You are already the leader of this party.");
 		
 		// Verify that charId is a member of the party

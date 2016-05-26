@@ -50,9 +50,7 @@ public class CommandRavenPayRespects extends Command {
 		
 		// Verify the caller is at Burial Site of The Ebon Raven
 		Key key = (Key)character.getProperty("locationKey");
-		if (key==null)
-			throw new UserErrorMessage("You cannot do that here.");
-		if (key.getId()!=4808618326097920L)
+		if (key==null || key.getId()!=4808618326097920L)
 			throw new UserErrorMessage("You cannot do that here.");
 		
 		// Get all buffs and check for Blessing of the Raven
@@ -113,7 +111,7 @@ public class CommandRavenPayRespects extends Command {
 				String name = (String)buff.getProperty("name");
 				if ("Well Rested".equals(name))
 					trigger1 = true;
-				if ("Pumped!".equals(name))
+				else if ("Pumped!".equals(name))
 					trigger2 = true;
 			}
 			if (trigger1 && trigger2)

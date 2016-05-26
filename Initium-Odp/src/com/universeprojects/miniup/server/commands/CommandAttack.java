@@ -95,19 +95,11 @@ public class CommandAttack extends Command {
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
 		ODPDBAccess db = getDB();
-
-		// Verify parameter sanity
-		Long charId;
-		try {
-			charId = Long.parseLong(parameters.get("charId"));
-		} catch (Exception e) {
-			throw new RuntimeException("Attack invalid call format, 'charId' is not a valid id.");
-		}
-		
 		CachedDatastoreService ds = getDS();
 		ds.beginTransaction();
 		try {
-			CachedEntity monster = db.getCharacterById(charId);
+			// Verify parameter sanity
+			CachedEntity monster = db.getCharacterById(tryParseId(parameters, "charId"));
 			if (monster==null)
 				throw new RuntimeException("Attack invalid call format, 'charId' is not a valid id.");
 			

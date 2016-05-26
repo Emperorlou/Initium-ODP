@@ -5,7 +5,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.miniup.server.GameUtils;
@@ -41,13 +40,7 @@ public class CommandSetLabel extends Command {
 		ODPDBAccess db = getDB();
 
 		// Verify itemId parameter sanity
-		Long itemId;
-		try {
-			itemId = Long.parseLong(parameters.get("itemId"));
-		} catch (Exception e) {
-			throw new RuntimeException("SetLabel invalid call format, 'itemId' is not a valid id.");
-		}
-		CachedEntity item = db.getEntity("Item", itemId);
+		CachedEntity item = db.getEntity("Item", tryParseId(parameters, "itemId"));
 		if (item==null)
 			throw new RuntimeException("SetLabel invalid call format, 'itemId' is not a valid id.");
 		

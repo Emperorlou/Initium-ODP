@@ -63,6 +63,8 @@ messager.onChatMessage = function(chatMessage)
 	}
 	else if (chatMessage.mode==null)
 	{
+		if (chatMessage.message.length > 2000)
+			chatMessage.message = "/me is a spammer. Kill him with fire!";
 		var meMode = chatMessage.message.toLowerCase().startsWith("/me ");
 		html+="<span class='chatMessage-text'>";
 		if (chatMessage.characterId!=null && meMode==false)
