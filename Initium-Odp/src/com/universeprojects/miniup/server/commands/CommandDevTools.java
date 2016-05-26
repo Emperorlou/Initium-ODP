@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -27,7 +30,6 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 
 /**
@@ -77,19 +79,25 @@ public class CommandDevTools extends Command {
 	 */
 	
 	private enum dataType {
-		DD, Double, Long, String
+		Curve, Double, Long, Boolean, Date, Key, String
 	}
 	
 	// requires valid fieldName
 	private dataType getDataType(String fieldName) {
 		switch (fieldName) {
 		case "weaponDamage":
-			return dataType.DD;
+			return dataType.Curve;
 		case "strengthRequirement": case "transportMovementSpeed": case "weaponDamageCriticalMultiplier":
 			return dataType.Double;
 		case "blockChance": case "damageReduction": case "dexterityPenalty": case "dogecoins": case "durability": case "maxSpace": case "maxWeight":
 		case "space": case "warmth": case "weaponDamageCriticalChance": case "weaponRange": case "weaponRangeIncrement": case "weatherDamage": case "weight":
 			return dataType.Long;
+		case "transportEnabled":
+			return dataType.Boolean;
+		case "movedTimestamp":
+			return dataType.Date;
+		case "_definitionKey": case "containerKey":
+			return dataType.Key;
 		default:
 			return dataType.String;
 		}
@@ -336,7 +344,7 @@ public class CommandDevTools extends Command {
 				for (Map.Entry<String, Object> prop : itemProps.entrySet())
 				{
 					switch (getDataType(prop.getKey())) {
-					case DD:
+					case Curve:
 						item.setProperty(prop.getKey(), (String)resolve(prop.getValue()));
 						break;
 					case Double:
@@ -345,7 +353,7 @@ public class CommandDevTools extends Command {
 					case Long:
 						item.setProperty(prop.getKey(), resolveLong(prop.getValue()));
 						break;
-					case String:
+					case Boolean: case Date: case Key: case String:
 						item.setProperty(prop.getKey(), prop.getValue());
 					}
 				}
@@ -433,14 +441,27 @@ public class CommandDevTools extends Command {
 									if (strVal!=null && (strVal=strVal.trim()).equals("")==false)
 									{
 										switch (getDataType(fieldName)) {
-										case DD:
+										case Curve:
 											newVal = strVal;
 											break;
 										case Double:
+											// Throws NumberFormatException
 											newVal = Double.parseDouble(strVal);
 											break;
 										case Long:
+											// Throws NumberFormatException
 											newVal = Long.parseLong(strVal);
+											break;
+										case Boolean:
+											newVal = Boolean.parseBoolean(strVal);
+											break;
+										case Date:
+											// Throws ParseException
+											newVal =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(strVal);
+											break;
+										case Key:
+											// throws IllegalArgumentException
+											newVal = KeyFactory.stringToKey(strVal);
 											break;
 										case String:
 											newVal = strVal;
@@ -460,6 +481,10 @@ public class CommandDevTools extends Command {
 								
 							} catch (NumberFormatException nfe) {
 								throw new RuntimeException("DevTools invalid call format, '"+fieldName+"' is not a valid number.");
+							} catch (ParseException pe) {
+								throw new RuntimeException("DevTools invalid call format, '"+fieldName+"' is not a valid date.");
+							} catch (IllegalArgumentException iae) {
+								throw new RuntimeException("DevTools invalid call format, '"+fieldName+"' is not a valid key.");
 							// Item was changed elsewhere, refetch and retry.
 							} catch (ConcurrentModificationException cme) {
 								if (retries==5)
