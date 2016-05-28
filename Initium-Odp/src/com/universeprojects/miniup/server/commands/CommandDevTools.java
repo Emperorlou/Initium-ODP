@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -365,7 +364,10 @@ public class CommandDevTools extends Command {
 				ds.put(item);
 				db.newSaleItem(ds, character, item, 1l);
 			}
-			setPopupMessage("Successfully restocked "+(amount-itemsRemaining)+" new items, making a total of "+amount+".");
+			if (amount>itemsRemaining)
+				setPopupMessage("Successfully restocked "+(amount-itemsRemaining)+" new items, making a total of "+amount+" available.");
+			else
+				setPopupMessage("No need to restock, still "+itemsRemaining+" remaining.");
 		} break;
 		
 		// tool=Teleport, locId=<xxx>
@@ -460,8 +462,14 @@ public class CommandDevTools extends Command {
 											newVal =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(strVal);
 											break;
 										case Key:
-											// throws IllegalArgumentException
-											newVal = KeyFactory.stringToKey(strVal);
+											try {
+												int match = strVal.indexOf("(");
+												newVal = db.createKey(strVal.substring(0, match-1), Long.parseLong(strVal.substring(match+1,strVal.lastIndexOf(")"))));
+											} catch (Exception e) {
+												throw new IllegalArgumentException();
+											}
+											if (newVal==null)
+												throw new IllegalArgumentException();
 											break;
 										case String:
 											newVal = strVal;
