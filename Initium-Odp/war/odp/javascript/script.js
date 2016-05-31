@@ -596,7 +596,7 @@ function helpPopup()
 			"<li>/changelog - This displays the latest changes to the game. <a onclick='viewChangelog()'>View change log.</a></li>" +
 			"<li>/me - This allows you to say something in 3rd person</li>" +
 			"<li>/map - This shows a link to the community-created map which <a href='https://docs.google.com/drawings/d/1ZGBwTTrY5ATlJOWrPnwH2qWkee7kgdRTnTDPVHYZ3Ak/edit?usp=sharing'>you can also find here.</a>" +
-			"<li>/customize - This allows you to share a link to the iten customization page. <a onclick='customizeItemOrderPage()'>You can calso find it here</a>" +
+			"<li>/customize - This allows you to share a link to the iten customization page. <a onclick='customizeItemOrderPage()'>You can also find it here</a>" +
 			"<li>/merchant - This allows you to share the link to your store with everyone in the location. Make sure to turn your store on first though! <a href='managestore.jsp'>You can do that here</a>" +
 			"<li>/quickstart - A quick start guide for new players who want to play efficiently as quick as possible! <a href='quickstart.jsp'>Open quick start page.</a></li>" +
 			"<li>/about - Easily share the link to the official 'about' page on this site. <a href='about.jsp'>Open about page.</a></li>" +
@@ -1147,6 +1147,13 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails, verifyCode
 	});
 }
 
+function doAttack(eventObject, charId)
+{
+    closeAllPopups();
+    closeAllTooltips();
+    doCommand(eventObject,"Attack",{"charId":charId});
+}
+
 
 
 
@@ -1235,7 +1242,9 @@ function doSetLeader(eventObject, charId)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	doCommand(eventObject,"SetLeader",{"charId":charId});
+	confirmPopup("Are you sure?", "Are you sure you want set someone else to be the leader of your group?", function(){
+		doCommand(eventObject,"SetLeader",{"charId":charId});
+	});
 }
 
 function doSetLabel(eventObject, itemId)

@@ -1562,20 +1562,20 @@ public class GameUtils
 	}
 	
 	public static double getWeaponMaxDamage(CachedEntity weapon)
-	{
-		String damageFormula = (String)weapon.getProperty("weaponDamage");
-		Double critChance = null;
-		if ((Long)weapon.getProperty("weaponDamageCriticalChance") instanceof Long)
-		{
-			Long chance = (Long)weapon.getProperty("weaponDamageCriticalChance");			
-			critChance = chance.doubleValue();
-		}
-		Double critMultiplier = null;
-		if (weapon.getProperty("weaponDamageCriticalMultiplier") instanceof Double)
-			critMultiplier = (Double)weapon.getProperty("weaponDamageCriticalMultiplier");
-		
-		return GameUtils.getWeaponMaxDamage(damageFormula, critMultiplier, critChance);
-	}
+    {
+        String damageFormula = (String)weapon.getProperty("weaponDamage");
+        Double critChance = null;
+        if ((Long)weapon.getProperty("weaponDamageCriticalChance") instanceof Long)
+        {
+            Long chance = (Long)weapon.getProperty("weaponDamageCriticalChance");            
+            critChance = chance.doubleValue()/100d;
+        }
+        Double critMultiplier = null;
+        if (weapon.getProperty("weaponDamageCriticalMultiplier") instanceof Double)
+            critMultiplier = (Double)weapon.getProperty("weaponDamageCriticalMultiplier");
+        
+        return GameUtils.getWeaponMaxDamage(damageFormula, critMultiplier, critChance);
+    }
 	
 	/**
 	 * 
@@ -1605,7 +1605,7 @@ public class GameUtils
 		if ((Long)weapon.getProperty("weaponDamageCriticalChance") instanceof Long)
 		{
 			Long chance = (Long)weapon.getProperty("weaponDamageCriticalChance");			
-			critChance = chance.doubleValue();
+			critChance = chance.doubleValue()/100d;
 		}
 		Double critMultiplier = null;
 		if (weapon.getProperty("weaponDamageCriticalMultiplier") instanceof Double)
@@ -1630,7 +1630,7 @@ public class GameUtils
 		double firstPart = Double.parseDouble(dmgParts[0]);
 		double secondPart = Double.parseDouble(dmgParts[1]);
 		
-		return firstPart*((secondPart-1d)/2d+secondPart)*(1d+critChance*(critMultiplier-1d));
+		return firstPart*((secondPart-1d)/2d+1)*(1d+critChance*(critMultiplier-1d));
 	}
 	
 	
