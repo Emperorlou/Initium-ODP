@@ -403,7 +403,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		text = "";
 	
 	
-	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='ServletCharacterControl?type=cancelLongOperations'>Cancel</a></p></div>";
+	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
 	content+="</div>";
 
 	$("#banner-base").html(content);
@@ -431,14 +431,14 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 function buyHouse()
 {
 	promptPopup("Buy House", "Are you sure you want to buy a house from the city? It will cost 2000 gold.\n\nIf you would like to proceed, please give your new home a name:", "My House", function(name){
-		window.location.href="ServletCharacterControl?type=buyHouse&houseName="+encodeURIComponent(name);
+		window.location.href="ServletCharacterControl?type=buyHouse&houseName="+encodeURIComponent(name)+"&v="+window.verifyCode;
 	});
 }
 
 function storeSellItem(itemId)
 {
 	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
-		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm;
+		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
 	});
 }
 
@@ -446,7 +446,7 @@ function renameStore()
 {
 	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
 		if (name!=null && name!="")
-			window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name);
+			window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
 	});
 }
 
@@ -459,7 +459,7 @@ function createCampsite()
 	promptPopup("New Campsite", "Provide a new name for your campsite:", lastNameUsed, function(name){
 		if (name!=null && name!="")
 		{
-			window.location.href='ServletCharacterControl?type=createCampsite&name='+encodeURIComponent(name);
+			window.location.href='ServletCharacterControl?type=createCampsite&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
 			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
 			localStorage.setItem("campsiteName", name);
 		}
@@ -471,7 +471,7 @@ function depositDogecoinsToItem(itemId, event)
 	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
-			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount), event, reloadPagePopup)
+			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode, event, reloadPagePopup)
 		}
 	});
 	
@@ -480,7 +480,7 @@ function depositDogecoinsToItem(itemId, event)
 
 function collectDogecoinsFromItem(itemId, event)
 {
-	ajaxAction("ServletCharacterControl?type=collectDogecoinsFromItem&itemId="+itemId+"", event, reloadPagePopup);	
+	ajaxAction("ServletCharacterControl?type=collectDogecoinsFromItem&itemId="+itemId+"&v="+window.verifyCode, event, reloadPagePopup);	
 }
 
 
@@ -490,7 +490,7 @@ function tradeSetDogecoin(currentDogecoin)
 	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
 		if (amount!=null && amount!="")
 		{
-			window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount);
+			window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
 		}
 	});
 }
@@ -570,6 +570,8 @@ function ajaxAction(url, eventObject, loadFunction)
 		url+="&ajax=true";
 	else
 		url+="?ajax=true";
+	
+	url += "&v="+window.verifyCode;
 
 	
 	var originalText = $(eventObject.target).text();
@@ -640,7 +642,7 @@ function createNewGroup()
 	promptPopup("New Group", "What name will you be using for your group.\n\nPlease use ONLY letters, commas, and apostrophes and a maximum of 30 characters.\n\nThis name cannot be changed later, so choose wisely!", "", function(groupName){
 		if (groupName!=null && groupName!="")
 		{
-			window.location.href='ServletCharacterControl?type=createGroup&groupName='+encodeURIComponent(groupName);
+			window.location.href='ServletCharacterControl?type=createGroup&groupName='+encodeURIComponent(groupName)+"&v="+window.verifyCode;
 		}
 	});
 }
@@ -648,10 +650,15 @@ function createNewGroup()
 function leaveGroup()
 {
 	confirmPopup("Leave group", "Are you sure you want to leave your group?", function(){
-		window.location.href = "ServletCharacterControl?type=requestLeaveGroup";
+		window.location.href = "ServletCharacterControl?type=requestLeaveGroup"+"&v="+window.verifyCode;
 		
 	});
 		
+}
+
+function cancelLeaveGroup()
+{
+	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
 }
 
 function setGroupDescription(existingDescription)
@@ -659,7 +666,7 @@ function setGroupDescription(existingDescription)
 	promptPopup("Group Description", "Set your group's description here, but please be careful to only use letters, numbers, commas, and apostrophies:", existingDescription, function(description){
 		if (description!=null && description!="")
 		{
-			window.location.href='ServletCharacterControl?type=setGroupDescription&description='+encodeURIComponent(description);
+			window.location.href='ServletCharacterControl?type=setGroupDescription&description='+encodeURIComponent(description)+"&v="+window.verifyCode;
 		}
 		
 	});
@@ -670,7 +677,7 @@ function setGroupMemberRank(oldPosition, characterId)
 	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
 		if (newPosition!=null && newPosition!="")
 		{
-			window.location.href='ServletCharacterControl?type=groupMemberChangeRank&characterId='+characterId+'&rank='+encodeURIComponent(newPosition);
+			window.location.href='ServletCharacterControl?type=groupMemberChangeRank&characterId='+characterId+'&rank='+encodeURIComponent(newPosition)+"&v="+window.verifyCode;
 		}
 		
 	});
@@ -679,33 +686,33 @@ function setGroupMemberRank(oldPosition, characterId)
 function promoteToAdmin(characterId)
 {
 	confirmPopup("Promote to Admin", "Are you sure you want to promote this member to admin?", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberPromoteToAdmin&characterId="+encodeURIComponent(characterId);
+		window.location.href="ServletCharacterControl?type=groupMemberPromoteToAdmin&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
 	});
 }
 
 function demoteFromAdmin(characterId)
 {
 	confirmPopup("Demote from Admin", "Are you sure you want to demote this member from admin?", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberDemoteFromAdmin&characterId="+encodeURIComponent(characterId);
+		window.location.href="ServletCharacterControl?type=groupMemberDemoteFromAdmin&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
 	});
 }
 
 function makeGroupCreator(characterId)
 {
 	confirmPopup("New Group Creator", "Are you sure you want to make this member into the group creator?\n\nThis action cannot be reversed unless the this member (as the new group creator) chooses to reverse it manually!", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberMakeGroupCreator&characterId="+encodeURIComponent(characterId);
+		window.location.href="ServletCharacterControl?type=groupMemberMakeGroupCreator&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
 	});
 }
 
 
 function duelConfirmation_Yes()
 {
-	window.location.href="ServletCharacterControl?type=duelResponse&accepted=true";
+	window.location.href="ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
 }
 
 function duelConfirmation_No()
 {
-	window.location.href="ServletCharacterControl?type=duelResponse&accepted=false";
+	window.location.href="ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
 }
 
 function reloadPopup(element, backUrl, event)
@@ -753,12 +760,12 @@ function refreshPopup(url, event)
 		event.stopPropagation();
 }
 
-function changeStoreSale(verifyCode)
+function changeStoreSale()
 {
 	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
 		if (sale!=null)
 		{
-			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+verifyCode;
+			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
 		}
 	});
 	
@@ -768,7 +775,7 @@ function changeStoreSale(verifyCode)
 function destroyThrowaway()
 {
 	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
-		window.location.href = 'ServletUserControl?type=destroyThrowaway';
+		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
 	});
 }
 
@@ -818,7 +825,7 @@ function acceptCharacterTransfer()
 	promptPopup("Accept Character Transfer", "What is the name of the character you are going to transfer to this account? \n\nPlease note that the name is case sensitive!", "", function(charName){
 		if (charName!=null)
 		{
-			window.location.href = "ServletUserControl?type=acceptCharacterTransfer&name="+charName;
+			window.location.href = "ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode;
 		}
 	});
 }
@@ -828,15 +835,15 @@ function transferCharacter(currentCharName)
 	promptPopup("Transfer Character To..", "Please type the email address of the account you wish to transfer this character to.\n\nPlease note that you are currently using: "+currentCharName, "", function(email){
 		if (email!=null)
 		{
-			window.location.href = "ServletUserControl?type=transferCharacter&email="+email;
+			window.location.href = "ServletUserControl?type=transferCharacter&email="+email+"&v="+window.verifyCode;
 		}
 	});
 }
 
-function dropAllInventory(verifyCode)
+function dropAllInventory()
 {
 	confirmPopup("Drop ALL Inventory", "Are you sure you want to drop EVERYTHING in your inventory on the ground?\n\nPlease note that items for sale in your store and equipped items will be excluded.", function(){
-		ajaxAction("ServletCharacterControl?type=dropAllInventory&v="+verifyCode, event, function(){
+		ajaxAction("ServletCharacterControl?type=dropAllInventory&v="+window.verifyCode, event, function(){
 			reloadPagePopup(true);
 		});
 	});
@@ -845,14 +852,14 @@ function dropAllInventory(verifyCode)
 function removeAllStoreItems()
 {
 	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
-		window.location.href='ServletCharacterControl?type=storeDeleteAllItems';
+		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
 	});
 }
 
 function giveHouseToGroup()
 {
 	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
-		window.location.href='ServletCharacterControl?type=giveHouseToGroup';
+		window.location.href='ServletCharacterControl?type=giveHouseToGroup'+"&v="+window.verifyCode;
 	});
 }
 
@@ -874,7 +881,7 @@ function refreshInstanceRespawnWarning()
 function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
 {
 	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
-		window.location.href = "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+"";
+		window.location.href = "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
 	});
 }
 
@@ -885,21 +892,21 @@ function giftPremium()
 		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose no.", function(){
 			anonymous = true;
 		});
-		location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous="+anonymous;
+		location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous="+anonymous+"&v="+window.verifyCode;
 	});
 }
 
 function newPremiumToken()
 {
 	confirmPopup("Create new premium token?", "Are you sure you want to create a premium token and put it in your inventory?\n\nBe aware that this token can be traded AND looted if you die.", function(){
-		window.location.href = "ServletUserControl?type=newPremiumToken";
+		window.location.href = "ServletUserControl?type=newPremiumToken"+"&v="+window.verifyCode;
 	});
 }
 
 function newCharacterFromUnconscious()
 {
 	confirmPopup("Create a new character?", "If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
-		window.location.href = "ServletUserControl?type=newCharacterFromUnconscious";
+		window.location.href = "ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode;
 	});
 }
 
@@ -908,12 +915,12 @@ function enterDefenceStructureSlot(slot)
 	if (slot=="Defending1" || slot=="Defending2" || slot=="Defending3")
 	{
 		confirmPopup("Defend this structure?", "Are you sure you want to defend this structure? If you do this, other players will be able to attack and kill you.", function(){
-			window.location.href = "ServletCharacterControl?type=setCharacterStatus&status="+slot;
+			window.location.href = "ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
 		});
 	}
 	else
 	{
-		window.location.href = "ServletCharacterControl?type=setCharacterStatus&status="+slot;
+		window.location.href = "ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
 	}
 }
 
@@ -1034,7 +1041,7 @@ function reloadPagePopup(quietly)
 
 function moveItem(event, itemId, newContainerKind, newContainerId)
 {
-	ajaxAction("ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId, event, function(){
+	ajaxAction("ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode, event, function(){
 		reloadPagePopup(true);
 	});
 }
@@ -1090,13 +1097,13 @@ function viewMap()
 	openMap();
 }
 
-function deleteCharacter(currentCharName, verifyCode)
+function deleteCharacter(currentCharName)
 {
 	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
 		if (currentCharName==null)
 			currentCharName = "";
 		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
-			window.location.href = "ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+verifyCode;
+			window.location.href = "ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+window.verifyCode;
 		});
 	});
 }
@@ -1104,7 +1111,7 @@ function deleteCharacter(currentCharName, verifyCode)
 function doDrinkBeer()
 {
 	confirmPopup("Drink Beer", "Are you sure you want to drink? It might affect your combat abilities...", function(){
-		window.location.href = "ServletCharacterControl?type=drinkBeer";
+		window.location.href = "ServletCharacterControl?type=drinkBeer"+"&v="+window.verifyCode;
 		
 	});
 		
@@ -1113,7 +1120,7 @@ function doDrinkBeer()
 function resendVerificationEmail()
 {
 	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
-		location.href = "ServletUserControl?type=resendVerificationEmail";
+		location.href = "ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode;
 	});
 	
 }
@@ -1121,7 +1128,7 @@ function resendVerificationEmail()
 function changeEmailAddress(oldEmail)
 {
 	promptPopup("Change email", "What email address would you like to use for your account?", oldEmail, function(value){
-		location.href = "ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value);
+		location.href = "ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value)+"&v="+window.verifyCode;
 	});
 }
 
@@ -1138,11 +1145,11 @@ function customizeItemOrderPage(itemId)
 	pagePopup("ajax_customizeitem.jsp?itemId="+itemId);
 }
 
-function orderItemCustomization(itemId, orderTypeId, requiredDetails, verifyCode)
+function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 {
 	confirmPopup("Are you sure?", "This will send an email to a content developer notifying them that you'd like to customize an item.<br>You will be asked to provide some details in the next popup.", function(){
 		promptPopup("Customization Details", requiredDetails, "", function(value){
-			location.href="ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+verifyCode+"&requiredDetails="+encodeURIComponent(value);
+			location.href="ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+window.verifyCode+"&requiredDetails="+encodeURIComponent(value);
 		});
 	});
 }
@@ -1153,6 +1160,140 @@ function doAttack(eventObject, charId)
     closeAllTooltips();
     doCommand(eventObject,"Attack",{"charId":charId});
 }
+
+function leaveParty()
+{
+	location.href = "ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
+}
+
+function collectDogecoinFromCharacter(characterKey)
+{
+	location.href = "ServletCharacterControl?type=collectDogecoin&characterId="+characterKey+"&v="+window.verifyCode;
+}
+
+function combatAttackWithLeftHand()
+{
+	location.href = "ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode;
+}
+
+function combatAttackWithRightHand()
+{
+	location.href = "ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode;
+}
+
+function combatEscape()
+{
+	location.href = "ServletCharacterControl?type=escape"+"&v="+window.verifyCode;
+}
+
+function combatAllowCharacterIn()
+{
+	location.href = "ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode;
+}
+
+function storeDisabled()
+{
+	location.href = "ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode;
+}
+
+function storeEnabled()
+{
+	location.href = "ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
+}
+
+function partyEnableJoins()
+{
+	location.href = "ServletCharacterControl?type=enablePartyJoins"+"&v="+window.verifyCode;
+}
+
+function partyDisableJoins()
+{
+	location.href = "ServletCharacterControl?type=disablePartyJoins"+"&v="+window.verifyCode;
+}
+
+function campsiteDefend()
+{
+	location.href = "ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
+}
+
+function leaveAndForgetCombatSite(pathId)
+{
+	location.href = "ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode;
+}
+
+function forgetCombatSite(locationId)
+{
+	location.href = "ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
+}
+
+function groupAcceptJoinGroupApplication(characterId)
+{
+	location.href = "ServletCharacterControl?type=acceptJoinGroupApplication&applicantId="+characterId+""+"&v="+window.verifyCode;
+}
+
+function groupDenyJoinGroupApplication(characterId)
+{
+	location.href = "ServletCharacterControl?type=denyJoinGroupApplication&applicantId="+characterId+""+"&v="+window.verifyCode;
+}
+
+function groupMemberKick(characterId)
+{
+	location.href = "ServletCharacterControl?type=groupMemberKick&characterId="+characterId+""+"&v="+window.verifyCode;
+}
+
+function groupMemberKickCancel(characterId)
+{
+	location.href = "ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
+}
+
+function groupRequestJoin(groupId)
+{
+	location.href = "ServletCharacterControl?type=requestJoinGroup&groupId="+groupId+"&v="+window.verifyCode;
+}
+
+function tradeRemoveItem(itemId)
+{
+	location.href = "ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
+}
+
+function tradeCancel()
+{
+	location.href = "ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode;
+}
+
+function tradeReady(version)
+{
+	location.href = "ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode;
+}
+
+function tradeAddItem(itemId)
+{
+	location.href = "ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
+}
+
+function partyJoin(characterId)
+{
+	location.href = "ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
+}
+
+function tradeStartTrade(characterId)
+{
+	location.href = "ServletCharacterControl?type=startTrade&characterId="+characterId+"&v="+window.verifyCode;
+}
+
+function duelRequest(characterId)
+{
+	location.href = "ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1355,7 +1496,7 @@ function setBannerOverlayText(title, text)
 {
 	if (text==null)
 		text = "";
-	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a href='ServletCharacterControl?type=cancelLongOperations'>Cancel</a></p></div>";
+	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a href='ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
 	
 	$(".travel-scene-text").remove();
 	$("#banner-base").append(contents);
@@ -1371,7 +1512,7 @@ function doGoto(event, pathId, attack)
 	if (attack == null)
 		attack = false;
 	showBannerLoadingIcon();
-	longOperation(event, "ServletCharacterControl?type=goto_ajax&pathId="+pathId+"&attack="+attack, 
+	longOperation(event, "ServletCharacterControl?type=goto_ajax&pathId="+pathId+"&attack="+attack+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -1398,7 +1539,7 @@ function doExplore(ignoreCombatSites)
 	if (ignoreCombatSites == null)
 		ignoreCombatSites = false;
 	showBannerLoadingIcon();
-	longOperation(null, "ServletCharacterControl?type=explore_ajax&ignoreCombatSites="+ignoreCombatSites, 
+	longOperation(null, "ServletCharacterControl?type=explore_ajax&ignoreCombatSites="+ignoreCombatSites+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -1422,7 +1563,7 @@ function doExplore(ignoreCombatSites)
 function doRest()
 {
 	showBannerLoadingIcon();
-	longOperation(null, "ServletCharacterControl?type=rest_ajax", 
+	longOperation(null, "ServletCharacterControl?type=rest_ajax"+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -1446,7 +1587,7 @@ function doRest()
 function doCollectCollectable(event, collectableId)
 {
 	showBannerLoadingIcon();
-	longOperation(event, "ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId, 
+	longOperation(event, "ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)

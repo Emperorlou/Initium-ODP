@@ -66,7 +66,7 @@ public class ODPDBAccess
 
 	public enum BlockCapability
 	{
-		None, Minimal, Average, Excellent
+		None, Minimal, Poor, Average, Good, Excellent
 	}
 
 	public enum GroupStatus

@@ -70,7 +70,7 @@ public abstract class JspSnippets
 		{
 			if (errorMessage.length()>0)
 			{
-				out.println("<script type='text/javascript'>popupMessage('An error occured', '"+
+				out.println("<script type='text/javascript'>popupMessage('An error occurred', '"+
 						errorMessage.replace("'", "\\'")+
 						"');</script>");
 			}
