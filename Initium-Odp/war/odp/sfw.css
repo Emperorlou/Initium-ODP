@@ -1,0 +1,27 @@
+/* Greyscale mode without images to use at work */
+/* #ecf0f1 - White */
+/* #0e0b06 - black */
+
+body img {
+	-webkit-filter: grayscale(100%);
+	-moz-filter: grayscale(100%);
+	filter: grayscale(100%);
+}
+
+.banner-shadowbox, .main-button, .main-button-half, .boldbox, .page-popup, .avatar-equip-backing {
+	background: #0e0b06;
+}
+
+.premium-character-name, .item-unique, .item-rare {
+	color: #ecf0f1; 
+}
+
+p a, li a {
+	color: #ecf0f1;
+	text-decoration: underline;
+}
+
+.chat_tab_selected {
+    background-color: #848484;
+    color: #FFFFFF;
+}
