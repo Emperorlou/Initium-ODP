@@ -9,11 +9,17 @@ body img {
 }
 
 .banner-shadowbox, .main-button, .main-button-half, .boldbox, .page-popup, .avatar-equip-backing {
-	background: #0e0b06;
+	background: #0e0b06 !important;
+}
+
+.avatar-equip-backing {
+	-webkit-filter: grayscale(100%);
+	-moz-filter: grayscale(100%);
+	filter: grayscale(100%);
 }
 
 .premium-character-name, .item-unique, .item-rare, .item-unique, .item-epic {
-	color: #ecf0f1; 
+	color: #ecf0f1 !important; 
 }
 
 p a, li a {
