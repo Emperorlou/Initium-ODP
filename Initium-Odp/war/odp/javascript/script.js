@@ -1286,6 +1286,17 @@ function duelRequest(characterId)
 	location.href = "ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
 }
 
+function storeDeleteSoldItems()
+{
+	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
+}
+
+function storeDeleteItem(saleItemId)
+{
+	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
+}
+
+
 
 
 
