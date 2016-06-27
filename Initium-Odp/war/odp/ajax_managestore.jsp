@@ -145,6 +145,7 @@
 				out.println("</div>");
 				out.println("</div>");
 				out.println("</div>");
+				out.println("</div>");
 				out.println("<br>");
 			}
 		%>
