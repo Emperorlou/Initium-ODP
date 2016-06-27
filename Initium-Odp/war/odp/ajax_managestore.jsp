@@ -48,31 +48,6 @@
 	request.setAttribute("storeSale", storeSale);
 	
 %>
-<!doctype html>
-<!-- The DOCTYPE declaration above will set the     -->
-<!-- browser's rendering engine into                -->
-<!-- "Standards Mode". Replacing this declaration   -->
-<!-- with a "Quirks Mode" doctype is not supported. -->
-
-<html>
-<head>
-	<jsp:include page="common-head.jsp"/>
-
-<!--                                           -->
-<!-- Any title is fine                         -->
-<!--                                           -->
-<title>Manage Store - Initium</title>
-
-</head>
-
-<!--                                           -->
-<!-- The body can have arbitrary html, or      -->
-<!-- you can leave the body empty if you want  -->
-<!-- to create a completely dynamic UI.        -->
-<!--                                           -->
-<body>
-	<%@ include file="loggedin-header.jspf" %>   
-	<div class='main-page'>
 
 		<%=GameUtils.renderSimpleBanner("images/banner---inventory.jpg")%>
 
@@ -178,9 +153,3 @@
 		%>
 		</div>
 		</div>
-		<div class='main-buttonbox'>
-			<a href='main.jsp' class='main-button'>Back to game</a>
-		</div>
-	</div>
-</body>
-</html>
