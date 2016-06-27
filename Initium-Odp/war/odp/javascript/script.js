@@ -435,7 +435,7 @@ function buyHouse()
 	});
 }
 
-function storeSellItem(itemId)
+function storeSellItemNew(itemId)
 {
 	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
 		{
@@ -446,7 +446,7 @@ function storeSellItem(itemId)
 	});
 }d
 
-function storeDeleteAllItems()
+function storeDeleteAllItemsNew()
 {
 	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
 		{
@@ -455,7 +455,7 @@ function storeDeleteAllItems()
 	});
 }
 
-function storeDeleteSoldItems()
+function storeDeleteSoldItemsNew()
 {
 	confirmPopup("Remove All Sold Items","Are you sure you want to remove ALL sold items from your store?", function(){
 		{
@@ -464,12 +464,36 @@ function storeDeleteSoldItems()
 	});
 }
 
-function storeDeleteItem(saleItemId)
+function storeDeleteItemNew(saleItemId)
 {
 	doCommand(eventObject,"StoreDeleteItem",{"itemId":itemId},function(){
 		$("div[ref='"+itemId+"']").remove();
 		})
 		
+}
+
+function storeSellItem(itemId)
+{
+	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
+		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
+	});
+}
+
+function removeAllStoreItems()
+{
+	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
+		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
+	});
+}
+
+function storeDeleteSoldItems()
+{
+	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
+}
+
+function storeDeleteItem(saleItemId)
+{
+	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
 }
 
 function renameStore()
