@@ -89,7 +89,7 @@
 				out.println("			</div>");
 				out.println("		</div>");
 				out.println("	</div>");
-				out.println("<div>");
+				out.println("</div>");
 				out.println("<br>");
 			}
 		%>
@@ -141,7 +141,6 @@
 				out.println("<a onclick='storeDeleteItemNew("+saleItem.getKey().getId()+")' style='font-size:32px;'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>");
 				out.println("<br>");
 				out.println("<div class='main-item-controls'>");
-				out.println("</div>");
 				out.println("</div>");
 				out.println("</div>");
 				out.println("</div>");
