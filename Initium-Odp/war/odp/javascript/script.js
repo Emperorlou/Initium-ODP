@@ -435,7 +435,7 @@ function buyHouse()
 	});
 }
 
-function storeSellItemNew(itemId)
+function storeSellItemNew(eventObject,itemId)
 {
 	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
 		{
@@ -444,9 +444,9 @@ function storeSellItemNew(itemId)
 			})
 		}
 	});
-}d
+}
 
-function storeDeleteAllItemsNew()
+function storeDeleteAllItemsNew(eventObject)
 {
 	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
 		{
@@ -455,7 +455,7 @@ function storeDeleteAllItemsNew()
 	});
 }
 
-function storeDeleteSoldItemsNew()
+function storeDeleteSoldItemsNew(eventObject)
 {
 	confirmPopup("Remove All Sold Items","Are you sure you want to remove ALL sold items from your store?", function(){
 		{
@@ -464,7 +464,7 @@ function storeDeleteSoldItemsNew()
 	});
 }
 
-function storeDeleteItemNew(saleItemId)
+function storeDeleteItemNew(eventObject,saleItemId)
 {
 	doCommand(eventObject,"StoreDeleteItem",{"itemId":itemId},function(){
 		$("div[ref='"+itemId+"']").remove();
