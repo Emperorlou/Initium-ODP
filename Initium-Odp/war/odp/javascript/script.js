@@ -438,8 +438,38 @@ function buyHouse()
 function storeSellItem(itemId)
 {
 	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
-		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
+		{
+		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"ammount":ammount},function(){
+			$("div[ref='"+itemId+"']").remove();
+			})
+		}
 	});
+}d
+
+function storeDeleteAllItems()
+{
+	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
+		{
+		doCommand(eventObject,"StoreDeleteAllItems")
+		}
+	});
+}
+
+function storeDeleteSoldItems()
+{
+	confirmPopup("Remove All Sold Items","Are you sure you want to remove ALL sold items from your store?", function(){
+		{
+		doCommand(eventObject,"StoreDeleteSoldItems")
+		}
+	});
+}
+
+function storeDeleteItem(saleItemId)
+{
+	doCommand(eventObject,"StoreDeleteItem",{"itemId":itemId},function(){
+		$("div[ref='"+itemId+"']").remove();
+		})
+		
 }
 
 function renameStore()
@@ -846,13 +876,6 @@ function dropAllInventory()
 		ajaxAction("ServletCharacterControl?type=dropAllInventory&v="+window.verifyCode, event, function(){
 			reloadPagePopup(true);
 		});
-	});
-}
-
-function removeAllStoreItems()
-{
-	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
-		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
 	});
 }
 
@@ -1286,17 +1309,6 @@ function duelRequest(characterId)
 	location.href = "ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
 }
 
-function storeDeleteSoldItems()
-{
-	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
-}
-
-function storeDeleteItem(saleItemId)
-{
-	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
-}
-
-
 
 
 
@@ -1333,7 +1345,7 @@ function storeDeleteItem(saleItemId)
 ////////////////////////////////////////////////////////
 // COMMANDS
 
-function doCommand(eventObject, commandName, parameters, callback)
+function eventObject, commandName, parameters, callback)
 {
 	// Collapse the parameters into a single string
 	var parametersStr = "";
