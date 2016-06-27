@@ -49,9 +49,6 @@
 	
 %>
 
-		<%=GameUtils.renderSimpleBanner("images/banner---inventory.jpg")%>
-
-
 		<h4 style='cursor:pointer'onclick='renameStore()'>Store name: <%=common.getCharacter().getProperty("storeName")%></h4>
 		<c:if test="${storeOpen==true}">
 			<a onclick='storeDiabled()'>Click here to shutdown your store</a>

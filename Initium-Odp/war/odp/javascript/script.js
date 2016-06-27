@@ -444,7 +444,7 @@ function storeSellItemNew(itemId)
 			})
 		}
 	});
-}d
+}
 
 function storeDeleteAllItemsNew()
 {
@@ -1333,7 +1333,13 @@ function duelRequest(characterId)
 	location.href = "ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
 }
 
-
+function viewManageStore()
+{
+    closeAllPagePopups();
+    closeAllPopups();
+    closeAllTooltips();
+    pagePopup("odp/ajax_managestore.jsp");
+}
 
 
 
