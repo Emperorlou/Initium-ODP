@@ -437,7 +437,8 @@ function buyHouse()
 
 function storeSellItemNew(eventObject,itemId)
 {
-	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
+	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(amount){
+		if (amount!=null && amount!="")
 		{
 		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(){
 			$("div[ref='"+itemId+"']").remove();
@@ -466,7 +467,7 @@ function storeDeleteSoldItemsNew(eventObject)
 
 function storeDeleteItemNew(eventObject,saleItemId)
 {
-	doCommand(eventObject,"StoreDeleteItem",{"itemId":itemId},function(){
+	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":itemId},function(){
 		$("div[ref='"+itemId+"']").remove();
 		})
 		
