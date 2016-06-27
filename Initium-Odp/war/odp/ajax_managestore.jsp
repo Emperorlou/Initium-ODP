@@ -113,7 +113,7 @@
 				out.println("<br>");
 				out.println("		<div ref='itemId'>");
 				out.println("			<div class='main-item-controls'>");
-				out.println("				<a href='#' onclick='storeSellItem("+item.getKey().getId()+")'>Sell This</a>");
+				out.println("				<a href='#' onclick='storeSellItemNew("+item.getKey().getId()+")'>Sell This</a>");
 				out.println("			</div>");
 				out.println("		</div>");
 				out.println("	</div>");
@@ -127,8 +127,8 @@
 		<div class='main-splitScreen'>
 		<div class='boldbox'><h4>Your Storefront</h4>
 		<div class='main-item-controls'>
-			<a onclick='storeDeleteSoldItems()' class='main-item-subnote'>Remove Sold Items</a>
-			<a onclick='removeAllStoreItems()' class='main-item-subnote'>REMOVE ALL</a>
+			<a onclick='storeDeleteSoldItemsNew()' class='main-item-subnote'>Remove Sold Items</a>
+			<a onclick='storeDeleteAllItemsNew()' class='main-item-subnote'>REMOVE ALL</a>
 		</div>
 		<%
 			for(CachedEntity saleItem:saleItems)
@@ -166,7 +166,7 @@
 					}
 					statusText = "<div class='saleItem-sold'>"+statusText+soldTo+"</div>";
 				}
-				out.println("<a onclick='storeDeleteItem("+saleItem.getKey().getId()+")' style='font-size:32px;'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>");
+				out.println("<a onclick='storeDeleteItemNew("+saleItem.getKey().getId()+")' style='font-size:32px;'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>");
 				out.println("<br>");
 				out.println("<div class='main-item-controls'>");
 				out.println("</div>");
