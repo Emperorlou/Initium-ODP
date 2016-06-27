@@ -1345,7 +1345,7 @@ function duelRequest(characterId)
 ////////////////////////////////////////////////////////
 // COMMANDS
 
-function eventObject, commandName, parameters, callback)
+function doCommand(eventObject, commandName, parameters, callback)
 {
 	// Collapse the parameters into a single string
 	var parametersStr = "";
