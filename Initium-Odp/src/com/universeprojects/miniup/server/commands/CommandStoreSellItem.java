@@ -31,16 +31,18 @@ public class CommandStoreSellItem<character> extends Command {
 	@Override
 public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
+		Long amount = (long) Integer.parseInt(parameters.get("amount"));
+		Long itemId = Long.parseLong(parameters.get("itemId"));
+		
 		if (amount<0)
 			throw new UserErrorMessage("You cannot sell an item for less than 0 gold.");
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);
-		CachedEntity item = db.getEntity("Item", tryParseId(parameters, "itemId")); 
+		CachedEntity item = db.getEntity("Item", tryParseId(parameters, "itemId"));
 		
-		Key itemKey = KeyFactory.createKey("Item", itemId);
-		Key characterKey = KeyFactory.createKey("characterKey", 123451234);
+		Key itemKey = KeyFactory.createKey("Item", (long) itemId);
 		
 		if (db.checkCharacterHasItemEquipped(character, itemKey))
 			throw new UserErrorMessage("Unable to sell this item, you currently have it equipped.");
@@ -54,7 +56,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		if (db.checkItemBeingSoldAlready(character.getKey(), itemKey))
 			throw new UserErrorMessage("You are already selling that item. If you want to change the price, remove the existing entry first.");
 		
-		newSaleItem(db, character, item, amount);
+		db.newSaleItem(ds, character, item, amount);
 	}
 	
 }
