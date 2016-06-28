@@ -83,7 +83,7 @@ public class ODPDBAccess
 	public static final String CHARACTER_MODE_TRADING = "TRADING";
 	public static final String[] EQUIPMENT_SLOTS = new String[]
 	{
-			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", 
+			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck"
 	};
 	private CachedDatastoreService ds = null;
 
