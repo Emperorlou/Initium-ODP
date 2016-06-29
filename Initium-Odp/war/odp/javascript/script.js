@@ -443,7 +443,7 @@ function storeSellItemNew(eventObject,itemId)
 		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
 			if (error) return;
 			$(".inventoryItem[ref='"+itemId+"']").remove();
-				$(".saleItem").after(data.createSellItem);
+				$(".saleItem").first().before(data.createSellItem);
 			})
 		}
 	});
@@ -472,7 +472,7 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":saleItemId,"itemId":itemId},function(data,error){
 		if (error) return;
 		$(".saleItem[ref='"+saleItemId+"']").remove();
-			$(".invItem").after(data.createInvItem);
+			$(".invItem").first().before(data.createInvItem);
 		})
 		
 }
