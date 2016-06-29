@@ -269,6 +269,8 @@ public class ODPDBAccess
 	 */
 	public CachedEntity getCurrentCharacter(HttpServletRequest request)
 	{
+		if (request==null) throw new IllegalArgumentException("Request cannot be null.");
+		
 		if (request.getAttribute("characterEntity") != null) return (CachedEntity) request.getAttribute("characterEntity");
 
 		HttpSession session = request.getSession(true);

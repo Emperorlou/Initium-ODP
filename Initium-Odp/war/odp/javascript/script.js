@@ -1427,13 +1427,17 @@ function doCommand(eventObject, commandName, parameters, callback)
 		if (data.message!=null && data.message.length>0)
 			popupMessage("System Message", data.message);
 
+		var error = false;
 		if (data.errorMessage!=null && data.errorMessage.length>0)
+		{
+			error = true;
 			popupMessage("System Message", data.errorMessage);
+		}
 			
 		if (callback!=null && data!=null)
-			callback(data.callbackData);
+			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
-			callback();
+			callback(null, error);
 		
 		$(eventObject.target).text(originalText);
 	})
