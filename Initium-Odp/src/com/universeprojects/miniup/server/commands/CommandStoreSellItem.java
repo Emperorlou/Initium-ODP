@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.commands;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,18 +9,17 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.JspSnippets;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 /** 
  * 
  * Sell an Item!
  * 
  */
 
-public class CommandStoreSellItem<character> extends Command {
+public class CommandStoreSellItem extends Command {
 	
 	public CommandStoreSellItem(HttpServletRequest request, HttpServletResponse response)
 	{
@@ -31,7 +29,7 @@ public class CommandStoreSellItem<character> extends Command {
 	@Override
 public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
-		Long amount = (long) Integer.parseInt(parameters.get("amount"));
+		Long amount = Long.parseLong(parameters.get("amount"));
 		Long itemId = Long.parseLong(parameters.get("itemId"));
 		
 		if (amount<0)
@@ -42,7 +40,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		CachedEntity character = db.getCurrentCharacter(request);
 		CachedEntity item = db.getEntity("Item", tryParseId(parameters, "itemId"));
 		
-		Key itemKey = KeyFactory.createKey("Item", (long) itemId);
+		Key itemKey = KeyFactory.createKey("Item", itemId);
 		
 		if (db.checkCharacterHasItemEquipped(character, itemKey))
 			throw new UserErrorMessage("Unable to sell this item, you currently have it equipped.");
@@ -56,7 +54,8 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		if (db.checkItemBeingSoldAlready(character.getKey(), itemKey))
 			throw new UserErrorMessage("You are already selling that item. If you want to change the price, remove the existing entry first.");
 		
-		db.newSaleItem(ds, character, item, amount);
-	}
-	
+		CachedEntity saleItem = db.newSaleItem(ds, character, item, amount);
+		
+		addCallbackData("createSellItem", HtmlComponents.generateSellItemHtml(db,saleItem));
+		}
 }
