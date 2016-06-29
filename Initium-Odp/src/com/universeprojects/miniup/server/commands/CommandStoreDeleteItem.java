@@ -9,13 +9,13 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 /** 
  * 
- * Deletes sold items from store interface.
+ * Delete an item from store interface.
  * 
  */
 
@@ -32,19 +32,21 @@ public class CommandStoreDeleteItem extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
+		Long saleItemId = Long.parseLong(parameters.get("saleItemId"));
 		Key characterKey = KeyFactory.createKey("characterKey", 954720227);
-		Key sellItemKey = KeyFactory.createKey("sellItemKey", 584775357);
-		CachedEntity sellItem = db.getEntity(sellItemKey);
+		Key saleItemKey = KeyFactory.createKey("saleItemKey", 584775357);
+		CachedEntity saleItem = db.getEntity(saleItemKey);
+		CachedEntity item = db.getEntity("Item", tryParseId(parameters, "itemId"));
 		
-		if (sellItem==null)
+		if (saleItem==null)
 			return;
 		
-		if (characterKey.equals(sellItem.getProperty("characterKey"))==false)
-			throw new IllegalArgumentException("The SellItem this user is trying to delete does not belong to his character.");
+		if (characterKey.equals(saleItem.getProperty("characterKey"))==false)
+			throw new IllegalArgumentException("The SaleItem this user is trying to delete does not belong to his character.");
 		
-		ds.delete(sellItem.getKey());
+		ds.delete(saleItem.getKey());
 		
-		setJavascriptResponse(JavascriptResponse.None);
+		addCallbackData("createInvItem", HtmlComponents.generateInvItemHtml(item));
 	}
 	
 }

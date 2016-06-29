@@ -440,8 +440,9 @@ function storeSellItemNew(eventObject,itemId)
 	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
-		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(){
-			$("div[ref='"+itemId+"']").remove();
+		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data){
+			$(".inventoryItem[ref='"+itemId+"']").remove();
+				$(".saleItem").after(data.createSellItem)
 			})
 		}
 	});
@@ -465,10 +466,11 @@ function storeDeleteSoldItemsNew(eventObject)
 	});
 }
 
-function storeDeleteItemNew(eventObject,saleItemId)
+function storeDeleteItemNew(eventObject,saleItemId,itemId)
 {
-	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":itemId},function(){
-		$("div[ref='"+itemId+"']").remove();
+	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":saleItemId,"itemId":itemId},function(data){
+		$(".saleItem[ref='"+saleItemId+"']").remove();
+			$(".invItem").after(data.createInvItem)
 		})
 		
 }
