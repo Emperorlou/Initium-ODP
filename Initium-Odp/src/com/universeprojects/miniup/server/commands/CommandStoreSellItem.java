@@ -38,9 +38,9 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);
-		CachedEntity item = db.getEntity("Item", tryParseId(parameters, "itemId"));
 		
 		Key itemKey = KeyFactory.createKey("Item", itemId);
+		CachedEntity item = db.getEntity(itemKey);
 		
 		if (db.checkCharacterHasItemEquipped(character, itemKey))
 			throw new UserErrorMessage("Unable to sell this item, you currently have it equipped.");
@@ -56,6 +56,6 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
 		CachedEntity saleItem = db.newSaleItem(ds, character, item, amount);
 		
-		addCallbackData("createSellItem", HtmlComponents.generateSellItemHtml(db,saleItem));
+		addCallbackData("createSellItem", HtmlComponents.generateSellItemHtml(db,saleItem,request));
 		}
 }

@@ -33,10 +33,14 @@ public class CommandStoreDeleteItem extends Command {
 		CachedDatastoreService ds = getDS();
 		
 		Long saleItemId = Long.parseLong(parameters.get("saleItemId"));
-		Key characterKey = KeyFactory.createKey("characterKey", 954720227);
-		Key saleItemKey = KeyFactory.createKey("saleItemKey", 584775357);
+		
+		Key saleItemKey = KeyFactory.createKey("SaleItem", saleItemId);
 		CachedEntity saleItem = db.getEntity(saleItemKey);
-		CachedEntity item = db.getEntity("Item", tryParseId(parameters, "itemId"));
+		
+		CachedEntity user = db.getCurrentUser(request);
+		Key characterKey = (Key) user.getProperty("characterKey");
+		
+		CachedEntity item = db.getEntity((Key) saleItem.getProperty("itemKey"));
 		
 		if (saleItem==null)
 			return;

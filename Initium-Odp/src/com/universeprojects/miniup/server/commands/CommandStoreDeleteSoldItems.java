@@ -7,13 +7,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 /** 
  * 
  * Deletes sold items from store interface.
@@ -33,7 +31,8 @@ public class CommandStoreDeleteSoldItems extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
-		Key characterKey = KeyFactory.createKey("characterKey", 954720227);
+		CachedEntity user = db.getCurrentUser(request);
+		Key characterKey = (Key) user.getProperty("characterKey");
 				
 		List<CachedEntity> saleItems = db.getSaleItemsFor(characterKey);
 		
