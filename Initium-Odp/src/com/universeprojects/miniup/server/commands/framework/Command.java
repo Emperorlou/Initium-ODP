@@ -101,7 +101,7 @@ public abstract class Command
 	 */
 	protected void addCallbackData(String field, Object value)
 	{
-		if (field.matches("[A-Za-z0-9_]")==false)
+		if (field.matches("[A-Za-z0-9_]+")==false)
 			throw new RuntimeException("Callback fields must be valid javascript field identifiers. They can only contain letters, numbers, and underscores.");
 		
 		callbackData.put(field,  value);
@@ -115,7 +115,7 @@ public abstract class Command
 	 */
 	protected Object getCallbackData(String field)
 	{
-		if (field.matches("[A-Za-z0-9_]")==false)
+		if (field.matches("[A-Za-z0-9_]+")==false)
 			throw new RuntimeException("Callback fields must be valid javascript field identifiers. They can only contain letters, numbers, and underscores.");
 		
 		return callbackData.get(field);
