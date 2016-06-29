@@ -91,34 +91,18 @@
 		<%
 			for(CachedEntity item:items)
 			{
-				if (db.checkCharacterHasItemEquipped(common.getCharacter(), item.getKey()))
-					continue;
-				
-				// Check if this item is already being sold. If so, skip it.
-				boolean skip = false;
+				List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", db.getCurrentCharacter(request).getKey());
+		
+				if (db.checkCharacterHasItemEquipped(character, item.getKey()))
+				continue;
+		
 				for(CachedEntity saleItem:saleItems)
 				{
-					if (((Key)saleItem.getProperty("itemKey")).getId() == item.getKey().getId())
-					{
-						skip = true;
-						continue;
-					}
-				}
-				if (skip)
+				if GameUtils.equals(saleItem.getProperty("itemKey"), item.getKey())
 					continue;
+				}
 				
-				out.println("<div ref='itemId'>");
-				out.println("<div class='main-item'> ");
-				out.println("<div class='main-item-container'>");
-				out.println(GameUtils.renderItem(item));
-				out.println("<br>");
-				out.println("			<div class='main-item-controls'>");
-				out.println("				<a href='#' onclick='storeSellItemNew(event,"+item.getKey().getId()+")'>Sell This</a>");
-				out.println("			</div>");
-				out.println("		</div>");
-				out.println("	</div>");
-				out.println("</div>");
-				out.println("<br>");
+				out.println(generateInvItemHtml(item,character))
 			}
 		%>
 		</div>
@@ -134,47 +118,9 @@
 			for(CachedEntity saleItem:saleItems)
 			{
 				if ("Hidden".equals(saleItem.getProperty("status")))
-					continue;
-				CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
-				String itemPopupAttribute = "";
-				String itemName = "";
-				String itemIconElement = "";
-				if (item!=null)
-				{
-					itemName = (String)item.getProperty("name");
-					itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
-					itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
-				}
-				Long cost = (Long)saleItem.getProperty("dogecoins");
-				cost=Math.round(cost.doubleValue()*(storeSale/100));
-				String finalCost = cost.toString();
-				
-				out.println("<div ref='itemId'>");
-				out.println("<div class='main-item'>");
-				
-				out.println(" ");
-				out.println("<div class='main-item-container'>");
-				String statusText = (String)saleItem.getProperty("status");
-				if (statusText.equals("Sold"))
-				{
-					String soldTo = "";
-					if (saleItem.getProperty("soldTo")!=null)
-					{
-						CachedEntity soldToChar = db.getEntity((Key)saleItem.getProperty("soldTo"));
-						if (soldToChar!=null)
-							soldTo = " to "+(String)soldToChar.getProperty("name");
-					}
-					statusText = "<div class='saleItem-sold'>"+statusText+soldTo+"</div>";
-				}
-				out.println("<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' style='font-size:32px;'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>");
-				out.println("<br>");
-				out.println("<div class='main-item-controls'>");
-				out.println("</div>");
-				out.println("</div>");
-				out.println("</div>");
-				out.println("</div>");
-				out.println("<br>");
-			}
+			continue;
+			ODPDBAccess db = getDB();
+			out.println(generateSellItemHtml(db,saleItem,request))
 		%>
 		</div>
 		</div>
