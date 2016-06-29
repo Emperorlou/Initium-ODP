@@ -1342,8 +1342,20 @@ function viewManageStore()
     pagePopup("odp/ajax_managestore.jsp");
 }
 
+function newCharacterFromDead()
+{
+	location.href = "ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
+}
 
+function switchCharacter(characterId)
+{
+	location.href = "ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
+}
 
+function logout()
+{
+	location.href = "ServletUserControl?type=logout"+"&v="+verifyCode;
+}
 
 
 
