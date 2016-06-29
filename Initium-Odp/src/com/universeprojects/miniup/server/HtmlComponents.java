@@ -1,11 +1,16 @@
 package com.universeprojects.miniup.server;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
 public class HtmlComponents {
 
 	public static String generateInvItemHtml(CachedEntity item) {
+		
+		if (item==null)
+			return " ";
 		
 		String result = "";
 			   result+="<div class='invItem'>";
@@ -26,10 +31,10 @@ public class HtmlComponents {
 		return result;
 	}
 	
-	public static String generateSellItemHtml(ODPDBAccess db,CachedEntity saleItem) {
+	public static String generateSellItemHtml(ODPDBAccess db,CachedEntity saleItem, HttpServletRequest request) {
 		
 		CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
-		Double storeSale = (Double)db.getCurrentCharacter(null).getProperty("storeSale");
+		Double storeSale = (Double)db.getCurrentCharacter(request).getProperty("storeSale");
 		String itemPopupAttribute = "";
 		String itemName = "";
 		String itemIconElement = "";
