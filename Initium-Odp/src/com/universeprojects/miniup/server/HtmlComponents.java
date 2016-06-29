@@ -35,6 +35,10 @@ public class HtmlComponents {
 		
 		CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
 		Double storeSale = (Double)db.getCurrentCharacter(request).getProperty("storeSale");
+		if (storeSale == null)
+		{
+			storeSale = 100.0;
+		}
 		String itemPopupAttribute = "";
 		String itemName = "";
 		String itemIconElement = "";
