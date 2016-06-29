@@ -440,15 +440,16 @@ function storeSellItemNew(eventObject,itemId)
 	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
-		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data){
+		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
+			if (error) return;
 			$(".inventoryItem[ref='"+itemId+"']").remove();
-				$(".saleItem").after(data.createSellItem)
+				$(".saleItem").after(data.createSellItem);
 			})
 		}
 	});
 }
 
-function storeDeleteAllItemsNew(eventObject)
+function storeDeleteAllItemsNew(eventObject,characterKey)
 {
 	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
 		{
@@ -468,9 +469,10 @@ function storeDeleteSoldItemsNew(eventObject)
 
 function storeDeleteItemNew(eventObject,saleItemId,itemId)
 {
-	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":saleItemId,"itemId":itemId},function(data){
+	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":saleItemId,"itemId":itemId},function(data,error){
+		if (error) return;
 		$(".saleItem[ref='"+saleItemId+"']").remove();
-			$(".invItem").after(data.createInvItem)
+			$(".invItem").after(data.createInvItem);
 		})
 		
 }
