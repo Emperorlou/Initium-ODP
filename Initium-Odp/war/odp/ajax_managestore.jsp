@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.miniup.server.HiddenUtils"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
@@ -63,18 +64,17 @@
 		<%
 			for(CachedEntity item:items)
 			{
-				List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", db.getCurrentCharacter(request).getKey());
 		
-				if (db.checkCharacterHasItemEquipped(character, item.getKey()))
-				continue;
+				if (db.checkCharacterHasItemEquipped(common.getCharacter(), item.getKey()))
+					continue;
 		
 				for(CachedEntity saleItem:saleItems)
 				{
-				if GameUtils.equals(saleItem.getProperty("itemKey"), item.getKey())
-					continue;
+					if (GameUtils.equals(saleItem.getProperty("itemKey"), item.getKey()))
+						continue;
 				}
 				
-				out.println(generateInvItemHtml(item,character))
+				out.println(HtmlComponents.generateInvItemHtml(item));
 			}
 		%>
 		</div>
@@ -90,9 +90,9 @@
 			for(CachedEntity saleItem:saleItems)
 			{
 				if ("Hidden".equals(saleItem.getProperty("status")))
-			continue;
-			ODPDBAccess db = getDB();
-			out.println(generateSellItemHtml(db,saleItem,request))
+					continue;
+				out.println(HtmlComponents.generateSellItemHtml(db,saleItem,request));
+			}
 		%>
 		</div>
 		</div>
