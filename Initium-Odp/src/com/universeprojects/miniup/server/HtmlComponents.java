@@ -13,8 +13,7 @@ public class HtmlComponents {
 			return " ";
 		
 		String result = "";
-			   result+="<div class='invItem'>";
-			   result+="<div ref="+item.getKey().getId()+">";
+			   result+="<div class='invItem' ref="+item.getKey().getId()+">";
 			   result+="<div class='main-item'>";
 			   result+="<div class='main-item-container'>";
 			   result+=GameUtils.renderItem(item);
@@ -24,7 +23,6 @@ public class HtmlComponents {
 			   result+="			</div>";
 			   result+="		</div>";
 			   result+="	</div>";
-			   result+="</div>";
 			   result+="</div>";
 			   result+="<br>";
 			   
@@ -65,15 +63,13 @@ public class HtmlComponents {
 		}
 		
 		String result = "";
-			   result+="<div class='saleItem'>";
-			   result+="<div ref="+saleItem.getKey().getId()+">";
+			   result+="<div class='saleItem' ref="+saleItem.getKey().getId()+">";
 		   	   result+="<div class='main-item'>";
 		   	   result+=" ";
 		   	   result+="<div class='main-item-container'>";
 		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' style='font-size:32px;'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
 		   	   result+="<br>";
 		   	   result+="<div class='main-item-controls'>";
-		   	   result+="</div>";
 		   	   result+="</div>";
 		   	   result+="</div>";
 		   	   result+="</div>";
