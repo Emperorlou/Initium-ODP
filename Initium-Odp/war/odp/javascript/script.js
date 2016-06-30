@@ -480,7 +480,7 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 		
 }
 
-function storeRenameNew()
+function storeRenameNew(eventObject)
 {
 	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
 		if (name!=null && name!="")
@@ -490,17 +490,17 @@ function storeRenameNew()
 	});	
 }
 
-function storeDisabledNew()
+function storeDisabledNew(eventObject)
 {
 	doCommand(eventObject,"StoreDisable")
 }
 
-function storeEnabledNew()
+function storeEnabledNew(eventObject)
 {
 	doCommand(eventObject,"StoreEnable")
 }
 
-function storeSetSaleNew()
+function storeSetSaleNew(eventObject)
 {
 	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
 		if (sale!=null)
