@@ -19,7 +19,7 @@ public class HtmlComponents {
 			   result+=GameUtils.renderItem(item);
 			   result+="<br>";
 			   result+="			<div class='main-item-controls'>";
-			   result+="				<a href='#' onclick='storeSellItemNew(event,"+item.getKey().getId()+")'>Sell This</a>";
+			   result+="				<a onclick='storeSellItemNew(event,"+item.getKey().getId()+")'>Sell This</a>";
 			   result+="			</div>";
 			   result+="		</div>";
 			   result+="	</div>";

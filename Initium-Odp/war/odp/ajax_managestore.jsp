@@ -51,7 +51,7 @@
 
 		<h4 style='cursor:pointer'onclick='storeRenameNew(event)'>Store name: <%=common.getCharacter().getProperty("storeName")%></h4>
 		<c:if test="${storeOpen==true}">
-			<a onclick='storeDiabledNew(event)'>Click here to shutdown your store</a>
+			<a onclick='storeDisabledNew(event)'>Click here to shutdown your store</a>
 		</c:if>
 		<c:if test="${storeOpen==false}">
 			<a onclick='storeEnabledNew(event)'>Click here to open your store for business</a>

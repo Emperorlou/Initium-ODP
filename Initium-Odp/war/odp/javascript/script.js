@@ -22,7 +22,7 @@ $(window).ready(function(e){
 	});
 	
 	// If a text box is selected, don't allow shortcut keys to process (prevend default)
-	$("input").keyup(function(event){
+	$("input").on("keyup", function(event){
 		event.stopPropagation();
 	});
 	
