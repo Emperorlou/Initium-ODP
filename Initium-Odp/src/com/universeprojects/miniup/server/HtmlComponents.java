@@ -29,7 +29,7 @@ public class HtmlComponents {
 		return result;
 	}
 	
-	public static String generateSellItemHtml(ODPDBAccess db,CachedEntity saleItem, HttpServletRequest request) {
+	public static String generateSellItemHtml(ODPDBAccess db, CachedEntity saleItem, HttpServletRequest request) {
 		
 		CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
 		Double storeSale = (Double)db.getCurrentCharacter(request).getProperty("storeSale");
