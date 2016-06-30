@@ -442,9 +442,9 @@ function storeSellItemNew(eventObject,itemId)
 		{
 		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
 			if (error) return;
-			$(".inventoryItem[ref='"+itemId+"']").remove();
+			$(".invItem[ref='"+itemId+"']").remove();
 			var container = $("#saleItems");
-			container.html(data.createSaleItem+container.html());
+			container.html(data.createSellItem+container.html());
 			})
 		}
 	});
