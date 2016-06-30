@@ -78,7 +78,7 @@
                     }
                 }
                 if (skip)
-                    continue;
+                    continue;	
 				
 				out.println(HtmlComponents.generateInvItemHtml(item));
 			}
