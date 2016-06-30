@@ -10,6 +10,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 /** 
  * 
  * Rename your store!
@@ -34,6 +35,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		character.setProperty("storeName", storeName);
 		
 		ds.put(character);
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }
 	
