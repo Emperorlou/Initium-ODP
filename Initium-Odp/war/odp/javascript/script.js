@@ -443,7 +443,8 @@ function storeSellItemNew(eventObject,itemId)
 		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
 			if (error) return;
 			$(".inventoryItem[ref='"+itemId+"']").remove();
-				$(".saleItem").first().before(data.createSellItem);
+			var container = $("#saleItems");
+			container.html(data.createSaleItem+container.html());
 			})
 		}
 	});
@@ -471,8 +472,10 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 {
 	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":saleItemId,"itemId":itemId},function(data,error){
 		if (error) return;
+		
 		$(".saleItem[ref='"+saleItemId+"']").remove();
-			$(".invItem").first().before(data.createInvItem);
+		var container = $("#invItems");
+		container.html(data.createInvItem+container.html());
 		})
 		
 }
@@ -1360,6 +1363,9 @@ function logout()
 {
 	location.href = "ServletUserControl?type=logout"+"&v="+verifyCode;
 }
+
+
+
 
 
 
