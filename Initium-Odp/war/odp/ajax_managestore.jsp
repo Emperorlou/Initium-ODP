@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.miniup.server.HiddenUtils"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
@@ -14,7 +15,6 @@
 <%@page import="com.universeprojects.miniup.server.Authenticator"%>
 <%
 	response.setHeader("Access-Control-Allow-Origin", "*");		// This is absolutely necessary for phonegap to work
-
 	Authenticator auth = Authenticator.getInstance(request);
 	GameFunctions db = auth.getDB(request);
 	try
@@ -48,34 +48,6 @@
 	request.setAttribute("storeSale", storeSale);
 	
 %>
-<!doctype html>
-<!-- The DOCTYPE declaration above will set the     -->
-<!-- browser's rendering engine into                -->
-<!-- "Standards Mode". Replacing this declaration   -->
-<!-- with a "Quirks Mode" doctype is not supported. -->
-
-<html>
-<head>
-	<jsp:include page="common-head.jsp"/>
-
-<!--                                           -->
-<!-- Any title is fine                         -->
-<!--                                           -->
-<title>Manage Store - Initium</title>
-
-</head>
-
-<!--                                           -->
-<!-- The body can have arbitrary html, or      -->
-<!-- you can leave the body empty if you want  -->
-<!-- to create a completely dynamic UI.        -->
-<!--                                           -->
-<body>
-	<%@ include file="loggedin-header.jspf" %>   
-	<div class='main-page'>
-
-		<%=GameUtils.renderSimpleBanner("images/banner---inventory.jpg")%>
-
 
 		<h4 style='cursor:pointer'onclick='renameStore()'>Store name: <%=common.getCharacter().getProperty("storeName")%></h4>
 		<c:if test="${storeOpen==true}">
@@ -88,23 +60,30 @@
 		<a onclick='changeStoreSale()' title='Use this feature to set a store-wide sale on all items (or even a store-wide price hike)'>Click here to change your store sale/adjustment value</a>
 		<div class='main-splitScreen'>
 		<div class='boldbox'><h4>Your Inventory</h4>
+		<div id='invItems'>
 		<%
 			for(CachedEntity item:items)
 			{
-				List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", db.getCurrentCharacter(request).getKey());
 		
-				if (db.checkCharacterHasItemEquipped(character, item.getKey()))
-				continue;
-		
-				for(CachedEntity saleItem:saleItems)
-				{
-				if GameUtils.equals(saleItem.getProperty("itemKey"), item.getKey())
+				if (db.checkCharacterHasItemEquipped(common.getCharacter(), item.getKey()))
 					continue;
-				}
+		
+				 boolean skip = false;
+                for(CachedEntity saleItem:saleItems)
+                {
+                    if (GameUtils.equals(saleItem.getProperty("itemKey"), item.getKey()))
+                    {
+                        skip=true;
+                        break;
+                    }
+                }
+                if (skip)
+                    continue;
 				
-				out.println(generateInvItemHtml(item,character))
+				out.println(HtmlComponents.generateInvItemHtml(item));
 			}
 		%>
+		</div>
 		</div>
 		</div>
 		
@@ -114,19 +93,15 @@
 			<a onclick='storeDeleteSoldItemsNew(event)' class='main-item-subnote'>Remove Sold Items</a>
 			<a onclick='storeDeleteAllItemsNew(event)' class='main-item-subnote'>REMOVE ALL</a>
 		</div>
+		<div id='saleItems'>
 		<%
 			for(CachedEntity saleItem:saleItems)
 			{
 				if ("Hidden".equals(saleItem.getProperty("status")))
-			continue;
-			ODPDBAccess db = getDB();
-			out.println(generateSellItemHtml(db,saleItem,request))
+					continue;
+				out.println(HtmlComponents.generateSellItemHtml(db,saleItem,request));
+			}
 		%>
 		</div>
 		</div>
-		<div class='main-buttonbox'>
-			<a href='main.jsp' class='main-button'>Back to game</a>
 		</div>
-	</div>
-</body>
-</html>
