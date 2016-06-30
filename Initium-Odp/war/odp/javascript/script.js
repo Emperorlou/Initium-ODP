@@ -1341,7 +1341,28 @@ function duelRequest(characterId)
 	location.href = "ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
 }
 
+function viewManageStore()
+{
+    closeAllPagePopups();
+    closeAllPopups();
+    closeAllTooltips();
+    pagePopup("odp/ajax_managestore.jsp");
+}
 
+function newCharacterFromDead()
+{
+	location.href = "ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
+}
+
+function switchCharacter(characterId)
+{
+	location.href = "ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
+}
+
+function logout()
+{
+	location.href = "ServletUserControl?type=logout"+"&v="+verifyCode;
+}
 
 
 
@@ -1414,13 +1435,17 @@ function doCommand(eventObject, commandName, parameters, callback)
 		if (data.message!=null && data.message.length>0)
 			popupMessage("System Message", data.message);
 
+		var error = false;
 		if (data.errorMessage!=null && data.errorMessage.length>0)
+		{
+			error = true;
 			popupMessage("System Message", data.errorMessage);
+		}
 			
 		if (callback!=null && data!=null)
-			callback(data.callbackData);
+			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
-			callback();
+			callback(null, error);
 		
 		$(eventObject.target).text(originalText);
 	})
