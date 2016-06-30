@@ -10,6 +10,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 /** 
  * 
  * Sell an Item!
@@ -35,5 +36,6 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 			db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_NORMAL);
 			db.doCharacterTimeRefresh(ds, character);
 		}
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }
