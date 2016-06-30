@@ -442,9 +442,9 @@ function storeSellItemNew(eventObject,itemId)
 		{
 		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
 			if (error) return;
-			$(".inventoryItem[ref='"+itemId+"']").remove();
+			$(".invItem[ref='"+itemId+"']").remove();
 			var container = $("#saleItems");
-			container.html(data.createSaleItem+container.html());
+			container.html(data.createSellItem+container.html());
 			})
 		}
 	});
@@ -1341,28 +1341,7 @@ function duelRequest(characterId)
 	location.href = "ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
 }
 
-function viewManageStore()
-{
-    closeAllPagePopups();
-    closeAllPopups();
-    closeAllTooltips();
-    pagePopup("odp/ajax_managestore.jsp");
-}
 
-function newCharacterFromDead()
-{
-	location.href = "ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
-}
-
-function switchCharacter(characterId)
-{
-	location.href = "ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
-}
-
-function logout()
-{
-	location.href = "ServletUserControl?type=logout"+"&v="+verifyCode;
-}
 
 
 
@@ -1435,17 +1414,13 @@ function doCommand(eventObject, commandName, parameters, callback)
 		if (data.message!=null && data.message.length>0)
 			popupMessage("System Message", data.message);
 
-		var error = false;
 		if (data.errorMessage!=null && data.errorMessage.length>0)
-		{
-			error = true;
 			popupMessage("System Message", data.errorMessage);
-		}
 			
 		if (callback!=null && data!=null)
-			callback(data.callbackData, error);
+			callback(data.callbackData);
 		else if (callback!=null && data==null)
-			callback(null, error);
+			callback();
 		
 		$(eventObject.target).text(originalText);
 	})
