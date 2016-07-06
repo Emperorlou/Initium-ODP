@@ -107,7 +107,7 @@ function updateDayNightCycle(forceRefresh)
 	if (rainStrength>=0 && isWeatherEnabled())
 	{
 		
-		var cloudLevel = ((rainStrength-0.25)*1.3333333333334);
+		var cloudLevel = ((rainStrength-0.4)*1.3333333333334);
 		if (cloudLevel<0) cloudLevel=0;
 		if (amount<cloudLevel) amount = cloudLevel;
 		
@@ -206,7 +206,7 @@ function updateDayNightCycle(forceRefresh)
 		previousA = amount;
 		
 		
-		if (rainStrength>0.5)
+		if (rainStrength>0.65)
 		{
 //			var bg=	"url('/images/effects/light-rain1.gif') no-repeat center center, ";
 //			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 

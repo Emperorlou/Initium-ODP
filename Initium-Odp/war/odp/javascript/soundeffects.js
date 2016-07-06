@@ -254,7 +254,7 @@ function setAudioDescriptor(newAudioDescriptor, preset, isOutside)
 function getEnvironmentAudioMode()
 {
 	var mode = "";
-	if (rainStrength<0.5)
+	if (rainStrength<0.65)
 		mode+="clear";
 	else
 		mode+="rainy";
@@ -284,7 +284,7 @@ function updateSpecialAudio()
 		return;
 	
 	var rainVolume = rainStrength;
-	rainVolume-=0.45;
+	rainVolume-=0.6;
 	rainVolume*=3;
 	if (rainVolume<0) rainVolume = 0;
 	if (rainVolume>1) rainVolume = 1;

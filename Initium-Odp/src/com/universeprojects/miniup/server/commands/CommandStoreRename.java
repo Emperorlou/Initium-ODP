@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
@@ -31,6 +32,15 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);
 		String storeName = parameters.get("name");
+
+		if (storeName==null || storeName.matches(db.STORE_NAME_REGEX)==false)
+			throw new UserErrorMessage("The name you provided has invalid characters. Please use only alpha numeric characters or the following symbols: - _/!?+:*&'.,%\"~");
+		if (db.checkStoreNameUnique(storeName)==false)
+			throw new UserErrorMessage("The store name '"+storeName+"' is already in use. Please choose another.");
+		
+		if (storeName.length()>80)
+			throw new UserErrorMessage("The store name cannot be more than 80 characters long.");
+		
 		
 		character.setProperty("storeName", storeName);
 		

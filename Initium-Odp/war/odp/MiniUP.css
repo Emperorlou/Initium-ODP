@@ -537,6 +537,13 @@ p a, li a
 	width:100%;
 }
 
+.main-item-bigx
+{
+	font-size:32px;
+	position: relative;
+    top: 11px;
+}
+
 .main-item
 {
 	display: inline-block;
@@ -829,6 +836,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	-o-box-shadow: inset 0px 0px 27px -7px #000000;
 	
 	font-family: DOS, Monospace;
+}
+
+.saleItems
+{
+	margin-top:10px;
 }
 
 .saleItem-sold

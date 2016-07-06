@@ -67,14 +67,13 @@ public class HtmlComponents {
 		   	   result+="<div class='main-item'>";
 		   	   result+=" ";
 		   	   result+="<div class='main-item-container'>";
-		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' style='font-size:32px;'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
-		   	   result+="<br>";
-		   	   result+="<div class='main-item-controls'>";
+		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
+//		   	   result+="<br>";
+//		   	   result+="<div class='main-item-controls'>";
+//		   	   result+="</div>";
 		   	   result+="</div>";
 		   	   result+="</div>";
 		   	   result+="</div>";
-		   	   result+="</div>";
-		   	   result+="<br>";
 		   	   
    	   return result;
 	}
