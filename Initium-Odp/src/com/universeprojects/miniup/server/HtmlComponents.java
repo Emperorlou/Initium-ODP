@@ -77,4 +77,39 @@ public class HtmlComponents {
 		   	   
    	   return result;
 	}
+	
+	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request){
+		
+        String itemName = "(Item Destroyed)";
+        String itemPopupAttribute = "";
+        String itemIconElement = "";
+        Double storeSale = (Double)storeCharacter.getProperty("storeSale");
+        if (item!=null)
+        {
+            itemName = (String)item.getProperty("name");
+            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
+            itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
+        }
+        
+        Long cost = (Long)item.getProperty("store-dogecoins");
+        cost=Math.round(cost.doubleValue()*(storeSale/100));
+        String finalCost = GameUtils.formatNumber(cost, false);
+        
+      
+        String result ="";
+        		result+="<div class='saleItem' ref="+saleItem.getKey().getId()+">";
+				result+="<div class='main-item'>";
+	   	       	result+="<span><img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
+	   	       	result+="<span>";
+	   	    if ("Selling".equals(item.getProperty("store-status")))
+	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(\""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+((Key)item.getProperty("store-saleItemKey")).getId()+", "+item.getKey().getId()+")'>Buy this</a>";
+	   	    else if ("Sold".equals(item.getProperty("store-status")))   
+	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
+	   	       	result+="</span>";
+	   	    	result+="</div>";
+	   	       	result+="</div>";
+	   	       	result+="<br>";
+		
+		return result;
+	}
 }
