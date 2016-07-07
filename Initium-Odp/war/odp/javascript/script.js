@@ -435,7 +435,7 @@ function buyHouse()
 	});
 }
 
-function storeBuyItemNew(itemName, itemPrice, itemId, saleItemId, characterId)
+function storeBuyItemNew(eventObject, itemName, itemPrice, characterId, saleItemId, itemId)
 {
 	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
 		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId},function(data,error){

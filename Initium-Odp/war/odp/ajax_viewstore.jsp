@@ -1,3 +1,5 @@
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.Map"%>
 <%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
@@ -17,7 +19,7 @@
 <%
     response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
     Authenticator auth = Authenticator.getInstance(request);
-    GameFunctions db = auth.getDB(request);
+    ODPDBAccess db = auth.getDB(request);
     try
     {
         auth.doSecurityChecks(request);
@@ -60,26 +62,48 @@
     }
     
     
-    List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", storeCharacter.getKey());
-    
-    List<CachedEntity> items = new ArrayList<CachedEntity>();
     CachedDatastoreService ds = db.getDB();
+    List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", storeCharacter.getKey());
+    List<Key> itemKeys = new ArrayList<Key>();
+    
+    // First go through each sale item and extract the item keys for each
     for(CachedEntity saleItem:saleItems)
+    	itemKeys.add((Key)saleItem.getProperty("itemKey"));
+
+    // Now fetch the full item list (they will come back in the same order which we definitely want to take advantage of)
+    List<CachedEntity> items = ds.fetchEntitiesFromKeys(itemKeys);
+    Map<CachedEntity, CachedEntity> itemToSaleItemMap = new HashMap<CachedEntity, CachedEntity>();
+    
+    
+    // Now go through the sale items and remove any saleItems (and item) that are invalid or hidden
+    for(int i = saleItems.size()-1; i>=0; i--)
     {
+    	CachedEntity saleItem = saleItems.get(i);
+		CachedEntity item = items.get(i);
+    	
         if ("Hidden".equals(saleItem.getProperty("status")))
-            continue;
-        
-        CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
-        if (item==null)
         {
-            ds.delete(saleItem);
+        	saleItems.remove(i);
+        	items.remove(i);
             continue;
         }
+        
+        // If the item being sold was not found in the database, then we'll delete the sale item while we're at it
+        if (items.get(i)==null)
+        {
+            ds.delete(saleItem);
+            saleItems.remove(i);
+            items.remove(i);
+            continue;
+        }
+        
+        // These are only used for the sorting method db.sortSaleItemList()
         item.setProperty("store-dogecoins", saleItem.getProperty("dogecoins"));
         item.setProperty("store-status", saleItem.getProperty("status"));
         item.setProperty("store-saleItemKey", saleItem.getKey());
         
-        items.add(item);
+        // Also add the item to the map we're going to use
+        itemToSaleItemMap.put(item, saleItem);
     }
     items = db.sortSaleItemList(items);
     
@@ -90,9 +114,6 @@
     
     // TODO: Check if all saleItems are sold, if so, take the player out of store mode
 %>
-        <%=GameUtils.renderSimpleBanner("images/banner---inventory.jpg")%>
-        
-        
         <div>
         <h4><%=storeCharacter.getProperty("name")%>'s Storefront</h4> 
         <p><%=storeCharacter.getProperty("storeName")%></p>
@@ -108,7 +129,7 @@
                     out.println("<h3>"+itemType+"</h3>");
                     currentCategory = itemType;
                 }
-                out.println(HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,saleItem,request));
+                out.println(HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,itemToSaleItemMap.get(item),request));
             }
         %>
         </div>
