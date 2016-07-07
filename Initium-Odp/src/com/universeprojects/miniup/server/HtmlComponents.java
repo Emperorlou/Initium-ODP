@@ -102,7 +102,7 @@ public class HtmlComponents {
 	   	       	result+="<span><img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
 	   	       	result+="<span>";
 	   	    if ("Selling".equals(item.getProperty("store-status")))
-	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='buyItem(\""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+((Key)item.getProperty("store-saleItemKey")).getId()+", "+item.getKey().getId()+")'>Buy this</a>";
+	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(\""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+((Key)item.getProperty("store-saleItemKey")).getId()+", "+item.getKey().getId()+")'>Buy this</a>";
 	   	    else if ("Sold".equals(item.getProperty("store-status")))   
 	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
 	   	       	result+="</span>";
