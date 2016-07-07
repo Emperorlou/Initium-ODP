@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedDatastoreService"%>
@@ -89,8 +90,6 @@
     
     // TODO: Check if all saleItems are sold, if so, take the player out of store mode
 %>
-    <%@ include file="loggedin-header.jspf" %>   
-    <div class='main-page'>
         <%=GameUtils.renderSimpleBanner("images/banner---inventory.jpg")%>
         
         
@@ -113,7 +112,3 @@
             }
         %>
         </div>
-        <div class='main-buttonbox'>
-            <a href='main.jsp' class='main-button'>Back to game</a>
-        </div>
-    </div>
