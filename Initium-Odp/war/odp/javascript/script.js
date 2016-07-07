@@ -435,6 +435,16 @@ function buyHouse()
 	});
 }
 
+function storeBuyItemNew(itemName, itemPrice, itemId, saleItemId, characterId)
+{
+	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
+		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId},function(data,error){
+			if (error) return;
+			$(".saleItem[ref='"+saleItemId+"']").html(data.createStoreItem)
+		})
+	});
+}
+
 function storeSellItemNew(eventObject,itemId)
 {
 	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(amount){
