@@ -107,7 +107,7 @@ function updateDayNightCycle(forceRefresh)
 	if (rainStrength>=0 && isWeatherEnabled())
 	{
 		
-		var cloudLevel = ((rainStrength-0.4)*1.3333333333334);
+		var cloudLevel = ((rainStrength-0.3)*1.3333333333334);
 		if (cloudLevel<0) cloudLevel=0;
 		if (amount<cloudLevel) amount = cloudLevel;
 		
