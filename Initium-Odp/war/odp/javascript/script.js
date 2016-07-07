@@ -22,7 +22,7 @@ $(window).ready(function(e){
 	});
 	
 	// If a text box is selected, don't allow shortcut keys to process (prevend default)
-	$("input").keyup(function(event){
+	$("input").on("keyup", function(event){
 		event.stopPropagation();
 	});
 	
@@ -435,6 +435,16 @@ function buyHouse()
 	});
 }
 
+function storeBuyItemNew(itemName, itemPrice, itemId, saleItemId, characterId)
+{
+	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
+		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId},function(data,error){
+			if (error) return;
+			$(".saleItem[ref='"+saleItemId+"']").html(data.createStoreItem)
+		})
+	});
+}
+
 function storeSellItemNew(eventObject,itemId)
 {
 	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(amount){
@@ -692,7 +702,7 @@ function helpPopup()
 			"<li>/me - This allows you to say something in 3rd person</li>" +
 			"<li>/map - This shows a link to the community-created map which <a href='https://docs.google.com/drawings/d/1ZGBwTTrY5ATlJOWrPnwH2qWkee7kgdRTnTDPVHYZ3Ak/edit?usp=sharing'>you can also find here.</a>" +
 			"<li>/customize - This allows you to share a link to the iten customization page. <a onclick='customizeItemOrderPage()'>You can also find it here</a>" +
-			"<li>/merchant - This allows you to share the link to your store with everyone in the location. Make sure to turn your store on first though! <a href='managestore.jsp'>You can do that here</a>" +
+			"<li>/merchant - This allows you to share the link to your store with everyone in the location. Make sure to turn your store on first though! <a onclick='viewManageStore()'>You can do that here</a>" +
 			"<li>/quickstart - A quick start guide for new players who want to play efficiently as quick as possible! <a href='quickstart.jsp'>Open quick start page.</a></li>" +
 			"<li>/about - Easily share the link to the official 'about' page on this site. <a href='about.jsp'>Open about page.</a></li>" +
 			"<li>/mechanics - Easily share the link to the official 'mechanics' page on this site. It goes into more detail about how the game works. <a href='mechanics.jsp'>Open mechanics page.</a></li>" +
@@ -1114,6 +1124,8 @@ function reloadPagePopup(quietly)
 
 	if (quietly==false)
 		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
+	else
+		$(".page-popup-Reload").html("<img src='javascript/images/wait.gif' border=0 style='margin-top:20px;'/>");
 
 	if (content.is("iframe"))
 	{
@@ -1121,7 +1133,9 @@ function reloadPagePopup(quietly)
 	}
 	else 
 	{
-		content.load(url);
+		content.load(url, null, function(){
+			$(".page-popup-Reload").html("&#8635;");
+		});
 	}
 }
 
@@ -1395,8 +1409,20 @@ function logout()
 	location.href = "ServletUserControl?type=logout"+"&v="+verifyCode;
 }
 
+function attackStructure()
+{
+	location.href = "ServletCharacterControl?type=attackStructure"+"&v="+verifyCode;
+}
 
+function allowDuelRequests()
+{
+	location.href = "ServletCharacterControl?type=allowDuelRequests"+"&v="+verifyCode;
+}
 
+function allowDuelRequests()
+{
+	location.href = "ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
+}
 
 
 
