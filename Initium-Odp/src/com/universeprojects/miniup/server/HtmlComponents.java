@@ -102,7 +102,7 @@ public class HtmlComponents {
         if (item!=null)
         {
             itemName = (String)item.getProperty("name");
-            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+" "+notEnoughStrengthClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
+            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
             itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
         }
         
@@ -117,7 +117,7 @@ public class HtmlComponents {
 	   	       	result+="<span><img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
 	   	       	result+="<span>";
 	   	    if ("Selling".equals(saleItem.getProperty("status")))
-	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getKey().getId()+", "+item.getKey().getId()+")'>Buy this</a>";
+	   	    	result+="<span class='"+notEnoughStrengthClass+"'><a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a></span> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getKey().getId()+", "+item.getKey().getId()+")'>Buy this</a>";
 	   	    else if ("Sold".equals(saleItem.getProperty("status")))   
 	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
 	   	       	result+="</span>";

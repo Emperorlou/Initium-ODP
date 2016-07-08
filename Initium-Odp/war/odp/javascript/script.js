@@ -1424,7 +1424,10 @@ function allowDuelRequests()
 	location.href = "ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
 }
 
-
+function viewStore(characterId)
+{
+	pagePopup("odp/ajax_viewstore.jsp?characterId="+characterId+"");
+}
 
 
 
