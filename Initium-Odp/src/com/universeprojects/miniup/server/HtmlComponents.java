@@ -80,15 +80,29 @@ public class HtmlComponents {
 	
 	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request)
 	{
+		CachedEntity selfCharacter = db.getCurrentCharacter(request);
+		Double characterStrength = db.getCharacterStrength(selfCharacter);
+		
+		Double strengthRequirement = (Double)item.getProperty("strengthRequirement");
+		
+		boolean hasRequiredStrength = true;
+		if (strengthRequirement!=null && characterStrength<strengthRequirement)
+			hasRequiredStrength = false;
+			
+		
+		
         String itemName = "(Item Destroyed)";
         String itemPopupAttribute = "";
         String itemIconElement = "";
         Double storeSale = (Double)storeCharacter.getProperty("storeSale");
+        String notEnoughStrengthClass = "";
+        if (hasRequiredStrength==false)
+        	notEnoughStrengthClass = "not-enough-strength";
         if (storeSale==null) storeSale = 100d;
         if (item!=null)
         {
             itemName = (String)item.getProperty("name");
-            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
+            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+" "+notEnoughStrengthClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
             itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
         }
         
