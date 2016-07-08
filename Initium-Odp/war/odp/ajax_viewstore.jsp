@@ -89,13 +89,18 @@
         }
         
         // If the item being sold was not found in the database, then we'll delete the sale item while we're at it
-        if (items.get(i)==null)
+        // OR
+        // If the item isn't in the seller's inventory AND the item is not sold, then lets delete the sellItem
+        if (item==null || 
+        	(GameUtils.equals(item.getProperty("containerKey"),storeCharacter.getKey())==false && "Sold".equals(saleItem.getProperty("status"))==false))
         {
             ds.delete(saleItem);
             saleItems.remove(i);
             items.remove(i);
             continue;
         }
+        
+        
         
         // These are only used for the sorting method db.sortSaleItemList()
         item.setProperty("store-dogecoins", saleItem.getProperty("dogecoins"));

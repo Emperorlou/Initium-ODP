@@ -89,6 +89,8 @@ public class CommandStoreBuyItem extends Command {
 			ds.put(item);
 			
 			ds.commit();
+
+			addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,saleItem,request));
 		}
 		finally
 		{

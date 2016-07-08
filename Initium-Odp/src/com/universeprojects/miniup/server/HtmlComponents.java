@@ -122,8 +122,7 @@ public class HtmlComponents {
 	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
 	   	       	result+="</span>";
 	   	    	result+="</div>";
-	   	       	result+="</div>";
-	   	       	result+="<br>";
+	   	    	result+="</div>";
 		
 		return result;
 	}
