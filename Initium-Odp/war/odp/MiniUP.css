@@ -1572,16 +1572,27 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 {
 	font-size:16px;
 	color:#999999;
+	background-color: rgba(0,255,0,0.1);
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+    padding: 8px;
 }
 
 .changelog-importance2
 {
 	font-size:20px;
 	color:#CCCCCC;
+	background-color: rgba(0,255,0,0.1);
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+    padding: 8px;
+    border: 3px solid #CCCCCC;
 }
 .changelog-importance2::before
 {
-	content:"MAJOR - ";
+	content:"MAJOR UPDATE: ";
 }
 
 .orders-open-order
