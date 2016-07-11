@@ -1147,8 +1147,138 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	margin-left:3px;
 }
 
+/* AVATAR PROFILE */
+.avatar-equip-boots
+{
+	position:absolute;
+	top:48px;
+	left:18px;
+	width:32px;
+	height:24px;
+	background-size:cover;
+	background-position:center;
+	background-repeat:no-repeat;
+}
 
+.avatar-equip-legs
+{
+	position:absolute;
+	top:30px;
+	left:20px;
+	width:32px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
 
+.avatar-equip-shirt
+{
+	position:absolute;
+	top:14px;
+	left:18px;
+	width:36px;
+	height:36px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-chest
+{
+	position:absolute;
+	top:14px;
+	left:18px;
+	width:36px;
+	height:36px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-helmet
+{
+	position:absolute;
+	top:0px;
+	left:20px;
+	width:30px;
+	height:24px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-gloves-left
+{
+	position:absolute;
+	top:25px;
+	left:5px;
+	width:20px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-gloves-right
+{
+	position:absolute;
+	top:25px;
+	right:5px;
+	width:20px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+	-moz-transform: scaleX(-1);
+	-o-transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
+}
+
+.avatar-equip-leftHand
+{
+	position:absolute;
+	bottom:0px;
+	left:0px;
+	width:30px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-rightHand
+{
+	position:absolute;
+	bottom:0px;
+	right:0px;
+	width:30px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+	-moz-transform: scaleX(-1);
+	-o-transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
+}
+
+.avatar-equip-2hands
+{
+	position:absolute;
+	bottom:4px;
+	left:6px;
+	width:50px;
+	height:40px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
 
 /* EQUIPMENT AVATAR */
 
@@ -1635,7 +1765,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 /* - Opera running on high DPI Macs, PCs and mobile devices   */
 /*                                                            */
 /* Please note that that this code assumes you'll swap a      */
-/* 2× version of your images. If you'd like to supply         */
+/* 2Ã— version of your images. If you'd like to supply         */
 /* finer increments, other thresholds might be appropriate.   */
 /*                                                            */
 /* A test for CSS pixel densites can be found here:           */
