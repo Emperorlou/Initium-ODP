@@ -83,7 +83,15 @@ public class HtmlComponents {
 		CachedEntity selfCharacter = db.getCurrentCharacter(request);
 		Double characterStrength = db.getCharacterStrength(selfCharacter);
 		
-		Double strengthRequirement = (Double)item.getProperty("strengthRequirement");
+		Double strengthRequirement = null;
+		try
+		{
+			strengthRequirement = (Double)item.getProperty("strengthRequirement");
+		}
+		catch(Exception e)
+		{
+			// Ignore exceptions
+		}
 		
 		boolean hasRequiredStrength = true;
 		if (strengthRequirement!=null && characterStrength<strengthRequirement)
@@ -119,7 +127,7 @@ public class HtmlComponents {
 	   	    if ("Selling".equals(saleItem.getProperty("status")))
 	   	    	result+="<span class='"+notEnoughStrengthClass+"'><a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a></span> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getKey().getId()+", "+item.getKey().getId()+")'>Buy this</a>";
 	   	    else if ("Sold".equals(saleItem.getProperty("status")))   
-	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
+	   	    	result+="<span class='"+notEnoughStrengthClass+"'><a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a></span> - <div class='saleItem-sold'>SOLD</div>";
 	   	       	result+="</span>";
 	   	    	result+="</div>";
 	   	    	result+="</div>";

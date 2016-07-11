@@ -2475,6 +2475,24 @@ public class ODPDBAccess
 
 	}
 	
+	public boolean isCharacterTrading(CachedDatastoreService ds, CachedEntity character)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		if (CHARACTER_MODE_TRADING.equals(character.getProperty("mode"))==false)
+			return false;
+		
+		TradeObject t = TradeObject.getTradeObjectFor(ds, character);
+
+		if (t==null || t.isCancelled())
+			return false;
+		
+		return true;
+	}
+	
+	
+	
 	
 	/**
 	 * This is a special method that is called from time to time after certain player actions.
