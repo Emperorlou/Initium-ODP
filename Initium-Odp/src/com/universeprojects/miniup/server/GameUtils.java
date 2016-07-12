@@ -864,11 +864,11 @@ public class GameUtils
     
     public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide)
     {
-    	return renderCharacterWidget(request, db, character, selfUser, leftSide, true);
+    	return renderCharacterWidget(request, db, character, selfUser, null, leftSide, true, false, false);
     }
     
     
-    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide, boolean showBuffs)
+    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean largeSize, boolean showGroup)
     {
     	boolean isSelf = false;
     	if (selfUser!=null)
@@ -933,7 +933,7 @@ public class GameUtils
 		int hitpoints = ((Double)character.getProperty("hitpoints")).intValue();
 		int maxHitpoints = ((Double)character.getProperty("maxHitpoints")).intValue();
 		if (leftSide)
-			nameAndBars.append("<div style='display:inline-block;'>");
+			nameAndBars.append("<div style='display:inline-block; max-width:230px'>");
 		else
 			nameAndBars.append("<div style='display:inline-block; text-align:right;max-width:100px; overflow: hidden;'>");
 		if (isSelf)
@@ -948,6 +948,15 @@ public class GameUtils
 		else
 			nameAndBars.append("			<p style='margin:0px; padding:0px; width:100px; text-align:right; display:block; font-size:11px;position:absolute;font-family:Sans-serif;'>"+hitpoints+"/"+maxHitpoints+"</p>");
 		nameAndBars.append("		</div>");
+		
+		// Insert the group stuff if we have one passed in
+		if (group!=null)
+		{
+			nameAndBars.append("<a href='group.jsp?groupId="+group.getId()+"' class='main-highlight'>"+group.getProperty("name")+"</a>");
+			if (character.getProperty("groupRank")!=null)
+				nameAndBars.append("<div class='main-highlight' style='font-size:14px'>"+character.getProperty("groupRank")+"</div>");
+		}
+		
 		nameAndBars.append("</div>");
 		
 		
@@ -966,33 +975,37 @@ public class GameUtils
 		if (isSelf)
 			sb.append("<a class='clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
 		
-		sb.append("<div class='avatar-equip-backing'>");
+		String sizePrepend = "";
+		if (largeSize)
+			sizePrepend = "-64px";
+		
+		sb.append("<div class='avatar-equip-backing"+sizePrepend+"'>");
 		if (equipmentBootsUrl!=null)
-			sb.append("<div class='avatar-equip-boots' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-boots"+sizePrepend+"' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
 		if (equipmentLegsUrl!=null)
-			sb.append("<div class='avatar-equip-legs' style='background-image:url(\""+equipmentLegsUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-legs"+sizePrepend+"' style='background-image:url(\""+equipmentLegsUrl+"\")'></div>");
 		if (equipmentShirtUrl!=null)
-			sb.append("<div class='avatar-equip-shirt' style='background-image:url(\""+equipmentShirtUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-shirt"+sizePrepend+"' style='background-image:url(\""+equipmentShirtUrl+"\")'></div>");
 		if (equipmentChestUrl!=null)
-			sb.append("<div class='avatar-equip-chest' style='background-image:url(\""+equipmentChestUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-chest"+sizePrepend+"' style='background-image:url(\""+equipmentChestUrl+"\")'></div>");
 		if (equipmentHelmetUrl!=null)
-			sb.append("<div class='avatar-equip-helmet' style='background-image:url(\""+equipmentHelmetUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-helmet"+sizePrepend+"' style='background-image:url(\""+equipmentHelmetUrl+"\")'></div>");
 		if (equipmentGlovesUrl!=null)
 		{
-			sb.append("<div class='avatar-equip-gloves-left' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
-			sb.append("<div class='avatar-equip-gloves-right' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-gloves-left"+sizePrepend+"' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-gloves-right"+sizePrepend+"' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
 		}
 		if (is2Handed==false)
 		{
 			if (equipmentLeftHandUrl!=null)
-				sb.append("<div class='avatar-equip-leftHand' style='background-image:url(\""+equipmentLeftHandUrl+"\")'></div>");
+				sb.append("<div class='avatar-equip-leftHand"+sizePrepend+"' style='background-image:url(\""+equipmentLeftHandUrl+"\")'></div>");
 			if (equipmentRightHandUrl!=null)
-				sb.append("<div class='avatar-equip-rightHand' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+				sb.append("<div class='avatar-equip-rightHand"+sizePrepend+"' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
 		}
 		else
 		{
 			if (equipmentRightHandUrl!=null)
-				sb.append("<div class='avatar-equip-2hands' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+				sb.append("<div class='avatar-equip-2hands"+sizePrepend+"' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
 		}
 		sb.append("</div>");
 		if (isSelf)

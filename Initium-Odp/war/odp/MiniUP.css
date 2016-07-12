@@ -413,6 +413,12 @@ p a, li a
 	color:#777777;
 }
 
+a.main-highlight:HOVER
+{
+	text-decoration: underline;
+	color:#777777;
+}
+
 .main-partied-indicator
 {
 	margin-left:15px;
@@ -1199,6 +1205,23 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 }
 
 /* EQUIPMENT AVATAR STYLES 64PX */
+.avatar-equip-backing-64px
+{
+    background-color: #333333;	
+    width: 72px;
+    height: 72px;
+    border: 3px solid #EFEFEF;
+    top: 0px;
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    margin-left: 5px;
+    margin-right: 5px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+	
+}
 .avatar-equip-boots-64px
 {
 	position:absolute;
@@ -1793,7 +1816,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .not-enough-strength
 {
-	background-color:rgba(255,0,0,0.3)
+	background-color:rgba(255,0,0,0.2)
 }
 
 
