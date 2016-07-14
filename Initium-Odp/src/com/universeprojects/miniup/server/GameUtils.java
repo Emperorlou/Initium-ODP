@@ -798,13 +798,41 @@ public class GameUtils
     
     public static String renderItem(CachedEntity item)
     {
-    	return renderItem(null, item, false);
+    	return renderItem(null, null, null, item, false);
     }
     
-    public static String renderItem(HttpServletRequest request, CachedEntity item, boolean popupEmbedded)
+    public static String renderItem(ODPDBAccess db, CachedEntity character, CachedEntity item)
+    {
+    	return renderItem(db, null, character, item, false);
+    }
+    
+    public static String renderItem(ODPDBAccess db, HttpServletRequest request, CachedEntity character, CachedEntity item, boolean popupEmbedded)
     {
 		if (item==null)
 			return "";
+
+		boolean hasRequiredStrength = true;
+		if (character!=null)
+		{
+			Double characterStrength = db.getCharacterStrength(character);
+			
+			Double strengthRequirement = null;
+			try
+			{
+				strengthRequirement = (Double)item.getProperty("strengthRequirement");
+			}
+			catch(Exception e)
+			{
+				// Ignore exceptions
+			}
+			
+			if (strengthRequirement!=null && characterStrength<strengthRequirement)
+				hasRequiredStrength = false;
+		}
+        String notEnoughStrengthClass = "";
+        if (hasRequiredStrength==false)
+        	notEnoughStrengthClass = "not-enough-strength";
+		
 		
 		String qualityClass = determineQuality(item.getProperties());
 		String label = (String)item.getProperty("label"); 
@@ -812,9 +840,9 @@ public class GameUtils
 			label = (String)item.getProperty("name");
 		
 		if (popupEmbedded)
-			return "<a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)
