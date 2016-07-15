@@ -2556,7 +2556,19 @@ public class ODPDBAccess
 	}
 	
 	
-	
+	public boolean isCharacterDefending(CachedEntity characterLocation, CachedEntity character)
+	{
+		if (character.getProperty("status")!=null && character.getProperty("status").equals(CharacterStatus.Normal)==false)
+			return false;
+		
+		if (characterLocation==null)
+			characterLocation = getEntity((Key)character.getProperty("locationKey"));
+		
+		if (characterLocation.getProperty("defenceStructure")==null || "TRUE".equals(characterLocation.getProperty("defenceStructuresAllowed"))==false)
+			return false;
+		
+		return true;
+	}
 	
 	
 	

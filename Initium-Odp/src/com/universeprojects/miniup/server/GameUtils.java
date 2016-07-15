@@ -902,6 +902,10 @@ public class GameUtils
     	if (selfUser!=null)
     		isSelf = true;
     	
+    	boolean isCloaked = false;
+    	if (GameUtils.equals(character.getProperty("cloaked"), true))
+    		isCloaked = true;
+    	
 		CachedEntity equipmentHelmet = db.getEntity((Key)character.getProperty("equipmentHelmet"));
 		String equipmentHelmetUrl = null;
 		if (equipmentHelmet!=null) 
@@ -1008,32 +1012,40 @@ public class GameUtils
 			sizePrepend = "-64px";
 		
 		sb.append("<div class='avatar-equip-backing"+sizePrepend+"'>");
-		if (equipmentBootsUrl!=null)
-			sb.append("<div class='avatar-equip-boots"+sizePrepend+"' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
-		if (equipmentLegsUrl!=null)
-			sb.append("<div class='avatar-equip-legs"+sizePrepend+"' style='background-image:url(\""+equipmentLegsUrl+"\")'></div>");
-		if (equipmentShirtUrl!=null)
-			sb.append("<div class='avatar-equip-shirt"+sizePrepend+"' style='background-image:url(\""+equipmentShirtUrl+"\")'></div>");
-		if (equipmentChestUrl!=null)
-			sb.append("<div class='avatar-equip-chest"+sizePrepend+"' style='background-image:url(\""+equipmentChestUrl+"\")'></div>");
-		if (equipmentHelmetUrl!=null)
-			sb.append("<div class='avatar-equip-helmet"+sizePrepend+"' style='background-image:url(\""+equipmentHelmetUrl+"\")'></div>");
-		if (equipmentGlovesUrl!=null)
+		
+		if (isCloaked==false)
 		{
-			sb.append("<div class='avatar-equip-gloves-left"+sizePrepend+"' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
-			sb.append("<div class='avatar-equip-gloves-right"+sizePrepend+"' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
-		}
-		if (is2Handed==false)
-		{
-			if (equipmentLeftHandUrl!=null)
-				sb.append("<div class='avatar-equip-leftHand"+sizePrepend+"' style='background-image:url(\""+equipmentLeftHandUrl+"\")'></div>");
-			if (equipmentRightHandUrl!=null)
-				sb.append("<div class='avatar-equip-rightHand"+sizePrepend+"' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+			if (equipmentBootsUrl!=null)
+				sb.append("<div class='avatar-equip-boots"+sizePrepend+"' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
+			if (equipmentLegsUrl!=null)
+				sb.append("<div class='avatar-equip-legs"+sizePrepend+"' style='background-image:url(\""+equipmentLegsUrl+"\")'></div>");
+			if (equipmentShirtUrl!=null)
+				sb.append("<div class='avatar-equip-shirt"+sizePrepend+"' style='background-image:url(\""+equipmentShirtUrl+"\")'></div>");
+			if (equipmentChestUrl!=null)
+				sb.append("<div class='avatar-equip-chest"+sizePrepend+"' style='background-image:url(\""+equipmentChestUrl+"\")'></div>");
+			if (equipmentHelmetUrl!=null)
+				sb.append("<div class='avatar-equip-helmet"+sizePrepend+"' style='background-image:url(\""+equipmentHelmetUrl+"\")'></div>");
+			if (equipmentGlovesUrl!=null)
+			{
+				sb.append("<div class='avatar-equip-gloves-left"+sizePrepend+"' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
+				sb.append("<div class='avatar-equip-gloves-right"+sizePrepend+"' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
+			}
+			if (is2Handed==false)
+			{
+				if (equipmentLeftHandUrl!=null)
+					sb.append("<div class='avatar-equip-leftHand"+sizePrepend+"' style='background-image:url(\""+equipmentLeftHandUrl+"\")'></div>");
+				if (equipmentRightHandUrl!=null)
+					sb.append("<div class='avatar-equip-rightHand"+sizePrepend+"' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+			}
+			else
+			{
+				if (equipmentRightHandUrl!=null)
+					sb.append("<div class='avatar-equip-2hands"+sizePrepend+"' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+			}
 		}
 		else
 		{
-			if (equipmentRightHandUrl!=null)
-				sb.append("<div class='avatar-equip-2hands"+sizePrepend+"' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"images/cloak1.png\")'></div>");
 		}
 		sb.append("</div>");
 		if (isSelf)
