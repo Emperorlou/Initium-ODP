@@ -59,7 +59,7 @@ p
 	<div class='main-page'>
 
 		<div class='main-banner-textonly'>
-			<img src="images/banner-backing.jpg" border="0" style="width:100%">
+			<img src="/images/banner-backing.jpg" border="0" style="width:100%">
 			<div class='main-banner-text'>			
 				<h1>INITIUM GAME MECHANICS</h1>
 	            <p>
