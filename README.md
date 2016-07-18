@@ -31,7 +31,10 @@ https://developers.google.com/eclipse/docs/getting_started
 I personally use TortoiseGIT. You can download that here: 
 https://tortoisegit.org/
 
-## Import Initium-ODP as a project into your eclipse
+## Get the CachedDatastore repo as well
+https://github.com/Emperorlou/Cached-Datastore
+
+## Import CachedDatastore AND Initium-ODP as a project into your eclipse
 I've never actually done this step. Any ODP guys please update the documentation for how to do this precisely. Thanks!
 
 NOTE: It may complain that there is no Appengine SDK defined. Usually that just means you have to remove the Appengine SDK and re-add it (silly eclipse). To do this do the following:
