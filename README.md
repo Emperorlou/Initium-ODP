@@ -28,6 +28,8 @@ This link also contains the install instuctions.
 https://developers.google.com/eclipse/docs/getting_started
 
 ## Get this GIT repo onto your system
+I personally use TortoiseGIT. You can download that here: 
+https://tortoisegit.org/
 
 ## Import Initium-ODP as a project into your eclipse
 I've never actually done this step. Any ODP guys please update the documentation for how to do this precisely. Thanks!
