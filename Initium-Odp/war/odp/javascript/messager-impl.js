@@ -30,6 +30,8 @@ messager.onNotificationMessage = function(message)
 		fullpageRefresh();
 	if (message.type == "tradeStarted")
 		_viewTrade();
+	if (message.type == "tradeChanged")
+		updateTradeWindow();
 };
 
 
