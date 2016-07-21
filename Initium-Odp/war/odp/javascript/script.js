@@ -1020,7 +1020,7 @@ function enterDefenceStructureSlot(slot)
 	}
 }
 
-
+var popupStackCloseCallbackHandlers = [];
 var currentPopupStackIndex = 0;
 var popupKeydownHandler = function(e){if (e.keyCode == 27) closePagePopup();}
 function incrementStackIndex()
@@ -1057,7 +1057,7 @@ function decrementStackIndex()
 	return currentPopupStackIndex;
 }
 
-function pagePopup(url)
+function pagePopup(url, closeCallback)
 {
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
@@ -1071,6 +1071,11 @@ function pagePopup(url)
 	
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
+	
+	if (closeCallback!=null)
+		popupStackCloseCallbackHandlers.push(closeCallback);
+	else
+		popupStackCloseCallbackHandlers.push(null);
 }
 
 function pagePopupIframe(url)
@@ -1097,6 +1102,10 @@ function closePagePopup()
 	}
 	
 	decrementStackIndex();
+	
+	var func = popupStackCloseCallbackHandlers.pop();
+	if (func!=null)
+		func();
 }
 
 function closeAllPagePopups()
