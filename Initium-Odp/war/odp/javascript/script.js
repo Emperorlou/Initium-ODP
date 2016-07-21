@@ -1429,7 +1429,10 @@ function viewStore(characterId)
 	pagePopup("odp/ajax_viewstore.jsp?characterId="+characterId+"");
 }
 
-
+function setBlockadeRule(rule)
+{
+	location.href = "ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
+}
 
 
 
