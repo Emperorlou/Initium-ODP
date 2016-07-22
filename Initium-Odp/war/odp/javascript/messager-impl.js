@@ -32,6 +32,8 @@ messager.onNotificationMessage = function(message)
 		_viewTrade();
 	if (message.type == "tradeChanged")
 		updateTradeWindow();
+	if (message.type == "tradeCancelled")
+		cancelledTradeWindow();
 };
 
 
