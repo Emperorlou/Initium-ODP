@@ -798,13 +798,41 @@ public class GameUtils
     
     public static String renderItem(CachedEntity item)
     {
-    	return renderItem(null, item, false);
+    	return renderItem(null, null, null, item, false);
     }
     
-    public static String renderItem(HttpServletRequest request, CachedEntity item, boolean popupEmbedded)
+    public static String renderItem(ODPDBAccess db, CachedEntity character, CachedEntity item)
+    {
+    	return renderItem(db, null, character, item, false);
+    }
+    
+    public static String renderItem(ODPDBAccess db, HttpServletRequest request, CachedEntity character, CachedEntity item, boolean popupEmbedded)
     {
 		if (item==null)
 			return "";
+
+		boolean hasRequiredStrength = true;
+		if (character!=null)
+		{
+			Double characterStrength = db.getCharacterStrength(character);
+			
+			Double strengthRequirement = null;
+			try
+			{
+				strengthRequirement = (Double)item.getProperty("strengthRequirement");
+			}
+			catch(Exception e)
+			{
+				// Ignore exceptions
+			}
+			
+			if (strengthRequirement!=null && characterStrength<strengthRequirement)
+				hasRequiredStrength = false;
+		}
+        String notEnoughStrengthClass = "";
+        if (hasRequiredStrength==false)
+        	notEnoughStrengthClass = "not-enough-strength";
+		
 		
 		String qualityClass = determineQuality(item.getProperties());
 		String label = (String)item.getProperty("label"); 
@@ -812,9 +840,9 @@ public class GameUtils
 			label = (String)item.getProperty("name");
 		
 		if (popupEmbedded)
-			return "<a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)
@@ -864,15 +892,19 @@ public class GameUtils
     
     public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide)
     {
-    	return renderCharacterWidget(request, db, character, selfUser, leftSide, true);
+    	return renderCharacterWidget(request, db, character, selfUser, null, leftSide, true, false, false);
     }
     
     
-    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide, boolean showBuffs)
+    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean largeSize, boolean showGroup)
     {
     	boolean isSelf = false;
     	if (selfUser!=null)
     		isSelf = true;
+    	
+    	boolean isCloaked = false;
+    	if (GameUtils.equals(character.getProperty("cloaked"), true))
+    		isCloaked = true;
     	
 		CachedEntity equipmentHelmet = db.getEntity((Key)character.getProperty("equipmentHelmet"));
 		String equipmentHelmetUrl = null;
@@ -933,7 +965,7 @@ public class GameUtils
 		int hitpoints = ((Double)character.getProperty("hitpoints")).intValue();
 		int maxHitpoints = ((Double)character.getProperty("maxHitpoints")).intValue();
 		if (leftSide)
-			nameAndBars.append("<div style='display:inline-block;'>");
+			nameAndBars.append("<div style='display:inline-block; max-width:230px'>");
 		else
 			nameAndBars.append("<div style='display:inline-block; text-align:right;max-width:100px; overflow: hidden;'>");
 		if (isSelf)
@@ -948,6 +980,15 @@ public class GameUtils
 		else
 			nameAndBars.append("			<p style='margin:0px; padding:0px; width:100px; text-align:right; display:block; font-size:11px;position:absolute;font-family:Sans-serif;'>"+hitpoints+"/"+maxHitpoints+"</p>");
 		nameAndBars.append("		</div>");
+		
+		// Insert the group stuff if we have one passed in
+		if (group!=null)
+		{
+			nameAndBars.append("<a href='group.jsp?groupId="+group.getId()+"' class='main-highlight'>"+group.getProperty("name")+"</a>");
+			if (character.getProperty("groupRank")!=null)
+				nameAndBars.append("<div class='main-highlight' style='font-size:14px'>"+character.getProperty("groupRank")+"</div>");
+		}
+		
 		nameAndBars.append("</div>");
 		
 		
@@ -966,33 +1007,45 @@ public class GameUtils
 		if (isSelf)
 			sb.append("<a class='clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
 		
-		sb.append("<div class='avatar-equip-backing'>");
-		if (equipmentBootsUrl!=null)
-			sb.append("<div class='avatar-equip-boots' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
-		if (equipmentLegsUrl!=null)
-			sb.append("<div class='avatar-equip-legs' style='background-image:url(\""+equipmentLegsUrl+"\")'></div>");
-		if (equipmentShirtUrl!=null)
-			sb.append("<div class='avatar-equip-shirt' style='background-image:url(\""+equipmentShirtUrl+"\")'></div>");
-		if (equipmentChestUrl!=null)
-			sb.append("<div class='avatar-equip-chest' style='background-image:url(\""+equipmentChestUrl+"\")'></div>");
-		if (equipmentHelmetUrl!=null)
-			sb.append("<div class='avatar-equip-helmet' style='background-image:url(\""+equipmentHelmetUrl+"\")'></div>");
-		if (equipmentGlovesUrl!=null)
+		String sizePrepend = "";
+		if (largeSize)
+			sizePrepend = "-64px";
+		
+		sb.append("<div class='avatar-equip-backing"+sizePrepend+"'>");
+		
+		if (isCloaked==false)
 		{
-			sb.append("<div class='avatar-equip-gloves-left' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
-			sb.append("<div class='avatar-equip-gloves-right' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
-		}
-		if (is2Handed==false)
-		{
-			if (equipmentLeftHandUrl!=null)
-				sb.append("<div class='avatar-equip-leftHand' style='background-image:url(\""+equipmentLeftHandUrl+"\")'></div>");
-			if (equipmentRightHandUrl!=null)
-				sb.append("<div class='avatar-equip-rightHand' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+			if (equipmentBootsUrl!=null)
+				sb.append("<div class='avatar-equip-boots"+sizePrepend+"' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
+			if (equipmentLegsUrl!=null)
+				sb.append("<div class='avatar-equip-legs"+sizePrepend+"' style='background-image:url(\""+equipmentLegsUrl+"\")'></div>");
+			if (equipmentShirtUrl!=null)
+				sb.append("<div class='avatar-equip-shirt"+sizePrepend+"' style='background-image:url(\""+equipmentShirtUrl+"\")'></div>");
+			if (equipmentChestUrl!=null)
+				sb.append("<div class='avatar-equip-chest"+sizePrepend+"' style='background-image:url(\""+equipmentChestUrl+"\")'></div>");
+			if (equipmentHelmetUrl!=null)
+				sb.append("<div class='avatar-equip-helmet"+sizePrepend+"' style='background-image:url(\""+equipmentHelmetUrl+"\")'></div>");
+			if (equipmentGlovesUrl!=null)
+			{
+				sb.append("<div class='avatar-equip-gloves-left"+sizePrepend+"' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
+				sb.append("<div class='avatar-equip-gloves-right"+sizePrepend+"' style='background-image:url(\""+equipmentGlovesUrl+"\")'></div>");
+			}
+			if (is2Handed==false)
+			{
+				if (equipmentLeftHandUrl!=null)
+					sb.append("<div class='avatar-equip-leftHand"+sizePrepend+"' style='background-image:url(\""+equipmentLeftHandUrl+"\")'></div>");
+				if (equipmentRightHandUrl!=null)
+					sb.append("<div class='avatar-equip-rightHand"+sizePrepend+"' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+			}
+			else
+			{
+				if (equipmentRightHandUrl!=null)
+					sb.append("<div class='avatar-equip-2hands"+sizePrepend+"' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+			}
 		}
 		else
 		{
-			if (equipmentRightHandUrl!=null)
-				sb.append("<div class='avatar-equip-2hands' style='background-image:url(\""+equipmentRightHandUrl+"\")'></div>");
+			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"images/cloak1.png\")'></div>");
 		}
 		sb.append("</div>");
 		if (isSelf)
@@ -1020,7 +1073,7 @@ public class GameUtils
 			sb.append("<h5 style='margin-top:0px;'>"+character.getProperty("name")+"'s Options</h5>");
 			sb.append("<p><a onclick='viewProfile()'>View "+character.getProperty("name")+"'s profile</a></p>");
 			sb.append("<p><a onclick='popupCharacterTransferService("+character.getKey().getId()+", \""+character.getProperty("name")+"\", \""+request.getAttribute("characterToTransfer")+"\")' style='cursor:pointer'>Open the Character Transfer Service</a></p>");
-			sb.append("<p><a href='ServletUserControl?type=logout'>Logout</a></p>");
+			sb.append("<p><a onclick='logout()'>Logout</a></p>");
 			if (request.getAttribute("characterList")!=null)
 			{
 				sb.append("<h5>Switch Characters</h5>");
@@ -1028,7 +1081,7 @@ public class GameUtils
 				for(CachedEntity c:(List<CachedEntity>)request.getAttribute("characterList"))
 				{
 					if (c.getProperty("name").toString().startsWith("Dead ")==false)
-						sb.append("<li><a href='ServletUserControl?type=switchCharacter&characterId="+c.getKey().getId()+"'>"+c.getProperty("name")+"</a></li>");	
+						sb.append("<li><a onclick='switchCharacter("+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
 				}
 				sb.append("</ul>");
 				sb.append("<p><a href='newcharacter.jsp'>Create a new character</a></p>");
@@ -1562,20 +1615,20 @@ public class GameUtils
 	}
 	
 	public static double getWeaponMaxDamage(CachedEntity weapon)
-	{
-		String damageFormula = (String)weapon.getProperty("weaponDamage");
-		Double critChance = null;
-		if ((Long)weapon.getProperty("weaponDamageCriticalChance") instanceof Long)
-		{
-			Long chance = (Long)weapon.getProperty("weaponDamageCriticalChance");			
-			critChance = chance.doubleValue();
-		}
-		Double critMultiplier = null;
-		if (weapon.getProperty("weaponDamageCriticalMultiplier") instanceof Double)
-			critMultiplier = (Double)weapon.getProperty("weaponDamageCriticalMultiplier");
-		
-		return GameUtils.getWeaponMaxDamage(damageFormula, critMultiplier, critChance);
-	}
+    {
+        String damageFormula = (String)weapon.getProperty("weaponDamage");
+        Double critChance = null;
+        if ((Long)weapon.getProperty("weaponDamageCriticalChance") instanceof Long)
+        {
+            Long chance = (Long)weapon.getProperty("weaponDamageCriticalChance");            
+            critChance = chance.doubleValue()/100d;
+        }
+        Double critMultiplier = null;
+        if (weapon.getProperty("weaponDamageCriticalMultiplier") instanceof Double)
+            critMultiplier = (Double)weapon.getProperty("weaponDamageCriticalMultiplier");
+        
+        return GameUtils.getWeaponMaxDamage(damageFormula, critMultiplier, critChance);
+    }
 	
 	/**
 	 * 
@@ -1605,7 +1658,7 @@ public class GameUtils
 		if ((Long)weapon.getProperty("weaponDamageCriticalChance") instanceof Long)
 		{
 			Long chance = (Long)weapon.getProperty("weaponDamageCriticalChance");			
-			critChance = chance.doubleValue();
+			critChance = chance.doubleValue()/100d;
 		}
 		Double critMultiplier = null;
 		if (weapon.getProperty("weaponDamageCriticalMultiplier") instanceof Double)
@@ -1630,7 +1683,7 @@ public class GameUtils
 		double firstPart = Double.parseDouble(dmgParts[0]);
 		double secondPart = Double.parseDouble(dmgParts[1]);
 		
-		return firstPart*((secondPart-1d)/2d+secondPart)*(1d+critChance*(critMultiplier-1d));
+		return firstPart*((secondPart-1d)/2d+1)*(1d+critChance*(critMultiplier-1d));
 	}
 	
 	

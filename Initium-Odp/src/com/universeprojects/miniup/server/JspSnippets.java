@@ -70,7 +70,7 @@ public abstract class JspSnippets
 		{
 			if (errorMessage.length()>0)
 			{
-				out.println("<script type='text/javascript'>popupMessage('An error occured', '"+
+				out.println("<script type='text/javascript'>popupMessage('An error occurred', '"+
 						errorMessage.replace("'", "\\'")+
 						"');</script>");
 			}
@@ -80,6 +80,7 @@ public abstract class JspSnippets
 		if(queryString != null && queryString.trim().isEmpty() == false) {
 			queryString = queryString.replaceAll("message=[^&]*", "");
 			queryString = queryString.replaceAll("error=[^&]*", "");
+			queryString = queryString.replaceAll("v=[^&]*", "");
 			queryString = queryString.replaceAll("&&+","&");
 			if(queryString.startsWith("&"))
 				queryString = queryString.substring(1);

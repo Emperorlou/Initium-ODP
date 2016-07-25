@@ -28,6 +28,12 @@ messager.onNotificationMessage = function(message)
 	
 	if (message.type == "fullpageRefresh")
 		fullpageRefresh();
+	if (message.type == "tradeStarted")
+		_viewTrade();
+	if (message.type == "tradeChanged")
+		updateTradeWindow();
+	if (message.type == "tradeCancelled")
+		cancelledTradeWindow();
 };
 
 

@@ -413,6 +413,12 @@ p a, li a
 	color:#777777;
 }
 
+a.main-highlight:HOVER
+{
+	text-decoration: underline;
+	color:#777777;
+}
+
 .main-partied-indicator
 {
 	margin-left:15px;
@@ -535,6 +541,13 @@ p a, li a
 	display:inline-block;
 	vertical-align:top;
 	width:100%;
+}
+
+.main-item-bigx
+{
+	font-size:32px;
+	position: relative;
+    top: 11px;
 }
 
 .main-item
@@ -829,6 +842,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	-o-box-shadow: inset 0px 0px 27px -7px #000000;
 	
 	font-family: DOS, Monospace;
+}
+
+.saleItems
+{
+	margin-top:10px;
 }
 
 .saleItem-sold
@@ -1135,8 +1153,215 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	margin-left:3px;
 }
 
+/* EQUIPMENT AVATAR STYLES 32PX */
+.avatar-equip-cloak
+{
+	position:absolute; top:0px; left:0px; width:100%; height:100%; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
 
+.avatar-equip-boots
+{
+	position:absolute; top:24px; left:9px; width:16px; height:12px; background-size:contain; background-position:center; background-repeat:no-repeat;
+}	
 
+.avatar-equip-legs
+{
+	position:absolute; top:15px; left:10px; width:16px; height:15px;  background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+
+.avatar-equip-shirt
+{
+	position:absolute; top:7px; left:9px; width:18px; height:18px; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+
+.avatar-equip-chest
+{
+	position:absolute; top:7px; left:9px; width:18px; height:18px; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+
+.avatar-equip-helmet
+{
+	position:absolute; top:0px; left:10px; width:15px; height:12px; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+
+.avatar-equip-gloves-left
+{
+	position:absolute; top:10px; left:1px; width:10px; height:15px; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+
+.avatar-equip-gloves-right
+{
+	position:absolute; top:10px; right:1px; width:10px; height:15px; background-size:contain; background-position:center; background-repeat:no-repeat; -moz-transform: scaleX(-1); -o-transform: scaleX(-1); -webkit-transform: scaleX(-1); transform: scaleX(-1); filter: FlipH; -ms-filter: "FlipH";
+}
+
+.avatar-equip-leftHand
+{
+	position:absolute; bottom:0px; left:0px; width:15px; height:15px; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+
+.avatar-equip-rightHand
+{
+	position:absolute; bottom:0px; right:0px; width:15px; height:15px; background-size:contain; background-position:center; background-repeat:no-repeat;-moz-transform: scaleX(-1); -o-transform: scaleX(-1); -webkit-transform: scaleX(-1); transform: scaleX(-1); filter: FlipH; -ms-filter: "FlipH";
+}
+
+.avatar-equip-2hands
+{
+	position:absolute; bottom:1px; left:3px; width:25px; height:20px; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+
+/* EQUIPMENT AVATAR STYLES 64PX */
+.avatar-equip-backing-64px
+{
+    background-color: #333333;	
+    width: 72px;
+    height: 72px;
+    border: 3px solid #EFEFEF;
+    top: 0px;
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    margin-left: 5px;
+    margin-right: 5px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+	
+}
+.avatar-equip-cloak-64px
+{
+	position:absolute; top:0px; left:0px; width:100%; height:100%; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+.avatar-equip-boots-64px
+{
+	position:absolute;
+	top:48px;
+	left:18px;
+	width:32px;
+	height:24px;
+	background-size:cover;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-legs-64px
+{
+	position:absolute;
+	top:30px;
+	left:20px;
+	width:32px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-shirt-64px
+{
+	position:absolute;
+	top:14px;
+	left:18px;
+	width:36px;
+	height:36px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-chest-64px
+{
+	position:absolute;
+	top:14px;
+	left:18px;
+	width:36px;
+	height:36px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-helmet-64px
+{
+	position:absolute;
+	top:0px;
+	left:20px;
+	width:30px;
+	height:24px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-gloves-left-64px
+{
+	position:absolute;
+	top:25px;
+	left:5px;
+	width:20px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-gloves-right-64px
+{
+	position:absolute;
+	top:25px;
+	right:5px;
+	width:20px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+	-moz-transform: scaleX(-1);
+	-o-transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
+}
+
+.avatar-equip-leftHand-64px
+{
+	position:absolute;
+	bottom:0px;
+	left:0px;
+	width:30px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
+
+.avatar-equip-rightHand-64px
+{
+	position:absolute;
+	bottom:0px;
+	right:0px;
+	width:30px;
+	height:30px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+	-moz-transform: scaleX(-1);
+	-o-transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
+}
+
+.avatar-equip-2hands-64px
+{
+	position:absolute;
+	bottom:4px;
+	left:6px;
+	width:50px;
+	height:40px;
+	background-size:contain;
+	background-position:center;
+	background-repeat:no-repeat;
+}
 
 /* EQUIPMENT AVATAR */
 
@@ -1560,16 +1785,27 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 {
 	font-size:16px;
 	color:#999999;
+	background-color: rgba(0,255,0,0.1);
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+    padding: 8px;
 }
 
 .changelog-importance2
 {
 	font-size:20px;
 	color:#CCCCCC;
+	background-color: rgba(0,255,0,0.1);
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+    padding: 8px;
+    border: 3px solid #CCCCCC;
 }
 .changelog-importance2::before
 {
-	content:"MAJOR - ";
+	content:"MAJOR UPDATE: ";
 }
 
 .orders-open-order
@@ -1587,7 +1823,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	
 }
 
-
+.not-enough-strength
+{
+	background-color:rgba(255,0,0,0.2)
+}
 
 
 
@@ -1620,7 +1859,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 /* - Opera running on high DPI Macs, PCs and mobile devices   */
 /*                                                            */
 /* Please note that that this code assumes you'll swap a      */
-/* 2× version of your images. If you'd like to supply         */
+/* 2Ã— version of your images. If you'd like to supply         */
 /* finer increments, other thresholds might be appropriate.   */
 /*                                                            */
 /* A test for CSS pixel densites can be found here:           */

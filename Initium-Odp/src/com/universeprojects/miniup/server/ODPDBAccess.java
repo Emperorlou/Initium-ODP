@@ -66,7 +66,7 @@ public class ODPDBAccess
 
 	public enum BlockCapability
 	{
-		None, Minimal, Average, Excellent
+		None, Minimal, Poor, Average, Good, Excellent
 	}
 
 	public enum GroupStatus
@@ -83,7 +83,7 @@ public class ODPDBAccess
 	public static final String CHARACTER_MODE_TRADING = "TRADING";
 	public static final String[] EQUIPMENT_SLOTS = new String[]
 	{
-			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", 
+			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck"
 	};
 	private CachedDatastoreService ds = null;
 
@@ -102,6 +102,12 @@ public class ODPDBAccess
 		return ds;
 	}
 
+	// Just a method stub that is not part of the ODP (but still callable)
+	public void sendNotification(CachedDatastoreService ds, Key character, NotificationType notificationType)
+	{
+		
+	}
+	
 	public MemcacheService getMC()
 	{
 		return getDB().getMC();
@@ -263,6 +269,8 @@ public class ODPDBAccess
 	 */
 	public CachedEntity getCurrentCharacter(HttpServletRequest request)
 	{
+		if (request==null) throw new IllegalArgumentException("Request cannot be null.");
+		
 		if (request.getAttribute("characterEntity") != null) return (CachedEntity) request.getAttribute("characterEntity");
 
 		HttpSession session = request.getSession(true);
@@ -2067,16 +2075,500 @@ public class ODPDBAccess
 	}
 
 	
+	public void doStoreSellItem(CachedEntity character, Long itemId, Long amount) throws UserErrorMessage {
+		
+		if (amount<0)
+			throw new UserErrorMessage("You cannot sell an item for less than 0 gold.");
+		
+		CachedDatastoreService db = getDB();
+		
+		
+		Key itemKey = KeyFactory.createKey("Item", itemId);
+		
+		if (checkCharacterHasItemEquipped(character, itemKey))
+			throw new UserErrorMessage("Unable to sell this item, you currently have it equipped.");
+		
+		CachedEntity item = getEntity(itemKey);
+		
+		if (item==null)
+			throw new UserErrorMessage("Item doesn't exist.");
+		
+		if (item.getProperty("containerKey").equals(character.getKey())==false)
+			throw new UserErrorMessage("You do not have this item. You cannot sell an item that is not in your inventory.");
+		
+		if (checkItemBeingSoldAlready(character.getKey(), itemKey))
+			throw new UserErrorMessage("You are already selling that item. If you want to change the price, remove the existing entry first.");
+		
+		
+		
+		newSaleItem(db, character, item, amount);
+	}
+
+
+	public void doStoreDeleteItemByItemId(Key characterKey, Long itemId) throws UserErrorMessage
+	{
+		List<CachedEntity> list = getFilteredList("SaleItem", "itemKey", KeyFactory.createKey("Item", itemId), "characterKey", characterKey);
+		for(CachedEntity e:list)
+			doStoreDeleteItem(characterKey, e);
+	}
+	
+	public void doStoreDeleteItem(Key characterKey, Long sellItemId) throws UserErrorMessage 
+	{
+		CachedDatastoreService db = getDB();
+		
+		Key sellItemKey = KeyFactory.createKey("SaleItem", sellItemId);
+		CachedEntity sellItem = getEntity(sellItemKey);
+		
+		doStoreDeleteItem(characterKey, sellItem);
+	}
+	
+	public void doStoreDeleteItem(Key characterKey, CachedEntity sellItem) throws UserErrorMessage 
+	{
+		CachedDatastoreService db = getDB();
+		
+		if (sellItem==null)
+			return;
+		
+		if (characterKey.equals(sellItem.getProperty("characterKey"))==false)
+			throw new IllegalArgumentException("The SellItem this user is trying to delete does not belong to his character.");
+		
+		db.delete(sellItem.getKey());
+	}
+	
+	public void doStoreDeleteAllItems(Key characterKey) throws UserErrorMessage 
+	{
+		CachedDatastoreService db = getDB();
+		
+		List<CachedEntity> saleItems = getSaleItemsFor(characterKey);
+		
+		for(CachedEntity item:saleItems)
+		{
+			if (item!=null)
+			{
+				if (characterKey.equals(item.getProperty("characterKey"))==false)
+					throw new IllegalArgumentException("The SellItem this user is trying to delete does not belong to his character.");
+				
+				db.delete(item);
+			}
+		}
+	}
+	
+	public void doStoreDeleteAllSoldItems(Key characterKey) throws UserErrorMessage 
+	{
+		CachedDatastoreService db = getDB();
+		
+		List<CachedEntity> saleItems = getSaleItemsFor(characterKey);
+		
+		for(CachedEntity item:saleItems)
+		{
+			if (item!=null)
+			{
+				if (characterKey.equals(item.getProperty("characterKey"))==false)
+					throw new IllegalArgumentException("The SellItem this user is trying to delete does not belong to his character.");
+				
+				if (item.getProperty("status")!=null && item.getProperty("status").equals("Sold"))
+					db.delete(item);
+			}
+		}
+	}
+	
+	public void doStoreEnable(CachedDatastoreService db, CachedEntity character, CachedEntity characterLocation) throws UserErrorMessage
+	{
+		if (db==null)
+			db = getDB();
+		
+//		if ("MarketSite".equals(characterLocation.getProperty("type"))==false)
+//			throw new UserErrorMessage("You cannot setup shop outside of a marketplace.");
+		
+		if ("COMBAT".equals(character.getProperty("mode")))
+			throw new UserErrorMessage("You cannot setup shop while in combat lol");
+		
+		setCharacterMode(db, character, ODPDBAccess.CHARACTER_MODE_MERCHANT);
+		
+		
+		doCharacterTimeRefresh(db, character);	// This is saving the character, so no need to save after this
+		
+//		db.put(character);
+	}
+
+	
+	public void doStoreDisable(CachedDatastoreService db, CachedEntity character) throws UserErrorMessage
+	{
+		if (db==null)
+			db = getDB();
+		
+		if ("MERCHANT".equals(character.getProperty("mode")))
+		{
+			character.setProperty("mode", CHARACTER_MODE_NORMAL);
+			
+			db.put(character);
+		}
+	}
+
+
+	public void doStoreRename(CachedDatastoreService db, CachedEntity character, String storeName) 
+	{
+		if (db==null)
+			db = getDB();
+		
+		character.setProperty("storeName", storeName);
+		
+		db.put(character);
+		
+	}
+
+
+	public void doStoreBuyItem(CachedDatastoreService db, CachedEntity character, Long saleItemId) throws UserErrorMessage {
+		if (db==null)
+			db = getDB();
+		
+		
+		CachedEntity saleItem = getEntity("SaleItem", saleItemId);
+		if (saleItem==null)
+			throw new UserErrorMessage("This item has been taken down. The owner is no longer selling it.");
+		if ("Sold".equals(saleItem.getProperty("status")))
+			throw new UserErrorMessage("The owner of the store has already sold this item.");
+		if ("Hidden".equals(saleItem.getProperty("status")))
+			throw new UserErrorMessage("The owner of the store is not selling this item at the moment.");
+
+		Long cost = (Long)saleItem.getProperty("dogecoins");
+		if (cost==null)
+			throw new UserErrorMessage("The sale item is not setup properly. It has no cost.");
+		
+		
+		CachedEntity sellingCharacter = getEntity((Key)saleItem.getProperty("characterKey"));
+		if (CHARACTER_MODE_MERCHANT.equals(sellingCharacter.getProperty("mode"))==false)
+			throw new UserErrorMessage("The owner of the store is not selling at the moment.");
+		if (((Key)sellingCharacter.getProperty("locationKey")).getId()!=((Key)character.getProperty("locationKey")).getId())
+			throw new UserErrorMessage("You are not in the same location as the seller. You can only buy from a merchant who is in the same location as you.");
+
+		if (character.getKey().getId() == sellingCharacter.getKey().getId())
+			throw new UserErrorMessage("You cannot buy items from yourself.");
+		
+		Double storeSale = (Double)sellingCharacter.getProperty("storeSale");
+		if (storeSale==null) storeSale = 100d;
+
+		cost=Math.round(cost.doubleValue()*(storeSale/100));
+		
+		if (cost>(Long)character.getProperty("dogecoins"))
+			throw new UserErrorMessage("You do not have enough funds to buy this item. You have "+character.getProperty("dogecoins")+" and it costs "+saleItem.getProperty("dogecoins")+".");
+		
+		CachedEntity item = getEntity((Key)saleItem.getProperty("itemKey"));
+		if (item==null)
+			throw new UserErrorMessage("The item being sold has been removed.");
+		if (((Key)item.getProperty("containerKey")).getId()!=sellingCharacter.getKey().getId())
+			throw new UserErrorMessage("The item you tried to buy is not actually in the seller's posession. Purchase has been cancelled.");
+		
+		
+		if (cost<0)
+			throw new UserErrorMessage("You cannot buy a negatively priced item.");
+		
+		db.beginTransaction();
+		try
+		{
+			saleItem.setProperty("status", "Sold");
+			saleItem.setProperty("soldTo", character.getKey());
+			sellingCharacter.setProperty("dogecoins", ((Long)sellingCharacter.getProperty("dogecoins"))+cost);
+			character.setProperty("dogecoins", ((Long)character.getProperty("dogecoins"))-cost);
+			item.setProperty("containerKey", character.getKey());
+			item.setProperty("movedTimestamp", new Date());
+			
+			db.put(saleItem);
+			db.put(sellingCharacter);
+			db.put(character);
+			db.put(item);
+			
+			db.commit();
+		}
+		finally
+		{
+			db.rollbackIfActive();
+		}
+		
+		
+		
+		
+		
+	}
+	
+	
+	public void setCharacterMode(CachedDatastoreService ds, CachedEntity character, String mode)
+	{
+		if ("TRADING".equals(character.getProperty("mode")))
+		{
+			try {
+				setTradeCancelled(ds, character);
+			} catch (UserErrorMessage e) {
+				// Ignore errors
+			}
+		}
+		character.setProperty("mode", mode);
+	}
+
+	
+	
+	
+	//////////////////////////////////////////////////
+	// 1 on 1 TRADE RELATED STUFF
+	
+	public void startTrade(CachedDatastoreService ds, CachedEntity character, CachedEntity otherCharacter) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		if (((Key)character.getProperty("locationKey")).getId() != ((Key)otherCharacter.getProperty("locationKey")).getId())
+			throw new UserErrorMessage("You cannot start a trade with a character that is not in your location.");
+		
+		TradeObject.startNewTrade(ds, character, otherCharacter);
+		
+		sendNotification(ds, otherCharacter.getKey(), NotificationType.fullpageRefresh);
+	}
+	
+	
+	public void addTradeItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+			throw new UserErrorMessage("Trade has been cancelled.");
+		
+		if (((Key)item.getProperty("containerKey")).getId() != character.getKey().getId())
+			throw new UserErrorMessage("You do not currently have that item in your posession and cannot trade it.");
+		
+		tradeObject.addObject(ds, character, item);
+		
+	}
+	
+	public void removeTradeItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+			throw new UserErrorMessage("Trade has been cancelled.");
+		
+		tradeObject.removeObject(ds, character, item);
+	}
+	
+	public void setTradeDogecoin(CachedDatastoreService ds, CachedEntity character, long amount) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+			throw new UserErrorMessage("Trade has been cancelled.");
+		
+		tradeObject.setDogecoins(ds, character, amount);
+	}
+	
+	public TradeObject setTradeReady(CachedDatastoreService ds, CachedEntity character, int version) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+			throw new UserErrorMessage("Trade has been cancelled.");
+		
+		if (tradeObject.getVersion()!=version)
+			throw new UserErrorMessage("The other user changed something.");
+
+		if (TradeObject.checkEntitiesChanged(ds, tradeObject.character1Items))
+		{
+			throw new UserErrorMessage("Items have changed, please restart the trade.");
+		}
+	
+		if (TradeObject.checkEntitiesChanged(ds, tradeObject.character2Items))
+		{
+			throw new UserErrorMessage("Items have changed, please restart the trade.");
+		}
+		
+		
+		if (tradeObject.isReady(ds, character))
+			tradeObject.flagReady(ds, character, false);
+		else
+			tradeObject.flagReady(ds, character, true);
+
+		CachedEntity character1 = getEntity(tradeObject.character1Key);
+		CachedEntity character2 = getEntity(tradeObject.character2Key);
+
+		if (((Key)character1.getProperty("locationKey")).getId() != ((Key)character2.getProperty("locationKey")).getId())
+		{
+			setTradeCancelled(ds, character);
+			throw new UserErrorMessage("You canot trade with a character who is not in your location.");
+		}
+		
+		
+		if (tradeObject.isReady(ds, character) && tradeObject.isReady(ds, getEntity(tradeObject.getOtherCharacter(character.getKey()))))
+		{
+			// If both users are ready at this point, perform the trade...
+		
+			
+			
+			// First give the items and dogecoins to character2...
+			for(CachedEntity item:tradeObject.character1Items)
+			{
+				//If the item being traded was up for sale, remove it from the sale list now
+				doStoreDeleteItemByItemId(tradeObject.character1Key, item.getKey().getId());
+				
+				item.setProperty("containerKey", character2.getKey());
+				item.setProperty("movedTimestamp", new Date());
+				ds.put(item);
+			}
+			character2.setProperty("dogecoins", (Long)character2.getProperty("dogecoins")+tradeObject.character1Dogecoins);
+			character1.setProperty("dogecoins", (Long)character1.getProperty("dogecoins")-tradeObject.character1Dogecoins);
+			
+			// Now give the items and dogecoins to character1...
+			for(CachedEntity item:tradeObject.character2Items)
+			{
+				//If the item being traded was up for sale, remove it from the sale list now
+				doStoreDeleteItemByItemId(tradeObject.character2Key, item.getKey().getId());
+				
+				item.setProperty("containerKey", character1.getKey());
+				item.setProperty("movedTimestamp", new Date());
+				ds.put(item);
+			}
+			character1.setProperty("dogecoins", (Long)character1.getProperty("dogecoins")+tradeObject.character2Dogecoins);
+			character2.setProperty("dogecoins", (Long)character2.getProperty("dogecoins")-tradeObject.character2Dogecoins);
+			
+			
+			// Change the character modes
+			character1.setProperty("mode", CHARACTER_MODE_NORMAL);
+			character1.setProperty("combatant", null);
+			character1.setProperty("combatType", null);
+			character2.setProperty("mode", CHARACTER_MODE_NORMAL);
+			character2.setProperty("combatant", null);
+			character2.setProperty("combatType", null);
+			
+			// Do a quick check to see if an exploit is being done somehow making a characters gold negative. If so, throw.
+			
+			if ((Long)character1.getProperty("dogecoins")<0l || (Long)character2.getProperty("dogecoins")<0l)
+				throw new IllegalStateException("Trade was resulting in a negative balance for one or more recipients: "+character1.getKey()+", "+character2.getKey());
+			
+	
+			ds.put(character1);
+			ds.put(character2);
+			
+			tradeObject.flagComplete(ds);
+		}
+		
+		if (character1.getKey().getId() == character.getKey().getId())
+			sendNotification(ds, character2.getKey(), NotificationType.fullpageRefresh);
+		else
+			sendNotification(ds, character1.getKey(), NotificationType.fullpageRefresh);
+
+		return tradeObject;
+	}
+	
+	public void setTradeCancelled(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+			throw new UserErrorMessage("Trade has been cancelled.");
+
+		
+		tradeObject.flagCancelled(ds, character);
+		
+		sendNotification(ds, tradeObject.getOtherCharacter(character.getKey()), NotificationType.fullpageRefresh);
+
+	}
+	
+	public boolean isCharacterTrading(CachedDatastoreService ds, CachedEntity character)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		if (CHARACTER_MODE_TRADING.equals(character.getProperty("mode"))==false)
+			return false;
+		
+		TradeObject t = TradeObject.getTradeObjectFor(ds, character);
+
+		if (t==null || t.isCancelled())
+			return false;
+		
+		return true;
+	}
 	
 	
 	
 	
+	/**
+	 * This is a special method that is called from time to time after certain player actions.
+	 * Essentially, instead of a game "tick", we do things in this method that relates to "stuff that happens over time".
+	 * The key is the character's locationEntryDatetime field. Every time this method is called, that field is updated
+	 * and the amount of time that passes since the last update must be taken into account when modifying things.
+	 * 
+	 * For example, if a character is resting and we want to gain 1 hitpoints every 10 seconds, then we would determine
+	 * how much time has passed and modify the character's hitpoints at that point.
+	 * 
+	 * Another example could be when a character enters a cold area, the amount of time spent in that area will reduce his
+	 * hit points based on how warm the character is (depending on what he is wearing). 
+	 * @param db
+	 * @param character
+	 */
+	public void doCharacterTimeRefresh(CachedDatastoreService db, CachedEntity character)
+	{
+		//TODO: I think we don't need this at all at the moment.
+//		if (character.getProperty("locationEntryDatetime") instanceof String)
+//		{
+//			character.setProperty("locationEntryDatetime", new Date());
+//			db.put(character);
+//			return;
+//		}
+//		Date locationStartDate = (Date)character.getProperty("locationEntryDatetime");
+//		if (locationStartDate==null)
+//		{
+//			// If the location start date is null, then just set it and get out of here
+//			character.setProperty("locationEntryDatetime", new Date());
+//			db.put(character);
+//			return;
+//		}
+//		
+//		boolean characterChanged = false;
+//		try
+//		{
+//			Date now = new Date();
+//			character.setProperty("locationEntryDatetime", now);
+//			
+//			// All of these values denote the amount of time that has passed since the last time refresh...
+//			long ms = now.getTime()-locationStartDate.getTime();
+//			long seconds = ms/1000;
+//			long minutes = seconds/60;
+//			long hours = minutes/60;
+//			long days = hours/24;
+//			
+//			// HERE is where we will progress long progressions (like building, harvesting/gathering, reseraching, experimenting, practicing..etc)
+//
+//			// TODO: Consider if we really NEED to save the character after each refresh. Maybe we should only save it if something actually changes.. that might require a more advanced time-refresh framework, but it would save excessive writes.
+//
+//			
+//			
+//		}
+//		finally
+//		{
+			db.put(character);
+//		}
+		
+		
+		
+	}
 	
 	
-	
-	
-	
-	
+	public boolean isCharacterDefending(CachedEntity characterLocation, CachedEntity character)
+	{
+		if (character.getProperty("status")!=null && character.getProperty("status").equals(CharacterStatus.Normal)==false)
+			return false;
+		
+		if (characterLocation==null)
+			characterLocation = getEntity((Key)character.getProperty("locationKey"));
+		
+		if (characterLocation.getProperty("defenceStructure")==null || "TRUE".equals(characterLocation.getProperty("defenceStructuresAllowed"))==false)
+			return false;
+		
+		return true;
+	}
 	
 	
 	

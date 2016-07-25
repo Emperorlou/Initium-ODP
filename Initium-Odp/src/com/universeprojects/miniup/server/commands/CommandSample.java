@@ -59,6 +59,8 @@ public class CommandSample extends Command {
 		// Lets get the parameter that was passed in, we'll do different things depending on what it is
 		String test = parameters.get("test");
 		
+		// Add a test variable that we could use in the callback on the client (in the javascript)
+		addCallbackData("testCallbackVariable", 100);
 		
 		// Now we'll poupup different messages (or throw exceptions) depending on what the 'test' parameter equals...
 		if ("1".equals(test))

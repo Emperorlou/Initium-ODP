@@ -75,7 +75,6 @@ public class CommandSetLeader extends Command {
 			throw new UserErrorMessage("Error while switching leader: "+e.getMessage());
 		}
 		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
-		
 	}
 
 }
