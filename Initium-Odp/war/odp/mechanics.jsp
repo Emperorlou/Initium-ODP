@@ -63,7 +63,7 @@ return;
 				<p>
 					This page will give you some in-depth insight into how the game works so you can
 					get the most out of your characters. If you are just starting out, you might want
-					to check out the <a href='about.jsp'>about page</a>, or the <a href='quickstart.jsp'>quick start guide</a> first.
+					to check out the <a href='/about.jsp'>about page</a>, or the <a href='/quickstart.jsp'>quick start guide</a> first.
 				</p>		
 			</div>
 		</div>

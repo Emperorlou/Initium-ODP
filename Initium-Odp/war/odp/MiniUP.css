@@ -718,12 +718,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 }
 
-.big-link
-{
-	font-size:20px;
-	text-align:center;
-	margin-left:30px;	
-}
 
 .main-forgetPath
 {
@@ -1510,9 +1504,14 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 {
 	font-size:14px;
 	overflow:hidden; 
-	height:120px;
-	min-height:120px;
+	height:100px;
+	min-height:100px;
 	background: #111111;
+	margin-top:10px;
+}
+#quotes p
+{
+	padding-bottom:10px;
 }
 #quotes div
 {
@@ -1524,6 +1523,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 .jshowoff-slidelinks
 {
 	text-align:center;
+	padding-bottom:10px; 
 }
 .jshowoff-slidelinks a
 {
@@ -1557,6 +1557,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 .marketing-button-group a img
 {
 	vertical-align:middle;
+	margin-left:8px; 
 }
 
 .fineprint
@@ -1828,7 +1829,18 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	background-color:rgba(255,0,0,0.2)
 }
 
+.big-link
+{
+	font-size:36px;
+	color: #DAA520;
+	text-shadow: 3px 3px 5px rgba(0, 0, 0, 1);
+	margin-bottom:8px;
+}
 
+.big-link-list
+{
+	text-align:center;
+}
 
 
 
