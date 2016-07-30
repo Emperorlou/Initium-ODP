@@ -55,6 +55,11 @@ public class CommandSetLeader extends Command {
 		if (GameUtils.isPlayerIncapacitated(character))
 			throw new UserErrorMessage("You are incapacitated and thus cannot do this.");
 		
+		// Make sure player isn't already doing something else
+		String mode = (String)character.getProperty("mode");
+		if (mode!=null && mode.equals("NORMAL")==false)
+			throw new UserErrorMessage("You're too busy to switch leaders at the moment.");
+		
 		// Quick sanity check that charId is not the current leader
 		if (GameUtils.equals(character.getKey(), member.getKey()))
 			throw new UserErrorMessage("You are already the leader of this party.");
@@ -75,6 +80,7 @@ public class CommandSetLeader extends Command {
 			throw new UserErrorMessage("Error while switching leader: "+e.getMessage());
 		}
 		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+		
 	}
 
 }
