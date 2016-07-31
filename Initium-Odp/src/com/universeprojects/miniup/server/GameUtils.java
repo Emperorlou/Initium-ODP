@@ -972,7 +972,7 @@ public class GameUtils
 			nameAndBars.append("	<a class='hint' rel='#profile' style='cursor:pointer'>"+characterName+"</a>");
 		else
 			nameAndBars.append("	<a>"+characterName+"</a>");
-		nameAndBars.append("		<div style='position:relative; display:block; background-color:#777777; width:100px; height:12px;text-align:left'>");
+		nameAndBars.append("		<div id='hitpointsBar' style='position:relative; display:block; background-color:#777777; width:100px; height:12px;text-align:left'>");
 		nameAndBars.append("			<div style='position:absolute; display:inline-block; background-color:#FF0000; width:"+hitpointsPercentage+"px; height:12px;'>");
 		nameAndBars.append("			</div>");
 		if (leftSide)

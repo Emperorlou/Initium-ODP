@@ -73,6 +73,11 @@ public class ODPDBAccess
 	{
 		Applied, Member, Admin, Kicked
 	}
+	
+	public enum TerritoryCharacterFilter
+	{
+		Defending, Trespassing, All
+	}
 
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
 	public static final String CAMP_NAME_REGEX = "[A-Za-z0-9- ,'&]+";
@@ -1044,7 +1049,8 @@ public class ODPDBAccess
 				"MERCHANT")));
 		return getDB().fetchAsList(q, 51);
 	}
-
+	
+	
 	public boolean isChatbanned(CachedDatastoreService db, String characterName)
 	{
 		if (db == null) db = getDB();

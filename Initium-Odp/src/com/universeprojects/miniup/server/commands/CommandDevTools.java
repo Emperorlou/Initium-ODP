@@ -464,7 +464,7 @@ public class CommandDevTools extends Command {
 										case Key:
 											try {
 												int match = strVal.indexOf("(");
-												newVal = db.createKey(strVal.substring(0, match-1), Long.parseLong(strVal.substring(match+1,strVal.lastIndexOf(")"))));
+												newVal = db.createKey(strVal.substring(0, match), Long.parseLong(strVal.substring(match+1,strVal.lastIndexOf(")"))));
 											} catch (Exception e) {
 												throw new IllegalArgumentException();
 											}
