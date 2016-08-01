@@ -212,6 +212,40 @@ public class TradeObject implements Serializable
 	}
 	
 	
+	public void addObjects(CachedDatastoreService ds, CachedEntity character, List<CachedEntity> items)
+	{
+		if (ds==null)
+			throw new IllegalArgumentException("CachedDatastoreService cannot be null.");
+		
+		for(CachedEntity item:items)
+		{
+		
+		
+		if (character1Key.getId() == character.getKey().getId())
+		{
+			// CHeck if the item has already been added, if so, don't add it again
+			for(int i = 0; i<character1Items.size(); i++)
+				if (character1Items.get(i).getKey().getId()==item.getKey().getId())
+					return;
+			// Add the item
+			character1Items.add(item);
+		}
+		else if (character2Key.getId() == character.getKey().getId())
+		{
+			// CHeck if the item has already been added, if so, don't add it again
+			for(int i = 0; i<character2Items.size(); i++)
+				if (character2Items.get(i).getKey().getId()==item.getKey().getId())
+					return;
+			// Add the item
+			character2Items.add(item);
+		}
+		else
+			throw new IllegalArgumentException("Character part of this trade object.");
+		}
+		saveChanges(ds);
+	}
+	
+	
 	
 	public void removeObject(CachedDatastoreService ds, CachedEntity character, CachedEntity item)
 	{
