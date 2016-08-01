@@ -2321,7 +2321,7 @@ public class ODPDBAccess
 		
 		TradeObject.startNewTrade(ds, character, otherCharacter);
 		
-		sendNotification(ds, otherCharacter.getKey(), NotificationType.fullpageRefresh);
+		sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeStarted);
 	}
 	
 	
@@ -2337,6 +2337,23 @@ public class ODPDBAccess
 			throw new UserErrorMessage("You do not currently have that item in your posession and cannot trade it.");
 		
 		tradeObject.addObject(ds, character, item);
+		
+	}
+	
+	public void addTradeItems(CachedDatastoreService ds, CachedEntity character, List<CachedEntity> items) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		for(CachedEntity item:items)
+		{
+		if (tradeObject==null || tradeObject.isCancelled())
+			throw new UserErrorMessage("Trade has been cancelled.");
+		
+		if (((Key)item.getProperty("containerKey")).getId() != character.getKey().getId())
+			throw new UserErrorMessage("You do not currently have that item in your posession and cannot trade it.");
+		}
+		tradeObject.addObjects(ds, character, items);
 		
 	}
 	
