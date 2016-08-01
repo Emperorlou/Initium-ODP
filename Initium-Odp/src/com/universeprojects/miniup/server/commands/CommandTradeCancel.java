@@ -24,8 +24,8 @@ public class CommandTradeCancel extends Command {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		Long characterId = Long.parseLong(parameters.get("characterId"));
-        CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
+        Long characterId = tryParseId(parameters,"characterId");
+		CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
         
         db.setTradeCancelled(ds, db.getCurrentCharacter(request));
         db.sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeCancelled);

@@ -25,7 +25,7 @@ public class CommandTradeSetGold extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		String dogecoinStr = parameters.get("amount");
-		Long characterId = Long.parseLong(parameters.get("characterId"));
+		Long characterId = tryParseId(parameters,"characterId");
 		CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
         dogecoinStr = dogecoinStr.replace(",", "");
         Long dogecoin = null;
