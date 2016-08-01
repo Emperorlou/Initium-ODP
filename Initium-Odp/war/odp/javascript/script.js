@@ -1376,10 +1376,63 @@ function partyJoin(characterId)
 	location.href = "ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
 }
 
-function tradeStartTrade(characterId)
+function tradeStartTradeNew(eventObject,characterId)
 {
-	location.href = "ServletCharacterControl?type=startTrade&characterId="+characterId+"&v="+window.verifyCode;
+	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
+		if (error) return;
+		popupMessage(data.tradePrompt);
+	})
 }
+
+function tradeRemoveItemNew(eventobject,itemId,characterId,tradeVersion)
+{
+	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId,"characterId":characterId},function(){
+		if (error) return;
+		$(".tradeItem[ref='"+itemId+"']").remove();
+		var container = $("#yourTrade");
+		container.html(data.createSellItem+container.html());
+		var tradeVersion;
+		tradeVersion = tradeVersion + 1;
+	})
+}
+
+function tradeCancelNew(eventObject,characterId)
+{
+	doCommand(eventObject,"TradeCancel",{"characterId":characterId})
+}
+
+function tradeReadyNew(eventObject,tradeVersion,characterId)
+{
+	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion,"characterId":characterId})
+}
+
+function tradeAddItemNew(eventObject,itemId,characterId,tradeVersion)
+{
+	doCommand(eventObject,"TradeAddItem",{"itemId":itemId,"characterId":characterId},function(){
+		if (error) return;
+		$(".invItem[ref='"+itemId+"']").remove();
+		var container = $("#yourTrade");
+		container.html(data.createSellItem+container.html());
+		var tradeVersion;
+		tradeversion = tradeversion + 1;
+	
+	})
+}
+
+function tradeSetGoldNew(eventObject,currentDogecoin,tradeVersion)
+{
+	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
+		if (amount!=null && amount!="")
+		{
+			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(){
+				var tradeVersion;
+				tradeVersion = tradeVersion + 1;
+			})
+			
+		}
+	});
+}
+	
 
 function duelRequest(characterId)
 {
@@ -1808,8 +1861,26 @@ function fullpageRefresh()
 	location.reload();
 }
 
+function _viewTrade()
+{
+	closeAllPagePopups();
+    closeAllPopups();
+    closeAllTooltips();
+	pagePopup("odp/ajax_trade.jsp",function(){
+		doCommand(eventObject,"TradeCancel");
+	});	
+}
 
+function updateTradeWindow()
+{
+	reloadPagePopup();
+}
 
+function cancelledTradeWindow()
+{
+	closeAllPagepopups();
+	popupMessage("The trade has been cancelled.")
+}
 
 
 /////////////////////////////////////////
