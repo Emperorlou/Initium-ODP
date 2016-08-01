@@ -27,7 +27,7 @@ public class CommandTradeReady extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		Integer version = Integer.parseInt(parameters.get("version"));
-		Long characterId = Long.parseLong(parameters.get("characterId"));
+		Long characterId = tryParseId(parameters,"characterId");
 		CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
 		
         TradeObject trade = db.setTradeReady(null, db.getCurrentCharacter(request), version);

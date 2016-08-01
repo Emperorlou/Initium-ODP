@@ -28,7 +28,7 @@ public class CommandTradeAddAllItems extends Command {
 		
 		CachedEntity character = db.getCurrentCharacter(request);
 		List<CachedEntity> items = db.getFilteredList("Item", "containerKey", character.getKey());
-		Long characterId = Long.parseLong("characterId");
+		Long characterId = tryParseId(parameters,"characterId");
         CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
         
 		for(CachedEntity item:items)

@@ -24,8 +24,8 @@ public class CommandTradeRemoveItem extends Command {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		Long itemId = Long.parseLong(parameters.get("itemId"));
-		Long characterId = Long.parseLong(parameters.get("characterId"));
+		Long itemId = tryParseId(parameters,"itemId");
+		Long characterId = tryParseId(parameters,"characterId");
         CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
         CachedEntity item = db.getEntity("Item", itemId);
         if (item==null)

@@ -25,7 +25,7 @@ public class CommandTradeStartTrade extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
-		Long characterId = Long.parseLong(parameters.get("characterId"));
+		Long characterId = tryParseId(parameters,"characterId");
         CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
           
         db.startTrade(null, db.getCurrentCharacter(request), otherCharacter);
