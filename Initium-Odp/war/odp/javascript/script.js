@@ -1385,10 +1385,65 @@ function partyJoin(characterId)
 	location.href = "ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
 }
 
-function tradeStartTrade(characterId)
+function tradeStartTradeNew(eventObject,characterId)
 {
-	location.href = "ServletCharacterControl?type=startTrade&characterId="+characterId+"&v="+window.verifyCode;
+	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
+		if (error) return;
+		popupMessage("Trade Started", data.tradePrompt);
+		_viewTrade();
+	})
 }
+
+
+function tradeRemoveItemNew(eventobject,itemId,characterId,tradeVersion)
+{
+	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId,"characterId":characterId},function(){
+		if (error) return;
+		$(".tradeItem[ref='"+itemId+"']").remove();
+		var container = $("#yourTrade");
+		container.html(data.createSellItem+container.html());
+		var tradeVersion;
+		tradeVersion = tradeVersion + 1;
+	})
+}
+
+function tradeCancelNew(eventObject,characterId)
+{
+	doCommand(eventObject,"TradeCancel",{"characterId":characterId})
+}
+
+function tradeReadyNew(eventObject,tradeVersion,characterId)
+{
+	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion,"characterId":characterId})
+}
+
+function tradeAddItemNew(eventObject,itemId,characterId,tradeVersion)
+{
+	doCommand(eventObject,"TradeAddItem",{"itemId":itemId,"characterId":characterId},function(){
+		if (error) return;
+		$(".invItem[ref='"+itemId+"']").remove();
+		var container = $("#yourTrade");
+		container.html(data.createSellItem+container.html());
+		var tradeVersion;
+		tradeversion = tradeversion + 1;
+	
+	})
+}
+
+function tradeSetGoldNew(eventObject,currentDogecoin,tradeVersion)
+{
+	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
+		if (amount!=null && amount!="")
+		{
+			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(){
+				var tradeVersion;
+				tradeVersion = tradeVersion + 1;
+			})
+			
+		}
+	});
+}
+	
 
 function duelRequest(characterId)
 {
@@ -1494,8 +1549,13 @@ function doCommand(eventObject, commandName, parameters, callback)
 	if (parametersStr.length>0)
 		url+="&"+parametersStr;
 	
-	var originalText = $(eventObject.target).text();
-	$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	if (eventObject!=null)
+	{
+		var originalText = $(eventObject.target).text();
+		$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	}
+	
+	
 	$.get(url)
 	.done(function(data)
 	{
@@ -1518,16 +1578,19 @@ function doCommand(eventObject, commandName, parameters, callback)
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
 			callback(null, error);
-		
-		$(eventObject.target).text(originalText);
+	
+		if (eventObject!=null)
+			$(eventObject.target).text(originalText);
 	})
 	.fail(function(data)
 	{
 		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
-		$(eventObject.target).text(originalText);
+		if (eventObject!=null)
+			$(eventObject.target).text(originalText);
 	});
 	
-	eventObject.stopPropagation();
+	if (eventObject!=null)
+		eventObject.stopPropagation();
 	
 }
 
@@ -1823,8 +1886,26 @@ function fullpageRefresh()
 	location.reload();
 }
 
+function _viewTrade()
+{
+	closeAllPagePopups();
+    closeAllPopups();
+    closeAllTooltips();
+	pagePopup("odp/ajax_trade.jsp",function(){
+		doCommand(null,"TradeCancel");
+	});	
+}
 
+function updateTradeWindow()
+{
+	reloadPagePopup();
+}
 
+function cancelledTradeWindow()
+{
+	closeAllPagepopups();
+	popupMessage("The trade has been cancelled.")
+}
 
 
 /////////////////////////////////////////

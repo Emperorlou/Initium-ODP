@@ -1,8 +1,11 @@
 package com.universeprojects.miniup.server;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
 public class HtmlComponents {
@@ -134,4 +137,60 @@ public class HtmlComponents {
 		
 		return result;
 	}
+
+	public static String generateTradeInvItemHtml(CachedEntity item, ODPDBAccess db, CachedDatastoreService ds, HttpServletRequest request) {
+		
+		if (item==null)
+			return " ";
+		
+		List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", db.getCurrentCharacter(request).getKey());
+		
+		String saleText = "";
+		// Determine if this item is for sale or not and mark it as such after
+		for(CachedEntity saleItem:saleItems)
+		{
+			if (((Key)saleItem.getProperty("itemKey")).getId()==item.getKey().getId())
+			{
+				saleText = "<div class='main-item-subnote' style='color:#FF0000'> - Selling</div>";
+				break;
+			}
+		}
+		
+		String result = "";
+			   result+="<div class='invItem' ref="+item.getKey().getId()+">";
+			   result+="<div class='main-item'>";
+			   result+="<div class='main-item-container'>";
+			   result+=GameUtils.renderItem(item)+saleText;
+			   result+="<br>";
+			   result+="			<div class='main-item-controls'>";
+			   result+="				<a onclick='tradeAddItem("+item.getKey().getId()+")'>Add to trade window</a>";
+			   result+="			</div>";
+			   result+="		</div>";
+			   result+="	</div>";
+			   result+="</div>";
+			   result+="<br>";
+			   
+		return result;
+	}
+	
+	public static String generatePlayerTradeItemHtml(CachedEntity item){
+		
+		String result = "";
+			   result+="<div class='tradeItem' ref"+item.getKey().getId()+">";
+		       result+="<div class='main-item'>";
+		       result+="<div class='main-item-container'>";
+		       result+=GameUtils.renderItem(item);
+		       result+="<br>";
+		       result+="			<div class='main-item-controls'>";
+		       result+="				<a onclick='tradeRemoveItem("+item.getKey().getId()+")'>Remove</a>";
+		       result+="			</div>";
+		       result+="		</div>";
+		       result+="	</div>";
+		       result+="</div>";
+		       result+="<br>";
+		
+		
+		return result;
+	}
+	
 }
