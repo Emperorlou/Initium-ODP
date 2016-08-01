@@ -1389,9 +1389,11 @@ function tradeStartTradeNew(eventObject,characterId)
 {
 	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
 		if (error) return;
-		popupMessage(data.tradePrompt);
+		popupMessage("Trade Started", data.tradePrompt);
+		_viewTrade();
 	})
 }
+
 
 function tradeRemoveItemNew(eventobject,itemId,characterId,tradeVersion)
 {
@@ -1547,8 +1549,13 @@ function doCommand(eventObject, commandName, parameters, callback)
 	if (parametersStr.length>0)
 		url+="&"+parametersStr;
 	
-	var originalText = $(eventObject.target).text();
-	$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	if (eventObject!=null)
+	{
+		var originalText = $(eventObject.target).text();
+		$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	}
+	
+	
 	$.get(url)
 	.done(function(data)
 	{
@@ -1571,16 +1578,19 @@ function doCommand(eventObject, commandName, parameters, callback)
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
 			callback(null, error);
-		
-		$(eventObject.target).text(originalText);
+	
+		if (eventObject!=null)
+			$(eventObject.target).text(originalText);
 	})
 	.fail(function(data)
 	{
 		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
-		$(eventObject.target).text(originalText);
+		if (eventObject!=null)
+			$(eventObject.target).text(originalText);
 	});
 	
-	eventObject.stopPropagation();
+	if (eventObject!=null)
+		eventObject.stopPropagation();
 	
 }
 
@@ -1882,7 +1892,7 @@ function _viewTrade()
     closeAllPopups();
     closeAllTooltips();
 	pagePopup("odp/ajax_trade.jsp",function(){
-		doCommand(eventObject,"TradeCancel");
+		doCommand(null,"TradeCancel");
 	});	
 }
 

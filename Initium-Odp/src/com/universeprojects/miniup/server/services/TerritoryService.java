@@ -26,17 +26,16 @@ import com.universeprojects.miniup.server.ODPDBAccess.TerritoryCharacterFilter;
  * @author Owner
  *
  */
-public class TerritoryService
+public class TerritoryService extends Service
 {
-	final private ODPDBAccess db;
 	final private CachedEntity territory;
 	
 	private List<CachedEntity> locations = null;
 	
 	public TerritoryService(ODPDBAccess db, CachedEntity territory)
 	{
+		super(db);
 		this.territory = territory;
-		this.db = db;
 		
 	}
 	

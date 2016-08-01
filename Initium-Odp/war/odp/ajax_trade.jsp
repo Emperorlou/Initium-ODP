@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
