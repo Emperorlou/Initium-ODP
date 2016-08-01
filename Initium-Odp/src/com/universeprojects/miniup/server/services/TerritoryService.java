@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
@@ -71,43 +74,36 @@ public class TerritoryService
 		if (isLocationInTerritory(location)==false)
 			throw new IllegalArgumentException("Location is not part of the territory this service is servicing.");
 
-		
 		// Get the rule for travel
 		String travelRule = (String)territory.getProperty("travelRule");
 		
-		//None,Whitelisted,OwningGroupOnly,OwningGroupAdminsOnly
-		if ("OwningGroupAdminsOnly".equals(travelRule))
+		//None,Whitelisted,OwningGroupOnly
+		if ("OwningGroupOnly".equals(travelRule))
 		{
-			// Check if the character is in the group that owns the territory and check if he's an admin. If he is not, then we'll return false.
+			// Check if the character is in the group that owns the territory.
 			if (GameUtils.equals(character.getProperty("groupKey"), getOwningGroupKey()) && 
-					("Admin".equals(character.getProperty("groupStatus"))))
-				return true;
-		}
-		else if ("OwningGroupOnly".equals(travelRule))
-		{
-			// Check if the character is in the group that owns the territory. If he is not in it, then we'll return false.
-			if (GameUtils.equals(character.getProperty("groupKey"), getOwningGroupKey()) && 
-					("Member".equals(character.getProperty("groupStatus"))==false || "Admin".equals(character.getProperty("groupStatus"))==false))
+					("Member".equals(character.getProperty("groupStatus"))==true || "Admin".equals(character.getProperty("groupStatus"))==true))
 				return true;
 		}
 		else if ("Whitelisted".equals(travelRule))
 		{
-			// Check if the character is in the group that owns the territory. If he is not in it, then we'll check if he's in the whitelist.
-			if (GameUtils.equals(character.getProperty("groupKey"), getOwningGroupKey()) == false || 
-					("Member".equals(character.getProperty("groupStatus"))==false && "Admin".equals(character.getProperty("groupStatus"))==false))
-			{
-				// Check if he's in the whitelist
-				Collection<Key> groupWhitelist = getGroupWhitelist();
-				Collection<Key> characterWhitelist = getCharacterWhitelist();
-				
+			// Check if the character is in the group that owns the territory.
+			if (GameUtils.equals(character.getProperty("groupKey"), getOwningGroupKey()) && 
+					("Member".equals(character.getProperty("groupStatus"))==true || "Admin".equals(character.getProperty("groupStatus"))==true))
+				return true;
+			
+			// Check if he's in the whitelist
+			Collection<Key> groupWhitelist = getGroupWhitelist();
+			Collection<Key> characterWhitelist = getCharacterWhitelist();
+			
+			if ("Member".equals(character.getProperty("groupStatus"))==true || "Admin".equals(character.getProperty("groupStatus"))==true)
 				for(Key whitelistGroup:groupWhitelist)
 					if (GameUtils.equals(whitelistGroup, character.getProperty("groupKey")))
 						return true;
-				
-				for(Key whitelistCharacter:characterWhitelist)
-					if (GameUtils.equals(whitelistCharacter, character.getKey()))
-						return true;
-			}
+			
+			for(Key whitelistCharacter:characterWhitelist)
+				if (GameUtils.equals(whitelistCharacter, character.getKey()))
+					return true;
 				
 		}
 		else 
@@ -139,19 +135,31 @@ public class TerritoryService
 	}
 	
 	/**
-	 * Shortcut method to get the first character that matches the given filter in our territory.
+	 * Shortcut method to get the first character in order that matches the given filter in our territory.
 	 * 
 	 * @param filter
 	 * @param startLocation
 	 * @return
 	 */
-	public CachedEntity getTerritoryAvailableCharacter(TerritoryCharacterFilter filter, CachedEntity startLocation)
+	public CachedEntity getTerritorySingleCharacter(TerritoryCharacterFilter filter, CachedEntity startLocation)
 	{
-		List<CachedEntity> characters = getTerritoryCharacters(filter, startLocation, true);
+		List<CachedEntity> characters = getTerritoryCharacters(filter, startLocation, true, true);
 		if (characters.isEmpty()) 
 			return null;
 		else
 			return characters.get(0);
+	}
+	
+	/**
+	 * Shortcut method to get all characters that match the given filter from the territory sorted by encounter order.
+	 * 
+	 * @param filter
+	 * @param startLocation
+	 * @return
+	 */
+	public List<CachedEntity> getTerritoryAllCharactersSorted(TerritoryCharacterFilter filter, CachedEntity startLocation)
+	{
+		return getTerritoryCharacters(filter, startLocation, false, true);
 	}
 	
 	/**
@@ -161,9 +169,9 @@ public class TerritoryService
 	 * @param startLocation
 	 * @return
 	 */
-	public List<CachedEntity> getTerritoryAllCharacters(TerritoryCharacterFilter filter, CachedEntity startLocation)
+	public List<CachedEntity> getTerritoryAllCharactersUnsorted(TerritoryCharacterFilter filter)
 	{
-		return getTerritoryCharacters(filter, startLocation, false);
+		return getTerritoryCharacters(filter, null, false, false);
 	}
 	
 	/**
@@ -175,28 +183,41 @@ public class TerritoryService
 	 * @param single
 	 * @return
 	 */
-	public List<CachedEntity> getTerritoryCharacters(TerritoryCharacterFilter filter, CachedEntity startLocation, boolean single)
+	private List<CachedEntity> getTerritoryCharacters(TerritoryCharacterFilter filter, CachedEntity startLocation, boolean single, boolean sorted)
 	{
-		if (startLocation==null) return null;
+		List<CachedEntity> locs = getLocations();
+		if (locs.isEmpty()) return null;
+		if (startLocation==null)
+			startLocation = locs.get(0);
 		if (isLocationInTerritory(startLocation))
 			throw new IllegalArgumentException("startLocation is not in the territory this service is servicing.");
 		
 		CachedDatastoreService ds = db.getDB();
-		List<CachedEntity> territoryLocations = db.getFilteredList("Location", "territoryKey", territory.getKey());
+		// Create a duplicate so we can modify it, implemented as set for performance
+		Set<CachedEntity> remainingLocations = new HashSet<CachedEntity>(locs);
+		// Remove the startLocation from the remaining territory locations
+		for (Iterator<CachedEntity> iter = remainingLocations.iterator();iter.hasNext();)
+		{
+			if (GameUtils.equals(iter.next().getKey(), startLocation.getKey()))
+			{
+				iter.remove();
+				break;
+			}
+		}
 		List<List<CachedEntity>> tlcList = new ArrayList<List<CachedEntity>>();
-		getTerritoryLocationCharacters(tlcList, ds, filter, startLocation, 0, territory, territoryLocations, single);
+		getTerritoryLocationCharacters(tlcList, ds, filter, startLocation, 0, remainingLocations, single, sorted);
 		List<CachedEntity> characters = new ArrayList<CachedEntity>();
 		for (List<CachedEntity> tlc : tlcList)
 		{
 			if (tlc!=null && tlc.isEmpty()==false)
 			{
-				// randomly shuffle the order
-				Collections.shuffle(tlc);
+				// if order matters randomly shuffle those with same order
+				if (sorted) Collections.shuffle(tlc);
 				characters.addAll(tlc);
 			}
 		}
-		// resort in Defending order if Defending 
-		if (filter == TerritoryCharacterFilter.Defending)
+		// if order matters resort in Defending order if Defending 
+		if (sorted && filter == TerritoryCharacterFilter.Defending)
 		{
 			// Status can only be DefendingX due to the Query, so no need for error checking
 			Collections.sort(characters, new Comparator<CachedEntity>()
@@ -222,9 +243,10 @@ public class TerritoryService
 	 * @param territory
 	 * @param territoryLocations
 	 * @param single
+	 * @param sorted
 	 * @return
 	 */
-	private boolean getTerritoryLocationCharacters(List<List<CachedEntity>> tlcList, CachedDatastoreService ds, TerritoryCharacterFilter filter, CachedEntity location, int distance, CachedEntity territory, List<CachedEntity> territoryLocations, boolean single)
+	private boolean getTerritoryLocationCharacters(List<List<CachedEntity>> tlcList, CachedDatastoreService ds, TerritoryCharacterFilter filter, CachedEntity location, int distance, Set<CachedEntity> remainingLocations, boolean single, boolean sorted)
 	{
 		// set up the DB search filter
 		Filter f0 = null;
@@ -255,44 +277,15 @@ public class TerritoryService
 		List<CachedEntity> characters = ds.fetchAsList("Character", f0, 10000);
 		
 		// Further filter what wasn't possible to do directly due to AppEngine limitations
-		Next: for (int i = 0; i < characters.size(); i++)
+		// Use manual for to obtain the index for removal purposes, traverse backwards for optimisation
+		// If this becomes a bottleneck, we can convert to LinkedList before removal
+		for (int i = characters.size()-1; i>=0 ; i--)
 		{
 			CachedEntity character = characters.get(i);
-			if (GameUtils.isPlayerIncapacitated(character))
+			if (GameUtils.isPlayerIncapacitated(character) ||
+					(filter==TerritoryCharacterFilter.Trespassing && isAllowedIn(character, location)))
 			{
 				characters.remove(i);
-				i--;
-				continue Next;
-			}
-			if (filter==TerritoryCharacterFilter.Trespassing)
-			{
-				// Remove whitelisted characters
-				List<CachedEntity> allowedChars = (List<CachedEntity>)territory.getProperty("characterWhitelist");
-				Key key = character.getKey();
-				for (CachedEntity c : allowedChars)
-				{
-					if (c.getKey().equals(key))
-					{
-						characters.remove(i);
-						i--;
-						continue Next;
-					}
-				}
-				List<CachedEntity> allowedGroups = (List<CachedEntity>)territory.getProperty("groupWhitelist");
-				key = (Key)character.getProperty("groupKey");
-				if (key==null) continue Next;
-				// since characters can have a groupKey while not part of the group, check groupStatus
-				if (GameUtils.isContainedInList("Member,Admin",(String)character.getProperty("groupStatus"))==false)
-					 continue Next;
-				for (CachedEntity c : allowedGroups)
-				{
-					if (c.getKey().equals(key))
-					{
-						characters.remove(i);
-						i--;
-						continue Next;
-					}
-				}
 			}
 		}
 		
@@ -306,28 +299,51 @@ public class TerritoryService
 		if (single && characters.isEmpty()==false)
 			return true;
 		
-		// Get the neighbouring locations that are part of the territory
-		List<CachedEntity> paths = db.getPathsByLocation(location.getKey());
-		List<CachedEntity> locations = new ArrayList<CachedEntity>();
-		for (CachedEntity path : paths)
+		if (sorted)
 		{
-			Key locationKey = (Key)path.getProperty("location1Key");
-			if (location.getKey().equals(locationKey))
-				locationKey = (Key)path.getProperty("location2Key");
-			if (locationKey!=null)
-				for (CachedEntity l : territoryLocations)
-					if (l.getKey().equals(locationKey))
-						locations.add(l);
+			// Get the neighbouring locations that are part of the territory
+			List<CachedEntity> paths = db.getPathsByLocation(location.getKey());
+			List<CachedEntity> locations = new ArrayList<CachedEntity>();
+			for (CachedEntity path : paths)
+			{
+				Key locationKey = (Key)path.getProperty("location1Key");
+				if (GameUtils.equals(location.getKey(),locationKey))
+					locationKey = (Key)path.getProperty("location2Key");
+				if (locationKey!=null)
+				{
+					for (Iterator<CachedEntity> iter = remainingLocations.iterator();iter.hasNext();)
+					{
+						CachedEntity l = iter.next();
+						if (GameUtils.equals(l.getKey(),locationKey))
+						{
+							locations.add(l);
+							iter.remove();
+							break;
+						}
+					}
+				}
+			}
+			// Randomly shuffle the order
+			Collections.shuffle(locations);
+			
+			// Now recursively get the characters in these locations
+			for (CachedEntity l : locations)
+				// If only 1 character is required and we have one, exit early
+				if (getTerritoryLocationCharacters(tlcList, ds, filter, l, distance+1, remainingLocations, single, sorted) && single)
+					return true;
 		}
-		// Randomly shuffle the order
-		Collections.shuffle(locations);
-		
-		// Now recursively get the characters in these locations
-		for (CachedEntity l : locations)
+		else
 		{
-			// If only 1 character is required and we have one, exit early
-			if (getTerritoryLocationCharacters(tlcList, ds, filter, l, distance+1, territory, territoryLocations, single) && single)
-				return true;
+			Iterator<CachedEntity> iter = remainingLocations.iterator();
+			if (iter.hasNext())
+			{
+				CachedEntity l = iter.next();
+				iter.remove();
+				// If only 1 character is required and we have one, exit early
+				if (getTerritoryLocationCharacters(tlcList, ds, filter, l, distance, remainingLocations, single, sorted) && single)
+					return true;
+			}
+			
 		}
 		
 		return false;
