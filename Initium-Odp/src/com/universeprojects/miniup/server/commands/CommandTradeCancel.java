@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.NotificationType;
@@ -24,12 +24,13 @@ public class CommandTradeCancel extends Command {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-        Long characterId = tryParseId(parameters,"characterId");
-		CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
-        
-        db.setTradeCancelled(ds, db.getCurrentCharacter(request));
-        db.sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeCancelled);
-     
-        return;
+		CachedEntity character = db.getCurrentCharacter(request);	
+		
+		if ("TRADING".equals(character.getProperty("mode")))
+		{
+		Key otherCharacter = (Key) character.getProperty("combatant");
+		db.setTradeCancelled(ds, character);
+        db.sendNotification(ds, otherCharacter, NotificationType.tradeCancelled);
+		}
 	}
 }

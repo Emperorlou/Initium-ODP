@@ -1,4 +1,3 @@
-<%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
@@ -111,8 +110,6 @@
 	
 %>
 
-<script type='text/javascript' src='odp/javascript/messager-impl.js'></script>
-
 <script type='text/javascript'>
 
 	changeChatTab("PrivateChat");
@@ -136,7 +133,7 @@
 		
 		<div class='main-splitScreen'>
 		<div class='${characterTradeWindowClass}'><h4>Your trade</h4>
-		<h4><a href='#' onclick='tradeSetDogecoin(<%=tradeObject.getDogecoinsFor(common.getCharacter().getKey())%>)'>Gold: <%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(common.getCharacter().getKey())) %></a></h4>
+		<h4><a href='#' onclick='tradeSetGoldNew(<%="event"+tradeObject.getDogecoinsFor(common.getCharacter().getKey())%>)'>Gold: <%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(common.getCharacter().getKey())) %></a></h4>
 		<div id='yourTrade'>
 		<%
 			for(CachedEntity item:tradeObject.getItemsFor(common.getCharacter().getKey()))
