@@ -1020,7 +1020,7 @@ function enterDefenceStructureSlot(slot)
 	}
 }
 
-
+var popupStackCloseCallbackHandlers = [];
 var currentPopupStackIndex = 0;
 var popupKeydownHandler = function(e){if (e.keyCode == 27) closePagePopup();}
 function incrementStackIndex()
@@ -1057,7 +1057,7 @@ function decrementStackIndex()
 	return currentPopupStackIndex;
 }
 
-function pagePopup(url)
+function pagePopup(url, closeCallback)
 {
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
@@ -1071,6 +1071,11 @@ function pagePopup(url)
 	
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
+	
+	if (closeCallback!=null)
+		popupStackCloseCallbackHandlers.push(closeCallback);
+	else
+		popupStackCloseCallbackHandlers.push(null);
 }
 
 function pagePopupIframe(url)
@@ -1097,6 +1102,10 @@ function closePagePopup()
 	}
 	
 	decrementStackIndex();
+	
+	var func = popupStackCloseCallbackHandlers.pop();
+	if (func!=null)
+		func();
 }
 
 function closeAllPagePopups()
@@ -1380,8 +1389,8 @@ function tradeStartTradeNew(eventObject,characterId)
 {
 	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
 		if (error) return;
-		popupMessage(data.tradePrompt);
-		_viewTrade()
+		popupMessage("Trade Started", data.tradePrompt);
+		_viewTrade();
 	})
 }
 
@@ -1475,9 +1484,15 @@ function allowDuelRequests()
 	location.href = "ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
 }
 
+function viewStore(characterId)
+{
+	pagePopup("odp/ajax_viewstore.jsp?characterId="+characterId+"");
+}
 
-
-
+function setBlockadeRule(rule)
+{
+	location.href = "ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
+}
 
 
 
@@ -1530,8 +1545,13 @@ function doCommand(eventObject, commandName, parameters, callback)
 	if (parametersStr.length>0)
 		url+="&"+parametersStr;
 	
-	var originalText = $(eventObject.target).text();
-	$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	if (eventObject!=null)
+	{
+		var originalText = $(eventObject.target).text();
+		$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	}
+	
+	
 	$.get(url)
 	.done(function(data)
 	{
@@ -1554,16 +1574,19 @@ function doCommand(eventObject, commandName, parameters, callback)
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
 			callback(null, error);
-		
-		$(eventObject.target).text(originalText);
+	
+		if (eventObject!=null)
+			$(eventObject.target).text(originalText);
 	})
 	.fail(function(data)
 	{
 		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
-		$(eventObject.target).text(originalText);
+		if (eventObject!=null)
+			$(eventObject.target).text(originalText);
 	});
 	
-	eventObject.stopPropagation();
+	if (eventObject!=null)
+		eventObject.stopPropagation();
 	
 }
 
@@ -1865,7 +1888,7 @@ function _viewTrade()
     closeAllPopups();
     closeAllTooltips();
 	pagePopup("odp/ajax_trade.jsp",function(){
-		doCommand(eventObject,"TradeCancel");
+		doCommand(null,"TradeCancel");
 	});	
 }
 
