@@ -19,9 +19,9 @@ import com.universeprojects.miniup.server.commands.framework.Command.JavascriptR
 
 public class CommandStoreEnable extends Command {
 	
-	public CommandStoreEnable(HttpServletRequest request, HttpServletResponse response)
+	public CommandStoreEnable(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	@Override

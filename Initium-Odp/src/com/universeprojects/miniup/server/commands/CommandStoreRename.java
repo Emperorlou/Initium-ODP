@@ -20,9 +20,9 @@ import com.universeprojects.miniup.server.commands.framework.Command.JavascriptR
 
 public class CommandStoreRename extends Command {
 	
-	public CommandStoreRename(HttpServletRequest request, HttpServletResponse response)
+	public CommandStoreRename(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	@Override

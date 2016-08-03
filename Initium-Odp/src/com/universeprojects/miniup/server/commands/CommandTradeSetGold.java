@@ -16,9 +16,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandTradeSetGold extends Command {
 	
-	public CommandTradeSetGold(HttpServletRequest request, HttpServletResponse response)
+	public CommandTradeSetGold(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {

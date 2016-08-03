@@ -29,9 +29,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  */
 public class CommandSetLabel extends Command {
 
-	public CommandSetLabel(HttpServletRequest request, HttpServletResponse response) 
+	public CommandSetLabel(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 
 	@Override
