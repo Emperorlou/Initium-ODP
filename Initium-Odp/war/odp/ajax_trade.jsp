@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
@@ -82,7 +83,7 @@
 	request.setAttribute("chatroomId", "T"+tradeObject.getKey());
 
 
-	if (((Key)common.getCharacter().getProperty("locationKey")).getId() != ((Key)otherCharacter.getProperty("locationKey")).getId())
+	if (GameUtils.equals(common.getCharacter().getProperty("locationKey"), otherCharacter.getProperty("locationKey")))
 	{
 		db.setTradeCancelled(ds, common.getCharacter());
 		WebUtils.forceRedirectClientTo("main.jsp", request, response, "You canot trade with a character who is not in your location.");
@@ -165,7 +166,7 @@
 		<br>
 		<br>
 		<div class='main-buttonbox'>
-			<a href='#' onclick='tradeAllNew(<%=items %>)' class='main-button'>Trade All</a>
+			<a href='#' onclick='tradeAddAllItemsNew()' class='main-button'>Trade All</a>
 		</div>
 		<br>
 

@@ -20,9 +20,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandStoreDeleteAllItems extends Command {
 	
-	public CommandStoreDeleteAllItems(HttpServletRequest request, HttpServletResponse response)
+	public CommandStoreDeleteAllItems(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	@Override

@@ -31,9 +31,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  */
 public class CommandAttack extends Command {
 
-	public CommandAttack(HttpServletRequest request, HttpServletResponse response) 
+	public CommandAttack(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 
 	public static boolean canAttack(CachedDatastoreService ds, CachedEntity location, CachedEntity character, CachedEntity monster)

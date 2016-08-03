@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.HtmlComponents;
@@ -16,9 +17,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandTradeRemoveItem extends Command {
 	
-	public CommandTradeRemoveItem(HttpServletRequest request, HttpServletResponse response)
+	public CommandTradeRemoveItem(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {
@@ -26,10 +27,10 @@ public class CommandTradeRemoveItem extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		Long itemId = tryParseId(parameters,"itemId");
-		Long characterId = tryParseId(parameters,"characterId");
-        CachedEntity otherCharacter = db.getEntity("Character", characterId);
+		CachedEntity character = db.getCurrentCharacter(request);
+		Key otherCharacter = (Key) character.getProperty("combatant");
         CachedEntity item = db.getEntity("Item", itemId);
-        TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, db.getCurrentCharacter(request));
+        TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
         
         if (tradeObject==null || tradeObject.isCancelled())
         {
@@ -41,7 +42,7 @@ public class CommandTradeRemoveItem extends Command {
             throw new UserErrorMessage("Item does not exist.");
         
         	tradeObject.removeObject(ds, db.getCurrentCharacter(request), item);
-            db.sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeChanged);
+            db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
         

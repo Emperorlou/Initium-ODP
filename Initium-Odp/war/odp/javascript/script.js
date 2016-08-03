@@ -1394,9 +1394,9 @@ function tradeStartTradeNew(eventObject,characterId)
 	})
 }
 
-function tradeRemoveItemNew(eventobject,itemId,characterId)
+function tradeRemoveItemNew(eventobject,itemId)
 {
-	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId,"characterId":characterId},function(data,error){
+	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId},function(data,error){
 		if (error) return;
 		$(".tradeItem[ref='"+itemId+"']").remove();
 		var container = $("#invItems");
@@ -1405,19 +1405,19 @@ function tradeRemoveItemNew(eventobject,itemId,characterId)
 	})
 }
 
-function tradeCancelNew(eventObject,characterId)
+function tradeCancelNew(eventObject)
 {
-	doCommand(eventObject,"TradeCancel",{"characterId":characterId})
+	doCommand(eventObject,"TradeCancel")
 }
 
-function tradeReadyNew(eventObject,tradeVersion,characterId)
+function tradeReadyNew(eventObject,tradeVersion)
 {
-	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion,"characterId":characterId})
+	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion})
 }
 
-function tradeAddItemNew(eventObject,itemId,characterId)
+function tradeAddItemNew(eventObject,itemId)
 {
-	doCommand(eventObject,"TradeAddItem",{"itemId":itemId,"characterId":characterId},function(data,error){
+	doCommand(eventObject,"TradeAddItem",{"itemId":itemId},function(data,error){
 		if (error) return;
 		$(".invItem[ref='"+itemId+"']").remove();
 		var container = $("#yourTrade");
@@ -1438,6 +1438,12 @@ function tradeSetGoldNew(eventObject,currentDogecoin)
 			
 		}
 	});
+}
+
+function tradeAddAllItemsNew(eventObject)
+{
+	doCommand(eventObject,"TradeAddAllItems");
+	reloadPagePopup();
 }
 	
 

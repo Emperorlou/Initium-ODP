@@ -65,9 +65,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  */
 public class CommandDevTools extends Command {
 
-	public CommandDevTools(HttpServletRequest request, HttpServletResponse response) 
+	public CommandDevTools(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	/**

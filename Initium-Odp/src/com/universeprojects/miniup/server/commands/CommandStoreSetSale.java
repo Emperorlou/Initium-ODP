@@ -19,9 +19,9 @@ import com.universeprojects.miniup.server.commands.framework.Command.JavascriptR
 
 public class CommandStoreSetSale extends Command {
 	
-	public CommandStoreSetSale(HttpServletRequest request, HttpServletResponse response)
+	public CommandStoreSetSale(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	@Override

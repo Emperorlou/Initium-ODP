@@ -141,7 +141,7 @@ public class HtmlComponents {
 			   result+=GameUtils.renderItem(item)+saleText;
 			   result+="<br>";
 			   result+="			<div class='main-item-controls'>";
-			   result+="				<a onclick='tradeAddItemNew("+item.getKey().getId()+")'>Add to trade window</a>";
+			   result+="				<a onclick='tradeAddItemNew(event,"+item.getKey().getId()+")'>Add to trade window</a>";
 			   result+="			</div>";
 			   result+="		</div>";
 			   result+="	</div>";
@@ -151,7 +151,7 @@ public class HtmlComponents {
 		return result;
 	}
 	
-	public static String generatePlayerTradeItemHtml(CachedEntity item, CachedEntity character){
+	public static String generatePlayerTradeItemHtml(CachedEntity item){
 		
 		String result = "";
 			   result+="<div class='tradeItem' ref"+item.getKey().getId()+">";
@@ -160,7 +160,7 @@ public class HtmlComponents {
 		       result+=GameUtils.renderItem(item);
 		       result+="<br>";
 		       result+="			<div class='main-item-controls'>";
-		       result+="				<a onclick='tradeRemoveItemNew(event,"+item.getKey().getId()+","+character.getKey().getId()+")'>Remove</a>";
+		       result+="				<a onclick='tradeRemoveItemNew(event,"+item.getKey().getId()+")'>Remove</a>";
 		       result+="			</div>";
 		       result+="		</div>";
 		       result+="	</div>";
