@@ -141,7 +141,7 @@ public class HtmlComponents {
 			   result+=GameUtils.renderItem(item)+saleText;
 			   result+="<br>";
 			   result+="			<div class='main-item-controls'>";
-			   result+="				<a onclick='tradeAddItemNew("+item.getKey().getId()+")'>Add to trade window</a>";
+			   result+="				<a onclick='tradeAddItemNew(event,"+item.getKey().getId()+")'>Add to trade window</a>";
 			   result+="			</div>";
 			   result+="		</div>";
 			   result+="	</div>";
