@@ -83,7 +83,7 @@
 	request.setAttribute("chatroomId", "T"+tradeObject.getKey());
 
 
-	if (((Key)common.getCharacter().getProperty("locationKey")).getId() != ((Key)otherCharacter.getProperty("locationKey")).getId())
+	if (GameUtils.equals(common.getCharacter().getProperty("locationKey"), otherCharacter.getProperty("locationKey")))
 	{
 		db.setTradeCancelled(ds, common.getCharacter());
 		WebUtils.forceRedirectClientTo("main.jsp", request, response, "You canot trade with a character who is not in your location.");
