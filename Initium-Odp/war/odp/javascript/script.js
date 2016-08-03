@@ -1439,6 +1439,12 @@ function tradeSetGoldNew(eventObject,currentDogecoin)
 		}
 	});
 }
+
+function tradeAddAllItemsNew(eventObject)
+{
+	doCommand(eventObject,"TradeAddAllItems");
+	reloadPagePopup();
+}
 	
 
 function duelRequest(characterId)
