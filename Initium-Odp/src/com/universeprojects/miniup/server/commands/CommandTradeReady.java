@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.NotificationType;
@@ -27,13 +27,13 @@ public class CommandTradeReady extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		Integer version = Integer.parseInt(parameters.get("version"));
-		Long characterId = tryParseId(parameters,"characterId");
-		CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
+		CachedEntity character = db.getCurrentCharacter(request);
+		Key otherCharacter = (Key) character.getProperty("combatant");
 		
         TradeObject trade = db.setTradeReady(null, db.getCurrentCharacter(request), version);
             if (trade.isComplete()==true)
             {
-            	db.sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeChanged);
+            	db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
                 return;
             }
         return;

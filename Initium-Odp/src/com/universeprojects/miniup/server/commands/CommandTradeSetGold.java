@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.NotificationType;
@@ -26,8 +27,8 @@ public class CommandTradeSetGold extends Command {
 		CachedDatastoreService ds = getDS();
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, db.getCurrentCharacter(request));
 		String dogecoinStr = parameters.get("amount");
-		Long characterId = tryParseId(parameters,"characterId");
-		CachedEntity otherCharacter = db.getEntity("Character", characterId);
+		CachedEntity character = db.getCurrentCharacter(request);
+		Key otherCharacter = (Key) character.getProperty("combatant");
         
         Long dogecoin = null;
         try {
@@ -40,7 +41,7 @@ public class CommandTradeSetGold extends Command {
         	
         
         db.setTradeDogecoin(ds, db.getCurrentCharacter(request), dogecoin);
-        db.sendNotification(ds,otherCharacter.getKey(),NotificationType.tradeChanged);
+        db.sendNotification(ds,otherCharacter,NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
         addCallbackData("tradeVersion",tradeVersion);

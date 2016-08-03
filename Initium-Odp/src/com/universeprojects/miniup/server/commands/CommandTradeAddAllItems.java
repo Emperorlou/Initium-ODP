@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.NotificationType;
@@ -28,8 +29,7 @@ public class CommandTradeAddAllItems extends Command {
 		
 		CachedEntity character = db.getCurrentCharacter(request);
 		List<CachedEntity> items = db.getFilteredList("Item", "containerKey", character.getKey());
-		Long characterId = tryParseId(parameters,"characterId");
-        CachedEntity otherCharacter = db.getEntity("Character", characterId);
+		Key otherCharacter = (Key) character.getProperty("combatant");
         TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, db.getCurrentCharacter(request));
         
         if (tradeObject==null || tradeObject.isCancelled())
@@ -48,7 +48,7 @@ public class CommandTradeAddAllItems extends Command {
 		}   
         
 		db.addTradeItems(ds, db.getCurrentCharacter(request), items);
-        db.sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeChanged);
+        db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
         addCallbackData("tradeVersion", tradeVersion);
