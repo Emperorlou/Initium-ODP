@@ -2593,7 +2593,87 @@ public class ODPDBAccess
 		return true;
 	}
 	
-	
-	
+	////////// GROUP METHODS //////////
+	///////////////////////////////////
+
+	/**
+	 * 
+	 * @param ds
+	 *            Datastore containing character
+	 * @param character
+	 *            Character that is leaving the group
+	 */
+	public final void doLeaveGroup(CachedDatastoreService ds,
+			final CachedEntity character)
+	{
+		if (ds == null)
+		{
+			ds = getDB();
+		}
+
+		character.setProperty("groupKey", null);
+		character.setProperty("groupStatus", null);
+		character.setProperty("groupRank", null);
+
+		ds.put(character);
+	}
+
+	/**
+	 * 
+	 * @param ds
+	 *            Datastore containing character
+	 * @param character
+	 *            Character to discover properties for
+	 */
+	public final void discoverAllGroupPropertiesFor(CachedDatastoreService ds,
+			CachedEntity character)
+	{
+		// TODO Fill this out
+	}
+
+	/**
+	 * Checks required to accept or deny some applicant.
+	 * 
+	 * @param applicant
+	 *            Applicant being checked
+	 * @param character
+	 *            Character being checked
+	 * @param groupKey
+	 *            Group being checked
+	 * @return true if all checks passed
+	 * @throws UserErrorMessage
+	 */
+	public boolean applicationAcceptOrDenyChecks(final CachedEntity applicant,
+			final CachedEntity character, final Key groupKey)
+			throws UserErrorMessage
+	{
+		boolean bool = true;
+
+		if (((Key) applicant.getProperty("groupKey")).getId() != groupKey
+				.getId())
+		{
+			bool = false;
+			throw new UserErrorMessage(
+					"Applicant is no longer applying to the group you manage.");
+		}
+
+		if (!"Admin".equals(character.getProperty("groupStatus")))
+		{
+			bool = false;
+			throw new UserErrorMessage(
+					"You are not an admin of your group and cannot perform this action.");
+		}
+
+		if (!"Applied".equals(applicant.getProperty("groupStatus")))
+		{
+			bool = false;
+			throw new UserErrorMessage("User is already a member of the group.");
+		}
+
+		return bool;
+	}
+
+	////////// END GROUP METHODS //////////
+	///////////////////////////////////////
 	
 }
