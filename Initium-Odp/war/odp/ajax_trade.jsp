@@ -26,7 +26,6 @@
 	}
 	catch(SecurityException e)
 	{
-		JspSnippets.handleSecurityException(e, request, response);
 		return;
 	}
 	

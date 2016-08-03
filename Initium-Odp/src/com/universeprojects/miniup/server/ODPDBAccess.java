@@ -2476,9 +2476,9 @@ public class ODPDBAccess
 		}
 		
 		if (character1.getKey().getId() == character.getKey().getId())
-			sendNotification(ds, character2.getKey(), NotificationType.fullpageRefresh);
+			sendNotification(ds, character2.getKey(), NotificationType.tradeChanged);
 		else
-			sendNotification(ds, character1.getKey(), NotificationType.fullpageRefresh);
+			sendNotification(ds, character1.getKey(), NotificationType.tradeChanged);
 
 		return tradeObject;
 	}
@@ -2494,7 +2494,7 @@ public class ODPDBAccess
 		
 		tradeObject.flagCancelled(ds, character);
 		
-		sendNotification(ds, tradeObject.getOtherCharacter(character.getKey()), NotificationType.fullpageRefresh);
+		sendNotification(ds, tradeObject.getOtherCharacter(character.getKey()), NotificationType.tradeCancelled);
 
 	}
 	
