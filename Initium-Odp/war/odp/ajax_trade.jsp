@@ -165,7 +165,7 @@
 		<br>
 		<br>
 		<div class='main-buttonbox'>
-			<a href='#' onclick='tradeAllNew(<%=items %>)' class='main-button'>Trade All</a>
+			<a href='#' onclick='tradeAllNew(<%=items%>)' class='main-button'>Trade All</a>
 		</div>
 		<br>
 
