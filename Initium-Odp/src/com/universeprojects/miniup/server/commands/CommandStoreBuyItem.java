@@ -16,8 +16,8 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandStoreBuyItem extends Command {
 	
-	public CommandStoreBuyItem(HttpServletRequest request, HttpServletResponse response) {
-		super(request, response);
+	public CommandStoreBuyItem(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
+		super(db, request, response);
 		}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {

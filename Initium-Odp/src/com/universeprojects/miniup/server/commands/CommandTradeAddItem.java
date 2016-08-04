@@ -5,19 +5,21 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.TradeObject;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandTradeAddItem extends Command {
 	
-	public CommandTradeAddItem(HttpServletRequest request, HttpServletResponse response)
+	public CommandTradeAddItem(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {
@@ -25,17 +27,21 @@ public class CommandTradeAddItem extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 			
-		Long characterId = tryParseId(parameters,"characterId");
-        CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
+		CachedEntity character = db.getCurrentCharacter(request);
+		Key otherCharacter = (Key) character.getProperty("combatant");
         Long itemId = tryParseId(parameters,"itemId");
         CachedEntity item = db.getEntity("Item", itemId);
+        TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
         
         if (item==null)
 			throw new UserErrorMessage("Item doesn't exist.");
 		
         db.addTradeItem(ds, db.getCurrentCharacter(request), item);
-        db.sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeChanged);
+        db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
-        return;
+        Integer tradeVersion = tradeObject.getVersion();
+        
+        addCallbackData("tradeVersion",tradeVersion);
+        addCallbackData("createTradeItemHtml",HtmlComponents.generatePlayerTradeItemHtml(item));
 	}
 }

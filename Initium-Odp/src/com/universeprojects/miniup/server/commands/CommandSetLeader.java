@@ -27,9 +27,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  */
 public class CommandSetLeader extends Command {
 
-	public CommandSetLeader(HttpServletRequest request, HttpServletResponse response) 
+	public CommandSetLeader(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 
 	@Override

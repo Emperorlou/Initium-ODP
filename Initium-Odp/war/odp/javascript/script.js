@@ -435,7 +435,7 @@ function buyHouse()
 	});
 }
 
-function storeBuyItemNew(eventObject, itemName, itemPrice, characterId, saleItemId, itemId)
+function storeBuyItemNew(itemName, itemPrice, itemId, saleItemId, characterId)
 {
 	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
 		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId},function(data,error){
@@ -705,7 +705,7 @@ function helpPopup()
 			"<li>/merchant - This allows you to share the link to your store with everyone in the location. Make sure to turn your store on first though! <a onclick='viewManageStore()'>You can do that here</a>" +
 			"<li>/quickstart - A quick start guide for new players who want to play efficiently as quick as possible! <a href='quickstart.jsp'>Open quick start page.</a></li>" +
 			"<li>/about - Easily share the link to the official 'about' page on this site. <a href='about.jsp'>Open about page.</a></li>" +
-			"<li>/mechanics - Easily share the link to the official 'mechanics' page on this site. It goes into more detail about how the game works. <a href='odp/mechanics.jsp'>Open mechanics page.</a></li>" +
+			"<li>/mechanics - Easily share the link to the official 'mechanics' page on this site. It goes into more detail about how the game works. <a href='mechanics.jsp'>Open mechanics page.</a></li>" +
 			"<li>/premium - Easily share a link to where people can learn about premium accounts.</li>" + 
 			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" + 
 			"<li>/app - This shows all the links to the mobile apps we have available.</li>" +
@@ -740,23 +740,30 @@ function shareItem(itemId)
 }
 
 
-function createNewGroup()
+function viewGroup(groupId)
 {
-	promptPopup("New Group", "What name will you be using for your group.\n\nPlease use ONLY letters, commas, and apostrophes and a maximum of 30 characters.\n\nThis name cannot be changed later, so choose wisely!", "", function(groupName){
-		if (groupName!=null && groupName!="")
-		{
-			window.location.href='ServletCharacterControl?type=createGroup&groupName='+encodeURIComponent(groupName)+"&v="+window.verifyCode;
-		}
-	});
+	pagePopup("odp/ajax_group.jsp?groupId=" + groupId);
 }
 
-function leaveGroup()
+
+function createNewGroup(eventObject)
+{
+	promptPopup("New Group","What name will you be using for your group.\n\nPlease use ONLY letters, commas, and apostrophes and a maximum of 30 characters.\n\nThis name cannot be changed later, so choose wisely!","", function(groupName) {
+				if (groupName != null && groupName != "") {
+					doCommand(eventObject, "GroupCreate", {"groupName" : groupName}, function(data, error) {
+						if (error) return;
+						viewGroup(data.groupId);
+					})
+				}
+			});
+}
+
+
+function leaveGroup(eventObject)
 {
 	confirmPopup("Leave group", "Are you sure you want to leave your group?", function(){
-		window.location.href = "ServletCharacterControl?type=requestLeaveGroup"+"&v="+window.verifyCode;
-		
+		doCommand(eventObject, "GroupLeave")
 	});
-		
 }
 
 function cancelLeaveGroup()
@@ -775,35 +782,35 @@ function setGroupDescription(existingDescription)
 	});
 }
 
-function setGroupMemberRank(oldPosition, characterId)
+function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
 	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
 		if (newPosition!=null && newPosition!="")
 		{
-			window.location.href='ServletCharacterControl?type=groupMemberChangeRank&characterId='+characterId+'&rank='+encodeURIComponent(newPosition)+"&v="+window.verifyCode;
+			doCommand(eventObject, "GroupMemberChangeRank", {"rank" : newPosition, "characterId" : characterId})
 		}
 		
 	});
 }
 
-function promoteToAdmin(characterId)
+function promoteToAdmin(eventObject, characterId)
 {
 	confirmPopup("Promote to Admin", "Are you sure you want to promote this member to admin?", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberPromoteToAdmin&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
+		doCommand(eventObject, "MemberPromoteToAdmin", {"characterId" : characterId})
 	});
 }
 
-function demoteFromAdmin(characterId)
+function demoteFromAdmin(eventObject, characterId)
 {
 	confirmPopup("Demote from Admin", "Are you sure you want to demote this member from admin?", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberDemoteFromAdmin&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
+		doCommand(eventObject, "MemberDemoteFromAdmin", {"characterId" : characterId})
 	});
 }
 
-function makeGroupCreator(characterId)
+function makeGroupCreator(eventGroup, characterId)
 {
 	confirmPopup("New Group Creator", "Are you sure you want to make this member into the group creator?\n\nThis action cannot be reversed unless the this member (as the new group creator) chooses to reverse it manually!", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberMakeGroupCreator&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
+		doCommand(eventObject, "MemberMakeGroupCreator", {"characterId" : characterId})
 	});
 }
 
@@ -1335,19 +1342,18 @@ function forgetCombatSite(locationId)
 	location.href = "ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
 }
 
-function groupAcceptJoinGroupApplication(characterId)
+function groupAcceptJoinGroupApplication(eventObject, characterId)
 {
-	location.href = "ServletCharacterControl?type=acceptJoinGroupApplication&applicantId="+characterId+""+"&v="+window.verifyCode;
+	doCommand(eventObject, "GroupAcceptJoinApplication", {"characterId" : characterId})
 }
 
-function groupDenyJoinGroupApplication(characterId)
+function groupDenyJoinGroupApplication(eventObject, characterId)
 {
-	location.href = "ServletCharacterControl?type=denyJoinGroupApplication&applicantId="+characterId+""+"&v="+window.verifyCode;
-}
+	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId})}
 
-function groupMemberKick(characterId)
+function groupMemberKick(eventObject, characterId)
 {
-	location.href = "ServletCharacterControl?type=groupMemberKick&characterId="+characterId+""+"&v="+window.verifyCode;
+	doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId})
 }
 
 function groupMemberKickCancel(characterId)
@@ -1355,9 +1361,9 @@ function groupMemberKickCancel(characterId)
 	location.href = "ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
 }
 
-function groupRequestJoin(groupId)
+function groupRequestJoin(eventObject, groupId)
 {
-	location.href = "ServletCharacterControl?type=requestJoinGroup&groupId="+groupId+"&v="+window.verifyCode;
+	doCommand(eventObject, "GroupRequestJoin", {"groupId" : groupId})
 }
 
 function tradeRemoveItem(itemId)
@@ -1394,54 +1400,56 @@ function tradeStartTradeNew(eventObject,characterId)
 	})
 }
 
-
-function tradeRemoveItemNew(eventobject,itemId,characterId,tradeVersion)
+function tradeRemoveItemNew(eventobject,itemId)
 {
-	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId,"characterId":characterId},function(){
+	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId},function(data,error){
 		if (error) return;
 		$(".tradeItem[ref='"+itemId+"']").remove();
-		var container = $("#yourTrade");
-		container.html(data.createSellItem+container.html());
-		var tradeVersion;
-		tradeVersion = tradeVersion + 1;
+		var container = $("#invItems");
+		container.html(data.createTradeInvItem+container.html());
+		tradeVersion = data.tradeVersion
 	})
 }
 
-function tradeCancelNew(eventObject,characterId)
+function tradeCancelNew(eventObject)
 {
-	doCommand(eventObject,"TradeCancel",{"characterId":characterId})
+	doCommand(eventObject,"TradeCancel")
 }
 
-function tradeReadyNew(eventObject,tradeVersion,characterId)
+function tradeReadyNew(eventObject,tradeVersion)
 {
-	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion,"characterId":characterId})
+	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion})
 }
 
-function tradeAddItemNew(eventObject,itemId,characterId,tradeVersion)
+function tradeAddItemNew(eventObject,itemId)
 {
-	doCommand(eventObject,"TradeAddItem",{"itemId":itemId,"characterId":characterId},function(){
+	doCommand(eventObject,"TradeAddItem",{"itemId":itemId},function(data,error){
 		if (error) return;
 		$(".invItem[ref='"+itemId+"']").remove();
 		var container = $("#yourTrade");
 		container.html(data.createSellItem+container.html());
-		var tradeVersion;
-		tradeversion = tradeversion + 1;
-	
+		tradeVersion = data.tradeVersion
 	})
 }
 
-function tradeSetGoldNew(eventObject,currentDogecoin,tradeVersion)
+function tradeSetGoldNew(eventObject,currentDogecoin)
 {
 	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
 		if (amount!=null && amount!="")
 		{
-			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(){
-				var tradeVersion;
-				tradeVersion = tradeVersion + 1;
+			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(data,error){
+				if (error) return;
+				tradeVersion = data.tradeVersion
 			})
 			
 		}
 	});
+}
+
+function tradeAddAllItemsNew(eventObject)
+{
+	doCommand(eventObject,"TradeAddAllItems");
+	reloadPagePopup();
 }
 	
 

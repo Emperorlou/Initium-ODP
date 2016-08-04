@@ -6,19 +6,20 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.TradeObject;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandTradeAddAllItems extends Command {
 	
-	public CommandTradeAddAllItems(HttpServletRequest request, HttpServletResponse response)
+	public CommandTradeAddAllItems(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {
@@ -28,8 +29,14 @@ public class CommandTradeAddAllItems extends Command {
 		
 		CachedEntity character = db.getCurrentCharacter(request);
 		List<CachedEntity> items = db.getFilteredList("Item", "containerKey", character.getKey());
-		Long characterId = tryParseId(parameters,"characterId");
-        CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
+		Key otherCharacter = (Key) character.getProperty("combatant");
+        TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, db.getCurrentCharacter(request));
+        
+        if (tradeObject==null || tradeObject.isCancelled())
+        {
+            addCallbackData("tradeCancelled", true);
+            throw new UserErrorMessage("Trade has been cancelled.");
+        }
         
 		for(CachedEntity item:items)
 		{
@@ -41,8 +48,9 @@ public class CommandTradeAddAllItems extends Command {
 		}   
         
 		db.addTradeItems(ds, db.getCurrentCharacter(request), items);
-        db.sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeChanged);
+        db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
-        return;
+        Integer tradeVersion = tradeObject.getVersion();
+        addCallbackData("tradeVersion", tradeVersion);
 	}
 }

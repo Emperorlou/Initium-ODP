@@ -5,39 +5,45 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.TradeObject;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandTradeSetGold extends Command {
 	
-	public CommandTradeSetGold(HttpServletRequest request, HttpServletResponse response)
+	public CommandTradeSetGold(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, db.getCurrentCharacter(request));
 		String dogecoinStr = parameters.get("amount");
-		Long characterId = tryParseId(parameters,"characterId");
-		CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
-        dogecoinStr = dogecoinStr.replace(",", "");
-        Long dogecoin = null;
-        if (dogecoinStr!=null)
-        {
-            dogecoin = Long.parseLong(dogecoinStr);
-        }
+		CachedEntity character = db.getCurrentCharacter(request);
+		Key otherCharacter = (Key) character.getProperty("combatant");
         
-        db.setTradeDogecoin(null, db.getCurrentCharacter(request), dogecoin);
-        db.sendNotification(ds,otherCharacter.getKey(),NotificationType.tradeChanged);
-       
-     
-        return;
+        Long dogecoin = null;
+        try {
+        	dogecoinStr = dogecoinStr.replace(",", "");
+            dogecoin = Long.parseLong(dogecoinStr);
+        	}
+        	catch (Exception e){
+        		new UserErrorMessage("Please type a valid gold amount.");
+        	}
+        	
+        
+        db.setTradeDogecoin(ds, db.getCurrentCharacter(request), dogecoin);
+        db.sendNotification(ds,otherCharacter,NotificationType.tradeChanged);
+        
+        Integer tradeVersion = tradeObject.getVersion();
+        addCallbackData("tradeVersion",tradeVersion);
 	}
 }

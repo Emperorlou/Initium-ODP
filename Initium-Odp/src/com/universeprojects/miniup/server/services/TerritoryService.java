@@ -17,8 +17,8 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.ODPDBAccess.TerritoryCharacterFilter;
 
 /**
  * 
@@ -31,6 +31,17 @@ import com.universeprojects.miniup.server.ODPDBAccess.TerritoryCharacterFilter;
  */
 public class TerritoryService extends Service
 {
+	
+	public enum TerritoryCharacterFilter
+	{
+		Defending, Trespassing, All
+	}
+	
+	public enum TerritoryTravelRule
+	{
+		None, Whitelisted, OwningGroupOnly
+	}
+	
 	final private CachedEntity territory;
 	
 	private List<CachedEntity> locations = null;
@@ -61,31 +72,33 @@ public class TerritoryService extends Service
 	 * @param location
 	 * @return
 	 */
-	public boolean isAllowedIn(CachedEntity character, CachedEntity location)
+	public boolean isAllowedIn(CachedEntity character)
 	{
 		// First validate the arguments...
 		if (character==null)
 			throw new IllegalArgumentException("Character cannot be null.");
-		if (location==null)
-			throw new IllegalArgumentException("Location cannot be null.");
 		if (territory==null)
 			return true;
-		if (isLocationInTerritory(location)==false)
-			throw new IllegalArgumentException("Location is not part of the territory this service is servicing.");
 
 		// Get the rule for travel
-		String travelRule = (String)territory.getProperty("travelRule");
+		TerritoryTravelRule travelRule = null;
+		try {
+			travelRule = TerritoryTravelRule.valueOf((String)territory.getProperty("travelRule"));
+		} catch (Exception e) {
+			// Unknown travel rule, silently reset to default
+			travelRule = TerritoryTravelRule.OwningGroupOnly;
+		}
 		
-		//None,Whitelisted,OwningGroupOnly
-		if ("OwningGroupOnly".equals(travelRule))
-		{
+		switch (travelRule) {
+		case OwningGroupOnly:
+		// This really shouldn't happen, but just in case...
+		default:
 			// Check if the character is in the group that owns the territory.
 			if (GameUtils.equals(character.getProperty("groupKey"), getOwningGroupKey()) && 
 					("Member".equals(character.getProperty("groupStatus"))==true || "Admin".equals(character.getProperty("groupStatus"))==true))
 				return true;
-		}
-		else if ("Whitelisted".equals(travelRule))
-		{
+			break;
+		case Whitelisted:
 			// Check if the character is in the group that owns the territory.
 			if (GameUtils.equals(character.getProperty("groupKey"), getOwningGroupKey()) && 
 					("Member".equals(character.getProperty("groupStatus"))==true || "Admin".equals(character.getProperty("groupStatus"))==true))
@@ -103,10 +116,8 @@ public class TerritoryService extends Service
 			for(Key whitelistCharacter:characterWhitelist)
 				if (GameUtils.equals(whitelistCharacter, character.getKey()))
 					return true;
-				
-		}
-		else 
-		{
+			break;
+		case None:
 			return true;
 		}
 		
@@ -262,12 +273,6 @@ public class TerritoryService extends Service
 			f0 = CompositeFilterOperator.and(f1, f2, f3, f4);
 		} break;
 		case Trespassing:
-		{
-			Filter f1 = new FilterPredicate("locationKey", FilterOperator.EQUAL, location.getKey());
-			Filter f2 = new FilterPredicate("type", FilterOperator.EQUAL, "PC");
-			Filter f3 = new FilterPredicate("mode", FilterOperator.NOT_EQUAL, "COMBAT");
-			f0 = CompositeFilterOperator.and(f1, f2, f3);
-		} break;
 		case All:
 			Filter f1 = new FilterPredicate("locationKey", FilterOperator.EQUAL, location.getKey());
 			Filter f2 = new FilterPredicate("type", FilterOperator.EQUAL, "PC");
@@ -282,7 +287,7 @@ public class TerritoryService extends Service
 		{
 			CachedEntity character = characters.get(i);
 			if (GameUtils.isPlayerIncapacitated(character) ||
-					(filter==TerritoryCharacterFilter.Trespassing && isAllowedIn(character, location)))
+					(filter==TerritoryCharacterFilter.Trespassing && isAllowedIn(character)))
 			{
 				characters.remove(i);
 			}
@@ -346,6 +351,69 @@ public class TerritoryService extends Service
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Moves all characters that match the filter to the first parentLocation that isn't in the territory.
+	 * If for some reason parentLocation isn't set correctly, this will blank the character's location,
+	 *   which in turn will send it to its hometown (therefore ensuring purge from territory) 
+	 * 
+	 * @param characters - when null, gets chars from DB
+	 * @param filter
+	 */
+	public void territoryPurgeCharacters(List<CachedEntity> characters, TerritoryCharacterFilter filter) {
+		if (characters==null)
+		{
+			// filter is already applied here, so no need to filter later 
+			characters = getTerritoryAllCharactersUnsorted(filter);
+			filter = TerritoryCharacterFilter.All;
+		}
+		territoryPurgeCharacters(characters, filter);
+		List<CachedEntity> locations = getLocations();
+		Key locationKey = null;
+		Key bufferedLocationKey = null;
+		Key parentLocationKey = null;
+		CachedDatastoreService ds = db.getDB();
+		for (CachedEntity character : characters)
+		{
+			// Filter the list if still needed
+			if (filter==TerritoryCharacterFilter.Defending)
+			{
+				String status = (String)character.getProperty("status");
+				if (status==null || status.startsWith("Defending")==false || "COMBAT".equals(character.getProperty("mode")))
+					continue;
+			}
+			else if (filter==TerritoryCharacterFilter.Trespassing)
+			{
+				if (isAllowedIn(character))
+					continue;
+			}
+			locationKey = (Key)character.getProperty("locationKey");
+			// characters are returned by location, so if it's the same as the previous character, no need to recalculate
+			if (locationKey!=bufferedLocationKey)
+			{
+				bufferedLocationKey = locationKey;
+				parentLocationKey = locationKey;
+				// Walk parentLocation until one is found that isn't in the territory
+				boolean match;
+				do
+				{
+					match = false;
+					for (CachedEntity location : locations)
+					{
+						if (GameUtils.equals(parentLocationKey, location.getKey()))
+						{
+							parentLocationKey = (Key)location.getProperty("parentLocationKey");
+							match = true;
+							break;
+						}
+					}
+				} while (match);
+			}
+			character.setProperty("locationKey", parentLocationKey);
+			ds.put(character);
+			db.sendNotification(ds, character.getKey(), NotificationType.fullpageRefresh);
+		}
 	}
 	
 }

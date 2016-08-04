@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.NotificationType;
@@ -15,21 +15,22 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandTradeCancel extends Command {
 	
-	public CommandTradeCancel(HttpServletRequest request, HttpServletResponse response)
+	public CommandTradeCancel(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-        Long characterId = tryParseId(parameters,"characterId");
-		CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
-        
-        db.setTradeCancelled(ds, db.getCurrentCharacter(request));
-        db.sendNotification(ds, otherCharacter.getKey(), NotificationType.tradeCancelled);
-     
-        return;
+		CachedEntity character = db.getCurrentCharacter(request);	
+		
+		if ("TRADING".equals(character.getProperty("mode")))
+		{
+		Key otherCharacter = (Key) character.getProperty("combatant");
+		db.setTradeCancelled(ds, character);
+        db.sendNotification(ds, otherCharacter, NotificationType.tradeCancelled);
+		}
 	}
 }

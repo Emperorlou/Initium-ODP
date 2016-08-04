@@ -81,35 +81,12 @@ public class HtmlComponents {
    	   return result;
 	}
 	
-	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request)
-	{
-		CachedEntity selfCharacter = db.getCurrentCharacter(request);
-		Double characterStrength = db.getCharacterStrength(selfCharacter);
-		
-		Double strengthRequirement = null;
-		try
-		{
-			strengthRequirement = (Double)item.getProperty("strengthRequirement");
-		}
-		catch(Exception e)
-		{
-			// Ignore exceptions
-		}
-		
-		boolean hasRequiredStrength = true;
-		if (strengthRequirement!=null && characterStrength<strengthRequirement)
-			hasRequiredStrength = false;
-			
-		
+	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request){
 		
         String itemName = "(Item Destroyed)";
         String itemPopupAttribute = "";
         String itemIconElement = "";
         Double storeSale = (Double)storeCharacter.getProperty("storeSale");
-        String notEnoughStrengthClass = "";
-        if (hasRequiredStrength==false)
-        	notEnoughStrengthClass = "not-enough-strength";
-        if (storeSale==null) storeSale = 100d;
         if (item!=null)
         {
             itemName = (String)item.getProperty("name");
@@ -117,7 +94,7 @@ public class HtmlComponents {
             itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
         }
         
-        Long cost = (Long)saleItem.getProperty("dogecoins");
+        Long cost = (Long)item.getProperty("store-dogecoins");
         cost=Math.round(cost.doubleValue()*(storeSale/100));
         String finalCost = GameUtils.formatNumber(cost, false);
         
@@ -127,13 +104,14 @@ public class HtmlComponents {
 				result+="<div class='main-item'>";
 	   	       	result+="<span><img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
 	   	       	result+="<span>";
-	   	    if ("Selling".equals(saleItem.getProperty("status")))
-	   	    	result+="<span class='"+notEnoughStrengthClass+"'><a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a></span> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getKey().getId()+", "+item.getKey().getId()+")'>Buy this</a>";
-	   	    else if ("Sold".equals(saleItem.getProperty("status")))   
-	   	    	result+="<span class='"+notEnoughStrengthClass+"'><a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a></span> - <div class='saleItem-sold'>SOLD</div>";
+	   	    if ("Selling".equals(item.getProperty("store-status")))
+	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(\""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+((Key)item.getProperty("store-saleItemKey")).getId()+", "+item.getKey().getId()+")'>Buy this</a>";
+	   	    else if ("Sold".equals(item.getProperty("store-status")))   
+	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
 	   	       	result+="</span>";
 	   	    	result+="</div>";
-	   	    	result+="</div>";
+	   	       	result+="</div>";
+	   	       	result+="<br>";
 		
 		return result;
 	}
@@ -163,7 +141,7 @@ public class HtmlComponents {
 			   result+=GameUtils.renderItem(item)+saleText;
 			   result+="<br>";
 			   result+="			<div class='main-item-controls'>";
-			   result+="				<a onclick='tradeAddItem("+item.getKey().getId()+")'>Add to trade window</a>";
+			   result+="				<a onclick='tradeAddItemNew(event,"+item.getKey().getId()+")'>Add to trade window</a>";
 			   result+="			</div>";
 			   result+="		</div>";
 			   result+="	</div>";
@@ -182,7 +160,7 @@ public class HtmlComponents {
 		       result+=GameUtils.renderItem(item);
 		       result+="<br>";
 		       result+="			<div class='main-item-controls'>";
-		       result+="				<a onclick='tradeRemoveItem("+item.getKey().getId()+")'>Remove</a>";
+		       result+="				<a onclick='tradeRemoveItemNew(event,"+item.getKey().getId()+")'>Remove</a>";
 		       result+="			</div>";
 		       result+="		</div>";
 		       result+="	</div>";
