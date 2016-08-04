@@ -746,7 +746,7 @@ function viewGroup(groupId)
 }
 
 
-function createNewGroup(eventObject)
+function createNewGroup(eventObject, groupName)
 {
 	promptPopup("New Group","What name will you be using for your group.\n\nPlease use ONLY letters, commas, and apostrophes and a maximum of 30 characters.\n\nThis name cannot be changed later, so choose wisely!","", function(groupName) {
 				if (groupName != null && groupName != "") {
@@ -782,7 +782,7 @@ function setGroupDescription(existingDescription)
 	});
 }
 
-function setGroupMemberRank(eventObject, oldPosition, characterId)
+function setGroupMemberRank(eventObject, oldPosition, characterId, newPosition)
 {
 	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
 		if (newPosition!=null && newPosition!="")

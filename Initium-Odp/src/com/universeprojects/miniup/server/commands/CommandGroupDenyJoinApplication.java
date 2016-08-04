@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -44,9 +45,9 @@ public class CommandGroupDenyJoinApplication extends Command
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);
 		Key groupKey = (Key) character.getProperty("groupKey");
-		Long applicantId = Long.valueOf(parameters.get("applicantId"))
-				.longValue();
-		CachedEntity applicant = db.getEntity("Character", applicantId);
+		Long applicantId = tryParseId(parameters, "characterId");
+		CachedEntity applicant = db.getEntity(KeyFactory.createKey("Character",
+				applicantId));
 
 		if (applicant == null)
 		{
