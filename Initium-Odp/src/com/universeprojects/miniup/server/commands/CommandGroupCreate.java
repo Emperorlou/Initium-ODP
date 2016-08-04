@@ -106,6 +106,6 @@ public class CommandGroupCreate extends Command
 
 		setPopupMessage("Group created successfully.");
 
-		addCallbackData("groupId", groupName);
+		addCallbackData("groupId", group.getId());
 	}
 }
