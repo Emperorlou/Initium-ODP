@@ -31,9 +31,9 @@ import com.universeprojects.miniup.server.services.TerritoryService.TerritoryTra
  */
 public class CommandTerritoryVacate extends Command {
 
-	public CommandTerritoryVacate(HttpServletRequest request, HttpServletResponse response) 
+	public CommandTerritoryVacate(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	@Override

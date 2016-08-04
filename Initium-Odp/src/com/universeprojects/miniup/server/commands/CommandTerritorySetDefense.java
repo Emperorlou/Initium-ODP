@@ -35,9 +35,9 @@ import com.universeprojects.miniup.server.services.TerritoryService.TerritoryTra
  */
 public class CommandTerritorySetDefense extends Command {
 
-	public CommandTerritorySetDefense(HttpServletRequest request, HttpServletResponse response) 
+	public CommandTerritorySetDefense(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	@Override
