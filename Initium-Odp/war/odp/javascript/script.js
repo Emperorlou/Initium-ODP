@@ -752,7 +752,7 @@ function createNewGroup(eventObject)
 				if (groupName != null && groupName != "") {
 					doCommand(eventObject, "GroupCreate", {"groupName" : groupName}, function(data, error) {
 						if (error) return;
-						viewGroup(data.groupName);
+						viewGroup(data.groupId);
 					})
 				}
 			});
