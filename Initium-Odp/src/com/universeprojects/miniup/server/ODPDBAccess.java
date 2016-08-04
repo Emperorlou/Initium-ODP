@@ -73,11 +73,6 @@ public class ODPDBAccess
 	{
 		Applied, Member, Admin, Kicked
 	}
-	
-	public enum TerritoryCharacterFilter
-	{
-		Defending, Trespassing, All
-	}
 
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
 	public static final String CAMP_NAME_REGEX = "[A-Za-z0-9- ,'&]+";
