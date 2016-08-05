@@ -1400,7 +1400,7 @@ function tradeStartTradeNew(eventObject,characterId)
 	})
 }
 
-function tradeRemoveItemNew(eventobject,itemId)
+function tradeRemoveItemNew(eventObject,itemId)
 {
 	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId},function(data,error){
 		if (error) return;
@@ -1427,7 +1427,7 @@ function tradeAddItemNew(eventObject,itemId)
 		if (error) return;
 		$(".invItem[ref='"+itemId+"']").remove();
 		var container = $("#yourTrade");
-		container.html(data.createSellItem+container.html());
+		container.html(data.createTradeItem+container.html());
 		tradeVersion = data.tradeVersion
 	})
 }
@@ -1918,7 +1918,7 @@ function updateTradeWindow()
 
 function cancelledTradeWindow()
 {
-	closeAllPagepopups();
+	closeAllPagePopups();
 	popupMessage("The trade has been cancelled.")
 }
 

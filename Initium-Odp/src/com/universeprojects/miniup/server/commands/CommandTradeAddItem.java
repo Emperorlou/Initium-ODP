@@ -42,6 +42,6 @@ public class CommandTradeAddItem extends Command {
         Integer tradeVersion = tradeObject.getVersion();
         
         addCallbackData("tradeVersion",tradeVersion);
-        addCallbackData("createTradeItemHtml",HtmlComponents.generatePlayerTradeItemHtml(item));
+        addCallbackData("createTradeItem",HtmlComponents.generatePlayerTradeItemHtml(item));
 	}
 }
