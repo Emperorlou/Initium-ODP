@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.TradeObject;
@@ -44,6 +45,7 @@ public class CommandTradeSetGold extends Command {
         db.sendNotification(ds,otherCharacter,NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
+        addCallbackData("newTradeGoldAmount",GameUtils.formatNumber(dogecoinStr));
         addCallbackData("tradeVersion",tradeVersion);
 	}
 }

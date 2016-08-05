@@ -154,7 +154,7 @@ public class HtmlComponents {
 	public static String generatePlayerTradeItemHtml(CachedEntity item){
 		
 		String result = "";
-			   result+="<div class='tradeItem' ref"+item.getKey().getId()+">";
+			   result+="<div class='tradeItem' ref="+item.getKey().getId()+">";
 		       result+="<div class='main-item'>";
 		       result+="<div class='main-item-container'>";
 		       result+=GameUtils.renderItem(item);
