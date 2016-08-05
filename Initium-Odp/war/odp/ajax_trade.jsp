@@ -108,8 +108,8 @@
         
         
         
-        
-        <div class='main-splitScreen' style="width: 27%">
+        <div class="trade-boxes" style="margin-top: 20px;">
+        <div class='main-splitScreen'>
         <div class='${characterTradeWindowClass}'><h4>Your offer</h4>
         <h4><a href='#' onclick='tradeSetGoldNew(event,<%=+tradeObject.getDogecoinsFor(character.getKey())%>)'>Gold: <span id='myTradeGoldAmount'><%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(character.getKey())) %></span></a></h4>
         <div id='yourTrade'>
@@ -122,7 +122,7 @@
         </div>
         </div>
         </div>
-        <div class='main-splitScreen' style="width: 27%"> 
+        <div class='main-splitScreen'> 
         <div class='${otherCharacterTradeWindowClass}'><h4><c:out value="${otherCharacterName}"/>'s offer</h4>
         <h4>Gold: <%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(otherCharacter.getKey())) %></h4>
         <%
@@ -131,6 +131,7 @@
                 out.println(HtmlComponents.generatePlayerTradeItemHtml(item));
             }
         %>
+        </div>
         </div>
         </div>
         
