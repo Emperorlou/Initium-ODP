@@ -73,7 +73,7 @@
 	request.setAttribute("chatroomId", "T"+tradeObject.getKey());
 
 
-	if (GameUtils.equals(character.getProperty("locationKey"), otherCharacter.getProperty("locationKey")))
+	if (GameUtils.equals(character.getProperty("locationKey"), otherCharacter.getProperty("locationKey"))==false)
 	{
 		db.setTradeCancelled(ds, character);
 		out.println("You canot trade with a character who is not in your location.");
