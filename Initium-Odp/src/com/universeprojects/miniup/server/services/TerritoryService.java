@@ -19,6 +19,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.commands.framework.WarnPlayerException;
 
 /**
  * 
@@ -123,7 +124,106 @@ public class TerritoryService extends Service
 		
 		return false;
 	}
+	
+	/**
+	 * Returns whether the character is an admin of the owning group
+	 * 
+	 * @param character
+	 * @return
+	 */
+	public boolean isTerritoryAdmin(CachedEntity character)
+	{
+		Key groupKey = (Key)character.getProperty("groupKey");
+		if (groupKey==null)
+			return false;
+		if (GameUtils.equals(groupKey, getOwningGroupKey())==false)
+			return false;
+		if ("Admin".equals(character.getProperty("groupStatus"))==false)
+			return false;
 
+		return true;
+	}
+	
+	/**
+	 * Returns whether the character is allowed to Move/Explore/Rest
+	 * if enterCombat = true, will automatically fight the nearest defender if action isn't allowed
+	 * 
+	 * @param character
+	 * @param location
+	 * @param enterCombat
+	 * @param throwWarning
+	 * @return
+	 */
+	public boolean processRegularActionInterruption(CachedEntity character, CachedEntity location, boolean enterCombat, boolean throwWarning) throws WarnPlayerException
+	{
+		if (character==null)
+			throw new IllegalArgumentException("canPerformRegularAction invalid call format, 'character' cannot be null.");
+		if (location==null)
+			throw new IllegalArgumentException("canPerformRegularAction invalid call format, 'location' cannot be null.");
+		
+		// If the location isn't in this territory, no need for restrictions
+		if (isLocationInTerritory(location)==false)
+			return true;
+		
+		if (isAllowedIn(character))
+			return true;
+		
+		if (throwWarning)
+			throw new WarnPlayerException("Are you sure you want to do this? You might be attacked by the territory's defenders...");
+		
+		// If there are no active defenders, action is allowed
+		CachedEntity defender = getTerritorySingleCharacter(TerritoryCharacterFilter.Defending, location);
+		if (defender==null)
+			return true;
+		
+		// At this point, the action isn't allowed
+		if (enterCombat)
+		{
+			// Attack defender
+			new CombatService(db).enterCombat(character, defender, true);
+			// Since we don't know how this method is called, use sendNotifaction rather than setJavascriptResponse
+			// Defender is refreshed from CombatService
+			db.sendNotification(db.getDB(), character.getKey(), NotificationType.fullpageRefresh);
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Returns the error message if the character cannot use Retreat or null otherwise.
+	 * (Placed in the service for link generation purposes)
+	 * 
+	 * @param character
+	 * @param location
+	 * @return
+	 */
+	public String getRetreatError(CachedEntity character, CachedEntity location)
+	{
+		if (character==null)
+			return "canRetreat invalid call format, 'character' cannot be null.";
+		if (location==null)
+			return "canRetreat invalid call format, 'location' cannot be null.";
+		
+		// Can't retreat if you're not there to begin with.
+		if (isLocationInTerritory(location)==false)
+			return "Retreat? Retreat from where? But that's not where you are!";
+			
+		// Verify character is alive and not doing something else
+		if (GameUtils.isPlayerIncapacitated(character))
+			return "You are incapacitated and thus cannot do this.";
+		String mode = (String)character.getProperty("mode");
+		if (mode!=null && mode.equals("NORMAL")==false)
+			return "You're too busy to try and retreat at the moment.";
+		
+		// Only trespassers can retreat and only when there are active defenders (to prevent exploits)
+		if (isAllowedIn(character))
+			return "You're free to move around in this territory, no need to retreat stealthily.";
+		if (getTerritorySingleCharacter(TerritoryCharacterFilter.Defending, location)==null)
+			return "You're free to move around in this territory, no need to retreat stealthily.";
+		
+		return null;
+	}
+	
 	/**
 	 * Returns the group entity that owns this territory.
 	 * @return
@@ -199,7 +299,7 @@ public class TerritoryService extends Service
 		if (locs.isEmpty()) return null;
 		if (startLocation==null)
 			startLocation = locs.get(0);
-		if (isLocationInTerritory(startLocation))
+		if (isLocationInTerritory(startLocation)==false)
 			throw new IllegalArgumentException("startLocation is not in the territory this service is servicing.");
 		
 		CachedDatastoreService ds = db.getDB();
@@ -411,6 +511,9 @@ public class TerritoryService extends Service
 				} while (match);
 			}
 			character.setProperty("locationKey", parentLocationKey);
+			
+			// Reset status because we're leaving a territory.
+			character.setProperty("status", "Normal");
 			ds.put(character);
 			db.sendNotification(ds, character.getKey(), NotificationType.fullpageRefresh);
 		}

@@ -43,6 +43,11 @@ public class CommandTerritorySetDefense extends Command {
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
+		// Verify line param sanity
+		String newStatus = parameters.get("line");
+		if (GameUtils.isContainedInList("0,1,2,3", newStatus)==false)
+			throw new RuntimeException("TerritorySetDefense invalid call format, 'line' is not a valid number.");
+		
 		ODPDBAccess db = getDB();
 		
 		CachedEntity character = db.getCurrentCharacter(request);
@@ -51,23 +56,13 @@ public class CommandTerritorySetDefense extends Command {
 		if (territory==null)
 			throw new UserErrorMessage("You're not in a territory at the moment.");
 		
-		// Verify line param sanity
-		String newStatus = parameters.get("line");
-		if (GameUtils.isContainedInList("0,1,2,3", newStatus)==false)
-			throw new RuntimeException("TerritorySetDefense invalid call format, 'line' is not a valid number.");
-		
 /* Admin version disabled for now
 		// If charId was passed, use the admin version
 		if (parameters.get("charId")!=null)
 		{
-			// Verify permission to set defense
-			Key groupKey = (Key)character.getProperty("groupKey");
-			if (groupKey==null)
-				throw new UserErrorMessage("Only groups can control territories.");
-			if (GameUtils.equals(groupKey, territory.getProperty("owningGroupKey"))==false)
-				throw new UserErrorMessage("Your group doesn't control this territory.");
-			if ("Admin".equals(character.getProperty("groupStatus"))==false)
-				throw new UserErrorMessage("Only the admins of the group can change defense ranks.");
+			// Only admins are allowed to set ranks
+			if (new TerritoryService(db, territory).isTerritoryAdmin(character)==false)
+				throw new UserErrorMessage("Only the admins of the owning group can change defense ranks.");
 			
 			// Verify defender validity
 			character = db.getCharacterById(tryParseId(parameters, "charId"));

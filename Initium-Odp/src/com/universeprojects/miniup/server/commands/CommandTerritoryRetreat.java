@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,21 +20,19 @@ import com.universeprojects.miniup.server.services.TerritoryService.TerritoryTra
 
 
 /**
- * Sets the territory navigation rule
+ * Retreats a trespassing character from the territory if there are active defenders.
  * 
  * Usage notes:
- * Checks if caller is Admin of owning group, and sets rule.
- * Purges all new trespassers.
+ * Calls TerritoryService.canRetreat for easy call access for link generation.
  * 
  * Parameters:
- * 		rule - valid values: None/Whitelisted/OwningGroupOnly 
  * 
  * @author NJ
  *
  */
-public class CommandTerritorySetRule extends Command {
+public class CommandTerritoryRetreat extends Command {
 
-	public CommandTerritorySetRule(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
+	public CommandTerritoryRetreat(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
 		super(db, request, response);
 	}
@@ -40,14 +40,6 @@ public class CommandTerritorySetRule extends Command {
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
-		// Verify rule parameter sanity
-		TerritoryTravelRule travelRule = null;
-		try {
-			travelRule = TerritoryTravelRule.valueOf(parameters.get("rule"));
-		} catch (Exception e) {
-			throw new RuntimeException("TerritorySetRule invalid call format, 'rule' is not a valid rule.");
-		}
-		
 		ODPDBAccess db = getDB();
 		
 		CachedEntity character = db.getCurrentCharacter(request);
@@ -58,18 +50,16 @@ public class CommandTerritorySetRule extends Command {
 		
 		TerritoryService ts = new TerritoryService(db, territory);
 		
-		// Only admins are allowed to change rules
-		if (ts.isTerritoryAdmin(character)==false)
-			throw new UserErrorMessage("Only the admins of the owning group can set new territory rules.");
+		String errorMsg = ts.getRetreatError(character, location);
+		if (errorMsg!=null)
+			throw new UserErrorMessage(errorMsg);
 		
-		territory.setProperty("travelRule", travelRule.toString());
+		//purge the character
+		List<CachedEntity> characters = new ArrayList<CachedEntity>(1);
+		characters.add(character);
+		ts.territoryPurgeCharacters(characters, TerritoryCharacterFilter.All);
 		
-		// Purge all newly created trespassers
-		ts.territoryPurgeCharacters(null, TerritoryCharacterFilter.Trespassing);
-		
-		// Commit to DB only after purge
-		db.getDB().put(territory);
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup); 
+		// Since your char will have been relocated by the purge, no need to send another refresh here.
 	}
 
 }

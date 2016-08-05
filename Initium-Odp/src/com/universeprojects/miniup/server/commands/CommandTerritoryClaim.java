@@ -51,6 +51,13 @@ public class CommandTerritoryClaim extends Command {
 		if (territory==null)
 			throw new UserErrorMessage("You're not in a territory at the moment.");
 		
+		// Verify character is alive and not doing something else
+		if (GameUtils.isPlayerIncapacitated(character))
+			throw new UserErrorMessage("You are incapacitated and thus cannot do this.");
+		String mode = (String)character.getProperty("mode");
+		if (mode!=null && mode.equals("NORMAL")==false)
+			throw new UserErrorMessage("You're too busy to try and claim a territory at the moment.");
+		
 		// Check if group already owns this territory to prevent attacking its own defenders
 		Key groupKey = (Key)character.getProperty("groupKey");
 		if (groupKey!=null && GameUtils.equals(groupKey, territory.getProperty("owningGroupKey")) &&
