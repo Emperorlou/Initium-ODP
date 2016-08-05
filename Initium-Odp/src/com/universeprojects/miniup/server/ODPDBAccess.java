@@ -2483,8 +2483,6 @@ public class ODPDBAccess
 		if (ds==null)
 			ds = getDB();
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
-		if (tradeObject==null || tradeObject.isCancelled())
-			throw new UserErrorMessage("Trade has been cancelled.");
 
 		
 		tradeObject.flagCancelled(ds, character);
