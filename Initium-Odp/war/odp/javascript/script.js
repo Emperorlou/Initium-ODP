@@ -1439,6 +1439,7 @@ function tradeSetGoldNew(eventObject,currentDogecoin)
 		{
 			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(data,error){
 				if (error) return;
+				$("#myTradeGoldAmount").text(data.newTradeGoldAmount);
 				tradeVersion = data.tradeVersion
 			})
 			
