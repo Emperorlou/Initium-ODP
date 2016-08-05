@@ -1395,8 +1395,8 @@ function tradeStartTradeNew(eventObject,characterId)
 {
 	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
 		if (error) return;
-		popupMessage("Trade Started", data.tradePrompt);
 		_viewTrade();
+		popupMessage("Trade Started", data.tradePrompt);	
 	})
 }
 
