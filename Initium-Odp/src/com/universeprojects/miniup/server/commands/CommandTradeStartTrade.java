@@ -31,7 +31,7 @@ public class CommandTradeStartTrade extends Command {
 		Long characterId = tryParseId(parameters,"characterId");
         CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
         
-        if (GameUtils.equals(((Key)character.getProperty("locationKey")),((Key)otherCharacter.getProperty("locationKey"))))
+        if (GameUtils.equals(((Key)character.getProperty("locationKey")),((Key)otherCharacter.getProperty("locationKey")))==false)
 			throw new UserErrorMessage("You cannot start a trade with a character that is not in your location.");
 		
 		TradeObject.startNewTrade(ds, character, otherCharacter);
