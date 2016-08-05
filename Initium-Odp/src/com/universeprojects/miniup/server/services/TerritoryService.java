@@ -17,8 +17,9 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.ODPDBAccess.TerritoryCharacterFilter;
+import com.universeprojects.miniup.server.commands.framework.WarnPlayerException;
 
 /**
  * 
@@ -31,6 +32,17 @@ import com.universeprojects.miniup.server.ODPDBAccess.TerritoryCharacterFilter;
  */
 public class TerritoryService extends Service
 {
+	
+	public enum TerritoryCharacterFilter
+	{
+		Defending, Trespassing, All
+	}
+	
+	public enum TerritoryTravelRule
+	{
+		None, Whitelisted, OwningGroupOnly
+	}
+	
 	final private CachedEntity territory;
 	
 	private List<CachedEntity> locations = null;
@@ -61,31 +73,33 @@ public class TerritoryService extends Service
 	 * @param location
 	 * @return
 	 */
-	public boolean isAllowedIn(CachedEntity character, CachedEntity location)
+	public boolean isAllowedIn(CachedEntity character)
 	{
 		// First validate the arguments...
 		if (character==null)
 			throw new IllegalArgumentException("Character cannot be null.");
-		if (location==null)
-			throw new IllegalArgumentException("Location cannot be null.");
 		if (territory==null)
 			return true;
-		if (isLocationInTerritory(location)==false)
-			throw new IllegalArgumentException("Location is not part of the territory this service is servicing.");
 
 		// Get the rule for travel
-		String travelRule = (String)territory.getProperty("travelRule");
+		TerritoryTravelRule travelRule = null;
+		try {
+			travelRule = TerritoryTravelRule.valueOf((String)territory.getProperty("travelRule"));
+		} catch (Exception e) {
+			// Unknown travel rule, silently reset to default
+			travelRule = TerritoryTravelRule.OwningGroupOnly;
+		}
 		
-		//None,Whitelisted,OwningGroupOnly
-		if ("OwningGroupOnly".equals(travelRule))
-		{
+		switch (travelRule) {
+		case OwningGroupOnly:
+		// This really shouldn't happen, but just in case...
+		default:
 			// Check if the character is in the group that owns the territory.
 			if (GameUtils.equals(character.getProperty("groupKey"), getOwningGroupKey()) && 
 					("Member".equals(character.getProperty("groupStatus"))==true || "Admin".equals(character.getProperty("groupStatus"))==true))
 				return true;
-		}
-		else if ("Whitelisted".equals(travelRule))
-		{
+			break;
+		case Whitelisted:
 			// Check if the character is in the group that owns the territory.
 			if (GameUtils.equals(character.getProperty("groupKey"), getOwningGroupKey()) && 
 					("Member".equals(character.getProperty("groupStatus"))==true || "Admin".equals(character.getProperty("groupStatus"))==true))
@@ -103,16 +117,113 @@ public class TerritoryService extends Service
 			for(Key whitelistCharacter:characterWhitelist)
 				if (GameUtils.equals(whitelistCharacter, character.getKey()))
 					return true;
-				
-		}
-		else 
-		{
+			break;
+		case None:
 			return true;
 		}
 		
 		return false;
 	}
+	
+	/**
+	 * Returns whether the character is an admin of the owning group
+	 * 
+	 * @param character
+	 * @return
+	 */
+	public boolean isTerritoryAdmin(CachedEntity character)
+	{
+		Key groupKey = (Key)character.getProperty("groupKey");
+		if (groupKey==null)
+			return false;
+		if (GameUtils.equals(groupKey, getOwningGroupKey())==false)
+			return false;
+		if ("Admin".equals(character.getProperty("groupStatus"))==false)
+			return false;
 
+		return true;
+	}
+	
+	/**
+	 * Returns whether the character is allowed to Move/Explore/Rest
+	 * if enterCombat = true, will automatically fight the nearest defender if action isn't allowed
+	 * 
+	 * @param character
+	 * @param location
+	 * @param enterCombat
+	 * @param throwWarning
+	 * @return
+	 */
+	public boolean processRegularActionInterruption(CachedEntity character, CachedEntity location, boolean enterCombat, boolean throwWarning) throws WarnPlayerException
+	{
+		if (character==null)
+			throw new IllegalArgumentException("canPerformRegularAction invalid call format, 'character' cannot be null.");
+		if (location==null)
+			throw new IllegalArgumentException("canPerformRegularAction invalid call format, 'location' cannot be null.");
+		
+		// If the location isn't in this territory, no need for restrictions
+		if (isLocationInTerritory(location)==false)
+			return true;
+		
+		if (isAllowedIn(character))
+			return true;
+		
+		if (throwWarning)
+			throw new WarnPlayerException("Are you sure you want to do this? You might be attacked by the territory's defenders...");
+		
+		// If there are no active defenders, action is allowed
+		CachedEntity defender = getTerritorySingleCharacter(TerritoryCharacterFilter.Defending, location);
+		if (defender==null)
+			return true;
+		
+		// At this point, the action isn't allowed
+		if (enterCombat)
+		{
+			// Attack defender
+			new CombatService(db).enterCombat(character, defender, true);
+			// Since we don't know how this method is called, use sendNotifaction rather than setJavascriptResponse
+			// Defender is refreshed from CombatService
+			db.sendNotification(db.getDB(), character.getKey(), NotificationType.fullpageRefresh);
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Returns the error message if the character cannot use Retreat or null otherwise.
+	 * (Placed in the service for link generation purposes)
+	 * 
+	 * @param character
+	 * @param location
+	 * @return
+	 */
+	public String getRetreatError(CachedEntity character, CachedEntity location)
+	{
+		if (character==null)
+			return "canRetreat invalid call format, 'character' cannot be null.";
+		if (location==null)
+			return "canRetreat invalid call format, 'location' cannot be null.";
+		
+		// Can't retreat if you're not there to begin with.
+		if (isLocationInTerritory(location)==false)
+			return "Retreat? Retreat from where? But that's not where you are!";
+			
+		// Verify character is alive and not doing something else
+		if (GameUtils.isPlayerIncapacitated(character))
+			return "You are incapacitated and thus cannot do this.";
+		String mode = (String)character.getProperty("mode");
+		if (mode!=null && mode.equals("NORMAL")==false)
+			return "You're too busy to try and retreat at the moment.";
+		
+		// Only trespassers can retreat and only when there are active defenders (to prevent exploits)
+		if (isAllowedIn(character))
+			return "You're free to move around in this territory, no need to retreat stealthily.";
+		if (getTerritorySingleCharacter(TerritoryCharacterFilter.Defending, location)==null)
+			return "You're free to move around in this territory, no need to retreat stealthily.";
+		
+		return null;
+	}
+	
 	/**
 	 * Returns the group entity that owns this territory.
 	 * @return
@@ -188,7 +299,7 @@ public class TerritoryService extends Service
 		if (locs.isEmpty()) return null;
 		if (startLocation==null)
 			startLocation = locs.get(0);
-		if (isLocationInTerritory(startLocation))
+		if (isLocationInTerritory(startLocation)==false)
 			throw new IllegalArgumentException("startLocation is not in the territory this service is servicing.");
 		
 		CachedDatastoreService ds = db.getDB();
@@ -254,20 +365,13 @@ public class TerritoryService extends Service
 		{
 			Filter f1 = new FilterPredicate("locationKey", FilterOperator.EQUAL, location.getKey());
 			Filter f2 = new FilterPredicate("type", FilterOperator.EQUAL, "PC");
-			Filter f3 = new FilterPredicate("mode", FilterOperator.NOT_EQUAL, "COMBAT");
-			Filter f4a = new FilterPredicate("status", FilterOperator.EQUAL, "Defending1");
-			Filter f4b = new FilterPredicate("status", FilterOperator.EQUAL, "Defending2");
-			Filter f4c = new FilterPredicate("status", FilterOperator.EQUAL, "Defending3");
-			Filter f4 = CompositeFilterOperator.or(f4a, f4b, f4c);
-			f0 = CompositeFilterOperator.and(f1, f2, f3, f4);
-		} break;
-		case Trespassing:
-		{
-			Filter f1 = new FilterPredicate("locationKey", FilterOperator.EQUAL, location.getKey());
-			Filter f2 = new FilterPredicate("type", FilterOperator.EQUAL, "PC");
-			Filter f3 = new FilterPredicate("mode", FilterOperator.NOT_EQUAL, "COMBAT");
+			Filter f3a = new FilterPredicate("status", FilterOperator.EQUAL, "Defending1");
+			Filter f3b = new FilterPredicate("status", FilterOperator.EQUAL, "Defending2");
+			Filter f3c = new FilterPredicate("status", FilterOperator.EQUAL, "Defending3");
+			Filter f3 = CompositeFilterOperator.or(f3a, f3b, f3c);
 			f0 = CompositeFilterOperator.and(f1, f2, f3);
 		} break;
+		case Trespassing:
 		case All:
 			Filter f1 = new FilterPredicate("locationKey", FilterOperator.EQUAL, location.getKey());
 			Filter f2 = new FilterPredicate("type", FilterOperator.EQUAL, "PC");
@@ -282,7 +386,8 @@ public class TerritoryService extends Service
 		{
 			CachedEntity character = characters.get(i);
 			if (GameUtils.isPlayerIncapacitated(character) ||
-					(filter==TerritoryCharacterFilter.Trespassing && isAllowedIn(character, location)))
+					(filter==TerritoryCharacterFilter.Defending && "COMBAT".equals(character.getProperty("mode"))) ||
+					(filter==TerritoryCharacterFilter.Trespassing && isAllowedIn(character)))
 			{
 				characters.remove(i);
 			}
@@ -346,6 +451,72 @@ public class TerritoryService extends Service
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Moves all characters that match the filter to the first parentLocation that isn't in the territory.
+	 * If for some reason parentLocation isn't set correctly, this will blank the character's location,
+	 *   which in turn will send it to its hometown (therefore ensuring purge from territory) 
+	 * 
+	 * @param characters - when null, gets chars from DB
+	 * @param filter
+	 */
+	public void territoryPurgeCharacters(List<CachedEntity> characters, TerritoryCharacterFilter filter) {
+		if (characters==null)
+		{
+			// filter is already applied here, so no need to filter later 
+			characters = getTerritoryAllCharactersUnsorted(filter);
+			filter = TerritoryCharacterFilter.All;
+		}
+		territoryPurgeCharacters(characters, filter);
+		List<CachedEntity> locations = getLocations();
+		Key locationKey = null;
+		Key bufferedLocationKey = null;
+		Key parentLocationKey = null;
+		CachedDatastoreService ds = db.getDB();
+		for (CachedEntity character : characters)
+		{
+			// Filter the list if still needed
+			if (filter==TerritoryCharacterFilter.Defending)
+			{
+				String status = (String)character.getProperty("status");
+				if (status==null || status.startsWith("Defending")==false || "COMBAT".equals(character.getProperty("mode")))
+					continue;
+			}
+			else if (filter==TerritoryCharacterFilter.Trespassing)
+			{
+				if (isAllowedIn(character))
+					continue;
+			}
+			locationKey = (Key)character.getProperty("locationKey");
+			// characters are returned by location, so if it's the same as the previous character, no need to recalculate
+			if (locationKey!=bufferedLocationKey)
+			{
+				bufferedLocationKey = locationKey;
+				parentLocationKey = locationKey;
+				// Walk parentLocation until one is found that isn't in the territory
+				boolean match;
+				do
+				{
+					match = false;
+					for (CachedEntity location : locations)
+					{
+						if (GameUtils.equals(parentLocationKey, location.getKey()))
+						{
+							parentLocationKey = (Key)location.getProperty("parentLocationKey");
+							match = true;
+							break;
+						}
+					}
+				} while (match);
+			}
+			character.setProperty("locationKey", parentLocationKey);
+			
+			// Reset status because we're leaving a territory.
+			character.setProperty("status", "Normal");
+			ds.put(character);
+			db.sendNotification(ds, character.getKey(), NotificationType.fullpageRefresh);
+		}
 	}
 	
 }

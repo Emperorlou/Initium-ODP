@@ -18,9 +18,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandTradeStartTrade extends Command {
 	
-	public CommandTradeStartTrade(HttpServletRequest request, HttpServletResponse response)
+	public CommandTradeStartTrade(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {

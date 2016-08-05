@@ -740,23 +740,30 @@ function shareItem(itemId)
 }
 
 
-function createNewGroup()
+function viewGroup(groupId)
 {
-	promptPopup("New Group", "What name will you be using for your group.\n\nPlease use ONLY letters, commas, and apostrophes and a maximum of 30 characters.\n\nThis name cannot be changed later, so choose wisely!", "", function(groupName){
-		if (groupName!=null && groupName!="")
-		{
-			window.location.href='ServletCharacterControl?type=createGroup&groupName='+encodeURIComponent(groupName)+"&v="+window.verifyCode;
-		}
-	});
+	pagePopup("odp/ajax_group.jsp?groupId=" + groupId);
 }
 
-function leaveGroup()
+
+function createNewGroup(eventObject)
+{
+	promptPopup("New Group","What name will you be using for your group.\n\nPlease use ONLY letters, commas, and apostrophes and a maximum of 30 characters.\n\nThis name cannot be changed later, so choose wisely!","", function(groupName) {
+				if (groupName != null && groupName != "") {
+					doCommand(eventObject, "GroupCreate", {"groupName" : groupName}, function(data, error) {
+						if (error) return;
+						viewGroup(data.groupId);
+					})
+				}
+			});
+}
+
+
+function leaveGroup(eventObject)
 {
 	confirmPopup("Leave group", "Are you sure you want to leave your group?", function(){
-		window.location.href = "ServletCharacterControl?type=requestLeaveGroup"+"&v="+window.verifyCode;
-		
+		doCommand(eventObject, "GroupLeave")
 	});
-		
 }
 
 function cancelLeaveGroup()
@@ -775,35 +782,35 @@ function setGroupDescription(existingDescription)
 	});
 }
 
-function setGroupMemberRank(oldPosition, characterId)
+function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
 	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
 		if (newPosition!=null && newPosition!="")
 		{
-			window.location.href='ServletCharacterControl?type=groupMemberChangeRank&characterId='+characterId+'&rank='+encodeURIComponent(newPosition)+"&v="+window.verifyCode;
+			doCommand(eventObject, "GroupMemberChangeRank", {"rank" : newPosition, "characterId" : characterId})
 		}
 		
 	});
 }
 
-function promoteToAdmin(characterId)
+function promoteToAdmin(eventObject, characterId)
 {
 	confirmPopup("Promote to Admin", "Are you sure you want to promote this member to admin?", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberPromoteToAdmin&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
+		doCommand(eventObject, "MemberPromoteToAdmin", {"characterId" : characterId})
 	});
 }
 
-function demoteFromAdmin(characterId)
+function demoteFromAdmin(eventObject, characterId)
 {
 	confirmPopup("Demote from Admin", "Are you sure you want to demote this member from admin?", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberDemoteFromAdmin&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
+		doCommand(eventObject, "MemberDemoteFromAdmin", {"characterId" : characterId})
 	});
 }
 
-function makeGroupCreator(characterId)
+function makeGroupCreator(eventGroup, characterId)
 {
 	confirmPopup("New Group Creator", "Are you sure you want to make this member into the group creator?\n\nThis action cannot be reversed unless the this member (as the new group creator) chooses to reverse it manually!", function(){
-		window.location.href="ServletCharacterControl?type=groupMemberMakeGroupCreator&characterId="+encodeURIComponent(characterId)+"&v="+window.verifyCode;
+		doCommand(eventObject, "MemberMakeGroupCreator", {"characterId" : characterId})
 	});
 }
 
@@ -1335,19 +1342,18 @@ function forgetCombatSite(locationId)
 	location.href = "ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
 }
 
-function groupAcceptJoinGroupApplication(characterId)
+function groupAcceptJoinGroupApplication(eventObject, characterId)
 {
-	location.href = "ServletCharacterControl?type=acceptJoinGroupApplication&applicantId="+characterId+""+"&v="+window.verifyCode;
+	doCommand(eventObject, "GroupAcceptJoinApplication", {"characterId" : characterId})
 }
 
-function groupDenyJoinGroupApplication(characterId)
+function groupDenyJoinGroupApplication(eventObject, characterId)
 {
-	location.href = "ServletCharacterControl?type=denyJoinGroupApplication&applicantId="+characterId+""+"&v="+window.verifyCode;
-}
+	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId})}
 
-function groupMemberKick(characterId)
+function groupMemberKick(eventObject, characterId)
 {
-	location.href = "ServletCharacterControl?type=groupMemberKick&characterId="+characterId+""+"&v="+window.verifyCode;
+	doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId})
 }
 
 function groupMemberKickCancel(characterId)
@@ -1355,9 +1361,9 @@ function groupMemberKickCancel(characterId)
 	location.href = "ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
 }
 
-function groupRequestJoin(groupId)
+function groupRequestJoin(eventObject, groupId)
 {
-	location.href = "ServletCharacterControl?type=requestJoinGroup&groupId="+groupId+"&v="+window.verifyCode;
+	doCommand(eventObject, "GroupRequestJoin", {"groupId" : groupId})
 }
 
 function tradeRemoveItem(itemId)

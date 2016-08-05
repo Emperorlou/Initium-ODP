@@ -17,9 +17,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandTradeAddItem extends Command {
 	
-	public CommandTradeAddItem(HttpServletRequest request, HttpServletResponse response)
+	public CommandTradeAddItem(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {

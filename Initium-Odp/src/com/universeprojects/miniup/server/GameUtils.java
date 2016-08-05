@@ -984,7 +984,7 @@ public class GameUtils
 		// Insert the group stuff if we have one passed in
 		if (group!=null)
 		{
-			nameAndBars.append("<a href='group.jsp?groupId="+group.getId()+"' class='main-highlight'>"+group.getProperty("name")+"</a>");
+			nameAndBars.append("<a onclick='viewGroup("+group.getId()+")' class='main-highlight'>"+group.getProperty("name")+"</a>");
 			if (character.getProperty("groupRank")!=null)
 				nameAndBars.append("<div class='main-highlight' style='font-size:14px'>"+character.getProperty("groupRank")+"</div>");
 		}

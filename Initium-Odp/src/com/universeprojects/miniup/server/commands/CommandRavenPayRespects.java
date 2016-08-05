@@ -37,9 +37,9 @@ import com.universeprojects.miniup.server.commands.framework.Command.JavascriptR
  */
 public class CommandRavenPayRespects extends Command {
 
-	public CommandRavenPayRespects(HttpServletRequest request, HttpServletResponse response) 
+	public CommandRavenPayRespects(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 
 	@Override

@@ -37,14 +37,13 @@ import com.universeprojects.miniup.server.commands.jsaccessors.DBAccessor;
  */
 public class CommandExecuteScript extends Command {
 
-	public CommandExecuteScript(HttpServletRequest request, HttpServletResponse response) {
-		super(request, response);
+	public CommandExecuteScript(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
+		super(db, request, response);
 	}
 
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
-		ODPDBAccess db = getDB();
-
+		
 		// Safely fetch script and item entities
 		Long sourceEntityId = tryParseId(parameters, "sourceEntityId");
 		String sourceEntityKind = parameters.get("sourceEntityKind");
@@ -125,7 +124,7 @@ public class CommandExecuteScript extends Command {
 	    	// Put accessor classes and other variables into scope
 	    	scope.put("request", scope, Context.toObject(request, scope));
 	    	scope.put("accessor", scope, Context.toObject(new DBAccessor(db, request), scope));
-	    	scope.put("commandAccessor", scope, Context.toObject(new CommandAccessor(this.request, this.response), scope));
+	    	scope.put("commandAccessor", scope, Context.toObject(new CommandAccessor(db, this.request, this.response), scope));
 	    	
 	    	// Evaluate the 
 	    	ctx.evaluateString(scope, script, "scriptName", 0, null);

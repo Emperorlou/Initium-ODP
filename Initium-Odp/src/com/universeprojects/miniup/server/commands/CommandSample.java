@@ -27,9 +27,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  */
 public class CommandSample extends Command {
 
-	public CommandSample(HttpServletRequest request, HttpServletResponse response) 
+	public CommandSample(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
-		super(request, response);
+		super(db, request, response);
 	}
 
 	@Override

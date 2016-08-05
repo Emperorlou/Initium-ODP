@@ -4,14 +4,6 @@ xmlns="http://java.sun.com/xml/ns/javaee"
 xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
-	<servlet>
-		<servlet-name>ServletCommand</servlet-name>
-		<servlet-class>com.universeprojects.miniup.server.commands.framework.ServletCommand</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>ServletCommand</servlet-name>
-		<url-pattern>/cmd</url-pattern>
-	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>

@@ -17,7 +17,7 @@ public abstract class Command
 		FullPageRefresh,
 		ReloadPagePopup
 	}
-	private final ODPDBAccess db;
+	protected final ODPDBAccess db;
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
 	
@@ -25,12 +25,12 @@ public abstract class Command
 	private JavascriptResponse jsResponse = JavascriptResponse.None;
 	private Map<String, Object> callbackData = new HashMap<String, Object>();
 	
-	public Command(HttpServletRequest request, HttpServletResponse response)
+	public Command(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
 		this.request = request;
 		this.response = response;
 		
-		this.db = new ODPDBAccess();
+		this.db = db;
 	}
 	
 	protected ODPDBAccess getDB()
