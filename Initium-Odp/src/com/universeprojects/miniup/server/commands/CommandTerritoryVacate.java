@@ -22,7 +22,7 @@ import com.universeprojects.miniup.server.services.TerritoryService.TerritoryTra
  * 
  * Usage notes:
  * Checks if caller is Admin of owning group, and unsets ownership.
- * After vacating everytone is purged from territory.
+ * Afterwards everyone is purged from territory.
  * 
  * Parameters:
  * 
@@ -47,19 +47,16 @@ public class CommandTerritoryVacate extends Command {
 		if (territory==null)
 			throw new UserErrorMessage("You're not in a territory at the moment.");
 		
-		// Verify permission to vacate
-		Key groupKey = (Key)character.getProperty("groupKey");
-		if (groupKey==null)
-			throw new UserErrorMessage("Only groups can control territories.");
-		if (GameUtils.equals(groupKey, territory.getProperty("owningGroupKey"))==false)
-			throw new UserErrorMessage("Your group doesn't control this territory.");
-		if ("Admin".equals(character.getProperty("groupStatus"))==false)
-			throw new UserErrorMessage("Only the admins of the group can give the order to vacate.");
+		TerritoryService ts = new TerritoryService(db, territory);
+		
+		// Only admins are allowed to vacate
+		if (ts.isTerritoryAdmin(character)==false)
+			throw new UserErrorMessage("Only the admins of the owning group can vacate a territory.");
 		
 		territory.setProperty("owningGroupKey", null);
 		
 		//purge everyone
-		new TerritoryService(db, territory).territoryPurgeCharacters(null, TerritoryCharacterFilter.All);
+		ts.territoryPurgeCharacters(null, TerritoryCharacterFilter.All);
 		
 		// Commit to DB only after purge
 		db.getDB().put(territory);
