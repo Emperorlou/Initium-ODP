@@ -468,7 +468,6 @@ public class TerritoryService extends Service
 			characters = getTerritoryAllCharactersUnsorted(filter);
 			filter = TerritoryCharacterFilter.All;
 		}
-		territoryPurgeCharacters(characters, filter);
 		List<CachedEntity> locations = getLocations();
 		Key locationKey = null;
 		Key bufferedLocationKey = null;
