@@ -54,6 +54,10 @@ public class CommandTerritoryVacate extends Command {
 			throw new UserErrorMessage("Only the admins of the owning group can vacate a territory.");
 		
 		territory.setProperty("owningGroupKey", null);
+		// reset fields to default 
+		territory.setProperty("characterWhitelist", null);
+		territory.setProperty("groupWhitelist", null);
+		territory.setProperty("travelRule", TerritoryTravelRule.None.toString());
 		
 		//purge everyone
 		ts.territoryPurgeCharacters(null, TerritoryCharacterFilter.All);

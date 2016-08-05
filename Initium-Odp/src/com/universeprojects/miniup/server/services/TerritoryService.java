@@ -236,12 +236,16 @@ public class TerritoryService extends Service
 	
 	public Collection<Key> getGroupWhitelist()
 	{
-		return (Collection<Key>)territory.getProperty("groupWhitelist");
+		Collection<Key> collection = (Collection<Key>)territory.getProperty("groupWhitelist"); 
+		if (collection==null) return Collections.EMPTY_LIST;
+		return collection;
 	}
 	
 	public Collection<Key> getCharacterWhitelist()
 	{
-		return (Collection<Key>)territory.getProperty("characterWhitelist");
+		Collection<Key> collection = (Collection<Key>)territory.getProperty("characterWhitelist");
+		if (collection==null) return Collections.EMPTY_LIST;
+		return collection;
 	}
 	
 	/**
