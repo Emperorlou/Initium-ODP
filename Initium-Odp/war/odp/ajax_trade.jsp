@@ -22,20 +22,25 @@
 	String characterMode = (String)character.getProperty("mode");
 	if (characterMode==null || characterMode.equals(ODPDBAccess.CHARACTER_MODE_TRADING)==false)
 	{
-		WebUtils.forceRedirectClientTo("main.jsp", request, response, "The trade has been cancelled.");
+		out.println("You are not currently in a trade.");
 		return;
 	}
 	
 	// Find out if we're actually in a trade right now...
 	TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
-	if (tradeObject==null || tradeObject.isCancelled())
+	if (tradeObject==null)
 	{
-		WebUtils.forceRedirectClientTo("main.jsp", request, response, "The trade has been cancelled.");
+		out.println("You are not currently in a trade.");
+		return;
+	}
+	else if (tradeObject.isCancelled())
+	{
+		out.println("The trade has been cancelled.");
 		return;
 	}
 	else if (tradeObject.isComplete())
 	{
-		WebUtils.forceRedirectClientTo("main.jsp", request, response, "The trade has completed successfully.");
+		out.println("The trade has completed successfully.");
 		return;
 	}
 	
@@ -71,7 +76,7 @@
 	if (GameUtils.equals(character.getProperty("locationKey"), otherCharacter.getProperty("locationKey")))
 	{
 		db.setTradeCancelled(ds, character);
-		WebUtils.forceRedirectClientTo("main.jsp", request, response, "You canot trade with a character who is not in your location.");
+		out.println("You canot trade with a character who is not in your location.");
 		return;
 	}
 	
