@@ -365,12 +365,11 @@ public class TerritoryService extends Service
 		{
 			Filter f1 = new FilterPredicate("locationKey", FilterOperator.EQUAL, location.getKey());
 			Filter f2 = new FilterPredicate("type", FilterOperator.EQUAL, "PC");
-			Filter f3 = new FilterPredicate("mode", FilterOperator.NOT_EQUAL, "COMBAT");
-			Filter f4a = new FilterPredicate("status", FilterOperator.EQUAL, "Defending1");
-			Filter f4b = new FilterPredicate("status", FilterOperator.EQUAL, "Defending2");
-			Filter f4c = new FilterPredicate("status", FilterOperator.EQUAL, "Defending3");
-			Filter f4 = CompositeFilterOperator.or(f4a, f4b, f4c);
-			f0 = CompositeFilterOperator.and(f1, f2, f3, f4);
+			Filter f3a = new FilterPredicate("status", FilterOperator.EQUAL, "Defending1");
+			Filter f3b = new FilterPredicate("status", FilterOperator.EQUAL, "Defending2");
+			Filter f3c = new FilterPredicate("status", FilterOperator.EQUAL, "Defending3");
+			Filter f3 = CompositeFilterOperator.or(f3a, f3b, f3c);
+			f0 = CompositeFilterOperator.and(f1, f2, f3);
 		} break;
 		case Trespassing:
 		case All:
@@ -387,6 +386,7 @@ public class TerritoryService extends Service
 		{
 			CachedEntity character = characters.get(i);
 			if (GameUtils.isPlayerIncapacitated(character) ||
+					(filter==TerritoryCharacterFilter.Defending && "COMBAT".equals(character.getProperty("mode"))) ||
 					(filter==TerritoryCharacterFilter.Trespassing && isAllowedIn(character)))
 			{
 				characters.remove(i);
