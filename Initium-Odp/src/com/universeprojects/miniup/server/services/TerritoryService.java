@@ -19,9 +19,6 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
-import com.universeprojects.miniup.server.services.TerritoryService.TerritoryCharacterFilter;
 
 /**
  * 
