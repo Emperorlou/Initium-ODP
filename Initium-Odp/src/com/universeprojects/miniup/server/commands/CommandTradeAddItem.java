@@ -36,7 +36,7 @@ public class CommandTradeAddItem extends Command {
         if (item==null)
 			throw new UserErrorMessage("Item doesn't exist.");
 		
-        db.addTradeItem(ds, db.getCurrentCharacter(request), item);
+        db.addTradeItem(ds, character, item);
         db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
