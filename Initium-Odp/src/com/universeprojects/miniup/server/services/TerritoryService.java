@@ -19,6 +19,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.commands.framework.WarnPlayerException;
 
 /**
  * 
@@ -150,9 +151,10 @@ public class TerritoryService extends Service
 	 * @param character
 	 * @param location
 	 * @param enterCombat
+	 * @param throwWarning
 	 * @return
 	 */
-	public boolean canPerformRegularAction(CachedEntity character, CachedEntity location, boolean enterCombat)
+	public boolean processRegularActionInterruption(CachedEntity character, CachedEntity location, boolean enterCombat, boolean throwWarning) throws WarnPlayerException
 	{
 		if (character==null)
 			throw new IllegalArgumentException("canPerformRegularAction invalid call format, 'character' cannot be null.");
@@ -165,6 +167,9 @@ public class TerritoryService extends Service
 		
 		if (isAllowedIn(character))
 			return true;
+		
+		if (throwWarning)
+			throw new WarnPlayerException("Are you sure you want to do this? You might be attacked by the territory's defenders...");
 		
 		// If there are no active defenders, action is allowed
 		CachedEntity defender = getTerritorySingleCharacter(TerritoryCharacterFilter.Defending, location);
@@ -294,7 +299,7 @@ public class TerritoryService extends Service
 		if (locs.isEmpty()) return null;
 		if (startLocation==null)
 			startLocation = locs.get(0);
-		if (isLocationInTerritory(startLocation))
+		if (isLocationInTerritory(startLocation)==false)
 			throw new IllegalArgumentException("startLocation is not in the territory this service is servicing.");
 		
 		CachedDatastoreService ds = db.getDB();
