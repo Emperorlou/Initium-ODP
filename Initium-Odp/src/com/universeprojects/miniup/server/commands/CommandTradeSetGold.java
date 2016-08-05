@@ -45,7 +45,7 @@ public class CommandTradeSetGold extends Command {
         db.sendNotification(ds,otherCharacter,NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
-        addCallbackData("newTradeGoldAmount",GameUtils.formatNumber(dogecoinStr));
+        addCallbackData("newTradeGoldAmount",GameUtils.formatNumber(dogecoin));
         addCallbackData("tradeVersion",tradeVersion);
 	}
 }
