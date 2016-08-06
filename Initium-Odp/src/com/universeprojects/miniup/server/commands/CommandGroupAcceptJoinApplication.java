@@ -45,9 +45,9 @@ public class CommandGroupAcceptJoinApplication extends Command
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);
 		Key groupKey = (Key) character.getProperty("groupKey");
-		Long applicantId = tryParseId(parameters, "characterId");
+		Long characterId = tryParseId(parameters, "characterId");
 		CachedEntity applicant = db.getEntity(KeyFactory.createKey("Character",
-				applicantId));
+				characterId));
 
 		if (applicant == null)
 		{

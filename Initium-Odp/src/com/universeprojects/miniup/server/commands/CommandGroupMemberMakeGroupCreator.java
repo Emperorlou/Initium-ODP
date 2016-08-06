@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -46,9 +47,9 @@ public class CommandGroupMemberMakeGroupCreator extends Command
 		CachedEntity admin = db.getCurrentCharacter(request);
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
-		Long characterId = Long.valueOf(parameters.get("characterId"))
-				.longValue();
-		CachedEntity newCreator = db.getEntity("Character", characterId);
+		Long characterId = tryParseId(parameters, "characterId");
+		CachedEntity newCreator = db.getEntity(KeyFactory.createKey(
+				"Character", characterId));
 
 		if (newCreator == null)
 		{
