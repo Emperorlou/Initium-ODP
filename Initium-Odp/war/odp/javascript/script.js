@@ -1395,12 +1395,12 @@ function tradeStartTradeNew(eventObject,characterId)
 {
 	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
 		if (error) return;
-		popupMessage("Trade Started", data.tradePrompt);
 		_viewTrade();
+		popupMessage("Trade Started", data.tradePrompt);	
 	})
 }
 
-function tradeRemoveItemNew(eventobject,itemId)
+function tradeRemoveItemNew(eventObject,itemId)
 {
 	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId},function(data,error){
 		if (error) return;
@@ -1427,7 +1427,7 @@ function tradeAddItemNew(eventObject,itemId)
 		if (error) return;
 		$(".invItem[ref='"+itemId+"']").remove();
 		var container = $("#yourTrade");
-		container.html(data.createSellItem+container.html());
+		container.html(data.createTradeItem+container.html());
 		tradeVersion = data.tradeVersion
 	})
 }
@@ -1439,6 +1439,7 @@ function tradeSetGoldNew(eventObject,currentDogecoin)
 		{
 			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(data,error){
 				if (error) return;
+				$("#myTradeGoldAmount").text(data.newTradeGoldAmount);
 				tradeVersion = data.tradeVersion
 			})
 			
@@ -1654,6 +1655,13 @@ function longOperation_fullPageRefresh(eventObject, operationName, operationDesc
 
 
 var lastLongOperationEventObject = null;
+/**
+ * 
+ * @param eventObject
+ * @param actionUrl
+ * @param responseFunction This is the handler that is called when the operation returns. The data that is passed into the handler includes: data.isComplete (boolean), data.error (boolean), data.timeLeft (seconds remaining to wait)
+ * @param recallFunction This function should call the original javascript call that includes the call to longOperation. This handler is invoked when the time on the long operation runs out.
+ */
 function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 {
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
@@ -1911,7 +1919,7 @@ function updateTradeWindow()
 
 function cancelledTradeWindow()
 {
-	closeAllPagepopups();
+	closeAllPagePopups();
 	popupMessage("The trade has been cancelled.")
 }
 

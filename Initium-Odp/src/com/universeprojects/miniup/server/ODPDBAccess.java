@@ -73,11 +73,6 @@ public class ODPDBAccess
 	{
 		Applied, Member, Admin, Kicked
 	}
-	
-	public enum TerritoryCharacterFilter
-	{
-		Defending, Trespassing, All
-	}
 
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
 	public static final String CAMP_NAME_REGEX = "[A-Za-z0-9- ,'&]+";
@@ -2476,9 +2471,9 @@ public class ODPDBAccess
 		}
 		
 		if (character1.getKey().getId() == character.getKey().getId())
-			sendNotification(ds, character2.getKey(), NotificationType.fullpageRefresh);
+			sendNotification(ds, character2.getKey(), NotificationType.tradeChanged);
 		else
-			sendNotification(ds, character1.getKey(), NotificationType.fullpageRefresh);
+			sendNotification(ds, character1.getKey(), NotificationType.tradeChanged);
 
 		return tradeObject;
 	}
@@ -2488,13 +2483,11 @@ public class ODPDBAccess
 		if (ds==null)
 			ds = getDB();
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
-		if (tradeObject==null || tradeObject.isCancelled())
-			throw new UserErrorMessage("Trade has been cancelled.");
 
 		
 		tradeObject.flagCancelled(ds, character);
 		
-		sendNotification(ds, tradeObject.getOtherCharacter(character.getKey()), NotificationType.fullpageRefresh);
+		sendNotification(ds, tradeObject.getOtherCharacter(character.getKey()), NotificationType.tradeCancelled);
 
 	}
 	
