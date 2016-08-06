@@ -1642,14 +1642,14 @@ function doTerritorySetRule(eventObject, rule)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	doCommand(eventObject,"TerritoryClaim",{"rule":rule});
+	doCommand(eventObject,"TerritorySetRule",{"rule":rule});
 }
 
 function doTerritorySetDefense(eventObject, line)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	doCommand(eventObject,"TerritoryDefense",{"line":line});
+	doCommand(eventObject,"TerritorySetDefense",{"line":line});
 }
 
 
