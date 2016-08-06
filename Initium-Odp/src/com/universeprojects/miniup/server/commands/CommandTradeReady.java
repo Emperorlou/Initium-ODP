@@ -30,12 +30,9 @@ public class CommandTradeReady extends Command {
 		CachedEntity character = db.getCurrentCharacter(request);
 		Key otherCharacter = (Key) character.getProperty("combatant");
 		
-        TradeObject trade = db.setTradeReady(null, db.getCurrentCharacter(request), version);
-            if (trade.isComplete()==true)
-            {
-            	db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
-                return;
-            }
-        return;
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+
+		TradeObject trade = db.setTradeReady(null, db.getCurrentCharacter(request), version);
+    	db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
 	}
 }
