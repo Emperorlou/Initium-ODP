@@ -52,5 +52,8 @@ public class CommandTradeAddAllItems extends Command {
         
         Integer tradeVersion = tradeObject.getVersion();
         addCallbackData("tradeVersion", tradeVersion);
+
+        setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+
 	}
 }

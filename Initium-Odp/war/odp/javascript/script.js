@@ -1393,6 +1393,7 @@ function partyJoin(characterId)
 
 function tradeStartTradeNew(eventObject,characterId)
 {
+	closeAllTooltips();
 	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
 		if (error) return;
 		_viewTrade();
@@ -1418,7 +1419,7 @@ function tradeCancelNew(eventObject)
 
 function tradeReadyNew(eventObject,tradeVersion)
 {
-	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion})
+	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion});
 }
 
 function tradeAddItemNew(eventObject,itemId)
