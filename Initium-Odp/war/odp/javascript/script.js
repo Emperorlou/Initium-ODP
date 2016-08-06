@@ -1620,6 +1620,38 @@ function doSetLabel(eventObject, itemId)
 	});
 }
 
+function doTerritoryClaim(eventObject)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	confirmPopup("Territory", "You are trying to claim a territory. If you continue, the defenders of this territory might attack you.<br><br>Are you sure you want to continue?", function(){
+		doCommand(eventObject,"TerritoryClaim");
+	});
+}
+
+function doTerritoryVacate(eventObject)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	confirmPopup("Territory", "By vacating, you are giving up the control of this territory.<br><br>Are you sure you want to continue?", function(){
+		doCommand(eventObject,"TerritoryVacate");
+	});
+}
+
+function doTerritorySetRule(eventObject, rule)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	doCommand(eventObject,"TerritoryClaim",{"rule":rule});
+}
+
+function doTerritorySetDefense(eventObject, line)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	doCommand(eventObject,"TerritoryDefense",{"line":line});
+}
+
 
 
 
