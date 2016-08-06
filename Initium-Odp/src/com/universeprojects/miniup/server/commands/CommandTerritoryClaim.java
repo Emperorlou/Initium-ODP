@@ -58,21 +58,28 @@ public class CommandTerritoryClaim extends Command {
 		if (mode!=null && mode.equals("NORMAL")==false)
 			throw new UserErrorMessage("You're too busy to try and claim a territory at the moment.");
 		
-		// Check if group already owns this territory to prevent attacking its own defenders
+		// Check if group already owns this territory or you're defending to prevent attacking its own defenders
 		Key groupKey = (Key)character.getProperty("groupKey");
 		if (groupKey!=null && GameUtils.equals(groupKey, territory.getProperty("owningGroupKey")) &&
 				("Member".equals(character.getProperty("groupStatus"))==true || "Admin".equals(character.getProperty("groupStatus"))==true))
 			throw new UserErrorMessage("Your group already controls this territory.");
+		String status = (String)character.getProperty("status");
+		if (status!=null && status.startsWith("Defending"))
+			throw new UserErrorMessage("You can't try and claim a territory you're currently defending.");
 		
-		// Check for defenders
 		TerritoryService ts = new TerritoryService(db, territory);
-		CachedEntity defender = ts.getTerritorySingleCharacter(TerritoryCharacterFilter.Defending, location);
-		if (defender!=null)
+		// If there's no owner, ignore defenders even if there are some (which there shouldn't)
+		if (ts.getOwningGroupKey()!=null)
 		{
-			// Attack defender
-			new CombatService(db).enterCombat(character, defender, true);
-			setJavascriptResponse(JavascriptResponse.FullPageRefresh); 
-			return;
+			// Check for defenders
+			CachedEntity defender = ts.getTerritorySingleCharacter(TerritoryCharacterFilter.Defending, location);
+			if (defender!=null)
+			{
+				// Attack defender
+				new CombatService(db).enterCombat(character, defender, true);
+				setJavascriptResponse(JavascriptResponse.FullPageRefresh); 
+				return;
+			}
 		}
 		
 		// Verify permission to claim

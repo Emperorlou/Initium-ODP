@@ -92,6 +92,9 @@ public class CommandTerritorySetDefense extends Command {
 			if (mode!=null && mode.equals("NORMAL")==false)
 				throw new UserErrorMessage("You're too busy to switch ranks at the moment.");
 			
+			// Don't defend an unowned territory
+			if (territory.getProperty("owningGroupKey")==null)
+				throw new UserErrorMessage("You're not allowed to defend this territory.");
 			// Make sure character is allowed in territory
 			if (new TerritoryService(db, territory).isAllowedIn(character)==false)
 				throw new UserErrorMessage("You're not allowed to defend this territory.");
