@@ -27,8 +27,9 @@ public class CommandGroupCreate extends Command
 	public static final int MAX_GROUP_NAME_LENGTH = 40;
 
 	/**
-	 * Command to create a group. The "groupName" key is required in the
-	 * parameters, this is the desired name for the group.
+	 * Command to create a group.
+	 * 
+	 * Parameters: groupName - The name of the group being created.
 	 * 
 	 * @param request
 	 *            Server request

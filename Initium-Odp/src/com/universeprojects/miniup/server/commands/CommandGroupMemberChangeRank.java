@@ -23,10 +23,11 @@ public class CommandGroupMemberChangeRank extends Command
 {
 
 	/**
-	 * Command to change the rank of a group member. The "rank" key is required
-	 * in the parameters, this is the new rank of the group member. The
-	 * "characterId" key is required in the parameters, this is the character
-	 * that will be given a new rank.
+	 * Command to change the rank of a group member.
+	 * 
+	 * Parameters: rank - The new rank of the group member.
+	 * 
+	 * characterId - The group member receiving the new rank.
 	 * 
 	 * @param request
 	 *            Server request
@@ -49,9 +50,8 @@ public class CommandGroupMemberChangeRank extends Command
 		CachedEntity admin = db.getCurrentCharacter(request);
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
-		Long characterId = tryParseId(parameters, "characterId");
-		CachedEntity character = db.getEntity(KeyFactory.createKey("Character",
-				characterId));
+		CachedEntity character = db.getCharacterById(tryParseId(parameters,
+				"characterId"));
 
 		if (character == null)
 		{

@@ -23,9 +23,9 @@ public class CommandGroupMemberMakeGroupCreator extends Command
 {
 
 	/**
-	 * Command to make a group member the new creator of the group. The
-	 * "characterId" key is required in the parameters, this is the character
-	 * that will become the new creator.
+	 * Command to make a group member the new creator of the group.
+	 * 
+	 * Parameters: characterId - The group member that will become the creator.
 	 * 
 	 * @param request
 	 *            Server request
@@ -47,9 +47,8 @@ public class CommandGroupMemberMakeGroupCreator extends Command
 		CachedEntity admin = db.getCurrentCharacter(request);
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
-		Long characterId = tryParseId(parameters, "characterId");
-		CachedEntity newCreator = db.getEntity(KeyFactory.createKey(
-				"Character", characterId));
+		CachedEntity newCreator = db.getCharacterById(tryParseId(parameters,
+				"characterId"));
 
 		if (newCreator == null)
 		{
