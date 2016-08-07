@@ -1622,6 +1622,47 @@ function doSetLabel(eventObject, itemId)
 	});
 }
 
+function doTerritoryClaim(eventObject)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	confirmPopup("Territory", "You are trying to claim a territory. If you continue, the defenders of this territory might attack you.<br><br>Are you sure you want to continue?", function(){
+		doCommand(eventObject,"TerritoryClaim");
+	});
+}
+
+function doTerritoryVacate(eventObject)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	confirmPopup("Territory", "By vacating, you are giving up the control of this territory.<br><br>Are you sure you want to continue?", function(){
+		doCommand(eventObject,"TerritoryVacate");
+	});
+}
+
+function doTerritoryRetreat(eventObject)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	confirmPopup("Territory", "By retreating, you are leaving the territory.<br><br>Are you sure you want to continue?", function(){
+		doCommand(eventObject,"TerritoryRetreat");
+	});
+}
+
+function doTerritorySetRule(eventObject, rule)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	doCommand(eventObject,"TerritorySetRule",{"rule":rule});
+}
+
+function doTerritorySetDefense(eventObject, line)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	doCommand(eventObject,"TerritorySetDefense",{"line":line});
+}
+
 
 
 
@@ -1921,7 +1962,14 @@ function updateTradeWindow()
 function cancelledTradeWindow()
 {
 	closeAllPagePopups();
-	popupMessage("The trade has been cancelled.")
+	popupMessage("The trade has been cancelled.");
+}
+
+function updateTerritory()
+{
+	var territoryView = $("#territoryView");
+	territoryView.html("<img src='javascript/images/wait.gif' border=0/>"+territoryView.html());
+	territoryView.load("ajax_territoryview.jsp");
 }
 
 
