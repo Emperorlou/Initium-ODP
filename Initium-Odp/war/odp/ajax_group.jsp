@@ -162,9 +162,9 @@
 								+ "'>"
 								+ character.getProperty("name"));
 						out.println("<div class='main-item-controls' style='top:0px'>");
-						out.println("<a onclick='groupAcceptJoinGroupApplication("
+						out.println("<a onclick='groupAcceptJoinGroupApplication(event, "
 								+ character.getKey().getId() + ")'>Accept</a>");
-						out.println("<a onclick='groupDenyJoinGroupApplication("
+						out.println("<a onclick='groupDenyJoinGroupApplication(event, "
 								+ character.getKey().getId() + ")'>Deny</a>");
 						out.println("</div>");
 						out.println("</a>");
@@ -221,29 +221,29 @@
 			if (isAdmin
 					|| ((Key) group.getProperty("creatorKey")).getId() == common
 							.getCharacter().getKey().getId()) {
-				out.println("<a href='#' onclick='setGroupMemberRank(\""
+				out.println("<a href='#' onclick='setGroupMemberRank(event, \""
 						+ character.getProperty("groupRank") + "\", "
 						+ character.getKey().getId()
 						+ ")'>Set position</a>");
 				if (((Key) group.getProperty("creatorKey")).getId() == common
 						.getCharacter().getKey().getId()) {
 					if (groupStatus.equals("Admin") == false)
-						out.println("<a href='#' onclick='promoteToAdmin("
+						out.println("<a href='#' onclick='promoteToAdmin(event, "
 								+ character.getKey().getId()
 								+ ")'>Promote to admin</a>");
 					if (groupStatus.equals("Admin") == true) {
 						if (((Key) group.getProperty("creatorKey")).getId() != character
 								.getKey().getId())
-							out.println("<a href='#' onclick='makeGroupCreator("
+							out.println("<a href='#' onclick='makeGroupCreator(event, "
 									+ character.getKey().getId()
 									+ ")' title='Setting this member to group creator will permanently make him in charge of adding and removing admins'>Promote to group creator</a>");
-						out.println("<a href='#' onclick='demoteFromAdmin("
+						out.println("<a href='#' onclick='demoteFromAdmin(event, "
 								+ character.getKey().getId()
 								+ ")'>Demote from admin</a>");
 					}
 				}
 				if (groupStatus.equals("Kicked") == false)
-					out.println("<a onclick='groupMemberKick("
+					out.println("<a onclick='groupMemberKick(event, "
 							+ character.getKey().getId() + ")'>Kick</a>");
 				else
 					out.println("<a onclick='groupMemberKickCancel("
@@ -264,7 +264,7 @@
 </c:if>
 <c:if test="${inGroup == false}">
 	<div class='main-buttonbox'>
-		<a onclick='groupRequestJoin(<%=group.getKey().getId()%>)'
+		<a onclick='groupRequestJoin(event, <%=group.getKey().getId()%>)'
 			class='main-button'>Request to join this group</a>
 	</div>
 </c:if>

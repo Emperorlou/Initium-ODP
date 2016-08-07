@@ -23,9 +23,10 @@ public class CommandGroupMemberPromoteToAdmin extends Command
 {
 
 	/**
-	 * Command to promote a member of a group to admin status. The "characterId"
-	 * key is required in the parameters, this is the character that will be
-	 * promoted.
+	 * Command to promote a member of a group to admin status.
+	 * 
+	 * Parameters: characterId - The group member being promoted to admin
+	 * status.
 	 * 
 	 * @param request
 	 *            Server request
@@ -47,9 +48,8 @@ public class CommandGroupMemberPromoteToAdmin extends Command
 		CachedEntity admin = db.getCurrentCharacter(request);
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
-		Long characterId = tryParseId(parameters, "characterId");
-		CachedEntity promoteCharacter = db.getEntity(KeyFactory.createKey(
-				"Character", characterId));
+		CachedEntity promoteCharacter = db.getCharacterById(tryParseId(
+				parameters, "characterId"));
 
 		if (promoteCharacter == null)
 		{

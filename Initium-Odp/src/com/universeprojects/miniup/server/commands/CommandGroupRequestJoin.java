@@ -22,8 +22,9 @@ public class CommandGroupRequestJoin extends Command
 {
 
 	/**
-	 * Command to request to join a group. The "groupId" key is required in the
-	 * parameters.
+	 * Command to request to join a group.
+	 * 
+	 * Paramters: groupId - The desired group to join.
 	 * 
 	 * @param request
 	 *            Server request

@@ -23,9 +23,9 @@ public class CommandGroupMemberKick extends Command
 {
 
 	/**
-	 * Command to kick a member of the group. The "characterId" key is required
-	 * in the parameters, this is the character that will be kicked from the
-	 * group.
+	 * Command to kick a member of the group.
+	 * 
+	 * Parameters: "characterId" - The member being kicked from the group.
 	 * 
 	 * @param request
 	 *            Server request
@@ -47,9 +47,8 @@ public class CommandGroupMemberKick extends Command
 		CachedEntity admin = db.getCurrentCharacter(request);
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
-		Long characterId = tryParseId(parameters, "characterId");
-		CachedEntity kickCharacter = db.getEntity(KeyFactory.createKey(
-				"Character", characterId));
+		CachedEntity kickCharacter = db.getCharacterById(tryParseId(parameters,
+				"characterId"));
 
 		if (kickCharacter == null)
 		{

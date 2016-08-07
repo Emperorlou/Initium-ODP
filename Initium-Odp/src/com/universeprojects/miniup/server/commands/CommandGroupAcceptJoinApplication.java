@@ -23,8 +23,9 @@ public class CommandGroupAcceptJoinApplication extends Command
 {
 
 	/**
-	 * Command to accept a player's application to join a group. The
-	 * "applicantId" key is required in the parameters.
+	 * Command to accept a player's application to join a group.
+	 * 
+	 * Parameters: characterId - The character applying to the group.
 	 * 
 	 * @param request
 	 *            Server request
@@ -45,9 +46,8 @@ public class CommandGroupAcceptJoinApplication extends Command
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);
 		Key groupKey = (Key) character.getProperty("groupKey");
-		Long characterId = tryParseId(parameters, "characterId");
-		CachedEntity applicant = db.getEntity(KeyFactory.createKey("Character",
-				characterId));
+		CachedEntity applicant = db.getCharacterById(tryParseId(parameters,
+				"characterId"));
 
 		if (applicant == null)
 		{

@@ -23,9 +23,10 @@ public class CommandGroupMemberDemoteFromAdmin extends Command
 {
 
 	/**
-	 * Command to demote an admin of a group to member status. The "characterId"
-	 * key is required in the parameters, this is the character that will be
-	 * demoted.
+	 * Command to demote an admin of a group to member status.
+	 * 
+	 * Parameters: characterId - The group member being demoted from admin
+	 * status.
 	 * 
 	 * @param request
 	 *            Server request
@@ -47,9 +48,8 @@ public class CommandGroupMemberDemoteFromAdmin extends Command
 		CachedEntity admin = db.getCurrentCharacter(request);
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
-		Long characterId = tryParseId(parameters, "characterId");
-		CachedEntity demoteCharacter = db.getEntity(KeyFactory.createKey(
-				"Character", characterId));
+		CachedEntity demoteCharacter = db.getCharacterById(tryParseId(
+				parameters, "characterId"));
 
 		if (demoteCharacter == null)
 		{
