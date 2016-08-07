@@ -1638,6 +1638,15 @@ function doTerritoryVacate(eventObject)
 	});
 }
 
+function doTerritoryRetreat(eventObject)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	confirmPopup("Territory", "By retreating, you are leaving the territory.<br><br>Are you sure you want to continue?", function(){
+		doCommand(eventObject,"TerritoryRetreat");
+	});
+}
+
 function doTerritorySetRule(eventObject, rule)
 {
 	closeAllPopups();
