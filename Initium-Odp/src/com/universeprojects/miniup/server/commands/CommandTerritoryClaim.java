@@ -85,8 +85,6 @@ public class CommandTerritoryClaim extends Command {
 		// Verify permission to claim
 		if (groupKey==null)
 			throw new UserErrorMessage("Only groups can control territories.");
-		if ("Admin".equals(character.getProperty("groupStatus"))==false)
-			throw new UserErrorMessage("Only the admins of the group can claim a territory.");
 		
 		territory.setProperty("owningGroupKey", groupKey);
 		// reset fields to default 
