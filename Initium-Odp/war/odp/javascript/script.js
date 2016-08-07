@@ -1953,7 +1953,14 @@ function updateTradeWindow()
 function cancelledTradeWindow()
 {
 	closeAllPagePopups();
-	popupMessage("The trade has been cancelled.")
+	popupMessage("The trade has been cancelled.");
+}
+
+function updateTerritory()
+{
+	var territoryView = $("#territoryView");
+	territoryView.html("<img src='javascript/images/wait.gif' border=0/>"+territoryView.html());
+	territoryView.load("ajax_territoryview.jsp");
 }
 
 

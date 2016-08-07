@@ -4,5 +4,6 @@ public enum NotificationType {
 	fullpageRefresh,
 	tradeStarted,
 	tradeChanged,
-	tradeCancelled
+	tradeCancelled,
+	territoryChanged
 }
