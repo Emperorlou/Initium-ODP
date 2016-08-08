@@ -96,7 +96,7 @@
 %>
 <script type='text/javascript'>
     changeChatTab("PrivateChat");
-    setPrivateChatTo("<%=otherCharacter.getProperty("name")%>");
+    setPrivateChatTo("<%=otherCharacter.getProperty("name")%>","<%=otherCharacter.getKey().getId()%>");
 </script>
 <script>var tradeVersion=${tradeVersion};</script>
     <div class='main-page'>
