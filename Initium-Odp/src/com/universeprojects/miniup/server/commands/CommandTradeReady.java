@@ -29,10 +29,16 @@ public class CommandTradeReady extends Command {
 		Integer version = Integer.parseInt(parameters.get("tradeVersion"));
 		CachedEntity character = db.getCurrentCharacter(request);
 		Key otherCharacter = (Key) character.getProperty("combatant");
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
 		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 
-		TradeObject trade = db.setTradeReady(null, db.getCurrentCharacter(request), version);
+		db.setTradeReady(ds, db.getCurrentCharacter(request), version);
     	db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
+    	if (tradeObject.isComplete() == true)
+    	{
+    		addCallbackData("tradeComplete","complete");
+    	}
+    	
 	}
 }
