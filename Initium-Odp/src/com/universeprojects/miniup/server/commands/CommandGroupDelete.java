@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +46,26 @@ public class CommandGroupDelete extends Command
 		CachedEntity character = db.getCurrentCharacter(request);
 		Key groupKey = (Key) character.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
+
+		// Error checking
+		if (group == null)
+		{
+			throw new UserErrorMessage("You are not currently in a group.");
+		}
 		String groupName = (String) group.getProperty("name");
+		List<CachedEntity> members = db.getGroupMembers(null, group);
+
+		if (members.size() > 1)
+		{
+			throw new UserErrorMessage(
+					"The group must be empty before it can be deleted.");
+		}
+
+		if (((Key) group.getProperty("creatorKey")).getId() != character
+				.getKey().getId())
+		{
+			throw new UserErrorMessage("Only the creator can delete the group.");
+		}
 
 		// Deleting the group
 		group.setProperty("createdDate", null);
