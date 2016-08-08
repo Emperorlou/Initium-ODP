@@ -245,4 +245,21 @@ public class HtmlComponents {
 		return result;
 	}
 	
+public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
+		
+		String result = "";
+			   result+="<div class='tradeItem' ref="+item.getKey().getId()+">";
+		       result+="<div class='main-item'>";
+		       result+="<div class='main-item-container'>";
+		       result+=GameUtils.renderItem(item);
+		       result+="<br>";
+		       result+="		</div>";
+		       result+="	</div>";
+		       result+="</div>";
+		       result+="<br>";
+		
+		
+		return result;
+	}
+	
 }

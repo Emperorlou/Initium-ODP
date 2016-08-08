@@ -1428,7 +1428,13 @@ function tradeCancelNew(eventObject)
 
 function tradeReadyNew(eventObject,tradeVersion)
 {
-	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion});
+	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion},function(error,data){
+		if (error) return;
+		if (data.tradeComplete == "complete")
+			{
+				popupMessage("Trade Complete","Trade is Complete.")
+			}
+	});
 }
 
 function tradeAddItemNew(eventObject,itemId)
@@ -1971,7 +1977,7 @@ function updateTradeWindow()
 function cancelledTradeWindow()
 {
 	closeAllPagePopups();
-	popupMessage("The trade has been cancelled.");
+	popupMessage("Trade Cancelled","This trade has been cancelled.");
 }
 
 function updateTerritory()

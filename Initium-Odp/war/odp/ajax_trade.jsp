@@ -128,7 +128,7 @@
         <%
             for(CachedEntity item:tradeObject.getItemsFor(otherCharacter.getKey()))
             {
-                out.println(HtmlComponents.generatePlayerTradeItemHtml(item));
+                out.println(HtmlComponents.generateOtherPlayerTradeItemHtml(item));
             }
         %>
         </div>
