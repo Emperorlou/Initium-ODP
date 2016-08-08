@@ -2413,7 +2413,7 @@ public class ODPDBAccess
 		if (((Key)character1.getProperty("locationKey")).getId() != ((Key)character2.getProperty("locationKey")).getId())
 		{
 			setTradeCancelled(ds, character);
-			throw new UserErrorMessage("You canot trade with a character who is not in your location.");
+			throw new UserErrorMessage("You cannot trade with a character who is not in your location.");
 		}
 		
 		
