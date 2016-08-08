@@ -2600,6 +2600,8 @@ public class ODPDBAccess
 	///////////////////////////////////
 
 	/**
+	 * This method sets the character's group properties to null. The group
+	 * entity is not required.
 	 * 
 	 * @param ds
 	 *            Datastore containing character

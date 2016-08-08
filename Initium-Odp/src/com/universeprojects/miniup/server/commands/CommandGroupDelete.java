@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -61,24 +62,19 @@ public class CommandGroupDelete extends Command
 					"The group must have no members before it can be deleted.");
 		}
 
-		if (((Key) group.getProperty("creatorKey")).getId() != character
-				.getKey().getId())
+		if (!(GameUtils.equals(group.getProperty("creatorKey"),
+				character.getKey())))
 		{
 			throw new UserErrorMessage("Only the creator can delete the group.");
 		}
 
 		// Deleting the group
-		group.setProperty("createdDate", null);
-		group.setProperty("creatorKey", null);
-		group.setProperty("name", null);
-		group.setProperty("applicationMode", null);
+		ds.delete(group);
 
-		ds.put(group);
+		db.doLeaveGroup(ds, character); // Sets group properties to null
 
-		// Removing character from group
-		db.doLeaveGroup(ds, character);
-
-		ds.put(character);
+		ds.put(character); // This is a bit redundant since it happens in
+							// doLeaveGroup but I'll leave it anyways
 
 		setPopupMessage(groupName + " has been deleted.");
 	}

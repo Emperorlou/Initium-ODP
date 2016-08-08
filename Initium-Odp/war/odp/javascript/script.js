@@ -761,8 +761,11 @@ function createNewGroup(eventObject)
 
 function deleteGroup(eventObject)
 {
-	confirmPopup("Confirmation", "Are you sure you want to delete your group?\n\nThis cannot be undone", function(){
-		doCommand(eventObject, "GroupDelete")
+	confirmPopup("Confirmation", "Are you sure you want to delete your group?\n\nThis cannot be undone", function() {
+		doCommand(eventObject, "GroupDelete", {}, function(data, error) {
+			if (error) return;
+			closePagePopup();
+		})
 	});
 }
 
