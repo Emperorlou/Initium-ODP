@@ -2483,7 +2483,17 @@ public class ODPDBAccess
 		if (ds==null)
 			ds = getDB();
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
-
+		
+		CachedEntity character1 = getEntity(tradeObject.character1Key);
+		CachedEntity character2 = getEntity(tradeObject.character2Key);
+		
+		character1.setProperty("mode", CHARACTER_MODE_NORMAL);
+		character1.setProperty("combatant", null);
+		character2.setProperty("mode", CHARACTER_MODE_NORMAL);
+		character2.setProperty("combatant", null);
+		
+		ds.put(character1);
+		ds.put(character2);
 		
 		tradeObject.flagCancelled(ds, character);
 		

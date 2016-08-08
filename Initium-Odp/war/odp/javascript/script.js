@@ -1962,7 +1962,7 @@ function updateTradeWindow()
 function cancelledTradeWindow()
 {
 	closeAllPagePopups();
-	popupMessage("The trade has been cancelled.");
+	popupMessage("Trade Cancelled","This trade has been cancelled.");
 }
 
 function updateTerritory()
