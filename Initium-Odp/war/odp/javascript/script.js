@@ -1428,11 +1428,11 @@ function tradeCancelNew(eventObject)
 
 function tradeReadyNew(eventObject,tradeVersion)
 {
-	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion},function(error,data){
+	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion},function(data,error){
 		if (error) return;
 		if (data.tradeComplete == "complete")
 			{
-				popupMessage("Trade Complete","Trade is Complete.")
+				popupMessage("Trade Complete","Trade is complete.")
 			}
 	});
 }

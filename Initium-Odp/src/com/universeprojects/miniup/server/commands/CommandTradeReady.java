@@ -31,14 +31,13 @@ public class CommandTradeReady extends Command {
 		Key otherCharacter = (Key) character.getProperty("combatant");
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
 		
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
-
 		db.setTradeReady(ds, db.getCurrentCharacter(request), version);
     	db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
     	if (tradeObject.isComplete() == true)
     	{
     		addCallbackData("tradeComplete","complete");
     	}
+    	else setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
     	
 	}
 }
