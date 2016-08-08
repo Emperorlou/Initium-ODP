@@ -70,6 +70,12 @@ public class CommandGroupMemberDemoteFromAdmin extends Command
 					"You are not the creator of your group and cannot perform this action.");
 		}
 
+		if (demoteCharacter.getKey().equals(group.getProperty("creatorKey")))
+		{
+			throw new UserErrorMessage(
+					"The creator cannot be demoted you fool.");
+		}
+
 		demoteCharacter.setProperty("group", "Member");
 
 		ds.put(demoteCharacter);

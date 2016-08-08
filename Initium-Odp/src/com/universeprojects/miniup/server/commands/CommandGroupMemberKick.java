@@ -67,7 +67,12 @@ public class CommandGroupMemberKick extends Command
 		if (!"Admin".equals(admin.getProperty("groupStatus")))
 		{
 			throw new UserErrorMessage(
-					"You are not an admin of your group and cannot perform this action");
+					"You are not an admin of your group and cannot perform this action.");
+		}
+
+		if (kickCharacter.getKey().equals(group.getProperty("creatorKey")))
+		{
+			throw new UserErrorMessage("The creator cannot be kicked you fool.");
 		}
 
 		db.doLeaveGroup(ds, kickCharacter);

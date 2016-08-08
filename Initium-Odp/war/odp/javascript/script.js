@@ -759,6 +759,14 @@ function createNewGroup(eventObject)
 }
 
 
+function deleteGroup(eventObject)
+{
+	confirmPopup("Confirmation", "Are you sure delete your group?\n\nThis cannot be undone", function(){
+		doCommand(eventObject, "GroupDelete")
+	});
+}
+
+
 function leaveGroup(eventObject)
 {
 	confirmPopup("Leave group", "Are you sure you want to leave your group?", function(){
@@ -796,21 +804,21 @@ function setGroupMemberRank(eventObject, oldPosition, characterId)
 function promoteToAdmin(eventObject, characterId)
 {
 	confirmPopup("Promote to Admin", "Are you sure you want to promote this member to admin?", function(){
-		doCommand(eventObject, "MemberPromoteToAdmin", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberPromoteToAdmin", {"characterId" : characterId})
 	});
 }
 
 function demoteFromAdmin(eventObject, characterId)
 {
 	confirmPopup("Demote from Admin", "Are you sure you want to demote this member from admin?", function(){
-		doCommand(eventObject, "MemberDemoteFromAdmin", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberDemoteFromAdmin", {"characterId" : characterId})
 	});
 }
 
 function makeGroupCreator(eventGroup, characterId)
 {
 	confirmPopup("New Group Creator", "Are you sure you want to make this member into the group creator?\n\nThis action cannot be reversed unless the this member (as the new group creator) chooses to reverse it manually!", function(){
-		doCommand(eventObject, "MemberMakeGroupCreator", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberMakeGroupCreator", {"characterId" : characterId})
 	});
 }
 
@@ -1349,7 +1357,8 @@ function groupAcceptJoinGroupApplication(eventObject, characterId)
 
 function groupDenyJoinGroupApplication(eventObject, characterId)
 {
-	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId})}
+	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId})
+}
 
 function groupMemberKick(eventObject, characterId)
 {
