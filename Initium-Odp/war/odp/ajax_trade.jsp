@@ -98,7 +98,15 @@
     changeChatTab("PrivateChat");
     setPrivateChatTo("<%=otherCharacter.getProperty("name")%>","<%=otherCharacter.getKey().getId()%>");
 </script>
-<script>var tradeVersion=${tradeVersion};</script>
+<script type='text/javascript'>
+	var tradeComplete = <%=tradeObject.isComplete()%>;
+	if (tradeComplete == true)
+	{
+			closeAllPagePopups();
+			popupMessage("Trade Complete","This trade has completed successfully.");
+	}
+</script>
+<script type='text/javascript'>var tradeVersion=${tradeVersion};</script>
     <div class='main-page'>
         <h2>Trading with <c:out value="${otherCharacterName}"/></h2> 
         <%=GameUtils.renderCharacterWidget(request, db, character, user, true) %>

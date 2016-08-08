@@ -35,7 +35,8 @@ public class CommandTradeReady extends Command {
     	db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
     	if (tradeObject.isComplete() == true)
     	{
-    		addCallbackData("tradeComplete","complete");
+    		String complete = "complete";
+    		addCallbackData("tradeComplete",complete);
     	}
     	else setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
     	
