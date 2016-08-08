@@ -58,7 +58,7 @@ public class CommandGroupDelete extends Command
 		if (members.size() > 1)
 		{
 			throw new UserErrorMessage(
-					"The group must be empty before it can be deleted.");
+					"The group must have no members before it can be deleted.");
 		}
 
 		if (((Key) group.getProperty("creatorKey")).getId() != character
