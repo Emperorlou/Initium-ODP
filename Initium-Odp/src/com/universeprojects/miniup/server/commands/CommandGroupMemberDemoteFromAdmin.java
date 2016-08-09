@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -68,6 +69,13 @@ public class CommandGroupMemberDemoteFromAdmin extends Command
 		{
 			throw new UserErrorMessage(
 					"You are not the creator of your group and cannot perform this action.");
+		}
+
+		if (GameUtils.equals(group.getProperty("creatorKey"),
+				demoteCharacter.getKey()))
+		{
+			throw new UserErrorMessage(
+					"The creator cannot be demoted you fool.");
 		}
 
 		demoteCharacter.setProperty("group", "Member");
