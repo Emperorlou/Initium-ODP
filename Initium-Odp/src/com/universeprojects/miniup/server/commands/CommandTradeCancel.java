@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.TradeObject;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
@@ -24,9 +25,16 @@ public class CommandTradeCancel extends Command {
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);	
 		
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+			return;
+		if (tradeObject.isComplete())
+			return;
+		
+		
 		if ("TRADING".equals(character.getProperty("mode")))
 		{
-		db.setTradeCancelled(ds, character);
+			db.setTradeCancelled(ds, tradeObject, character);
 		}
 	}
 }

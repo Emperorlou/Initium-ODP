@@ -1110,7 +1110,7 @@ function pagePopupIframe(url)
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><iframe id='"+pagePopupId+"-content' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div>");
 }
 
-function closePagePopup()
+function closePagePopup(doNotCallback)
 {
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
 	if ($("#"+pagePopupId+"-map").length>0)
@@ -1120,16 +1120,19 @@ function closePagePopup()
 	
 	decrementStackIndex();
 	
-	var func = popupStackCloseCallbackHandlers.pop();
-	if (func!=null)
-		func();
+	if (doNotCallback!=true)
+	{
+		var func = popupStackCloseCallbackHandlers.pop();
+		if (func!=null)
+			func();
+	}
 }
 
-function closeAllPagePopups()
+function closeAllPagePopups(doNotCallback)
 {
 	while (currentPopupStackIndex>0)
 	{		
-		closePagePopup();
+		closePagePopup(doNotCallback);
 	}
 }
 
@@ -1435,6 +1438,7 @@ function tradeReadyNew(eventObject)
 		if (data.tradeComplete == "complete")
 			{
 				popupMessage("Trade Complete","Trade is complete.")
+				closePagePopup(true);
 			}
 	});
 }
@@ -1968,6 +1972,7 @@ function _viewTrade()
     closeAllTooltips();
 	pagePopup("odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
+//		popupMessage("Trade Cancelled","This trade has been cancelled.")
 	});	
 }
 
@@ -1978,8 +1983,14 @@ function updateTradeWindow()
 
 function cancelledTradeWindow()
 {
-	closeAllPagePopups();
+	closeAllPagePopups(true);
 	popupMessage("Trade Cancelled","This trade has been cancelled.");
+}
+
+function completedTradeWindow()
+{
+	closeAllPagePopups(true);
+	popupMessage("Trade Completed","The trade completed successfully.");
 }
 
 function updateTerritory()
