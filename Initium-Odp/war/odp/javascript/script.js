@@ -1968,6 +1968,7 @@ function _viewTrade()
     closeAllTooltips();
 	pagePopup("odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
+		popupMessage("Trade Cancelled","This trade has been cancelled.")
 	});	
 }
 
