@@ -62,8 +62,8 @@ public class CommandGroupDelete extends Command
 					"The group must have no members before it can be deleted.");
 		}
 
-		if (!(GameUtils.equals(group.getProperty("creatorKey"),
-				character.getKey())))
+		if (GameUtils.equals((Key) group.getProperty("creatorKey"),
+				(Key) character.getKey()) == false)
 		{
 			throw new UserErrorMessage("Only the creator can delete the group.");
 		}

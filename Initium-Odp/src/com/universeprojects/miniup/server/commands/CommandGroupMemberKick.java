@@ -13,6 +13,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 /**
  * Group member kick command.
@@ -71,8 +72,8 @@ public class CommandGroupMemberKick extends Command
 					"You are not an admin of your group and cannot perform this action.");
 		}
 
-		if (GameUtils.equals(group.getProperty("creatorKey"),
-				kickCharacter.getKey()))
+		if (GameUtils.equals((Key) group.getProperty("creatorKey"),
+				(Key) kickCharacter.getKey()))
 		{
 			throw new UserErrorMessage("The creator cannot be kicked you fool.");
 		}
@@ -81,5 +82,7 @@ public class CommandGroupMemberKick extends Command
 
 		setPopupMessage(kickCharacter.getProperty("name")
 				+ " has been kicked from the group!");
+		
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }
