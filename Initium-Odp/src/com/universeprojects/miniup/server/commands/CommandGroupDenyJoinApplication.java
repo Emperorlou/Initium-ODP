@@ -12,6 +12,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 /**
  * Deny join group application command.
@@ -66,5 +67,7 @@ public class CommandGroupDenyJoinApplication extends Command
 		db.discoverAllGroupPropertiesFor(ds, applicant);
 
 		ds.put(applicant);
+		
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }
