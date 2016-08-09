@@ -30,13 +30,16 @@ public class CommandTradeAddAllItems extends Command {
 		CachedEntity character = db.getCurrentCharacter(request);
 		List<CachedEntity> items = db.getFilteredList("Item", "containerKey", character.getKey());
 		Key otherCharacter = (Key) character.getProperty("combatant");
-        TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, db.getCurrentCharacter(request));
+
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+		{
+			addCallbackData("tradeCancelled", true);
+			throw new UserErrorMessage("Trade has been cancelled.");
+		}
+		if (tradeObject.isComplete())
+			throw new UserErrorMessage("Trade is already complete.");
         
-        if (tradeObject==null || tradeObject.isCancelled())
-        {
-            addCallbackData("tradeCancelled", true);
-            throw new UserErrorMessage("Trade has been cancelled.");
-        }
         
 		for(CachedEntity item:items)
 		{
@@ -47,7 +50,7 @@ public class CommandTradeAddAllItems extends Command {
                 continue;
 		}   
         
-		db.addTradeItems(ds, db.getCurrentCharacter(request), items);
+		db.addTradeItems(ds, tradeObject, db.getCurrentCharacter(request), items);
         db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();

@@ -26,7 +26,6 @@ public class CommandTradeSetGold extends Command {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, db.getCurrentCharacter(request));
 		String dogecoinStr = parameters.get("amount");
 		CachedEntity character = db.getCurrentCharacter(request);
 		Key otherCharacter = (Key) character.getProperty("combatant");
@@ -40,8 +39,14 @@ public class CommandTradeSetGold extends Command {
         		new UserErrorMessage("Please type a valid gold amount.");
         	}
         	
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+			throw new UserErrorMessage("Trade has been cancelled.");
+		if (tradeObject.isComplete())
+			throw new UserErrorMessage("Trade is already complete.");
+
         
-        db.setTradeDogecoin(ds, db.getCurrentCharacter(request), dogecoin);
+        db.setTradeDogecoin(ds, tradeObject, db.getCurrentCharacter(request), dogecoin);
         db.sendNotification(ds,otherCharacter,NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
