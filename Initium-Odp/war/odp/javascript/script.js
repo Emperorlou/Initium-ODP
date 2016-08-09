@@ -1428,7 +1428,7 @@ function tradeCancelNew(eventObject)
 	doCommand(eventObject,"TradeCancel")
 }
 
-function tradeReadyNew(eventObject,tradeVersion)
+function tradeReadyNew(eventObject)
 {
 	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion},function(data,error){
 		if (error) return;
