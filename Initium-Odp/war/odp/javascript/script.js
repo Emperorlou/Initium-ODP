@@ -1419,7 +1419,7 @@ function tradeRemoveItemNew(eventObject,itemId)
 		$(".tradeItem[ref='"+itemId+"']").remove();
 		var container = $("#invItems");
 		container.html(data.createTradeInvItem+container.html());
-		tradeVersion = data.tradeVersion
+		tradeVersion = data.tradeVersion;
 	})
 }
 
@@ -1428,7 +1428,7 @@ function tradeCancelNew(eventObject)
 	doCommand(eventObject,"TradeCancel")
 }
 
-function tradeReadyNew(eventObject,tradeVersion)
+function tradeReadyNew(eventObject)
 {
 	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion},function(data,error){
 		if (error) return;
@@ -1446,7 +1446,7 @@ function tradeAddItemNew(eventObject,itemId)
 		$(".invItem[ref='"+itemId+"']").remove();
 		var container = $("#yourTrade");
 		container.html(data.createTradeItem+container.html());
-		tradeVersion = data.tradeVersion
+		tradeVersion = data.tradeVersion;
 	})
 }
 
@@ -1458,7 +1458,7 @@ function tradeSetGoldNew(eventObject,currentDogecoin)
 			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(data,error){
 				if (error) return;
 				$("#myTradeGoldAmount").text(data.newTradeGoldAmount);
-				tradeVersion = data.tradeVersion
+				tradeVersion = data.tradeVersion;
 			})
 			
 		}

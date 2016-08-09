@@ -144,7 +144,7 @@
         </div>
         
         <div class='main-buttonbox' style="margin-top: 20px">
-            <a onclick='tradeReadyNew(event,${tradeVersion})' class='main-button'>Accept Trade</a>
+            <a onclick='tradeReadyNew(event)' class='main-button'>Accept Trade</a>
         </div>
         <br>
         <br>
