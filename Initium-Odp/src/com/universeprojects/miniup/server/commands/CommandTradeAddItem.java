@@ -31,16 +31,22 @@ public class CommandTradeAddItem extends Command {
 		Key otherCharacter = (Key) character.getProperty("combatant");
         Long itemId = tryParseId(parameters,"itemId");
         CachedEntity item = db.getEntity("Item", itemId);
-        TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
         
         if (item==null)
 			throw new UserErrorMessage("Item doesn't exist.");
 		
-        db.addTradeItem(ds, character, item);
+		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+		if (tradeObject==null || tradeObject.isCancelled())
+			throw new UserErrorMessage("Trade has been cancelled.");
+		if (tradeObject.isComplete())
+			throw new UserErrorMessage("Trade is already complete.");
+        
+        
+        db.addTradeItem(ds, tradeObject, character, item);
         db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
-        
+        System.out.println("");
         addCallbackData("tradeVersion",tradeVersion);
         addCallbackData("createTradeItem",HtmlComponents.generatePlayerTradeItemHtml(item));
 	}

@@ -1,39 +1,37 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 /**
- * Deny join group application command.
+ * Delete group command.
  * 
  * @author Atmostphear
- * 
  */
-public class CommandGroupDenyJoinApplication extends Command
+
+public class CommandGroupDelete extends Command
 {
 
 	/**
-	 * Command to deny a player's application to join a group.
-	 * 
-	 * Parameters: characterId - The character applying to the group.
+	 * Command to delete a group.
 	 * 
 	 * @param request
 	 *            Server request
 	 * @param response
 	 *            Server response
 	 */
-	public CommandGroupDenyJoinApplication(final ODPDBAccess db,
+	public CommandGroupDelete(final ODPDBAccess db,
 			final HttpServletRequest request, final HttpServletResponse response)
 	{
 		super(db, request, response);
@@ -43,31 +41,41 @@ public class CommandGroupDenyJoinApplication extends Command
 	public final void run(final Map<String, String> parameters)
 			throws UserErrorMessage
 	{
+		// Variables
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);
 		Key groupKey = (Key) character.getProperty("groupKey");
-		CachedEntity applicant = db.getCharacterById(tryParseId(parameters,
-				"characterId"));
+		CachedEntity group = db.getEntity(groupKey);
 
-		if (applicant == null)
+		// Error checking
+		if (group == null)
 		{
-			throw new UserErrorMessage("Invalid character ID.");
+			throw new UserErrorMessage("You are not currently in a group.");
+		}
+		String groupName = (String) group.getProperty("name");
+		List<CachedEntity> members = db.getGroupMembers(null, group);
+
+		if (members.size() > 1)
+		{
+			throw new UserErrorMessage(
+					"The group must have no members before it can be deleted.");
 		}
 
-		if (!db.applicationAcceptOrDenyChecks(applicant, character, groupKey))
+		if (GameUtils.equals((Key) group.getProperty("creatorKey"),
+				(Key) character.getKey()) == false)
 		{
-			return;
+			throw new UserErrorMessage("Only the creator can delete the group.");
 		}
 
-		applicant.setProperty("groupStatus", null);
-		applicant.setProperty("groupKey", null);
-		applicant.setProperty("groupStatus", null);
+		// Deleting the group
+		ds.delete(group);
 
-		db.discoverAllGroupPropertiesFor(ds, applicant);
+		db.doLeaveGroup(ds, character); // Sets group properties to null
 
-		ds.put(applicant);
-		
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+		ds.put(character); // This is a bit redundant since it happens in
+							// doLeaveGroup but I'll leave it anyways
+
+		setPopupMessage(groupName + " has been deleted.");
 	}
 }

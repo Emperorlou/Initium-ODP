@@ -2298,7 +2298,11 @@ public class ODPDBAccess
 		if ("TRADING".equals(character.getProperty("mode")))
 		{
 			try {
-				setTradeCancelled(ds, character);
+				TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+				if (tradeObject!=null && tradeObject.isCancelled()==false && tradeObject.isComplete()==false)
+				{
+					setTradeCancelled(ds, tradeObject, character);
+				}
 			} catch (UserErrorMessage e) {
 				// Ignore errors
 			}
@@ -2326,11 +2330,10 @@ public class ODPDBAccess
 	}
 	
 	
-	public void addTradeItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item) throws UserErrorMessage
+	public void addTradeItem(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, CachedEntity item) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
-		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
 		if (tradeObject==null || tradeObject.isCancelled())
 			throw new UserErrorMessage("Trade has been cancelled.");
 		
@@ -2341,52 +2344,42 @@ public class ODPDBAccess
 		
 	}
 	
-	public void addTradeItems(CachedDatastoreService ds, CachedEntity character, List<CachedEntity> items) throws UserErrorMessage
+	public void addTradeItems(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, List<CachedEntity> items) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
-		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
 		for(CachedEntity item:items)
 		{
-		if (tradeObject==null || tradeObject.isCancelled())
-			throw new UserErrorMessage("Trade has been cancelled.");
-		
-		if (((Key)item.getProperty("containerKey")).getId() != character.getKey().getId())
-			throw new UserErrorMessage("You do not currently have that item in your posession and cannot trade it.");
+			if (tradeObject==null || tradeObject.isCancelled())
+				throw new UserErrorMessage("Trade has been cancelled.");
+			
+			if (((Key)item.getProperty("containerKey")).getId() != character.getKey().getId())
+				throw new UserErrorMessage("You do not currently have the '"+item.getProperty("name")+"' item in your posession and cannot trade it.");
 		}
-		tradeObject.addObjects(ds, character, items);
 		
+		tradeObject.addObjects(ds, character, items);
 	}
 	
-	public void removeTradeItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item) throws UserErrorMessage
+	public void removeTradeItem(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, CachedEntity item) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
-		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
-		if (tradeObject==null || tradeObject.isCancelled())
-			throw new UserErrorMessage("Trade has been cancelled.");
 		
 		tradeObject.removeObject(ds, character, item);
 	}
 	
-	public void setTradeDogecoin(CachedDatastoreService ds, CachedEntity character, long amount) throws UserErrorMessage
+	public void setTradeDogecoin(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, long amount) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
-		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
-		if (tradeObject==null || tradeObject.isCancelled())
-			throw new UserErrorMessage("Trade has been cancelled.");
 		
 		tradeObject.setDogecoins(ds, character, amount);
 	}
 	
-	public TradeObject setTradeReady(CachedDatastoreService ds, CachedEntity character, int version) throws UserErrorMessage
+	public TradeObject setTradeReady(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, int version) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
-		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
-		if (tradeObject==null || tradeObject.isCancelled())
-			throw new UserErrorMessage("Trade has been cancelled.");
 		
 		if (tradeObject.getVersion()!=version)
 			throw new UserErrorMessage("The other user changed something.");
@@ -2412,7 +2405,7 @@ public class ODPDBAccess
 
 		if (((Key)character1.getProperty("locationKey")).getId() != ((Key)character2.getProperty("locationKey")).getId())
 		{
-			setTradeCancelled(ds, character);
+			setTradeCancelled(ds, tradeObject, character);
 			throw new UserErrorMessage("You cannot trade with a character who is not in your location.");
 		}
 		
@@ -2478,11 +2471,10 @@ public class ODPDBAccess
 		return tradeObject;
 	}
 	
-	public void setTradeCancelled(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
+	public void setTradeCancelled(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
-		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
 		
 		CachedEntity character1 = getEntity(tradeObject.character1Key);
 		CachedEntity character2 = getEntity(tradeObject.character2Key);
@@ -2600,6 +2592,8 @@ public class ODPDBAccess
 	///////////////////////////////////
 
 	/**
+	 * This method sets the character's group properties to null. The group
+	 * entity is not required.
 	 * 
 	 * @param ds
 	 *            Datastore containing character

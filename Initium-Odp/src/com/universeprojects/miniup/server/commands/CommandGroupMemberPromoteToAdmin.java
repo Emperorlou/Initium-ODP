@@ -64,13 +64,13 @@ public class CommandGroupMemberPromoteToAdmin extends Command
 			throw new UserErrorMessage(
 					"The member you are trying to demote is not part of your group.");
 		}
-		if (!admin.getKey().equals(group.getProperty("creatorKey")))
+		if (admin.getKey().equals(group.getProperty("creatorKey")) == false)
 		{
 			throw new UserErrorMessage(
 					"You are not the creator of your group and cannot perform this action.");
 		}
 
-		promoteCharacter.setProperty("group", "Admin");
+		promoteCharacter.setProperty("groupStatus", "Admin");
 
 		ds.put(promoteCharacter);
 

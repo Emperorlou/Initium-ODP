@@ -9,9 +9,11 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 /**
  * Group member kick command.
@@ -64,15 +66,23 @@ public class CommandGroupMemberKick extends Command
 					"The member you are trying to kick is not part of your group.");
 		}
 
-		if (!"Admin".equals(admin.getProperty("groupStatus")))
+		if ("Admin".equals(admin.getProperty("groupStatus")) == false)
 		{
 			throw new UserErrorMessage(
-					"You are not an admin of your group and cannot perform this action");
+					"You are not an admin of your group and cannot perform this action.");
+		}
+
+		if (GameUtils.equals((Key) group.getProperty("creatorKey"),
+				(Key) kickCharacter.getKey()))
+		{
+			throw new UserErrorMessage("The creator cannot be kicked you fool.");
 		}
 
 		db.doLeaveGroup(ds, kickCharacter);
 
 		setPopupMessage(kickCharacter.getProperty("name")
 				+ " has been kicked from the group!");
+		
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }

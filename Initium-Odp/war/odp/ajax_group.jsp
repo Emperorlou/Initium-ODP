@@ -249,6 +249,9 @@
 					out.println("<a onclick='groupMemberKickCancel("
 							+ character.getKey().getId()
 							+ ")'>Cancel Kick</a>");
+				if ((GameUtils.equals(group.getProperty("creatorKey"),
+						character.getKey())) && (members.size() <= 1))
+					out.println("<a onclick='deleteGroup(event)'>Delete group</a>");
 			}
 			out.println("</div>");
 			out.println("</div>");
