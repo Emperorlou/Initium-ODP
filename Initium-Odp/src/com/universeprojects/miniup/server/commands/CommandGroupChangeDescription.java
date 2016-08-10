@@ -62,7 +62,7 @@ public class CommandGroupChangeDescription extends Command
 
 		description = description.replace("'", "`");
 
-		group.setProperty("groupDescription", description);
+		group.setProperty("description", description);
 
 		ds.put(group);
 
