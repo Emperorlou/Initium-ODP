@@ -782,8 +782,12 @@ function cancelLeaveGroup()
 	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
 }
 
-function setGroupDescription(existingDescription)
+function setGroupDescription(eventObject, existingDescription)
 {
+	if (existingDescription==null || existingDescription =="")
+	{
+		existingDescription=" ";
+	}
 	promptPopup("Group Description", "Set your group's description here, but please be careful to only use letters, numbers, commas, and apostrophies:", existingDescription, function(description){
 		if (description!=null && description!="")
 		{
@@ -795,9 +799,9 @@ function setGroupDescription(existingDescription)
 
 function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
-	if (oldPosition==null)
+	if (oldPosition==null || oldPosition=="")
 	{
-		oldPosition="";
+		oldPosition=" ";
 	}
 	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
 		if (newPosition!=null && newPosition!="")
