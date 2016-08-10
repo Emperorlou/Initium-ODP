@@ -784,9 +784,9 @@ function cancelLeaveGroup()
 
 function setGroupDescription(eventObject, existingDescription)
 {
-	if (existingDescription==null || existingDescription =="")
+	if (existingDescription==null || existingDescription=="")
 	{
-		existingDescription=" ";
+		existingDescription="No description";
 	}
 	promptPopup("Group Description", "Set your group's description here, but please be careful to only use letters, numbers, commas, and apostrophies:", existingDescription, function(description){
 		if (description!=null && description!="")
@@ -801,7 +801,7 @@ function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
 	if (oldPosition==null || oldPosition=="")
 	{
-		oldPosition=" ";
+		oldPosition="No position";
 	}
 	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
 		if (newPosition!=null && newPosition!="")
