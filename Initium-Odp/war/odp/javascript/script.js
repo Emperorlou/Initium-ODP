@@ -765,7 +765,7 @@ function deleteGroup(eventObject)
 		doCommand(eventObject, "GroupDelete", {}, function(data, error) {
 			if (error) return;
 			closePagePopup();
-		})
+		});
 	});
 }
 
@@ -773,7 +773,7 @@ function deleteGroup(eventObject)
 function leaveGroup(eventObject)
 {
 	confirmPopup("Leave group", "Are you sure you want to leave your group?", function(){
-		doCommand(eventObject, "GroupLeave")
+		doCommand(eventObject, "GroupLeave");
 	});
 }
 
@@ -787,7 +787,7 @@ function setGroupDescription(existingDescription)
 	promptPopup("Group Description", "Set your group's description here, but please be careful to only use letters, numbers, commas, and apostrophies:", existingDescription, function(description){
 		if (description!=null && description!="")
 		{
-			window.location.href='ServletCharacterControl?type=setGroupDescription&description='+encodeURIComponent(description)+"&v="+window.verifyCode;
+			doCommand(eventObject, "GroupChangeDescription", {"description" : description});
 		}
 		
 	});
@@ -795,10 +795,14 @@ function setGroupDescription(existingDescription)
 
 function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
+	if (oldPosition==null)
+	{
+		oldPosition="";
+	}
 	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
 		if (newPosition!=null && newPosition!="")
 		{
-			doCommand(eventObject, "GroupMemberChangeRank", {"rank" : newPosition, "characterId" : characterId})
+			doCommand(eventObject, "GroupMemberChangeRank", {"rank" : newPosition, "characterId" : characterId});
 		}
 	});
 }
@@ -806,21 +810,21 @@ function setGroupMemberRank(eventObject, oldPosition, characterId)
 function promoteToAdmin(eventObject, characterId)
 {
 	confirmPopup("Promote to Admin", "Are you sure you want to promote this member to admin?", function(){
-		doCommand(eventObject, "GroupMemberPromoteToAdmin", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberPromoteToAdmin", {"characterId" : characterId});
 	});
 }
 
 function demoteFromAdmin(eventObject, characterId)
 {
 	confirmPopup("Demote from Admin", "Are you sure you want to demote this member from admin?", function(){
-		doCommand(eventObject, "GroupMemberDemoteFromAdmin", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberDemoteFromAdmin", {"characterId" : characterId});
 	});
 }
 
 function makeGroupCreator(eventGroup, characterId)
 {
 	confirmPopup("New Group Creator", "Are you sure you want to make this member into the group creator?\n\nThis action cannot be reversed unless the this member (as the new group creator) chooses to reverse it manually!", function(){
-		doCommand(eventObject, "GroupMemberMakeGroupCreator", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberMakeGroupCreator", {"characterId" : characterId});
 	});
 }
 
@@ -1357,17 +1361,17 @@ function forgetCombatSite(locationId)
 
 function groupAcceptJoinGroupApplication(eventObject, characterId)
 {
-	doCommand(eventObject, "GroupAcceptJoinApplication", {"characterId" : characterId})
+	doCommand(eventObject, "GroupAcceptJoinApplication", {"characterId" : characterId});
 }
 
 function groupDenyJoinGroupApplication(eventObject, characterId)
 {
-	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId})
+	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId});
 }
 
 function groupMemberKick(eventObject, characterId)
 {
-	doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId})
+	doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId});
 }
 
 function groupMemberKickCancel(characterId)
@@ -1377,7 +1381,7 @@ function groupMemberKickCancel(characterId)
 
 function groupRequestJoin(eventObject, groupId)
 {
-	doCommand(eventObject, "GroupRequestJoin", {"groupId" : groupId})
+	doCommand(eventObject, "GroupRequestJoin", {"groupId" : groupId});
 }
 
 function tradeRemoveItem(itemId)
