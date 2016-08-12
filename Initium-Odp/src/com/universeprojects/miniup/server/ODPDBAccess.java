@@ -2376,7 +2376,7 @@ public class ODPDBAccess
 		tradeObject.setDogecoins(ds, character, amount);
 	}
 	
-	public TradeObject setTradeReady(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, int version) throws UserErrorMessage
+	public TradeObject setTradeReady(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, Integer version) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
