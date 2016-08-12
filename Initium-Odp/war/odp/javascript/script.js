@@ -1537,8 +1537,10 @@ function setBlockadeRule(rule)
 	location.href = "ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
 }
 
-function doEatBerry(eventObject,itemId)
-{		
+function doEatBerry(eventObject)
+{	
+	var itemId = thisItemId
+		if (itemID = null)return;
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
 		if (error) return;
 		reloadPagePopup();
