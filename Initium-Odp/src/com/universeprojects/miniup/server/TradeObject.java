@@ -81,33 +81,29 @@ public class TradeObject implements Serializable
 		if (ds==null)
 			throw new IllegalArgumentException("CachedDatastoreService cannot be null.");
 		
-		if (character.getProperty("mode").equals(ODPDBAccess.CHARACTER_MODE_TRADING))
+		TradeObject tradeObject = null;
+		if (character.getProperty("combatant")!=null)
+			tradeObject = (TradeObject)ds.getSaferMemcacheValue(constructKey(character.getKey(), (Key)character.getProperty("combatant")), numberOfMemcacheBackups);
+		
+		// If the tradeObject is null at this point, we gotta fix the character's mode...
+		if (tradeObject==null || tradeObject.isCancelled() || tradeObject.isComplete())
 		{
-			TradeObject tradeObject = null;
-			if (character.getProperty("combatant")!=null)
-				tradeObject = (TradeObject)ds.getSaferMemcacheValue(constructKey(character.getKey(), (Key)character.getProperty("combatant")), numberOfMemcacheBackups);
-			
-			// If the tradeObject is null at this point, we gotta fix the character's mode...
-			if (tradeObject==null || tradeObject.isCancelled())
-			{
-				character.setProperty("mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
-				character.setProperty("combatant", null);
-				ds.put(character);
-			}
-			else
-			{
-				// TEMPORARY FIX
-				if (tradeObject.character1Items==null)
-					tradeObject.character1Items = new ArrayList<CachedEntity>();
-				if (tradeObject.character2Items==null)
-					tradeObject.character2Items = new ArrayList<CachedEntity>();
-			}
-			
-			
-			return tradeObject;
+			character.setProperty("mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
+			character.setProperty("combatant", null);
+			ds.put(character);
+		}
+		else
+		{
+			// TEMPORARY FIX
+			if (tradeObject.character1Items==null)
+				tradeObject.character1Items = new ArrayList<CachedEntity>();
+			if (tradeObject.character2Items==null)
+				tradeObject.character2Items = new ArrayList<CachedEntity>();
 		}
 		
-		return null;
+		
+		return tradeObject;
+	
 	}
 	
 	public static boolean checkEntitiesChanged(CachedDatastoreService ds, List<CachedEntity> entities)
