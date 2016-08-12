@@ -1597,6 +1597,18 @@ public class ODPDBAccess
 
 		if (buff != null) ds.put(buff);
 	}
+	
+	public Boolean awardBuff_Berry(CachedDatastoreService ds, CachedEntity character)
+	{
+		Boolean buffApplied = null;
+		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/Pixel_Art-Food-Fruit-I_C_Mulberry.png","Mysterious Berry",
+				"You are feeling enlightened.  That berry you just ate has left your mind feeling extra sharp. The effect lasts for 1 hour.",3600,"intelligence","35%",null,null,null,null,1);
+		if (buff != null){ 
+			ds.put(buff);
+			buffApplied = true;
+		}
+		return buffApplied;
+	}
 
 	public List<CachedEntity> sortSaleItemList(List<CachedEntity> items)
 	{
