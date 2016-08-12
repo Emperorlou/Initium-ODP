@@ -19,28 +19,39 @@
     CachedEntity user = db.getCurrentUser(request);
             
     String characterMode = (String)character.getProperty("mode");
-    if (characterMode==null || characterMode.equals(ODPDBAccess.CHARACTER_MODE_TRADING)==false)
-    {
-        out.println("You are not currently in a trade.");
-        return;
-    }
     
     // Find out if we're actually in a trade right now...
+    boolean tradeDoneAlready = false;
+    boolean cancelled = false;
+    boolean complete = false;
     TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
-    if (tradeObject==null)
+    if (tradeObject==null || tradeObject.isCancelled())
     {
-        out.println("You are not currently in a trade.");
-        return;
-    }
-    else if (tradeObject.isCancelled())
-    {
-        out.println("The trade has been cancelled.");
-        return;
+    	tradeDoneAlready = true;
+    	cancelled = true;
     }
     else if (tradeObject.isComplete())
     {
-        out.println("The trade has completed successfully.");
-        return;
+    	tradeDoneAlready = true;
+        complete = true;
+    }
+
+    
+    if (tradeDoneAlready)
+    {
+    	// We're closing the trade window because we're not in a trade anymore, we have to make sure the database now reflects that
+    	character.setProperty("mode", ODPDBAccess.CharacterMode.NORMAL.toString());
+		character.setProperty("combatant", null);    	
+		ds.put(character);
+    	
+    	out.println("<script type='text/javascript'>");
+    	out.println("closePagePopup()");
+    	if (cancelled)
+    		out.println("popupMessage('Trade Cancelled', 'The trade has been cancelled.');");
+    	if (complete)
+    		out.println("popupMessage('Trade Complete', 'The trade completed successfully');");
+    	out.println("</script>");
+    	return;
     }
     
     List<CachedEntity> items = db.getFilteredList("Item", "containerKey", character.getKey());
@@ -98,14 +109,6 @@
     changeChatTab("PrivateChat");
     setPrivateChatTo("<%=otherCharacter.getProperty("name")%>","<%=otherCharacter.getKey().getId()%>");
 </script>
-<script type='text/javascript'>
-	var tradeComplete = <%=tradeObject.isComplete()%>;
-	if (tradeComplete == true)
-	{
-			closeAllPagePopups();
-			popupMessage("Trade Complete","This trade has completed successfully.");
-	}
-</script>
 <script type='text/javascript'>var tradeVersion=${tradeVersion};</script>
     <div class='main-page'>
         <h2>Trading with <c:out value="${otherCharacterName}"/></h2> 
@@ -119,7 +122,7 @@
         <div class="trade-boxes" style="margin-top: 20px;">
         <div class='main-splitScreen'>
         <div class='${characterTradeWindowClass}'><h4>Your offer</h4>
-        <h4><a href='#' onclick='tradeSetGoldNew(event,<%=+tradeObject.getDogecoinsFor(character.getKey())%>)'>Gold: <span id='myTradeGoldAmount'><%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(character.getKey())) %></span></a></h4>
+        <h4><a onclick='tradeSetGoldNew(event,<%=+tradeObject.getDogecoinsFor(character.getKey())%>)'>Gold: <span id='myTradeGoldAmount'><%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(character.getKey())) %></span></a></h4>
         <div id='yourTrade'>
         <%
             for(CachedEntity item:tradeObject.getItemsFor(character.getKey()))
@@ -149,7 +152,7 @@
         <br>
         <br>
         <div class='main-buttonbox'>
-            <a href='#' onclick='closePagePopup()' class='main-button'>Cancel</a>
+            <a onclick='closePagePopup()' class='main-button'>Cancel</a>
         </div>
         <br>
         <div class='main-splitScreen'>

@@ -765,7 +765,7 @@ function deleteGroup(eventObject)
 		doCommand(eventObject, "GroupDelete", {}, function(data, error) {
 			if (error) return;
 			closePagePopup();
-		})
+		});
 	});
 }
 
@@ -773,7 +773,7 @@ function deleteGroup(eventObject)
 function leaveGroup(eventObject)
 {
 	confirmPopup("Leave group", "Are you sure you want to leave your group?", function(){
-		doCommand(eventObject, "GroupLeave")
+		doCommand(eventObject, "GroupLeave");
 	});
 }
 
@@ -782,12 +782,16 @@ function cancelLeaveGroup()
 	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
 }
 
-function setGroupDescription(existingDescription)
+function setGroupDescription(eventObject, existingDescription)
 {
+	if (existingDescription==null || existingDescription=="")
+	{
+		existingDescription="No description";
+	}
 	promptPopup("Group Description", "Set your group's description here, but please be careful to only use letters, numbers, commas, and apostrophies:", existingDescription, function(description){
 		if (description!=null && description!="")
 		{
-			window.location.href='ServletCharacterControl?type=setGroupDescription&description='+encodeURIComponent(description)+"&v="+window.verifyCode;
+			doCommand(eventObject, "GroupChangeDescription", {"description" : description});
 		}
 		
 	});
@@ -795,10 +799,14 @@ function setGroupDescription(existingDescription)
 
 function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
+	if (oldPosition==null || oldPosition=="")
+	{
+		oldPosition="No position";
+	}
 	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
 		if (newPosition!=null && newPosition!="")
 		{
-			doCommand(eventObject, "GroupMemberChangeRank", {"rank" : newPosition, "characterId" : characterId})
+			doCommand(eventObject, "GroupMemberChangeRank", {"rank" : newPosition, "characterId" : characterId});
 		}
 	});
 }
@@ -806,21 +814,21 @@ function setGroupMemberRank(eventObject, oldPosition, characterId)
 function promoteToAdmin(eventObject, characterId)
 {
 	confirmPopup("Promote to Admin", "Are you sure you want to promote this member to admin?", function(){
-		doCommand(eventObject, "GroupMemberPromoteToAdmin", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberPromoteToAdmin", {"characterId" : characterId});
 	});
 }
 
 function demoteFromAdmin(eventObject, characterId)
 {
 	confirmPopup("Demote from Admin", "Are you sure you want to demote this member from admin?", function(){
-		doCommand(eventObject, "GroupMemberDemoteFromAdmin", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberDemoteFromAdmin", {"characterId" : characterId});
 	});
 }
 
 function makeGroupCreator(eventGroup, characterId)
 {
 	confirmPopup("New Group Creator", "Are you sure you want to make this member into the group creator?\n\nThis action cannot be reversed unless the this member (as the new group creator) chooses to reverse it manually!", function(){
-		doCommand(eventObject, "GroupMemberMakeGroupCreator", {"characterId" : characterId})
+		doCommand(eventObject, "GroupMemberMakeGroupCreator", {"characterId" : characterId});
 	});
 }
 
@@ -1110,7 +1118,7 @@ function pagePopupIframe(url)
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><iframe id='"+pagePopupId+"-content' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div>");
 }
 
-function closePagePopup()
+function closePagePopup(doNotCallback)
 {
 	var pagePopupId = "page-popup"+currentPopupStackIndex;
 	if ($("#"+pagePopupId+"-map").length>0)
@@ -1120,16 +1128,19 @@ function closePagePopup()
 	
 	decrementStackIndex();
 	
-	var func = popupStackCloseCallbackHandlers.pop();
-	if (func!=null)
-		func();
+	if (doNotCallback!=true)
+	{
+		var func = popupStackCloseCallbackHandlers.pop();
+		if (func!=null)
+			func();
+	}
 }
 
-function closeAllPagePopups()
+function closeAllPagePopups(doNotCallback)
 {
 	while (currentPopupStackIndex>0)
 	{		
-		closePagePopup();
+		closePagePopup(doNotCallback);
 	}
 }
 
@@ -1354,17 +1365,17 @@ function forgetCombatSite(locationId)
 
 function groupAcceptJoinGroupApplication(eventObject, characterId)
 {
-	doCommand(eventObject, "GroupAcceptJoinApplication", {"characterId" : characterId})
+	doCommand(eventObject, "GroupAcceptJoinApplication", {"characterId" : characterId});
 }
 
 function groupDenyJoinGroupApplication(eventObject, characterId)
 {
-	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId})
+	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId});
 }
 
 function groupMemberKick(eventObject, characterId)
 {
-	doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId})
+	doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId});
 }
 
 function groupMemberKickCancel(characterId)
@@ -1374,7 +1385,7 @@ function groupMemberKickCancel(characterId)
 
 function groupRequestJoin(eventObject, groupId)
 {
-	doCommand(eventObject, "GroupRequestJoin", {"groupId" : groupId})
+	doCommand(eventObject, "GroupRequestJoin", {"groupId" : groupId});
 }
 
 function tradeRemoveItem(itemId)
@@ -1435,6 +1446,7 @@ function tradeReadyNew(eventObject)
 		if (data.tradeComplete == "complete")
 			{
 				popupMessage("Trade Complete","Trade is complete.")
+				closePagePopup(true);
 			}
 	});
 }
@@ -1968,7 +1980,7 @@ function _viewTrade()
     closeAllTooltips();
 	pagePopup("odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
-		popupMessage("Trade Cancelled","This trade has been cancelled.")
+//		popupMessage("Trade Cancelled","This trade has been cancelled.")
 	});	
 }
 
@@ -1979,8 +1991,14 @@ function updateTradeWindow()
 
 function cancelledTradeWindow()
 {
-	closeAllPagePopups();
+	closeAllPagePopups(true);
 	popupMessage("Trade Cancelled","This trade has been cancelled.");
+}
+
+function completedTradeWindow()
+{
+	closeAllPagePopups(true);
+	popupMessage("Trade Completed","The trade completed successfully.");
 }
 
 function updateTerritory()

@@ -143,7 +143,7 @@
 
 		<div class='main-item-controls'>
 			<a
-				onclick='setGroupDescription("<c:out value="${groupDescriptionEscaped}"/>")'>Set&nbsp;group&nbsp;description</a>
+				onclick='setGroupDescription(event, "<c:out value="${groupDescriptionEscaped}"/>")'>Set&nbsp;group&nbsp;description</a>
 		</div>
 
 		<h4>New Member Applications</h4>
