@@ -2444,16 +2444,21 @@ public class ODPDBAccess
 			
 			
 			// Change the character modes
-			character1.setProperty("mode", CHARACTER_MODE_NORMAL);
-			character1.setProperty("combatant", null);
-			character1.setProperty("combatType", null);
-			
 			// We don't want to reset the other character's mode because we want that other character to try to load up the trade window again
 			// so that the user can discover the result of the trade. If we reset the combatant to null, he won't be able to find the TradeObject
 			// again.
-//			character2.setProperty("mode", CHARACTER_MODE_NORMAL);
-//			character2.setProperty("combatant", null);
-//			character2.setProperty("combatType", null);
+			if (GameUtils.equals(character1.getKey(), character.getKey()))	// Set our combatant and mode to normal, but NOT the other guy, he will do this when he refreshes his trade page
+			{
+				character1.setProperty("mode", CHARACTER_MODE_NORMAL);
+				character1.setProperty("combatant", null);
+				character1.setProperty("combatType", null);
+			}
+			else
+			{
+				character2.setProperty("mode", CHARACTER_MODE_NORMAL);
+				character2.setProperty("combatant", null);
+				character2.setProperty("combatType", null);
+			}
 			
 			// Do a quick check to see if an exploit is being done somehow making a characters gold negative. If so, throw.
 			
