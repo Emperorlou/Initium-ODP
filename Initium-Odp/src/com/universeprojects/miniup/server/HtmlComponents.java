@@ -19,7 +19,8 @@ public class HtmlComponents {
 			groupName = (String)territoryOwnerGroup.getProperty("name");
 		String groupStatus = (String)character.getProperty("groupStatus");
 		boolean isOwningGroupMember = false;
-		if (GameUtils.equals(territoryOwnerGroup.getKey(),character.getProperty("groupKey")) && 
+		if (territoryOwnerGroup!=null && 
+				GameUtils.equals(territoryOwnerGroup.getKey(),character.getProperty("groupKey")) && 
 				("Member".equals(groupStatus) || "Admin".equals(groupStatus)))
 			isOwningGroupMember = true;
 		boolean isOwningGroupAdmin = false;
