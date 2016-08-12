@@ -1540,7 +1540,7 @@ function setBlockadeRule(rule)
 function doEatBerry(eventObject)
 {	
 	var itemId = $("#popupItemId").val();
-		if (itemID = null)return;
+	if (itemId == null) return;
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
 		if (error) return;
 		reloadPagePopup();
