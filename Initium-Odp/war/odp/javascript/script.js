@@ -435,13 +435,13 @@ function buyHouse()
 	});
 }
 
-function storeBuyItemNew(itemName, itemPrice, itemId, saleItemId, characterId)
+function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, characterId)
 {
 	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
 		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId},function(data,error){
 			if (error) return;
-			$(".saleItem[ref='"+saleItemId+"']").html(data.createStoreItem)
-		})
+			$(".saleItem[ref='"+saleItemId+"']").html(data.createStoreItem);
+		});
 	});
 }
 
@@ -455,7 +455,7 @@ function storeSellItemNew(eventObject,itemId)
 			$(".invItem[ref='"+itemId+"']").remove();
 			var container = $("#saleItems");
 			container.html(data.createSellItem+container.html());
-			})
+			});
 		}
 	});
 }
@@ -1985,7 +1985,7 @@ function fullpageRefresh()
 
 function _viewTrade()
 {
-	closeAllPagePopups();
+	closeAllPagePopups(true);
     closeAllPopups();
     closeAllTooltips();
 	pagePopup("odp/ajax_trade.jsp",function(){

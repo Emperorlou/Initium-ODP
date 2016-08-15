@@ -53,7 +53,7 @@ public class HtmlComponents {
 		if ("Defending1".equals(characterStatus))
 			sb.append("<p class='hint' rel='#joinedDefenderGroup'>Joined</p>");
 		else
-			sb.append("<p><a onclick='doTerritorySetDefense(event, \"Defending1\")'>Join</a></p>");
+			sb.append("<p><a onclick='doTerritorySetDefense(event, \"1\")'>Join</a></p>");
 		sb.append("</div>");
 		sb.append("<div class='smallbox'>");
 		sb.append("2nd Line");
@@ -61,7 +61,7 @@ public class HtmlComponents {
 		if ("Defending2".equals(characterStatus))
 			sb.append("<p class='hint' rel='#joinedDefenderGroup'>Joined</p>");
 		else
-			sb.append("<p><a onclick='doTerritorySetDefense(event, \"Defending2\")'>Join</a></p>");
+			sb.append("<p><a onclick='doTerritorySetDefense(event, \"2\")'>Join</a></p>");
 		sb.append("</div>");
 		sb.append("<div class='smallbox'>");
 		sb.append("3rd Line");
@@ -69,7 +69,7 @@ public class HtmlComponents {
 		if ("Defending3".equals(characterStatus))
 			sb.append("<p class='hint' rel='#joinedDefenderGroup'>Joined</p>");
 		else
-			sb.append("<p><a onclick='doTerritorySetDefense(event, \"Defending3\")'>Join</a></p>");
+			sb.append("<p><a onclick='doTerritorySetDefense(event, \"3\")'>Join</a></p>");
 		sb.append("</div>");
 		sb.append("<div class='smallbox'>");
 		sb.append("Not Defending");
@@ -77,7 +77,7 @@ public class HtmlComponents {
 		if (characterStatus==null || "Normal".equals(characterStatus))
 			sb.append("<p class='hint' rel='#joinedDefenderGroup'>Joined</p>");
 		else
-			sb.append("<p><a onclick='doTerritorySetDefense(event, \"Normal\")'>Join</a></p>");
+			sb.append("<p><a onclick='doTerritorySetDefense(event, \"0\")'>Join</a></p>");
 		sb.append("</div>");
 		sb.append("</div>");
 		sb.append("</div>");
@@ -162,6 +162,7 @@ public class HtmlComponents {
         String itemPopupAttribute = "";
         String itemIconElement = "";
         Double storeSale = (Double)storeCharacter.getProperty("storeSale");
+        if (storeSale==null) storeSale = 100d;
         if (item!=null)
         {
             itemName = (String)item.getProperty("name");
@@ -169,7 +170,7 @@ public class HtmlComponents {
             itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
         }
         
-        Long cost = (Long)item.getProperty("store-dogecoins");
+        Long cost = (Long)saleItem.getProperty("dogecoins");
         cost=Math.round(cost.doubleValue()*(storeSale/100));
         String finalCost = GameUtils.formatNumber(cost, false);
         
@@ -179,9 +180,9 @@ public class HtmlComponents {
 				result+="<div class='main-item'>";
 	   	       	result+="<span><img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
 	   	       	result+="<span>";
-	   	    if ("Selling".equals(item.getProperty("store-status")))
-	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(\""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+((Key)item.getProperty("store-saleItemKey")).getId()+", "+item.getKey().getId()+")'>Buy this</a>";
-	   	    else if ("Sold".equals(item.getProperty("store-status")))   
+	   	    if ("Selling".equals(saleItem.getProperty("status")))
+	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
+	   	    else if ("Sold".equals(saleItem.getProperty("status")))   
 	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
 	   	       	result+="</span>";
 	   	    	result+="</div>";

@@ -1598,11 +1598,11 @@ public class ODPDBAccess
 		if (buff != null) ds.put(buff);
 	}
 	
-	public Boolean awardBuff_Berry(CachedDatastoreService ds, CachedEntity character)
+	public boolean awardBuff_Berry(CachedDatastoreService ds, CachedEntity character)
 	{
-		Boolean buffApplied = null;
+		boolean buffApplied = false;
 		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/Pixel_Art-Food-Fruit-I_C_Mulberry.png","Mysterious Berry",
-				"You are feeling enlightened.  That berry you just ate has left your mind feeling extra sharp. The effect lasts for 1 hour.",3600,"intelligence","35%",null,null,null,null,1);
+				"You are feeling enlightened.  That berry you just ate has left your mind feeling extra sharp. The effect lasts for 1 hour.",3600,"intelligence","+35%",null,null,null,null,1);
 		if (buff != null){ 
 			ds.put(buff);
 			buffApplied = true;
@@ -2603,10 +2603,13 @@ public class ODPDBAccess
 		if (characterLocation==null)
 			characterLocation = getEntity((Key)character.getProperty("locationKey"));
 		
-		if (characterLocation.getProperty("defenceStructure")==null || "TRUE".equals(characterLocation.getProperty("defenceStructuresAllowed"))==false)
-			return false;
+		if (characterLocation.getProperty("defenceStructure")!=null && "TRUE".equals(characterLocation.getProperty("defenceStructuresAllowed"))==false)
+			return true;
 		
-		return true;
+		if (characterLocation.getProperty("territoryKey")!=null && "DefenceStructureAttack".equals(character.getProperty("combatType"))==false)
+			return true;
+		
+		return false;
 	}
 	
 	////////// GROUP METHODS //////////
