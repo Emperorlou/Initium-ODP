@@ -1597,6 +1597,18 @@ public class ODPDBAccess
 
 		if (buff != null) ds.put(buff);
 	}
+	
+	public Boolean awardBuff_Berry(CachedDatastoreService ds, CachedEntity character)
+	{
+		Boolean buffApplied = null;
+		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/Pixel_Art-Food-Fruit-I_C_Mulberry.png","Mysterious Berry",
+				"You are feeling enlightened.  That berry you just ate has left your mind feeling extra sharp. The effect lasts for 1 hour.",3600,"intelligence","35%",null,null,null,null,1);
+		if (buff != null){ 
+			ds.put(buff);
+			buffApplied = true;
+		}
+		return buffApplied;
+	}
 
 	public List<CachedEntity> sortSaleItemList(List<CachedEntity> items)
 	{
@@ -2376,7 +2388,7 @@ public class ODPDBAccess
 		tradeObject.setDogecoins(ds, character, amount);
 	}
 	
-	public TradeObject setTradeReady(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, int version) throws UserErrorMessage
+	public TradeObject setTradeReady(CachedDatastoreService ds, TradeObject tradeObject, CachedEntity character, Integer version) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
@@ -2444,16 +2456,21 @@ public class ODPDBAccess
 			
 			
 			// Change the character modes
-			character1.setProperty("mode", CHARACTER_MODE_NORMAL);
-			character1.setProperty("combatant", null);
-			character1.setProperty("combatType", null);
-			
 			// We don't want to reset the other character's mode because we want that other character to try to load up the trade window again
 			// so that the user can discover the result of the trade. If we reset the combatant to null, he won't be able to find the TradeObject
 			// again.
-//			character2.setProperty("mode", CHARACTER_MODE_NORMAL);
-//			character2.setProperty("combatant", null);
-//			character2.setProperty("combatType", null);
+			if (GameUtils.equals(character1.getKey(), character.getKey()))	// Set our combatant and mode to normal, but NOT the other guy, he will do this when he refreshes his trade page
+			{
+				character1.setProperty("mode", CHARACTER_MODE_NORMAL);
+				character1.setProperty("combatant", null);
+				character1.setProperty("combatType", null);
+			}
+			else
+			{
+				character2.setProperty("mode", CHARACTER_MODE_NORMAL);
+				character2.setProperty("combatant", null);
+				character2.setProperty("combatType", null);
+			}
 			
 			// Do a quick check to see if an exploit is being done somehow making a characters gold negative. If so, throw.
 			

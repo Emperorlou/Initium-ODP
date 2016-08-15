@@ -1537,6 +1537,16 @@ function setBlockadeRule(rule)
 	location.href = "ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
 }
 
+function doEatBerry(eventObject)
+{	
+	var itemId = $("#popupItemId").val();
+	if (itemId == null) return;
+	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
+		if (error) return;
+		reloadPagePopup();
+		popupMessage("System Message", "That was a tasty berry! Makes you feel kinda weird though, like your insides are trying to become outsides. WOW OK, now you don't feel too good. But you understand why. You feel like you understand a lot of things.");
+	});
+}
 
 
 
