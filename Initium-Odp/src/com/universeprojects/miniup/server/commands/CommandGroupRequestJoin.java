@@ -50,7 +50,7 @@ public class CommandGroupRequestJoin extends Command
 			throw new UserErrorMessage(
 					"The group you are requesting to join does not exist.");
 		}
-		CachedEntity group = db.getGroupByName(groupId);
+		CachedEntity group = db.getEntity("Group", Long.parseLong(groupId));
 
 		// Checking if already in a group
 		Key groupKey = (Key) character.getProperty("groupKey");

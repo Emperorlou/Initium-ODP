@@ -1598,11 +1598,11 @@ public class ODPDBAccess
 		if (buff != null) ds.put(buff);
 	}
 	
-	public Boolean awardBuff_Berry(CachedDatastoreService ds, CachedEntity character)
+	public boolean awardBuff_Berry(CachedDatastoreService ds, CachedEntity character)
 	{
-		Boolean buffApplied = null;
+		boolean buffApplied = false;
 		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/Pixel_Art-Food-Fruit-I_C_Mulberry.png","Mysterious Berry",
-				"You are feeling enlightened.  That berry you just ate has left your mind feeling extra sharp. The effect lasts for 1 hour.",3600,"intelligence","35%",null,null,null,null,1);
+				"You are feeling enlightened.  That berry you just ate has left your mind feeling extra sharp. The effect lasts for 1 hour.",3600,"intelligence","+35%",null,null,null,null,1);
 		if (buff != null){ 
 			ds.put(buff);
 			buffApplied = true;
@@ -2456,16 +2456,21 @@ public class ODPDBAccess
 			
 			
 			// Change the character modes
-			character1.setProperty("mode", CHARACTER_MODE_NORMAL);
-			character1.setProperty("combatant", null);
-			character1.setProperty("combatType", null);
-			
 			// We don't want to reset the other character's mode because we want that other character to try to load up the trade window again
 			// so that the user can discover the result of the trade. If we reset the combatant to null, he won't be able to find the TradeObject
 			// again.
-//			character2.setProperty("mode", CHARACTER_MODE_NORMAL);
-//			character2.setProperty("combatant", null);
-//			character2.setProperty("combatType", null);
+			if (GameUtils.equals(character1.getKey(), character.getKey()))	// Set our combatant and mode to normal, but NOT the other guy, he will do this when he refreshes his trade page
+			{
+				character1.setProperty("mode", CHARACTER_MODE_NORMAL);
+				character1.setProperty("combatant", null);
+				character1.setProperty("combatType", null);
+			}
+			else
+			{
+				character2.setProperty("mode", CHARACTER_MODE_NORMAL);
+				character2.setProperty("combatant", null);
+				character2.setProperty("combatType", null);
+			}
 			
 			// Do a quick check to see if an exploit is being done somehow making a characters gold negative. If so, throw.
 			
@@ -2598,10 +2603,13 @@ public class ODPDBAccess
 		if (characterLocation==null)
 			characterLocation = getEntity((Key)character.getProperty("locationKey"));
 		
-		if (characterLocation.getProperty("defenceStructure")==null || "TRUE".equals(characterLocation.getProperty("defenceStructuresAllowed"))==false)
-			return false;
+		if (characterLocation.getProperty("defenceStructure")!=null && "TRUE".equals(characterLocation.getProperty("defenceStructuresAllowed"))==false)
+			return true;
 		
-		return true;
+		if (characterLocation.getProperty("territoryKey")!=null && "DefenceStructureAttack".equals(character.getProperty("combatType"))==false)
+			return true;
+		
+		return false;
 	}
 	
 	////////// GROUP METHODS //////////

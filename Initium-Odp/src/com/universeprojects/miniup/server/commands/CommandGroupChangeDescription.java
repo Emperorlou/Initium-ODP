@@ -51,16 +51,15 @@ public class CommandGroupChangeDescription extends Command
 		if (("Admin".equals(admin.getProperty("groupStatus"))) == false)
 		{
 			throw new UserErrorMessage(
-					"You are not an admin of your group and cannot perform this action");
+					"You are not an admin of your group and cannot perform this action.");
 		}
 
-		if ((description.matches(db.GROUP_NAME_REGEX)) == false)
+		if ((description.matches(db.STORE_NAME_REGEX)) == false)
 		{
 			throw new UserErrorMessage(
-					"You can only use letters, spaces, commas, and apostophes");
+					"You can only use letters, numbers, spaces, commas, and apostophes.");
 		}
 
-		description = description.replace("'", "`");
 
 		group.setProperty("description", description);
 

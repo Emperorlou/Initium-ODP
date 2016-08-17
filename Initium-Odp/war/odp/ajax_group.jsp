@@ -125,8 +125,7 @@
 	});
 %>
 
-<div class='main-banner-textonly'>
-	<img src="images/banner-backing.jpg" border="0" style="width: 100%">
+<div class='main-banner-textonly' style='height:240px; background-color:rgba(0,0,0,0.5)'>
 	<div class='main-banner-text'>
 		<h1>
 			<c:out value="${groupName}" />

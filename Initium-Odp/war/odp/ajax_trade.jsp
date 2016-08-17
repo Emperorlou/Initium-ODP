@@ -39,11 +39,6 @@
     
     if (tradeDoneAlready)
     {
-    	// We're closing the trade window because we're not in a trade anymore, we have to make sure the database now reflects that
-    	character.setProperty("mode", ODPDBAccess.CharacterMode.NORMAL.toString());
-		character.setProperty("combatant", null);    	
-		ds.put(character);
-    	
     	out.println("<script type='text/javascript'>");
     	out.println("closePagePopup()");
     	if (cancelled)
