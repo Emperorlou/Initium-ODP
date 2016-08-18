@@ -2037,7 +2037,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 		.main-banner-textonly
 		{
 			width:100%;
-			background:url('/images/banner-backing.jpg') no-repeat center;
 			height:240px;
 		}
 	
