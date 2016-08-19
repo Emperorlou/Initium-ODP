@@ -39,16 +39,20 @@ public class CommandTradeAddAllItems extends Command {
 		}
 		if (tradeObject.isComplete())
 			throw new UserErrorMessage("Trade is already complete.");
-        
-        
-		for(CachedEntity item:items)
+		
+		for(int i = items.size()-1;i>=0;i--)
 		{
-			if (db.checkCharacterHasItemEquipped(character, item.getKey()))
+			CachedEntity item = items.get(i);
+			
+			if (db.checkCharacterHasItemEquipped(character, item.getKey())){
+				items.remove(i);
+				continue;
+			}
+            if (db.checkItemIsVending(character.getKey(), item.getKey())){
+            	items.remove(i);
                 continue;
-            
-            if (db.checkItemIsVending(character.getKey(), item.getKey()))
-                continue;
-		}   
+            }
+		}
         
 		db.addTradeItems(ds, tradeObject, db.getCurrentCharacter(request), items);
         db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
