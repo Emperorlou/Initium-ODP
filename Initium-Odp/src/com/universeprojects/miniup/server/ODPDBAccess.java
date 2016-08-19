@@ -2612,6 +2612,32 @@ public class ODPDBAccess
 		return false;
 	}
 	
+	
+	
+
+	private String getCharacterLastCombatActionKey(CachedEntity character)
+	{
+		if (character.getProperty("combatant")==null)
+			return null;
+		else
+			return "PVP_LastCombatAction_"+character.getKey().getId()+"vs"+((Key)character.getProperty("combatant")).getId();
+	}
+
+	public void flagCharacterCombatAction(CachedDatastoreService ds, CachedEntity character) 
+	{
+		String key = getCharacterLastCombatActionKey(character);
+		if (key==null) return;
+		ds.getMC().put(key, System.currentTimeMillis());
+	}
+
+	public Long getLastCharacterCombatAction(CachedDatastoreService ds, CachedEntity character)
+	{
+		String key = getCharacterLastCombatActionKey(character);
+		if (key==null) return null;
+		return (Long)ds.getMC().get(key);
+	}
+	
+	
 	////////// GROUP METHODS //////////
 	///////////////////////////////////
 

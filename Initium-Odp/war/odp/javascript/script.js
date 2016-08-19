@@ -1576,6 +1576,11 @@ function doEatBerry(eventObject)
 
 function doCommand(eventObject, commandName, parameters, callback)
 {
+	if (parameters==null)
+		parameters = {"v":verifyCode};
+	else
+		parameters.v = verifyCode;
+	
 	// Collapse the parameters into a single string
 	var parametersStr = "";
 	var firstTime = true;
