@@ -1548,6 +1548,11 @@ function doEatBerry(eventObject)
 	});
 }
 
+function enableDisableCloak(eventObject)
+{
+	doCommand(eventObject, "CloakEnableDisable");
+}
+
 
 
 
