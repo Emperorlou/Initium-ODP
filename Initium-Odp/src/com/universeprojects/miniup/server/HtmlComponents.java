@@ -192,24 +192,52 @@ public class HtmlComponents {
 		return result;
 	}
 
-	public static String generateTradeInvItemHtml(CachedEntity item, ODPDBAccess db, CachedDatastoreService ds, HttpServletRequest request) {
+	public static String generateTradeInvItemHtml(CachedEntity item, List<CachedEntity> saleItems, ODPDBAccess db, CachedDatastoreService ds, HttpServletRequest request) {
 		
 		if (item==null)
 			return " ";
 		
+		Boolean isVending = false;
+		String saleText = "";
+		// Determine if this item is for sale or not and mark it as such after
+		for(CachedEntity saleItem:saleItems)
+		{
+			if ((saleItem.getProperty("itemKey"))==item.getKey())
+			{
+				saleText = "<div class='main-item-subnote' style='color:#FF0000'> - Selling</div>";
+				isVending = true;
+				break;
+			}
+		}
+		if(isVending == true){
 		String result = "";
 			   result+="<div class='invItem' ref="+item.getKey().getId()+">";
 			   result+="<div class='main-item'>";
 			   result+="<div class='main-item-container'>";
-			   result+=GameUtils.renderItem(item);
+			   result+=GameUtils.renderItem(item)+saleText;
 			   result+="<br>";
 			   result+="			<div class='main-item-controls'>";
-			   result+="				<a onclick='tradeAddItemNew(event,"+item.getKey().getId()+")'>Add to trade window</a>";
 			   result+="			</div>";
 			   result+="		</div>";
 			   result+="	</div>";
 			   result+="</div>";
 			   result+="<br>";
+	    return result;
+		}
+		
+		String result = "";
+		   result+="<div class='invItem' ref="+item.getKey().getId()+">";
+		   result+="<div class='main-item'>";
+		   result+="<div class='main-item-container'>";
+		   result+=GameUtils.renderItem(item)+saleText;
+		   result+="<br>";
+		   result+="			<div class='main-item-controls'>";
+		   result+="				<a onclick='tradeAddItemNew(event,"+item.getKey().getId()+")'>Add to trade window</a>";
+		   result+="			</div>";
+		   result+="		</div>";
+		   result+="	</div>";
+		   result+="</div>";
+		   result+="<br>";
 			   
 		return result;
 	}

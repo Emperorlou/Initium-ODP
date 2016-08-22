@@ -157,12 +157,7 @@
         <%
             String currentCategory = "";
             for(CachedEntity item:items)
-            {
-				for(CachedEntity saleItem:saleItems)
-				{
-					if (GameUtils.equals(saleItem.getProperty("itemKey"),item.getKey()))
-					continue;
-				}
+            {			
                 if (db.checkCharacterHasItemEquipped(character, item.getKey()))
                     continue;
 				
@@ -178,7 +173,7 @@
                     currentCategory = itemType;
                 }
                 
-                out.println(HtmlComponents.generateTradeInvItemHtml(item, db, ds, request));
+                out.println(HtmlComponents.generateTradeInvItemHtml(item, saleItems, db, ds, request));
             }
         %>
         </div>
