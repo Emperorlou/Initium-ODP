@@ -209,21 +209,6 @@ public class HtmlComponents {
 				break;
 			}
 		}
-		if(isVending == true){
-		String result = "";
-			   result+="<div class='invItem' ref="+item.getKey().getId()+">";
-			   result+="<div class='main-item'>";
-			   result+="<div class='main-item-container'>";
-			   result+=GameUtils.renderItem(item)+saleText;
-			   result+="<br>";
-			   result+="			<div class='main-item-controls'>";
-			   result+="			</div>";
-			   result+="		</div>";
-			   result+="	</div>";
-			   result+="</div>";
-			   result+="<br>";
-	    return result;
-		}
 		
 		String result = "";
 		   result+="<div class='invItem' ref="+item.getKey().getId()+">";
@@ -231,9 +216,11 @@ public class HtmlComponents {
 		   result+="<div class='main-item-container'>";
 		   result+=GameUtils.renderItem(item)+saleText;
 		   result+="<br>";
+		   if(isVending == false){
 		   result+="			<div class='main-item-controls'>";
 		   result+="				<a onclick='tradeAddItemNew(event,"+item.getKey().getId()+")'>Add to trade window</a>";
 		   result+="			</div>";
+		   }
 		   result+="		</div>";
 		   result+="	</div>";
 		   result+="</div>";
