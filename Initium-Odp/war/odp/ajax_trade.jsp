@@ -158,7 +158,15 @@
             String currentCategory = "";
             for(CachedEntity item:items)
             {
+				for(CachedEntity saleItem:saleItems)
+				{
+					if (GameUtils.equals(saleItem.getProperty("itemKey"),item.getKey()))
+					continue;
+				}
                 if (db.checkCharacterHasItemEquipped(character, item.getKey()))
+                    continue;
+				
+				if (tradeObject.isItemInTrade(character.getKey(), item.getKey()))
                     continue;
                 
                 String itemType = (String)item.getProperty("itemType");
@@ -169,9 +177,6 @@
                     out.println("<h4> "+itemType+"</h4>");
                     currentCategory = itemType;
                 }
-                
-                if (tradeObject.isItemInTrade(character.getKey(), item.getKey()))
-                    continue;
                 
                 out.println(HtmlComponents.generateTradeInvItemHtml(item, db, ds, request));
             }

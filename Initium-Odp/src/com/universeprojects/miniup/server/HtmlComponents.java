@@ -197,24 +197,11 @@ public class HtmlComponents {
 		if (item==null)
 			return " ";
 		
-		List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", db.getCurrentCharacter(request).getKey());
-		
-		String saleText = "";
-		// Determine if this item is for sale or not and mark it as such after
-		for(CachedEntity saleItem:saleItems)
-		{
-			if (((Key)saleItem.getProperty("itemKey")).getId()==item.getKey().getId())
-			{
-				saleText = "<div class='main-item-subnote' style='color:#FF0000'> - Selling</div>";
-				break;
-			}
-		}
-		
 		String result = "";
 			   result+="<div class='invItem' ref="+item.getKey().getId()+">";
 			   result+="<div class='main-item'>";
 			   result+="<div class='main-item-container'>";
-			   result+=GameUtils.renderItem(item)+saleText;
+			   result+=GameUtils.renderItem(item);
 			   result+="<br>";
 			   result+="			<div class='main-item-controls'>";
 			   result+="				<a onclick='tradeAddItemNew(event,"+item.getKey().getId()+")'>Add to trade window</a>";
