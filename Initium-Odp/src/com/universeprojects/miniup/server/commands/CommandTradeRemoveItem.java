@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ public class CommandTradeRemoveItem extends Command {
 		Key otherCharacter = (Key) character.getProperty("combatant");
         CachedEntity item = db.getEntity("Item", itemId);
         TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
+        List<CachedEntity> saleItems = db.getSaleItemsFor(character.getKey());
         
         if (tradeObject==null || tradeObject.isCancelled())
         {
@@ -47,7 +49,7 @@ public class CommandTradeRemoveItem extends Command {
         Integer tradeVersion = tradeObject.getVersion();
         
         addCallbackData("tradeVersion",tradeVersion);
-        addCallbackData("createTradeInvItem",HtmlComponents.generateTradeInvItemHtml(item, db, ds, request));
+        addCallbackData("createTradeInvItem",HtmlComponents.generateTradeInvItemHtml(item, saleItems, db, ds, request));
         return;
 	}
 }
