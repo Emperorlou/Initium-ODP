@@ -47,14 +47,17 @@ public class CommandCloakEnableDisable extends Command
 			throw new UserErrorMessage("You cannot cloak in combat.");
 		}
 
-		if ((boolean) character.getProperty("cloaked") == false)
-		{
-			character.setProperty("cloaked", true);
-			setPopupMessage("You are now cloaked.");
-		} else if ((boolean) character.getProperty("cloaked") == true)
+		if (Boolean.TRUE.equals(character.getProperty("cloaked")))
 		{
 			character.setProperty("cloaked", false);
-			setPopupMessage("You are now uncloaked.");
+			
+			addCallbackData("html", "<a onclick='toggleCloaked(event)'  title='Clicking here will hide your equipment and stats from other players.'><img src='images/ui/cloakedDisabled.png' border=0/></a>");
+		} 
+		else
+		{
+			character.setProperty("cloaked", true);
+
+			addCallbackData("html", "<a onclick='toggleCloaked(event)'  title='Clicking here will hide your equipment and stats from other players.'><img src='images/ui/cloakedEnabled.png' border=0/></a>");
 		}
 
 		ds.put(character);
