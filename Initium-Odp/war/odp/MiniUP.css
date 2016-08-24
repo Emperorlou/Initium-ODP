@@ -2167,6 +2167,38 @@ body
 	max-height:100%;
 }
 
+::-webkit-scrollbar
+{
+	width:14px;
+	height:14px;
+}
+::-webkit-scrollbar-track
+{
+	background-color:#4e4a4e;
+	border-top:1px solid #2e2a2e;
+	border-left:1px solid #2e2a2e;
+	border-right:1px solid #6e6a6e;
+	border-bottom:1px solid #6e6a6e;
+	
+	-webkit-border-radius:8px;
+	border-radius:8px;
+}
+::-webkit-scrollbar-thumb
+{
+	background-image:url('/images/ui/newui/scrollbar1-thumb-bgimage.png');
+	background-position:center center;
+	background-repeat: no-repeat;
+	background-color:#854c30;
+	border-top:1px solid #d27d2c;
+	border-left:1px solid #d27d2c;
+	border-right:2px solid #442434;
+	border-bottom:2px solid #442434;
+	
+	-webkit-border-radius:8px;
+	border-radius:8px;
+}
+
+
 .page
 {
 	position:fixed;
@@ -2831,6 +2863,11 @@ body
 /* When the screen is a square or less */
 @media screen and (min-aspect-ratio: 7/5)
 {
+	.banner1
+	{
+		background-size:cover;
+		background-position: center center;
+	}
 	#banner-sizer
 	{
 		display:none;
