@@ -27,6 +27,16 @@ Use this link to find the right version for you.
 This link also contains the install instuctions.
 https://developers.google.com/eclipse/docs/getting_started
 
+## Download and install the Appengine SDK files
+https://cloud.google.com/appengine/downloads
+
+Once you have the appengine SDK on your system, you may need to tell the GWT Appengine plugin in eclipse where your SDK is. To do the following: 
+
+Go to: Window | Preferences | Google | App Engine
+Click on: Add...
+Choose the installation directory of your freshly installed Appengine SDK
+That should do it.
+
 ## Get this GIT repo onto your system
 I personally use TortoiseGIT. You can download that here: 
 https://tortoisegit.org/
