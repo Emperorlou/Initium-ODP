@@ -202,7 +202,7 @@ public class HtmlComponents {
 		// Determine if this item is for sale or not and mark it as such after
 		for(CachedEntity saleItem:saleItems)
 		{
-			if ((saleItem.getProperty("itemKey"))==item.getKey())
+			if (GameUtils.equals(saleItem.getProperty("itemKey"),item.getKey()))
 			{
 				saleText = "<div class='main-item-subnote' style='color:#FF0000'> - Selling</div>";
 				isVending = true;
