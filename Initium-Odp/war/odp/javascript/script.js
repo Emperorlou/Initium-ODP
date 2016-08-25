@@ -1548,6 +1548,15 @@ function doEatBerry(eventObject)
 	});
 }
 
+function deleteCharacter(eventObject,characterId)
+{
+	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
+		if(error) return;
+		$("a[onclick='switchCharacter(" + characterId +")']").remove();
+		//fullpageRefresh();
+	})
+}
+
 
 
 
