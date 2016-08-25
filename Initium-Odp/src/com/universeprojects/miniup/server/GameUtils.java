@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -463,6 +464,8 @@ public class GameUtils
     //TODO: Redo this whole thing. Needs to be simpler now that we don't need custom junk and it should be more precise.
     public static long determineQualityScore(Map<String, Object> entityProperties)
     {
+    	entityProperties = new HashMap<String, Object>(entityProperties);
+    	
     	long result = 0;
     	List<Double> qualityNumbers = new ArrayList<Double>();
     	String qualityUnit = (String)entityProperties.get("qualityUnit");
@@ -470,15 +473,28 @@ public class GameUtils
     	// Override for the quality unit. I'm testing a global quality determination now...
     	if ("Weapon".equals(entityProperties.get("itemType")))
     	{
-    		qualityUnit = "weaponDamage[4..20]&&maxDurability[100..500]&&blockChance[5..40]";
+    		qualityUnit = "_weaponMaxDamage[0..50]&&blockChance[5..40]";
+    		
+    		String damageFormula = (String)entityProperties.get("weaponDamage");
+    		Double critChance = 0d;
+    		if (entityProperties.get("weaponDamageCriticalChance")!=null)
+    			critChance = ((Long)entityProperties.get("weaponDamageCriticalChance")).doubleValue();
+    		Double critMultiplier = 1d;
+    		if (entityProperties.get("weaponDamageCriticalMultiplier")!=null)
+    			critMultiplier = (Double)entityProperties.get("weaponDamageCriticalMultiplier");
+    		Double weaponMaxDamage = getWeaponMaxDamage(damageFormula, critMultiplier, critChance); 
+    		Double weaponAverageDamage = getWeaponAverageDamage(damageFormula, critMultiplier, critChance);
+    		
+    		entityProperties.put("_weaponMaxDamage", weaponMaxDamage.intValue());
+    		entityProperties.put("_weaponAverageDamage", weaponAverageDamage.intValue());
     	}
     	else if ("Armor".equals(entityProperties.get("itemType")))
     	{
-    		qualityUnit = "blockChance[50..95]&&dexterityPenalty[10..0]&&maxDurability[100..500]&&damageReduction[5..25]";
+    		qualityUnit = "blockChance[50..95]&&dexterityPenalty[10..0]&&damageReduction[5..25]";
     	} 
     	else if ("Shield".equals(entityProperties.get("itemType")))
     	{
-    		qualityUnit = "blockChance[15..50]&&dexterityPenalty[10..0]&&maxDurability[100..500]&&damageReduction[5..25]";
+    		qualityUnit = "blockChance[15..50]&&dexterityPenalty[10..0]&&damageReduction[5..25]";
     	} 
     	
     	String[] qualityUnitParts = qualityUnit.split("&&");
@@ -491,7 +507,7 @@ public class GameUtils
 	    		qualityDescPart = qualityDescPart.replace(" ", "");
 	    		
 	    		// There are 2 versions of the quality unit. The simplified version is parsed into the more complex version here...
-	    		if (qualityDescPart.matches("[A-Za-z]+\\[(-?\\d+\\.\\.-?\\d+)+\\]"))
+	    		if (qualityDescPart.matches("[_A-Za-z]+\\[(-?\\d+\\.\\.-?\\d+)+\\]"))
 	    		{
 	    			String simpleFormula = qualityDescPart.replaceAll(".*?(-?\\d+\\.\\.-?\\d+).*", "$1");
 	    			String[] parts = simpleFormula.split("\\.\\.");
@@ -523,7 +539,7 @@ public class GameUtils
 	    		}
 	    		
 	    		
-	    		if (qualityDescPart.matches("[A-Za-z]+\\((-?\\d+\\.\\.-?\\d+,?)+\\)")==false)
+	    		if (qualityDescPart.matches("[_A-Za-z]+\\((-?\\d+\\.\\.-?\\d+,?)+\\)")==false)
 	    			return result;
 	    		
 	    		qualityDescPart = qualityDescPart.substring(0, qualityDescPart.length()-1);
@@ -611,6 +627,8 @@ public class GameUtils
     
     public static String determineQuality(Map<String, Object> entityProperties)
     {
+    	entityProperties = new HashMap<String, Object>(entityProperties);
+    	
     	String result = "";
     	
     	
@@ -636,21 +654,49 @@ public class GameUtils
     	}
 
     	
+    	
     	List<Double> qualityNumbers = new ArrayList<Double>();
     	String qualityUnit = (String)entityProperties.get("qualityUnit");
     	
     	// Override for the quality unit. I'm testing a global quality determination now...
     	if ("Weapon".equals(entityProperties.get("itemType")))
     	{
-    		qualityUnit = "weaponDamage[4..20]&&maxDurability[100..500]&&blockChance[5..40]";
+    		qualityUnit = "_weaponMaxDamage[0..50]&&blockChance[5..40]";
+    		
+    		String damageFormula = (String)entityProperties.get("weaponDamage");
+    		Double critChance = 0d;
+    		if (entityProperties.get("weaponDamageCriticalChance")!=null)
+    		{
+    			try
+    			{
+    				critChance = ((Long)entityProperties.get("weaponDamageCriticalChance")).doubleValue();
+    			}
+    			catch(Exception e)
+    			{}
+    		}
+    		Double critMultiplier = 1d;
+    		if (entityProperties.get("weaponDamageCriticalMultiplier")!=null)
+    		{
+    			try
+    			{
+    				critMultiplier = (Double)entityProperties.get("weaponDamageCriticalMultiplier");
+    			}
+    			catch(Exception e)
+    			{}
+    		}
+    		Double weaponMaxDamage = getWeaponMaxDamage(damageFormula, critMultiplier, critChance); 
+    		Double weaponAverageDamage = getWeaponAverageDamage(damageFormula, critMultiplier, critChance);
+    		
+    		entityProperties.put("_weaponMaxDamage", weaponMaxDamage.intValue());
+    		entityProperties.put("_weaponAverageDamage", weaponAverageDamage.intValue());
     	}
     	else if ("Armor".equals(entityProperties.get("itemType")))
     	{
-    		qualityUnit = "blockChance[50..95]&&dexterityPenalty[10..0]&&maxDurability[100..500]&&damageReduction[5..25]";
+    		qualityUnit = "blockChance[50..95]&&dexterityPenalty[10..0]&&damageReduction[5..25]";
     	} 
     	else if ("Shield".equals(entityProperties.get("itemType")))
     	{
-    		qualityUnit = "blockChance[15..50]&&dexterityPenalty[10..0]&&maxDurability[100..500]&&damageReduction[5..25]";
+    		qualityUnit = "blockChance[15..50]&&dexterityPenalty[10..0]&&damageReduction[5..25]";
     	} 
     	else
     		return "";
@@ -665,7 +711,7 @@ public class GameUtils
 	    		qualityDescPart = qualityDescPart.replace(" ", "");
 	    		
 	    		// There are 2 versions of the quality unit. The simplified version is parsed into the more complex version here...
-	    		if (qualityDescPart.matches("[A-Za-z]+\\[(-?\\d+\\.\\.-?\\d+)+\\]"))
+	    		if (qualityDescPart.matches("[_A-Za-z]+\\[(-?\\d+\\.\\.-?\\d+)+\\]"))
 	    		{
 	    			String simpleFormula = qualityDescPart.replaceAll(".*?(-?\\d+\\.\\.-?\\d+).*", "$1");
 	    			String[] parts = simpleFormula.split("\\.\\.");
@@ -697,7 +743,7 @@ public class GameUtils
 	    		}
 	    		
 	    		
-	    		if (qualityDescPart.matches("[A-Za-z]+\\((-?\\d+\\.\\.-?\\d+,?)+\\)")==false)
+	    		if (qualityDescPart.matches("[_A-Za-z]+\\((-?\\d+\\.\\.-?\\d+,?)+\\)")==false)
 	    			return result;
 	    		
 	    		qualityDescPart = qualityDescPart.substring(0, qualityDescPart.length()-1);

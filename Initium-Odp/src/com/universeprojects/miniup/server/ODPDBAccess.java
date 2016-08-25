@@ -1384,7 +1384,8 @@ public class ODPDBAccess
 		for (int i = 0; i < EQUIPMENT_SLOTS.length; i++)
 		{
 			Key equipmentInSlot = (Key) character.getProperty("equipment" + EQUIPMENT_SLOTS[i]);
-			if (equipmentInSlot != null && itemKey.getId() == equipmentInSlot.getId()) return true;
+			if (GameUtils.equals(itemKey, equipmentInSlot)) 
+				return true;
 		}
 
 		return false;
@@ -2612,6 +2613,32 @@ public class ODPDBAccess
 		return false;
 	}
 	
+	
+	
+
+	private String getCharacterLastCombatActionKey(CachedEntity character)
+	{
+		if (character.getProperty("combatant")==null)
+			return null;
+		else
+			return "PVP_LastCombatAction_"+character.getKey().getId()+"vs"+((Key)character.getProperty("combatant")).getId();
+	}
+
+	public void flagCharacterCombatAction(CachedDatastoreService ds, CachedEntity character) 
+	{
+		String key = getCharacterLastCombatActionKey(character);
+		if (key==null) return;
+		ds.getMC().put(key, System.currentTimeMillis());
+	}
+
+	public Long getLastCharacterCombatAction(CachedDatastoreService ds, CachedEntity character)
+	{
+		String key = getCharacterLastCombatActionKey(character);
+		if (key==null) return null;
+		return (Long)ds.getMC().get(key);
+	}
+	
+	
 	////////// GROUP METHODS //////////
 	///////////////////////////////////
 
@@ -2694,7 +2721,122 @@ public class ODPDBAccess
 		return bool;
 	}
 
+	
+	public void doGivePlayerHouseToGroup(CachedDatastoreService ds, CachedEntity charactersGroup, CachedEntity user, CachedEntity playerHouse) throws UserErrorMessage
+	{
+		if (charactersGroup==null)
+			throw new UserErrorMessage("You are not part of a group and cannot do this.");
+		
+		if (((Key)playerHouse.getProperty("ownerKey")).getId() != user.getKey().getId())
+			throw new UserErrorMessage("You do not own this house and therefore cannot assign it to your group.");
+		
+		if (ds==null)
+			ds = getDB();
+		
+		// Get the path to the player house too...
+		List<CachedEntity> paths = getPathsByLocation(playerHouse.getKey());
+		
+		if (paths.size()!=1 || "PlayerHouse".equals(paths.get(0).getProperty("type"))==false) 
+			throw new UserErrorMessage("You can only do this for player houses.");
+		
+		// Now set all the path and the location's owner to the player's group
+		for(CachedEntity p:paths)
+		{
+			p.setProperty("ownerKey", charactersGroup.getKey());
+			ds.put(p);
+		}
+		
+		playerHouse.setProperty("ownerKey", charactersGroup.getKey());
+		playerHouse.setProperty("description", "This house is the property of "+charactersGroup.getProperty("name")+". Feel free to leave equipment and gold here, but bear in mind that everyone in the group has access to this house.");
+		
+		ds.put(playerHouse);
+		
+		
+		// Now go through all group members and give them the house discovery...
+		List<CachedEntity> members = getFilteredList("Character", "groupKey", charactersGroup.getKey());
+		for(CachedEntity m:members)
+			newDiscovery(ds, m, paths.get(0));
+	}
+
+	
 	////////// END GROUP METHODS //////////
 	///////////////////////////////////////
+	
+	
+	public void doCharacterDiscoverEntity(CachedDatastoreService db, CachedEntity character, CachedEntity entityToDiscover)
+	{
+		//TODO: Probably implement some sort of caching for this. Check the cache first for the discovery and add to the cache new discoveries.
+		newDiscovery(db, character, entityToDiscover);
+	}
+
+	public CachedEntity doCreatePlayerHouseFromCityHall(Key user, CachedEntity character, CachedEntity cityHallLocation, long dogecoinCost, String houseName) throws UserErrorMessage
+	{
+		if ("CityHall".equals(cityHallLocation.getProperty("type"))==false)
+			throw new UserErrorMessage("You cannot buy a house here. You're not in a town hall.");
+		Long dogecoins = (Long)character.getProperty("dogecoins");
+		if (dogecoins<dogecoinCost)
+			throw new UserErrorMessage("You do not have enough gold to buy a house at this time. You have "+dogecoins+" but require at least "+dogecoinCost+". Come back when you have "+(dogecoinCost-dogecoins)+" more.");
+		
+		CachedDatastoreService db = getDB();
+		db.beginTransaction();
+		CachedEntity playerHouse = null;
+		try
+		{
+			// Get the path from the city hall, we will create the house branching from the other end of it...
+			List<CachedEntity> paths = getPathsByLocation(cityHallLocation.getKey());
+			if (paths.isEmpty())
+				throw new RuntimeException("Invalid city hall. No paths from this location were found.");
+			CachedEntity pathFromCityHall = paths.get(0);
+	
+			// Figure out which end of the path is the location key for the city we'll put the house in
+			Key cityLocation = null;
+			Key location1Key = (Key)pathFromCityHall.getProperty("location1Key");
+			Key location2Key = (Key)pathFromCityHall.getProperty("location2Key");
+			if (cityHallLocation.getKey().getId()==location1Key.getId())
+				cityLocation = location2Key;
+			else
+				cityLocation = location1Key;
+	
+			playerHouse = doCreatePlayerHouse(db, user, character, cityLocation, houseName);
+			
+			// Finally subtract the money from the player's character
+			character.setProperty("dogecoins", dogecoins-dogecoinCost);
+			db.put(character);
+			
+			db.commit();
+		}
+		catch(Exception e)
+		{
+			db.rollbackIfActive();
+			
+			throw e;
+		}
+			
+		
+		return playerHouse;
+	}
+
+	public CachedEntity doCreatePlayerHouse(CachedDatastoreService db, Key userKey, CachedEntity character, Key locationKey, String houseName)
+	{
+		if (db==null)
+			db = getDB();
+		
+		CachedEntity house = newLocation(db, "images/special-house2.jpg", houseName, "This is "+character.getProperty("name")+"'s property called '"+houseName+"'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!", -1d, "RestSite", locationKey, userKey);
+		
+		
+		// Connect a path from the house to the location that was passed in
+		CachedEntity pathToHouse = newPath(db, "Path to house - "+houseName, house.getKey(), "Leave "+houseName, locationKey, "Go to "+houseName, 0d, 0l, "PlayerHouse");
+		
+		pathToHouse.setProperty("ownerKey", userKey);
+		
+		db.put(pathToHouse);
+		
+		// Give the player the discovery of the path now...
+		doCharacterDiscoverEntity(db, character, pathToHouse);
+		
+		return house;
+		
+	}
+
 	
 }

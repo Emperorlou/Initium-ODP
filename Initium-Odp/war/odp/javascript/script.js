@@ -1548,6 +1548,14 @@ function doEatBerry(eventObject)
 	});
 }
 
+function toggleCloaked(eventObject)
+{
+	doCommand(eventObject, "CloakEnableDisable", null, function(data, error){
+		if (error) return;
+		
+		$(eventObject.target).parent().parent().html(data.html);
+	});
+}
 function deleteCharacter(eventObject,characterId)
 {
 	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
@@ -1579,12 +1587,16 @@ function deleteCharacter(eventObject,characterId)
 
 
 
-
 ////////////////////////////////////////////////////////
 // COMMANDS
 
 function doCommand(eventObject, commandName, parameters, callback)
 {
+	if (parameters==null)
+		parameters = {"v":verifyCode};
+	else
+		parameters.v = verifyCode;
+	
 	// Collapse the parameters into a single string
 	var parametersStr = "";
 	var firstTime = true;
