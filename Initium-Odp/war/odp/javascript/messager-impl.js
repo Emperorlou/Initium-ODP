@@ -269,3 +269,124 @@ function getItem(key)
 		return window.localStorage.getItem(key);
 	}
 };
+
+//Clears the ignore list from the cache.
+function clearIgnoreList()
+{
+	saveIgnoredList([]);
+};
+
+//Refreshes the ignore list taking it from LocalStorage and appends to the list
+function refreshIgnoreList()
+{
+	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerIds');
+
+	$('.ignoreList').empty();
+	if(mutedPlayerIds.length > 0)
+	{
+		mutedPlayerIds.forEach(function(item){
+			$('.ignoreList').append('<div class="ignoreListItem">' +
+				'<div class="main-item">' + item["name"] + '</div>' +
+				'<a class="main-unmutePlayer" onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a><br>' +
+				'</div>');
+		});
+	}
+	refreshSuggestedList();
+};
+
+//Refreshes the suggested list by taking first five unique recent chatters.
+function refreshSuggestedList()
+{
+	var suggestedList = createRecentChattersList();
+
+	$('.suggestedList').empty();
+	if(suggestedList.length > 0)
+	{
+		suggestedList.forEach(function(item){
+			$('.suggestedList').append('<div class="suggestListItem">' +
+				'<a class="ignorePlayer" onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">' + item["name"] + '</a><br>' +
+				'</div>');
+		});
+	}
+};
+
+function getItemFromLocalStorage(itemName){
+	var item = localStorage.getItem( String(itemName));
+	return item != null ? JSON.parse(item) : [];
+};
+
+function removeIgnoredPerson(characterId)
+{
+	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerIds');
+
+	mutedPlayerIds = findAndRemove(mutedPlayerIds, 'characterId', String(characterId));
+	saveIgnoredList(mutedPlayerIds);
+};
+
+function findAndRemove(array, property, value) {
+	array.forEach(function(result, index) {
+		if(result[property] === value) {
+			//Remove from array
+			array.splice(index, 1);
+		}
+	});
+
+	return array;
+};
+
+
+//Creates an object from recent chatters list, not bigger than 5
+function createRecentChattersList()
+{
+	var object = [];
+	$('.chat_box').find('a[rel*="viewcharactermini"]').each(function(){
+		if(object.length > 5)
+			return;
+
+		var tempCharacterId = $(this).attr("rel").split("=")[1];
+		var tempNickName = $(this).text();
+		var tempObject = {"name":String(tempNickName),"characterId":String(tempCharacterId)};
+		if(!findIfExists(object, 'characterId', String(tempCharacterId))) {
+			object.push(tempObject);
+		}
+	});
+
+	return object;
+};
+
+function findIfExists(array, property, value) {
+	var exists = false;
+	array.forEach(function(result) {
+		if(result[property] === value) {
+			exists = true;
+			return;
+		}
+	});
+	return exists;
+};
+
+function ignoreAPlayer(characterId, nickname)
+{
+	var playerObject = {'name':String(nickname), 'characterId':String(characterId)};
+	var ignoreList = getItemFromLocalStorage('mutedPlayerIds');
+	if(!findIfExists(ignoreList, 'characterId', String(characterId))) {
+		ignoreList.push(playerObject);
+		saveIgnoredList(ignoreList);
+	}
+};
+
+function saveIgnoredList(array)
+{
+	localStorage.setItem('mutedPlayerIds', JSON.stringify(array));
+	refreshIgnoreList();
+};
+
+function isMessageNotMuted(characterId)
+{
+	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerIds');
+
+	if(!findIfExists(mutedPlayerIds, 'characterId', String(characterId))) {
+		return true;
+	}
+	return false;
+};
