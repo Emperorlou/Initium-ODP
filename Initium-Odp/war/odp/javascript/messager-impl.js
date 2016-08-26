@@ -42,6 +42,8 @@ messager.onNotificationMessage = function(message)
 
 messager.onChatMessage = function(chatMessage)
 {
+	if(!isMessageNotMuted(chatMessage.characterId))
+	return; //We quit the function if message is muted
 	
 	var html = "<div class='chatMessage-main'>";
 	if (chatMessage.createdDate!=null)
@@ -285,10 +287,10 @@ function refreshIgnoreList()
 	if(mutedPlayerIds.length > 0)
 	{
 		mutedPlayerIds.forEach(function(item){
-			$('.ignoreList').append('<div class="ignoreListItem">' +
+			$('.ignoreList').append('' +
 				'<div class="main-item">' + item["name"] + '</div>' +
 				'<a class="main-unmutePlayer" onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a><br>' +
-				'</div>');
+				'');
 		});
 	}
 	refreshSuggestedList();
@@ -303,8 +305,8 @@ function refreshSuggestedList()
 	if(suggestedList.length > 0)
 	{
 		suggestedList.forEach(function(item){
-			$('.suggestedList').append('<div class="suggestListItem">' +
-				'<a class="ignorePlayer" onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">' + item["name"] + '</a><br>' +
+			$('.suggestedList').append('' +
+				'<div class="main-item"><a class="ignorePlayer" onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">' + item["name"] + '</a><br>' +
 				'</div>');
 		});
 	}
