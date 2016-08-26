@@ -42,6 +42,8 @@ messager.onNotificationMessage = function(message)
 
 messager.onChatMessage = function(chatMessage)
 {
+	if(!isMessageNotMuted(chatMessage.characterId))
+	return; //We quit the function if message is muted
 	
 	var html = "<div class='chatMessage-main'>";
 	if (chatMessage.createdDate!=null)
