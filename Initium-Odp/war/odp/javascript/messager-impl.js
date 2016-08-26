@@ -306,8 +306,8 @@ function refreshSuggestedList()
 	{
 		suggestedList.forEach(function(item){
 			$('.suggestedList').append('<div class="suggestListItem">' +
-				'<a class="ignorePlayer" onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">' + item["name"] + '</a><br>' +
-				'</div>');
+				'<div class="main-item"><a class="ignorePlayer" onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">' + item["name"] + '</a><br>' +
+				'</div></div>');
 		});
 	}
 };
