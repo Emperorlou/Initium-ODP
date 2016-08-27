@@ -1,5 +1,5 @@
 <script type="text/javascript">
-window.onload = refreshIgnoreList();
+refreshIgnoreList();
 </script>
 <div class="mini-window-header">
     <div class="mini-window-header-split">
@@ -10,12 +10,12 @@ window.onload = refreshIgnoreList();
         <div>
             <h5>Ignore list</h5>
                 <a onclick="refreshIgnoreList()">Refresh</a><br><br>
-                <div class="ignoreList">
+                <div id="ignoreList">
             </div>
             <div>
                 <h5>Suggestion list</h5>
                 <a onclick="refreshSuggestedList()">Refresh</a><br><br>
-                <div class="suggestedList">
+                <div id="suggestedList">
             </div>
         </div>
     </div>
