@@ -400,3 +400,9 @@ function isMessageNotMuted(characterId)
 	}
 	return false;
 };
+
+$( document ).ajaxComplete(function( event, xhr, settings ) {
+	if ( settings.url.match("^/odp/ajax_ignore" )) {
+		refreshLists();
+	}
+});
