@@ -1556,7 +1556,14 @@ function toggleCloaked(eventObject)
 		$(eventObject.target).parent().parent().html(data.html);
 	});
 }
-
+function deleteCharacter(eventObject,characterId)
+{
+	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
+		if(error) return;
+		$("a[onclick='switchCharacter(" + characterId +")']").remove();
+		//fullpageRefresh();
+	})
+}
 
 
 
