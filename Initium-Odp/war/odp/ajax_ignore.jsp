@@ -1,7 +1,7 @@
 <script>
-(function() {
+$(document).ready(function() {
 refreshLists();
-})();
+});
 </script>
 
 <div class="mini-window-header">
@@ -11,8 +11,8 @@ refreshLists();
     </div>
 </div>
 <div>
-    <h5>Ignore list</h5>
+    <h5>Ignore list</h5><br>
     <div id="ignoreList"></div>
-    <h5>Recent chatters list</h5>
+    <h5>Recent chatters list</h5><br>
     <div id="suggestedList"></div>
 </div>
