@@ -284,6 +284,7 @@ function refreshLists()
 function clearIgnoreList()
 {
 	saveIgnoredList([]);
+	refreshLists();
 };
 
 //Refreshes the ignore list taking it from LocalStorage and appends to the list
@@ -297,7 +298,7 @@ function refreshIgnoreList()
 		mutedPlayerIds.forEach(function(item){
 			$('#ignoreList').append('' +
 				'' + item["name"] + '' +
-				'<a  onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a><br><br>' +
+				'<a  onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a><br>' +
 				'');
 		});
 	}
@@ -313,8 +314,7 @@ function refreshSuggestedList()
 	{
 		suggestedList.forEach(function(item){
 			$('#suggestedList').append('' +
-				'<a onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">' + item["name"] + '</a><br>' +
-				'<br>');
+				'<a onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">Ignore ' + item["name"] + '</a><br>');
 		});
 	}
 };
