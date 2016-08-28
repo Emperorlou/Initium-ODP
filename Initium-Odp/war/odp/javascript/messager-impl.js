@@ -272,6 +272,14 @@ function getItem(key)
 	}
 };
 
+function refreshLists()
+{
+	setTimeout(function() {
+       refreshIgnoreList();
+       refreshSuggestedList();
+   }, 10);
+};
+
 //Clears the ignore list from the cache.
 function clearIgnoreList()
 {
@@ -293,7 +301,6 @@ function refreshIgnoreList()
 				'');
 		});
 	}
-	refreshSuggestedList();
 };
 
 //Refreshes the suggested list by taking first five unique recent chatters.
@@ -323,6 +330,7 @@ function removeIgnoredPerson(characterId)
 
 	mutedPlayerIds = findAndRemove(mutedPlayerIds, 'characterId', String(characterId));
 	saveIgnoredList(mutedPlayerIds);
+	refreshLists();
 };
 
 function findAndRemove(array, property, value) {
@@ -375,12 +383,12 @@ function ignoreAPlayer(characterId, nickname)
 		ignoreList.push(playerObject);
 		saveIgnoredList(ignoreList);
 	}
+	refreshLists();
 };
 
 function saveIgnoredList(array)
 {
 	localStorage.setItem('mutedPlayerIds', JSON.stringify(array));
-	refreshIgnoreList();
 };
 
 function isMessageNotMuted(characterId)
