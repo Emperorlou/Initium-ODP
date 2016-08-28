@@ -1,3 +1,9 @@
+<script>
+(function() {
+refreshLists();
+})();
+</script>
+
 <div class="mini-window-header">
     <div class="mini-window-header-split">
         <a onclick="clearIgnoreList()">Clear ignore list</a><br><br>
