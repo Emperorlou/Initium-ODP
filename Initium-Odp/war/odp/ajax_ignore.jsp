@@ -1,22 +1,18 @@
-<script type="text/javascript">
-window.onload = refreshIgnoreList();
+<script>
+(function() {
+refreshLists();
+})();
 </script>
+
 <div class="mini-window-header">
     <div class="mini-window-header-split">
-        <a onclick="clearIgnoreList()">Clear ignore list</a>
+        <a onclick="clearIgnoreList()">Clear ignore list</a><br><br>
+        <a onclick="refreshLists()">Refresh</a>
     </div>
 </div>
 <div>
-        <div>
-            <h5>Ignore list</h5>
-                <a onclick="refreshIgnoreList()">Refresh</a><br><br>
-                <div class="ignoreList">
-            </div>
-            <div>
-                <h5>Suggestion list</h5>
-                <a onclick="refreshSuggestedList()">Refresh</a><br><br>
-                <div class="suggestedList">
-            </div>
-        </div>
-    </div>
+    <h5>Ignore list</h5>
+    <div id="ignoreList"></div>
+    <h5>Recent chatters list</h5>
+    <div id="suggestedList"></div>
 </div>
