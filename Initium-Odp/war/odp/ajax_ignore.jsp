@@ -1,6 +1,6 @@
 <div class="mini-window-header">
     <div class="mini-window-header-split">
-        <a onclick="clearIgnoreList()">Clear ignore list</a>
+        <a onclick="clearIgnoreList()">Clear ignore list</a><br><br>
         <a onclick="refreshLists()">Refresh</a>
     </div>
 </div>
