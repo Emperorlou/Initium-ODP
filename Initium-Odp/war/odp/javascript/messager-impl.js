@@ -283,13 +283,13 @@ function refreshIgnoreList()
 {
 	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerIds');
 
-	$('.ignoreList').empty();
+	$('#ignoreList').empty();
 	if(mutedPlayerIds.length > 0)
 	{
 		mutedPlayerIds.forEach(function(item){
-			$('.ignoreList').append('' +
-				'<div class="main-item">' + item["name"] + '</div>' +
-				'<a class="main-unmutePlayer" onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a><br>' +
+			$('#ignoreList').append('' +
+				'' + item["name"] + '' +
+				'<a  onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a><br><br>' +
 				'');
 		});
 	}
@@ -301,13 +301,13 @@ function refreshSuggestedList()
 {
 	var suggestedList = createRecentChattersList();
 
-	$('.suggestedList').empty();
+	$('#suggestedList').empty();
 	if(suggestedList.length > 0)
 	{
 		suggestedList.forEach(function(item){
-			$('.suggestedList').append('' +
-				'<div class="main-item"><a class="ignorePlayer" onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">' + item["name"] + '</a><br>' +
-				'</div>');
+			$('#suggestedList').append('' +
+				'<a onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">' + item["name"] + '</a><br>' +
+				'<br>');
 		});
 	}
 };
