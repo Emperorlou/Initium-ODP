@@ -1,7 +1,7 @@
 <script>
-(function() {
+$(document).ready(function() {
 refreshLists();
-})();
+});
 </script>
 
 <div class="mini-window-header">
