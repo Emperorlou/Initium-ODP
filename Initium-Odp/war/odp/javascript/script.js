@@ -1548,11 +1548,22 @@ function doEatBerry(eventObject)
 	});
 }
 
-function enableDisableCloak(eventObject)
+function toggleCloaked(eventObject)
 {
-	doCommand(eventObject, "CloakEnableDisable");
+	doCommand(eventObject, "CloakEnableDisable", null, function(data, error){
+		if (error) return;
+		
+		$(eventObject.target).parent().parent().html(data.html);
+	});
 }
-
+function deleteCharacter(eventObject,characterId)
+{
+	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
+		if(error) return;
+		$("a[onclick='switchCharacter(" + characterId +")']").remove();
+		//fullpageRefresh();
+	})
+}
 
 
 
@@ -1581,6 +1592,11 @@ function enableDisableCloak(eventObject)
 
 function doCommand(eventObject, commandName, parameters, callback)
 {
+	if (parameters==null)
+		parameters = {"v":verifyCode};
+	else
+		parameters.v = verifyCode;
+	
 	// Collapse the parameters into a single string
 	var parametersStr = "";
 	var firstTime = true;

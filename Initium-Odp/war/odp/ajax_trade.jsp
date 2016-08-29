@@ -13,7 +13,7 @@
 <% 
     response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
     ODPDBAccess db = new ODPDBAccess();
-    CachedDatastoreService ds = db.getDB();
+    CachedDatastoreService ds = db.getDB(); 
     
     CachedEntity character = db.getCurrentCharacter(request);
     CachedEntity user = db.getCurrentUser(request);
@@ -157,8 +157,11 @@
         <%
             String currentCategory = "";
             for(CachedEntity item:items)
-            {
+            {			
                 if (db.checkCharacterHasItemEquipped(character, item.getKey()))
+                    continue;
+				
+				if (tradeObject.isItemInTrade(character.getKey(), item.getKey()))
                     continue;
                 
                 String itemType = (String)item.getProperty("itemType");
@@ -170,10 +173,7 @@
                     currentCategory = itemType;
                 }
                 
-                if (tradeObject.isItemInTrade(character.getKey(), item.getKey()))
-                    continue;
-                
-                out.println(HtmlComponents.generateTradeInvItemHtml(item, db, ds, request));
+                out.println(HtmlComponents.generateTradeInvItemHtml(item, saleItems, db, ds, request));
             }
         %>
         </div>

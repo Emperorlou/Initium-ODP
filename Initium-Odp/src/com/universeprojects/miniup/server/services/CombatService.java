@@ -23,10 +23,14 @@ public class CombatService extends Service
 		attacker.setProperty("combatType", null);
 		defender.setProperty("combatType", null);
 		
-		if (autoAttack)
-			attacker.setProperty("combatType", "DefenceStructureAttack");
-		
 		CachedDatastoreService ds = db.getDB();
+
+		if (autoAttack)
+		{
+			attacker.setProperty("combatType", "DefenceStructureAttack");
+			db.flagCharacterCombatAction(db.getDB(), attacker);
+		}
+		
 		
 		ds.put(attacker);
 		ds.put(defender);
