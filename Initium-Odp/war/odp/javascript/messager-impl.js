@@ -317,8 +317,9 @@ function refreshIgnoredMessagesList() {
 	if (mutedPlayerIds.length > 0) {
 		mutedPlayerIds.forEach(function (item) {
 			$('#ignoreList').append('' +
-				'' + item["message"] + '' +
-				'<a onclick="removeIgnoredMessage(\'' + item["message"] + '\')">X</a><br>' +
+				'<a onclick="removeIgnoredMessage(\'' + item["message"] + '\')">X</a> ' + 
+				item["message"] + '' +
+				'<br>' +
 				'');
 		});
 	}
