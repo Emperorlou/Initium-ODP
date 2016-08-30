@@ -45,8 +45,6 @@ messager.onChatMessage = function(chatMessage)
 	if (!isCharNotMuted(chatMessage.characterId))
 	return; //We quit the function if message is muted
 
-	if (!isMessageNotMuted(chatMessage.characterId))
-		return; //We quit the function if message is muted
 
 	var html = "<div class='chatMessage-main'>";
 	if (chatMessage.createdDate!=null)
@@ -98,6 +96,9 @@ messager.onChatMessage = function(chatMessage)
 	}
 	else if (chatMessage.mode=="admin")
 	{
+		if (!isMessageNotMuted(chatMessage.message))
+			return; //We quit the function if message is muted
+
 		html+="<span class='chatMessage-text-story'>";
 		html+=chatMessage.message;
 		html+="</div>";
