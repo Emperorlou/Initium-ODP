@@ -367,7 +367,7 @@ function removeIgnoredMessage(message) {
 
 function findAndRemove(array, property, value) {
 	array.forEach(function(result, index) {
-		if(result[property] === value) {
+		if (value.indexOf(result[property]) !== -1) {
 			//Remove from array
 			array.splice(index, 1);
 		}
@@ -399,7 +399,7 @@ function createRecentChattersList()
 function findIfExists(array, property, value) {
 	var exists = false;
 	array.forEach(function(result) {
-		if(result[property] === value) {
+		if (value.indexOf(result[property]) !== -1) {
 			exists = true;
 			return;
 		}
