@@ -302,8 +302,9 @@ function refreshIgnoreList()
 	{
 		mutedPlayerIds.forEach(function(item){
 			$('#ignoreList').append('' +
-				'' + item["name"] + '' +
-				'<a  onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a><br>' +
+				'<a onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a> ' + 
+				item["name"] + '' +
+				'<br>' +
 				'');
 		});
 	}

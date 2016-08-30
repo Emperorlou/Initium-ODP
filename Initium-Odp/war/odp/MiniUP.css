@@ -364,7 +364,10 @@ hr:after {
 }
 
 
-
+.mini-window-header-container
+{
+	max-width:320px;
+}
 
 .mini-window-header
 {

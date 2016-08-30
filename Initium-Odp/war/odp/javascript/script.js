@@ -1234,7 +1234,7 @@ function viewMap()
 	openMap();
 }
 
-function deleteCharacter(currentCharName)
+function deleteAndRecreateCharacter(currentCharName)
 {
 	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
 		if (currentCharName==null)
@@ -1556,7 +1556,7 @@ function toggleCloaked(eventObject)
 		$(eventObject.target).parent().parent().html(data.html);
 	});
 }
-function deleteCharacter(eventObject,characterId)
+function doDeleteCharacter(eventObject,characterId)
 {
 	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
 		if(error) return;
