@@ -445,7 +445,6 @@ function isCharNotMuted(characterId)
 function isMessageNotMuted(message) {
 	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerMessages');
 
-
 	var timeNow = $.now();
 	var diff = new Date(mutedPlayerIds["date"] - timeNow);
 	var days = diff / 1000 / 60 / 60 / 24;
