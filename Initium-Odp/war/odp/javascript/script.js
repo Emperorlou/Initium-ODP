@@ -368,26 +368,29 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<plants; i++)
 			{
 				var filename = "";
-				var type=random(0,5);
-				if (type==0)
-					filename = "tree";
-				else if (type==1)
-					filename = "tree";
-				else if (type==2)
-					filename = "shrub";
-				else if (type==3)
-					filename = "shrub";
-				else if (type==4)
-					filename = "shrub";
-				else if (type==5)
-					filename = "baretree";
-				
-				if (filename == "tree")
-					filename+=random(1,6);
-				else if (filename == "shrub")
-					filename+=random(1,3);
-				else if (filename == "baretree")
-					filename+=random(1,7);
+				var type = random(0, 5);
+
+				switch(type)
+				{
+				    case 0:
+				        filename = "tree" + random(1,6);
+				        break;
+				    case 1:
+				        filename = "tree" + random(1,6);
+				        break;
+				    case 2:
+				        filename = "shrub" + random(1,3);
+				        break;
+				    case 3:
+				        filename = "shrub" + random(1,3);
+				        break;
+				    case 4:
+				        filename = "shrub" + random(1,3);
+				        break;
+				    case 5:
+				        filename = "baretree" + random(1,7);
+				        break;
+				}
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
@@ -1144,6 +1147,13 @@ function closeAllPagePopups(doNotCallback)
 	}
 }
 
+function closeAllPopupsTooltips(doNotCallback)
+{
+    closeAllPagePopups(doNotCallback);
+    closeAllPopups();
+    closeAllTooltips();
+}
+
 
 function reloadPagePopup(quietly)
 {
@@ -1196,41 +1206,31 @@ function loadInlineCollectables()
 
 function inventory()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_inventory.jsp");
 }
 
 function viewChangelog()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_changelog.jsp");
 }
 
 function viewSettings()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_settings.jsp");
 }
 
 function viewProfile()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_profile.jsp");
 }
 
 function viewMap()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	openMap();
 }
 
@@ -1276,9 +1276,7 @@ function viewReferrals()
 
 function customizeItemOrderPage(itemId)
 {
-	closeAllTooltips();
-	closeAllPopups();
-	closeAllPagePopups();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_customizeitem.jsp?itemId="+itemId);
 }
 
@@ -2006,9 +2004,7 @@ function fullpageRefresh()
 
 function _viewTrade()
 {
-	closeAllPagePopups(true);
-    closeAllPopups();
-    closeAllTooltips();
+    closeAllPopupsTooltips(true);
 	pagePopup("odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
 //		popupMessage("Trade Cancelled","This trade has been cancelled.")
