@@ -42,9 +42,10 @@ messager.onNotificationMessage = function(message)
 
 messager.onChatMessage = function(chatMessage)
 {
-	if(!isMessageNotMuted(chatMessage.characterId))
+	if (!isCharNotMuted(chatMessage.characterId))
 	return; //We quit the function if message is muted
-	
+
+
 	var html = "<div class='chatMessage-main'>";
 	if (chatMessage.createdDate!=null)
 	{
@@ -95,6 +96,9 @@ messager.onChatMessage = function(chatMessage)
 	}
 	else if (chatMessage.mode=="admin")
 	{
+		if (!isMessageNotMuted(chatMessage.message))
+			return; //We quit the function if message is muted
+
 		html+="<span class='chatMessage-text-story'>";
 		html+=chatMessage.message;
 		html+="</div>";
@@ -275,17 +279,19 @@ function getItem(key)
 function refreshLists()
 {
 	setTimeout(function() {
-       refreshIgnoreList();
-       refreshSuggestedList();
+		refreshIgnoreList();
+		refreshSuggestedList();
+		refreshIgnoredMessagesList();
    }, 10);
-};
+}
 
 //Clears the ignore list from the cache.
 function clearIgnoreList()
 {
-	saveIgnoredList([]);
+	saveIgnoredList('mutedPlayerIds', []);
+	saveIgnoredList('mutedPlayerMessages', []);
 	refreshLists();
-};
+}
 
 //Refreshes the ignore list taking it from LocalStorage and appends to the list
 function refreshIgnoreList()
@@ -297,12 +303,28 @@ function refreshIgnoreList()
 	{
 		mutedPlayerIds.forEach(function(item){
 			$('#ignoreList').append('' +
-				'' + item["name"] + '' +
-				'<a  onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a><br>' +
+				'<a onclick="removeIgnoredPerson(' + item["characterId"] + ')">X</a> ' + 
+				item["name"] + '' +
+				'<br>' +
 				'');
 		});
 	}
-};
+}
+
+//Refreshes the ignore list taking it from LocalStorage and appends to the list
+function refreshIgnoredMessagesList() {
+	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerMessages');
+
+	if (mutedPlayerIds.length > 0) {
+		mutedPlayerIds.forEach(function (item) {
+			$('#ignoreList').append('' +
+				'<a onclick="removeIgnoredMessage(\'' + item["message"] + '\')">X</a> ' + 
+				item["message"] + '' +
+				'<br>' +
+				'');
+		});
+	}
+}
 
 //Refreshes the suggested list by taking first five unique recent chatters.
 function refreshSuggestedList()
@@ -317,32 +339,44 @@ function refreshSuggestedList()
 				'<a onclick="ignoreAPlayer(\'' + item["characterId"] +'\', \''+ item["name"] + '\')">Ignore ' + item["name"] + '</a><br>');
 		});
 	}
-};
+
+	$('#suggestedList').append('<br><p>' +
+		'<a onclick="ignoreAMessage(\'A new player has just joined\')">Ignore \"A new player has just joined\" message </a><br></p>');
+
+}
 
 function getItemFromLocalStorage(itemName){
 	var item = localStorage.getItem( String(itemName));
 	return item != null ? JSON.parse(item) : [];
-};
+}
 
 function removeIgnoredPerson(characterId)
 {
 	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerIds');
 
 	mutedPlayerIds = findAndRemove(mutedPlayerIds, 'characterId', String(characterId));
-	saveIgnoredList(mutedPlayerIds);
+	saveIgnoredList('mutedPlayerIds', (mutedPlayerIds));
 	refreshLists();
-};
+}
+
+function removeIgnoredMessage(message) {
+	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerMessages');
+
+	mutedPlayerIds = findAndRemove(mutedPlayerIds, 'message', String(message));
+	saveIgnoredList('mutedPlayerMessages', (mutedPlayerIds));
+	refreshLists();
+}
 
 function findAndRemove(array, property, value) {
 	array.forEach(function(result, index) {
-		if(result[property] === value) {
+		if (value.indexOf(result[property]) !== -1) {
 			//Remove from array
 			array.splice(index, 1);
 		}
 	});
 
 	return array;
-};
+}
 
 
 //Creates an object from recent chatters list, not bigger than 5
@@ -362,18 +396,18 @@ function createRecentChattersList()
 	});
 
 	return object;
-};
+}
 
 function findIfExists(array, property, value) {
 	var exists = false;
 	array.forEach(function(result) {
-		if(result[property] === value) {
+		if (value.indexOf(result[property]) !== -1) {
 			exists = true;
 			return;
 		}
 	});
 	return exists;
-};
+}
 
 function ignoreAPlayer(characterId, nickname)
 {
@@ -381,17 +415,27 @@ function ignoreAPlayer(characterId, nickname)
 	var ignoreList = getItemFromLocalStorage('mutedPlayerIds');
 	if(!findIfExists(ignoreList, 'characterId', String(characterId))) {
 		ignoreList.push(playerObject);
-		saveIgnoredList(ignoreList);
+		saveIgnoredList('mutedPlayerIds', ignoreList);
 	}
 	refreshLists();
-};
+}
 
-function saveIgnoredList(array)
+function ignoreAMessage(messageText) {
+	var ignoreList = getItemFromLocalStorage('mutedPlayerMessages');
+	var playerObject = {'message': String(messageText), 'date': String($.now())};
+	if (!findIfExists(ignoreList, 'message', String(messageText))) {
+		ignoreList.push(playerObject);
+		saveIgnoredList('mutedPlayerMessages', ignoreList);
+	}
+	refreshLists();
+}
+
+function saveIgnoredList(itemName, array)
 {
-	localStorage.setItem('mutedPlayerIds', JSON.stringify(array));
-};
+	localStorage.setItem(String(itemName), JSON.stringify(array));
+}
 
-function isMessageNotMuted(characterId)
+function isCharNotMuted(characterId)
 {
 	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerIds');
 
@@ -399,10 +443,27 @@ function isMessageNotMuted(characterId)
 		return true;
 	}
 	return false;
-};
+}
+
+function isMessageNotMuted(message) {
+	var mutedPlayerIds = getItemFromLocalStorage('mutedPlayerMessages');
+
+	var timeNow = $.now();
+	var diff = new Date(mutedPlayerIds["date"] - timeNow);
+	var days = diff / 1000 / 60 / 60 / 24;
+	if (days >= 1) {
+		findAndRemove(mutedPlayerIds, 'message', message);
+		saveIgnoredList('mutedPlayerMessages', mutedPlayerIds);
+	}
+
+	if (!findIfExists(mutedPlayerIds, 'message', String(message))) {
+		return true;
+	}
+	return false;
+}
 
 $( document ).ajaxComplete(function( event, xhr, settings ) {
 	if ( settings.url.match("^/odp/ajax_ignore" )) {
 		refreshLists();
 	}
-});
+})

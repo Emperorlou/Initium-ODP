@@ -34,6 +34,8 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class ODPDBAccess
 {
+	final public static boolean welcomeMessages = true;
+	
 	public enum CharacterMode
 	{
 		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD

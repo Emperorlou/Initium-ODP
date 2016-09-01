@@ -282,6 +282,9 @@ function updateSpecialAudio()
 {
 	if (outsideAudio == false)
 		return;
+
+	if (window.biome == "Snow")
+		return;
 	
 	var rainVolume = rainStrength;
 	rainVolume-=0.6;
@@ -294,6 +297,12 @@ function updateSpecialAudio()
 	rainVolume2 *= 4;
 	if (rainVolume2<0) rainVolume2 = 0;
 	if (rainVolume2>1) rainVolume2 = 1;
+
+	if (window.biome == "Desert")
+	{
+		rainVolume = 0;
+		rainVolume2 = 0;
+	}
 	
 	var windVolume = rainStrength;
 	windVolume -= 0.65;

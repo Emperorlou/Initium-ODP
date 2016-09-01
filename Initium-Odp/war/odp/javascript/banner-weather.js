@@ -45,6 +45,9 @@ function getWeather()
 var lightningTrigger = null;
 function processLightning()
 {
+	if (window.biome=="Snow")
+		return;
+	
 	var weather = getWeather();
 	var serverTime = getCurrentServerTime();
 	
@@ -206,13 +209,28 @@ function updateDayNightCycle(forceRefresh)
 		previousA = amount;
 		
 		
-		if (rainStrength>0.65)
+		if (rainStrength>0.65 && window.biome=="Desert")
 		{
-//			var bg=	"url('/images/effects/light-rain1.gif') no-repeat center center, ";
-//			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
-//			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+")";
-//			banner.css("background", bg);
-//			banner.css("background-blend-mode", "screen, multiply");
+			var bg=	"";
+			bg+="url('/images/effects/light-sandstorm1.gif') no-repeat center center, ";
+			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
+			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
+			banner.css("background", bg);
+			banner.css("background-blend-mode", "screen, multiply");
+			banner.css("background-size", "contain");
+		}
+		else if (rainStrength>0.65 && window.biome=="Snow")
+		{
+			var bg=	"";
+			bg+="url('/images/effects/medium-snow1.gif') no-repeat center center, ";
+			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
+			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
+			banner.css("background", bg);
+			banner.css("background-blend-mode", "screen, multiply");
+			banner.css("background-size", "contain");
+		}
+		else if (rainStrength>0.65)
+		{
 			var bg=	"";
 			bg+="url('/images/effects/light-rain1.gif') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 

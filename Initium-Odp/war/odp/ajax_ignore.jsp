@@ -3,7 +3,7 @@ $(document).ready(function() {
 refreshLists();
 });
 </script>
-
+<div class='mini-window-header-container'>
 <div class="mini-window-header">
     <div class="mini-window-header-split">
         <a onclick="clearIgnoreList()">Clear ignored list</a><br><br>
@@ -12,7 +12,8 @@ refreshLists();
 </div>
 <div>
     <h5>Ignored list</h5><br>
-    <div id="ignoreList"></div>
+    <p id="ignoreList"></p>
     <h5>Recent chatters list</h5><br>
     <div id="suggestedList"></div>
+</div>
 </div>
