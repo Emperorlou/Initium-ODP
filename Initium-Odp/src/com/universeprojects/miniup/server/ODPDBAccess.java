@@ -2840,5 +2840,95 @@ public class ODPDBAccess
 		
 	}
 
+	public String cleanCharacterName(String name)
+	{
+		name = name.trim();
+		name = name.replace("  ", " ");
+		return name;
+	}
+
+	/**
+	 * Returns all party members belonging to the party that the selfCharacter belongs to.
+	 * 
+	 * If he doesn't belong to a party, we return null.
+	 * 
+	 * @param ds
+	 * @param selfCharacter
+	 * @return
+	 */
+	public List<CachedEntity> getParty(CachedDatastoreService ds, CachedEntity selfCharacter)
+	{
+		String partyCode = (String)selfCharacter.getProperty("partyCode");
+		if (partyCode==null || partyCode.equals(""))
+			return null;
+		
+		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
+	
+		if (result.size()==1)
+		{
+			selfCharacter.setProperty("partyCode", null);
+			if (ds==null)
+				ds = getDB();
+			ds.put(selfCharacter);
+			return null;
+		}
+		
+		return result;
+	}
+
+	protected List<CachedEntity> getParty(CachedDatastoreService ds, String partyCode)
+	{
+		if (partyCode==null || partyCode.equals(""))
+			return null;
+		
+		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
+	
+		if (result.size()==1)
+		{
+			result.get(0).setProperty("partyCode", null);
+			if (ds==null)
+				ds = getDB();
+			ds.put(result.get(0));
+			return null;
+		}
+		
+		return result;
+	}
+
+	public void doPartyJoinsAllowed(CachedDatastoreService ds, CachedEntity character, boolean joinsAllowed) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+	
+		List<CachedEntity> party = getParty(ds, character);
+	
+		CachedEntity leader = null;
+		if (party==null)
+		{
+			leader = character;
+		}
+		else
+		{
+			if ("TRUE".equals(character.getProperty("partyLeader")))
+				leader = character;
+			else
+			{
+				for(CachedEntity e:party)
+					if ("TRUE".equals(e.getProperty("partyLeader")))
+						leader = e;
+			}
+		}
+		
+		if (leader==null)
+			throw new UserErrorMessage("You are in a party but you are not the leader, therefore you do not have permission to decide whether or not joins are allowed.");
+		
+		if (joinsAllowed)
+			leader.setProperty("partyJoinsAllowed", "TRUE");
+		else
+			leader.setProperty("partyJoinsAllowed", "FALSE");
+		
+		ds.put(leader);
+		return;
+	}
 	
 }

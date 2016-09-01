@@ -12,7 +12,13 @@ var messager = new Messager(4000, 15000, 30);
 // need to make sure we never execute the same notifications twice, so we'll always remember where we left off.
 messager.markers = [null, null, null, null, null, getItem("NotificationsMarker")];
 
-
+messager.onMessagesChecked = function()
+{
+	if (messager.ping==null)
+		$("#ping").text("??");
+	else
+		$("#ping").text(messager.ping);
+};
 
 messager.onError = function(xhr, textStatus, error)
 {
