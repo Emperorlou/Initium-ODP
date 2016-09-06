@@ -39,7 +39,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
 		addCallbackData(
 				"html",
-				"<a onclick='storeEnabledNew(event)'  title='Clicking here will enable your storefront so other players can buy your goods.'><img src='images/ui/storeEnabled.png' border=0/></a>");
+				"<a onclick='storeEnabledNew(event)'  title='Clicking here will enable your storefront so other players can buy your goods.'><img src='images/ui/storefrontEnabled.png' border=0/></a>");
 		db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_MERCHANT);
 		db.doCharacterTimeRefresh(ds, character);	// This is saving the character, so no need to save after this
 		

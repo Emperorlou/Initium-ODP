@@ -42,24 +42,25 @@
         return;
     }
     
-    CachedEntity storeCharacter = db.getEntity("Character", characterId);
-    if (storeCharacter==null)
-    {
-        WebUtils.forceRedirectClientTo("main.jsp", request, response, "This store no longer exists.");
-        return;
-    }
-    
-    if ("MERCHANT".equals(storeCharacter.getProperty("mode"))==false)
-    {
-        WebUtils.forceRedirectClientTo("main.jsp", request, response, "The store you're trying to browse is now closed. The player has shut it down.");
-        return;
-    }
-    
-    if (((Key)storeCharacter.getProperty("locationKey")).getId()!=common.getLocation().getKey().getId())
-    {
-        WebUtils.forceRedirectClientTo("main.jsp", request, response, "The store you're trying to browse is not in your location.");
-        return;
-    }
+	CachedEntity storeCharacter = db.getEntity("Character", characterId);
+	if (storeCharacter==null)
+	{
+		out.println("OMG the person who owned this store has been KILLED! You cannot browse their store anymore.");
+		return;
+	}
+	
+	if ("MERCHANT".equals(storeCharacter.getProperty("mode"))==false)
+	{
+		out.println("The store you're trying to browse is now closed. The player has shut it down.");
+		return;
+	}
+	
+	if (((Key)storeCharacter.getProperty("locationKey")).getId()!=common.getLocation().getKey().getId())
+	{
+		out.println("The store you're trying to browse is not in your location.");
+		return;
+	}
+
     
     
     CachedDatastoreService ds = db.getDB();

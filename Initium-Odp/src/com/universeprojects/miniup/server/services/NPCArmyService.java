@@ -217,7 +217,7 @@ public class NPCArmyService extends Service
 			// Choose a path. Paths are already shuffled so we'll just choose at random
 			for(int i = 0; i<paths.size(); i++)
 			{
-				CachedEntity pathToPropagateTo = paths.get(0);
+				CachedEntity pathToPropagateTo = paths.get(i);
 				Key locationToPropagateTo = pathsToLocations.get(pathToPropagateTo);
 				
 				// If there is already an NPCArmy at this location, we will add to it

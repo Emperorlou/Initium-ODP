@@ -467,7 +467,7 @@ function storeDeleteAllItemsNew(eventObject,characterKey)
 {
 	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
 		{
-		doCommand(eventObject,"StoreDeleteAllItems")
+		doCommand(eventObject,"StoreDeleteAllItems");
 		}
 	});
 }
@@ -476,7 +476,7 @@ function storeDeleteSoldItemsNew(eventObject)
 {
 	confirmPopup("Remove All Sold Items","Are you sure you want to remove ALL sold items from your store?", function(){
 		{
-		doCommand(eventObject,"StoreDeleteSoldItems")
+		doCommand(eventObject,"StoreDeleteSoldItems");
 		}
 	});
 }
@@ -489,7 +489,7 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 		$(".saleItem[ref='"+saleItemId+"']").remove();
 		var container = $("#invItems");
 		container.html(data.createInvItem+container.html());
-		})
+		});
 		
 }
 
@@ -498,7 +498,7 @@ function storeRenameNew(eventObject)
 	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
 		if (name!=null && name!="")
 		{
-			doCommand(eventObject,"StoreRename",{"name":name})
+			doCommand(eventObject,"StoreRename",{"name":name});
 		}
 	});	
 }
@@ -508,7 +508,7 @@ function storeDisabledNew(eventObject)
 	var clickedElement = $(eventObject.currentTarget);
 	doCommand(eventObject, "StoreDisable", null, function(data, error){
 		if (error) return;
-		clickedElement.html(data.html);
+		clickedElement.replaceWith(data.html);
 	});
 }
 
@@ -517,7 +517,7 @@ function storeEnabledNew(eventObject)
 	var clickedElement = $(eventObject.currentTarget);
 	doCommand(eventObject, "StoreEnable", null, function(data, error){
 		if (error) return;
-		clickedElement.html(data.html);
+		clickedElement.replaceWith(data.html);
 	});
 }
 
@@ -526,7 +526,7 @@ function storeSetSaleNew(eventObject)
 	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
 		if (sale!=null)
 		{
-			doCommand(eventObject,"StoreSetSale",{"sale":sale})
+			doCommand(eventObject,"StoreSetSale",{"sale":sale});
 		}
 	});
 	
@@ -585,7 +585,7 @@ function depositDogecoinsToItem(itemId, event)
 	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
-			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode, event, reloadPagePopup)
+			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode, event, reloadPagePopup);
 		}
 	});
 	
@@ -1535,7 +1535,7 @@ function allowDuelRequests()
 
 function viewStore(characterId)
 {
-	pagePopup("odp/ajax_viewstore.jsp?characterId="+characterId+"");
+	pagePopup("/ajax_viewstore.jsp?characterId="+characterId+"");
 }
 
 function setBlockadeRule(rule)
