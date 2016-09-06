@@ -830,7 +830,7 @@ function demoteFromAdmin(eventObject, characterId)
 
 function makeGroupCreator(eventObject, characterId)
 {
-	confirmPopup("New Group Creator", "Are you sure you want to make this member into the group creator?\n\nThis action cannot be reversed unless the this member (as the new group creator) chooses to reverse it manually!", function(){
+	confirmPopup("New Group Creator", "Are you sure you want to make this member the group creator?\n\nThis action cannot be reversed unless this member (as the new group creator) chooses to reverse it manually!", function(){
 		doCommand(eventObject, "GroupMemberMakeGroupCreator", {"characterId" : characterId});
 	});
 }
