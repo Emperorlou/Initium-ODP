@@ -1130,7 +1130,7 @@ public class GameUtils
 				sb.append("<ul class='switch-characters-list'>");
 				for(CachedEntity c:(List<CachedEntity>)request.getAttribute("characterList"))
 				{
-					if (c.getProperty("name").toString().startsWith("Dead ")==false)
+					if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
 						sb.append("<li><a onclick='switchCharacter("+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
 				}
 				sb.append("</ul>");

@@ -418,7 +418,7 @@ public class ODPDBAccess
 	public Integer getFilteredList_Count(String kind, String fieldName, FilterOperator operator, Object equalToValue)
 	{
 		FilterPredicate f1 = new FilterPredicate(fieldName, operator, equalToValue);
-		return getDB().fetchAsList(kind, f1, 1000).size();
+		return getDB().fetchAsList_Keys(kind, f1, 5000).size();
 	}
 
 	public List<CachedEntity> getFilteredList(String kind, int limit, Cursor cursor, String fieldName, FilterOperator operator, Object equalToValue)
@@ -444,7 +444,16 @@ public class ODPDBAccess
 		FilterPredicate f1 = new FilterPredicate(fieldName, operator, equalToValue);
 		FilterPredicate f2 = new FilterPredicate(fieldName2, operator2, equalToValue2);
 		Filter f = CompositeFilterOperator.and(f1, f2);
-		return getDB().fetchAsList(kind, f, 1000).size();
+		return getDB().fetchAsList_Keys(kind, f, 5000).size();
+	}
+
+	public Integer getFilteredList_Count(String kind, String fieldName, FilterOperator operator, Object equalToValue, String fieldName2, FilterOperator operator2, Object equalToValue2, String fieldName3, FilterOperator operator3, Object equalToValue3)
+	{
+		FilterPredicate f1 = new FilterPredicate(fieldName, operator, equalToValue);
+		FilterPredicate f2 = new FilterPredicate(fieldName2, operator2, equalToValue2);
+		FilterPredicate f3 = new FilterPredicate(fieldName3, operator3, equalToValue3);
+		Filter f = CompositeFilterOperator.and(f1, f2, f3);
+		return getDB().fetchAsList_Keys(kind, f, 5000).size();
 	}
 
 	public List<CachedEntity> getFilteredList(String kind)
@@ -2678,7 +2687,26 @@ public class ODPDBAccess
 	public final void discoverAllGroupPropertiesFor(CachedDatastoreService ds,
 			CachedEntity character)
 	{
-		// TODO Fill this out
+		if (ds==null)
+			ds = getDB();
+		
+		if (isCharacterAGroupMember(character))
+		{
+			List<CachedEntity> paths = getFilteredList("Path", "ownerKey", character.getProperty("groupKey"));
+			
+			for(CachedEntity path:paths)
+				newDiscovery(ds, character, path);
+		}		
+	}
+
+	public boolean isCharacterAGroupMember(CachedEntity character)
+	{
+		if (character.getProperty("groupKey")==null) return false;
+		
+		String status = (String)character.getProperty("groupStatus");
+		if (status==null) return false;
+		if (status.equals("Member") || status.equals("Admin")) return true;
+		return false;
 	}
 
 	/**
@@ -2930,5 +2958,62 @@ public class ODPDBAccess
 		ds.put(leader);
 		return;
 	}
+
 	
+	/**
+	 * Method stub placeholder for ODP.
+	 * 
+	 *  This method will accept a curve formula and output a number.
+	 * 
+	 * @param curve
+	 * @return
+	 */
+	public Object solveCurve(String curve)
+	{
+		return 0L;
+	}
+	
+	/**
+	 * Method stub placeholder for ODP. 
+	 * 
+	 *  This method will accept a curve formula and output a number.
+	 *  This variant specifically will try to parse the resulting number 
+	 *  as a long so you have to make sure the curve formula will result in a whole number.
+	 *  
+	 * @param curve
+	 * @return
+	 */
+	public Long solveCurve_Long(String curve)
+	{
+		return 0L;
+	}
+	
+	/**
+	 * Method stub placeholder for ODP. 
+	 *
+	 *  This method will accept a curve formula and output a number.
+	 *  This variant specifically will try to parse the resulting number 
+	 *  as a double.
+	 * 
+	 * @param curve
+	 * @return
+	 */
+	public Double solveCurve_Double(String curve)
+	{
+		return 0D;
+	}
+	
+	/**
+	 * Method stub placeholder for ODP.
+	 * 
+	 * This method will generate a monster from an NPCDef. The only thing this method
+	 * doesn't do is set the location for the monster.
+	 * 
+	 * @param npcDefinition
+	 * @return
+	 */
+	public CachedEntity doCreateMonster(CachedEntity npcDefinition, Key locationKey)
+	{
+		return null;
+	}
 }
