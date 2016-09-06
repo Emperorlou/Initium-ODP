@@ -505,12 +505,20 @@ function storeRenameNew(eventObject)
 
 function storeDisabledNew(eventObject)
 {
-	doCommand(eventObject,"StoreDisable")
+	var clickedElement = $(eventObject.currentTarget);
+	doCommand(eventObject, "StoreDisable", null, function(data, error){
+		if (error) return;
+		clickedElement.html(data.html);
+	});
 }
 
 function storeEnabledNew(eventObject)
 {
-	doCommand(eventObject,"StoreEnable")
+	var clickedElement = $(eventObject.currentTarget);
+	doCommand(eventObject, "StoreEnable", null, function(data, error){
+		if (error) return;
+		clickedElement.html(data.html);
+	});
 }
 
 function storeSetSaleNew(eventObject)

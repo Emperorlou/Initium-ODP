@@ -33,6 +33,9 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
 		if ("MERCHANT".equals(character.getProperty("mode")))
 		{
+			addCallbackData(
+					"html",
+					"<a onclick='storeDisabledNew(event)'  title='Clicking here will disable your storefront so other players cannot buy your goods.'><img src='images/ui/storeDisabled.png' border=0/></a>");
 			db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_NORMAL);
 			db.doCharacterTimeRefresh(ds, character);
 		}
