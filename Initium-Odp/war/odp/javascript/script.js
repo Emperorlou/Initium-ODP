@@ -679,18 +679,18 @@ function ajaxAction(url, eventObject, loadFunction)
 	
 	url += "&v="+window.verifyCode;
 
-	
-	var originalText = $(eventObject.target).text();
-	$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	var clickedElement = $(eventObject.currentTarget);
+	var originalText = clickedElement.html();
+	clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
 	$.get(url)
 	.done(function(data){
-		$(eventObject.target).html(data);
+		clickedElement.html(data);
 		loadFunction();
 	})
 	.fail(function(data){
 		loadFunction();
 		popupMessage("ERROR", "There was a server error when trying to perform the action. Feel free to report this on /r/initium. A log has been generated.");
-		$(eventObject.target).text(originalText);
+		clickedElement.html(originalText);
 	});
 	
 	eventObject.stopPropagation();
@@ -1548,10 +1548,11 @@ function doEatBerry(eventObject)
 
 function toggleCloaked(eventObject)
 {
+	var clickedElement = $(eventObject.currentTarget);
 	doCommand(eventObject, "CloakEnableDisable", null, function(data, error){
 		if (error) return;
 		
-		$(eventObject.target).parent().parent().html(data.html);
+		clickedElement.html(data.html);
 	});
 }
 function doDeleteCharacter(eventObject,characterId)
@@ -1617,10 +1618,13 @@ function doCommand(eventObject, commandName, parameters, callback)
 	if (parametersStr.length>0)
 		url+="&"+parametersStr;
 	
+	var clickedElement = null;
+	var originalText = null;
 	if (eventObject!=null)
 	{
-		var originalText = $(eventObject.target).text();
-		$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+		clickedElement = $(eventObject.currentTarget);
+		originalText = clickedElement.html();
+		clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
 	}
 	
 	
@@ -1642,19 +1646,20 @@ function doCommand(eventObject, commandName, parameters, callback)
 			popupMessage("System Message", data.errorMessage);
 		}
 			
+		if (eventObject!=null)
+			clickedElement.html(originalText);
+		
 		if (callback!=null && data!=null)
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
 			callback(null, error);
 	
-		if (eventObject!=null)
-			$(eventObject.target).text(originalText);
 	})
 	.fail(function(data)
 	{
 		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
 		if (eventObject!=null)
-			$(eventObject.target).text(originalText);
+			clickedElement.html(originalText);
 	});
 	
 	if (eventObject!=null)
@@ -1736,17 +1741,17 @@ function doTerritorySetDefense(eventObject, line)
 
 function longOperation_fullPageRefresh(eventObject, operationName, operationDescription, operationBannerUrl, actionUrl, fullPageRefreshSeconds)
 {
-	var originalText = $(eventObject.target).text();
-	$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	var originalText = $(eventObject.currentTarget).html();
+	$(eventObject.currentTarget).html("<img src='javascript/images/wait.gif' border=0/>");
 	$.get(url)
 	.done(function(data){
 		fullpageRefresh();
-		$(eventObject.target).html(data);
+		$(eventObject.currentTarget).html(data);
 	})
 	.fail(function(data){
 		fullpageRefresh();
 		popupMessage("ERROR", "There was a server error when trying to perform the "+operationName+" action. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
-		$(eventObject.target).text(originalText);
+		$(eventObject.currentTarget).html(originalText);
 	});
 	
 	eventObject.stopPropagation();
