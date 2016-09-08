@@ -292,4 +292,22 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		return result;
 	}
 	
+	/**
+	 * Generator method to create consistent toggle buttons.
+	 * 
+	 * @param buttonId
+	 * 	The id of the toggle button
+	 * @param title
+	 * 	Hover text for the link
+	 * @param onClick
+	 * 	The action to perform when clicked
+	 * @param imgSource
+	 * 	Image source for the button
+	 * @return 
+	 * 	Formatted HTML of the generated button
+	 */
+	public static String generateToggleButton(String buttonId, String title, String onClick, String imgSource)
+	{
+		return "<a id='"+buttonId+"' onclick='"+onClick+"' title='"+title+"'><img src='"+imgSource+"' border=0/></a>";
+	}
 }

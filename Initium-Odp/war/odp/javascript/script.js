@@ -1346,12 +1346,7 @@ function storeEnabled()
 
 function togglePartyJoins(eventObject)
 {
-	var clickedElement = $(eventObject.currentTarget);
-	doCommand(eventObject, "PartyJoinEnableDisable", null, function(data, error){
-		if (error) return;
-		
-		clickedElement.html(data.html);
-	});
+	doCommand(eventObject, "PartyJoinEnableDisable", {"buttonId" : eventObject.currentTarget.id});
 }
 
 function campsiteDefend()

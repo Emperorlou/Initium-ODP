@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -40,12 +41,14 @@ public class CommandPartyJoinEnableDisable extends Command
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter(request);
+		
+		String buttonId = parameters.get("buttonId");
 
 		if (Boolean.TRUE.equals(character.getProperty("partyJoinsAllowed")))
 		{
 			character.setProperty("partyJoinsAllowed", false);
 			
-			addCallbackData("html", "<a onclick='togglePartyJoins(event)'  title='Clicking here will allow other players to join your party.'><img src='images/ui/partyJoinsDisallowed.png' border=0/></a>");
+			updateHtml("#"+buttonId, HtmlComponents.generateToggleButton(buttonId, "Clicking here will allow other players to join your party.", "togglePartyJoins(event)", "images/ui/partyJoinsDisallowed.png"));
 		} 
 		else
 		{
@@ -56,7 +59,7 @@ public class CommandPartyJoinEnableDisable extends Command
 			
 			character.setProperty("partyJoinsAllowed", true);
 			
-			addCallbackData("html", "<a onclick='togglePartyJoins(event)'  title='Clicking here will disallow other players from joining your party.'><img src='images/ui/partyJoinsAllowed.png' border=0/></a>");
+			updateHtml("#"+buttonId, HtmlComponents.generateToggleButton(buttonId, "Clicking here will disallow other players from joining your party.", "togglePartyJoins(event)", "images/ui/partyJoinsAllowed.png"));
 		}
 
 		ds.put(character);
