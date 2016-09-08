@@ -135,7 +135,7 @@
                     out.println("<h3>"+itemType+"</h3>");
                     currentCategory = itemType;
                 }
-                out.println(HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,itemToSaleItemMap.get(item),request));
+                out.println(HtmlComponents.generateStoreItemHtml(db,common.getCharacter(), storeCharacter,item,itemToSaleItemMap.get(item),request));
             }
         %>
         </div>

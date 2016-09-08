@@ -1639,21 +1639,42 @@ function doCommand(eventObject, commandName, parameters, callback)
 	$.get(url)
 	.done(function(data)
 	{
+		// Refresh the full page or the pagePopup if applicable
 		if (data.javascriptResponse == "FullPageRefresh")
 			fullpageRefresh();
 		else if (data.javascriptResponse == "ReloadPagePopup")
 			reloadPagePopup();
 
+		// Here we display the system message if there was a system message
 		if (data.message!=null && data.message.length>0)
 			popupMessage("System Message", data.message);
 
+		// Here we display an error message popup if there was an error
 		var error = false;
 		if (data.errorMessage!=null && data.errorMessage.length>0)
 		{
 			error = true;
 			popupMessage("System Message", data.errorMessage);
 		}
-			
+
+		// Here we update the screen with fresh html that came along with the response
+		if (data.responseHtml!=null && data.responseHtml.length>0)
+		{
+			for(var i = 0; i<data.responseHtml.length; i++)
+			{
+				var htmlData = data.responseHtml[i];
+				if (htmlData.type==0)
+				{
+					$(htmlData.selector).html(htmlData.html);
+				}
+				else if (htmlData.type==1)
+				{
+					$(htmlData.selector).replaceWith(htmlData.html);
+				}
+			}
+		}
+		
+		
 		if (eventObject!=null)
 			clickedElement.html(originalText);
 		

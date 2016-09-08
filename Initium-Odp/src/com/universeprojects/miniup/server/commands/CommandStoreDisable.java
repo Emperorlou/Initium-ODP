@@ -35,7 +35,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		{
 			addCallbackData(
 					"html",
-					"<a onclick='storeDisabledNew(event)'  title='Clicking here will disable your storefront so other players cannot buy your goods.'><img src='images/ui/storefrontDisabled.png' border=0/></a>");
+					"<a onclick='storeEnabledNew(event)'  title='Clicking here will disable your storefront so other players cannot buy your goods.'><img src='images/ui/storefrontDisabled.png' border=0/></a>");
 			db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_NORMAL);
 			db.doCharacterTimeRefresh(ds, character);
 		}
@@ -43,7 +43,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		{
 			addCallbackData(
 					"html",
-					"<a onclick='storeEnabledNew(event)'  title='Clicking here will enable your storefront so other players can buy your goods.'><img src='images/ui/storefrontEnabled.png' border=0/></a>");
+					"<a onclick='storeDisabledNew(event)'  title='Clicking here will enable your storefront so other players can buy your goods.'><img src='images/ui/storefrontEnabled.png' border=0/></a>");
 		}
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}

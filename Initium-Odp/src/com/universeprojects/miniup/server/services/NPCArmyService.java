@@ -32,6 +32,16 @@ public class NPCArmyService extends Service
 		log.setLevel(Level.FINEST);
 	}
 	
+	public String getUniqueId()
+	{
+		return (String)npcArmy.getProperty("uniqueId");
+	}
+
+	public void setUniqueId(String uniqueId)
+	{
+		npcArmy.setProperty("uniqueId", uniqueId);
+	}
+
 	public long getPropagationCount()
 	{
 		return (Long)npcArmy.getProperty("propagationCount");
@@ -164,14 +174,22 @@ public class NPCArmyService extends Service
 		
 		
 		
-		if (isSeed() || (getSpawnsPerTick()<1 && GameUtils.roll(getSpawnsPerTick())==true))
+		if (isSeed())
 		{
 			CachedEntity npcDef = db.getEntity(getNpcDefKey());
-			db.doCreateMonster(npcDef, getLocationKey());
-			
+			long spawnCount = Math.round(getSpawnsPerTick());
+			if (spawnCount<1) spawnCount = 1;
+			for(int i = 0; i<spawnCount; i++)
+				db.doCreateMonster(npcDef, getLocationKey());
+
 			// Once we've seeded the spawn, we'll want to turn off the seed field
 			if (isSeed())
 				setSeed(false);
+		}
+		else if (getSpawnsPerTick()<1 && GameUtils.roll(getSpawnsPerTick())==true)
+		{
+			CachedEntity npcDef = db.getEntity(getNpcDefKey());
+			db.doCreateMonster(npcDef, getLocationKey());
 		}
 		else if (getSpawnsPerTick()>=1)
 		{
@@ -217,6 +235,11 @@ public class NPCArmyService extends Service
 			// Choose a path. Paths are already shuffled so we'll just choose at random
 			for(int i = 0; i<paths.size(); i++)
 			{
+				if (getPropagationCount()<=0) return;
+				
+				if (paths.get(i).getProperty("discoveryChance")==null || (Double)paths.get(i).getProperty("discoveryChance")<=0d)
+					continue;
+				
 				CachedEntity pathToPropagateTo = paths.get(i);
 				Key locationToPropagateTo = pathsToLocations.get(pathToPropagateTo);
 				
@@ -231,9 +254,13 @@ public class NPCArmyService extends Service
 						break;
 					}
 				
+				
+				
 				// If there is no army at the next location, we will create one. If there is, we'll add a propagation value to it
 				if (npcArmyAtNextLocation==null)
 				{
+					CachedEntity locationEntity = db.getEntity(locationToPropagateTo);
+					if (locationEntity==null) continue; // Cancel propagation to here, the location is deleted
 					log.info("Propagating to a new location: "+locationToPropagateTo);
 					CachedEntity newNpcArmy = new CachedEntity("NPCArmy");
 					newNpcArmy.setProperty("maxSpawnCount", db.solveCurve_Long(getPropagatedMaxSpawnCount()));
@@ -243,9 +270,12 @@ public class NPCArmyService extends Service
 					newNpcArmy.setProperty("spawnsPerTick", getSpawnsPerTick());
 					newNpcArmy.setProperty("npcDefKey", getNpcDefKey());
 					newNpcArmy.setProperty("locationKey", locationToPropagateTo);
+					newNpcArmy.setProperty("uniqueId", getUniqueId());
+					newNpcArmy.setProperty("name", getUniqueId()+": "+locationEntity.getProperty("name")+"(max: "+newNpcArmy.getProperty("maxSpawnCount")+")");
 	
+					setPropagationCount(getPropagationCount()-1);
+
 					db.getDB().put(newNpcArmy);
-					return;
 				}
 				else
 				{
@@ -264,7 +294,6 @@ public class NPCArmyService extends Service
 					
 					db.getDB().put(npcArmyAtNextLocation);
 					
-					return;
 				}
 			}			
 			

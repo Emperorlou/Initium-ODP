@@ -156,7 +156,31 @@ public class HtmlComponents {
    	   return result;
 	}
 	
-	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request){
+	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity selfCharacter, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request)
+	{
+
+		boolean hasRequiredStrength = true;
+		if (selfCharacter!=null)
+		{
+			Double characterStrength = db.getCharacterStrength(selfCharacter);
+			
+			Double strengthRequirement = null;
+			try
+			{
+				strengthRequirement = (Double)item.getProperty("strengthRequirement");
+			}
+			catch(Exception e)
+			{
+				// Ignore exceptions
+			}
+			
+			if (strengthRequirement!=null && characterStrength<strengthRequirement)
+				hasRequiredStrength = false;
+		}
+		String notEnoughStrengthClass = "";
+		if (hasRequiredStrength==false)
+			notEnoughStrengthClass = "not-enough-strength";
+		
 		
         String itemName = "(Item Destroyed)";
         String itemPopupAttribute = "";
@@ -166,9 +190,11 @@ public class HtmlComponents {
         if (item!=null)
         {
             itemName = (String)item.getProperty("name");
-            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
+            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+" ' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
             itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
         }
+
+        
         
         Long cost = (Long)saleItem.getProperty("dogecoins");
         cost=Math.round(cost.doubleValue()*(storeSale/100));
@@ -179,7 +205,7 @@ public class HtmlComponents {
         		result+="<div class='saleItem' ref="+saleItem.getKey().getId()+">";
 				result+="<div class='main-item'>";
 	   	       	result+="<span><img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
-	   	       	result+="<span>";
+	   	       	result+="<span class='"+notEnoughStrengthClass+"'>";
 	   	    if ("Selling".equals(saleItem.getProperty("status")))
 	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
 	   	    else if ("Sold".equals(saleItem.getProperty("status")))   

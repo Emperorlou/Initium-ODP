@@ -34,7 +34,7 @@ public class CommandStoreBuyItem extends Command {
 		CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
 		CachedEntity storeCharacter = db.getEntity("Character", characterId);
 		
-		addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,saleItem,request));
+		addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,character, storeCharacter,item,saleItem,request));
 		
 		if (saleItem==null)
 			throw new UserErrorMessage("This item has been taken down. The owner is no longer selling it.");
@@ -90,7 +90,7 @@ public class CommandStoreBuyItem extends Command {
 			
 			ds.commit();
 
-			addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,saleItem,request));
+			addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,character, storeCharacter,item,saleItem,request));
 		}
 		finally
 		{
