@@ -1344,14 +1344,9 @@ function storeEnabled()
 	location.href = "ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
 }
 
-function partyEnableJoins()
+function togglePartyJoins(eventObject)
 {
-	location.href = "ServletCharacterControl?type=enablePartyJoins"+"&v="+window.verifyCode;
-}
-
-function partyDisableJoins()
-{
-	location.href = "ServletCharacterControl?type=disablePartyJoins"+"&v="+window.verifyCode;
+	doCommand(eventObject, "PartyJoinEnableDisable", {"buttonId" : eventObject.currentTarget.id});
 }
 
 function campsiteDefend()
