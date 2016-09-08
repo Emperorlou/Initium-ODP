@@ -44,13 +44,18 @@ I personally use TortoiseGIT. You can download that here:
 https://tortoisegit.org/
 
 Before you clone the repo, create a fork of this project in GitHub, then create an upstream repo to link back to the root.
+
 From your own fork, click the "Clone or download" button, and copy the path (typically https://github.com/*username*/initium-odp.git). Right-click a folder in Explorer, and select `Git Clone...`. Paste the link you copied in URL, and specify the directory where you'll be working on your fork. 
+
 After it's pulled from GitHub, we need to set the upstream repo, so right-click the directory of your clone and go to `TortoiseGIT`->`Settings`. Select `Git`->`Remote`. Type in `upstream` in the Remote textbox, and `https://github.com/Emperorlou/initium-odp.git` in the URL textbox, then click the `Add New/Save` button.
 
 Command line setup is a lot easier, but requires a Git installation (ie: git-for-windows.github.io).
 In command line, navigate to the directory you want to download the clone to, and type the following commands:
-```git clone https://github.com/*username*/initium-odp.git
-git remote add upstream https://github.com/Emperorlou/initium-odp```
+
+```
+git clone https://github.com/*username*/initium-odp.git
+git remote add upstream https://github.com/Emperorlou/initium-odp.git
+```
 
 That's it.
 
