@@ -44,23 +44,14 @@ public class CommandPartyJoinEnableDisable extends Command
 		
 		String buttonId = parameters.get("buttonId");
 
-		if (Boolean.TRUE.equals(character.getProperty("partyJoinsAllowed")))
+		boolean isEnabled = "TRUE".equals(character.getProperty("partyJoinsAllowed"));
+		if (!isEnabled && "COMBAT".equals(character.getProperty("mode")))
 		{
-			character.setProperty("partyJoinsAllowed", false);
-			
-			updateHtml("#"+buttonId, HtmlComponents.generateToggleButton(buttonId, "Clicking here will allow other players to join your party.", "togglePartyJoins(event)", "images/ui/partyJoinsDisallowed.png"));
-		} 
-		else
-		{
-			if ("COMBAT".equals(character.getProperty("mode")))
-			{
-				throw new UserErrorMessage("You cannot join parties in combat.");
-			}
-			
-			character.setProperty("partyJoinsAllowed", true);
-			
-			updateHtml("#"+buttonId, HtmlComponents.generateToggleButton(buttonId, "Clicking here will disallow other players from joining your party.", "togglePartyJoins(event)", "images/ui/partyJoinsAllowed.png"));
+			throw new UserErrorMessage("You cannot join parties in combat.");
 		}
+		
+		character.setProperty("partyJoinsAllowed", !isEnabled);
+		updateHtml("#"+buttonId, HtmlComponents.generateTogglePartyJoin(!isEnabled));
 
 		ds.put(character);
 	}
