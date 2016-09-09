@@ -308,7 +308,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 	 */
 	private static String generateButtonBarItem(String buttonId, String title, String onClick, String imgSource)
 	{
-		return "<a id='"+buttonId+"' onclick='"+onClick+"' title='"+title+"'><img src='"+imgSource+"' border=0/></a>";
+		return "<a id='"+buttonId+"' onclick='"+onClick+"' title='"+title+"'><img src='"+imgSource+"' border=0 /></a>";
 	}
 
 	public static String generateManageStoreButton()
@@ -316,9 +316,9 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		return generateButtonBarItem("manageStore", "Opens your storefront management page so you can setup items for sale", "viewManageStore()", "images/ui/manageStore.png");
 	}
 	
-	public static String generateToggleStorefront(boolean isEnabled)
+	public static String generateToggleStorefront(CachedEntity character)
 	{
-		if(isEnabled)
+		if("MERCHANT".equals(character.getProperty("mode")))
 		{
 			return generateButtonBarItem("toggleStorefront", "Clicking here will DISABLE your storefront so other players can buy your goods.", "storeDisabledNew(event)", "images/ui/storefrontEnabled.png");
 		}
@@ -328,9 +328,9 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		}
 	}
 	
-	public static String generateTogglePartyJoin(boolean isEnabled)
+	public static String generateTogglePartyJoin(CachedEntity character)
 	{
-		if(isEnabled)
+		if("TRUE".equals(character.getProperty("partyJoinsAllowed")))
 		{
 			return generateButtonBarItem("togglePartyJoin", "Clicking here will DISALLOW other players from joining your party.", "togglePartyJoins(event)", "images/ui/partyJoinsAllowed.png");
 		}
@@ -340,11 +340,11 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		}
 	}
 	
-	public static String generateToggleDuel(boolean isEnabled)
+	public static String generateToggleDuel(CachedEntity character)
 	{
 		return generateButtonBarItem("toggleDuel", "Clicking here will ENABLE duel requests. This would allow other players to request a duel with you.", "allowDuelRequests()", "images/ui/duelRequestsDisallowed.png");
 		/*
-		if(isEnabled)
+		if("TRUE".equals(character.getProperty("duelRequestsAllowed")))
 		{
 			return generateButtonBarItem("toggleDuel", "Clicking here will DISABLE duel requests. This would prevent other players from requesting a duel with you.", "allowDuelRequests()", "images/ui/duelRequestsAllowed.png");
 		}
@@ -355,9 +355,9 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		*/
 	}
 	
-	public static String generateToggleCloak(boolean isEnabled)
+	public static String generateToggleCloak(CachedEntity character)
 	{
-		if(isEnabled)
+		if(Boolean.TRUE.equals(character.getProperty("cloaked")))
 		{
 			return generateButtonBarItem("toggleCloak", "Clicking here will HIDE your equipment and stats from other players.", "toggleCloaked(event)", "images/ui/cloakedEnabled.png");
 		}
@@ -370,13 +370,13 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 	public static String generateButtonBar(CachedEntity character)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("<div id='buttonBarMain'>");
+		sb.append("<div id='buttonbar-main'>");
 		// Buttons
 		sb.append("<span>" + generateManageStoreButton() + "</span>");
-		sb.append("<span>" + generateToggleStorefront("MERCHANT".equals(character.getProperty("mode"))) + "</span>");
-		sb.append("<span>" + generateTogglePartyJoin("TRUE".equals(character.getProperty("partyJoinsAllowed"))) + "</span>");
-		sb.append("<span>" + generateToggleDuel("TRUE".equals(character.getProperty("duelRequestsAllowed"))) + "</span>");
-		sb.append("<span>" + generateToggleCloak(Boolean.TRUE.equals(character.getProperty("cloaked"))) + "</span>");
+		sb.append("<span>" + generateToggleStorefront(character) + "</span>");
+		sb.append("<span>" + generateTogglePartyJoin(character) + "</span>");
+		sb.append("<span>" + generateToggleDuel(character) + "</span>");
+		sb.append("<span>" + generateToggleCloak(character) + "</span>");
 		// Help text
 		sb.append("<div class='hiddenTooltip' id='buttonbar'><h5>The Button Bar</h5>");
 		sb.append("<img src='images/ui/manageStore.png' border='0' style='float:left; padding:4px;'>");

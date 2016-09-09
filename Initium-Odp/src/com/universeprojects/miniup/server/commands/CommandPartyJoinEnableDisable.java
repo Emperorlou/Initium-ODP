@@ -51,7 +51,7 @@ public class CommandPartyJoinEnableDisable extends Command
 		}
 		
 		character.setProperty("partyJoinsAllowed", !isEnabled);
-		updateHtml("#"+buttonId, HtmlComponents.generateTogglePartyJoin(!isEnabled));
+		updateHtml("#"+buttonId, HtmlComponents.generateTogglePartyJoin(character));
 
 		ds.put(character);
 	}
