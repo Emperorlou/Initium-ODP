@@ -860,6 +860,12 @@ public class ODPDBAccess
 		result.setProperty("status", "Selling");
 		result.setProperty("name", character.getProperty("name") + " - " + item.getProperty("name") + " - " + dogecoins);
 
+		// This is a special case for premium tokens to set the specialId
+		if ("Initium Premium Membership".equals(item.getProperty("name")))
+		{
+			result.setProperty("specialId", "Initium Premium Membership");
+		}
+		
 		db.put(result);
 
 		return result;
@@ -3015,5 +3021,19 @@ public class ODPDBAccess
 	public CachedEntity doCreateMonster(CachedEntity npcDefinition, Key locationKey)
 	{
 		return null;
+	}
+
+	public void flagActiveCharacter(CachedEntity character)
+	{
+		if (character!=null)
+		{
+			
+			Date currentDate = (Date)character.getProperty("locationEntryDatetime");
+			if (currentDate==null || currentDate.getTime()+(1000*300)<System.currentTimeMillis())
+			{
+				character.setProperty("locationEntryDatetime", new Date());
+				ds.put(character);
+			}
+		}
 	}
 }

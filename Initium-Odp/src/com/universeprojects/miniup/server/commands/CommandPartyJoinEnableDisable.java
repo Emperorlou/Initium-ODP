@@ -50,7 +50,10 @@ public class CommandPartyJoinEnableDisable extends Command
 			throw new UserErrorMessage("You cannot join parties in combat.");
 		}
 		
-		character.setProperty("partyJoinsAllowed", !isEnabled);
+		if (isEnabled)
+			character.setProperty("partyJoinsAllowed", "FALSE");
+		else
+			character.setProperty("partyJoinsAllowed", "TRUE");
 		updateHtml("#"+buttonId, HtmlComponents.generateTogglePartyJoin(character));
 
 		ds.put(character);

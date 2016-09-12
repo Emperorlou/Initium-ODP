@@ -393,7 +393,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("<p>This button will not allow other players to see your character stats, referral stats, or equipment. It can be an important tool in PvP to hide your equipment so other players are less prepared to attack you since they do not know what you're weak to. However if you're not planning on doing PvP any time soon, keeping this option off makes it easier for people to see what you have and to help you - or just to show off your great gear.</p>");
 		sb.append("</div>");
 		// Help button
-		sb.append("<span class='hint hasTooltip' rel='#buttonbar' style='float:right'><img src='images/ui/help.png' border='0/'></span>");
+		sb.append("<span class='hint' rel='#buttonbar' style='float:right'><img src='images/ui/help.png' border='0'></span>");
 		sb.append("</div>");
 		return sb.toString();
 	}
