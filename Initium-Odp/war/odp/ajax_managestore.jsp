@@ -1,3 +1,5 @@
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.HashMap"%>
 <%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.miniup.server.HiddenUtils"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
@@ -33,7 +35,7 @@
 	items = db.sortSaleItemList(items);
 	
 	List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", common.getCharacter().getKey());
-	
+	List<CachedEntity> sortedSaleItems = new ArrayList<CachedEntity>();
 	
 	boolean storeOpen = false;
 	if ("MERCHANT".equals(common.getCharacter().getProperty("mode")))
@@ -60,6 +62,9 @@
 		<a onclick='storeSetSaleNew(event)' title='Use this feature to set a store-wide sale on all items (or even a store-wide price hike)'>Click here to change your store sale/adjustment value</a>
 		<div class='main-splitScreen'>
 		<div class='boldbox'><h4>Your Inventory</h4>
+		<div class="main-item-filter">
+			<input class="main-item-filter-input" id="filter_invItem" type="text" placeholder="Filter inventory...">
+		</div>
 		<div id='invItems'>
 		<%
 			for(CachedEntity item:items)
@@ -73,6 +78,7 @@
                 {
                     if (GameUtils.equals(saleItem.getProperty("itemKey"), item.getKey()))
                     {
+                    	sortedSaleItems.add(saleItem);
                         skip=true;
                         break;
                     }
@@ -89,13 +95,16 @@
 		
 		<div class='main-splitScreen'>
 		<div class='boldbox'><h4>Your Storefront</h4>
+		<div class="main-item-filter">
+			<input class="main-item-filter-input" id="filter_saleItem" type="text" placeholder="Filter store...">
+		</div>
 		<div class='main-item-controls'>
 			<a onclick='storeDeleteSoldItemsNew(event)' class='main-item-subnote'>Remove Sold Items</a>
 			<a onclick='storeDeleteAllItemsNew(event)' class='main-item-subnote'>REMOVE ALL</a>
 		</div>
 		<div id='saleItems'>
 		<%
-			for(CachedEntity saleItem:saleItems)
+			for(CachedEntity saleItem:sortedSaleItems)
 			{
 				if ("Hidden".equals(saleItem.getProperty("status")))
 					continue;

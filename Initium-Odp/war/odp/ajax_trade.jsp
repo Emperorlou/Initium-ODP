@@ -153,6 +153,9 @@
         <div class='main-splitScreen'>
         <span class="paragraph boldbox-right-link"><a onclick="tradeAddAllItemsNew()" title="This will put the whole inventory into the trade window.">Trade All</a></span>
         <div class='boldbox'><h4>Your Inventory</h4>
+        <div class="main-item-filter">
+			<input class="main-item-filter-input" id="filter_invItem" type="text" placeholder="Filter inventory...">
+		</div>
         <div id='invItems'>
         <%
             String currentCategory = "";

@@ -4,6 +4,9 @@ window.popupsArray = new Array();
 
 window.singlePostFormSubmitted = false;
 
+// Case insensitive Contains selector.
+jQuery.expr[':'].ContainsI = function(a, i, m) { return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0; };
+
 $(window).ready(function(e){
 	$(".single-post-form").submit(function(e){
 		if (window.singlePostFormSubmitted)
@@ -21,9 +24,42 @@ $(window).ready(function(e){
 		$(this).parent().toggleClass("boldBoxCollapsed");
 	});
 	
-	// If a text box is selected, don't allow shortcut keys to process (prevend default)
-	$("input").on("keyup", function(event){
+	// For all inputs under the body: If a text box is selected, don't allow shortcut keys to process (prevent default)
+	$("body").on("keyup", "input", function(event){
 		event.stopPropagation();
+	});
+	
+	// Any inputs with the main-item-filter-input class should be named (ID) according to 
+	// which div class they will be filtering on.
+	$("#page-popup-root").on("input propertychange paste", "input.main-item-filter-input", function(event)
+	{
+		var selector = "div."+event.currentTarget.id.substring("filter_".length);
+		var searchString = $(event.currentTarget).val();
+
+		// If filter is empty, then simply show all elements. 
+		if(searchString == "")
+		{
+			$(selector).show();
+		}
+		else
+		{
+			// Still using the custom case insensitive contains selector.
+			var conditionSelector = "a.clue:ContainsI('" + searchString + "')";
+			$(selector).each(function(){
+				// Some inventory screens have a line break between items. If they do, 
+				// then also hide the next br sibling of the current item div.
+				if($(this).has(conditionSelector).length)
+				{
+					$(this).show();
+					$(this).next("br").show();
+				}
+				else
+				{
+					$(this).hide();
+					$(this).next("br").hide();
+				}
+			});
+		}
 	});
 	
 	$(".main-expandable .main-expandable-title").click(function(){
@@ -1344,9 +1380,27 @@ function storeEnabled()
 	location.href = "ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
 }
 
+////////////////////////////////////////////////////////
+// BUTTON BAR TOGGLES
+function toggleStorefront(eventObject)
+{
+	doCommand(eventObject, "ToggleStorefront", {"buttonId" : eventObject.currentTarget.id});
+}
+
 function togglePartyJoins(eventObject)
 {
-	doCommand(eventObject, "PartyJoinEnableDisable", {"buttonId" : eventObject.currentTarget.id});
+	doCommand(eventObject, "TogglePartyJoins", {"buttonId" : eventObject.currentTarget.id});
+}
+
+function toggleDuelRequests(eventObject)
+{
+	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
+	//doCommand(eventObject, "ToggleDuelRequests", {"buttonId" : eventObject.currentTarget.id});
+}
+
+function toggleCloaked(eventObject)
+{	
+	doCommand(eventObject, "ToggleCloak", {"buttonId" : eventObject.currentTarget.id});
 }
 
 function campsiteDefend()
@@ -1550,16 +1604,6 @@ function doEatBerry(eventObject)
 		if (error) return;
 		reloadPagePopup();
 		popupMessage("System Message", "That was a tasty berry! Makes you feel kinda weird though, like your insides are trying to become outsides. WOW OK, now you don't feel too good. But you understand why. You feel like you understand a lot of things.");
-	});
-}
-
-function toggleCloaked(eventObject)
-{
-	var clickedElement = $(eventObject.currentTarget);
-	doCommand(eventObject, "CloakEnableDisable", null, function(data, error){
-		if (error) return;
-		
-		clickedElement.html(data.html);
 	});
 }
 function doDeleteCharacter(eventObject,characterId)

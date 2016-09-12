@@ -123,6 +123,9 @@
         <div>
         <h4><%=storeCharacter.getProperty("name")%>'s Storefront</h4> 
         <p><%=storeCharacter.getProperty("storeName")%></p>
+        <div class="main-item-filter">
+			<input class="main-item-filter-input" id="filter_saleItem" type="text" placeholder="Filter store items...">
+		</div>
         <%
             String currentCategory = "";
             for(CachedEntity item:items)

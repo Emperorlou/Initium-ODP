@@ -602,6 +602,19 @@ a.main-highlight:HOVER
 	
 }
 
+.main-item-filter
+{
+	margin-bottom:5px;
+	margin-right:8px;
+	display:block;
+}
+
+.main-item-filter-input
+{
+	display:table-cell;
+	width:100%;
+}
+
 .main-item-storefront-status
 {
 	font-size:12px;
