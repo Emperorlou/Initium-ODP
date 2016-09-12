@@ -43,30 +43,22 @@ $(window).ready(function(e){
 	    	var selector = "div."+event.currentTarget.id.substring("filter_".length);
 			var searchString = $(event.currentTarget).val();
 
-			// If filter is empty, then simply show all elements. 
-			if(searchString == "")
-			{
-				$(selector).show();
-			}
-			else
-			{
-				// Still using the custom case insensitive contains selector.
-				var conditionSelector = "a.clue:ContainsI('" + searchString + "')";
-				$(selector).each(function(){
-					// Some inventory screens have a line break between items. If they do, 
-					// then also hide the next br sibling of the current item div.
-					if($(this).has(conditionSelector).length)
-					{
-						$(this).show();
-						$(this).next("br").show();
-					}
-					else
-					{
-						$(this).hide();
-						$(this).next("br").hide();
-					}
-				});
-			}
+			// Still using the custom case insensitive contains selector.
+			var conditionSelector = "a.clue:ContainsI('" + searchString + "')";
+			$(selector).each(function(){
+				// Some inventory screens have a line break between items. If they do, 
+				// then also hide the next br sibling of the current item div.
+				if(searchString == "" || $(this).has(conditionSelector).length)
+				{
+					$(this).show();
+					$(this).next("br").show();
+				}
+				else
+				{
+					$(this).hide();
+					$(this).next("br").hide();
+				}
+			});
 	    }, 500));
 	});
 	
@@ -1596,7 +1588,7 @@ function disallowDuelRequests()
 
 function viewStore(characterId)
 {
-	pagePopup("/ajax_viewstore.jsp?characterId="+characterId+"");
+	pagePopup("/odp/ajax_viewstore.jsp?characterId="+characterId+"");
 }
 
 function setBlockadeRule(rule)
