@@ -45,22 +45,24 @@
 	CachedEntity storeCharacter = db.getEntity("Character", characterId);
 	if (storeCharacter==null)
 	{
-		WebUtils.forceRedirectClientTo("main.jsp", request, response, "This store no longer exists.");
+		out.println("OMG the person who owned this store has been KILLED! You cannot browse their store anymore.");
 		return;
 	}
 	
 	if ("MERCHANT".equals(storeCharacter.getProperty("mode"))==false)
 	{
-		WebUtils.forceRedirectClientTo("main.jsp", request, response, "The store you're trying to browse is now closed. The player has shut it down.");
+		out.println("The store you're trying to browse is now closed. The player has shut it down.");
 		return;
 	}
 	
 	if (((Key)storeCharacter.getProperty("locationKey")).getId()!=common.getLocation().getKey().getId())
 	{
-		WebUtils.forceRedirectClientTo("main.jsp", request, response, "The store you're trying to browse is not in your location.");
+		out.println("The store you're trying to browse is not in your location.");
 		return;
 	}
 
+    
+    
     CachedDatastoreService ds = db.getDB();
     List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", storeCharacter.getKey());
     List<Key> itemKeys = new ArrayList<Key>();
@@ -98,6 +100,8 @@
             items.remove(i);
             continue;
         }
+        
+        
         
         // These are only used for the sorting method db.sortSaleItemList()
         item.setProperty("store-dogecoins", saleItem.getProperty("dogecoins"));
