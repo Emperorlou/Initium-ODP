@@ -1588,7 +1588,7 @@ function disallowDuelRequests()
 
 function viewStore(characterId)
 {
-	pagePopup("/ajax_viewstore.jsp?characterId="+characterId+"");
+	pagePopup("/odp/ajax_viewstore.jsp?characterId="+characterId+"");
 }
 
 function setBlockadeRule(rule)
