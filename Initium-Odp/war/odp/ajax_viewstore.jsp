@@ -38,7 +38,7 @@
     
     if (common.getCharacter().getKey().getId() == characterId)
     {
-        WebUtils.forceRedirectClientTo("managestore.jsp", request, response);
+        WebUtils.forceRedirectClientTo("/odp/ajax_managestore.jsp", request, response);
         return;
     }
     
@@ -61,8 +61,6 @@
 		return;
 	}
 
-    
-    
     CachedDatastoreService ds = db.getDB();
     List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", storeCharacter.getKey());
     List<Key> itemKeys = new ArrayList<Key>();
@@ -100,8 +98,6 @@
             items.remove(i);
             continue;
         }
-        
-        
         
         // These are only used for the sorting method db.sortSaleItemList()
         item.setProperty("store-dogecoins", saleItem.getProperty("dogecoins"));
