@@ -1520,11 +1520,15 @@ function attackStructure()
 
 function allowDuelRequests()
 {
+	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we hvae a solution.");
+	return;
 	location.href = "ServletCharacterControl?type=allowDuelRequests"+"&v="+verifyCode;
 }
 
-function allowDuelRequests()
+function disallowDuelRequests()
 {
+	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we hvae a solution.");
+	return;
 	location.href = "ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
 }
 
@@ -1567,7 +1571,10 @@ function doDeleteCharacter(eventObject,characterId)
 	})
 }
 
-
+function viewExchange()
+{
+	pagePopup("/odp/ajax_exchange.jsp");
+}
 
 
 

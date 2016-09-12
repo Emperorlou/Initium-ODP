@@ -428,6 +428,11 @@ a.main-highlight:HOVER
 	float:right;
 }
 
+#buttonbar-main span a
+{
+	margin-left:4px;
+	margin-right:4px;
+}
 
 .main-stats
 {
