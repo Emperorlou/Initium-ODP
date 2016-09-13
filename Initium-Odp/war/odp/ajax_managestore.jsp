@@ -35,6 +35,7 @@
 	items = db.sortSaleItemList(items);
 	
 	List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", common.getCharacter().getKey());
+	
 	List<CachedEntity> sortedSaleItems = new ArrayList<CachedEntity>();
 	
 	boolean storeOpen = false;
@@ -88,6 +89,8 @@
 				
 				out.println(HtmlComponents.generateInvItemHtml(item));
 			}
+			// This should remove our sorted items, meaning only sold items remain.
+			saleItems.removeAll(sortedSaleItems);
 		%>
 		</div>
 		</div>
@@ -104,6 +107,26 @@
 		</div>
 		<div id='saleItems'>
 		<%
+			
+			if(saleItems.size() > 0)
+			{
+				%>
+				<div class='soldItems'>
+					<div class='soldItems-header'>
+						<a id='soldItems-minimize' onclick='toggleMinimizeBox(event, ".soldItems");'>Sold Items</a>
+					</div>
+					<%
+					for(CachedEntity saleItem:saleItems)
+					{
+						if ("Hidden".equals(saleItem.getProperty("status")))
+							continue;
+						out.println(HtmlComponents.generateSellItemHtml(db,saleItem,request));
+					}
+					%>
+					<hr class='items-separator' />
+				</div>
+				<%
+			}
 			for(CachedEntity saleItem:sortedSaleItems)
 			{
 				if ("Hidden".equals(saleItem.getProperty("status")))

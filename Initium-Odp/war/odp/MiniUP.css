@@ -613,6 +613,8 @@ a.main-highlight:HOVER
 {
 	display:table-cell;
 	width:100%;
+	font-size: 1em;
+	font-family: DOS, Monospace;
 }
 
 .main-item-storefront-status
@@ -865,6 +867,22 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	font-weight: bold;
 	color:#00AA00;
 	display:inline;
+}
+
+hr.items-separator {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0))
+}
+
+.soldItems
+{
+	margin-top:8px;
+}
+
+.soldItems-header
+{
+    margin-left: 6px;
 }
 
 .equipment-destroyed-notice
