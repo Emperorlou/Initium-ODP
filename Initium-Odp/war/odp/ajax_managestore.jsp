@@ -111,10 +111,10 @@
 			if(saleItems.size() > 0)
 			{
 				%>
+				<div class='soldItems-header'>
+					<a id='soldItems-minimize' title='Click to show/hide sold items.' onclick='toggleMinimizeSoldItems()'>Sold Items</a>
+				</div>
 				<div class='soldItems'>
-					<div class='soldItems-header'>
-						<a id='soldItems-minimize' onclick='toggleMinimizeBox(event, ".soldItems");'>Sold Items</a>
-					</div>
 					<%
 					for(CachedEntity saleItem:saleItems)
 					{
