@@ -2032,6 +2032,15 @@ function doCollectCollectable(event, collectableId)
  * it will include a call to doGoto() with all the same parameters in some script tags.
  */
 
+function toggleMinimizeChat()
+{
+	$("#chat_tab").toggle();
+}
+
+function toggleMinimizeSoldItems()
+{
+	$(".soldItems").toggle();
+}
 
 function updateMinimizeBox(buttonElement, selector)
 {
