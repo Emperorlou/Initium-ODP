@@ -70,7 +70,7 @@ public class CommandGroupMemberMakeGroupCreator extends Command
 		}
 
 		group.setProperty("creatorKey", newCreator.getKey());
-		newCreator.setProperty("group", "Admin");
+		newCreator.setProperty("groupStatus", "Admin");
 
 		ds.put(group);
 		ds.put(newCreator);

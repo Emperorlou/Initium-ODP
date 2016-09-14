@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -31,13 +32,20 @@ public class CommandStoreBuyItem extends Command {
 		
 		CachedEntity character = db.getCurrentCharacter(request);
 		CachedEntity saleItem = db.getEntity("SaleItem", saleItemId);
-		CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
-		CachedEntity storeCharacter = db.getEntity("Character", characterId);
-		
-		addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,saleItem,request));
-		
 		if (saleItem==null)
 			throw new UserErrorMessage("This item has been taken down. The owner is no longer selling it.");
+		CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
+		CachedEntity storeCharacter = db.getEntity("Character", characterId);
+		if (item==null)
+			throw new UserErrorMessage("The item being sold has been removed.");
+		
+		
+		boolean isPremiumMembership = false;
+		if ("Initium Premium Membership".equals(item.getProperty("name")))
+			isPremiumMembership = true;
+		
+		addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,character, storeCharacter,item,saleItem,request));
+		
 		if ("Sold".equals(saleItem.getProperty("status")))
 			throw new UserErrorMessage("The owner of the store has already sold this item.");
 		if ("Hidden".equals(saleItem.getProperty("status")))
@@ -51,10 +59,10 @@ public class CommandStoreBuyItem extends Command {
 		CachedEntity sellingCharacter = db.getEntity((Key)saleItem.getProperty("characterKey"));
 		if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(sellingCharacter.getProperty("mode"))==false)
 			throw new UserErrorMessage("The owner of the store is not selling at the moment.");
-		if (((Key)sellingCharacter.getProperty("locationKey")).getId()!=((Key)character.getProperty("locationKey")).getId())
+		if (isPremiumMembership==false && GameUtils.equals(sellingCharacter.getProperty("locationKey"), character.getProperty("locationKey"))==false)
 			throw new UserErrorMessage("You are not in the same location as the seller. You can only buy from a merchant who is in the same location as you.");
 
-		if (character.getKey().getId() == sellingCharacter.getKey().getId())
+		if (GameUtils.equals(character.getKey(), sellingCharacter.getKey()))
 			throw new UserErrorMessage("You cannot buy items from yourself.");
 		
 		Double storeSale = (Double)sellingCharacter.getProperty("storeSale");
@@ -64,8 +72,6 @@ public class CommandStoreBuyItem extends Command {
 		
 		if (cost>(Long)character.getProperty("dogecoins"))
 			throw new UserErrorMessage("You do not have enough funds to buy this item. You have "+character.getProperty("dogecoins")+" and it costs "+saleItem.getProperty("dogecoins")+".");	
-		if (item==null)
-			throw new UserErrorMessage("The item being sold has been removed.");
 		if (((Key)item.getProperty("containerKey")).getId()!=sellingCharacter.getKey().getId())
 			throw new UserErrorMessage("The item you tried to buy is not actually in the seller's posession. Purchase has been cancelled.");
 		
@@ -90,7 +96,7 @@ public class CommandStoreBuyItem extends Command {
 			
 			ds.commit();
 
-			addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,saleItem,request));
+			addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,character, storeCharacter,item,saleItem,request));
 		}
 		finally
 		{

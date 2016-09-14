@@ -884,11 +884,15 @@ public class GameUtils
 		String label = (String)item.getProperty("label"); 
 		if (label==null || label.trim().equals("") || (label=WebUtils.htmlSafe(label).trim()).equals(""))
 			label = (String)item.getProperty("name");
+
+		String iconUrl = (String)item.getProperty("icon");
+		if (iconUrl!=null && iconUrl.startsWith("http://"))
+			iconUrl = "https://"+iconUrl.substring(7);
 		
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+item.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)
@@ -1126,7 +1130,7 @@ public class GameUtils
 				sb.append("<ul class='switch-characters-list'>");
 				for(CachedEntity c:(List<CachedEntity>)request.getAttribute("characterList"))
 				{
-					if (c.getProperty("name").toString().startsWith("Dead ")==false)
+					if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
 						sb.append("<li><a onclick='switchCharacter("+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
 				}
 				sb.append("</ul>");

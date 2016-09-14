@@ -4,6 +4,9 @@ window.popupsArray = new Array();
 
 window.singlePostFormSubmitted = false;
 
+// Case insensitive Contains selector.
+jQuery.expr[':'].ContainsI = function(a, i, m) { return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0; };
+
 $(window).ready(function(e){
 	$(".single-post-form").submit(function(e){
 		if (window.singlePostFormSubmitted)
@@ -21,9 +24,42 @@ $(window).ready(function(e){
 		$(this).parent().toggleClass("boldBoxCollapsed");
 	});
 	
-	// If a text box is selected, don't allow shortcut keys to process (prevend default)
-	$("input").on("keyup", function(event){
+	// For all inputs under the body: If a text box is selected, don't allow shortcut keys to process (prevent default)
+	$("body").on("keyup", "input", function(event){
 		event.stopPropagation();
+	});
+	
+	// Any inputs with the main-item-filter-input class should be named (ID) according to 
+	// which div class they will be filtering on.
+	$("#page-popup-root").on("input propertychange paste", "input.main-item-filter-input", function(event)
+	{
+		// If it's the propertychange event, make sure it's the value that changed.
+	    if (window.event && event.type == "propertychange" && event.propertyName != "value")
+	        return;
+
+	    // Clear any previously set timer before setting a fresh one
+	    window.clearTimeout($(this).data("timeout"));
+	    $(this).data("timeout", setTimeout(function () {
+	    	var selector = "div."+event.currentTarget.id.substring("filter_".length);
+			var searchString = $(event.currentTarget).val();
+
+			// Still using the custom case insensitive contains selector.
+			var conditionSelector = "a.clue:ContainsI('" + searchString + "')";
+			$(selector).each(function(){
+				// Some inventory screens have a line break between items. If they do, 
+				// then also hide the next br sibling of the current item div.
+				if(searchString == "" || $(this).has(conditionSelector).length)
+				{
+					$(this).show();
+					$(this).next("br").show();
+				}
+				else
+				{
+					$(this).hide();
+					$(this).next("br").hide();
+				}
+			});
+	    }, 500));
 	});
 	
 	$(".main-expandable .main-expandable-title").click(function(){
@@ -368,26 +404,29 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<plants; i++)
 			{
 				var filename = "";
-				var type=random(0,5);
-				if (type==0)
-					filename = "tree";
-				else if (type==1)
-					filename = "tree";
-				else if (type==2)
-					filename = "shrub";
-				else if (type==3)
-					filename = "shrub";
-				else if (type==4)
-					filename = "shrub";
-				else if (type==5)
-					filename = "baretree";
-				
-				if (filename == "tree")
-					filename+=random(1,6);
-				else if (filename == "shrub")
-					filename+=random(1,3);
-				else if (filename == "baretree")
-					filename+=random(1,7);
+				var type = random(0, 5);
+
+				switch(type)
+				{
+				    case 0:
+				        filename = "tree" + random(1,6);
+				        break;
+				    case 1:
+				        filename = "tree" + random(1,6);
+				        break;
+				    case 2:
+				        filename = "shrub" + random(1,3);
+				        break;
+				    case 3:
+				        filename = "shrub" + random(1,3);
+				        break;
+				    case 4:
+				        filename = "shrub" + random(1,3);
+				        break;
+				    case 5:
+				        filename = "baretree" + random(1,7);
+				        break;
+				}
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
@@ -464,7 +503,7 @@ function storeDeleteAllItemsNew(eventObject,characterKey)
 {
 	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
 		{
-		doCommand(eventObject,"StoreDeleteAllItems")
+		doCommand(eventObject,"StoreDeleteAllItems");
 		}
 	});
 }
@@ -473,7 +512,7 @@ function storeDeleteSoldItemsNew(eventObject)
 {
 	confirmPopup("Remove All Sold Items","Are you sure you want to remove ALL sold items from your store?", function(){
 		{
-		doCommand(eventObject,"StoreDeleteSoldItems")
+		doCommand(eventObject,"StoreDeleteSoldItems");
 		}
 	});
 }
@@ -486,7 +525,7 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 		$(".saleItem[ref='"+saleItemId+"']").remove();
 		var container = $("#invItems");
 		container.html(data.createInvItem+container.html());
-		})
+		});
 		
 }
 
@@ -495,19 +534,27 @@ function storeRenameNew(eventObject)
 	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
 		if (name!=null && name!="")
 		{
-			doCommand(eventObject,"StoreRename",{"name":name})
+			doCommand(eventObject,"StoreRename",{"name":name});
 		}
 	});	
 }
 
 function storeDisabledNew(eventObject)
 {
-	doCommand(eventObject,"StoreDisable")
+	var clickedElement = $(eventObject.currentTarget);
+	doCommand(eventObject, "StoreDisable", null, function(data, error){
+		if (error) return;
+		clickedElement.replaceWith(data.html);
+	});
 }
 
 function storeEnabledNew(eventObject)
 {
-	doCommand(eventObject,"StoreEnable")
+	var clickedElement = $(eventObject.currentTarget);
+	doCommand(eventObject, "StoreEnable", null, function(data, error){
+		if (error) return;
+		clickedElement.replaceWith(data.html);
+	});
 }
 
 function storeSetSaleNew(eventObject)
@@ -515,7 +562,7 @@ function storeSetSaleNew(eventObject)
 	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
 		if (sale!=null)
 		{
-			doCommand(eventObject,"StoreSetSale",{"sale":sale})
+			doCommand(eventObject,"StoreSetSale",{"sale":sale});
 		}
 	});
 	
@@ -574,7 +621,7 @@ function depositDogecoinsToItem(itemId, event)
 	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
-			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode, event, reloadPagePopup)
+			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode, event, reloadPagePopup);
 		}
 	});
 	
@@ -676,18 +723,18 @@ function ajaxAction(url, eventObject, loadFunction)
 	
 	url += "&v="+window.verifyCode;
 
-	
-	var originalText = $(eventObject.target).text();
-	$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	var clickedElement = $(eventObject.currentTarget);
+	var originalText = clickedElement.html();
+	clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
 	$.get(url)
 	.done(function(data){
-		$(eventObject.target).html(data);
+		clickedElement.html(data);
 		loadFunction();
 	})
 	.fail(function(data){
 		loadFunction();
 		popupMessage("ERROR", "There was a server error when trying to perform the action. Feel free to report this on /r/initium. A log has been generated.");
-		$(eventObject.target).text(originalText);
+		clickedElement.html(originalText);
 	});
 	
 	eventObject.stopPropagation();
@@ -825,9 +872,9 @@ function demoteFromAdmin(eventObject, characterId)
 	});
 }
 
-function makeGroupCreator(eventGroup, characterId)
+function makeGroupCreator(eventObject, characterId)
 {
-	confirmPopup("New Group Creator", "Are you sure you want to make this member into the group creator?\n\nThis action cannot be reversed unless the this member (as the new group creator) chooses to reverse it manually!", function(){
+	confirmPopup("New Group Creator", "Are you sure you want to make this member the group creator?\n\nThis action cannot be reversed unless this member (as the new group creator) chooses to reverse it manually!", function(){
 		doCommand(eventObject, "GroupMemberMakeGroupCreator", {"characterId" : characterId});
 	});
 }
@@ -1009,11 +1056,11 @@ function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
 function giftPremium()
 {
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
-		var anonymous = false;
 		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose no.", function(){
-			anonymous = true;
+			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
+		}, function(){
+			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
 		});
-		location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous="+anonymous+"&v="+window.verifyCode;
 	});
 }
 
@@ -1144,6 +1191,13 @@ function closeAllPagePopups(doNotCallback)
 	}
 }
 
+function closeAllPopupsTooltips(doNotCallback)
+{
+    closeAllPagePopups(doNotCallback);
+    closeAllPopups();
+    closeAllTooltips();
+}
+
 
 function reloadPagePopup(quietly)
 {
@@ -1196,45 +1250,35 @@ function loadInlineCollectables()
 
 function inventory()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_inventory.jsp");
 }
 
 function viewChangelog()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_changelog.jsp");
 }
 
 function viewSettings()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_settings.jsp");
 }
 
 function viewProfile()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_profile.jsp");
 }
 
 function viewMap()
 {
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
+    closeAllPopupsTooltips();
 	openMap();
 }
 
-function deleteCharacter(currentCharName)
+function deleteAndRecreateCharacter(currentCharName)
 {
 	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
 		if (currentCharName==null)
@@ -1276,9 +1320,7 @@ function viewReferrals()
 
 function customizeItemOrderPage(itemId)
 {
-	closeAllTooltips();
-	closeAllPopups();
-	closeAllPagePopups();
+    closeAllPopupsTooltips();
 	pagePopup("ajax_customizeitem.jsp?itemId="+itemId);
 }
 
@@ -1338,14 +1380,27 @@ function storeEnabled()
 	location.href = "ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
 }
 
-function partyEnableJoins()
+////////////////////////////////////////////////////////
+// BUTTON BAR TOGGLES
+function toggleStorefront(eventObject)
 {
-	location.href = "ServletCharacterControl?type=enablePartyJoins"+"&v="+window.verifyCode;
+	doCommand(eventObject, "ToggleStorefront", {"buttonId" : eventObject.currentTarget.id});
 }
 
-function partyDisableJoins()
+function togglePartyJoins(eventObject)
 {
-	location.href = "ServletCharacterControl?type=disablePartyJoins"+"&v="+window.verifyCode;
+	doCommand(eventObject, "TogglePartyJoins", {"buttonId" : eventObject.currentTarget.id});
+}
+
+function toggleDuelRequests(eventObject)
+{
+	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
+	//doCommand(eventObject, "ToggleDuelRequests", {"buttonId" : eventObject.currentTarget.id});
+}
+
+function toggleCloaked(eventObject)
+{	
+	doCommand(eventObject, "ToggleCloak", {"buttonId" : eventObject.currentTarget.id});
 }
 
 function campsiteDefend()
@@ -1519,17 +1574,21 @@ function attackStructure()
 
 function allowDuelRequests()
 {
+	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we hvae a solution.");
+	return;
 	location.href = "ServletCharacterControl?type=allowDuelRequests"+"&v="+verifyCode;
 }
 
-function allowDuelRequests()
+function disallowDuelRequests()
 {
+	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we hvae a solution.");
+	return;
 	location.href = "ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
 }
 
 function viewStore(characterId)
 {
-	pagePopup("odp/ajax_viewstore.jsp?characterId="+characterId+"");
+	pagePopup("/odp/ajax_viewstore.jsp?characterId="+characterId+"");
 }
 
 function setBlockadeRule(rule)
@@ -1547,16 +1606,7 @@ function doEatBerry(eventObject)
 		popupMessage("System Message", "That was a tasty berry! Makes you feel kinda weird though, like your insides are trying to become outsides. WOW OK, now you don't feel too good. But you understand why. You feel like you understand a lot of things.");
 	});
 }
-
-function toggleCloaked(eventObject)
-{
-	doCommand(eventObject, "CloakEnableDisable", null, function(data, error){
-		if (error) return;
-		
-		$(eventObject.target).parent().parent().html(data.html);
-	});
-}
-function deleteCharacter(eventObject,characterId)
+function doDeleteCharacter(eventObject,characterId)
 {
 	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
 		if(error) return;
@@ -1565,7 +1615,10 @@ function deleteCharacter(eventObject,characterId)
 	})
 }
 
-
+function viewExchange()
+{
+	pagePopup("/odp/ajax_exchange.jsp");
+}
 
 
 
@@ -1619,44 +1672,69 @@ function doCommand(eventObject, commandName, parameters, callback)
 	if (parametersStr.length>0)
 		url+="&"+parametersStr;
 	
+	var clickedElement = null;
+	var originalText = null;
 	if (eventObject!=null)
 	{
-		var originalText = $(eventObject.target).text();
-		$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+		clickedElement = $(eventObject.currentTarget);
+		originalText = clickedElement.html();
+		clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
 	}
 	
 	
 	$.get(url)
 	.done(function(data)
 	{
+		// Refresh the full page or the pagePopup if applicable
 		if (data.javascriptResponse == "FullPageRefresh")
 			fullpageRefresh();
 		else if (data.javascriptResponse == "ReloadPagePopup")
 			reloadPagePopup();
 
+		// Here we display the system message if there was a system message
 		if (data.message!=null && data.message.length>0)
 			popupMessage("System Message", data.message);
 
+		// Here we display an error message popup if there was an error
 		var error = false;
 		if (data.errorMessage!=null && data.errorMessage.length>0)
 		{
 			error = true;
 			popupMessage("System Message", data.errorMessage);
 		}
-			
+
+		// Here we update the screen with fresh html that came along with the response
+		if (data.responseHtml!=null && data.responseHtml.length>0)
+		{
+			for(var i = 0; i<data.responseHtml.length; i++)
+			{
+				var htmlData = data.responseHtml[i];
+				if (htmlData.type==0)
+				{
+					$(htmlData.selector).html(htmlData.html);
+				}
+				else if (htmlData.type==1)
+				{
+					$(htmlData.selector).replaceWith(htmlData.html);
+				}
+			}
+		}
+		
+		
+		if (eventObject!=null)
+			clickedElement.html(originalText);
+		
 		if (callback!=null && data!=null)
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
 			callback(null, error);
 	
-		if (eventObject!=null)
-			$(eventObject.target).text(originalText);
 	})
 	.fail(function(data)
 	{
 		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
 		if (eventObject!=null)
-			$(eventObject.target).text(originalText);
+			clickedElement.html(originalText);
 	});
 	
 	if (eventObject!=null)
@@ -1738,17 +1816,17 @@ function doTerritorySetDefense(eventObject, line)
 
 function longOperation_fullPageRefresh(eventObject, operationName, operationDescription, operationBannerUrl, actionUrl, fullPageRefreshSeconds)
 {
-	var originalText = $(eventObject.target).text();
-	$(eventObject.target).html("<img src='javascript/images/wait.gif' border=0/>");
+	var originalText = $(eventObject.currentTarget).html();
+	$(eventObject.currentTarget).html("<img src='javascript/images/wait.gif' border=0/>");
 	$.get(url)
 	.done(function(data){
 		fullpageRefresh();
-		$(eventObject.target).html(data);
+		$(eventObject.currentTarget).html(data);
 	})
 	.fail(function(data){
 		fullpageRefresh();
 		popupMessage("ERROR", "There was a server error when trying to perform the "+operationName+" action. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
-		$(eventObject.target).text(originalText);
+		$(eventObject.currentTarget).html(originalText);
 	});
 	
 	eventObject.stopPropagation();
@@ -1954,6 +2032,15 @@ function doCollectCollectable(event, collectableId)
  * it will include a call to doGoto() with all the same parameters in some script tags.
  */
 
+function toggleMinimizeChat()
+{
+	$("#chat_tab").toggle();
+}
+
+function toggleMinimizeSoldItems()
+{
+	$(".soldItems").toggle();
+}
 
 function updateMinimizeBox(buttonElement, selector)
 {
@@ -2006,9 +2093,7 @@ function fullpageRefresh()
 
 function _viewTrade()
 {
-	closeAllPagePopups(true);
-    closeAllPopups();
-    closeAllTooltips();
+    closeAllPopupsTooltips(true);
 	pagePopup("odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
 //		popupMessage("Trade Cancelled","This trade has been cancelled.")

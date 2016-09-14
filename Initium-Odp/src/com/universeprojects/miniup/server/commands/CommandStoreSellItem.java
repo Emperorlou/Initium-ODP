@@ -55,6 +55,12 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 			throw new UserErrorMessage("You are already selling that item. If you want to change the price, remove the existing entry first.");
 		
 		CachedEntity saleItem = db.newSaleItem(ds, character, item, amount);
+
+		// This is a special case
+		if ("Initium Premium Membership".equals(item.getProperty("name")))
+		{
+			setPopupMessage("This item has been listed on the global exchange for premium tokens.");
+		}
 		
 		addCallbackData("createSellItem", HtmlComponents.generateSellItemHtml(db,saleItem,request));
 		}

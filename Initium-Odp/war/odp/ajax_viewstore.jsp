@@ -38,30 +38,29 @@
     
     if (common.getCharacter().getKey().getId() == characterId)
     {
-        WebUtils.forceRedirectClientTo("managestore.jsp", request, response);
+        WebUtils.forceRedirectClientTo("/odp/ajax_managestore.jsp", request, response);
         return;
     }
     
-    CachedEntity storeCharacter = db.getEntity("Character", characterId);
-    if (storeCharacter==null)
-    {
-        WebUtils.forceRedirectClientTo("main.jsp", request, response, "This store no longer exists.");
-        return;
-    }
-    
-    if ("MERCHANT".equals(storeCharacter.getProperty("mode"))==false)
-    {
-        WebUtils.forceRedirectClientTo("main.jsp", request, response, "The store you're trying to browse is now closed. The player has shut it down.");
-        return;
-    }
-    
-    if (((Key)storeCharacter.getProperty("locationKey")).getId()!=common.getLocation().getKey().getId())
-    {
-        WebUtils.forceRedirectClientTo("main.jsp", request, response, "The store you're trying to browse is not in your location.");
-        return;
-    }
-    
-    
+	CachedEntity storeCharacter = db.getEntity("Character", characterId);
+	if (storeCharacter==null)
+	{
+		out.println("OMG the person who owned this store has been KILLED! You cannot browse their store anymore.");
+		return;
+	}
+	
+	if ("MERCHANT".equals(storeCharacter.getProperty("mode"))==false)
+	{
+		out.println("The store you're trying to browse is now closed. The player has shut it down.");
+		return;
+	}
+	
+	if (((Key)storeCharacter.getProperty("locationKey")).getId()!=common.getLocation().getKey().getId())
+	{
+		out.println("The store you're trying to browse is not in your location.");
+		return;
+	}
+
     CachedDatastoreService ds = db.getDB();
     List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", storeCharacter.getKey());
     List<Key> itemKeys = new ArrayList<Key>();
@@ -100,8 +99,6 @@
             continue;
         }
         
-        
-        
         // These are only used for the sorting method db.sortSaleItemList()
         item.setProperty("store-dogecoins", saleItem.getProperty("dogecoins"));
         item.setProperty("store-status", saleItem.getProperty("status"));
@@ -122,6 +119,9 @@
         <div>
         <h4><%=storeCharacter.getProperty("name")%>'s Storefront</h4> 
         <p><%=storeCharacter.getProperty("storeName")%></p>
+        <div class="main-item-filter">
+			<input class="main-item-filter-input" id="filter_saleItem" type="text" placeholder="Filter store items...">
+		</div>
         <%
             String currentCategory = "";
             for(CachedEntity item:items)
@@ -134,7 +134,7 @@
                     out.println("<h3>"+itemType+"</h3>");
                     currentCategory = itemType;
                 }
-                out.println(HtmlComponents.generateStoreItemHtml(db,storeCharacter,item,itemToSaleItemMap.get(item),request));
+                out.println(HtmlComponents.generateStoreItemHtml(db,common.getCharacter(), storeCharacter,item,itemToSaleItemMap.get(item),request));
             }
         %>
         </div>
