@@ -1606,6 +1606,17 @@ function doEatBerry(eventObject)
 		popupMessage("System Message", "That was a tasty berry! Makes you feel kinda weird though, like your insides are trying to become outsides. WOW OK, now you don't feel too good. But you understand why. You feel like you understand a lot of things.");
 	});
 }
+
+function doDrinkElixir(eventObject)
+{	
+	var itemId = $("#popupItemId").val();
+	if (itemId == null) return;
+	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
+		if (error) return;
+		reloadPagePopup();
+		popupMessage("System Message", "As you sip down the liquid you feel a rush of energy that pulsates through your body, your mind becomes hazy and you can only focus on defeating your enemies.");
+	});
+}
 function doDeleteCharacter(eventObject,characterId)
 {
 	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
