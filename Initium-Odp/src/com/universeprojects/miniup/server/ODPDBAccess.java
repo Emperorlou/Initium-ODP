@@ -1632,7 +1632,7 @@ public class ODPDBAccess
 	{
 		boolean buffApplied = false;
 		CachedEntity buff = awardBuff(ds, character.getKey(), "http://i.imgur.com/vCbVFpw.png","Strange Elixir",
-				"You are filled with vigor. That elixir you just drank has left you feeling ready for combat, but your thoughts are hazy. This effect lasts for 1 hour.",3600,"strength","+15%","dexterity","+15%","intelligence","-10%",1);
+				"You are filled with vigor. That elixir you just drank has left you feeling ready for combat, but your thoughts are hazy. This effect lasts for 1 hour.",3600,"strength","+5%","dexterity","+15%","intelligence","-5%",1);
 		if (buff != null){ 
 			ds.put(buff);
 			buffApplied = true;
