@@ -2513,5 +2513,5 @@ function updateEnvironmentSoundEffectsVolume()
 function doPopupNotification(iconUrl, title, text, category, options, onclick, onerror)
 {
 	if(notifyHandler == null || notifyHandler.popupNotify === "undefined") return;
-	return notifyHandler.popupNotify(icon, title, text, category, data, onclick, onerror);
+	return notifyHandler.popupNotify(iconUrl, title, text, category, data, onclick, onerror);
 }
