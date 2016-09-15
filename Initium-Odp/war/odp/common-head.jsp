@@ -26,8 +26,11 @@
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
 <script type="text/javascript" src="/odp/javascript/script.js?v=47"></script>
-<!-- <script type="text/javascript" src="javascript/chat.js?v=2"></script> -->
+
 <script type="text/javascript" src="javascript/messager.js?v=2"></script>
+
+<script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=1"></script>
+
 
 
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>

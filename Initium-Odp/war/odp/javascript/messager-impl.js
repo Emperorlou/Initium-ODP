@@ -77,6 +77,18 @@ messager.onChatMessage = function(chatMessage)
 		html+=" ";
 		html+=chatMessage.message;
 		html+="</div>";
+		
+		try
+		{
+			doPopupNotification(null, "New private message", chatMessage.nickname+": "+chatMessage.message, "PrivateMessage", null, function(){
+				setPrivateChatTo(chatMessage.nickname, chatMessage.characterId);
+			});
+			
+		}
+		catch(e)
+		{
+			// Ignore errors if there are any
+		}
 	}
 	else if (chatMessage.mode==null)
 	{
