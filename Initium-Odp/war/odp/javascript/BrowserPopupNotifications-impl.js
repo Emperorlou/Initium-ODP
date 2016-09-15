@@ -78,4 +78,5 @@ function BrowserPopupNotifications()
 function SetNotificationHandler()
 {
 	notifyHandler = BrowserPopupNotifications();
+	notifyHandler.requestPermission();
 }
