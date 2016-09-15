@@ -4,6 +4,7 @@ window.popupsArray = new Array();
 
 window.singlePostFormSubmitted = false;
 
+var notifyHandler = null;
 // Case insensitive Contains selector.
 jQuery.expr[':'].ContainsI = function(a, i, m) { return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0; };
 
@@ -2505,4 +2506,12 @@ function updateEnvironmentSoundEffectsVolume()
 	var vol = getSoundEffectsVolume();
 	vol = parseFloat(vol)/100;
 	createjs.Sound.volume = vol;
+}
+
+////////////////////////////////////////////////////////
+//Notifications
+function doPopupNotification(iconUrl, title, text, category, options, onclick, onerror)
+{
+	if(notifyHandler == null || notifyHandler.popupNotify === "undefined") return;
+	return notifyHandler.popupNotify(icon, title, text, category, data, onclick, onerror);
 }
