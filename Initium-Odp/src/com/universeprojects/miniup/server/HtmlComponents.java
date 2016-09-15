@@ -359,11 +359,11 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 	{
 		if(Boolean.TRUE.equals(character.getProperty("cloaked")))
 		{
-			return generateButtonBarItem("toggleCloak", "Clicking here will HIDE your equipment and stats from other players.", "toggleCloaked(event)", "images/ui/cloakedEnabled.png");
+			return generateButtonBarItem("toggleCloak", "Clicking here will SHOW your equipment and stats to other players.", "toggleCloaked(event)", "images/ui/cloakedEnabled.png");
 		}
 		else
 		{
-			return generateButtonBarItem("toggleCloak", "Clicking here will SHOW your equipment and stats to other players.", "toggleCloaked(event)", "images/ui/cloakedDisabled.png");
+			return generateButtonBarItem("toggleCloak", "Clicking here will HIDE your equipment and stats from other players.", "toggleCloaked(event)", "images/ui/cloakedDisabled.png");
 		}
 	}
 	
