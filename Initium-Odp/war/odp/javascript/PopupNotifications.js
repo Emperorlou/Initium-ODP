@@ -123,6 +123,6 @@ var notificationScript = "/odp/javascript/BrowserPopupNotifications-impl.js";
 
 // Load the detected notification version script. Each impl should have a 
 // SetNotificationHandler method that instantiates and assigns the global notifyHandler object.
-$.cachedScript(notificationScript).done(function() {
+$.cachedScript(notificationScript, {async:false}).done(function() {
 	SetNotificationHandler();
 });
