@@ -40,7 +40,7 @@ function PopupNotifications()
 	var _self = this;
 	
 	// Default icon to show in the notification
-	var icon = "favicon.ico";
+	this.icon = "favicon.ico";
 	
 	/**
 	 * Request permission from the implementing Notification API.
