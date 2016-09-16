@@ -1615,7 +1615,7 @@ function doDrinkElixir(eventObject)
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
 		if (error) return;
 		reloadPagePopup();
-		popupMessage("System Message", "As you sip down the liquid you feel a rush of energy that pulsates through your body, your mind becomes hazy and you can only focus on defeating your enemies.");
+		popupMessage("System Message", "As you sip down the liquid you feel a rush of energy that pulsates through your body. Your mind becomes hazy and you can only focus on defeating your enemies.");
 	});
 }
 function doDeleteCharacter(eventObject,characterId)
