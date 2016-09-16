@@ -1631,7 +1631,7 @@ public class ODPDBAccess
 	public boolean awardBuff_Elixir(CachedDatastoreService ds, CachedEntity character)
 	{
 		boolean buffApplied = false;
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/pixel_art_food_strange_elixir.png","Strange Elixir",
+		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Food-Strange_Elixir.png","Strange Elixir",
 				"You are filled with vigor. That elixir you just drank has left you feeling ready for combat, but your thoughts are hazy. This effect lasts for 1 hour.",3600,"strength","+5%","dexterity","+15%","intelligence","-5%",1);
 		if (buff != null){ 
 			ds.put(buff);
