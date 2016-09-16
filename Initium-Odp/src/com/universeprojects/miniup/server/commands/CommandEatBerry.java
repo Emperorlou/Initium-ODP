@@ -34,15 +34,17 @@ public class CommandEatBerry extends Command {
 		if (GameUtils.equals(item.getProperty("containerKey"),character.getKey())==false)
 			throw new UserErrorMessage("You cannot consume this item. It must be in your inventory!");
 		
-		if (GameUtils.equals(item.getProperty("name"), "Strange Elixir")){
+		if ("Strange Elixir".equals(item.getProperty("name"))==true){
 			if(db.awardBuff_Elixir(ds, character)==false)
 				throw new UserErrorMessage("Only one elixir buff can be active at a time");
 			ds.delete(item);
+			return;
 		}
-		else if (GameUtils.equals(item.getProperty("name"), "Mysterious Berry")){
+		else if ("Mysterious Berry".equals(item.getProperty("name"))==true){
 			if(db.awardBuff_Berry(ds,character)==false)
 				throw new UserErrorMessage("Only one berry buff can be active at a time.");
 			ds.delete(item);
+			return;
 		}
 		else throw new UserErrorMessage("Why would you even try to eat that?");
 	}
