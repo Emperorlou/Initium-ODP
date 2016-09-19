@@ -24,7 +24,7 @@ public class CommandEatBerry extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		Long itemId = tryParseId(parameters,"itemId");		
 		CachedEntity item = db.getEntity("Item",itemId);
 		

@@ -43,11 +43,11 @@ public class DBAccessor {
 	
 	public CachedEntity getCurrentUser()
 	{
-		return db.getCurrentUser(request);
+		return db.getCurrentUser();
 	}
 	
 	public CachedEntity getCurrentCharacter()
 	{
-		return db.getCurrentCharacter(request);
+		return db.getCurrentCharacter();
 	}
 }

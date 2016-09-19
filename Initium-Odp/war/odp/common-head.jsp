@@ -25,11 +25,12 @@
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=47"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=48"></script>
 
 <script type="text/javascript" src="javascript/messager.js?v=2"></script>
 
-<script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=1"></script>
+<script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
+<script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
 
 
 
@@ -57,6 +58,7 @@
 
 
 <script type="text/javascript">
+	window.characterId = ${characterId};
 	window.verifyCode = "${verifyCode}";
 	window.serverTime=<c:out value="${serverTime}"/>;
 	window.clientTime=new Date().getTime();

@@ -417,5 +417,6 @@ public class TradeObject implements Serializable
 		else
 			throw new IllegalArgumentException("Character part of this trade object.");
 	}
+
 	
 }

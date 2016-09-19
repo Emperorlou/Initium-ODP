@@ -27,7 +27,7 @@ public class CommandTradeSetGold extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		String dogecoinStr = parameters.get("amount");
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		Key otherCharacter = (Key) character.getProperty("combatant");
         
         Long dogecoin = null;
@@ -46,7 +46,7 @@ public class CommandTradeSetGold extends Command {
 			throw new UserErrorMessage("Trade is already complete.");
 
         
-        db.setTradeDogecoin(ds, tradeObject, db.getCurrentCharacter(request), dogecoin);
+        db.setTradeDogecoin(ds, tradeObject, db.getCurrentCharacter(), dogecoin);
         db.sendNotification(ds,otherCharacter,NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();

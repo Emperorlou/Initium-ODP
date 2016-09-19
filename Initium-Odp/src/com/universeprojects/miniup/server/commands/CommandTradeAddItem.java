@@ -27,7 +27,7 @@ public class CommandTradeAddItem extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 			
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		Key otherCharacter = (Key) character.getProperty("combatant");
         Long itemId = tryParseId(parameters,"itemId");
         CachedEntity item = db.getEntity("Item", itemId);

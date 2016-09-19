@@ -57,7 +57,7 @@ public class CommandSetLabel extends Command {
 		Key containerKey = (Key)item.getProperty("containerKey");
 		if (containerKey==null)
 			throw new UserErrorMessage("You can only relabel items in your immediate vicinity.");
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		if (GameUtils.equals(containerKey,character.getKey())==false && GameUtils.equals(containerKey,(Key)character.getProperty("locationKey"))==false)
 			throw new UserErrorMessage("You can only relabel items in your immediate vicinity.");
 		

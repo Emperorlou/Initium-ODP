@@ -101,18 +101,18 @@ function PopupNotifications()
 };
 
 // Allow Ajax loaded scripts to be cached.
-jQuery.cachedScript = function( url, options ) {
-	// Allow user to set any option except for dataType, cache, and url
-	options = $.extend( options || {}, {
-		dataType: "script",
-		cache: true,
-		url: url
-	});
- 
-	// Use $.ajax() since it is more flexible than $.getScript
-	// Return the jqXHR object so we can chain callbacks
-	return jQuery.ajax( options );
-};
+//jQuery.cachedScript = function( url, options ) {
+//	// Allow user to set any option except for dataType, cache, and url
+//	options = $.extend( options || {}, {
+//		dataType: "script",
+//		cache: true,
+//		url: url
+//	});
+// 
+//	// Use $.ajax() since it is more flexible than $.getScript
+//	// Return the jqXHR object so we can chain callbacks
+//	return jQuery.ajax( options );
+//};
 
 var notificationScript = "/odp/javascript/BrowserPopupNotifications-impl.js";
 /* Default to browser popup notifications. If any other version, set the associated script location.
@@ -123,6 +123,10 @@ var notificationScript = "/odp/javascript/BrowserPopupNotifications-impl.js";
 
 // Load the detected notification version script. Each impl should have a 
 // SetNotificationHandler method that instantiates and assigns the global notifyHandler object.
-$.cachedScript(notificationScript, {async:false}).done(function() {
+//$.cachedScript(notificationScript, {async:false}).done(function() {
+//	SetNotificationHandler();
+//});
+
+$(document).ready(function(){
 	SetNotificationHandler();
 });

@@ -40,7 +40,7 @@ public class CommandStoreDeleteItem extends Command {
 		if (saleItem==null)
 			return;
 		
-		CachedEntity user = db.getCurrentUser(request);
+		CachedEntity user = db.getCurrentUser();
 		Key characterKey = (Key) user.getProperty("characterKey");
 		
 		CachedEntity item = db.getEntity((Key) saleItem.getProperty("itemKey"));

@@ -45,8 +45,8 @@ public class CommandSample extends Command {
 		// We're going to use both the user and character entities of the logged in user
 		// Needing at least the character is VERY common in commands since most commands
 		// deal with the user who is activating them in one way or another
-		CachedEntity user = db.getCurrentUser(request);
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity user = db.getCurrentUser();
+		CachedEntity character = db.getCurrentCharacter();
 
 		// We're going to output whether or not we have a full account or a throwaway, just for fun
 		boolean hasUser = false;

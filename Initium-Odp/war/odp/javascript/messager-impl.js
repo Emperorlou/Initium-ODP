@@ -80,9 +80,12 @@ messager.onChatMessage = function(chatMessage)
 		
 		try
 		{
-			doPopupNotification(null, "New private message", chatMessage.nickname+": "+chatMessage.message, "PrivateMessage", null, function(){
-				setPrivateChatTo(chatMessage.nickname, chatMessage.characterId);
-			});
+			if (characterId != chatMessage.characterId)
+			{
+				doPopupNotification(null, "New private message", chatMessage.nickname+": "+chatMessage.message, "PrivateMessage", null, function(){
+					setPrivateChatTo(chatMessage.nickname, chatMessage.characterId);
+				});
+			}
 			
 		}
 		catch(e)

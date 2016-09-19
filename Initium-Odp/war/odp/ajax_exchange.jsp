@@ -14,9 +14,9 @@
 <%
     response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
 
-    ODPDBAccess db = new ODPDBAccess();
+    ODPDBAccess db = new ODPDBAccess(request);
     
-    CachedEntity character = db.getCurrentCharacter(request); 
+    CachedEntity character = db.getCurrentCharacter(); 
     
 	
     

@@ -41,7 +41,7 @@ public class CommandToggleDuelRequests extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		// Make no changes, since Duel functionality is disabled for now. Just recreate the button.
 		updateHtml(parameters.get("buttonId"), HtmlComponents.generateToggleDuel(character));
 		throw new UserErrorMessage("Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");

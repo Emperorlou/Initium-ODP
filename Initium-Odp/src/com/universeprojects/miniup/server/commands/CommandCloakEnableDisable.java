@@ -40,7 +40,7 @@ public class CommandCloakEnableDisable extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 
 		if ("COMBAT".equals(character.getProperty("mode")))
 		{

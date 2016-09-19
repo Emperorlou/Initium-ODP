@@ -40,7 +40,7 @@ public class CommandPartyJoinEnableDisable extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		
 		String buttonId = parameters.get("buttonId");
 

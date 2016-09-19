@@ -48,7 +48,7 @@ public class CommandGroupCreate extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		String groupName = parameters.get("groupName");
 		if (groupName == null)
 		{

@@ -45,7 +45,7 @@ public class CommandGroupDenyJoinApplication extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		Key groupKey = (Key) character.getProperty("groupKey");
 		CachedEntity applicant = db.getCharacterById(tryParseId(parameters,
 				"characterId"));

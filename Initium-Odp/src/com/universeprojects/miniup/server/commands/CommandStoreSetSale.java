@@ -28,7 +28,7 @@ public class CommandStoreSetSale extends Command {
 public void run(Map<String,String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		
 		Double sale = Double.parseDouble(parameters.get("sale"));
 

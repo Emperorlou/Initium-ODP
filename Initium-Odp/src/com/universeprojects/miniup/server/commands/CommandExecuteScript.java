@@ -71,7 +71,7 @@ public class CommandExecuteScript extends Command {
 		}
 
 		// Can player trigger this effect...
-		CachedEntity playerEntity = db.getCurrentCharacter(request);
+		CachedEntity playerEntity = db.getCurrentCharacter();
 
 		switch(sourceEntity.getKind())
 		{

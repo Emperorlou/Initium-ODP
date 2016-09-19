@@ -44,7 +44,7 @@ public class CommandGroupDelete extends Command
 		// Variables
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		Key groupKey = (Key) character.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
 

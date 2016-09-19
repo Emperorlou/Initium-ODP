@@ -1,3 +1,7 @@
+// If we don't have Notification but we do have webkitNotifications, the interfaces should be the same so just use it
+if (typeof window.Notification === 'undefined' && window.webkitNotifications !== 'undefined')
+	window.Notification = window.webkitNotifications;
+
 // The Browser notification handler.
 // Uses the Notification API: https://developer.mozilla.org/en-US/docs/Web/API/notification
 function BrowserPopupNotifications()
@@ -7,17 +11,15 @@ function BrowserPopupNotifications()
 	// Notification.requestPermission will exit immediately if permission === "denied",
 	// so safe to call before every request.
 	handler.requestPermission = function() 
-	{
-		if (!'Notification' in window) {
-	        return;
-	    }
-	    if (Notification.permission !== 'granted') {
-	        Notification.requestPermission().then(function(result) { 
-	        	console.log("Notification Permission: "+result);
-	        	localStorage.setItem("DesktopNotificationsDenied", false);
-	    	});
-	    }
-	}
+    {
+        if (typeof window.Notification === 'undefined') 
+            return;
+        
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission();
+			localStorage.setItem("DesktopNotificationsDenied", false);
+        }
+    }
 
 	// If it tries to fire after a permission denial, notify the user on first call (since last
 	// permission request) and prevent further popups.
@@ -41,9 +43,9 @@ function BrowserPopupNotifications()
 	};
 
 	handler.onNotification = function(notifyEvent){
-		if (!'Notification' in window) {
+		if (typeof window.Notification === 'undefined') 
 	        return;
-	    }
+		
 	    if (Notification.permission === 'granted') {
 	        var opt = {};
 	    	opt.tag = notifyEvent.category || guid();

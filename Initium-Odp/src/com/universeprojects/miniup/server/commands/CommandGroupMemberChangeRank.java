@@ -48,7 +48,7 @@ public class CommandGroupMemberChangeRank extends Command
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		String rank = parameters.get("rank");
-		CachedEntity admin = db.getCurrentCharacter(request);
+		CachedEntity admin = db.getCurrentCharacter();
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
 		CachedEntity character = db.getCharacterById(tryParseId(parameters,

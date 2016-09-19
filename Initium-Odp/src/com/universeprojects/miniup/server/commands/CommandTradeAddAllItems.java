@@ -27,7 +27,7 @@ public class CommandTradeAddAllItems extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		List<CachedEntity> items = db.getFilteredList("Item", "containerKey", character.getKey());
 		Key otherCharacter = (Key) character.getProperty("combatant");
 
@@ -54,7 +54,7 @@ public class CommandTradeAddAllItems extends Command {
             }
 		}
         
-		db.addTradeItems(ds, tradeObject, db.getCurrentCharacter(request), items);
+		db.addTradeItems(ds, tradeObject, db.getCurrentCharacter(), items);
         db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();

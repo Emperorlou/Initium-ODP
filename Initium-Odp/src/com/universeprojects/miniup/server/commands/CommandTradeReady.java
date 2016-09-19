@@ -13,6 +13,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.TradeObject;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 public class CommandTradeReady extends Command {
 	
@@ -27,7 +28,7 @@ public class CommandTradeReady extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		Integer version = Integer.parseInt(parameters.get("tradeVersion"));
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		Key otherCharacter = (Key) character.getProperty("combatant");
 
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
@@ -36,12 +37,16 @@ public class CommandTradeReady extends Command {
 		if (tradeObject.isComplete())
 			throw new UserErrorMessage("Trade is already complete.");
 		
-		db.setTradeReady(ds, tradeObject, db.getCurrentCharacter(request), version);
+		db.setTradeReady(ds, tradeObject, db.getCurrentCharacter(), version);
     	db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
     	if (tradeObject.isComplete() == true)
     	{
     		String complete = "complete";
     		addCallbackData("tradeComplete",complete);
+    		
+    		MainPageUpdateService service = new MainPageUpdateService(db, this);
+    		service.updateMoney(character);
+    		
     	}
     	else setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
     	

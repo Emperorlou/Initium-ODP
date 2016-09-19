@@ -701,7 +701,7 @@ function loadInventoryAndEquipment()
 
 function loadInventory()
 {
-	$("#inventory").load("inventorylist.jsp?ajax=true");
+	$("#inventory").load("/odp/inventorylist.jsp?ajax=true");
 //	$("#inventory").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
 //	});
@@ -709,7 +709,7 @@ function loadInventory()
 
 function loadEquipment()
 {
-	$("#equipment").load("equipmentlist.jsp?ajax=true");
+	$("#equipment").load("/odp/equipmentlist.jsp?ajax=true");
 //	$("#inventory").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
 //	});
@@ -1252,7 +1252,7 @@ function loadInlineCollectables()
 function inventory()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_inventory.jsp");
+	pagePopup("/odp/ajax_inventory.jsp");
 }
 
 function viewChangelog()
@@ -1655,6 +1655,27 @@ function viewExchange()
 ////////////////////////////////////////////////////////
 // COMMANDS
 
+function ajaxUpdatePage(ajaxResponseData)
+{
+	// Here we update the screen with fresh html that came along with the response
+	if (ajaxResponseData.responseHtml!=null && ajaxResponseData.responseHtml.length>0)
+	{
+		for(var i = 0; i<ajaxResponseData.responseHtml.length; i++)
+		{
+			var htmlData = ajaxResponseData.responseHtml[i];
+			if (htmlData.type==0)
+			{
+				$(htmlData.selector).html(htmlData.html);
+			}
+			else if (htmlData.type==1)
+			{
+				$(htmlData.selector).replaceWith(htmlData.html);
+			}
+		}
+	}
+}
+
+
 function doCommand(eventObject, commandName, parameters, callback)
 {
 	if (parameters==null)
@@ -1697,11 +1718,18 @@ function doCommand(eventObject, commandName, parameters, callback)
 	$.get(url)
 	.done(function(data)
 	{
+		
 		// Refresh the full page or the pagePopup if applicable
 		if (data.javascriptResponse == "FullPageRefresh")
+		{
 			fullpageRefresh();
+			return;		// No need to go any further, we're refreshing the page anyway
+		}
 		else if (data.javascriptResponse == "ReloadPagePopup")
 			reloadPagePopup();
+
+		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
+		ajaxUpdatePage(data);
 
 		// Here we display the system message if there was a system message
 		if (data.message!=null && data.message.length>0)
@@ -1715,22 +1743,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 			popupMessage("System Message", data.errorMessage);
 		}
 
-		// Here we update the screen with fresh html that came along with the response
-		if (data.responseHtml!=null && data.responseHtml.length>0)
-		{
-			for(var i = 0; i<data.responseHtml.length; i++)
-			{
-				var htmlData = data.responseHtml[i];
-				if (htmlData.type==0)
-				{
-					$(htmlData.selector).html(htmlData.html);
-				}
-				else if (htmlData.type==1)
-				{
-					$(htmlData.selector).replaceWith(htmlData.html);
-				}
-			}
-		}
+
 		
 		
 		if (eventObject!=null)
@@ -1858,7 +1871,11 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 {
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
 	$.get(actionUrl)
-	.done(function(data){
+	.done(function(data)
+	{
+		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
+		ajaxUpdatePage(data);
+		
 		if (data.error!=undefined)
 		{
 			hideBannerLoadingIcon();

@@ -41,7 +41,7 @@ public class CommandTerritoryVacate extends Command {
 	{
 		ODPDBAccess db = getDB();
 		
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		CachedEntity territory = db.getEntity((Key)location.getProperty("territoryKey"));
 		if (territory==null)

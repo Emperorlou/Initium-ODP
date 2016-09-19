@@ -110,7 +110,7 @@ public class HtmlComponents {
 	public static String generateSellItemHtml(ODPDBAccess db, CachedEntity saleItem, HttpServletRequest request) {
 		
 		CachedEntity item = db.getEntity((Key)saleItem.getProperty("itemKey"));
-		Double storeSale = (Double)db.getCurrentCharacter(request).getProperty("storeSale");
+		Double storeSale = (Double)db.getCurrentCharacter().getProperty("storeSale");
 		if (storeSale == null)
 		{
 			storeSale = 100.0;
