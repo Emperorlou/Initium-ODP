@@ -1634,7 +1634,15 @@ function viewExchange()
 	pagePopup("/odp/ajax_exchange.jsp");
 }
 
-
+function renamePlayerHouse(eventObject)
+{
+	promptPopup("Rename Player House", "Enter a new name for your house:", "", function(newName) {
+		if (newName != null && newName != "")
+		{
+			doCommand(eventObject, "RenamePlayerHouse", {"newName" : newName});
+		}
+	});
+}
 
 
 
