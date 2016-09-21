@@ -93,6 +93,7 @@ public class HtmlComponents {
 		String result = "";
 			   result+="<div class='invItem' ref="+item.getKey().getId()+">";
 			   result+="<div class='main-item'>";
+			   result+="<input type=checkbox>";
 			   result+="<div class='main-item-container'>";
 			   result+=GameUtils.renderItem(item);
 			   result+="<br>";
@@ -143,6 +144,7 @@ public class HtmlComponents {
 		String result = "";
 			   result+="<div class='saleItem' ref="+saleItem.getKey().getId()+">";
 		   	   result+="<div class='main-item'>";
+		   	   result+="<input type=checkbox>";
 		   	   result+=" ";
 		   	   result+="<div class='main-item-container'>";
 		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";

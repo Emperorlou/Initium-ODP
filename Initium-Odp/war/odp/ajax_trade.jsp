@@ -152,11 +152,20 @@
         <br>
         <div class='main-splitScreen'>
         <span class="paragraph boldbox-right-link"><a onclick="tradeAddAllItemsNew()" title="This will put the whole inventory into the trade window.">Trade All</a></span>
-        <div class='boldbox'><h4>Your Inventory</h4>
-        <div class="main-item-filter">
-			<input class="main-item-filter-input" id="filter_invItem" type="text" placeholder="Filter inventory...">
+        <div class='boldbox selection-root'>
+        <div class="inventory-main-header">
+			<h4>Your Inventory</h4>
+	        <div class="main-item-filter">
+				<input class="main-item-filter-input" id="filter_invItem" type="text" placeholder="Filter inventory...">
+			</div>
+			<div class="inventory-main-commands">
+				<div class="command-row">
+					<label class="command-cell" title="Marks all inventory items for batch operations."><input type="checkbox" class="check-all">Select All</label>
+					<a class="command-cell right" title="Adds selected items to the trade window." onclick="selectedItemsTrade(event, '#invItems .invItem')">Trade Selected</a>
+				</div>
+			</div>
 		</div>
-        <div id='invItems'>
+        <div id='invItems' class='selection-list'>
         <%
             String currentCategory = "";
             for(CachedEntity item:items)
