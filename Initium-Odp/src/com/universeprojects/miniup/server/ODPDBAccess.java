@@ -2485,8 +2485,18 @@ public class ODPDBAccess
 		else
 			tradeObject.flagReady(ds, character, true);
 
-		CachedEntity character1 = getEntity(tradeObject.getOtherCharacter(character.getKey()));
-		CachedEntity character2 = character;
+		CachedEntity character1 = null;
+		CachedEntity character2 = null;
+		if (GameUtils.equals(tradeObject.character2Key, character.getKey()))
+		{
+			character1 = getEntity(tradeObject.getOtherCharacter(character.getKey()));
+			character2 = character;
+		}
+		else if (GameUtils.equals(tradeObject.character1Key, character.getKey()))
+		{
+			character1 = character;
+			character2 = getEntity(tradeObject.getOtherCharacter(character.getKey()));
+		}
 
 		if (((Key)character1.getProperty("locationKey")).getId() != ((Key)character2.getProperty("locationKey")).getId())
 		{

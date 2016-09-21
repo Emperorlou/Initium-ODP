@@ -5,6 +5,8 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -1128,7 +1130,17 @@ public class GameUtils
 			{
 				sb.append("<h5>Switch Characters</h5>");
 				sb.append("<ul class='switch-characters-list'>");
-				for(CachedEntity c:(List<CachedEntity>)request.getAttribute("characterList"))
+				
+				List<CachedEntity> characterList = (List<CachedEntity>)request.getAttribute("characterList");
+				Collections.sort(characterList, new Comparator<CachedEntity>()
+				{
+					@Override
+					public int compare(CachedEntity o1, CachedEntity o2)
+					{
+						return ((String)o1.getProperty("name")).compareTo((String)o2.getProperty("name"));
+					}
+				});
+				for(CachedEntity c:characterList)
 				{
 					if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
 						sb.append("<li><a onclick='switchCharacter("+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	

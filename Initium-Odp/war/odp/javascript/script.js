@@ -569,37 +569,37 @@ function storeSetSaleNew(eventObject)
 	
 }
 
-function storeSellItem(itemId)
-{
-	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
-		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
-	});
-}
+//function storeSellItem(itemId)
+//{
+//	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
+//		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
+//	});
+//}
 
-function removeAllStoreItems()
-{
-	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
-		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
-	});
-}
+//function removeAllStoreItems()
+//{
+//	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
+//		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
+//	});
+//}
 
-function storeDeleteSoldItems()
-{
-	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
-}
+//function storeDeleteSoldItems()
+//{
+//	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
+//}
+//
+//function storeDeleteItem(saleItemId)
+//{
+//	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
+//}
 
-function storeDeleteItem(saleItemId)
-{
-	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
-}
-
-function renameStore()
-{
-	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
-		if (name!=null && name!="")
-			window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
-	});
-}
+//function renameStore()
+//{
+//	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
+//		if (name!=null && name!="")
+//			window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
+//	});
+//}
 
 function createCampsite()
 {
@@ -636,15 +636,15 @@ function collectDogecoinsFromItem(itemId, event)
 
 
 
-function tradeSetDogecoin(currentDogecoin)
-{
-	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
-		if (amount!=null && amount!="")
-		{
-			window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
-		}
-	});
-}
+//function tradeSetDogecoin(currentDogecoin)
+//{
+//	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
+//		if (amount!=null && amount!="")
+//		{
+//			window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
+//		}
+//	});
+//}
 
 
 function toggleFullscreenChat()
@@ -825,10 +825,10 @@ function leaveGroup(eventObject)
 	});
 }
 
-function cancelLeaveGroup()
-{
-	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
-}
+//function cancelLeaveGroup()
+//{
+//	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
+//}
 
 function setGroupDescription(eventObject, existingDescription)
 {
@@ -881,15 +881,15 @@ function makeGroupCreator(eventObject, characterId)
 }
 
 
-function duelConfirmation_Yes()
-{
-	window.location.href="ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
-}
-
-function duelConfirmation_No()
-{
-	window.location.href="ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
-}
+//function duelConfirmation_Yes()
+//{
+//	window.location.href="ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
+//}
+//
+//function duelConfirmation_No()
+//{
+//	window.location.href="ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
+//}
 
 function reloadPopup(element, backUrl, event)
 {
@@ -936,24 +936,24 @@ function refreshPopup(url, event)
 		event.stopPropagation();
 }
 
-function changeStoreSale()
-{
-	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
-		if (sale!=null)
-		{
-			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
-		}
-	});
-	
-}
+//function changeStoreSale()
+//{
+//	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
+//		if (sale!=null)
+//		{
+//			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
+//		}
+//	});
+//	
+//}
 
 
-function destroyThrowaway()
-{
-	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
-		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
-	});
-}
+//function destroyThrowaway()
+//{
+//	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
+//		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
+//	});
+//}
 
 function popupPremiumReminder()
 {
@@ -1040,19 +1040,19 @@ function refreshInstanceRespawnWarning()
 		var seconds = (window.instanceRespawnMs - now)/1000;
 		var warning = $("#instanceRespawnWarning");
 		if (seconds<=0)
-			warning.text("Reinforcements will arrive at any moment! If you do not vacate the premises before they arrive, you will be forced out!")
+			warning.text("Reinforcements will arrive at any moment! If you do not vacate the premises before they arrive, you will be forced out!");
 		else
 			warning.text("Reinforcements will arrive in "+secondsElapsed(seconds)+". If you do not vacate the premises before they arrive, you will be forced out!");
 		warning.show();
 	}
 }
 
-function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
-{
-	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
-		window.location.href = "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
-	});
-}
+//function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
+//{
+//	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
+//		window.location.href = "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
+//	});
+//}
 
 function giftPremium()
 {
@@ -1343,7 +1343,9 @@ function doAttack(eventObject, charId)
 
 function leaveParty()
 {
-	location.href = "ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
+	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
+		location.href = "ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
+	});
 }
 
 function collectDogecoinFromCharacter(characterKey)
@@ -1779,7 +1781,7 @@ function doSetLeader(eventObject, charId)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	confirmPopup("Are you sure?", "Are you sure you want set someone else to be the leader of your group?", function(){
+	confirmPopup("Set new leader", "Are you sure you want set someone else to be the leader of your group?", function(){
 		doCommand(eventObject,"SetLeader",{"charId":charId});
 	});
 }
