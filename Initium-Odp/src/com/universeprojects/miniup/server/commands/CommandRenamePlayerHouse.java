@@ -31,11 +31,11 @@ public class CommandRenamePlayerHouse extends Command {
 		String newName = parameters.get("newName");
 		
 		if (newName == null || newName == "")
-			throw new UserErrorMessage("Name cannot be blank.");
+			throw new UserErrorMessage("House name cannot be blank.");
 		else if (newName.length() > 40)
-			throw new UserErrorMessage("Name is too long. Max length is 40 characters.");
-		else if (!newName.matches("[A-Za-z0-9'\" .!$&()#?:;]+"))
-			throw new UserErrorMessage("Name contains invalid characters.");
+			throw new UserErrorMessage("House name is too long. Max length is 40 characters.");
+		else if (!newName.matches("[A-Za-z0-9 ,]+"))
+			throw new UserErrorMessage("House name can only have letters, numbers, commas, and spaces in the name.");
 		else
 		{
 			location.setProperty("name", newName);
