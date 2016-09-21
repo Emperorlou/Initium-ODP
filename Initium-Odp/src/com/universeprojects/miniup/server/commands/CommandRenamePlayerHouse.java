@@ -11,6 +11,15 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
+/**
+ * Allows the player to rename their house
+ * 
+ * Parameters:
+ * 		newName - New name of the house
+ * 
+ * @author jDyn
+ * 
+ */
 public class CommandRenamePlayerHouse extends Command {
 
 	public CommandRenamePlayerHouse(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
