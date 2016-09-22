@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 	protected void processBatchItems(Map<String, String> parameters,
 			ODPDBAccess db, CachedDatastoreService ds, CachedEntity character,
 			List<CachedEntity> batchItems) throws UserErrorMessage {
-		// TODO Auto-generated method stub
+		
 		Key characterKey = character.getKey();
 		StringBuilder storeString = new StringBuilder();
 		for(CachedEntity storeItem:batchItems)
@@ -40,11 +42,14 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 			if (GameUtils.equals(characterKey, storeItem.getProperty("characterKey"))==false)
 				continue;
 			
+			// We need the actual item to generate the HTML to add.
+			CachedEntity item = db.getEntity((Key)storeItem.getProperty("itemKey"));
+			
 			ds.delete(storeItem.getKey());
 			
 			if ("Sold".equals(storeItem.getProperty("status"))==false)
 			{
-				storeString.append(HtmlComponents.generateInvItemHtml(storeItem));
+				storeString.append(HtmlComponents.generateInvItemHtml(item));
 			}
 			processedItems.add(storeItem.getKey().getId());
 		}
