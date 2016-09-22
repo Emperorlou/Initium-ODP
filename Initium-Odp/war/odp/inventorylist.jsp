@@ -36,8 +36,23 @@
 %>
 <html>
 <body>
-		<span class='paragraph boldbox-right-link'><a onclick='dropAllInventory()' title='This will drop everything in your inventory onto the ground. Equipped and vending items will NOT be dropped.'>Drop All</a></span>
-		<div class='boldbox'><h4>Your Inventory</h4>
+	<div class='boldbox selection-root'>
+		<div class="inventory-main-header">
+			<span class='paragraph boldbox-right-link'><a onclick='dropAllInventory()' title='This will drop everything in your inventory onto the ground. Equipped and vending items will NOT be dropped.'>Drop All</a></span>
+			<h4>Your Inventory</h4>
+			<div class="main-item-filter">
+				<input class="main-item-filter-input" id="filter_invItem" type="text" placeholder="Filter inventory...">
+			</div>
+			<div class="inventory-main-commands">
+				<div class="command-row">
+					<label class="command-cell" title="Marks all inventory items for batch operations."><input type="checkbox" class="check-all">Select All</label>
+					<a class="command-cell right" title="Drops any items you've selected in your inventory on the ground." onclick="selectedItemsSell(event, '#invItems .invItem')">Drop Selected</a>
+				</div>
+			</div>
+		</div>
+		<div id="invItems" class="selection-list">
+			
+		
 		<%
 			if (carryingChars.isEmpty()==false)
 			{
@@ -82,8 +97,9 @@
 					}
 				}
 				
+				out.println("<div class='invItem' ref=" + item.getKey().getId() + ">");
 				out.println("<div class='main-item'>");
-				out.println("	<div class='main-item-container'>");
+				out.println("<input type=checkbox><div class='main-item-container'>");
 				out.println("		"+GameUtils.renderItem(db, common.getCharacter(), item)+saleText);
 				out.println("<br>");
 				out.println("		<div class='main-item-controls'>");
@@ -98,9 +114,10 @@
 				out.println("		</div>");
 				out.println("	</div>");
 				out.println("</div>");
-				out.println("<br>");
+				out.println("</div>");
 			}
 		%>
 		</div>
+	</div>
 </body>
 </html>

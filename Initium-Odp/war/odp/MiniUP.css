@@ -552,15 +552,85 @@ a.main-highlight:HOVER
 	font-size:32px;
 	position: relative;
     top: 11px;
+    left: 5px;
 }
 
 .main-item
 {
 	display: inline-block;
-	margin-left:15px;
+	padding-left:15px;
 	font-size:17px;
-	margin-bottom:10px;
+	padding-bottom:10px;
+	width:95%;
 }
+		
+.main-item-selected
+{
+	background-color:rgba(0,255,0,.1);
+}
+
+.inventory-main-commands
+{
+	margin-bottom:2px;
+}
+
+.inventory-main-commands .command-row
+{
+	margin-top: 8px;
+	margin-bottom: 8px;
+	white-space: nowrap;
+}
+
+.inventory-main-commands .command-cell
+{
+	min-width: 100px;
+}
+
+.inventory-main-commands .left
+{
+	float: left;
+	margin-left: 6px;
+}
+
+.inventory-main-commands label
+{
+	margin-left: 0px;
+}
+
+.inventory-main-commands .right
+{
+	float: right;
+	text-align: right;
+	margin-right: 6px;
+}
+
+.check-all
+{
+	vertical-align:middle;
+}
+
+.inventory-main-header
+{
+	
+    margin-right: 0px;
+    margin-left: -4px;
+    margin-top: -4px;
+    margin-bottom: 5px;
+    background-color: #222222;
+    padding-left: 4px;
+    padding-top: 4px;
+    border-bottom: solid #CCCCCC 3px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.selection-list input[type=checkbox] {
+    margin-left: -15px;
+    margin-top: 20px;
+    float: left;
+    position: absolute;
+}
+		
 .main-item-subnote
 {
 	font-size:15px;
@@ -2107,6 +2177,7 @@ hr.items-separator {
 		{
 			font-size:24px;
 		}
+		
 		.main-item-subnote
 		{
 			font-size:20px;

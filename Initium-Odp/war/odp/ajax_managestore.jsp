@@ -62,11 +62,20 @@
 		<br><br>
 		<a onclick='storeSetSaleNew(event)' title='Use this feature to set a store-wide sale on all items (or even a store-wide price hike)'>Click here to change your store sale/adjustment value</a>
 		<div class='main-splitScreen'>
-		<div class='boldbox'><h4>Your Inventory</h4>
-		<div class="main-item-filter">
-			<input class="main-item-filter-input" id="filter_invItem" type="text" placeholder="Filter inventory...">
-		</div>
-		<div id='invItems'>
+		<div class='boldbox selection-root'>
+			<div class="inventory-main-header">
+				<h4>Your Inventory</h4>
+				<div class="main-item-filter">
+					<input class="main-item-filter-input" id="filter_invItem" type="text" placeholder="Filter inventory...">
+				</div>
+				<div class="inventory-main-commands">
+					<div class="command-row">
+						<label class="command-cell" title="Marks all inventory items for batch operations."><input type="checkbox" class="check-all">Select All</label>
+						<a class="command-cell right" title="Adds the selected inventory items to your storefront for the SAME specified price" onclick="selectedItemsSell(event, '#invItems .invItem')">Sell Selected</a>
+					</div>
+				</div>
+			</div>
+			<div id="invItems" class="selection-list">
 		<%
 			for(CachedEntity item:items)
 			{
@@ -92,20 +101,30 @@
 			// This should remove our sorted items, meaning only sold items remain.
 			saleItems.removeAll(sortedSaleItems);
 		%>
-		</div>
+			</div>
 		</div>
 		</div>
 		
 		<div class='main-splitScreen'>
-		<div class='boldbox'><h4>Your Storefront</h4>
-		<div class="main-item-filter">
-			<input class="main-item-filter-input" id="filter_saleItem" type="text" placeholder="Filter store...">
-		</div>
-		<div class='main-item-controls'>
-			<a onclick='storeDeleteSoldItemsNew(event)' class='main-item-subnote'>Remove Sold Items</a>
-			<a onclick='storeDeleteAllItemsNew(event)' class='main-item-subnote'>REMOVE ALL</a>
-		</div>
-		<div id='saleItems'>
+		<div class='boldbox selection-root'>
+			<div class='inventory-main-header'>
+				<h4>Your Storefront</h4>
+				<div class='main-item-filter'>
+					<input class='main-item-filter-input' id='filter_saleItem' type='text' placeholder='Filter store...'>
+				</div>
+				<div class='inventory-main-commands'>
+					<div class='command-row'>
+						<label class='command-cell' title='Marks sold storefront items for batch operations.'><input type='checkbox' class='check-group' ref='soldItems'>Select Sold</label>
+					</div>
+					<div class='command-row'>
+						<label class='command-cell' title='Marks all storefront items for batch operations.'><input type='checkbox' class='check-all'>Select All</label>
+						<a class='command-cell right' title='Removes the selected sale items from your storefront' onclick='selectedItemsRemoveFromStore(event, "#saleItems .saleItem")'>Remove Selected</a>
+					</div>
+				</div>
+			</div>
+		
+			
+			<div id='saleItems' class='selection-list'>
 		<%
 			
 			if(saleItems.size() > 0)
@@ -114,7 +133,7 @@
 				<div class='soldItems-header'>
 					<a id='soldItems-minimize' title='Click to show/hide sold items.' onclick='toggleMinimizeSoldItems()'>Sold Items</a>
 				</div>
-				<div class='soldItems'>
+				<div id='soldItems' class='selection-group'>
 					<%
 					for(CachedEntity saleItem:saleItems)
 					{
@@ -134,6 +153,6 @@
 				out.println(HtmlComponents.generateSellItemHtml(db,saleItem,request));
 			}
 		%>
-		</div>
+			</div>
 		</div>
 		</div>
