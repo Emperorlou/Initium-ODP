@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
 import java.util.Map;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,11 +48,27 @@ public class CommandRenamePlayerHouse extends Command {
 			throw new UserErrorMessage("House name is too long. Max length is 40 characters.");
 		else if (!newName.matches("[A-Za-z0-9 ,]+"))
 			throw new UserErrorMessage("House name can only have letters, numbers, commas, and spaces in the name.");
-		else
-		{
-			location.setProperty("name", newName);
-			ds.put(location);
-			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+		
+		// rename the location and edit location's description
+		location.setProperty("name", newName);
+		location.setProperty("description", "No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!");
+		
+		ds.put(location);
+		
+		// rename the path button overlays
+		List<CachedEntity> paths = db.getPathsByLocation(locationKey);
+		
+		for (CachedEntity path:paths) {
+			if (GameUtils.equals(path.getProperty("location1Key"), locationKey))
+				path.setProperty("location1ButtonNameOverlay", "Go to " + newName);
+			else if (GameUtils.equals(path.getProperty("location2Key"), locationKey))
+				path.setProperty("location2ButtonNameOverlay", "Go to " + newName);
+			else
+				throw new RuntimeException("Path from house to location was not found.");
 		}
+		
+		ds.put(paths);
+		
+		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 	}
 }
