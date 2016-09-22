@@ -46,7 +46,7 @@ public abstract class CommandItemsBase extends Command {
 			{
 				// If we can't parse the ID, then skip processing of the item.
 				Long itemId = Long.parseLong(id);
-				Key itemKey = KeyFactory.createKey(entityType, itemId);
+				Key itemKey = KeyFactory.createKey(getEntityType(), itemId);
 				itemKeys.add(itemKey);
 			}
 			catch(NumberFormatException nfe)
@@ -74,7 +74,6 @@ public abstract class CommandItemsBase extends Command {
 	 */
 	protected abstract void processBatchItems(Map<String, String> parameters, ODPDBAccess db, CachedDatastoreService ds, CachedEntity character, List<CachedEntity> batchItems) throws UserErrorMessage;
 
-	private String entityType;
 	/**
 	 * Specifies the entity type the specified itemIds reference, used to generate the Key
 	 * which will fetch the entities from the cache.
