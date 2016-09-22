@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -31,8 +32,8 @@ public class CommandRenamePlayerHouse extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
-		Long locationKey = (long)character.getProperty("locationKey");
-		CachedEntity location = db.getEntity("location", locationKey);
+		Key locationKey = (Key)character.getProperty("locationKey");
+		CachedEntity location = db.getEntity(locationKey);
 		
 		// check if player is house owner
 		if (!GameUtils.equals(location.getProperty("ownerKey"), character.getProperty("userKey")))
