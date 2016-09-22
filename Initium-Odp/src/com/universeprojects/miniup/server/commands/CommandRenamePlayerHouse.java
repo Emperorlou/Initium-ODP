@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
 import java.util.Map;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,9 +35,10 @@ public class CommandRenamePlayerHouse extends Command {
 		CachedEntity character = db.getCurrentCharacter();
 		Key locationKey = (Key)character.getProperty("locationKey");
 		CachedEntity location = db.getEntity(locationKey);
+		CachedEntity owner = db.getEntity((Key)location.getProperty("ownerKey"));
 		
 		// check if player is house owner
-		if (!GameUtils.equals(location.getProperty("ownerKey"), character.getProperty("userKey")))
+		if (!GameUtils.equals(owner.getProperty("userKey"), character.getProperty("userKey")))
 			throw new UserErrorMessage("You cannot rename a house you do not own.");
 		
 		String newName = parameters.get("newName");
@@ -47,11 +49,24 @@ public class CommandRenamePlayerHouse extends Command {
 			throw new UserErrorMessage("House name is too long. Max length is 40 characters.");
 		else if (!newName.matches("[A-Za-z0-9 ,]+"))
 			throw new UserErrorMessage("House name can only have letters, numbers, commas, and spaces in the name.");
+		
+		// rename the location and edit location's description
+		location.setProperty("name", newName);
+		location.setProperty("description", "This is " + owner.name + "'s property called '" + newName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!");
+		
+		ds.put(location);
+		
+		// rename the path button overlays
+		path = db.getPathsByLocation(locationKey).get(0);
+		if (GameUtils.equals((Key)path.getProperty("location1Key"), locationKey))
+			path.setProperty("location1ButtonNameOverlay", "Go to " + newName);
+		else if (GameUtils.equals((Key)path.getProperty("location2Key"), locationKey))
+			path.setProperty("location2ButtonNameOverlay", "Go to " + newName);
 		else
-		{
-			location.setProperty("name", newName);
-			ds.put(location);
-			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
-		}
+			throw new UserErrorMessage("Path from house to town was not found.");
+		
+		ds.put(path);
+		
+		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 	}
 }
