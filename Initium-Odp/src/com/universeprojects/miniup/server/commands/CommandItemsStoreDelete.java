@@ -35,6 +35,24 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 			ODPDBAccess db, CachedDatastoreService ds, CachedEntity character,
 			List<CachedEntity> batchItems) throws UserErrorMessage {
 		
+		List<Key> invItemKeys = new ArrayList<Key>();
+		for(CachedEntity storeItem:batchItems)
+			invItemKeys.add((Key)storeItem.getProperty("itemKey"));
+		
+		Map<CachedEntity, CachedEntity> storeToItemsMap = new HashMap<CachedEntity, CachedEntity>();
+		List<CachedEntity> invItems = ds.fetchEntitiesFromKeys(invItemKeys);
+		for(CachedEntity storeItem:batchItems)
+		{
+			for(CachedEntity item:invItems)
+			{
+				if(GameUtils.equals(item.getKey(), storeItem.getKey()))
+				{
+					storeToItemsMap.put(storeItem, item);
+					break;
+				}
+			}
+		}
+		
 		Key characterKey = character.getKey();
 		StringBuilder storeString = new StringBuilder();
 		for(CachedEntity storeItem:batchItems)
@@ -42,15 +60,14 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 			if (GameUtils.equals(characterKey, storeItem.getProperty("characterKey"))==false)
 				continue;
 			
-			// We need the actual item to generate the HTML to add.
-			CachedEntity item = db.getEntity((Key)storeItem.getProperty("itemKey"));
-			
 			ds.delete(storeItem.getKey());
 			
-			if ("Sold".equals(storeItem.getProperty("status"))==false)
+			if ("Sold".equals(storeItem.getProperty("status"))==false && storeToItemsMap.containsKey(storeItem))
 			{
+				CachedEntity item = storeToItemsMap.get(storeItem);
 				storeString.append(HtmlComponents.generateInvItemHtml(item));
 			}
+			// Add no matter what, so we can remove from the original list.
 			processedItems.add(storeItem.getKey().getId());
 		}
 		
