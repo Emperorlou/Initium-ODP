@@ -33,7 +33,7 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 			ODPDBAccess db, CachedDatastoreService ds, CachedEntity character,
 			List<CachedEntity> batchItems) throws UserErrorMessage {
 		// TODO Auto-generated method stub
-		Key characterKey = (Key) character.getProperty("characterKey");
+		Key characterKey = character.getKey();
 		StringBuilder storeString = new StringBuilder();
 		for(CachedEntity storeItem:batchItems)
 		{
