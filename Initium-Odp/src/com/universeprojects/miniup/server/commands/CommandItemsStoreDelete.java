@@ -45,8 +45,8 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 			if ("Sold".equals(storeItem.getProperty("status"))==false)
 			{
 				storeString.append(HtmlComponents.generateInvItemHtml(storeItem));
-				processedItems.add(storeItem.getKey().getId());
 			}
+			processedItems.add(storeItem.getKey().getId());
 		}
 		
 		addCallbackData("createInvItem", storeString.toString());
