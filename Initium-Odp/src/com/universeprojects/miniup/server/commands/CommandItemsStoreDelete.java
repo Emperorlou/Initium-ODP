@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +34,25 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 	protected void processBatchItems(Map<String, String> parameters,
 			ODPDBAccess db, CachedDatastoreService ds, CachedEntity character,
 			List<CachedEntity> batchItems) throws UserErrorMessage {
-		// TODO Auto-generated method stub
+		
+		List<Key> invItemKeys = new ArrayList<Key>();
+		for(CachedEntity storeItem:batchItems)
+			invItemKeys.add((Key)storeItem.getProperty("itemKey"));
+		
+		Map<CachedEntity, CachedEntity> storeToItemsMap = new HashMap<CachedEntity, CachedEntity>();
+		List<CachedEntity> invItems = ds.fetchEntitiesFromKeys(invItemKeys);
+		for(CachedEntity storeItem:batchItems)
+		{
+			for(CachedEntity item:invItems)
+			{
+				if(GameUtils.equals(item.getKey(), storeItem.getKey()))
+				{
+					storeToItemsMap.put(storeItem, item);
+					break;
+				}
+			}
+		}
+		
 		Key characterKey = character.getKey();
 		StringBuilder storeString = new StringBuilder();
 		for(CachedEntity storeItem:batchItems)
@@ -42,10 +62,12 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 			
 			ds.delete(storeItem.getKey());
 			
-			if ("Sold".equals(storeItem.getProperty("status"))==false)
+			if ("Sold".equals(storeItem.getProperty("status"))==false && storeToItemsMap.containsKey(storeItem))
 			{
-				storeString.append(HtmlComponents.generateInvItemHtml(storeItem));
+				CachedEntity item = storeToItemsMap.get(storeItem);
+				storeString.append(HtmlComponents.generateInvItemHtml(item));
 			}
+			// Add no matter what, so we can remove from the original list.
 			processedItems.add(storeItem.getKey().getId());
 		}
 		
