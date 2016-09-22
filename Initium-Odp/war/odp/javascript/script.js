@@ -948,12 +948,12 @@ function refreshPopup(url, event)
 //}
 
 
-//function destroyThrowaway()
-//{
-//	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
-//		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
-//	});
-//}
+function destroyThrowaway()
+{
+	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
+		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
+	});
+}
 
 function popupPremiumReminder()
 {
