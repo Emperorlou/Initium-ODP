@@ -46,7 +46,7 @@
 			<div class="inventory-main-commands">
 				<div class="command-row">
 					<label class="command-cell" title="Marks all inventory items for batch operations."><input type="checkbox" class="check-all">Select All</label>
-					<a class="command-cell right" title="Drops any items you've selected in your inventory on the ground." onclick="selectedItemsSell(event, '#invItems .invItem')">Drop Selected</a>
+					<a class="command-cell right" title="Drops any items you've selected in your inventory on the ground." onclick="selectedItemsDrop(event, '#invItems .invItem')">Drop Selected</a>
 				</div>
 			</div>
 		</div>
