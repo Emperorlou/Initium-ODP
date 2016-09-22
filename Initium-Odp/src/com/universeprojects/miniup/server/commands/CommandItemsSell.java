@@ -63,7 +63,7 @@ public class CommandItemsSell extends CommandItemsBase {
 			
 			CachedEntity saleItem = db.newSaleItem(ds, character, batchSale, amount);
 			saleString.append(HtmlComponents.generateSellItemHtml(db,saleItem,request));
-			processedItems.add(saleItem.getKey().getId());
+			processedItems.add(batchSale.getKey().getId());
 		}
 		
 		// If no items were sold, then we're returning an empty string, which won't change

@@ -241,6 +241,7 @@ public class HtmlComponents {
 		String result = "";
 		   result+="<div class='invItem' ref="+item.getKey().getId()+">";
 		   result+="<div class='main-item'>";
+		   result+="<input type=checkbox>";
 		   result+="<div class='main-item-container'>";
 		   result+=GameUtils.renderItem(item)+saleText;
 		   result+="<br>";
