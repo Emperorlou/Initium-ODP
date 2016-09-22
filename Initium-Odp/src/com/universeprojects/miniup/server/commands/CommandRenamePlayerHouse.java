@@ -51,6 +51,7 @@ public class CommandRenamePlayerHouse extends Command {
 		{
 			location.setProperty("name", newName);
 			ds.put(location);
+			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 		}
 	}
 }
