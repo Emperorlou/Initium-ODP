@@ -107,19 +107,18 @@
 		
 		<div class='main-splitScreen'>
 		<div class='boldbox selection-root'>
-			<div class="inventory-main-header">
+			<div class='inventory-main-header'>
 				<h4>Your Storefront</h4>
-				<div class="main-item-filter">
-					<input class="main-item-filter-input" id="filter_saleItem" type="text" placeholder="Filter store...">
+				<div class='main-item-filter'>
+					<input class='main-item-filter-input' id='filter_saleItem' type='text' placeholder='Filter store...'>
 				</div>
-				<div class="inventory-main-commands">
-					<div class="command-row">
-						<a onclick='storeDeleteSoldItemsNew(event)' class="command-cell left">Remove Sold</a>&nbsp;
-						<a onclick='storeDeleteAllItemsNew(event)' class="command-cell right">REMOVE ALL</a>
+				<div class='inventory-main-commands'>
+					<div class='command-row'>
+						<label class='command-cell' title='Marks sold storefront items for batch operations.'><input type='checkbox' class='check-group' ref='soldItems'>Select Sold</label>
 					</div>
-					<div class="command-row">
-						<label class="command-cell left" title="Marks all inventory items for batch operations."><input type="checkbox" class="check-all">Select All</label>&nbsp;
-						<a class="command-cell right" title="Removes the selected sale items from your storefront" onclick="selectedItemsRemoveFromStore(event, '#saleItems .saleItem')">Remove Selected</a>
+					<div class='command-row'>
+						<label class='command-cell' title='Marks all storefront items for batch operations.'><input type='checkbox' class='check-all'>Select All</label>
+						<a class='command-cell right' title='Removes the selected sale items from your storefront' onclick='selectedItemsRemoveFromStore(event, "#saleItems .saleItem")'>Remove Selected</a>
 					</div>
 				</div>
 			</div>
@@ -134,7 +133,7 @@
 				<div class='soldItems-header'>
 					<a id='soldItems-minimize' title='Click to show/hide sold items.' onclick='toggleMinimizeSoldItems()'>Sold Items</a>
 				</div>
-				<div class='soldItems'>
+				<div id='soldItems' class='selection-group'>
 					<%
 					for(CachedEntity saleItem:saleItems)
 					{

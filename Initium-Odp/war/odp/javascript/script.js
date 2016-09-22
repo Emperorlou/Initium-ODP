@@ -44,22 +44,13 @@ $(window).ready(function(e){
 	    	var selector = "div."+event.currentTarget.id.substring("filter_".length);
 			var searchString = $(event.currentTarget).val();
 
-			// Still using the custom case insensitive contains selector.
 			var conditionSelector = "a.clue:ContainsI('" + searchString + "')";
-			$(selector).each(function(){
-				// Some inventory screens have a line break between items. If they do, 
-				// then also hide the next br sibling of the current item div.
-				if(searchString == "" || $(this).has(conditionSelector).length)
-				{
-					$(this).show();
-					$(this).next("br").show();
-				}
-				else
-				{
-					$(this).hide();
-					$(this).next("br").hide();
-				}
-			});
+			var filterItems = $(selector);
+			var showItems = filterItems.has(conditionSelector);
+			var hideItems = filterItems.not(showItems);
+			
+			showItems.show().next("br").show();
+			hideItems.hide().next("br").hide();
 	    }, 500));
 	});
 	
@@ -67,9 +58,27 @@ $(window).ready(function(e){
 	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-all", function(event)
 	{
 		var cb = $(event.currentTarget);
-		var selectList = cb.parents(".selection-root").find(".selection-list");
-		selectList.find("input:checkbox").prop("checked", cb.prop("checked"));
-		selectList.find(".selection-list .main-item").toggleClass("main-item-selected", cb.prop("checked"));
+		var selectRoot = cb.parents(".selection-root");
+		selectRoot.find("input:checkbox.check-group").prop( {checked:cb.prop("checked"), indeterminate:false});
+		selectRoot.find(".selection-list input:checkbox").prop("checked", cb.prop("checked"));
+		selectRoot.find(".selection-list .main-item").toggleClass("main-item-selected", cb.prop("checked"));
+	});
+	
+	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-group", function(event)
+	{
+		var cb = $(event.currentTarget);
+		var groupId = cb.attr("ref");
+		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item");
+		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
+		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
+		
+		var allItems = cb.parents(".selection-root").find(".main-item");
+		var checkedItems = allItems.has("input:checkbox:checked");
+		cb.parents(".selection-root").find("input:checkbox.check-all")
+			.prop({
+				checked:checkedItems.length == allItems.length,
+				indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
+			});
 	});
 	
 	$("#page-popup-root").on("click", ".selection-list input:checkbox", function(event)
@@ -85,6 +94,19 @@ $(window).ready(function(e){
 				checked:checkedItems.length == invItems.length,
 				indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
 				});
+		
+		var group = cb.parents(".selection-group");
+		if(group.length > 0)
+		{
+			var groupName = group.prop("id");
+			invItems = group.find(".main-item");
+			checkedItems = invItems.find("input:checkbox:checked");
+			itemsDiv.find("input:checkbox.check-group[ref="+groupName+"]")
+				.prop({
+					checked:checkedItems.length == invItems.length,
+					indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
+					});
+		}
 	});
 	
 	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
@@ -1057,26 +1079,17 @@ function dropAllInventory()
 ////////////////////////////////////////////////////////
 //Batch item functions
 /**
- * Removes the items specified by the selector matching any of the ID's in the delimited string.
+ * fromSelector - should select the item divs themselves, not the parent (selection-list)
+ * toSelector - this is the encompassing div we'll be adding to
  */
-function removeSelectedElements(selector, delimitedIds)
-{
-	
-}
-
 function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 {
-	var itemsList = (delimitedIds || "").split(",");
-	var selectedItems = $(fromSelector);
-	$.each(itemsList, function(idx, itemId){
-		if(itemId != "")
-		{
-			var delItem = selectedItems.filter("[ref="+itemId+"]");
-			// Delete leading line breaks (if they exist).
-			delItem.next("br").remove();
-			delItem.remove();
-		}
-	})
+	var itemsList = "[ref="+(delimitedIds || "").split(",").join("],[ref=")+"]";
+	
+	var selectedItems = $(fromSelector).filter(itemsList);
+	// Get rid of following line breaks first.
+	selectedItems.next("br").remove();
+	selectedItems.remove();
 	
 	var container = $(toSelector);
 	container.html(newHtml+container.html());
