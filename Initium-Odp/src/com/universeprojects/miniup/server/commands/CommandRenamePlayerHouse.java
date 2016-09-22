@@ -35,10 +35,9 @@ public class CommandRenamePlayerHouse extends Command {
 		CachedEntity character = db.getCurrentCharacter();
 		Key locationKey = (Key)character.getProperty("locationKey");
 		CachedEntity location = db.getEntity(locationKey);
-		CachedEntity owner = db.getEntity((Key)location.getProperty("ownerKey"));
 		
 		// check if player is house owner
-		if (!GameUtils.equals(owner.getProperty("userKey"), character.getProperty("userKey")))
+		if (!GameUtils.equals(location.getProperty("ownerKey"), character.getProperty("userKey")))
 			throw new UserErrorMessage("You cannot rename a house you do not own.");
 		
 		String newName = parameters.get("newName");
@@ -52,15 +51,15 @@ public class CommandRenamePlayerHouse extends Command {
 		
 		// rename the location and edit location's description
 		location.setProperty("name", newName);
-		location.setProperty("description", "This is " + owner.name + "'s property called '" + newName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!");
+		location.setProperty("description", "No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!");
 		
 		ds.put(location);
 		
 		// rename the path button overlays
 		path = db.getPathsByLocation(locationKey).get(0);
-		if (GameUtils.equals((Key)path.getProperty("location1Key"), locationKey))
+		if (GameUtils.equals(path.getProperty("location1Key"), locationKey))
 			path.setProperty("location1ButtonNameOverlay", "Go to " + newName);
-		else if (GameUtils.equals((Key)path.getProperty("location2Key"), locationKey))
+		else if (GameUtils.equals(path.getProperty("location2Key"), locationKey))
 			path.setProperty("location2ButtonNameOverlay", "Go to " + newName);
 		else
 			throw new UserErrorMessage("Path from house to town was not found.");
