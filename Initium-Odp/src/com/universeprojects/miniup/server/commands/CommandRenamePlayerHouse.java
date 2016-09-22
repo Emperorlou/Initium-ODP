@@ -56,15 +56,18 @@ public class CommandRenamePlayerHouse extends Command {
 		ds.put(location);
 		
 		// rename the path button overlays
-		path = db.getPathsByLocation(locationKey).get(0);
-		if (GameUtils.equals(path.getProperty("location1Key"), locationKey))
-			path.setProperty("location1ButtonNameOverlay", "Go to " + newName);
-		else if (GameUtils.equals(path.getProperty("location2Key"), locationKey))
-			path.setProperty("location2ButtonNameOverlay", "Go to " + newName);
-		else
-			throw new UserErrorMessage("Path from house to town was not found.");
+		List<CachedEntity> paths = db.getPathsByLocation(locationKey);
 		
-		ds.put(path);
+		for (CachedEntity path:paths) {
+			if (GameUtils.equals(path.getProperty("location1Key"), locationKey))
+				path.setProperty("location1ButtonNameOverlay", "Go to " + newName);
+			else if (GameUtils.equals(path.getProperty("location2Key"), locationKey))
+				path.setProperty("location2ButtonNameOverlay", "Go to " + newName);
+			else
+				throw new RuntimeException("Path from house to location was not found.");
+		}
+		
+		ds.put(paths);
 		
 		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 	}
