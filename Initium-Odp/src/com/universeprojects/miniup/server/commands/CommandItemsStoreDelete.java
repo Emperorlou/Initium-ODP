@@ -51,7 +51,8 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 		
 		addCallbackData("createInvItem", storeString.toString());
 	}
-
+	
+	@Override
 	protected String getEntityType()
 	{
 		return "SaleItem";
