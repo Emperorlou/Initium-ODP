@@ -47,7 +47,7 @@ public class CommandRenamePlayerHouse extends Command {
 		else if (newName.length() > 40)
 			throw new UserErrorMessage("House name is too long. Max length is 40 characters.");
 		else if (!newName.matches(ODPDBAccess.STORE_NAME_REGEX))
-			throw new UserErrorMessage("House name can only have letters, numbers, commas, and spaces in the name.");
+			throw new UserErrorMessage("House name can only have letters, numbers, commas, spaces, and common symbols.");
 		
 		// rename the location and edit location's description
 		location.setProperty("name", newName);
@@ -59,10 +59,14 @@ public class CommandRenamePlayerHouse extends Command {
 		List<CachedEntity> paths = db.getPathsByLocation(locationKey);
 		
 		for (CachedEntity path:paths) {
-			if (GameUtils.equals(path.getProperty("location1Key"), locationKey))
+			if (GameUtils.equals(path.getProperty("location1Key"), locationKey)) {
 				path.setProperty("location1ButtonNameOverride", "Go to " + newName);
-			else if (GameUtils.equals(path.getProperty("location2Key"), locationKey))
+				path.setProperty("location2ButtonNameOverride", "Leave " + newName);
+			}
+			else if (GameUtils.equals(path.getProperty("location2Key"), locationKey)) {
 				path.setProperty("location2ButtonNameOverride", "Go to " + newName);
+				path.setProperty("location1ButtonNameOverride", "Leave " + newName);
+			}
 			else
 				throw new RuntimeException("Path from house to location was not found.");
 		}
