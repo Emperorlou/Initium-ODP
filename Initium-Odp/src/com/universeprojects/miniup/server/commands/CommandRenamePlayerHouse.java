@@ -46,7 +46,7 @@ public class CommandRenamePlayerHouse extends Command {
 			throw new UserErrorMessage("House name cannot be blank.");
 		else if (newName.length() > 40)
 			throw new UserErrorMessage("House name is too long. Max length is 40 characters.");
-		else if (!newName.matches("[A-Za-z0-9 ,]+"))
+		else if (!newName.matches(ODPDBAccess.STORE_NAME_REGEX))
 			throw new UserErrorMessage("House name can only have letters, numbers, commas, and spaces in the name.");
 		
 		// rename the location and edit location's description
