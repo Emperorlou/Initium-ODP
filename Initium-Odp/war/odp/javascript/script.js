@@ -125,8 +125,45 @@ $(window).ready(function(e){
 	else
 		$("#header-mute").attr("src", "images/ui/sound-button1-mute.png");
 		
+
+	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
+	$(window).focus(function(){
+		flagReadMessages();
+	});
 	
 });
+
+/**
+ * This removes the * from the title, (and by extension the 'unread messages' symbol on chrome browsers).
+ *  
+ * You can safely call this as often as you want.
+ */
+function flagReadMessages()
+{
+	if (document.hasFocus())
+	{
+		if (document.title.indexOf("* ")==0)
+		{
+			document.title = document.title.substring(2);
+		}
+	}
+}
+
+/**
+ * This adds a * to the title of the page (and by extension adds an 'unread messages' symbol on chrome browsers). 
+ * 
+ * You can safely call this as often as you want.
+ */
+function flagUnreadMessages()
+{
+	if (document.hasFocus()==false)
+	{
+		if (document.title.indexOf("*")<0)
+		{
+			document.title = "* "+document.title;
+		}
+	}
+}
 
 //Pop up Message
 function popupPermanentOverlay(title, content, popupClassOverride) 

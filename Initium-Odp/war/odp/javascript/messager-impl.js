@@ -85,6 +85,9 @@ messager.onChatMessage = function(chatMessage)
 				doPopupNotification(null, "New private message", chatMessage.nickname+": "+chatMessage.message, "PrivateMessage", null, function(){
 					setPrivateChatTo(chatMessage.nickname, chatMessage.characterId);
 				});
+				
+				// Change the title to include a * but only if the tab doesn't have focus
+				flagUnreadMessages();
 			}
 			
 		}

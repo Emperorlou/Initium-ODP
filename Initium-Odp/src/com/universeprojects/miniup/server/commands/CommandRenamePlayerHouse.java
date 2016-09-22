@@ -60,9 +60,9 @@ public class CommandRenamePlayerHouse extends Command {
 		
 		for (CachedEntity path:paths) {
 			if (GameUtils.equals(path.getProperty("location1Key"), locationKey))
-				path.setProperty("location1ButtonNameOverlay", "Go to " + newName);
+				path.setProperty("location1ButtonNameOverride", "Go to " + newName);
 			else if (GameUtils.equals(path.getProperty("location2Key"), locationKey))
-				path.setProperty("location2ButtonNameOverlay", "Go to " + newName);
+				path.setProperty("location2ButtonNameOverride", "Go to " + newName);
 			else
 				throw new RuntimeException("Path from house to location was not found.");
 		}
