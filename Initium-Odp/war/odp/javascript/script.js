@@ -63,6 +63,35 @@ $(window).ready(function(e){
 	    }, 500));
 	});
 	
+	// Unfortunately, we have to use event delegation for checkboxes, since it's in popup content.
+	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-all", function(event)
+	{
+		var cb = $(event.currentTarget);
+		var selectList = cb.parents(".selection-root").find(".selection-list");
+		selectList.find("input:checkbox").prop("checked", cb.prop("checked"));
+		selectList.find(".selection-list .main-item").toggleClass("main-item-selected", cb.prop("checked"));
+	});
+	
+	$("#page-popup-root").on("click", ".selection-list input:checkbox", function(event)
+	{
+		var cb = $(event.currentTarget);
+		cb.parent(".main-item").toggleClass("main-item-selected", cb.prop("checked"));
+		
+		var itemsDiv = cb.parents(".selection-root");
+		var invItems = itemsDiv.find(".main-item")
+		var checkedItems = invItems.find("input:checkbox:checked");
+		itemsDiv.find("input:checkbox.check-all")
+			.prop({
+				checked:checkedItems.length == invItems.length,
+				indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
+				});
+	});
+	
+	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
+	{
+		$(event.currentTarget).parent().find("input:checkbox").click();
+	});
+	
 	$(".main-expandable .main-expandable-title").click(function(){
 		$(this).parent().find(".main-expandable-content").show();
 		$(this).hide();
@@ -1021,6 +1050,103 @@ function dropAllInventory()
 	confirmPopup("Drop ALL Inventory", "Are you sure you want to drop EVERYTHING in your inventory on the ground?\n\nPlease note that items for sale in your store and equipped items will be excluded.", function(){
 		ajaxAction("ServletCharacterControl?type=dropAllInventory&v="+window.verifyCode, event, function(){
 			reloadPagePopup(true);
+		});
+	});
+}
+
+////////////////////////////////////////////////////////
+//Batch item functions
+/**
+ * Removes the items specified by the selector matching any of the ID's in the delimited string.
+ */
+function removeSelectedElements(selector, delimitedIds)
+{
+	
+}
+
+function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
+{
+	var itemsList = (delimitedIds || "").split(",");
+	var selectedItems = $(fromSelector);
+	$.each(itemsList, function(idx, itemId){
+		if(itemId != "")
+		{
+			var delItem = selectedItems.filter("[ref="+itemId+"]");
+			// Delete leading line breaks (if they exist).
+			delItem.next("br").remove();
+			delItem.remove();
+		}
+	})
+	
+	var container = $(toSelector);
+	container.html(newHtml+container.html());
+}
+
+function selectedItemsDrop(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:checked");
+	if(batchItems.length == 0) return;
+	
+	confirmPopup("Drop Selected Inventory", "Are you sure you want to drop " + batchItems.length + " selected items on the ground?\n\nPlease note that items for sale in your store will be excluded.", function(){
+		var itemIds = $.makeArray(
+				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
+				.join(",");
+
+		// This command causes the popup to reload, so no need for a callback.
+		doCommand(event,"ItemsDrop",{"itemIds":itemIds});
+	});
+}
+
+function selectedItemsRemoveFromStore(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:checked");
+	if(batchItems.length == 0) return;
+	
+	confirmPopup("Remove Items from Store", "Are you sure you want to remove " + batchItems.length + " selected items from your store?", function(){
+		var itemIds = $.makeArray(
+				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
+				.join(",");
+
+		doCommand(event,"ItemsStoreDelete",{"itemIds":itemIds}, function(data, error){
+			if (error) return;
+			moveSelectedElements(selector, "#invItems", data.processedItems || "", data.createInvItem);
+		});
+	});
+}
+
+function selectedItemsSell(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:checked");
+	if(batchItems.length == 0) return;
+	promptPopup("Sell Multiple Items", "How much do you want to sell these " + batchItems.length + " selected items for?", "0", function(amount){
+		if (amount!=null && amount!="")
+		{
+			var itemIds = $.makeArray(
+					batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
+					.join(",");
+	
+			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
+				if (error) return;
+				moveSelectedElements(selector, "#saleItems", data.processedItems || "", data.createSellItem);
+			});
+		}
+	});
+}
+
+function selectedItemsTrade(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:checked");
+	if(batchItems.length == 0) return;
+	
+	confirmPopup("Trade Items", "Are you sure you want to trade " + batchItems.length + " selected items?", function(){
+		var itemIds = $.makeArray(
+				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
+				.join(",");
+
+		doCommand(event,"ItemsTrade",{"itemIds":itemIds}, function(data, error){
+			if (error) return;
+			moveSelectedElements(selector, "#yourTrade", data.processedItems || "", data.createTradeItem);
+			tradeVersion = data.tradeVersion;
 		});
 	});
 }
