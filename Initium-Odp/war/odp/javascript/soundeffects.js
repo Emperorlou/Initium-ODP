@@ -161,6 +161,10 @@ $(document).ready(function(){
 	updateEnvironmentSoundEffectsVolume();
 });
 
+// The parameters passed to setAudioDescriptor when sound effects were
+// disabled, so we can enable it later if desired
+var requestedAudioDescriptor = null;
+
 /**
  * This gets called from the pages that need sound. The audioDescriptor of the location
  * being displayed is to be passed in.
@@ -170,7 +174,10 @@ $(document).ready(function(){
 function setAudioDescriptor(newAudioDescriptor, preset, isOutside)
 {
 	if (isSoundEffectsEnabled()==false)
+	{
+		requestedAudioDescriptor = [newAudioDescriptor, preset, isOutside];
 		return;
+	}
 
 	
 	outsideAudio = isOutside;
