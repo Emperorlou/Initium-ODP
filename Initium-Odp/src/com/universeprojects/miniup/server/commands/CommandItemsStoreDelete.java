@@ -45,7 +45,7 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 		{
 			for(CachedEntity item:invItems)
 			{
-				if(GameUtils.equals(item.getKey(), storeItem.getKey()))
+				if(item != null && GameUtils.equals(item.getKey(), storeItem.getKey()))
 				{
 					storeToItemsMap.put(storeItem, item);
 					break;

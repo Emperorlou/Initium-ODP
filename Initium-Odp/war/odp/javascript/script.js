@@ -59,7 +59,7 @@ $(window).ready(function(e){
 	{
 		var cb = $(event.currentTarget);
 		var selectRoot = cb.parents(".selection-root");
-		selectRoot.find("input:checkbox.check-group").prop( {checked:cb.prop("checked"), indeterminate:false});
+		selectRoot.find("input:checkbox.check-group:not(:disabled)").prop( {checked:cb.prop("checked"), indeterminate:false});
 		selectRoot.find(".selection-list input:checkbox").prop("checked", cb.prop("checked"));
 		selectRoot.find(".selection-list .main-item").toggleClass("main-item-selected", cb.prop("checked"));
 	});
@@ -72,13 +72,7 @@ $(window).ready(function(e){
 		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
 		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
 		
-		var allItems = cb.parents(".selection-root").find(".main-item");
-		var checkedItems = allItems.has("input:checkbox:checked");
-		cb.parents(".selection-root").find("input:checkbox.check-all")
-			.prop({
-				checked:checkedItems.length == allItems.length,
-				indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
-			});
+		setSelectionCheckboxes(event, groupId);
 	});
 	
 	$("#page-popup-root").on("click", ".selection-list input:checkbox", function(event)
@@ -86,30 +80,10 @@ $(window).ready(function(e){
 		var cb = $(event.currentTarget);
 		cb.parent(".main-item").toggleClass("main-item-selected", cb.prop("checked"));
 		
-		var itemsDiv = cb.parents(".selection-root");
-		var invItems = itemsDiv.find(".main-item")
-		var checkedItems = invItems.find("input:checkbox:checked");
-		itemsDiv.find("input:checkbox.check-all")
-			.prop({
-				checked:checkedItems.length == invItems.length,
-				indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
-				});
-		
-		var group = cb.parents(".selection-group");
-		if(group.length > 0)
-		{
-			var groupName = group.prop("id");
-			invItems = group.find(".main-item");
-			checkedItems = invItems.find("input:checkbox:checked");
-			itemsDiv.find("input:checkbox.check-group[ref="+groupName+"]")
-				.prop({
-					checked:checkedItems.length == invItems.length,
-					indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
-					});
-		}
+		setSelectionCheckboxes(event);
 	});
 	
-	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
+	$("#page-popup-root").on("click", ".selection-list .main-item", function(event)
 	{
 		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
@@ -1079,8 +1053,10 @@ function dropAllInventory()
 ////////////////////////////////////////////////////////
 //Batch item functions
 /**
- * fromSelector - should select the item divs themselves, not the parent (selection-list)
- * toSelector - this is the encompassing div we'll be adding to
+ * @param fromSelector - should select the item divs themselves, not the parent (selection-list)
+ * @param toSelector - this is the encompassing div we'll be adding to
+ * @param delimitedIds - The list of ID's we'll be removing from the original list (fromSelector)
+ * @param newHtml - Raw HTML to add to the new list (toSelector)
  */
 function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 {
@@ -1093,6 +1069,47 @@ function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 	
 	var container = $(toSelector);
 	container.html(newHtml+container.html());
+}
+
+/**
+ * This call is used to set the checkboxes in the inventory headers. Required to be called
+ * using an event, so we can get the root and work from there (on popups with multiple
+ * roots, such as inventory/equipment, this keeps us in the correct context).
+ * @param event - Event object fired from the user action. Used to get context list.
+ * @param groupId - Specified when clicking on a select group checkbox, bypassing checkbox state for groups entirely
+ */
+function setSelectionCheckboxes(event, groupId)
+{
+	var selectRoot = $(event.currentTarget).parents(".selection-root");
+	var allItems = selectRoot.find(".main-item");
+	var checkedItems = allItems.has("input:checkbox:checked");
+	
+	// Check-all first
+	selectRoot.find("input:checkbox.check-all")
+		.prop({
+			checked:checkedItems.length == allItems.length,
+			indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
+		});
+	
+	// If we pass in a groupId, that means we've clicked a group checkbox already.
+	// There won't be any overlapping groups (yet), so don't bother doing anything else with groups.
+	if(groupId == null || groupId == "")
+	{
+		// Check if this event belongs to a group. We can limit our selection that way.
+		var belongsToGroup = $(event.currentTarget).parents(".selection-group").prop("id");
+		
+		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]" 
+		selectRoot.find("input:checkbox.check-group" + groupFilter).not(":disabled").each(function(idx, grp) {
+			var groupCB = $(grp);
+			var groupItems = allItems.has(":parents('#" + groupCB.attr("ref") + "')");
+			var groupChecked = checkedItems.has(":parents('#" + groupCB.attr("ref") + "')");
+			groupCB
+				.prop({
+					checked:groupChecked.length == groupItems.length,
+					indeterminate: groupChecked.length > 0 && groupChecked.length != groupItems.length
+				});
+		});
+	}
 }
 
 function selectedItemsDrop(event, selector)
@@ -1123,6 +1140,7 @@ function selectedItemsRemoveFromStore(event, selector)
 		doCommand(event,"ItemsStoreDelete",{"itemIds":itemIds}, function(data, error){
 			if (error) return;
 			moveSelectedElements(selector, "#invItems", data.processedItems || "", data.createInvItem);
+			setSelectionCheckboxes(event);
 		});
 	});
 }
@@ -1141,6 +1159,7 @@ function selectedItemsSell(event, selector)
 			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
 				if (error) return;
 				moveSelectedElements(selector, "#saleItems", data.processedItems || "", data.createSellItem);
+				setSelectionCheckboxes(event);
 			});
 		}
 	});
@@ -1160,8 +1179,19 @@ function selectedItemsTrade(event, selector)
 			if (error) return;
 			moveSelectedElements(selector, "#yourTrade", data.processedItems || "", data.createTradeItem);
 			tradeVersion = data.tradeVersion;
+			setSelectionCheckboxes(event);
 		});
 	});
+}
+
+function characterUnequipItem(event, itemId)
+{
+	doCommand(event, "CharacterUnequipSlot", {"itemId":itemId});
+}
+
+function characterUnequipAll(event)
+{
+	doCommand(event, "CharacterUnequipAll");
 }
 
 function giveHouseToGroup()
@@ -1827,32 +1857,14 @@ function ajaxUpdatePage(ajaxResponseData)
 
 function doCommand(eventObject, commandName, parameters, callback)
 {
+	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
 		parameters = {"v":verifyCode};
 	else
 		parameters.v = verifyCode;
 	
-	// Collapse the parameters into a single string
-	var parametersStr = "";
-	var firstTime = true;
-	for(var propertyName in parameters)
-		if (parameters.hasOwnProperty(propertyName))
-		{
-			if (firstTime)
-			{
-				firstTime=false;
-				parametersStr+=encodeURIComponent(propertyName)+"="+encodeURIComponent(parameters[propertyName]);
-			}
-			else
-			{
-				parametersStr+="&"+encodeURIComponent(propertyName)+"="+encodeURIComponent(parameters[propertyName]);
-			}
-		}
-	
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "cmd?cmd="+commandName;
-	if (parametersStr.length>0)
-		url+="&"+parametersStr;
 	
 	var clickedElement = null;
 	var originalText = null;
@@ -1863,8 +1875,8 @@ function doCommand(eventObject, commandName, parameters, callback)
 		clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
 	}
 	
-	
-	$.get(url)
+	// We need to post, as larger batch operations failed due to URL string being too long
+	$.post(url, parameters)
 	.done(function(data)
 	{
 		
