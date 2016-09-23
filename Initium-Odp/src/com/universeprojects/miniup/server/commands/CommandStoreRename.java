@@ -30,7 +30,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		String storeName = parameters.get("name");
 
 		if (storeName==null || storeName.matches(db.STORE_NAME_REGEX)==false)

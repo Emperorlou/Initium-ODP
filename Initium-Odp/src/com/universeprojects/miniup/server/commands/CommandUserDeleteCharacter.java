@@ -28,14 +28,14 @@ public class CommandUserDeleteCharacter extends Command {
 	public void run(Map<String,String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 		
-		Key currentUser = db.getCurrentUserKey(request);
+		Key currentUser = db.getCurrentUserKey();
 		Long characterId = tryParseId(parameters, "characterId");
 		CachedEntity character = db.getEntity("character",characterId);
 		
 		if(GameUtils.equals(character.getProperty("mode"), "COMBAT"))
 			throw new UserErrorMessage("You can not delete a character that's in combat.");
 		
-		if(GameUtils.equals(character, db.getCurrentCharacter(request)))
+		if(GameUtils.equals(character, db.getCurrentCharacter()))
 			throw new UserErrorMessage("You can not delete the character you are currently using. Please switch characters and try again.");
 		
 		if(GameUtils.equals(currentUser, character.getProperty("userKey"))){

@@ -41,7 +41,7 @@ public class CommandGroupLeave extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 
 		// Check if we're not in a group
 		Key groupKey = (Key) character.getProperty("groupKey");

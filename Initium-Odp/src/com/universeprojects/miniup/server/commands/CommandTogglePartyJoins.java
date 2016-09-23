@@ -40,7 +40,7 @@ public class CommandTogglePartyJoins extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		
 		boolean isEnabled = "TRUE".equals(character.getProperty("partyJoinsAllowed"));
 		if (!isEnabled && "COMBAT".equals(character.getProperty("mode")))

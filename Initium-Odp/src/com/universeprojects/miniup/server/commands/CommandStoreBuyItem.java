@@ -30,7 +30,7 @@ public class CommandStoreBuyItem extends Command {
 		Long characterId = Long.parseLong(parameters.get("characterId"));
 		
 		
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity saleItem = db.getEntity("SaleItem", saleItemId);
 		if (saleItem==null)
 			throw new UserErrorMessage("This item has been taken down. The owner is no longer selling it.");

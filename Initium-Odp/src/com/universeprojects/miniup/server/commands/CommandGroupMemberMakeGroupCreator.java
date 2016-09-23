@@ -44,7 +44,7 @@ public class CommandGroupMemberMakeGroupCreator extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity admin = db.getCurrentCharacter(request);
+		CachedEntity admin = db.getCurrentCharacter();
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
 		CachedEntity newCreator = db.getCharacterById(tryParseId(parameters,

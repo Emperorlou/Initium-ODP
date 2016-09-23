@@ -43,7 +43,7 @@ public class CommandGroupRequestJoin extends Command
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		String groupId = parameters.get("groupId");
 		if (groupId == null)
 		{

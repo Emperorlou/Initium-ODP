@@ -37,7 +37,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		
 		Key itemKey = KeyFactory.createKey("Item", itemId);
 		CachedEntity item = db.getEntity(itemKey);

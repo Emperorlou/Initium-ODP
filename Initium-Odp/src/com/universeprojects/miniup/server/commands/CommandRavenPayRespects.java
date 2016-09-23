@@ -46,7 +46,7 @@ public class CommandRavenPayRespects extends Command {
 	public void run(Map<String, String> parameters) throws UserErrorMessage 
 	{
 		ODPDBAccess db = getDB();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		
 		// Verify the caller is at Burial Site of The Ebon Raven
 		Key key = (Key)character.getProperty("locationKey");

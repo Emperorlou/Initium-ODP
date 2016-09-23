@@ -31,10 +31,13 @@ import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 
 public class ODPDBAccess
 {
 	final public static boolean welcomeMessages = true;
+	
+	final private HttpServletRequest request;
 	
 	public enum CharacterMode
 	{
@@ -91,11 +94,17 @@ public class ODPDBAccess
 
 	public Map<Key, List<CachedEntity>> buffsCache = new HashMap<Key, List<CachedEntity>>();
 
-	public ODPDBAccess()
+	public ODPDBAccess(HttpServletRequest request)
 	{
+		this.request = request;
 		getDB(); // Initialize the datastore service
 	}
 
+	public HttpServletRequest getRequest()
+	{
+		return request;
+	}
+	
 	public CachedDatastoreService getDB()
 	{
 		if (ds != null) return ds;
@@ -221,9 +230,9 @@ public class ODPDBAccess
 	 * @param request
 	 * @return
 	 */
-	public Key getCurrentUserKey(HttpServletRequest request)
+	public Key getCurrentUserKey()
 	{
-		HttpSession session = request.getSession(true);
+		HttpSession session = getRequest().getSession(true);
 
 		Long userId = (Long) session.getAttribute("userId");
 
@@ -241,11 +250,11 @@ public class ODPDBAccess
 	 * @param request
 	 * @return
 	 */
-	public CachedEntity getCurrentUser(HttpServletRequest request)
+	public CachedEntity getCurrentUser()
 	{
 		if (request.getAttribute("userEntity") != null) return (CachedEntity) request.getAttribute("userEntity");
 
-		Key userKey = getCurrentUserKey(request);
+		Key userKey = getCurrentUserKey();
 
 		if (userKey == null) return null;
 
@@ -259,6 +268,42 @@ public class ODPDBAccess
 		return user;
 	}
 
+	
+	/**
+	 * Gets the character key of the user who is currently logged in (if they
+	 * are logged in).
+	 * 
+	 * This will return null if The user is not currently logged in or if the
+	 * user has no character on his account for some reason.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public Key getCurrentCharacterKey()
+	{
+		if (getRequest().getAttribute("characterEntity") != null) return ((CachedEntity) getRequest().getAttribute("characterEntity")).getKey();
+
+		HttpSession session = request.getSession(true);
+
+		Long authenticatedInstantCharacterId = (Long) session.getAttribute("instantCharacterId");
+		Long userId = (Long) session.getAttribute("userId");
+		if (userId != null)
+		{
+			CachedEntity user = getCurrentUser();
+			Key characterKey = (Key) user.getProperty("characterKey");
+			return characterKey;
+		}
+
+		if (authenticatedInstantCharacterId != null)
+		{
+			Key characterKey = createKey("Character", authenticatedInstantCharacterId);
+			return characterKey;
+		}
+
+		return null;
+
+	}
+	
 	/**
 	 * Gets the character entity of the user who is currently logged in (if they
 	 * are logged in).
@@ -269,11 +314,9 @@ public class ODPDBAccess
 	 * @param request
 	 * @return
 	 */
-	public CachedEntity getCurrentCharacter(HttpServletRequest request)
+	public CachedEntity getCurrentCharacter()
 	{
-		if (request==null) throw new IllegalArgumentException("Request cannot be null.");
-		
-		if (request.getAttribute("characterEntity") != null) return (CachedEntity) request.getAttribute("characterEntity");
+		if (getRequest().getAttribute("characterEntity") != null) return (CachedEntity) getRequest().getAttribute("characterEntity");
 
 		HttpSession session = request.getSession(true);
 
@@ -281,7 +324,7 @@ public class ODPDBAccess
 		Long userId = (Long) session.getAttribute("userId");
 		if (userId != null)
 		{
-			CachedEntity user = getCurrentUser(request);
+			CachedEntity user = getCurrentUser();
 			Key characterKey = (Key) user.getProperty("characterKey");
 			CachedEntity character = getEntity(characterKey);
 
@@ -2442,8 +2485,18 @@ public class ODPDBAccess
 		else
 			tradeObject.flagReady(ds, character, true);
 
-		CachedEntity character1 = getEntity(tradeObject.character1Key);
-		CachedEntity character2 = getEntity(tradeObject.character2Key);
+		CachedEntity character1 = null;
+		CachedEntity character2 = null;
+		if (GameUtils.equals(tradeObject.character2Key, character.getKey()))
+		{
+			character1 = getEntity(tradeObject.getOtherCharacter(character.getKey()));
+			character2 = character;
+		}
+		else if (GameUtils.equals(tradeObject.character1Key, character.getKey()))
+		{
+			character1 = character;
+			character2 = getEntity(tradeObject.getOtherCharacter(character.getKey()));
+		}
 
 		if (((Key)character1.getProperty("locationKey")).getId() != ((Key)character2.getProperty("locationKey")).getId())
 		{
@@ -2451,8 +2504,8 @@ public class ODPDBAccess
 			throw new UserErrorMessage("You cannot trade with a character who is not in your location.");
 		}
 		
-		
-		if (tradeObject.isReady(ds, character) && tradeObject.isReady(ds, getEntity(tradeObject.getOtherCharacter(character.getKey()))))
+
+		if (tradeObject.isReady(ds, character1) && tradeObject.isReady(ds, character2))
 		{
 			// If both users are ready at this point, perform the trade...
 		
@@ -3048,4 +3101,291 @@ public class ODPDBAccess
 			}
 		}
 	}
+	
+	
+	
+	//////////////////////////////////////
+	// Long Operation stuff
+	
+	
+	
+	
+	public void flagNotALooter(HttpServletRequest request)
+	{
+		request.setAttribute("notLooter", true);
+	}
+	
+
+	public void doCharacterAttemptTakePath(CachedDatastoreService ds, HttpServletRequest request, CachedEntity path, CachedEntity character, boolean attack) throws UserErrorMessage, AbortedActionException
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		if (GameUtils.isCharacterInParty(character) && GameUtils.isCharacterPartyLeader(character)==false)
+		{
+			throw new UserErrorMessage("You cannot move your party because you are not the leader.");
+		}
+
+		
+		
+		Long travelTime = (Long)path.getProperty("travelTime");
+		if (travelTime==null)
+			GameUtils.timePasses(6);	// Default travel time is 6 seconds
+		else
+			GameUtils.timePasses(travelTime.intValue());
+		
+		
+		if (randomMonsterEncounter(ds, character, getEntity((Key)character.getProperty("locationKey")), 1, 0.5d))
+		{
+			flagNotALooter(request);
+			throw new AbortedActionException(AbortedActionException.Type.CombataWhileMoving);
+		}
+		
+		
+		doCharacterTakePath(ds, character, path, attack);
+
+		flagNotALooter(request);
+		
+	}
+
+
+	public void setClientDescription(CachedDatastoreService ds, Key characterKey, String message)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		ds.getMC().put("ClientDescription-"+characterKey, message);
+	}
+	
+	
+	public void addToClientDescription(CachedDatastoreService ds, Key characterKey, String message)
+	{
+		String currentMessage = getClientDescription(ds, characterKey);
+		if (currentMessage==null)
+			currentMessage=message;
+		else
+			currentMessage+=message;
+		
+		setClientDescription(ds, characterKey, currentMessage);
+	}
+	
+	public String getClientDescription(CachedDatastoreService ds, Key characterKey)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		return (String)ds.getMC().get("ClientDescription-"+characterKey);
+	}
+	
+	public String getClientDescriptionAndClear(CachedDatastoreService ds, Key characterKey)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		String clientMessage = (String)ds.getMC().get("ClientDescription-"+characterKey);
+		if (clientMessage!=null)
+			setClientDescription(ds, characterKey, null);
+		
+		return clientMessage;
+	}
+
+	
+	/**
+	 * This is a placeholder since the actual implementation is not in the ODP.
+	 * 
+	 * This method takes the given definition object (like an ItemDef or NPCDef) and creates
+	 * a new CachedEntity with all of the fields from the definition and with the curve
+	 * formulas all solved.
+	 * 
+	 * @param definition
+	 * @param generatedEntityKind The "entity type" or "kind" of the returned CachedEntity
+	 * @return
+	 */
+	public CachedEntity generateNewObject(CachedEntity definition, String generatedEntityKind)
+	{
+		return null;
+	}
+
+	
+	/**
+	 * This is a placeholder since the actual implementation is not in the ODP.
+	 * 
+	 * This executes the full randomMonsterEncounter method with the tries set to 1 and multiplier set to 1.
+	 * 
+	 * @param ds
+	 * @param character
+	 * @param location
+	 * @param retries This is the number of times to retry when trying to get a random encounter. Use this when you want there to be a higher chance of getting an encounter.
+	 * @return
+	 */
+	public boolean randomMonsterEncounter(CachedDatastoreService ds, CachedEntity character, CachedEntity location)
+	{
+		return randomMonsterEncounter(ds, character, location, 1, 1d);
+	}
+	
+	
+	/**
+	 * This is a placeholder since the actual implementation is not in the ODP.
+	 * 
+	 * This method rolls a random chance to find a monster in the given location. It will load
+	 * all the monster spawners and attempt to spawn each one with the spawner's random chance.
+	 * 
+	 * @param ds
+	 * @param character The character who will enter combat with this monster if successful
+	 * @param location The location that contains the monster spawners to spawn
+	 * @param tries The number of times this method should attempt to spawn a monster. This is an easy way of upping the spawn chances. This basically just efficiently retries the spawn "tries" number of times if no spawn is successful.
+	 * @param individualMonsterChanceMultilier This number is multiplied against the individual monster spawn chance. The most common use for this multiplier is weather effect multipliers.
+	 * @return
+	 */
+	public boolean randomMonsterEncounter(CachedDatastoreService ds, CachedEntity character, CachedEntity location, int tries, Double individualMonsterChanceMultilier) 
+	{
+		return false;
+	}
+
+
+	/**
+	 * This is a placeholder since the actual implementation is not in the ODP.
+	 * 
+	 * @param db
+	 * @param character
+	 * @param path
+	 * @throws UserErrorMessage
+	 */
+	public void doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
+	{
+		doCharacterTakePath(db, character, path, false);
+	}
+	
+	/**
+	 * This is a placeholder since the actual implementation is not in the ODP.
+	 * 
+	 * @param db
+	 * @param character
+	 * @param path
+	 * @param allowAttack
+	 * @throws UserErrorMessage
+	 */
+	public void doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
+	{
+		return;
+	}
+
+	/**
+	 * This is a placeholder since the actual implementation is not in the ODP.
+	 * 
+	 * @param ds
+	 * @param character
+	 * @param location
+	 * @param tries
+	 * @param individualCollectionDiscoveryChanceMultiplier
+	 * @return
+	 */
+	public boolean randomCollectionDiscovery(CachedDatastoreService ds, CachedEntity character, CachedEntity location, int tries, Double individualCollectionDiscoveryChanceMultiplier) 
+	{
+		return false;
+	}	
+	
+	
+	
+	public void setPartiedField(List<CachedEntity> party, CachedEntity character, String fieldName, Object fieldValue)
+	{
+		character.setProperty(fieldName, fieldValue);
+		if (party!=null)
+			for(CachedEntity member:party)
+				if (GameUtils.equals(member.getKey(), character.getKey())==false)
+				{
+					member.setProperty(fieldName, fieldValue);
+				}
+	}
+	
+	//TODO: Figure out why the _SkipSelf variant is identical to the non _SkipSelf version... probably a bug, but no one is complaining
+	public void putPartyMembersToDB_SkipSelf(CachedDatastoreService ds, List<CachedEntity> party, CachedEntity character)
+	{
+		if (party!=null)
+			for(CachedEntity member:party)
+				if (GameUtils.equals(member.getKey(), character.getKey())==false)
+				{
+					ds.put(member);
+				}
+	}
+	
+	public void putPartyMembersToDB(CachedDatastoreService ds, List<CachedEntity> party, CachedEntity character)
+	{
+		ds.put(character);
+		if (party!=null)
+			for(CachedEntity member:party)
+				if (GameUtils.equals(member.getKey(), character.getKey())==false)
+				{
+					ds.put(member);
+				}
+	}
+
+	/**
+	 * This method PROBABLY COULD BE migrated over to the ODP.
+	 * 
+	 * 
+	 * @param currentCharacter
+	 * @param destination
+	 * @return
+	 */
+	public CachedEntity getBlockadeFor(CachedEntity currentCharacter, CachedEntity destination)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	public void sortAndShuffleCharactersByAttackOrder(List<CachedEntity> characters)
+	{
+		// An odd bug where null entries are getting into the character list
+		for(int i = characters.size()-1; i>=0; i--)
+			if (characters.get(i)==null) characters.remove(i);
+		
+		Collections.shuffle(characters);	// We first shuffle so that characters with the same status will be randomized
+		Collections.sort(characters, new Comparator<CachedEntity>(){
+
+			@Override
+			public int compare(CachedEntity o1, CachedEntity o2) {
+				String o1Status = (String)o1.getProperty("status");
+				String o2Status = (String)o2.getProperty("status");
+				if (o1Status==null) o1Status = "Normal";
+				if (o2Status==null) o2Status = "Normal";
+				return o1Status.compareTo(o2Status);
+			}
+		});
+		
+	}
+	
+	
+
+	public CachedEntity getCombatantFor(CachedEntity character, CachedEntity destination) 
+	{
+		List<CachedEntity> monsters = getFilteredList("Character", "type", "NPC", "locationKey", destination.getKey());
+		
+		if (monsters==null || monsters.isEmpty())
+			return null;
+		
+		sortAndShuffleCharactersByAttackOrder(monsters);
+		
+		for(CachedEntity monster:monsters)
+		{
+			if (monster.getProperty("combatant")==null && GameUtils.isPlayerIncapacitated(monster)==false)
+			{
+				character.setProperty("combatant", monster.getKey());
+				character.setProperty("combatType", "DefenceStructureAttack");
+				character.setProperty("mode", CHARACTER_MODE_COMBAT);
+				flagCharacterCombatAction(getDB(), character);
+				
+				monster.setProperty("combatant", character.getKey());
+				monster.setProperty("mode", CHARACTER_MODE_COMBAT);
+				
+				
+				
+				return monster;
+			}
+		}
+		return null;
+	}
+	
+	
 }

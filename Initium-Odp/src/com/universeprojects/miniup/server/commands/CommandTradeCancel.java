@@ -23,7 +23,7 @@ public class CommandTradeCancel extends Command {
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);	
+		CachedEntity character = db.getCurrentCharacter();	
 		
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
 		if (tradeObject==null || tradeObject.isCancelled())

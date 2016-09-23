@@ -28,7 +28,7 @@ public class CommandTradeRemoveItem extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		Long itemId = tryParseId(parameters,"itemId");
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		Key otherCharacter = (Key) character.getProperty("combatant");
         CachedEntity item = db.getEntity("Item", itemId);
         TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
@@ -43,7 +43,7 @@ public class CommandTradeRemoveItem extends Command {
         if (item==null)
             throw new UserErrorMessage("Item does not exist.");
         
-        	tradeObject.removeObject(ds, db.getCurrentCharacter(request), item);
+        	tradeObject.removeObject(ds, db.getCurrentCharacter(), item);
             db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();

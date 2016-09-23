@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -36,21 +37,22 @@ public class CommandStoreDeleteItem extends Command {
 		
 		Key saleItemKey = KeyFactory.createKey("SaleItem", saleItemId);
 		CachedEntity saleItem = db.getEntity(saleItemKey);
+		if (saleItem==null)
+			return;
 		
-		CachedEntity user = db.getCurrentUser(request);
+		CachedEntity user = db.getCurrentUser();
 		Key characterKey = (Key) user.getProperty("characterKey");
 		
 		CachedEntity item = db.getEntity((Key) saleItem.getProperty("itemKey"));
 		
-		if (saleItem==null)
-			return;
 		
-		if (characterKey.equals(saleItem.getProperty("characterKey"))==false)
-			throw new IllegalArgumentException("The SaleItem this user is trying to delete does not belong to his character.");
+		if (GameUtils.equals(characterKey, saleItem.getProperty("characterKey"))==false)
+			throw new UserErrorMessage("The SaleItem this user is trying to delete does not belong to his character.");
 		
 		ds.delete(saleItem.getKey());
 		
-		addCallbackData("createInvItem", HtmlComponents.generateInvItemHtml(item));
+		if ("Sold".equals(saleItem.getProperty("status"))==false)
+			addCallbackData("createInvItem", HtmlComponents.generateInvItemHtml(item));
 	}
 	
 }

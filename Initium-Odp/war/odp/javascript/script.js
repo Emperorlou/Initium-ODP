@@ -4,6 +4,7 @@ window.popupsArray = new Array();
 
 window.singlePostFormSubmitted = false;
 
+var notifyHandler = null;
 // Case insensitive Contains selector.
 jQuery.expr[':'].ContainsI = function(a, i, m) { return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0; };
 
@@ -43,23 +44,74 @@ $(window).ready(function(e){
 	    	var selector = "div."+event.currentTarget.id.substring("filter_".length);
 			var searchString = $(event.currentTarget).val();
 
-			// Still using the custom case insensitive contains selector.
 			var conditionSelector = "a.clue:ContainsI('" + searchString + "')";
-			$(selector).each(function(){
-				// Some inventory screens have a line break between items. If they do, 
-				// then also hide the next br sibling of the current item div.
-				if(searchString == "" || $(this).has(conditionSelector).length)
-				{
-					$(this).show();
-					$(this).next("br").show();
-				}
-				else
-				{
-					$(this).hide();
-					$(this).next("br").hide();
-				}
-			});
+			var filterItems = $(selector);
+			var showItems = filterItems.has(conditionSelector);
+			var hideItems = filterItems.not(showItems);
+			
+			showItems.show().next("br").show();
+			hideItems.hide().next("br").hide();
 	    }, 500));
+	});
+	
+	// Unfortunately, we have to use event delegation for checkboxes, since it's in popup content.
+	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-all", function(event)
+	{
+		var cb = $(event.currentTarget);
+		var selectRoot = cb.parents(".selection-root");
+		selectRoot.find("input:checkbox.check-group").prop( {checked:cb.prop("checked"), indeterminate:false});
+		selectRoot.find(".selection-list input:checkbox").prop("checked", cb.prop("checked"));
+		selectRoot.find(".selection-list .main-item").toggleClass("main-item-selected", cb.prop("checked"));
+	});
+	
+	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-group", function(event)
+	{
+		var cb = $(event.currentTarget);
+		var groupId = cb.attr("ref");
+		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item");
+		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
+		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
+		
+		var allItems = cb.parents(".selection-root").find(".main-item");
+		var checkedItems = allItems.has("input:checkbox:checked");
+		cb.parents(".selection-root").find("input:checkbox.check-all")
+			.prop({
+				checked:checkedItems.length == allItems.length,
+				indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
+			});
+	});
+	
+	$("#page-popup-root").on("click", ".selection-list input:checkbox", function(event)
+	{
+		var cb = $(event.currentTarget);
+		cb.parent(".main-item").toggleClass("main-item-selected", cb.prop("checked"));
+		
+		var itemsDiv = cb.parents(".selection-root");
+		var invItems = itemsDiv.find(".main-item")
+		var checkedItems = invItems.find("input:checkbox:checked");
+		itemsDiv.find("input:checkbox.check-all")
+			.prop({
+				checked:checkedItems.length == invItems.length,
+				indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
+				});
+		
+		var group = cb.parents(".selection-group");
+		if(group.length > 0)
+		{
+			var groupName = group.prop("id");
+			invItems = group.find(".main-item");
+			checkedItems = invItems.find("input:checkbox:checked");
+			itemsDiv.find("input:checkbox.check-group[ref="+groupName+"]")
+				.prop({
+					checked:checkedItems.length == invItems.length,
+					indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
+					});
+		}
+	});
+	
+	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
+	{
+		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
 	
 	$(".main-expandable .main-expandable-title").click(function(){
@@ -73,8 +125,45 @@ $(window).ready(function(e){
 	else
 		$("#header-mute").attr("src", "images/ui/sound-button1-mute.png");
 		
+
+	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
+	$(window).focus(function(){
+		flagReadMessages();
+	});
 	
 });
+
+/**
+ * This removes the * from the title, (and by extension the 'unread messages' symbol on chrome browsers).
+ *  
+ * You can safely call this as often as you want.
+ */
+function flagReadMessages()
+{
+	if (document.hasFocus())
+	{
+		if (document.title.indexOf("* ")==0)
+		{
+			document.title = document.title.substring(2);
+		}
+	}
+}
+
+/**
+ * This adds a * to the title of the page (and by extension adds an 'unread messages' symbol on chrome browsers). 
+ * 
+ * You can safely call this as often as you want.
+ */
+function flagUnreadMessages()
+{
+	if (document.hasFocus()==false)
+	{
+		if (document.title.indexOf("*")<0)
+		{
+			document.title = "* "+document.title;
+		}
+	}
+}
 
 //Pop up Message
 function popupPermanentOverlay(title, content, popupClassOverride) 
@@ -568,37 +657,37 @@ function storeSetSaleNew(eventObject)
 	
 }
 
-function storeSellItem(itemId)
-{
-	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
-		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
-	});
-}
+//function storeSellItem(itemId)
+//{
+//	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
+//		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
+//	});
+//}
 
-function removeAllStoreItems()
-{
-	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
-		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
-	});
-}
+//function removeAllStoreItems()
+//{
+//	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
+//		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
+//	});
+//}
 
-function storeDeleteSoldItems()
-{
-	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
-}
+//function storeDeleteSoldItems()
+//{
+//	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
+//}
+//
+//function storeDeleteItem(saleItemId)
+//{
+//	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
+//}
 
-function storeDeleteItem(saleItemId)
-{
-	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
-}
-
-function renameStore()
-{
-	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
-		if (name!=null && name!="")
-			window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
-	});
-}
+//function renameStore()
+//{
+//	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
+//		if (name!=null && name!="")
+//			window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
+//	});
+//}
 
 function createCampsite()
 {
@@ -635,15 +724,15 @@ function collectDogecoinsFromItem(itemId, event)
 
 
 
-function tradeSetDogecoin(currentDogecoin)
-{
-	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
-		if (amount!=null && amount!="")
-		{
-			window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
-		}
-	});
-}
+//function tradeSetDogecoin(currentDogecoin)
+//{
+//	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
+//		if (amount!=null && amount!="")
+//		{
+//			window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
+//		}
+//	});
+//}
 
 
 function toggleFullscreenChat()
@@ -700,7 +789,7 @@ function loadInventoryAndEquipment()
 
 function loadInventory()
 {
-	$("#inventory").load("inventorylist.jsp?ajax=true");
+	$("#inventory").load("/odp/inventorylist.jsp?ajax=true");
 //	$("#inventory").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
 //	});
@@ -708,7 +797,7 @@ function loadInventory()
 
 function loadEquipment()
 {
-	$("#equipment").load("equipmentlist.jsp?ajax=true");
+	$("#equipment").load("/odp/equipmentlist.jsp?ajax=true");
 //	$("#inventory").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
 //	});
@@ -824,10 +913,10 @@ function leaveGroup(eventObject)
 	});
 }
 
-function cancelLeaveGroup()
-{
-	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
-}
+//function cancelLeaveGroup()
+//{
+//	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
+//}
 
 function setGroupDescription(eventObject, existingDescription)
 {
@@ -880,15 +969,15 @@ function makeGroupCreator(eventObject, characterId)
 }
 
 
-function duelConfirmation_Yes()
-{
-	window.location.href="ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
-}
-
-function duelConfirmation_No()
-{
-	window.location.href="ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
-}
+//function duelConfirmation_Yes()
+//{
+//	window.location.href="ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
+//}
+//
+//function duelConfirmation_No()
+//{
+//	window.location.href="ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
+//}
 
 function reloadPopup(element, backUrl, event)
 {
@@ -935,16 +1024,16 @@ function refreshPopup(url, event)
 		event.stopPropagation();
 }
 
-function changeStoreSale()
-{
-	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
-		if (sale!=null)
-		{
-			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
-		}
-	});
-	
-}
+//function changeStoreSale()
+//{
+//	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
+//		if (sale!=null)
+//		{
+//			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
+//		}
+//	});
+//	
+//}
 
 
 function destroyThrowaway()
@@ -1024,6 +1113,94 @@ function dropAllInventory()
 	});
 }
 
+////////////////////////////////////////////////////////
+//Batch item functions
+/**
+ * fromSelector - should select the item divs themselves, not the parent (selection-list)
+ * toSelector - this is the encompassing div we'll be adding to
+ */
+function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
+{
+	var itemsList = "[ref="+(delimitedIds || "").split(",").join("],[ref=")+"]";
+	
+	var selectedItems = $(fromSelector).filter(itemsList);
+	// Get rid of following line breaks first.
+	selectedItems.next("br").remove();
+	selectedItems.remove();
+	
+	var container = $(toSelector);
+	container.html(newHtml+container.html());
+}
+
+function selectedItemsDrop(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:checked");
+	if(batchItems.length == 0) return;
+	
+	confirmPopup("Drop Selected Inventory", "Are you sure you want to drop " + batchItems.length + " selected items on the ground?\n\nPlease note that items for sale in your store will be excluded.", function(){
+		var itemIds = $.makeArray(
+				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
+				.join(",");
+
+		// This command causes the popup to reload, so no need for a callback.
+		doCommand(event,"ItemsDrop",{"itemIds":itemIds});
+	});
+}
+
+function selectedItemsRemoveFromStore(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:checked");
+	if(batchItems.length == 0) return;
+	
+	confirmPopup("Remove Items from Store", "Are you sure you want to remove " + batchItems.length + " selected items from your store?", function(){
+		var itemIds = $.makeArray(
+				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
+				.join(",");
+
+		doCommand(event,"ItemsStoreDelete",{"itemIds":itemIds}, function(data, error){
+			if (error) return;
+			moveSelectedElements(selector, "#invItems", data.processedItems || "", data.createInvItem);
+		});
+	});
+}
+
+function selectedItemsSell(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:checked");
+	if(batchItems.length == 0) return;
+	promptPopup("Sell Multiple Items", "How much do you want to sell these " + batchItems.length + " selected items for?", "0", function(amount){
+		if (amount!=null && amount!="")
+		{
+			var itemIds = $.makeArray(
+					batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
+					.join(",");
+	
+			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
+				if (error) return;
+				moveSelectedElements(selector, "#saleItems", data.processedItems || "", data.createSellItem);
+			});
+		}
+	});
+}
+
+function selectedItemsTrade(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:checked");
+	if(batchItems.length == 0) return;
+	
+	confirmPopup("Trade Items", "Are you sure you want to trade " + batchItems.length + " selected items?", function(){
+		var itemIds = $.makeArray(
+				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
+				.join(",");
+
+		doCommand(event,"ItemsTrade",{"itemIds":itemIds}, function(data, error){
+			if (error) return;
+			moveSelectedElements(selector, "#yourTrade", data.processedItems || "", data.createTradeItem);
+			tradeVersion = data.tradeVersion;
+		});
+	});
+}
+
 function giveHouseToGroup()
 {
 	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
@@ -1039,19 +1216,19 @@ function refreshInstanceRespawnWarning()
 		var seconds = (window.instanceRespawnMs - now)/1000;
 		var warning = $("#instanceRespawnWarning");
 		if (seconds<=0)
-			warning.text("Reinforcements will arrive at any moment! If you do not vacate the premises before they arrive, you will be forced out!")
+			warning.text("Reinforcements will arrive at any moment! If you do not vacate the premises before they arrive, you will be forced out!");
 		else
 			warning.text("Reinforcements will arrive in "+secondsElapsed(seconds)+". If you do not vacate the premises before they arrive, you will be forced out!");
 		warning.show();
 	}
 }
 
-function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
-{
-	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
-		window.location.href = "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
-	});
-}
+//function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
+//{
+//	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
+//		window.location.href = "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
+//	});
+//}
 
 function giftPremium()
 {
@@ -1251,7 +1428,7 @@ function loadInlineCollectables()
 function inventory()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_inventory.jsp");
+	pagePopup("/odp/ajax_inventory.jsp");
 }
 
 function viewChangelog()
@@ -1342,7 +1519,9 @@ function doAttack(eventObject, charId)
 
 function leaveParty()
 {
-	location.href = "ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
+	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
+		location.href = "ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
+	});
 }
 
 function collectDogecoinFromCharacter(characterKey)
@@ -1631,7 +1810,15 @@ function viewExchange()
 	pagePopup("/odp/ajax_exchange.jsp");
 }
 
-
+function renamePlayerHouse(eventObject)
+{
+	promptPopup("Rename Player House", "Enter a new name for your house:", "", function(newName) {
+		if (newName != null && newName != "")
+		{
+			doCommand(eventObject, "RenamePlayerHouse", {"newName" : newName});
+		}
+	});
+}
 
 
 
@@ -1653,6 +1840,27 @@ function viewExchange()
 
 ////////////////////////////////////////////////////////
 // COMMANDS
+
+function ajaxUpdatePage(ajaxResponseData)
+{
+	// Here we update the screen with fresh html that came along with the response
+	if (ajaxResponseData.responseHtml!=null && ajaxResponseData.responseHtml.length>0)
+	{
+		for(var i = 0; i<ajaxResponseData.responseHtml.length; i++)
+		{
+			var htmlData = ajaxResponseData.responseHtml[i];
+			if (htmlData.type==0)
+			{
+				$(htmlData.selector).html(htmlData.html);
+			}
+			else if (htmlData.type==1)
+			{
+				$(htmlData.selector).replaceWith(htmlData.html);
+			}
+		}
+	}
+}
+
 
 function doCommand(eventObject, commandName, parameters, callback)
 {
@@ -1696,11 +1904,18 @@ function doCommand(eventObject, commandName, parameters, callback)
 	$.get(url)
 	.done(function(data)
 	{
+		
 		// Refresh the full page or the pagePopup if applicable
 		if (data.javascriptResponse == "FullPageRefresh")
+		{
 			fullpageRefresh();
+			return;		// No need to go any further, we're refreshing the page anyway
+		}
 		else if (data.javascriptResponse == "ReloadPagePopup")
 			reloadPagePopup();
+
+		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
+		ajaxUpdatePage(data);
 
 		// Here we display the system message if there was a system message
 		if (data.message!=null && data.message.length>0)
@@ -1714,22 +1929,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 			popupMessage("System Message", data.errorMessage);
 		}
 
-		// Here we update the screen with fresh html that came along with the response
-		if (data.responseHtml!=null && data.responseHtml.length>0)
-		{
-			for(var i = 0; i<data.responseHtml.length; i++)
-			{
-				var htmlData = data.responseHtml[i];
-				if (htmlData.type==0)
-				{
-					$(htmlData.selector).html(htmlData.html);
-				}
-				else if (htmlData.type==1)
-				{
-					$(htmlData.selector).replaceWith(htmlData.html);
-				}
-			}
-		}
+
 		
 		
 		if (eventObject!=null)
@@ -1757,7 +1957,7 @@ function doSetLeader(eventObject, charId)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	confirmPopup("Are you sure?", "Are you sure you want set someone else to be the leader of your group?", function(){
+	confirmPopup("Set new leader", "Are you sure you want set someone else to be the leader of your group?", function(){
 		doCommand(eventObject,"SetLeader",{"charId":charId});
 	});
 }
@@ -1857,7 +2057,11 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 {
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
 	$.get(actionUrl)
-	.done(function(data){
+	.done(function(data)
+	{
+		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
+		ajaxUpdatePage(data);
+		
 		if (data.error!=undefined)
 		{
 			hideBannerLoadingIcon();
@@ -2490,18 +2694,23 @@ function getMusicVolume()
 	return parseInt(setting);
 }
 
-function toggleEnvironmentSoundEffects()
+function toggleEnvironmentSoundEffects(newState)
 {
 	var enabled = isSoundEffectsEnabled();
 	if (enabled==null)
 		enabled = true;
-	
-	
+	if (newState !== undefined) {
+		enabled = newState;
+	}
 	
 	createjs.Sound.muted = enabled;
 	localStorage.setItem("checkboxDisableEnvironmentSoundEffects", enabled+"");
-	
-	
+
+	if (requestedAudioDescriptor !== null)
+	{
+		setAudioDescriptor(requestedAudioDescriptor[0], requestedAudioDescriptor[1], requestedAudioDescriptor[2]);
+		requestedAudioDescriptor = null;
+	}
 	
 	// Set the correct image for the header mute button
 	if (enabled)
@@ -2516,4 +2725,12 @@ function updateEnvironmentSoundEffectsVolume()
 	var vol = getSoundEffectsVolume();
 	vol = parseFloat(vol)/100;
 	createjs.Sound.volume = vol;
+}
+
+////////////////////////////////////////////////////////
+//Notifications
+function doPopupNotification(iconUrl, title, text, category, options, onclick, onerror)
+{
+	if(notifyHandler == null || notifyHandler.popupNotify === "undefined") return;
+	return notifyHandler.popupNotify(iconUrl, title, text, category, options, onclick, onerror);
 }

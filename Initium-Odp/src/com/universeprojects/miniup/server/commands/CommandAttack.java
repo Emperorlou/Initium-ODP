@@ -104,7 +104,7 @@ public class CommandAttack extends Command {
 				throw new RuntimeException("Attack invalid call format, 'charId' is not a valid id.");
 			
 			// Check if monster can be attacked
-			CachedEntity character = db.getCurrentCharacter(request);
+			CachedEntity character = db.getCurrentCharacter();
 			CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 			canAttackHelper(ds, location, character, monster);
 

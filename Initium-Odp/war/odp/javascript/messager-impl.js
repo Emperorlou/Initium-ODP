@@ -77,6 +77,24 @@ messager.onChatMessage = function(chatMessage)
 		html+=" ";
 		html+=chatMessage.message;
 		html+="</div>";
+		
+		try
+		{
+			if (characterId != chatMessage.characterId)
+			{
+				doPopupNotification(null, "New private message", chatMessage.nickname+": "+chatMessage.message, "PrivateMessage", null, function(){
+					setPrivateChatTo(chatMessage.nickname, chatMessage.characterId);
+				});
+				
+				// Change the title to include a * but only if the tab doesn't have focus
+				flagUnreadMessages();
+			}
+			
+		}
+		catch(e)
+		{
+			// Ignore errors if there are any
+		}
 	}
 	else if (chatMessage.mode==null)
 	{

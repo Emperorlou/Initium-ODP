@@ -31,7 +31,7 @@ public class CommandStoreDeleteSoldItems extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
-		CachedEntity user = db.getCurrentUser(request);
+		CachedEntity user = db.getCurrentUser();
 		Key characterKey = (Key) user.getProperty("characterKey");
 				
 		List<CachedEntity> saleItems = db.getSaleItemsFor(characterKey);

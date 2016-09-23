@@ -42,7 +42,7 @@ public class CommandToggleStorefront extends Command
 		// TODO Auto-generated method stub
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		
 //		if ("MarketSite".equals(characterLocation.getProperty("type"))==false)
 //			throw new UserErrorMessage("You cannot setup shop outside of a marketplace.");

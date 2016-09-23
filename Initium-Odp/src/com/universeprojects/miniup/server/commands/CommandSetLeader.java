@@ -43,7 +43,7 @@ public class CommandSetLeader extends Command {
 			throw new RuntimeException("SetLeader invalid call format, 'charId' is not a valid id.");
 
 		// Verify that the caller is the current party leader
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		String partyCode = (String)character.getProperty("partyCode");
 		if (partyCode==null || partyCode.trim().equals(""))
 			throw new UserErrorMessage("You are not currently in a party and thus cannot do this.");

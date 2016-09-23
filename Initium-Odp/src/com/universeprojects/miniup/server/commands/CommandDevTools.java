@@ -185,7 +185,7 @@ public class CommandDevTools extends Command {
 		ODPDBAccess db = getDB();
 
 		// Verify that caller is a Dev
-		CachedEntity character = db.getCurrentCharacter(request);
+		CachedEntity character = db.getCurrentCharacter();
 		String nameClass = (String)character.getProperty("nameClass");
 		if (nameClass==null || nameClass.contains("content-dev-nickname")==false)
 			throw new UserErrorMessage("This command is only available to Dev characters.");

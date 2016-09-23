@@ -1,8 +1,6 @@
 package com.universeprojects.miniup.server.commands.framework;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,8 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.OperationBase;
 
-public abstract class Command 
+public abstract class Command extends OperationBase
 {
 	public enum JavascriptResponse
 	{
@@ -26,7 +25,6 @@ public abstract class Command
 	private String popupMessage;
 	private JavascriptResponse jsResponse = JavascriptResponse.None;
 	private Map<String, Object> callbackData = new HashMap<String, Object>();
-	private List<Map<String, String>> htmlUpdates = new ArrayList<Map<String, String>>();
 	
 	public Command(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -124,47 +122,8 @@ public abstract class Command
 		return callbackData.get(field);
 	}
 	
-	/**
-	 * When the command returns to the browser, the page will then find the elements that match
-	 * the given jquerySelector and the element's contents will be filled with the given htmlContents.
-	 * 
-	 * If you just want to replace the selected elements with html, then use the 
-	 * updateHtml() method instead.
-	 * 
-	 * @param jquerySelector
-	 * @param htmlContents
-	 */
-	protected void updateHtmlContents(String jquerySelector, String htmlContents)
-	{
-		Map<String,String> htmlData = new HashMap<String,String>();
-		
-		htmlData.put("type", "0");
-		htmlData.put("selector", jquerySelector);
-		htmlData.put("html", htmlContents);
-		
-		htmlUpdates.add(htmlData);
-	}
 	
-	/**
-	 * When the command returns to the browser, the page will then find the elements that match
-	 * the given jquerySelector and the element itself will be replaced with the given newHtml.
-	 * 
-	 * If you just want to update the contents of the element (ie. adding html inside of a div) then 
-	 * use the updateHtmlContents() method instead.
-	 * 
-	 * @param jquerySelector
-	 * @param newHtml
-	 */
-	protected void updateHtml(String jquerySelector, String newHtml)
-	{
-		Map<String,String> htmlData = new HashMap<String,String>();
-		
-		htmlData.put("type", "1");
-		htmlData.put("selector", jquerySelector);
-		htmlData.put("html", newHtml);
-		
-		htmlUpdates.add(htmlData);
-	}
+	
 	
 	/**
 	 * The command's execution logic is done here. 
@@ -181,9 +140,5 @@ public abstract class Command
 		return callbackData;
 	}
 	
-	public List<Map<String,String>> getHtmlUpdates()
-	{
-		return htmlUpdates;
-	}
 	
 }
