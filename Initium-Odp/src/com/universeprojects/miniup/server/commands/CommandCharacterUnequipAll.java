@@ -45,8 +45,6 @@ public class CommandCharacterUnequipAll extends Command {
 			character.setProperty("equipment" + slot, null);
 		}
 		ds.put(character);
-		
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 
 }

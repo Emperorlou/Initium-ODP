@@ -37,8 +37,6 @@ public class CommandCharacterUnequipItem extends Command {
 			throw new UserErrorMessage("Item doesn't exist.");
 		}
 		db.doCharacterUnequipEntity(ds, character, equipmentItem);
-		
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 
 }

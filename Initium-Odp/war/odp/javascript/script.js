@@ -83,7 +83,7 @@ $(window).ready(function(e){
 		setSelectionCheckboxes(event);
 	});
 	
-	$("#page-popup-root").on("click", ".selection-list .main-item", function(event)
+	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
 	{
 		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
@@ -1221,16 +1221,14 @@ function selectedItemsTrade(event, selector)
 	});
 }
 
-// These cause popup reload to occur.
 function characterUnequipItem(event, itemId)
 {
-	doCommand(event, "CharacterUnequipItem", {"itemId":itemId});
+	doCommand(event, "CharacterUnequipItem", {"itemId":itemId}, loadInventoryAndEquipment);
 }
 
-//These cause popup reload to occur.
 function characterUnequipAll(event)
 {
-	doCommand(event, "CharacterUnequipAll");
+	doCommand(event, "CharacterUnequipAll", null, loadInventoryAndEquipment);
 }
 
 function giveHouseToGroup()
