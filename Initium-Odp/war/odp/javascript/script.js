@@ -559,7 +559,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 function buyHouse()
 {
 	promptPopup("Buy House", "Are you sure you want to buy a house from the city? It will cost 2000 gold.\n\nIf you would like to proceed, please give your new home a name:", "My House", function(name){
-		window.location.href="ServletCharacterControl?type=buyHouse&houseName="+encodeURIComponent(name)+"&v="+window.verifyCode;
+		doCommand(eventObject, "BuyHouse", {"houseName":name});
 	});
 }
 
