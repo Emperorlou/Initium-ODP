@@ -1117,14 +1117,16 @@ function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
  */
 function setSelectionCheckboxes(event, groupId)
 {
-	var selectRoot = $(event.currentTarget).parents(".selection-root");
+	// On link clicks, currentTarget should be null since it's not assigned from a shared parent
+	// The link itself has the onclick, so coalesce to event.target
+	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
 	var allItems = selectRoot.find(".main-item");
 	var checkedItems = allItems.has("input:checkbox:checked");
 	
 	// Check-all first
 	selectRoot.find("input:checkbox.check-all")
 		.prop({
-			checked:checkedItems.length == allItems.length,
+			checked: allItems.length > 0 && checkedItems.length == allItems.length,
 			indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
 		});
 	
@@ -1142,7 +1144,7 @@ function setSelectionCheckboxes(event, groupId)
 			var groupChecked = checkedItems.has(":parents('#" + groupCB.attr("ref") + "')");
 			groupCB
 				.prop({
-					checked:groupChecked.length == groupItems.length,
+					checked:groupItems.length > 0 && groupChecked.length == groupItems.length,
 					indeterminate: groupChecked.length > 0 && groupChecked.length != groupItems.length
 				});
 		});
