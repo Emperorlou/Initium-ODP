@@ -2705,8 +2705,12 @@ function toggleEnvironmentSoundEffects(newState)
 	
 	createjs.Sound.muted = enabled;
 	localStorage.setItem("checkboxDisableEnvironmentSoundEffects", enabled+"");
-	
-	
+
+	if (requestedAudioDescriptor !== null)
+	{
+		setAudioDescriptor(requestedAudioDescriptor[0], requestedAudioDescriptor[1], requestedAudioDescriptor[2]);
+		requestedAudioDescriptor = null;
+	}
 	
 	// Set the correct image for the header mute button
 	if (enabled)
