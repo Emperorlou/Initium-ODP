@@ -1221,11 +1221,13 @@ function selectedItemsTrade(event, selector)
 	});
 }
 
+// These cause popup reload to occur.
 function characterUnequipItem(event, itemId)
 {
-	doCommand(event, "CharacterUnequipSlot", {"itemId":itemId});
+	doCommand(event, "CharacterUnequipItem", {"itemId":itemId});
 }
 
+//These cause popup reload to occur.
 function characterUnequipAll(event)
 {
 	doCommand(event, "CharacterUnequipAll");
