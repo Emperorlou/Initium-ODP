@@ -2694,18 +2694,23 @@ function getMusicVolume()
 	return parseInt(setting);
 }
 
-function toggleEnvironmentSoundEffects()
+function toggleEnvironmentSoundEffects(newState)
 {
 	var enabled = isSoundEffectsEnabled();
 	if (enabled==null)
 		enabled = true;
-	
-	
+	if (newState !== undefined) {
+		enabled = newState;
+	}
 	
 	createjs.Sound.muted = enabled;
 	localStorage.setItem("checkboxDisableEnvironmentSoundEffects", enabled+"");
-	
-	
+
+	if (requestedAudioDescriptor !== null)
+	{
+		setAudioDescriptor(requestedAudioDescriptor[0], requestedAudioDescriptor[1], requestedAudioDescriptor[2]);
+		requestedAudioDescriptor = null;
+	}
 	
 	// Set the correct image for the header mute button
 	if (enabled)
