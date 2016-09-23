@@ -1221,16 +1221,14 @@ function selectedItemsTrade(event, selector)
 	});
 }
 
-// These cause popup reload to occur.
 function characterUnequipItem(event, itemId)
 {
-	doCommand(event, "CharacterUnequipItem", {"itemId":itemId});
+	doCommand(event, "CharacterUnequipItem", {"itemId":itemId}, loadInventoryAndEquipment);
 }
 
-//These cause popup reload to occur.
 function characterUnequipAll(event)
 {
-	doCommand(event, "CharacterUnequipAll");
+	doCommand(event, "CharacterUnequipAll", null, loadInventoryAndEquipment);
 }
 
 function giveHouseToGroup()
