@@ -83,7 +83,7 @@ $(window).ready(function(e){
 		setSelectionCheckboxes(event);
 	});
 	
-	$("#page-popup-root").on("click", ".selection-list .main-item", function(event)
+	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
 	{
 		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
