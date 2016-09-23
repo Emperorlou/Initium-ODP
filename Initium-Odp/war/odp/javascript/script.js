@@ -556,7 +556,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 
 
 
-function buyHouse()
+function buyHouse(eventObject)
 {
 	promptPopup("Buy House", "Are you sure you want to buy a house from the city? It will cost 2000 gold.\n\nIf you would like to proceed, please give your new home a name:", "My House", function(name){
 		doCommand(eventObject, "BuyHouse", {"houseName":name});
