@@ -30,7 +30,7 @@ public class CommandUserDeleteCharacter extends Command {
 		
 		Key currentUser = db.getCurrentUserKey();
 		Long characterId = tryParseId(parameters, "characterId");
-		CachedEntity character = db.getEntity("character",characterId);
+		CachedEntity character = db.getEntity("Character",characterId);
 		
 		if(GameUtils.equals(character.getProperty("mode"), "COMBAT"))
 			throw new UserErrorMessage("You can not delete a character that's in combat.");
