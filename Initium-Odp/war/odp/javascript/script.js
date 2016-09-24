@@ -1117,14 +1117,16 @@ function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
  */
 function setSelectionCheckboxes(event, groupId)
 {
-	var selectRoot = $(event.currentTarget).parents(".selection-root");
+	// On link clicks, currentTarget should be null since it's not assigned from a shared parent
+	// The link itself has the onclick, so coalesce to event.target
+	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
 	var allItems = selectRoot.find(".main-item");
 	var checkedItems = allItems.has("input:checkbox:checked");
 	
 	// Check-all first
 	selectRoot.find("input:checkbox.check-all")
 		.prop({
-			checked:checkedItems.length == allItems.length,
+			checked: allItems.length > 0 && checkedItems.length == allItems.length,
 			indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
 		});
 	
@@ -1133,18 +1135,21 @@ function setSelectionCheckboxes(event, groupId)
 	if(groupId == null || groupId == "")
 	{
 		// Check if this event belongs to a group. We can limit our selection that way.
-		var belongsToGroup = $(event.currentTarget).parents(".selection-group").prop("id");
+		var belongsToGroup = $(event.currentTarget || event.target).parents(".selection-group").prop("id");
 		
 		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]" 
-		selectRoot.find("input:checkbox.check-group" + groupFilter).not(":disabled").each(function(idx, grp) {
+		selectRoot.find("input:checkbox.check-group" + groupFilter).each(function(idx, grp) {
 			var groupCB = $(grp);
-			var groupItems = allItems.has(":parents('#" + groupCB.attr("ref") + "')");
-			var groupChecked = checkedItems.has(":parents('#" + groupCB.attr("ref") + "')");
+			var groupItems = allItems.filter("#" + groupCB.attr("ref") + " .main-item");
+			var groupChecked = checkedItems.filter(groupItems);
 			groupCB
 				.prop({
-					checked:groupChecked.length == groupItems.length,
+					checked:groupItems.length > 0 && groupChecked.length == groupItems.length,
 					indeterminate: groupChecked.length > 0 && groupChecked.length != groupItems.length
 				});
+			// Set the checkbox enabled state in case there are new elements
+			// in the group.
+			groupCB.get(0).disabled = groupItems.length == 0;
 		});
 	}
 }
