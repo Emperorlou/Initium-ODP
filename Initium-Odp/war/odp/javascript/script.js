@@ -59,7 +59,7 @@ $(window).ready(function(e){
 	{
 		var cb = $(event.currentTarget);
 		var selectRoot = cb.parents(".selection-root");
-		selectRoot.find("input:checkbox.check-group").prop( {checked:cb.prop("checked"), indeterminate:false});
+		selectRoot.find("input:checkbox.check-group:not(:disabled)").prop( {checked:cb.prop("checked"), indeterminate:false});
 		selectRoot.find(".selection-list input:checkbox").prop("checked", cb.prop("checked"));
 		selectRoot.find(".selection-list .main-item").toggleClass("main-item-selected", cb.prop("checked"));
 	});
@@ -72,13 +72,7 @@ $(window).ready(function(e){
 		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
 		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
 		
-		var allItems = cb.parents(".selection-root").find(".main-item");
-		var checkedItems = allItems.has("input:checkbox:checked");
-		cb.parents(".selection-root").find("input:checkbox.check-all")
-			.prop({
-				checked:checkedItems.length == allItems.length,
-				indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
-			});
+		setSelectionCheckboxes(event, groupId);
 	});
 	
 	$("#page-popup-root").on("click", ".selection-list input:checkbox", function(event)
@@ -86,27 +80,7 @@ $(window).ready(function(e){
 		var cb = $(event.currentTarget);
 		cb.parent(".main-item").toggleClass("main-item-selected", cb.prop("checked"));
 		
-		var itemsDiv = cb.parents(".selection-root");
-		var invItems = itemsDiv.find(".main-item")
-		var checkedItems = invItems.find("input:checkbox:checked");
-		itemsDiv.find("input:checkbox.check-all")
-			.prop({
-				checked:checkedItems.length == invItems.length,
-				indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
-				});
-		
-		var group = cb.parents(".selection-group");
-		if(group.length > 0)
-		{
-			var groupName = group.prop("id");
-			invItems = group.find(".main-item");
-			checkedItems = invItems.find("input:checkbox:checked");
-			itemsDiv.find("input:checkbox.check-group[ref="+groupName+"]")
-				.prop({
-					checked:checkedItems.length == invItems.length,
-					indeterminate: checkedItems.length > 0 && checkedItems.length != invItems.length
-					});
-		}
+		setSelectionCheckboxes(event);
 	});
 	
 	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
@@ -556,10 +530,10 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 
 
 
-function buyHouse()
+function buyHouse(eventObject)
 {
 	promptPopup("Buy House", "Are you sure you want to buy a house from the city? It will cost 2000 gold.\n\nIf you would like to proceed, please give your new home a name:", "My House", function(name){
-		window.location.href="ServletCharacterControl?type=buyHouse&houseName="+encodeURIComponent(name)+"&v="+window.verifyCode;
+		doCommand(eventObject, "BuyHouse", {"houseName":name});
 	});
 }
 
@@ -1133,8 +1107,10 @@ function dropAllInventory()
 ////////////////////////////////////////////////////////
 //Batch item functions
 /**
- * fromSelector - should select the item divs themselves, not the parent (selection-list)
- * toSelector - this is the encompassing div we'll be adding to
+ * @param fromSelector - should select the item divs themselves, not the parent (selection-list)
+ * @param toSelector - this is the encompassing div we'll be adding to
+ * @param delimitedIds - The list of ID's we'll be removing from the original list (fromSelector)
+ * @param newHtml - Raw HTML to add to the new list (toSelector)
  */
 function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 {
@@ -1147,6 +1123,52 @@ function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 	
 	var container = $(toSelector);
 	container.html(newHtml+container.html());
+}
+
+/**
+ * This call is used to set the checkboxes in the inventory headers. Required to be called
+ * using an event, so we can get the root and work from there (on popups with multiple
+ * roots, such as inventory/equipment, this keeps us in the correct context).
+ * @param event - Event object fired from the user action. Used to get context list.
+ * @param groupId - Specified when clicking on a select group checkbox, bypassing checkbox state for groups entirely
+ */
+function setSelectionCheckboxes(event, groupId)
+{
+	// On link clicks, currentTarget should be null since it's not assigned from a shared parent
+	// The link itself has the onclick, so coalesce to event.target
+	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
+	var allItems = selectRoot.find(".main-item");
+	var checkedItems = allItems.has("input:checkbox:checked");
+	
+	// Check-all first
+	selectRoot.find("input:checkbox.check-all")
+		.prop({
+			checked: allItems.length > 0 && checkedItems.length == allItems.length,
+			indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
+		});
+	
+	// If we pass in a groupId, that means we've clicked a group checkbox already.
+	// There won't be any overlapping groups (yet), so don't bother doing anything else with groups.
+	if(groupId == null || groupId == "")
+	{
+		// Check if this event belongs to a group. We can limit our selection that way.
+		var belongsToGroup = $(event.currentTarget || event.target).parents(".selection-group").prop("id");
+		
+		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]" 
+		selectRoot.find("input:checkbox.check-group" + groupFilter).each(function(idx, grp) {
+			var groupCB = $(grp);
+			var groupItems = allItems.filter("#" + groupCB.attr("ref") + " .main-item");
+			var groupChecked = checkedItems.filter(groupItems);
+			groupCB
+				.prop({
+					checked:groupItems.length > 0 && groupChecked.length == groupItems.length,
+					indeterminate: groupChecked.length > 0 && groupChecked.length != groupItems.length
+				});
+			// Set the checkbox enabled state in case there are new elements
+			// in the group.
+			groupCB.get(0).disabled = groupItems.length == 0;
+		});
+	}
 }
 
 function selectedItemsDrop(event, selector)
@@ -1177,6 +1199,7 @@ function selectedItemsRemoveFromStore(event, selector)
 		doCommand(event,"ItemsStoreDelete",{"itemIds":itemIds}, function(data, error){
 			if (error) return;
 			moveSelectedElements(selector, "#invItems", data.processedItems || "", data.createInvItem);
+			setSelectionCheckboxes(event);
 		});
 	});
 }
@@ -1195,6 +1218,7 @@ function selectedItemsSell(event, selector)
 			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
 				if (error) return;
 				moveSelectedElements(selector, "#saleItems", data.processedItems || "", data.createSellItem);
+				setSelectionCheckboxes(event);
 			});
 		}
 	});
@@ -1214,8 +1238,19 @@ function selectedItemsTrade(event, selector)
 			if (error) return;
 			moveSelectedElements(selector, "#yourTrade", data.processedItems || "", data.createTradeItem);
 			tradeVersion = data.tradeVersion;
+			setSelectionCheckboxes(event);
 		});
 	});
+}
+
+function characterUnequipItem(event, itemId)
+{
+	doCommand(event, "CharacterUnequipItem", {"itemId":itemId}, loadInventoryAndEquipment);
+}
+
+function characterUnequipAll(event)
+{
+	doCommand(event, "CharacterUnequipAll", null, loadInventoryAndEquipment);
 }
 
 function giveHouseToGroup()
@@ -1871,32 +1906,14 @@ function ajaxUpdatePage(ajaxResponseData)
 
 function doCommand(eventObject, commandName, parameters, callback)
 {
+	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
 		parameters = {"v":verifyCode};
 	else
 		parameters.v = verifyCode;
 	
-	// Collapse the parameters into a single string
-	var parametersStr = "";
-	var firstTime = true;
-	for(var propertyName in parameters)
-		if (parameters.hasOwnProperty(propertyName))
-		{
-			if (firstTime)
-			{
-				firstTime=false;
-				parametersStr+=encodeURIComponent(propertyName)+"="+encodeURIComponent(parameters[propertyName]);
-			}
-			else
-			{
-				parametersStr+="&"+encodeURIComponent(propertyName)+"="+encodeURIComponent(parameters[propertyName]);
-			}
-		}
-	
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "cmd?cmd="+commandName;
-	if (parametersStr.length>0)
-		url+="&"+parametersStr;
 	
 	var clickedElement = null;
 	var originalText = null;
@@ -1907,8 +1924,8 @@ function doCommand(eventObject, commandName, parameters, callback)
 		clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
 	}
 	
-	
-	$.get(url)
+	// We need to post, as larger batch operations failed due to URL string being too long
+	$.post(url, parameters)
 	.done(function(data)
 	{
 		
@@ -2701,18 +2718,23 @@ function getMusicVolume()
 	return parseInt(setting);
 }
 
-function toggleEnvironmentSoundEffects()
+function toggleEnvironmentSoundEffects(newState)
 {
 	var enabled = isSoundEffectsEnabled();
 	if (enabled==null)
 		enabled = true;
-	
-	
+	if (newState !== undefined) {
+		enabled = newState;
+	}
 	
 	createjs.Sound.muted = enabled;
 	localStorage.setItem("checkboxDisableEnvironmentSoundEffects", enabled+"");
-	
-	
+
+	if (requestedAudioDescriptor !== null)
+	{
+		setAudioDescriptor(requestedAudioDescriptor[0], requestedAudioDescriptor[1], requestedAudioDescriptor[2]);
+		requestedAudioDescriptor = null;
+	}
 	
 	// Set the correct image for the header mute button
 	if (enabled)
