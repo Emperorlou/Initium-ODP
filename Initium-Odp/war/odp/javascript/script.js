@@ -547,10 +547,10 @@ function renamePlayerHouse(eventObject)
 	});
 }
 
-function deletePlayerHouse(eventObject)
+function deletePlayerHouse(eventObject, pathId)
 {
 	confirmPopup("Delete Player House", "Deleting a house will take with it all items, chests, and gold that are currently inside. Are you absolutely sure you want to delete this house?", function() {
-		doCommand(eventObject, "DeletePlayerHouse");
+		doCommand(eventObject, "DeletePlayerHouse", {"pathId" : pathId});
 	});
 }
 
