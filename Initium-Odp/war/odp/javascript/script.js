@@ -537,6 +537,23 @@ function buyHouse(eventObject)
 	});
 }
 
+function renamePlayerHouse(eventObject)
+{
+	promptPopup("Rename Player House", "Enter a new name for your house:", "", function(newName) {
+		if (newName != null && newName != "")
+		{
+			doCommand(eventObject, "RenamePlayerHouse", {"newName" : newName});
+		}
+	});
+}
+
+function deletePlayerHouse(eventObject, pathId)
+{
+	confirmPopup("Delete Player House", "Deleting a house will take with it all items, chests, and gold that are currently inside. Are you absolutely sure you want to delete this house?", function() {
+		doCommand(eventObject, "DeletePlayerHouse", {"pathId" : pathId});
+	});
+}
+
 function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, characterId)
 {
 	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
@@ -1838,13 +1855,16 @@ function doDrinkElixir(eventObject)
 		popupMessage("System Message", "As you sip down the liquid you feel a rush of energy that pulsates through your body. Your mind becomes hazy and you can only focus on defeating your enemies.");
 	});
 }
-function doDeleteCharacter(eventObject,characterId)
+function doDeleteCharacter(eventObject,characterId,characterName)
 {
-	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
-		if(error) return;
-		$("a[onclick='switchCharacter(" + characterId +")']").remove();
-		//fullpageRefresh();
-	})
+	confirmPopup("Delete Character","Are you sure you want to delete " + characterName + "?",function(){
+		confirmPopup("Delete Character","I mean, are you REALLY sure you want to delete " + characterName + "? You can't take it back!",function(){
+			doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
+				if(error) return;
+				$("a[onclick='switchCharacter(" + characterId +")']").parent("li").remove();
+			});
+		});
+	});
 }
 
 function viewExchange()
@@ -1852,15 +1872,54 @@ function viewExchange()
 	pagePopup("/odp/ajax_exchange.jsp");
 }
 
-function renamePlayerHouse(eventObject)
-{
-	promptPopup("Rename Player House", "Enter a new name for your house:", "", function(newName) {
-		if (newName != null && newName != "")
-		{
-			doCommand(eventObject, "RenamePlayerHouse", {"newName" : newName});
-		}
-	});
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
