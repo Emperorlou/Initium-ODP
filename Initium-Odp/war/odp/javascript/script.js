@@ -1848,13 +1848,15 @@ function doDrinkElixir(eventObject)
 		popupMessage("System Message", "As you sip down the liquid you feel a rush of energy that pulsates through your body. Your mind becomes hazy and you can only focus on defeating your enemies.");
 	});
 }
-function doDeleteCharacter(eventObject,characterId)
+function doDeleteCharacter(eventObject,characterId,characterName)
 {
-	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
-		if(error) return;
-		$("a[onclick='switchCharacter(" + characterId +")']").remove();
-		//fullpageRefresh();
-	})
+	confirmPopup("Delete Character","Are you sure you want to delete " + characterName + "?",function(){
+		doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
+			if(error) return;
+			$("a[onclick='switchCharacter(" + characterId +")']").remove();
+			//fullpageRefresh();
+		})
+	}
 }
 
 function viewExchange()
