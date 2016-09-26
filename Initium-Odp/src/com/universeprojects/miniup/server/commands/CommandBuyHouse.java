@@ -92,8 +92,13 @@ public class CommandBuyHouse extends Command {
 
 		ds.put(pathToHouse);
 
-		// Give the player the discovery of the path now...
-		db.doCharacterDiscoverEntity(ds, character, pathToHouse);
+		List<CachedEntity> userCharacters = db.getFilteredList("Character", "userKey", userKey);
+		if(userCharacters.isEmpty()) userCharacters.add(character);
+		for(CachedEntity characterEntity:userCharacters)
+		{
+			// Give all the player alts the discovery of the path now...
+			db.doCharacterDiscoverEntity(ds, characterEntity, pathToHouse);
+		}
 
 		return house;
 
