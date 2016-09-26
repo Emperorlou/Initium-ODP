@@ -1853,7 +1853,7 @@ function doDeleteCharacter(eventObject,characterId,characterName)
 	confirmPopup("Delete Character","Are you sure you want to delete " + characterName + "?",function(){
 		doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
 			if(error) return;
-			$("a[onclick='switchCharacter(" + characterId +")']").remove();
+			$("a[onclick='switchCharacter(" + characterId +")']").parent("li").remove();
 			//fullpageRefresh();
 		})
 	}
