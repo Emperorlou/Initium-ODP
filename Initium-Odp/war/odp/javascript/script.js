@@ -1087,6 +1087,13 @@ function dropAllInventory()
 	});
 }
 
+function dropAllInventoryNew(event)
+{
+	confirmPopup("Drop ALL Inventory", "Are you sure you want to drop EVERYTHING in your inventory on the ground?\n\nPlease note that items for sale in your store and equipped items will be excluded.", function(){
+		doCommand(event, "CharacterDropAll");
+	});
+}
+
 ////////////////////////////////////////////////////////
 //Batch item functions
 /**

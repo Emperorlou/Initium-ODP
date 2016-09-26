@@ -45,7 +45,7 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 		{
 			for(CachedEntity item:invItems)
 			{
-				if(item != null && GameUtils.equals(item.getKey(), storeItem.getKey()))
+				if(item != null && GameUtils.equals(item.getKey(), storeItem.getProperty("itemKey")))
 				{
 					storeToItemsMap.put(storeItem, item);
 					break;
@@ -60,13 +60,12 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 			if (GameUtils.equals(characterKey, storeItem.getProperty("characterKey"))==false)
 				continue;
 			
+			ds.delete(storeItem.getKey());
 			if ("Sold".equals(storeItem.getProperty("status"))==false && storeToItemsMap.containsKey(storeItem))
 			{
 				CachedEntity item = storeToItemsMap.get(storeItem);
 				storeString.append(HtmlComponents.generateInvItemHtml(item));
 			}
-			// Delete after getting the new inventory HTML. 
-			ds.delete(storeItem.getKey());
 			
 			// Add no matter what, so we can remove from the original list.
 			processedItems.add(storeItem.getKey().getId());

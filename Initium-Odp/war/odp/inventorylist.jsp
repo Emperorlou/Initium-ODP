@@ -38,7 +38,7 @@
 <body>
 	<div class='boldbox selection-root'>
 		<div class="inventory-main-header">
-			<span class='paragraph boldbox-right-link'><a onclick='dropAllInventory()' title='This will drop everything in your inventory onto the ground. Equipped and vending items will NOT be dropped.'>Drop All</a></span>
+			<span class='paragraph boldbox-right-link'><a onclick='dropAllInventoryNew(event)' title='This will drop everything in your inventory onto the ground. Equipped and vending items will NOT be dropped.'>Drop All</a></span>
 			<h4>Your Inventory</h4>
 			<div class="main-item-filter">
 				<input class="main-item-filter-input" id="filter_invItem" type="text" placeholder="Filter inventory...">
