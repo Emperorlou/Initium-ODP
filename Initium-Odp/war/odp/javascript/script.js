@@ -1851,18 +1851,68 @@ function doDrinkElixir(eventObject)
 function doDeleteCharacter(eventObject,characterId,characterName)
 {
 	confirmPopup("Delete Character","Are you sure you want to delete " + characterName + "?",function(){
-		doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
-			if(error) return;
-			$("a[onclick='switchCharacter(" + characterId +")']").parent("li").remove();
-			//fullpageRefresh();
-		})
-	}
+		confirmPopup("Delete Character","I mean, are you REALLY sure you want to delete " + characterName + "? You can't take it back!",function(){
+			doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
+				if(error) return;
+				$("a[onclick='switchCharacter(" + characterId +")']").parent("li").remove();
+			});
+		});
+	});
 }
 
 function viewExchange()
 {
 	pagePopup("/odp/ajax_exchange.jsp");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
