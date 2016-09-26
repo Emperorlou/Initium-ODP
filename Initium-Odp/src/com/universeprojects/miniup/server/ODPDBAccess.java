@@ -3210,7 +3210,7 @@ public class ODPDBAccess
 		
 		if (!(lockCode == null || lockCode =="")) {
 			if (!checkHasKey(character, (long)lockCode))
-				throw new UserErrorMessage("This location is locked. You must have the correct key in your inventory before you can access.");
+				throw new UserErrorMessage("This location is locked. You must have the correct key in your inventory before you can access it.");
 		}
 		
 		return;
