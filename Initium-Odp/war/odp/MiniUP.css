@@ -544,7 +544,9 @@ a.main-highlight:HOVER
 {
 	display:inline-block;
 	vertical-align:top;
-	width:100%;
+	width:inherit;
+	padding-left:15px;
+	padding-bottom:10px;
 }
 
 .main-item-bigx
@@ -552,16 +554,20 @@ a.main-highlight:HOVER
 	font-size:32px;
 	position: relative;
     top: 11px;
-    left: 5px;
+    right: 20px;
+    float: right;
 }
 
 .main-item
 {
 	display: inline-block;
-	padding-left:15px;
 	font-size:17px;
-	padding-bottom:10px;
-	width:95%;
+	width:99%;
+}
+
+.equip-slot
+{
+	padding-left: 15px;
 }
 		
 .main-item-selected
@@ -625,10 +631,14 @@ a.main-highlight:HOVER
 }
 
 .selection-list input[type=checkbox] {
-    margin-left: -15px;
     margin-top: 20px;
     float: left;
     position: absolute;
+}
+
+.selection-list .main-item-container
+{
+	padding-left:20px;
 }
 		
 .main-item-subnote

@@ -114,7 +114,7 @@
 				</div>
 				<div class='inventory-main-commands'>
 					<div class='command-row'>
-						<label class='command-cell' title='Marks sold storefront items for batch operations.'><input type='checkbox' class='check-group' ref='soldItems'>Select Sold</label>
+						<label class='command-cell' title='Marks sold storefront items for batch operations.'><input type='checkbox' <% if (saleItems.size() == 0) { %>disabled<% } %> class='check-group' ref='soldItems'>Select Sold</label>
 					</div>
 					<div class='command-row'>
 						<label class='command-cell' title='Marks all storefront items for batch operations.'><input type='checkbox' class='check-all'>Select All</label>

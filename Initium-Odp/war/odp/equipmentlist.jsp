@@ -27,11 +27,19 @@
 %>
 <html>
 <body>
-		<div class='boldbox'><h4>Your Equipment</h4>
+		<div class='boldbox'>
+			<div class="inventory-main-header">
+				<h4>Your Equipment</h4>
+				<div class="inventory-main-commands">
+					<div class="command-row">
+						<a class="command-cell left" title="Unequips all items currently on your character." onclick="characterUnequipAll(event)">Unequip All</a>&nbsp;
+					</div>
+				</div>
+			</div>
 		<%
 			for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
 			{
-				out.println("<div class='main-item'>"+slot+": ");
+				out.println("<div class='main-item'><span class='equip-slot'>"+slot+": </span>");
 				Key itemKey = (Key)db.getCurrentCharacter().getProperty("equipment"+slot);
 				CachedEntity item = db.getEntity(itemKey);
 				if (item==null)
@@ -46,7 +54,7 @@
 					out.println(GameUtils.renderItem(item));
 					out.println("<br>");
 					out.println("<div class='main-item-controls'>");
-					out.println("<a onclick='ajaxAction(\"ServletCharacterControl?type=unequip&itemId="+item.getKey().getId()+"\", event, loadInventoryAndEquipment)'>Unequip</a>");
+					out.println("<a onclick='characterUnequipItem(event, "+item.getKey().getId()+")'>Unequip</a>");
 					out.println("</div>");
 					out.println("</div>");
 					out.println("<br>");
