@@ -1411,26 +1411,6 @@ public class ODPDBAccess
 		getDB().put(item);
 	}
 
-	public void doCharacterDropAllInventory(CachedEntity character) throws UserErrorMessage
-	{
-		CachedDatastoreService ds = getDB();
-		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
-
-		Key characterLocationKey = (Key) character.getProperty("locationKey");
-
-		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", character.getKey());
-		for (CachedEntity item : inventory)
-		{
-			if (checkCharacterHasItemEquipped(character, item.getKey())) continue;
-
-			if (checkItemIsVending(character.getKey(), item.getKey())) continue;
-
-			item.setProperty("containerKey", characterLocationKey);
-			item.setProperty("movedTimestamp", new Date());
-			ds.put(item);
-		}
-	}
-
 	/**
 	 * Checks if the given character has the given item (itemKey) equipped in
 	 * any slot.
