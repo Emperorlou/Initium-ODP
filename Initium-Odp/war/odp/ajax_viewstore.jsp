@@ -137,4 +137,5 @@
                 out.println(HtmlComponents.generateStoreItemHtml(db,common.getCharacter(), storeCharacter,item,itemToSaleItemMap.get(item),request));
             }
         %>
+        <center><a onclick="closePagePopup()" class="big-link">Leave Store</a></center>
         </div>
