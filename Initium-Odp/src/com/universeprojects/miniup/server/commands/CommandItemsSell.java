@@ -38,12 +38,24 @@ public class CommandItemsSell extends CommandItemsBase {
 		if (amount<0)
 			throw new UserErrorMessage("You cannot sell items for less than 0 gold.");
 		
+		// If we're selling all tokens, then allow the batch sale
+		boolean allTokens = true;
+		for(CachedEntity batchSale:batchItems)
+		{
+			if ("Initium Premium Membership".equals(batchSale.getProperty("name")) == false)
+			{
+				allTokens = false;
+				break;
+			}
+		}
+		
 		StringBuilder saleString = new StringBuilder();
 		for(CachedEntity batchSale:batchItems)
 		{
-			// Skip premium membership tokens. This was a conscious decision, as we
-			// want players to be mindful of token prices.
-			if ("Initium Premium Membership".equals(batchSale.getProperty("name")))
+			// If we're selling all tokens, then we want to allow the batch sale.
+			// Otherwise, we want to ensure they don't accidentally add a token to
+			// a set of items for a low price
+			if (allTokens == false && "Initium Premium Membership".equals(batchSale.getProperty("name")))
 			{
 				setPopupMessage("Premium tokens cannot be sold through this method.");
 				continue;
