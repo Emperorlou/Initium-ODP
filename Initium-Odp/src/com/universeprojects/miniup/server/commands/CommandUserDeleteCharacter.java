@@ -27,6 +27,7 @@ public class CommandUserDeleteCharacter extends Command {
 	
 	public void run(Map<String,String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
+		CachedDatastoreService ds = getDS();
 		
 		Key currentUser = db.getCurrentUserKey();
 		Long characterId = tryParseId(parameters, "characterId");
@@ -41,7 +42,8 @@ public class CommandUserDeleteCharacter extends Command {
 		if(GameUtils.equals(currentUser, character.getProperty("userKey"))){
 			character.setProperty("hitpoints", 0L);
 			character.setProperty("mode", CharacterMode.DEAD.toString());
-			character.setProperty("userKey", null);	
+			character.setProperty("userKey", null);
+			ds.put(character);
 		}
 	}
 }
