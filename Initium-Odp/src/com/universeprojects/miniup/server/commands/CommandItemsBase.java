@@ -33,7 +33,6 @@ public abstract class CommandItemsBase extends Command {
 	
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
-		// TODO Auto-generated method stub
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
