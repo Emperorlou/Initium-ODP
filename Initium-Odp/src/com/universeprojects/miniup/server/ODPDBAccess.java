@@ -3178,29 +3178,9 @@ public class ODPDBAccess
 	 */
 	public void doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
 	{
-		Object location = character.getProperty("locationKey");
-		Object lockCode = null;
-		
-		if (GameUtils.equals(location, path.getProperty("location1Key")))
-			lockCode = path.getProperty("location2LockCode");
-		else if (GameUtils.equals(location, path.getProperty("location2Key")))
-			lockCode = path.getProperty("location1LockCode");
-		else
-			throw new RuntimeException("Player is not located at either end of the specified path.");
-		
-		if (!(lockCode == null || lockCode =="")) {
-			if (!checkHasKey(character, (long)lockCode))
-				throw new UserErrorMessage("This location is locked. You must have the correct key in your inventory before you can access it.");
-		}
-		
 		return;
 	}
 	
-	public boolean checkHasKey(CachedEntity character, long lockCode) {
-		int matchingKeys = getFilteredList_Count("Item", "containerKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
-		
-		return (matchingKeys > 0);
-	}
 
 	/**
 	 * This is a placeholder since the actual implementation is not in the ODP.
