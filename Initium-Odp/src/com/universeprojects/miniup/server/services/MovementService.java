@@ -23,7 +23,7 @@ public class MovementService extends Service {
 		else
 			throw new RuntimeException("Player is not located at either end of the specified path.");
 		
-		int matchingKeys = db.getFilteredList_Count("item", "containerKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
+		int matchingKeys = db.getFilteredList_Count("Item", "containerKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
 		
 		return (matchingKeys > 0);
 	}
