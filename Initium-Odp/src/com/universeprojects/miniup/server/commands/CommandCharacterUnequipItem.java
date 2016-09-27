@@ -14,6 +14,12 @@ import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
+/**
+ * Unequips the specified item from the character.
+ * 
+ * @author SPFiredrake
+ *
+ */
 public class CommandCharacterUnequipItem extends Command {
 
 	public CommandCharacterUnequipItem(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 

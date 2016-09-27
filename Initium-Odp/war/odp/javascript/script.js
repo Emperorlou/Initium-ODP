@@ -698,22 +698,32 @@ function createCampsite()
 
 function depositDogecoinsToItem(itemId, event)
 {
-	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", "0", function(amount){
+	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", $("#mainGoldIndicator").text().replace(","), function(amount){
 		if (amount!=null && amount!="")
 		{
-			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode, event, reloadPagePopup);
+			doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
+				if(error) return;
+				reloadPagePopup();
+			});
 		}
 	});
-	
-	event.stopPropagation();
 }
 
 function collectDogecoinsFromItem(itemId, event)
 {
-	ajaxAction("ServletCharacterControl?type=collectDogecoinsFromItem&itemId="+itemId+"&v="+window.verifyCode, event, reloadPagePopup);	
+	// Command updates the gold indicator as needed, but not the inventory gold span. 
+	// Just reload popup (if one is open, that is).
+	doCommand(event, "DogeCoinsCollectFromItem", {"itemId" : itemId}, function(data, error){
+		if(error) return;
+		reloadPagePopup();
+	});
 }
 
-
+function collectDogecoinsFromCharacter(characterId, event)
+{
+	// Command updates the gold indicator as needed.
+	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId});
+}
 
 //function tradeSetDogecoin(currentDogecoin)
 //{
@@ -1572,11 +1582,6 @@ function leaveParty()
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
 		location.href = "ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
 	});
-}
-
-function collectDogecoinFromCharacter(characterKey)
-{
-	location.href = "ServletCharacterControl?type=collectDogecoin&characterId="+characterKey+"&v="+window.verifyCode;
 }
 
 function combatAttackWithLeftHand()

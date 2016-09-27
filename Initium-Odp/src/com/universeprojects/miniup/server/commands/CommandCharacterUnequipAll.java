@@ -12,16 +12,7 @@ import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 /**
- * Allows the player to attack a mob at the current location
- * 
- * Usage notes:
- * Checks if caller can attack and initiates combat if so
- * 
- * Parameters:
- * 		charId - characterId of monster to attack 
- * 
- * Support methods:
- * 		canAttack - returns boolean whether attack is allowed
+ * Unequips all items currently equipped to character by setting equipment slots null.
  * 
  * @author SPFiredrake
  *
