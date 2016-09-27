@@ -549,7 +549,7 @@ function renamePlayerHouse(eventObject)
 
 function deletePlayerHouse(eventObject, pathId)
 {
-	confirmPopup("Delete Player House", "Deleting a house will take with it all items, chests, and gold that are currently inside. Are you absolutely sure you want to delete this house?", function() {
+	confirmPopup("Delete Player House", "Are you sure you want to delete this house? You will not be able to access this house again.", function() {
 		doCommand(eventObject, "DeletePlayerHouse", {"pathId" : pathId});
 	});
 }
