@@ -9,8 +9,10 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -1681,6 +1683,56 @@ public class ODPDBAccess
 			buffApplied = true;
 		}
 		return buffApplied;
+	}
+	
+	public void awardBuff_Sick(CachedDatastoreService ds, CachedEntity character)
+	{
+		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png", "Sick",
+				"You ate entirely too much candy, and now you're sick! You feel terrible, and couldn't possibly eat more candy for at least 30 minutes.",1800, "strength", "-5%", "dexterity", "-5%",
+				"intelligence", "-5%", 6);
+
+		if (buff != null) ds.put(buff);
+	}
+	
+	public void awardBuff_Candy(CachedDatastoreService ds, CachedEntity character)
+	{
+		Double buffDouble = Math.random();
+		
+		if(buffDouble <= 0.16){
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+				"That was some good candy! You feel stronger!",600,"strength","+0.2",null,null,null,null,10);
+			if (buff != null) ds.put(buff);
+		}
+		if((buffDouble >= 0.17) && (buffDouble < 0.32)){
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+					"That was some good candy! You feel more agile!",600,"dexterity","+0.2",null,null,null,null,10);
+			if (buff != null) ds.put(buff);
+		}
+		if((buffDouble >= 0.32) && (buffDouble < 0.48)){
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+					"That was some good candy! You feel smarter!",600,"Intelligence","+0.2",null,null,null,null,10);
+			if (buff != null) ds.put(buff);
+		}
+		if((buffDouble >= 0.48) && (buffDouble < 0.64)){
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+					"That candy was terrible! You feel weaker!",600,"strength","-0.2",null,null,null,null,10);
+			if (buff != null) ds.put(buff);
+		}
+		if((buffDouble >= 0.64) && (buffDouble < 0.80)){
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+					"That candy was terrible! You feel slower!",600,"strength","-0.2",null,null,null,null,10);
+			if (buff != null) ds.put(buff);
+		}
+		if((buffDouble >= 0.80) && (buffDouble < 0.96)){
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+					"That candy was terrible! You feel dumb!",600,"intelligence","-0.2",null,null,null,null,10);
+			if (buff != null) ds.put(buff);
+		}
+		if((buffDouble >= 0.96)){
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+					"That was some good candy! You feel stronger!",600,"strength","+0.2","dexterity","+0.2","intelligence","+0.2",10);
+			if (buff != null) ds.put(buff);
+		}	
 	}
 
 	public List<CachedEntity> sortSaleItemList(List<CachedEntity> items)
