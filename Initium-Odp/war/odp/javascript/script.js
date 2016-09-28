@@ -154,7 +154,8 @@ function popupPermanentOverlay(title, content, popupClassOverride)
     expandpopupMessage();
 }
 
-function popupMessage(title, content, noBackground) {
+function popupMessage(title, content, noBackground) 
+{
 	noBackgroundHtml = "";
 	if (noBackground==true)
 		noBackgroundHtml = 'style="background:none"';
@@ -166,7 +167,7 @@ function popupMessage(title, content, noBackground) {
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
     expandpopupMessage();
     enterPopupClose();
-    }
+   }
 
 $(document).bind("keydown",function(e) 
 {
@@ -2812,4 +2813,34 @@ function doPopupNotification(iconUrl, title, text, category, options, onclick, o
 {
 	if(notifyHandler == null || notifyHandler.popupNotify === "undefined") return;
 	return notifyHandler.popupNotify(iconUrl, title, text, category, options, onclick, onerror);
+}
+
+
+
+////////////////////////////////////////////////////////////
+// Anti-bot question stuff
+
+function antiBotAnswer(answer)
+{
+	doCommand(event, "AntiBotAnswer", {answer:answer}, function(data,error)
+	{
+		closeAllPopups();
+	});
+}
+
+function antiBotQuestionPopup(type, question)
+{
+	if (type == "BasicPopup")
+	{
+		popupMessage("Quick Question", question);
+	}
+	else if (type == "PromptPopup")
+	{
+		promptPopup("Quick Question", question, "", function(answer)
+		{
+			
+		}, function(){
+			location.reload();
+		});
+	}
 }

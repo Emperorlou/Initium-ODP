@@ -1142,7 +1142,7 @@ public class GameUtils
 				});
 				for(CachedEntity c:characterList)
 				{
-					if ("Zombie".equals(c.getProperty("status"))==false && "DEAD".equals(c.getProperty("mode"))==false)
+					if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
 						sb.append("<li><a onclick='doDeleteCharacter(event,"+c.getId()+",\""+WebUtils.htmlSafe((String)c.getProperty("name"))+"\")'>X</a> <a onclick='switchCharacter("+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
 				}
 				sb.append("</ul>");
