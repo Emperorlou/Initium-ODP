@@ -11,7 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -28,6 +32,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  * 
  */
 public class CommandTransmuteItems extends Command {
+	
 	public CommandTransmuteItems(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
 		super(db, request, response);
 	}
@@ -53,7 +58,8 @@ public class CommandTransmuteItems extends Command {
 		// sorting for ease of comparing this list to other material lists
 		Collections.sort(materialsKeys);
 		
-		List<CachedEntity> recipes = db.getFilteredList("TransmuteRecipe", "materials", FilterOperator.EQUAL, materialsKeys);
+		CompositeFilter f = buildFilter("materials", materialsKeys, FilterOperator.EQUAL, CompositeFilterOperator.AND);
+		List<CachedEntity> recipes = ds.fetchAsList("TransmuteRecipe", f, 1000);
 		
 		for (CachedEntity recipe:recipes) {
 			List<Key> recipeMaterialsKeys = (List<Key>) recipe.getProperty("materials");
@@ -101,5 +107,27 @@ public class CommandTransmuteItems extends Command {
 			
 			throw new RuntimeException("Duplicate recipes: " + recipeNames);
 		}
+	}
+	
+	/**
+	 * Builds a composite filter from a list of any size, that can be used in a query
+	 * 
+	 * @param list - list of Keys to each be used as a value for a filter
+	 * @return
+	 */
+	private CompositeFilter buildFilter(String property, List<Key> keys, FilterOperator operator, CompositeFilterOperator compositeOperator) {
+		
+		if (keys.size() == 0)
+			return null;
+		
+		List<Filter> filterList = new ArrayList<Filter>();
+		
+		for (Object key:keys) {
+			filterList.add(new FilterPredicate(property, operator, key));
+		}
+		
+		CompositeFilter filter = new CompositeFilter(compositeOperator, filterList);
+		
+		return filter;
 	}
 }
