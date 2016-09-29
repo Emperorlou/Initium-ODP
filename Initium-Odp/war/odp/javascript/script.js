@@ -649,6 +649,11 @@ function storeSetSaleNew(eventObject)
 	
 }
 
+function transmuteItems(eventObject, containerId) 
+{
+	doCommand(eventObject, "TransmuteItems", {"containerId":containerId});
+}
+
 //function storeSellItem(itemId)
 //{
 //	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
