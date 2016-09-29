@@ -62,24 +62,31 @@ public class CommandBuyHouse extends Command {
 				cityLocation = location1Key;
 			}
 
-			playerHouse = doCreatePlayerHouse(user.getKey(), character, cityLocation, houseName);
+			// House = Location, so create that here, with the city as the parent location
+			playerHouse = db.newLocation(ds, "images/special-house2.jpg", houseName, "This is " + character.getProperty("name") + "'s property called '" + houseName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!", -1d, "RestSite", cityLocation, user.getKey());
 
+			// Connect a path from the house to the city where we bought it
+			CachedEntity pathToHouse = db.newPath(ds, "Path to house - " + houseName, playerHouse.getKey(), "Leave " + houseName, cityLocation, "Go to " + houseName, 0d, 0l, "PlayerHouse");
+			pathToHouse.setProperty("ownerKey", user.getKey());
+
+			// Save path and have our character discover it
+			ds.put(pathToHouse);
+			db.doCharacterDiscoverEntity(ds, character, pathToHouse);
+			
 			// Finally subtract the money from the player's character
 			character.setProperty("dogecoins", dogecoins - DOGECOIN_COST);
 			ds.put(character);
 
 			ds.commit();
 			
-			// There should only be a single path, the character we just created it under...
-			CachedEntity path = db.getPathsByLocation(playerHouse.getKey()).get(0);
+			// Give all the player alts the discovery of the path now...			
 			List<CachedEntity> userCharacters = db.getFilteredList("Character", "userKey", user.getKey());
-			
-			// Go ahead and add it for everyone, since we don't do anything if it already exists.
 			for(CachedEntity characterEntity:userCharacters)
 			{
-				// Give all the player alts the discovery of the path now...
-				db.doCharacterDiscoverEntity(ds, characterEntity, path);
+				// If discovery already exists, nothing happens
+				db.doCharacterDiscoverEntity(ds, characterEntity, pathToHouse);
 			}
+			
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -88,24 +95,5 @@ public class CommandBuyHouse extends Command {
 
 		setPopupMessage("Your house is ready for you! Just leave " + currentLocation.getProperty("name") + " and you'll find it right away. It's called '" + playerHouse.getProperty("name") + "'.");
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
-	}
-
-	private CachedEntity doCreatePlayerHouse(Key userKey, CachedEntity character, Key locationKey, String houseName) {
-		ODPDBAccess db = getDB();
-		CachedDatastoreService ds = getDS();
-
-		CachedEntity house = db.newLocation(ds, "images/special-house2.jpg", houseName, "This is " + character.getProperty("name") + "'s property called '" + houseName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!", -1d, "RestSite", locationKey, userKey);
-
-		// Connect a path from the house to the location that was passed in
-		CachedEntity pathToHouse = db.newPath(ds, "Path to house - " + houseName, house.getKey(), "Leave " + houseName, locationKey, "Go to " + houseName, 0d, 0l, "PlayerHouse");
-
-		pathToHouse.setProperty("ownerKey", userKey);
-
-		ds.put(pathToHouse);
-
-		db.doCharacterDiscoverEntity(ds, character, pathToHouse);
-
-		return house;
-
 	}
 }
