@@ -11,6 +11,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.AntiBotService;
 
 public class CommandAntiBotAnswer extends Command
 {
@@ -29,16 +30,12 @@ public class CommandAntiBotAnswer extends Command
 		
 		answer = answer.toLowerCase();
 		
-		CachedEntity user = db.getCurrentUser();
-		Key antiBotQuestionKey = (Key)user.getProperty("aniBotQuestionKey");
-		if (antiBotQuestionKey==null)
-			return;
+		AntiBotService antiBotService = new AntiBotService(db);
+		CachedEntity antiBotQuestion = antiBotService.getAntiBotQuestion();
 		
-		CachedEntity antiBotQuestion = db.getEntity(antiBotQuestionKey);
 		if (antiBotQuestion==null)
 		{
-			user.setProperty("antiBotQuestionKey", null);
-			db.getDB().put(user);
+			antiBotService.clearAndSave();
 			return;
 		}
 		
@@ -48,8 +45,8 @@ public class CommandAntiBotAnswer extends Command
 		if (answer.equals(realAnswer))
 		{
 			// Correct!
-			user.setProperty("antiBotQuestionKey", null);
-			db.getDB().put(user);
+			antiBotService.clearAndSave();
+			return;
 		}
 		else
 		{

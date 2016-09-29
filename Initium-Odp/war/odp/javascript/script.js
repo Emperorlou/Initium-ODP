@@ -1984,6 +1984,11 @@ function doCommand(eventObject, commandName, parameters, callback)
 	$.post(url, parameters)
 	.done(function(data)
 	{
+		if (data.antiBotQuestionActive == true)
+		{
+			antiBotQuestionPopup(data.antiBotQuestionType, data.antiBotQuestion);
+			return;
+		}
 		
 		// Refresh the full page or the pagePopup if applicable
 		if (data.javascriptResponse == "FullPageRefresh")
