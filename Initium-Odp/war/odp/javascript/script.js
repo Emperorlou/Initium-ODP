@@ -154,7 +154,8 @@ function popupPermanentOverlay(title, content, popupClassOverride)
     expandpopupMessage();
 }
 
-function popupMessage(title, content, noBackground) {
+function popupMessage(title, content, noBackground) 
+{
 	noBackgroundHtml = "";
 	if (noBackground==true)
 		noBackgroundHtml = 'style="background:none"';
@@ -166,7 +167,7 @@ function popupMessage(title, content, noBackground) {
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
     expandpopupMessage();
     enterPopupClose();
-    }
+   }
 
 $(document).bind("keydown",function(e) 
 {
@@ -549,7 +550,7 @@ function renamePlayerHouse(eventObject)
 
 function deletePlayerHouse(eventObject, pathId)
 {
-	confirmPopup("Delete Player House", "Deleting a house will take with it all items, chests, and gold that are currently inside. Are you absolutely sure you want to delete this house?", function() {
+	confirmPopup("Delete Player House", "Deleting this house will cause THIS character to forget how to get back to this house, however the house itself will still be accessible by other characters who know about it's existence. <br>Are you absolutely sure you want to delete this house?", function() {
 		doCommand(eventObject, "DeletePlayerHouse", {"pathId" : pathId});
 	});
 }
@@ -703,22 +704,32 @@ function createCampsite()
 
 function depositDogecoinsToItem(itemId, event)
 {
-	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", "0", function(amount){
+	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", $("#mainGoldIndicator").text().replace(",",""), function(amount){
 		if (amount!=null && amount!="")
 		{
-			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode, event, reloadPagePopup);
+			doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
+				if(error) return;
+				reloadPagePopup();
+			});
 		}
 	});
-	
-	event.stopPropagation();
 }
 
 function collectDogecoinsFromItem(itemId, event)
 {
-	ajaxAction("ServletCharacterControl?type=collectDogecoinsFromItem&itemId="+itemId+"&v="+window.verifyCode, event, reloadPagePopup);	
+	// Command updates the gold indicator as needed, but not the inventory gold span. 
+	// Just reload popup (if one is open, that is).
+	doCommand(event, "DogeCoinsCollectFromItem", {"itemId" : itemId}, function(data, error){
+		if(error) return;
+		reloadPagePopup();
+	});
 }
 
-
+function collectDogecoinsFromCharacter(characterId, event)
+{
+	// Command updates the gold indicator as needed.
+	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId});
+}
 
 //function tradeSetDogecoin(currentDogecoin)
 //{
@@ -1100,12 +1111,10 @@ function transferCharacter(currentCharName)
 	});
 }
 
-function dropAllInventory()
+function dropAllInventory(event)
 {
 	confirmPopup("Drop ALL Inventory", "Are you sure you want to drop EVERYTHING in your inventory on the ground?\n\nPlease note that items for sale in your store and equipped items will be excluded.", function(){
-		ajaxAction("ServletCharacterControl?type=dropAllInventory&v="+window.verifyCode, event, function(){
-			reloadPagePopup(true);
-		});
+		doCommand(event, "CharacterDropAll");
 	});
 }
 
@@ -1581,11 +1590,6 @@ function leaveParty()
 	});
 }
 
-function collectDogecoinFromCharacter(characterKey)
-{
-	location.href = "ServletCharacterControl?type=collectDogecoin&characterId="+characterKey+"&v="+window.verifyCode;
-}
-
 function combatAttackWithLeftHand()
 {
 	location.href = "ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode;
@@ -1853,19 +1857,71 @@ function doDrinkElixir(eventObject)
 		popupMessage("System Message", "As you sip down the liquid you feel a rush of energy that pulsates through your body. Your mind becomes hazy and you can only focus on defeating your enemies.");
 	});
 }
-function doDeleteCharacter(eventObject,characterId)
+function doDeleteCharacter(eventObject,characterId,characterName)
 {
-	doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
-		if(error) return;
-		$("a[onclick='switchCharacter(" + characterId +")']").remove();
-		//fullpageRefresh();
-	})
+	confirmPopup("Delete Character","Are you sure you want to delete " + characterName + "?",function(){
+		confirmPopup("Delete Character","I mean, are you REALLY sure you want to delete " + characterName + "? You can't take it back!",function(){
+			doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
+				if(error) return;
+				$("a[onclick='switchCharacter(" + characterId +")']").parent("li").remove();
+			});
+		});
+	});
 }
 
 function viewExchange()
 {
 	pagePopup("/odp/ajax_exchange.jsp");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2762,4 +2818,34 @@ function doPopupNotification(iconUrl, title, text, category, options, onclick, o
 {
 	if(notifyHandler == null || notifyHandler.popupNotify === "undefined") return;
 	return notifyHandler.popupNotify(iconUrl, title, text, category, options, onclick, onerror);
+}
+
+
+
+////////////////////////////////////////////////////////////
+// Anti-bot question stuff
+
+function antiBotAnswer(answer)
+{
+	doCommand(event, "AntiBotAnswer", {answer:answer}, function(data,error)
+	{
+		closeAllPopups();
+	});
+}
+
+function antiBotQuestionPopup(type, question)
+{
+	if (type == "BasicPopup")
+	{
+		popupMessage("Quick Question", question);
+	}
+	else if (type == "PromptPopup")
+	{
+		promptPopup("Quick Question", question, "", function(answer)
+		{
+			
+		}, function(){
+			location.reload();
+		});
+	}
 }

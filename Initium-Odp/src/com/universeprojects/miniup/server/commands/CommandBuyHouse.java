@@ -69,6 +69,17 @@ public class CommandBuyHouse extends Command {
 			ds.put(character);
 
 			ds.commit();
+			
+			// There should only be a single path, the character we just created it under...
+			CachedEntity path = db.getPathsByLocation(playerHouse.getKey()).get(0);
+			List<CachedEntity> userCharacters = db.getFilteredList("Character", "userKey", user.getKey());
+			
+			// Go ahead and add it for everyone, since we don't do anything if it already exists.
+			for(CachedEntity characterEntity:userCharacters)
+			{
+				// Give all the player alts the discovery of the path now...
+				db.doCharacterDiscoverEntity(ds, characterEntity, path);
+			}
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -92,7 +103,6 @@ public class CommandBuyHouse extends Command {
 
 		ds.put(pathToHouse);
 
-		// Give the player the discovery of the path now...
 		db.doCharacterDiscoverEntity(ds, character, pathToHouse);
 
 		return house;
