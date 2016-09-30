@@ -1270,7 +1270,7 @@ function characterUnequipAll(event)
 function giveHouseToGroup()
 {
 	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
-		window.location.href='ServletCharacterControl?type=giveHouseToGroup'+"&v="+window.verifyCode;
+		doCommand(eventObject,"GivePlayerHouseToGroup")};
 	});
 }
 
