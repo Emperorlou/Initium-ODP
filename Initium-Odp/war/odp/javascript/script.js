@@ -1269,7 +1269,7 @@ function characterUnequipAll(event)
 
 function giveHouseToGroup()
 {
-	confirmPrompt("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
+	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
 		doCommand(eventObject,"GivePlayerHouseToGroup")};
 	});
 }
