@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.commands;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -61,18 +63,21 @@ public class CommandTransmuteItems extends Command {
 		CompositeFilter f = buildFilter("materials", materialsKeys, FilterOperator.EQUAL, CompositeFilterOperator.AND);
 		List<CachedEntity> recipes = ds.fetchAsList("TransmuteRecipe", f, 1000);
 		
-		for (CachedEntity recipe:recipes) {
-			List<Key> recipeMaterialsKeys = (List<Key>) recipe.getProperty("materials");
+		// go through the recipes list and remove the ones that don't match
+		Iterator<CachedEntity> iter = recipes.iterator();
+		CachedEntity next = null;
+		List<Key> recipeMaterialsKeys = null;
+		
+		while (iter.hasNext()) {
+			next = iter.next();
+			recipeMaterialsKeys = (List<Key>) next.getProperty("materials");
+			Collections.sort(recipeMaterialsKeys);
 			
-			if (recipeMaterialsKeys.size() != materialsKeys.size())
-				recipes.remove(recipe);
-			else {
-				Collections.sort(recipeMaterialsKeys);
-				if (!recipeMaterialsKeys.equals(materialsKeys))
-					recipes.remove(recipe);
-			}
+			if (!listEquals(recipeMaterialsKeys, materialsKeys))
+				iter.remove();
 		}
 		
+		// perform the actual transmutation of the items
 		if (recipes.size() == 0)
 			throw new UserErrorMessage("You tried transmuting the items, but nothing happened.");
 		else if (recipes.size() == 1) {
@@ -80,29 +85,37 @@ public class CommandTransmuteItems extends Command {
 			List<Key> results = (List<Key>) recipe.getProperty("results");
 			CachedEntity resultItem = null;
 			
-			for (Key result:results) {
-				resultItem = db.generateNewObject(db.getEntity(result), "Item");
+			try {
+				for (Key result:results) {
+					resultItem = db.generateNewObject(db.getEntity(result), "Item");
+					
+					// put the item(s) in character's transmute box
+					resultItem.setProperty("containerKey", containerKey);
+					resultItem.setProperty("movedDate", new Date());
+					
+					ds.put(resultItem);
+				}
 				
-				// put the item(s) in character's transmute box
-				resultItem.setProperty("containerKey", containerKey);
-				resultItem.setProperty("movedDate", new Date());
-				
-				ds.put(resultItem);
+				// now remove the transmuted materials from player
+				for (CachedEntity item:materials) {
+					item.setProperty("containerKey", null);
+					item.setProperty("movedDate", new Date());
+					
+					ds.put(item);
+				}
 			}
-			
-			// now remove the transmuted materials from player
-			for (CachedEntity item:materials) {
-				item.setProperty("containerKey", null);
-				item.setProperty("movedDate", new Date());
+			catch (Exception e) {
 				
-				ds.put(item);
+			}
+			finally {
+				setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 			}
 		}
 		else {
 			String recipeNames = (String) recipes.get(0).getProperty("name");
 			
 			for (int i=1; i<recipes.size(); i++) {
-				recipeNames.concat(", " + recipes.get(i));
+				recipeNames.concat(", " + recipes.get(i).getProperty("name"));
 			}
 			
 			throw new RuntimeException("Duplicate recipes: " + recipeNames);
@@ -112,8 +125,12 @@ public class CommandTransmuteItems extends Command {
 	/**
 	 * Builds a composite filter from a list of any size, that can be used in a query
 	 * 
-	 * @param list - list of Keys to each be used as a value for a filter
-	 * @return
+	 * @param property - entity property to filter on
+	 * @param keys - list of Keys to each be used as a value for a filter
+	 * @param operator - operator to use for each individual filter
+	 * @param compositeOperator - operator to use to tie filters together
+	 * 
+	 * @return CompositeFilter 
 	 */
 	private CompositeFilter buildFilter(String property, List<Key> keys, FilterOperator operator, CompositeFilterOperator compositeOperator) {
 		
@@ -129,5 +146,26 @@ public class CommandTransmuteItems extends Command {
 		CompositeFilter filter = new CompositeFilter(compositeOperator, filterList);
 		
 		return filter;
+	}
+	
+	/**
+	 * Checks the equality of each entity in two key lists, based on ID
+	 * 
+	 * @param l1 - List to compare with l2
+	 * @param l2 - List to compare with l1
+	 * 
+	 * @return true/false
+	 */
+	private boolean listEquals(List<Key> l1, List<Key> l2) {
+		
+		if (l1.size() != l2.size())
+			return false;
+		
+		for (int i=0; i<l1.size(); i++) {
+			if (!GameUtils.equals(l1.get(i), l2.get(i)))
+				return false;
+		}
+		
+		return true;
 	}
 }
