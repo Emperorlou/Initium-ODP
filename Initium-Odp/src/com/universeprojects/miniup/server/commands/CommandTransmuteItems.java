@@ -85,6 +85,8 @@ public class CommandTransmuteItems extends Command {
 			List<Key> results = (List<Key>) recipe.getProperty("results");
 			CachedEntity resultItem = null;
 			
+			ds.beginTransaction();
+			
 			try {
 				for (Key result:results) {
 					resultItem = db.generateNewObject(db.getEntity(result), "Item");
@@ -103,12 +105,15 @@ public class CommandTransmuteItems extends Command {
 					
 					ds.put(item);
 				}
+				
+				ds.commit();
+				setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 			}
 			catch (Exception e) {
-				
+				throw e;
 			}
 			finally {
-				setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+				ds.rollbackIfActive();
 			}
 		}
 		else {
