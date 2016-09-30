@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.commands;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -32,7 +35,20 @@ import com.universeprojects.miniup.server.commands.jsaccessors.DBAccessor;
  * Keep in mind that this command is meant to be safe: if you add more variables to the script scope,
  * make sure to keep it secret, keep it safe.
  * 
+ * Don't want to pass too much information into the command, as anyone viewing source
+ * can see what params we're passing and try to game the system somehow. Only 1 of 3 entities
+ * can be passed, since it works solely from the context of the entity in question.
+ * Where we show/trigger the script, we should know the entity type, so set the param
+ * accordingly there.
+ * 
+ * Parameters:
+ * 		itemId - the ID of the item the script is attached to
+ * 		characterId - the ID of the character the script is attached to
+ * 		locationId - the ID of the location the script is attached to
+ * 		scriptId - the ID of the script we will be running
+ * 
  * @author aboxoffoxes
+ * @author SPFiredrake
  *
  */
 public class CommandExecuteScript extends Command {
@@ -40,63 +56,96 @@ public class CommandExecuteScript extends Command {
 	public CommandExecuteScript(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
 		super(db, request, response);
 	}
+	
+	private Key getSourceEntityKey(Map<String, String> parameters) throws UserErrorMessage
+	{
+		String entityKind = null;
+		Long entityId = null;
+		// We need to make sure only 1 entity is being passed in here
+		int entryCount = 0;
+		if(parameters.containsKey("itemId"))
+		{
+			entryCount++;
+			entityKind = "Item";
+			entityId = tryParseId(parameters, "itemId");
+		}
+		if(parameters.containsKey("characterId"))
+		{
+			entryCount++;
+			entityKind = "Character";
+			entityId = tryParseId(parameters, "characterId");
+		}
+		if(parameters.containsKey("locationId"))
+		{
+			entryCount++;
+			entityKind = "Location";
+			entityId = tryParseId(parameters, "locationId");
+		}
+		
+		if(entryCount == 0)
+			throw new UserErrorMessage("Entity is not allowed to execute scripts this way.");
+		if(entryCount > 1)
+			throw new RuntimeException("Expected only 1 entity, got " + entryCount);
+		
+		return KeyFactory.createKey(entityKind, entityId);
+	}
 
 	@Override
-	public void run(Map<String, String> parameters) throws UserErrorMessage {
+	public void run(Map<String, String> parameters) throws UserErrorMessage 
+	{
+		ODPDBAccess db = getDB();
+		CachedDatastoreService ds = getDS();
+		CachedEntity character = db.getCurrentCharacter();
 		
 		// Safely fetch script and item entities
-		Long sourceEntityId = tryParseId(parameters, "sourceEntityId");
-		String sourceEntityKind = parameters.get("sourceEntityKind");
-		CachedEntity sourceEntity = db.getEntity(sourceEntityKind, sourceEntityId);
-
 		Long scriptId = tryParseId(parameters, "scriptId");
-		String scriptName = parameters.get("scriptName");
-		CachedEntity scriptEntity = db.getEntity("script", scriptId);
+		CachedEntity scriptSource = null;
+		
+		// Get the entity for which the script will run
+		Key entityKey = getSourceEntityKey(parameters);
+		CachedEntity entitySource = db.getEntity(entityKey);
 
 		//// SECURITY CHECKS
-		// Is this source of the right kind?
-		Set<String> allowedKinds = new HashSet<String> (Arrays.asList("item", "character"));
-		if (allowedKinds.contains(sourceEntity.getKind())==false)
-		{
-			throw new UserErrorMessage("Entity is not allowed to execute scripts this way.");
-		}
-
 		// Does this source have this script?
-		Map<String, Object> sourceProperties = sourceEntity.getProperties();
-		@SuppressWarnings("unchecked")
-		Set<Long> sourceScripts = (Set<Long>)sourceProperties.get("scripts");
-		if (sourceScripts.contains(scriptId)==false)
+		List<Key> sourceScriptKeys = (List<Key>)entitySource.getProperty("scripts");
+		for(Key scriptKey:sourceScriptKeys)
 		{
-			throw new UserErrorMessage("The entity does not have this effect!");
+			if (GameUtils.equals(scriptId, scriptKey.getId()))
+			{
+				scriptSource = db.getEntity(scriptKey);
+				break;
+			}
 		}
+		
+		if(scriptSource == null)
+			throw new UserErrorMessage("The entity does not have this effect!");
 
 		// Can player trigger this effect...
-		CachedEntity playerEntity = db.getCurrentCharacter();
-
-		switch(sourceEntity.getKind())
+		switch(entitySource.getKind())
 		{
 			// ...by being its originator:
-			case("character"):
+			case("Character"):
 			{
-				if (playerEntity.equals(sourceEntityId)==false)
+				if (GameUtils.equals(entityKey, character.getKey())==false)
 				{
 					throw new UserErrorMessage("You are not allowed to trigger others");
 				}
 			}
-			case("item"):
+			case("Item"):
 			{
 				// ...by being close enough to the item OR having it in their pocket
-				Key containerKey = (Key)sourceEntity.getProperty("containerKey");
-				if (containerKey==null)
-				{
-					throw new UserErrorMessage("You can only trigger items in your vicinity!");
-				}
-				if (GameUtils.equals(containerKey,playerEntity.getKey())==false
-					&& GameUtils.equals(containerKey,(Key)playerEntity.getProperty("locationKey"))==false)
+				Key itemContainerKey = (Key)entitySource.getProperty("containerKey");
+				CachedEntity itemContainer = db.getEntity(itemContainerKey);
+				if (itemContainer==null || db.checkContainerAccessAllowed(character, itemContainer)==false)
 				{
 					throw new UserErrorMessage("You can only trigger items in your vicinity!");
 				}
 				break;
+			}
+			case("Location"):
+			{
+				if(db.checkContainerAccessAllowed(character, entitySource)==false)
+					throw new UserErrorMessage("You are not located at the specified trigger location!");
 			}
 			default:
 			{
@@ -104,9 +153,8 @@ public class CommandExecuteScript extends Command {
 			}
 		}
 
-
 		// Does this script actually do anything?
-		String script = (String)scriptEntity.getProperty("script");
+		String script = (String)scriptSource.getProperty("script");
 		if (script == null || script.isEmpty())
 		{
 			// This is not necessarily an error, so it is not thrown as such
@@ -125,9 +173,11 @@ public class CommandExecuteScript extends Command {
 	    	scope.put("request", scope, Context.toObject(request, scope));
 	    	scope.put("accessor", scope, Context.toObject(new DBAccessor(db, request), scope));
 	    	scope.put("commandAccessor", scope, Context.toObject(new CommandAccessor(db, this.request, this.response), scope));
+	    	scope.put("currentCharacter", scope, Context.toObject(character, scope));
+	    	scope.put("entitySource", scope, Context.toObject(entitySource, scope));
 	    	
 	    	// Evaluate the 
-	    	ctx.evaluateString(scope, script, "scriptName", 0, null);
+	    	Object result = ctx.evaluateString(scope, script, "scriptName", 0, null);
 	    }
 	    catch (Exception e)
 	    {
