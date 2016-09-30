@@ -3351,5 +3351,15 @@ public class ODPDBAccess
 		return null;
 	}
 	
-	
+	/**
+	 * Method stub. This is actually implemented in the primary repo because the secret key is there.
+	 * 
+	 * @param response
+	 * @param remoteip
+	 * @return
+	 */
+	public boolean validateCaptcha(String response, String remoteip)
+	{
+		return false;
+	}
 }

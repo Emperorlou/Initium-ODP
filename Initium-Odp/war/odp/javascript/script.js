@@ -1991,7 +1991,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 	{
 		if (data.antiBotQuestionActive == true)
 		{
-			antiBotQuestionPopup(data.antiBotQuestionType, data.antiBotQuestion);
+			antiBotQuestionPopup();
 			return;
 		}
 		
@@ -2830,27 +2830,29 @@ function doPopupNotification(iconUrl, title, text, category, options, onclick, o
 ////////////////////////////////////////////////////////////
 // Anti-bot question stuff
 
-function antiBotAnswer(answer)
+function antiBotAnswer(response)
 {
-	doCommand(event, "AntiBotAnswer", {answer:answer}, function(data,error)
-	{
-		closeAllPopups();
+	doCommand(null, "AntiBotAnswer", {response:response}, function(data,error){
+		if (error)
+		{
+			closeAllPopups();
+			antiBotQuestionPopup();
+		}
+		else
+		{
+			closeAllPopups();
+		}
 	});
 }
 
-function antiBotQuestionPopup(type, question)
+function antiBotQuestionPopup()
 {
-	if (type == "BasicPopup")
-	{
-		popupMessage("Quick Question", question);
-	}
-	else if (type == "PromptPopup")
-	{
-		promptPopup("Quick Question", question, "", function(answer)
-		{
-			
-		}, function(){
-			location.reload();
+	popupMessage("Anti Bot Check", "<div id='myCaptcha' style='float:left;margin-right:10px;'></div><p>We have to check from time to time to make sure you're a human playing. This is to prevent people from " +
+			"playing the game automatically using bots.</p>");
+	
+	grecaptcha.render( 'myCaptcha', {
+		  'sitekey' : '6Ldx9wcUAAAAAG78kIIiv-pnhHBaAaTrpcX5ZDwT',  // required
+		  'theme' : 'light',  // optional
+		  'callback': antiBotAnswer  // optional
 		});
-	}
 }
