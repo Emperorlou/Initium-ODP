@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -35,7 +36,7 @@ public class CommandGivePlayerHouseToGroup extends Command{
 			throw new UserErrorMessage("You are not part of a group and cannot do this.");
 		}
 		
-		if (((Key)playerHouse.getProperty("ownerKey")).getId() != user.getKey().getId()){
+		if (!(GameUtils.equals(playerHouse.getProperty("ownerKey"), user.getKey()))){
 			throw new UserErrorMessage("You do not own this house and therefore cannot assign it to your group.");		
 		}					
 		// Get the path to the player house too...
