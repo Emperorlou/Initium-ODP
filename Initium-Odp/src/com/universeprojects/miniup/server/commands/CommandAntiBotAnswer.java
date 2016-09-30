@@ -11,7 +11,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.services.AntiBotService;
+import com.universeprojects.miniup.server.services.CaptchaService;
 
 public class CommandAntiBotAnswer extends Command
 {
@@ -24,33 +24,14 @@ public class CommandAntiBotAnswer extends Command
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage
 	{
-		String answer = parameters.get("answer");
+		String answer = parameters.get("response");
 		if (answer==null)
 			throw new UserErrorMessage("No answer given.");
 		
-		answer = answer.toLowerCase();
-		
-		AntiBotService antiBotService = new AntiBotService(db);
-		CachedEntity antiBotQuestion = antiBotService.getAntiBotQuestion();
-		
-		if (antiBotQuestion==null)
+		if (db.validateCaptcha(answer, WebUtils.getClientIpAddr(request))==true)
 		{
-			antiBotService.clearAndSave();
-			return;
-		}
-		
-		String realAnswer = (String)antiBotQuestion.getProperty("answer");
-		realAnswer = realAnswer.toLowerCase();
-		
-		if (answer.equals(realAnswer))
-		{
-			// Correct!
-			antiBotService.clearAndSave();
-			return;
-		}
-		else
-		{
-			throw new UserErrorMessage("This answer is incorrect.");
+			CaptchaService service = new CaptchaService(db);
+			service.flagCheckSucceeded();
 		}
 	}
 
