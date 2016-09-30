@@ -51,6 +51,7 @@ $(window).ready(function(e){
 			
 			showItems.show().next("br").show();
 			hideItems.hide().next("br").hide();
+			setSelectionCheckboxes(event, null);
 	    }, 500));
 	});
 	
@@ -60,15 +61,16 @@ $(window).ready(function(e){
 		var cb = $(event.currentTarget);
 		var selectRoot = cb.parents(".selection-root");
 		selectRoot.find("input:checkbox.check-group:not(:disabled)").prop( {checked:cb.prop("checked"), indeterminate:false});
-		selectRoot.find(".selection-list input:checkbox").prop("checked", cb.prop("checked"));
-		selectRoot.find(".selection-list .main-item").toggleClass("main-item-selected", cb.prop("checked"));
+		var selectItems = selectRoot.find(".selection-list .main-item:visible");
+		selectItems.find("input:checkbox").prop("checked", cb.prop("checked"));
+		selectItems.toggleClass("main-item-selected", cb.prop("checked"));
 	});
 	
 	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-group", function(event)
 	{
 		var cb = $(event.currentTarget);
 		var groupId = cb.attr("ref");
-		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item");
+		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item:visible");
 		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
 		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
 		
@@ -1151,7 +1153,7 @@ function setSelectionCheckboxes(event, groupId)
 	// On link clicks, currentTarget should be null since it's not assigned from a shared parent
 	// The link itself has the onclick, so coalesce to event.target
 	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
-	var allItems = selectRoot.find(".main-item");
+	var allItems = selectRoot.find(".main-item:visible");
 	var checkedItems = allItems.has("input:checkbox:checked");
 	
 	// Check-all first
@@ -1187,13 +1189,11 @@ function setSelectionCheckboxes(event, groupId)
 
 function selectedItemsDrop(event, selector)
 {
-	var batchItems = $(selector).has("input:checkbox:checked");
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	
 	confirmPopup("Drop Selected Inventory", "Are you sure you want to drop " + batchItems.length + " selected items on the ground?\n\nPlease note that items for sale in your store will be excluded.", function(){
-		var itemIds = $.makeArray(
-				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
-				.join(",");
+		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
 		// This command causes the popup to reload, so no need for a callback.
 		doCommand(event,"ItemsDrop",{"itemIds":itemIds});
@@ -1202,13 +1202,11 @@ function selectedItemsDrop(event, selector)
 
 function selectedItemsRemoveFromStore(event, selector)
 {
-	var batchItems = $(selector).has("input:checkbox:checked");
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	
 	confirmPopup("Remove Items from Store", "Are you sure you want to remove " + batchItems.length + " selected items from your store?", function(){
-		var itemIds = $.makeArray(
-				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
-				.join(",");
+		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
 		doCommand(event,"ItemsStoreDelete",{"itemIds":itemIds}, function(data, error){
 			if (error) return;
@@ -1220,14 +1218,12 @@ function selectedItemsRemoveFromStore(event, selector)
 
 function selectedItemsSell(event, selector)
 {
-	var batchItems = $(selector).has("input:checkbox:checked");
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	promptPopup("Sell Multiple Items", "How much do you want to sell these " + batchItems.length + " selected items for?", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
-			var itemIds = $.makeArray(
-					batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
-					.join(",");
+			var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 	
 			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
 				if (error) return;
@@ -1240,13 +1236,11 @@ function selectedItemsSell(event, selector)
 
 function selectedItemsTrade(event, selector)
 {
-	var batchItems = $(selector).has("input:checkbox:checked");
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	
 	confirmPopup("Trade Items", "Are you sure you want to trade " + batchItems.length + " selected items?", function(){
-		var itemIds = $.makeArray(
-				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
-				.join(",");
+		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
 		doCommand(event,"ItemsTrade",{"itemIds":itemIds}, function(data, error){
 			if (error) return;

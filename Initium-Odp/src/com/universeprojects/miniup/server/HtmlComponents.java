@@ -323,11 +323,11 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 	{
 		if("MERCHANT".equals(character.getProperty("mode")))
 		{
-			return generateButtonBarItem("toggleStorefront", "Clicking here will DISABLE your storefront so other players can buy your goods.", "storeDisabledNew(event)", "images/ui/storefrontEnabled.png");
+			return generateButtonBarItem("toggleStorefront", "Clicking here will DISABLE your storefront so other players cannot buy your goods.", "storeDisabledNew(event)", "images/ui/storefrontEnabled.png");
 		}
 		else
 		{
-			return generateButtonBarItem("toggleStorefront", "Clicking here will ENABLE your storefront so other players cannot buy your goods.", "storeEnabledNew(event)", "images/ui/storefrontDisabled.png");
+			return generateButtonBarItem("toggleStorefront", "Clicking here will ENABLE your storefront so other players can buy your goods.", "storeEnabledNew(event)", "images/ui/storefrontDisabled.png");
 		}
 	}
 	
