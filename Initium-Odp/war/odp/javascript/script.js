@@ -1267,20 +1267,12 @@ function characterUnequipAll(event)
 	doCommand(event, "CharacterUnequipAll", null, loadInventoryAndEquipment);
 }
 
-//function giveHouseToGroup()
-//{
-//	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
-//		window.location.href='ServletCharacterControl?type=giveHouseToGroup'+"&v="+window.verifyCode;
-//	});
-//}
-
 function giveHouseToGroup()
 {
-	promptPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
-		doCommand(eventObject,"GivePlayerHouseToGroup")};
+	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
+		window.location.href='ServletCharacterControl?type=giveHouseToGroup'+"&v="+window.verifyCode;
 	});
 }
-
 
 function refreshInstanceRespawnWarning()
 {
