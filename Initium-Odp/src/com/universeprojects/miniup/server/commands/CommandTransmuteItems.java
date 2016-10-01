@@ -47,6 +47,10 @@ public class CommandTransmuteItems extends Command {
 		
 		Long containerId = tryParseId(parameters, "containerId");
 		final Key containerKey = KeyFactory.createKey("Item", containerId);
+		CachedEntity container = db.getEntity(containerKey);
+		
+		if (GameUtils.equals(container.getProperty("transmuteEnabled"), true)==false)
+			throw new UserErrorMessage("You can only transmute items that are in a valid transmuting container.");
 		
 		final List<CachedEntity> materials = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, containerKey);
 		
@@ -87,7 +91,7 @@ public class CommandTransmuteItems extends Command {
 			final List<Key> results = (List<Key>) recipe.getProperty("results");
 			
 			try {
-				CachedEntity container = (CachedEntity) new Transaction<CachedEntity>(ds) {
+				container = (CachedEntity) new Transaction<CachedEntity>(ds) {
 				
 					@Override
 					public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
