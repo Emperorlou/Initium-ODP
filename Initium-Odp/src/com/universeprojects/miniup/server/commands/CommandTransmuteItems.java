@@ -95,13 +95,12 @@ public class CommandTransmuteItems extends Command {
 						
 						for (Key result:results) {
 						CachedEntity resultItem = db.generateNewObject(db.getEntity(result), "Item");
-						CachedEntity rfResultItem = refetch(resultItem);
 						
 						// put the item(s) in character's transmute box
-						rfResultItem.setProperty("containerKey", containerKey);
-						rfResultItem.setProperty("movedDate", new Date());
+						resultItem.setProperty("containerKey", containerKey);
+						resultItem.setProperty("movedDate", new Date());
 						
-						ds.put(rfResultItem);
+						ds.put(resultItem);
 						}
 						
 						// now remove the transmuted materials from player
