@@ -91,7 +91,7 @@ public class CommandTransmuteItems extends Command {
 			final List<Key> results = (List<Key>) recipe.getProperty("results");
 			
 			try {
-				CachedEntity container = (CachedEntity) new Transaction<CachedEntity>(ds) {
+				container = (CachedEntity) new Transaction<CachedEntity>(ds) {
 				
 					@Override
 					public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
