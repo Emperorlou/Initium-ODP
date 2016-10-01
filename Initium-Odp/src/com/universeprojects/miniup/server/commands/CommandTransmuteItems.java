@@ -47,6 +47,10 @@ public class CommandTransmuteItems extends Command {
 		
 		Long containerId = tryParseId(parameters, "containerId");
 		final Key containerKey = KeyFactory.createKey("Item", containerId);
+		CachedEntity container = db.getEntity(containerKey);
+		
+		if (!(boolean) container.getProperty("transmuteEnabled"))
+			throw new UserErrorMessage("You can only transmute items that are in a valid transmuting container.");
 		
 		final List<CachedEntity> materials = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, containerKey);
 		
