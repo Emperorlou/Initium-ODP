@@ -17,8 +17,10 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.Transaction;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -40,13 +42,13 @@ public class CommandTransmuteItems extends Command {
 	}
 	
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
-		ODPDBAccess db = getDB();
+		final ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
 		Long containerId = tryParseId(parameters, "containerId");
-		Key containerKey = KeyFactory.createKey("Item", containerId);
+		final Key containerKey = KeyFactory.createKey("Item", containerId);
 		
-		List<CachedEntity> materials = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, containerKey);
+		final List<CachedEntity> materials = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, containerKey);
 		
 		if (materials.size() < 2)
 			throw new UserErrorMessage("You must select at least two items to transmute.");
@@ -82,38 +84,45 @@ public class CommandTransmuteItems extends Command {
 			throw new UserErrorMessage("You tried transmuting the items, but nothing happened.");
 		else if (recipes.size() == 1) {
 			CachedEntity recipe = recipes.get(0);
-			List<Key> results = (List<Key>) recipe.getProperty("results");
-			CachedEntity resultItem = null;
-			
-			ds.beginTransaction();
+			final List<Key> results = (List<Key>) recipe.getProperty("results");
 			
 			try {
-				for (Key result:results) {
-					resultItem = db.generateNewObject(db.getEntity(result), "Item");
-					
-					// put the item(s) in character's transmute box
-					resultItem.setProperty("containerKey", containerKey);
-					resultItem.setProperty("movedDate", new Date());
-					
-					ds.put(resultItem);
-				}
+				CachedEntity container = (CachedEntity) new Transaction<CachedEntity>(ds) {
 				
-				// now remove the transmuted materials from player
-				for (CachedEntity item:materials) {
-					item.setProperty("containerKey", null);
-					item.setProperty("movedDate", new Date());
+					@Override
+					public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
+						CachedEntity container = db.getEntity(containerKey);
+						
+						for (Key result:results) {
+						CachedEntity resultItem = db.generateNewObject(db.getEntity(result), "Item");
+						CachedEntity rfResultItem = refetch(resultItem);
+						
+						// put the item(s) in character's transmute box
+						rfResultItem.setProperty("containerKey", containerKey);
+						rfResultItem.setProperty("movedDate", new Date());
+						
+						ds.put(rfResultItem);
+						}
+						
+						// now remove the transmuted materials from player
+						for (CachedEntity item:materials) {
+						CachedEntity rfItem = refetch(item);
+						
+						rfItem.setProperty("containerKey", null);
+						rfItem.setProperty("movedDate", new Date());
+						
+						ds.put(rfItem);
+						}
+						
+						return container;
+					}
 					
-					ds.put(item);
-				}
+				}.run();
 				
-				ds.commit();
 				setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 			}
-			catch (Exception e) {
-				throw e;
-			}
-			finally {
-				ds.rollbackIfActive();
+			catch (AbortTransactionException e) {
+				throw new RuntimeException(e);
 			}
 		}
 		else {
