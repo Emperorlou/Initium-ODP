@@ -17,7 +17,7 @@ public class PropertiesService extends Service {
 	public void buyHouse(ODPDBAccess db, CachedDatastoreService ds, CachedEntity user, CachedEntity character, CachedEntity currentLocation, String houseName, long cost) throws UserErrorMessage {
 
 		if (!houseName.matches("[A-Za-z0-9, ]+")) {
-			throw new UserErrorMessage("A property name can only have letters, numbers, commas, and spaces in the name.");
+			throw new UserErrorMessage("A property name can only have letters, numbers, commas, and spaces in its name.");
 		}
 		if (houseName.length() > 40) {
 			throw new UserErrorMessage("A property name can be up to 40 characters long.");
