@@ -74,8 +74,7 @@ public class CommandGivePlayerHouseToGroup extends Command{
 			ds.rollbackIfActive();
 		}
 		
-		setPopupMessage("Your house now belongs to your group: " + charactersGroup.getProperty("name") + ".");
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 
 		
 	}
