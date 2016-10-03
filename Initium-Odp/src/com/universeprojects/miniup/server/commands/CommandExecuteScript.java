@@ -26,8 +26,8 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.jsaccessors.CommandAccessor;
-import com.universeprojects.miniup.server.commands.jsaccessors.DBAccessor;
+import com.universeprojects.miniup.server.scripting.jsaccessors.CommandAccessor;
+import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
 
 /**
  * Makes it possible to execute script associated with an item.

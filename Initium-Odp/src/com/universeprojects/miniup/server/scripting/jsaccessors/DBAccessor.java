@@ -1,4 +1,4 @@
-package com.universeprojects.miniup.server.commands.jsaccessors;
+package com.universeprojects.miniup.server.scripting.jsaccessors;
 
 import java.util.Arrays;
 import java.util.HashSet;
