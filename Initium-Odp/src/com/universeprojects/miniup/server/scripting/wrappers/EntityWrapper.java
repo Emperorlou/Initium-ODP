@@ -1,9 +1,9 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 /**
  * Base wrapper class for CachedEntity objects, for use with the Scripting 
@@ -12,12 +12,12 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  * 
  * @author spfiredrake
  */
-public abstract class WrapperBase 
+public abstract class EntityWrapper 
 {
-	protected CachedEntity wrappedEntity;
+	public CachedEntity wrappedEntity;
 	protected ODPDBAccess db;
 	
-	public WrapperBase(CachedEntity entity, ODPDBAccess db)
+	public EntityWrapper(CachedEntity entity, ODPDBAccess db)
 	{
 		this.db = db;
 		this.wrappedEntity = entity;
@@ -36,5 +36,14 @@ public abstract class WrapperBase
 	protected Key getKey()
 	{
 		return wrappedEntity.getKey();
+	}
+	
+	public String getKind()
+	{
+		return wrappedEntity.getKind();
+	}
+
+	public String getName() {
+		return (String) wrappedEntity.getProperty("name");
 	}
 }

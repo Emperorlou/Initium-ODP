@@ -26,8 +26,11 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
+import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.jsaccessors.CommandAccessor;
 import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
+import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
  * Makes it possible to execute script associated with an item.
@@ -149,43 +152,17 @@ public class CommandExecuteScript extends Command {
 			}
 			default:
 			{
-				throw new RuntimeException("CommandExecuteItemScript: unhandled source entity type");
+				throw new RuntimeException("CommandExecuteScript: unhandled source entity type");
 			}
 		}
 
-		// Does this script actually do anything?
-		String script = (String)scriptSource.getProperty("script");
-		if (script == null || script.isEmpty())
+		ScriptEvent event = new SimpleEvent(character, db);
+		ScriptService service = new ScriptService(db, event);
+		service.executeScript(scriptSource, entitySource);
+		for(CachedEntity saveEntity:event.getSaveEntities())
 		{
-			// This is not necessarily an error, so it is not thrown as such
-			throw new UserErrorMessage("But nothing happened.", false);
+			ds.put(saveEntity);
 		}
-
-		//// SCRIPT EXECUTION
-	    Context ctx = Context.enter();
-	    try
-	    {
-	    	// This sandboxes the engine by preventing access to non-standard objects and some reflexion objects
-	    	// This is the simplest way to prevent access to top-level packages
-	    	Scriptable scope = ctx.initSafeStandardObjects();
-	    	
-	    	// Put accessor classes and other variables into scope
-	    	scope.put("request", scope, Context.toObject(request, scope));
-	    	scope.put("accessor", scope, Context.toObject(new DBAccessor(db, request), scope));
-	    	scope.put("commandAccessor", scope, Context.toObject(new CommandAccessor(db, this.request, this.response), scope));
-	    	scope.put("currentCharacter", scope, Context.toObject(character, scope));
-	    	scope.put("entitySource", scope, Context.toObject(entitySource, scope));
-	    	
-	    	// Evaluate the 
-	    	Object result = ctx.evaluateString(scope, script, "scriptName", 0, null);
-	    }
-	    catch (Exception e)
-	    {
-	    	throw new RuntimeException("ExecuteItemScript: JavaScript engine exception\n -> " + e.toString());
-	    }
-	    finally
-	    {
-	        Context.exit();
-	    }
+		service.close();
 	}
 }
