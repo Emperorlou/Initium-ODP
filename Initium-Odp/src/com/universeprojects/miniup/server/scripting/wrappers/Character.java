@@ -44,6 +44,11 @@ public class Character extends EntityWrapper
 		return (Double)this.getProperty("hitpoints");
 	}
 	
+	public void setHitpoints(Double newHp)
+	{
+		this.setProperty("hitpoints", newHp);
+	}
+	
 	/**
 	 * Adds the specified HP to the characters current hit points, not exceeding maximum hitpoints.
 	 * @param addHp The amount to adjust the characters hitpoints by. Can be negative.
@@ -62,7 +67,9 @@ public class Character extends EntityWrapper
 	 */
 	public Double addHitpoints(Double addHp, boolean overrideMax)
 	{
-		return Math.min(getHitpoints() + addHp, overrideMax ? Integer.MAX_VALUE : getMaxHitpoints());
+		Double newHitpoints = Math.min(getHitpoints() + addHp, overrideMax ? Integer.MAX_VALUE : getMaxHitpoints());
+		this.setProperty("hitpoints", newHitpoints);
+		return newHitpoints;
 	}
 
 	public String getMode() {
