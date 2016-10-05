@@ -10,7 +10,6 @@ public abstract class OperationBase
 
 	private List<Map<String, String>> htmlUpdates = new ArrayList<Map<String, String>>();
 	
-	
 	/**
 	 * When the command returns to the browser, the page will then find the elements that match
 	 * the given jquerySelector and the element's contents will be filled with the given htmlContents.
@@ -49,6 +48,42 @@ public abstract class OperationBase
 		htmlData.put("type", "1");
 		htmlData.put("selector", jquerySelector);
 		htmlData.put("html", newHtml);
+		
+		htmlUpdates.add(htmlData);
+	}
+	
+	/**
+	 * When the command returns to the browser, the page will then find the first element 
+	 * that matches the given jquerySelector and will insert the given htmlContents before.
+	 * 
+	 * @param jquerySelector
+	 * @param htmlContents
+	 */
+	public void insertHtmlBefore(String jquerySelector, String htmlContents)
+	{
+		Map<String,String> htmlData = new HashMap<String,String>();
+		
+		htmlData.put("type", "2");
+		htmlData.put("selector", jquerySelector);
+		htmlData.put("html", htmlContents);
+		
+		htmlUpdates.add(htmlData);
+	}
+	
+	/**
+	 * When the command returns to the browser, the page will then find the last element 
+	 * that matches the given jquerySelector and will insert the given htmlContents after.
+	 * 
+	 * @param jquerySelector
+	 * @param htmlContents
+	 */
+	public void insertHtmlAfter(String jquerySelector, String htmlContents)
+	{
+		Map<String,String> htmlData = new HashMap<String,String>();
+		
+		htmlData.put("type", "3");
+		htmlData.put("selector", jquerySelector);
+		htmlData.put("html", htmlContents);
 		
 		htmlUpdates.add(htmlData);
 	}

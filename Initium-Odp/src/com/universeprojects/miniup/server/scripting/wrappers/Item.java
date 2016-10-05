@@ -27,12 +27,14 @@ public class Item extends EntityWrapper
 	{
 		db.doMoveItem(null, currentCharacter.wrappedEntity, this.wrappedEntity, newContainer.wrappedEntity);
 	}
-
-	public Date getMovedTimestamp() {
-		return (Date) this.getProperty("movedTimestamp");
+	
+	public boolean hasCharges()
+	{
+		return wrappedEntity.hasProperty("charges") && (int)this.getProperty("charges") > 0;
 	}
-
-	public void setMovedTimestamp(Date movedTimestamp) {
-		this.setProperty("movedTimestamp", movedTimestamp);
+	
+	public void setCharges(int numCharges)
+	{
+		this.setProperty("charges", numCharges);
 	}
 }

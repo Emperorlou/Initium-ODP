@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -14,6 +15,7 @@ import javax.script.SimpleBindings;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mortbay.log.Log;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -28,8 +30,6 @@ import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
-import com.universeprojects.miniup.server.scripting.jsaccessors.CommandAccessor;
-import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -138,10 +138,9 @@ public class CommandExecuteScript extends Command {
 			{
 				// ...by being close enough to the item OR having it in their pocket
 				Key itemContainerKey = (Key)entitySource.getProperty("containerKey");
-				CachedEntity itemContainer = db.getEntity(itemContainerKey);
-				if (itemContainer==null || db.checkContainerAccessAllowed(character, itemContainer)==false)
+				if (itemContainerKey==null || GameUtils.equals(character.getKey(), itemContainerKey)==false)
 				{
-					throw new UserErrorMessage("You can only trigger items in your vicinity!");
+					throw new UserErrorMessage("You can only trigger items in your posession!");
 				}
 				break;
 			}
@@ -156,13 +155,42 @@ public class CommandExecuteScript extends Command {
 			}
 		}
 
-		ScriptEvent event = new SimpleEvent(character, db);
-		ScriptService service = new ScriptService(db, event);
-		service.executeScript(scriptSource, entitySource);
-		for(CachedEntity saveEntity:event.getSaveEntities())
+		
+		try
 		{
-			ds.put(saveEntity);
+			ScriptService service = ScriptService.getScriptService(db);
+			ScriptEvent event = new SimpleEvent(character, db);
+			if(service.executeScript(event, scriptSource, entitySource))
+			{
+				if(!event.haltExecution)
+				{
+					for(CachedEntity saveEntity:event.getSaveEntities())
+					{
+						ds.put(saveEntity);
+					}
+					
+					if(event.descriptionText != null && event.descriptionText != "")
+					{
+						insertHtmlBefore(".main-description", "<div class='main-description'>" + event.descriptionText + "</div>");
+					}
+				}
+				else
+				{
+					if(event.errorText != null)
+					{
+						throw new UserErrorMessage(event.errorText);
+					}
+				}
+			}
 		}
-		service.close();
+		catch(UserErrorMessage uem)
+		{
+			throw uem;
+		}
+		catch(Exception ex)
+		{
+			// First pass, we want to log the exception but still allow it to continue.
+			ScriptService.log.log(Level.ALL, "Unexpected error in ExecuteScript!", ex);
+		}
 	}
 }
