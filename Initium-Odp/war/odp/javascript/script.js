@@ -1954,6 +1954,14 @@ function ajaxUpdatePage(ajaxResponseData)
 			{
 				$(htmlData.selector).replaceWith(htmlData.html);
 			}
+			else if (htmlData.type==2)
+			{
+				$(htmlData.selector).first().before(htmlData.html);
+			}
+			else if (htmlData.type==3)
+			{
+				$(htmlData.selector).last().after(htmlData.html);
+			}
 		}
 	}
 }
