@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.scripting.events;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -49,7 +50,7 @@ public abstract class ScriptEvent
 	 * Setting this to true will immediately halt execution of the command. Keep in mind
 	 * that certain commands cannot be halted immediately.
 	 */
-	public boolean haltExecution;
+	public boolean haltExecution = false;
 	/**
 	 * Used to indicate to the ODP which objects need to be pushed back to the DB.
 	 */
@@ -68,9 +69,14 @@ public abstract class ScriptEvent
 	 */
 	public void saveEntity(EntityWrapper... entities)
 	{
+		ScriptService.log.log(Level.ALL, "SaveEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
-			if(!saveEntities.contains(entity)) saveEntities.add(entity);
+			if(!saveEntities.contains(entity)) 
+			{
+				ScriptService.log.log(Level.ALL, "Saving " + entity.getKind() + ":"+ entity.getName() + " entity.");
+				saveEntities.add(entity);
+			}
 		}
 	}
 	
