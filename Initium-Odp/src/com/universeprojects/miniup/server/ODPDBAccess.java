@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +80,12 @@ public class ODPDBAccess
 	public enum GroupStatus
 	{
 		Applied, Member, Admin, Kicked
+	}
+	
+	public enum ScriptType
+	{
+		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
+		onMoveBegin, onMoveEnd, onServerTick, onCombatTick;
 	}
 
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
