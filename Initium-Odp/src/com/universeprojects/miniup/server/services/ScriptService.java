@@ -48,11 +48,11 @@ public class ScriptService extends Service
 			// This sandboxes the engine by preventing access to non-standard objects and some reflexion objects
 	    	// This is the simplest way to prevent access to top-level packages
 			jsScope = jsContext.initSafeStandardObjects();
+			canExecute = true;
 		}
 		catch(Exception ex)
 		{
 			log.log(Level.ALL, "Failed to initialize ScriptService", ex);
-			canExecute = false;
 		}
 	}
 	
