@@ -8,11 +8,15 @@ import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.scripting.events.GlobalEvent;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
+import com.universeprojects.miniup.server.scripting.wrappers.Character;
+import com.universeprojects.miniup.server.scripting.wrappers.Item;
+import com.universeprojects.miniup.server.scripting.wrappers.Location;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -28,24 +32,11 @@ import com.universeprojects.miniup.server.services.ScriptService;
 public class DBAccessor {
 	private final ODPDBAccess db;
 	private final HttpServletRequest request;
-	// Constitutes the set of all the kinds this wrapper is allowed to fetch
-	private Set<String> allowedKinds = new HashSet<String>(Arrays.asList(
-			"Item",
-			"Character",
-			"Location"
-			));
 	
 	public DBAccessor(ODPDBAccess db, HttpServletRequest request)
 	{
 		this.db = db;
 		this.request = request;
-	}
-	
-	public DBAccessor(ODPDBAccess db, HttpServletRequest request, Set<String> allowedKinds)
-	{
-		this.db = db;
-		this.request = request;
-		this.allowedKinds = allowedKinds;
 	}
 	
 	public EntityWrapper getCurrentCharacter()
@@ -64,6 +55,11 @@ public class DBAccessor {
 			return false;
 		}
 		CachedEntity script = scripts.get(0);
+		if("global".equals(script.getProperty("type")) == false)
+		{
+			ScriptService.log.log(Level.SEVERE, "Cannot call non-global script through core.executeScript: " + scriptName);
+			return false;
+		}
 		ScriptService service = ScriptService.getScriptService(db);
 		GlobalEvent event = new GlobalEvent(db, entities);
 		boolean executed = service.executeScript(event, script, (EntityWrapper)null);
@@ -79,5 +75,35 @@ public class DBAccessor {
 			currentEvent.descriptionText += event.descriptionText;
 		}
 		return executed;
+	}
+	
+	public Character getCharacterByKey(Key characterKey)
+	{
+		return new Character(db.getEntity(characterKey), db);
+	}
+	
+	public Character getCharacterById(Long charId)
+	{
+		return new Character(db.getEntity("Character", charId), db);
+	}
+	
+	public Location getLocationByKey(Key locationKey)
+	{
+		return new Location(db.getEntity(locationKey), db);
+	}
+	
+	public Location getLocationById(Long locationId)
+	{
+		return new Location(db.getEntity("Location", locationId), db);
+	}
+	
+	public Item getItemByKey(Key itemKey)
+	{
+		return new Item(db.getEntity(itemKey), db);
+	}
+	
+	public Item getItemById(Long itemId)
+	{
+		return new Item(db.getEntity("Item", itemId), db);
 	}
 }
