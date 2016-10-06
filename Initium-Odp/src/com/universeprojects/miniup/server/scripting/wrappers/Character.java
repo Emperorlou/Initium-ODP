@@ -1,9 +1,15 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.logging.Level;
+
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
  * Scripting engine wrapper for the Character CachedEntity.
@@ -70,6 +76,46 @@ public class Character extends EntityWrapper
 		Double newHitpoints = Math.min(getHitpoints() + addHp, overrideMax ? Integer.MAX_VALUE : getMaxHitpoints());
 		this.setProperty("hitpoints", newHitpoints);
 		return newHitpoints;
+	}
+	
+	public List<Buff> getBuffs()
+	{
+		List<CachedEntity> playerBuffs = db.getBuffsFor(this.getKey());
+		List<Buff> buffs = new ArrayList<Buff>();
+		for(CachedEntity buff:playerBuffs)
+			buffs.add(new Buff(buff, this.db, this));
+		return buffs;
+	}
+	
+	public Buff addBuff(String buffDefName)
+	{
+		// Get the BuffDef from the ODP. We will use that to create a new Buff, associate
+		// it with the current character, then return back the Buff for save (since
+		// we don't save in Script context).
+		List<CachedEntity> buffDefs = db.getFilteredList("BuffDef", "name", buffDefName);
+		if(buffDefs.size() > 1)
+		{
+			// D'oh! Log it, return back null. name should be unique.
+			ScriptService.log.log(Level.WARNING, "BuffDef name not unique: " + buffDefName);
+			return null;
+		}
+		
+		// There should only be 1. If not, it will fall through and return a null value. 
+		for(CachedEntity def:buffDefs)
+		{
+			CachedEntity newBuff = db.generateNewObject(def, "Buff");
+			newBuff.setProperty("parentKey", this.getKey());
+			return new Buff(newBuff, db, this); 
+		}
+		ScriptService.log.log(Level.INFO, "BuffDef name not found: " + buffDefName);
+		return null;
+	}
+	
+	public Buff addManualBuff(String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
+			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
+	{
+		CachedEntity newBuff = db.awardBuff(null, this.getKey(), icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
+		return new Buff(newBuff, db, this);
 	}
 
 	public String getMode() {
