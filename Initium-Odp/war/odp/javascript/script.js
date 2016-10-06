@@ -854,6 +854,7 @@ function helpPopup()
 			"<li>/premium - Easily share a link to where people can learn about premium accounts.</li>" + 
 			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" + 
 			"<li>/app - This shows all the links to the mobile apps we have available.</li>" +
+			"<li>/competition - This puts up a link to the official competition page. This page allows you to donate to prize pools and is usually used to organize competitions between the content developers for creating new content.</li>" +
 			"</ul>", false);
 	
 }
@@ -2147,9 +2148,21 @@ var lastLongOperationEventObject = null;
 function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 {
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
+
+	if (actionUrl.indexOf("?")>0)
+		actionUrl+="&ajax=true";
+	else
+		actionUrl+="?ajax=true";
+	
 	$.get(actionUrl)
 	.done(function(data)
 	{
+		if (data.captcha==true)
+		{
+			antiBotQuestionPopup();
+			return;
+		}
+		
 		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
 		
