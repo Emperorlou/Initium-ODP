@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CachedDatastore"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-codec-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/rhino1.7.6/rhinojs.jar" sourcepath="libs/rhino1.7.6/src"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/appengine-java-sdk-1.9.42"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

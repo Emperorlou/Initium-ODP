@@ -8,3 +8,21 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 </web-app>
+
+<!-- Page controller servlet (locates controllers for various pages) -->
+<filter>
+  <filter-name>PageControllerFilter</filter-name>
+  <filter-class>com.universeprojects.web.PageControllerFilter</filter-class>
+  <init-param>
+    <param-name>uriPrefix</param-name>
+    <param-value>/</param-value>
+  </init-param>
+  <init-param>
+    <param-name>baseScanPackage</param-name>
+    <param-value>com.mywebsite.controllers</param-value>
+  </init-param>
+</filter>
+<filter-mapping>
+  <filter-name>PageControllerFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
