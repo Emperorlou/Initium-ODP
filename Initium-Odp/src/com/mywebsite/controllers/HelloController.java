@@ -11,15 +11,19 @@ import java.io.IOException;
 
 @Controller
 public class HelloController extends PageController {
-  super("hello");
-}
+	
+	public HelloController() {
+		super("hello");
+	}
 
 @Override
 protected final String processRequest(HttpServletRequest request, HttpServletResponse response) 
-  throws ServletException, IOException {
-
-  // set request attributes, to be accessible in the JSP page
-  request.setAttribute("message", "Hello World!");
-
-  return "/WEB-INF/pages/hello.jsp";
+	throws ServletException, IOException {
+	
+	// set request attributes, to be accessible in the JSP page
+	String msg = "Hello World!";
+	request.setAttribute("message", msg);
+	
+	return "/WEB-INF/pages/hello.jsp";
+	}
 }
