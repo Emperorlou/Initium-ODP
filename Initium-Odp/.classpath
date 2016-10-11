@@ -2,15 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CachedDatastore"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-codec-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/rhino1.7.6/rhinojs.jar" sourcepath="libs/rhino1.7.6/src"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Joe/Documents/Eclipse/eclipse/plugins/jsp-api-2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Joe/Documents/Eclipse/eclipse/plugins/reflections-0.9.10.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Joe/Documents/Eclipse/eclipse/plugins/slf4j-1.7.21/slf4j-simple-1.7.21.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Joe/Documents/Eclipse/eclipse/plugins/slf4j-1.7.21/slf4j-api-1.7.21.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Joe/Documents/Eclipse/eclipse/plugins/slf4j-1.7.21/slf4j-nop-1.7.21.jar"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/appengine-java-sdk-1.9.42"/>
-	<classpathentry kind="lib" path="C:/Users/Joe/Documents/Eclipse/eclipse/plugins/slf4j-1.7.21"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
