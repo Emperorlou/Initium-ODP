@@ -30,11 +30,26 @@ public class Item extends EntityWrapper
 	
 	public boolean hasCharges()
 	{
-		return wrappedEntity.hasProperty("charges") && (int)this.getProperty("charges") > 0;
+		return getCharges() > 0;
+	}
+	
+	public int getCharges()
+	{
+		return wrappedEntity.hasProperty("charges") ? (int)this.getProperty("charges") : -1;
 	}
 	
 	public void setCharges(int numCharges)
 	{
 		this.setProperty("charges", numCharges);
+	}
+	
+	public int adjustCharges(int numCharges)
+	{
+		int newCharges = getCharges();
+		if(newCharges == -1)
+			return -1;
+		newCharges += numCharges;
+		this.setProperty("charges", numCharges);
+		return newCharges;
 	}
 }

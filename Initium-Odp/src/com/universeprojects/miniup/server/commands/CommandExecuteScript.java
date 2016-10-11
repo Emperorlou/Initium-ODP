@@ -165,9 +165,9 @@ public class CommandExecuteScript extends Command {
 				if(!event.haltExecution)
 				{
 					for(CachedEntity saveEntity:event.getSaveEntities())
-					{
 						ds.put(saveEntity);
-					}
+					for(CachedEntity delEntity:event.getDeleteEntities())
+						ds.delete(delEntity);
 					
 					if(event.descriptionText != null && event.descriptionText != "")
 					{

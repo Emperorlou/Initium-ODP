@@ -54,7 +54,12 @@ public abstract class ScriptEvent
 	/**
 	 * Used to indicate to the ODP which objects need to be pushed back to the DB.
 	 */
-	protected List<EntityWrapper> saveEntities = new ArrayList<EntityWrapper>();
+	public List<EntityWrapper> saveEntities = new ArrayList<EntityWrapper>();
+	
+	/**
+	 * Used to indicate to the ODP which objects need to be deleted from the DB.
+	 */
+	public List<EntityWrapper> deleteEntities = new ArrayList<EntityWrapper>();
 	
 	/**
 	 * Indicates the event type we're dealing with. Simply used for sanity purposes,
@@ -93,6 +98,53 @@ public abstract class ScriptEvent
 			{
 				return new Iterator<CachedEntity>() {
 					private Iterator<EntityWrapper> wrappers = saveEntities.iterator();
+
+					public boolean hasNext() {
+						return wrappers.hasNext();
+					}
+
+					public CachedEntity next() {
+						return wrappers.next().wrappedEntity;
+					}
+
+					public void remove() {
+						wrappers.remove();
+					}
+				};
+			}
+		};
+	}
+	
+	/**
+	 * Helper method used in script context to mark wrapped entities for delete in the ODP.
+	 * @param entities
+	 */
+	public void deleteEntity(EntityWrapper... entities)
+	{
+		ScriptService.log.log(Level.ALL, "DeleteEntity called with " + entities.length + " entities.");
+		for(EntityWrapper entity:entities)
+		{
+			if(!saveEntities.contains(entity)) 
+			{
+				ScriptService.log.log(Level.ALL, "Deleting " + entity.getKind() + ":"+ entity.getName() + " entity.");
+				saveEntities.add(entity);
+			}
+		}
+	}
+	
+	/**
+	 * Allows calling commands to iterate over the WrappedEntity delete list
+	 * as CachedEntity, to make deleting easier.
+	 * @return
+	 */
+	public Iterable<CachedEntity> getDeleteEntities()
+	{
+		return new Iterable<CachedEntity>()
+		{
+			public Iterator<CachedEntity> iterator()
+			{
+				return new Iterator<CachedEntity>() {
+					private Iterator<EntityWrapper> wrappers = deleteEntities.iterator();
 
 					public boolean hasNext() {
 						return wrappers.hasNext();
