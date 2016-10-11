@@ -1500,7 +1500,7 @@ function viewChangelog()
 function viewSettings()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_settings.jsp");
+	pagePopup("/odp/ajax_settings.jsp");
 }
 
 function viewProfile()
@@ -2778,6 +2778,15 @@ function isWeatherEnabled()
 function isAnimationsEnabled()
 {
 	var setting = localStorage.getItem("checkboxDisableTravelAnimations");
+	if (setting!="true")
+		return true;
+	else
+		return false;
+}
+
+function isAdsEnabled()
+{
+	var setting = localStorage.getItem("checkboxDisableAds");
 	if (setting!="true")
 		return true;
 	else
