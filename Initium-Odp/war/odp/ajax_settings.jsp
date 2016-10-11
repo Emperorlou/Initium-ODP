@@ -63,6 +63,7 @@ input[type='checkbox']
 		<h2>Bandwidth</h2>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableBanners'> Disable all banners</div>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableOnlyAnimatedBanners'> Disable only animated banners</div>
+		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableAds'> Disable ads (premium only)</div>
 		
 		<h2>Performance</h2>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableWeather'> Disable weather effects</div>
@@ -77,7 +78,8 @@ input[type='checkbox']
 		                   "checkboxDisableBanners",
 		                   "checkboxDisableOnlyAnimatedBanners", 
 		                   "checkboxDisableWeather", 
-		                   "checkboxDisableTravelAnimations"];
+		                   "checkboxDisableTravelAnimations",
+		                   "checkboxDisableAds"];
 		for(var i = 0; i<checkboxIds.length; i++)
 		{
 			var checkboxId = checkboxIds[i];
