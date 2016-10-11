@@ -2784,6 +2784,15 @@ function isAnimationsEnabled()
 		return false;
 }
 
+function isAdsEnabled()
+{
+	var setting = localStorage.getItem("checkboxDisableAds");
+	if (setting!="true")
+		return true;
+	else
+		return false;
+}
+
 function getSoundEffectsVolume()
 {
 	var setting = localStorage.getItem("sliderSoundEffectsVolume");
