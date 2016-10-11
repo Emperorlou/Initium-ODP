@@ -14,6 +14,8 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
+import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
+import com.universeprojects.miniup.server.scripting.wrappers.Buff;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
@@ -31,16 +33,16 @@ public class ScriptService extends Service
 		HttpServletRequest request = db.getRequest();
 		if (request.getAttribute("scriptService") != null) return (ScriptService) request.getAttribute("scriptService");
 
-		ScriptService service = new ScriptService(db);
+		ScriptService service = new ScriptService(db, request);
 		request.setAttribute("scriptService", service);
 
 		return service;
 	}
 	
-	private ScriptService(ODPDBAccess db)
+	private ScriptService(ODPDBAccess db, HttpServletRequest request)
 	{
 		super(db);
-		log.setLevel(Level.FINEST);
+		log.setLevel(Level.ALL);
 		
 		try
 		{
@@ -48,11 +50,13 @@ public class ScriptService extends Service
 			// This sandboxes the engine by preventing access to non-standard objects and some reflexion objects
 	    	// This is the simplest way to prevent access to top-level packages
 			jsScope = jsContext.initSafeStandardObjects();
+			DBAccessor coreFunctions = new DBAccessor(db, request);
+			jsScope.put("core", jsScope, coreFunctions);
 			canExecute = true;
 		}
 		catch(Exception ex)
 		{
-			log.log(Level.ALL, "Failed to initialize ScriptService", ex);
+			log.log(Level.WARNING, "Failed to initialize ScriptService", ex);
 		}
 	}
 	
@@ -64,6 +68,9 @@ public class ScriptService extends Service
 	 */
 	public static EntityWrapper wrapEntity(CachedEntity entity, ODPDBAccess db)
 	{
+		// We want to allow null wrappers to be returned, in cases such as GlobalEvent,
+		// where we pass a null CachedEntity for the currentCharacter parameter.
+		if(entity == null) return null;
 		switch(entity.getKind())
 		{
 			case "Item":
@@ -72,6 +79,8 @@ public class ScriptService extends Service
 				return new Character(entity, db);
 			case "Location":
 				return new Location(entity, db);
+			case "Buff":
+				return new Buff(entity, db);
 			default: 
 				throw new RuntimeException("Entity does not support scripting.");
 		}
@@ -113,25 +122,28 @@ public class ScriptService extends Service
 			return false;
 		}
 		
+		String scriptName = (String)scriptEntity.getProperty("internalName");
 	    try
 	    {
-	    	log.log(Level.INFO, "Executing script: " + scriptEntity.getKey().getId());
+	    	log.log(Level.WARNING, "Executing script: " + scriptEntity.getKey().getId());
+	    	// Create a new scope for every script execution call.
+	    	Scriptable currentScope = jsContext.newObject(jsScope);
+	    	currentScope.setPrototype(jsScope);
+	    	currentScope.setParentScope(null);
 			// Put the event into scope, so we can use it
-			if(jsScope.has("event", jsScope))
-				jsScope.delete("event");
-			jsScope.put("event", jsScope, Context.toObject(event, jsScope));
+	    	currentScope.put("event", currentScope, Context.toObject(event, currentScope));
 	    	// Recreate the sourceEntity variable on each hit.
-	    	if(jsScope.has("sourceEntity", jsScope))
-	    		jsScope.delete("sourceEntity");
-	    	jsScope.put("sourceEntity", jsScope, Context.toObject(entitySource, jsScope));
+	    	if(entitySource != null)
+	    		currentScope.put("sourceEntity", currentScope, Context.toObject(entitySource, currentScope));
 	    	// Evaluate the script. We don't need to return anything, everything we need
 	    	// is on the Event object itself.
-	    	jsContext.evaluateString(jsScope, script, "scriptName", 0, null);
+	    	jsContext.evaluateString(currentScope, script, scriptName, 0, null);
+	    	currentScope = null;
 	    	return true;
 	    }
 	    catch (Exception e)
 	    {
-	    	log.log(Level.SEVERE, "Exception during Script exection!", e);
+	    	log.log(Level.SEVERE, "Exception during Script exection of " + scriptName, e);
 	    }
 		return false;
 	}
