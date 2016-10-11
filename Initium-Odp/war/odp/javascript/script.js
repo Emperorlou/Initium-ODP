@@ -1500,7 +1500,7 @@ function viewChangelog()
 function viewSettings()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_settings.jsp");
+	pagePopup("odp/ajax_settings.jsp");
 }
 
 function viewProfile()
