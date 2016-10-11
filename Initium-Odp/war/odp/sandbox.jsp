@@ -18,6 +18,7 @@
 	
 	<div>
 		<a onclick='viewMap()'>viewMap</a>
+		<a onclick='viewSettings()'>viewSettings</a>
 		<a onclick='closeAllPagePopups()'>Close all</a>
 	</div>
 	
