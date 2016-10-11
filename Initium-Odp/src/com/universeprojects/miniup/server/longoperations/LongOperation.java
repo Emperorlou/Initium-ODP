@@ -22,6 +22,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.CaptchaService;
 
 
 
@@ -180,8 +181,12 @@ public abstract class LongOperation extends OperationBase
 	
 	public abstract String getPageRefreshJavascriptCall();
 	
-	public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, GameStateChangeException
 	{
+		CaptchaService captcha = new CaptchaService(db);
+		if (captcha.isBotCheckTime())
+			throw new GameStateChangeException();
+		
 		JSONObject result = new JSONObject();
 		try 
 		{
@@ -218,6 +223,16 @@ public abstract class LongOperation extends OperationBase
 		
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
+		out.print(result.toJSONString());
+		out.flush();
+		out.close();
+	}
+
+	public static void sendCaptchaRequired(HttpServletResponse response) throws IOException {
+		response.setContentType("application/json");
+		PrintWriter out = response.getWriter();
+		JSONObject result = new JSONObject();
+		result.put("captcha", true);
 		out.print(result.toJSONString());
 		out.flush();
 		out.close();
