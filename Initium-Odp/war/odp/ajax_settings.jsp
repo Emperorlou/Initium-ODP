@@ -63,11 +63,13 @@ input[type='checkbox']
 		<h2>Bandwidth</h2>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableBanners'> Disable all banners</div>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableOnlyAnimatedBanners'> Disable only animated banners</div>
-		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableAds'> Disable ads (premium only)</div>
 		
 		<h2>Performance</h2>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableWeather'> Disable weather effects</div>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableTravelAnimations'> Disable travel animations</div>
+		
+		<h2>Premium Settings</h2>
+		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableAds'> Disable ads</div>
 	</div>
 	
 	<center><p><a onclick='fullpageRefresh()' style='font-size:24px'>Apply Changes</a></p></center>
