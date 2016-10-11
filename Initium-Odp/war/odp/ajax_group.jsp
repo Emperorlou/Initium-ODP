@@ -84,7 +84,8 @@
 	// GO through the members list and pull out all the applications into a new list
 	for (int i = members.size() - 1; i >= 0; i--)
 		if ("Applied".equals(members.get(i).getProperty("groupStatus"))) {
-			applications.add(members.get(i));
+			if(GameUtils.isPlayerIncapacitated(members.get(i))==false)
+				applications.add(members.get(i));
 			members.remove(i);
 		}
 
