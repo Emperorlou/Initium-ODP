@@ -4,6 +4,12 @@
 <html>
 <head>
 	<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=45"/>
+	<style type="text/css" media="screen">
+	    #editor { 
+	        width: 100%;
+	        height: 100%;
+	    }
+	</style>
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	
@@ -24,5 +30,17 @@
 	
 	<div id="page-popup-root">
 	</div>
+	
+	<div id="editor">function foo(items) {
+	    var x = "All this is syntax highlighted";
+	    return x;
+	}</div>	
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+	    var editor = ace.edit("editor");
+	    editor.setTheme("ace/theme/monokai");
+	    editor.getSession().setMode("ace/mode/javascript");
+	</script>
 </body>
 </html>

@@ -117,6 +117,13 @@ public class CommandTransmuteItems extends Command {
 						ds.put(rfItem);
 						}
 						
+						// reduce container's durability
+						long durab = (long) container.getProperty("durability");
+						if (durab > 1)
+							container.setProperty("durability", durab - 1);
+						else
+							ds.delete(container);
+						
 						return container;
 					}
 					
