@@ -1,4 +1,4 @@
-package com.mywebsite.controllers;
+package com.universeprojects.miniup.server.controllers;
 
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -24,6 +24,6 @@ protected final String processRequest(HttpServletRequest request, HttpServletRes
 	String msg = "Hello World!";
 	request.setAttribute("message", msg);
 	
-	return "/WEB-INF/pages/hello.jsp";
+	return "/WEB-INF/odppages/hello.jsp";
 	}
 }
