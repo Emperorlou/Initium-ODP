@@ -1,4 +1,4 @@
-package com.mywebsite.controllers;
+package com.universeprojects.miniup.server.controllers;
 
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;

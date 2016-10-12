@@ -19,7 +19,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   	</init-param>
   	<init-param>
     	<param-name>baseScanPackage</param-name>
-    	<param-value>com.mywebsite.controllers</param-value>
+    	<param-value>com.universeprojects.miniup.server.controllers</param-value>
   	</init-param>
 	</filter>
 	<filter-mapping>
