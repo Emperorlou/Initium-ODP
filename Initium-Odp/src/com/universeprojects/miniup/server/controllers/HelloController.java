@@ -24,6 +24,6 @@ protected final String processRequest(HttpServletRequest request, HttpServletRes
 	String msg = "Hello World!";
 	request.setAttribute("message", msg);
 	
-	return "/WEB-INF/pages/hello.jsp";
+	return "/odp/pages/hello.jsp";
 	}
 }
