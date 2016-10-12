@@ -12,6 +12,7 @@
 	</style>
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="/odp/javascript/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 	
 	<script type="text/javascript" src="/odp/javascript/script.js"></script>
 	
@@ -36,11 +37,30 @@
 	    return x;
 	}</div>	
 	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js" type="text/javascript" charset="utf-8"></script>
+
 	<script>
+		$('#editor').on('keyup', function(e) {
+	    	e.stopPropagation();
+	    });
+	
 	    var editor = ace.edit("editor");
 	    editor.setTheme("ace/theme/monokai");
 	    editor.getSession().setMode("ace/mode/javascript");
+	    ace.config.loadModule("ace/ext/tern", function() {
+	        editor.setOptions({
+	            enableTern: {
+	                defs: ['browser', 'ecma5'],
+	                plugins: {
+	                    doc_comment: {
+	                        fullDocs: true
+	                    }
+	                },                    
+	                useWorker: true,
+	            },
+	            enableSnippets: true,
+	            enableBasicAutocompletion: true,
+	        });
+	    });
 	</script>
 </body>
 </html>
