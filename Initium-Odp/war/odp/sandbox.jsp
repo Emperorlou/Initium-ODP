@@ -28,15 +28,15 @@
 		<a onclick='closeAllPagePopups()'>Close all</a>
 	</div>
 	
-	<div id="editor">function foo(items) {
-	    var x = "All this is syntax highlighted";
-	    return x;
-	}</div>
-	
 	<div id="page-popup-root">
 	</div>
 	
-	<script src="javascript/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+	<div id="editor">function foo(items) {
+	    var x = "All this is syntax highlighted";
+	    return x;
+	}</div>	
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script>
 	    var editor = ace.edit("editor");
 	    editor.setTheme("ace/theme/monokai");
