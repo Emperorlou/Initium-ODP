@@ -32,5 +32,6 @@ public class CommandUserRediscoverHouses extends Command {
 
 		Key user = db.getCurrentUserKey();
 		new PropertiesService(db).rediscoverHouses(user);
+		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 	}
 }
