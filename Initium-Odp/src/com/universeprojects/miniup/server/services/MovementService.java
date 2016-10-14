@@ -25,8 +25,10 @@ public class MovementService extends Service {
 		
 		if (lockCode != null) 
 		{
-			if (checkHasKey(character, (long)lockCode)==false)
+			if (checkHasKey(character, (long)lockCode)==false) {
+				db.getDB().getMC().put("LongOperation-"+character.getKey(), null);
 				throw new UserErrorMessage("This location is locked. You must have the correct key in your inventory before you can access it.");
+			}
 		}
 	}
 	
