@@ -2787,6 +2787,27 @@ public class ODPDBAccess
 		ds.put(character);
 	}
 
+	public void discoverAllPropertiesFor(CachedDatastoreService ds, CachedEntity user, CachedEntity character)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		if (user!=null && Boolean.TRUE.equals(user.getProperty("premium")))
+		{
+			List<CachedEntity> paths = getFilteredList("Path", "ownerKey", user.getKey());
+			
+			for(CachedEntity path:paths)
+				newDiscovery(ds, character, path);
+
+			CachedEntity group = getEntity((Key)character.getProperty("groupKey"));
+			
+			if (group!=null)
+				discoverAllGroupPropertiesFor(ds, character);
+			
+		}
+	}
+	
+	
 	/**
 	 * 
 	 * @param ds
