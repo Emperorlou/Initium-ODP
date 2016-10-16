@@ -30,7 +30,9 @@ public class CommandUserRediscoverHouses extends Command {
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 
-		Key user = db.getCurrentUserKey();
+		CachedEntity user = db.getCurrentUser();
+		if(Boolean.TRUE.equals(user.getProperty("premium"))==false)
+			throw new UserErrorMessage("You must be a premium user in order to rediscover properties");
 		new PropertiesService(db).rediscoverHouses(user);
 		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 	}

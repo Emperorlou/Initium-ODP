@@ -81,17 +81,10 @@ public class PropertiesService extends Service {
 		
 	}
 	
-	public void rediscoverHouses(Key userKey)
+	public void rediscoverHouses(CachedEntity user)
 	{
-		List<CachedEntity> userCharacters = db.getFilteredList("Character", "userKey", userKey);
-		List<CachedEntity> playerHouses = db.getFilteredList("Location", "ownerKey", userKey);
-		for(CachedEntity house:playerHouses)
-		{
-			List<CachedEntity> paths = db.getPathsByLocation(house.getKey());
-			if(paths.isEmpty()) continue;
-			CachedEntity discoverPath = paths.get(0);
-			for(CachedEntity character:userCharacters)
-				db.newDiscovery(null, character, discoverPath);
-		}
+		List<CachedEntity> userCharacters = db.getFilteredList("Character", "userKey", user.getKey());
+		for(CachedEntity character:userCharacters)
+			db.discoverAllPropertiesFor(null, user, character);
 	}
 }
