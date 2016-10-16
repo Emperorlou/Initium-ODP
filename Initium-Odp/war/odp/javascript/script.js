@@ -649,7 +649,6 @@ function storeSetSaleNew(eventObject)
 		if (sale!=null)
 		{
 			doCommand(eventObject,"StoreSetSale",{"sale":sale});
-			fullPageRefresh();
 		}
 	});
 	
