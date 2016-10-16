@@ -2361,7 +2361,7 @@ function toggleMinimizeChat()
 
 function toggleMinimizeSoldItems()
 {
-	$(".soldItems").toggle();
+	$("#soldItems").toggle();
 }
 
 function updateMinimizeBox(buttonElement, selector)
