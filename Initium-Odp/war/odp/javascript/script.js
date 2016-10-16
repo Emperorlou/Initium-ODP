@@ -1509,7 +1509,7 @@ function viewSettings()
 function viewProfile()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_profile.jsp");
+	pagePopup("odp/view_profile");
 }
 
 function viewMap()
