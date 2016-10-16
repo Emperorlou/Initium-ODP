@@ -31,6 +31,8 @@ public class CommandUserRediscoverHouses extends Command {
 		ODPDBAccess db = getDB();
 
 		CachedEntity user = db.getCurrentUser();
+		if(user==null)
+			throw new UserErrorMessage("You cannot rediscover houses on throwaway accounts");
 		if(Boolean.TRUE.equals(user.getProperty("premium"))==false)
 			throw new UserErrorMessage("You must be a premium user in order to rediscover properties");
 		new PropertiesService(db).rediscoverHouses(user);
