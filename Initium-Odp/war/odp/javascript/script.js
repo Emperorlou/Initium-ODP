@@ -97,9 +97,9 @@ $(window).ready(function(e){
 	
 	// Set the correct image for the header mute button
 	if (isSoundEffectsEnabled())
-		$("#header-mute").attr("src", "images/ui/sound-button1.png");
+		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	else
-		$("#header-mute").attr("src", "images/ui/sound-button1-mute.png");
+		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 		
 
 	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
@@ -278,14 +278,14 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	if (isAnimationsEnabled())
 	{
 	
-		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 	
 		if (biome=="Dungeon")
 		{
 			// This version uses the new torch walking man
-			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			
-			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			var grassTiles = 40;
 			// The ground first
 			for(var i = 0; i<grassTiles; i++)
@@ -297,11 +297,11 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 				
 				var y = random(-40, 10);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			// Add the dungeon wall
-			content+="<img class='walkingman-prop' src='images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
+			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
 		
 			var torches = random(1,5);
 			var torchXOffset = random(0,100);
@@ -309,7 +309,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			{
 				
 				var x = torchXOffset;
-				content+="<img class='walkingman-prop' src='images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
 			}
 			
 	//		var plants = random(0,10);
@@ -340,7 +340,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	//	
 	//			var y = random(-60, 60);
 	//			var x = random(width/2*-1,width/2)-100;
-	//			content+="<img class='walkingman-prop' src='images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+	//			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 	//		}		
 		}
 		else if (biome=="Snow")
@@ -359,7 +359,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -391,7 +391,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		else if (biome=="Desert")
@@ -410,7 +410,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -442,7 +442,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		else // Temperate by default
@@ -461,7 +461,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -496,7 +496,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		content+="</div>";
@@ -517,15 +517,15 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 
 //function popupPermanentOverlay_Searching(locationName) {
 //	var title = "Exploring "+locationName;
-//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
+//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
 //	popupPermanentOverlay(title, content);
 //	$(".walkingman").animate({left: "+=60px"}, 800, "linear", function()
 //			{
 //				var img = $(this);
-//				img.attr("src", "images/anim/Pixelman_Ducking_by_pfunked.gif");
+//				img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Ducking_by_pfunked.gif");
 //				img.animate({left: "+=0px"}, 1250, "linear", function(){
 //					var img = $(this);
-//					img.attr("src", "images/anim/Pixelman_Walking_by_pfunked.gif");
+//					img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif");
 //					img.animate({left: "+=600px"}, 10000, "linear");
 //				});
 //			});
@@ -2306,7 +2306,7 @@ function doRest()
 				else
 				{
 					hideBannerLoadingIcon();
-					setBannerImage("images/action-campsite1.gif");
+					setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
 					setBannerOverlayText("Resting..", action.description);
 				}
 			},
@@ -2830,9 +2830,9 @@ function toggleEnvironmentSoundEffects(newState)
 	
 	// Set the correct image for the header mute button
 	if (enabled)
-		$("#header-mute").attr("src", "images/ui/sound-button1-mute.png");
+		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 	else
-		$("#header-mute").attr("src", "images/ui/sound-button1.png");
+		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	
 }
 
