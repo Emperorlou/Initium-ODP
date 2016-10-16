@@ -531,7 +531,10 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 //			});
 //}
 
-
+function rediscoverHouses(event)
+{
+	doCommand(event, "UserRediscoverHouses");
+}
 
 function buyHouse(eventObject)
 {
