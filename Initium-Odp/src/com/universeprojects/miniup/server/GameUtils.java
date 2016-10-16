@@ -650,6 +650,8 @@ public class GameUtils
 	    		qualityClass = "item-epic";
 	    	else if ("Custom".equals(qualityClassOverride))
 	    		qualityClass = "item-custom";
+	    	else if ("Magic".equals(qualityClassOverride))
+	    		qualityClass = "item-magic";
 	    	
 	    	if (qualityClass!=null)
 	    		return qualityClass;
@@ -890,6 +892,8 @@ public class GameUtils
 		String iconUrl = (String)item.getProperty("icon");
 		if (iconUrl!=null && iconUrl.startsWith("http://"))
 			iconUrl = "https://"+iconUrl.substring(7);
+		else if (iconUrl!=null && iconUrl.startsWith("http")==false)
+			iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
 		
 		if (popupEmbedded)
 			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
@@ -908,9 +912,9 @@ public class GameUtils
     		return "";
     	
     	if (popupEmbedded)
-    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
     	else
-    		return "<a rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
     }
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)
@@ -961,42 +965,42 @@ public class GameUtils
 		CachedEntity equipmentHelmet = db.getEntity((Key)character.getProperty("equipmentHelmet"));
 		String equipmentHelmetUrl = null;
 		if (equipmentHelmet!=null) 
-			equipmentHelmetUrl = (String)equipmentHelmet.getProperty("icon");
+			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty("icon"));
 
 		CachedEntity equipmentChest = db.getEntity((Key)character.getProperty("equipmentChest"));
 		String equipmentChestUrl = null;
 		if (equipmentChest!=null)
-			equipmentChestUrl = (String)equipmentChest.getProperty("icon");
+			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty("icon"));
 
 		CachedEntity equipmentLegs = db.getEntity((Key)character.getProperty("equipmentLegs"));
 		String equipmentLegsUrl = null;
 		if (equipmentLegs!=null)
-			equipmentLegsUrl = (String)equipmentLegs.getProperty("icon");
+			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty("icon"));
 
 		CachedEntity equipmentBoots = db.getEntity((Key)character.getProperty("equipmentBoots"));
 		String equipmentBootsUrl = null;
 		if (equipmentBoots!=null)
-			equipmentBootsUrl = (String)equipmentBoots.getProperty("icon");
+			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty("icon"));
 
 		CachedEntity equipmentGloves = db.getEntity((Key)character.getProperty("equipmentGloves"));
 		String equipmentGlovesUrl = null;
 		if (equipmentGloves!=null)
-			equipmentGlovesUrl = (String)equipmentGloves.getProperty("icon");
+			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty("icon"));
 
 		CachedEntity equipmentLeftHand = db.getEntity((Key)character.getProperty("equipmentLeftHand"));
 		String equipmentLeftHandUrl = null;
 		if (equipmentLeftHand!=null)
-			equipmentLeftHandUrl = (String)equipmentLeftHand.getProperty("icon");
+			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty("icon"));
 
 		CachedEntity equipmentRightHand = db.getEntity((Key)character.getProperty("equipmentRightHand"));
 		String equipmentRightHandUrl = null;
 		if (equipmentRightHand!=null)
-			equipmentRightHandUrl = (String)equipmentRightHand.getProperty("icon");
+			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty("icon"));
 
 		CachedEntity equipmentShirt = db.getEntity((Key)character.getProperty("equipmentShirt"));
 		String equipmentShirtUrl = null;
 		if (equipmentShirt!=null)
-			equipmentShirtUrl = (String)equipmentShirt.getProperty("icon");
+			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty("icon"));
 
 		boolean is2Handed = false;
 		if (equipmentRightHand!=null && "2Hands".equals(equipmentRightHand.getProperty("equipSlot")))
@@ -1097,7 +1101,7 @@ public class GameUtils
 		}
 		else
 		{
-			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"images/cloak1.png\")'></div>");
+			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
 		}
 		sb.append("</div>");
 		if (isSelf)
@@ -1173,7 +1177,7 @@ public class GameUtils
 				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
 				for(CachedEntity buff:buffs)
 				{
-					sb.append("<img src='"+buff.getProperty("icon")+"' border='0'>");
+					sb.append("<img src='"+"https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'>");
 				}
 				sb.append("</div>");
 				
@@ -1198,7 +1202,7 @@ public class GameUtils
 		for(CachedEntity buff:buffs)
 		{
 			sb.append("<div class='buff-detail'>");
-			sb.append("<img src='"+buff.getProperty("icon")+"' border='0'/>");
+			sb.append("<img src='https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'/>");
 			sb.append("<div class='buff-detail-header'>");
 			sb.append("<h5>"+buff.getProperty("name")+"</h5>");
 			for(int i = 1; i<=3; i++)
@@ -1238,9 +1242,9 @@ public class GameUtils
     		return "";
     	StringBuilder sb = new StringBuilder();
     	
-		sb.append("<img class='main-page-banner-image' src='images/banner-backing.jpg' border=0 />");
+		sb.append("<img class='main-page-banner-image' src='https://initium-resources.appspot.com/images/banner-backing.jpg' border=0 />");
 		sb.append("<div class='main-banner-container' style='z-index:1000100'>");
-		sb.append("	<img class='main-page-banner-image' src='images/banner-backing.jpg' border=0 />");
+		sb.append("	<img class='main-page-banner-image' src='https://initium-resources.appspot.com/images/banner-backing.jpg' border=0 />");
 		sb.append("	<div class='main-banner'>");
 		sb.append("		<img class='main-page-banner-image' src='"+bannerUrl+"' border=0 />");
 		sb.append("		<div class='banner-shadowbox' style=\"background: url('"+bannerUrl+"') no-repeat center / contain;\">");
@@ -1507,7 +1511,7 @@ public class GameUtils
                         if (simpleMode)
                             formula = new Double(jep.getValue()).intValue()+"";
                         else
-                            formula = "<img src='images/dice1.png' border=0/> "+originalFormula+" = "+formula+" = "+jep.getValue()+"";
+                            formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> "+originalFormula+" = "+formula+" = "+jep.getValue()+"";
                     }
                 }
                 catch (org.cheffo.jeplite.ParseException e) {
@@ -1799,5 +1803,21 @@ public class GameUtils
 			return "https://www.playinitium.com/login.jsp?game="+WebUtils.StringToEncryptedForUrl(email);
 		}
 		return null;
+	}
+	
+	public static String getResourceUrl(Object relativeUrlObj)
+	{
+		if (relativeUrlObj==null) return null;
+		String relativeUrl = (String)relativeUrlObj;
+		
+		if (relativeUrl.startsWith("http://"))
+			relativeUrl = "https://"+relativeUrl.substring(7);
+		
+		if (relativeUrl.startsWith("https://"))
+			return relativeUrl;
+		else if (relativeUrl.startsWith("/"))
+			return "https://initium-resources.appspot.com"+relativeUrl;
+		else
+			return "https://initium-resources.appspot.com/"+relativeUrl;
 	}
 }

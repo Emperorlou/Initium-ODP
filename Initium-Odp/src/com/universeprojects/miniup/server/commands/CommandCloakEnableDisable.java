@@ -51,13 +51,13 @@ public class CommandCloakEnableDisable extends Command
 		{
 			character.setProperty("cloaked", false);
 			
-			addCallbackData("html", "<a onclick='toggleCloaked(event)'  title='Clicking here will show your equipment and stats to other players.'><img src='images/ui/cloakedDisabled.png' border=0/></a>");
+			addCallbackData("html", "<a onclick='toggleCloaked(event)'  title='Clicking here will show your equipment and stats to other players.'><img src='https://initium-resources.appspot.com/images/ui/cloakedDisabled.png' border=0/></a>");
 		} 
 		else
 		{
 			character.setProperty("cloaked", true);
 
-			addCallbackData("html", "<a onclick='toggleCloaked(event)'  title='Clicking here will hide your equipment and stats from other players.'><img src='images/ui/cloakedEnabled.png' border=0/></a>");
+			addCallbackData("html", "<a onclick='toggleCloaked(event)'  title='Clicking here will hide your equipment and stats from other players.'><img src='https://initium-resources.appspot.com/images/ui/cloakedEnabled.png' border=0/></a>");
 		}
 
 		ds.put(character);

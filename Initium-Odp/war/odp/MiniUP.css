@@ -124,7 +124,7 @@ hr:after {
 {
 	width:100%;
 	height:211px;
-	background-image:url('/images/environment/background.png');
+	background-image:url('https://initium-resources.appspot.com/images/environment/background.png');
 }
 .travel-scene
 {
@@ -502,6 +502,13 @@ a.main-highlight:HOVER
     color: #AC54FF;
 }
 
+.no-backgroundcliptext .item-magic
+{
+    font-size: 20px;
+    text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
+    color: #2597FF;
+}
+
 .item-junk
 {
 	color:#777777;
@@ -535,6 +542,16 @@ a.main-highlight:HOVER
     text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
     color: transparent;
     background-color: #AC54FF;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+}
+
+.backgroundcliptext .item-magic
+{
+    font-size: 20px;
+    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+    color: transparent;
+	background-color: #2597FF;
     -webkit-background-clip: text;
     -moz-background-clip: text;
 }
@@ -836,7 +853,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .main-button
 {
-	background-image: url("/images/main-button-backing.jpg");
+	background-image: url("https://initium-resources.appspot.com/images/main-button-backing.jpg");
 	background-position:center;
 	width: 511px;
 	height: 38px;
@@ -856,7 +873,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .main-button-half
 {
-	background-image: url("/images/main-button-backing-half.jpg");
+	background-image: url("https://initium-resources.appspot.com/images/main-button-backing-half.jpg");
 	background-position:center;
 	background-size: 100% 100%;
 	width: 362px;
@@ -894,7 +911,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .main-textbox
 {
-	background: url("/images/main-button-backing.jpg") no-repeat center;
+	background: url("https://initium-resources.appspot.com/images/main-button-backing.jpg") no-repeat center;
 	width:100%;
 	height: 43px;
 	
@@ -1037,7 +1054,7 @@ hr.items-separator {
     position: absolute;
 	height:240px;
     /*background-image: url('../images/info-category-title-bar.png');*/
-	background: url("/images/banner-backing.jpg") no-repeat center;
+	background: url("https://initium-resources.appspot.com/images/banner-backing.jpg") no-repeat center;
 }
 .popup_header {
     width: 700px;
@@ -1486,7 +1503,7 @@ hr.items-separator {
 
 .avatar-equip-backing
 {
-	background-image:url("/images/ui/avatarbacking1.png"); width:36px; height:36px; top:0px; display:inline-block;position:relative;
+	background-image:url("https://initium-resources.appspot.com/images/ui/avatarbacking1.png"); width:36px; height:36px; top:0px; display:inline-block;position:relative;
 	vertical-align:top;
 	margin-left:5px;
 	margin-right:5px;
@@ -1552,7 +1569,7 @@ hr.items-separator {
     height: 100%;
     top: 0px;
     z-index: 47;
-	background: url("/images/loading.gif") center no-repeat, rgb(14,11,6);
+	background: url("https://initium-resources.appspot.com/images/loading.gif") center no-repeat, rgb(14,11,6);
 }
 
 .smallbox
@@ -1800,7 +1817,7 @@ hr.items-separator {
 .page-popup::before
 {
   position:absolute;
-  background:url('/images/ui/large-popup-top.jpg');
+  background:url('https://initium-resources.appspot.com/images/ui/large-popup-top.jpg');
   background-position:center;
   width:100%;
   height:18px;
@@ -1815,7 +1832,7 @@ hr.items-separator {
 	max-width:750px;
 	margin: 0 auto;
 	position:relative;
-	background-image:url('/images/ui/large-popup-middle.jpg');
+	background-image:url('https://initium-resources.appspot.com/images/ui/large-popup-middle.jpg');
   	background-position:center;
 	width:100%;
 	color:#FFFFFF;
@@ -1834,7 +1851,7 @@ hr.items-separator {
 
 .page-popup::after
 {
-  background-image:url('/images/ui/large-popup-bottom.jpg');
+  background-image:url('https://initium-resources.appspot.com/images/ui/large-popup-bottom.jpg');
   background-position:center;
 	position:absolute;
   content:" ";
@@ -2302,7 +2319,7 @@ body
 }
 ::-webkit-scrollbar-thumb
 {
-	background-image:url('/images/ui/newui/scrollbar1-thumb-bgimage.png');
+	background-image:url('https://initium-resources.appspot.com/images/ui/newui/scrollbar1-thumb-bgimage.png');
 	background-position:center center;
 	background-repeat: no-repeat;
 	background-color:#854c30;
@@ -2349,7 +2366,7 @@ body
 
 .header1
 {
-	background-image:url("/images/ui/newui/header1-background.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-background.png");
 	height:27px;
 	min-height:27px;
 	max-height:27px;
@@ -2365,7 +2382,7 @@ body
 .header1-spacer
 {
 	display:table-cell;
-	background-image:url("/images/ui/newui/header1-spacer.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-spacer.png");
 	min-width:11px;
 	height:27px;
 	min-height:27px;
@@ -2381,7 +2398,7 @@ body
 {
 	content: '';
 	position:absolute;
-	background-image:url("/images/ui/newui/header1-display-left.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-display-left.png");
 	width:4px;
 	height:27px;
 	min-height:27px;
@@ -2393,7 +2410,7 @@ body
 {
 	position:relative;
 	display:table-cell;
-	background-image:url("/images/ui/newui/header1-display-middle.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-display-middle.png");
 	height:21px;
 	min-height:27px;
 	padding-top:4px;
@@ -2406,7 +2423,7 @@ body
 {
 	content: '';
 	position:absolute;
-	background-image:url("/images/ui/newui/header1-display-right.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-display-right.png");
 	width:4px;
 	height:27px;
 	min-height:27px;
@@ -2427,7 +2444,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("/images/ui/newui/header1-button-left.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-left.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -2440,7 +2457,7 @@ body
 	cursor:pointer;
 	display:table-cell;
 	position:relative;
-	background-image:url("/images/ui/newui/header1-button-middle.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-middle.png");
 	height:21px;
 	max-height:21px;
 	min-height:27px;
@@ -2454,7 +2471,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("/images/ui/newui/header1-button-right.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-right.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -2464,15 +2481,15 @@ body
 }
 .header1-button:hover:before
 {
-	background-image:url("/images/ui/newui/header1-button-left-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-left-hover.png");
 }
 .header1-button:hover
 {
-	background-image:url("/images/ui/newui/header1-button-middle-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-middle-hover.png");
 }
 .header1-button:hover:after
 {
-	background-image:url("/images/ui/newui/header1-button-right-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-right-hover.png");
 }
 
 .banner1-container-container
@@ -2498,7 +2515,7 @@ body
 
 .banner1
 {
-	background-image:url("/images/banner---animated-stream-waterfall1.gif");
+	background-image:url("https://initium-resources.appspot.com/images/banner---animated-stream-waterfall1.gif");
 	background-position:top center;
 	background-repeat:no-repeat;
 	background-size:contain;
@@ -2754,7 +2771,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("/images/ui/newui/button1-left.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-left.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -2767,7 +2784,7 @@ body
 	cursor:pointer;
 	display:block;
 	position:relative;
-	background-image:url("/images/ui/newui/button1-middle.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-middle.png");
 	height:21px;
 	max-height:21px;
 	padding-top:5px;
@@ -2784,7 +2801,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("/images/ui/newui/button1-right.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-right.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -2794,15 +2811,15 @@ body
 }
 .button1:hover:before
 {
-	background-image:url("/images/ui/newui/button1-left-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-left-hover.png");
 }
 .button1:hover
 {
-	background-image:url("/images/ui/newui/button1-middle-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-middle-hover.png");
 }
 .button1:hover:after
 {
-	background-image:url("/images/ui/newui/button1-right-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-right-hover.png");
 }
 
 
@@ -2810,7 +2827,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("/images/ui/newui/button2-left.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-left.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -2823,7 +2840,7 @@ body
 	cursor:pointer;
 	display:block;
 	position:relative;
-	background-image:url("/images/ui/newui/button2-middle.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-middle.png");
 	height:21px;
 	max-height:21px;
 	padding-top:5px;
@@ -2840,7 +2857,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("/images/ui/newui/button2-right.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-right.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -2850,15 +2867,15 @@ body
 }
 .button2:hover:before
 {
-	background-image:url("/images/ui/newui/button2-left-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-left-hover.png");
 }
 .button2:hover
 {
-	background-image:url("/images/ui/newui/button2-middle-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-middle-hover.png");
 }
 .button2:hover:after
 {
-	background-image:url("/images/ui/newui/button2-right-hover.png");
+	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-right-hover.png");
 }
 
 

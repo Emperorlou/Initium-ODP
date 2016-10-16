@@ -239,7 +239,7 @@ function setAudioDescriptor(newAudioDescriptor, preset, isOutside)
 			{
 				loadingCount++;
 				loadedFilenames.push(audioFilenames[i]);
-				createjs.Sound.registerSound("audio/"+audioFilenames[i]+".ogg", audioFilenames[i]);
+				createjs.Sound.registerSound("https://initium-resources.appspot.com/audio/"+audioFilenames[i]+".ogg", audioFilenames[i]);
 				audioInstances.push(createjs.Sound.createInstance(audioFilenames[i]));
 			}
 		}
@@ -482,7 +482,7 @@ function playAudio(id, volume, delay)
 	if (audioInstance==null)
 	{
 		loadedFilenames.push(id);
-		createjs.Sound.registerSound("audio/"+id+".ogg", id);
+		createjs.Sound.registerSound("https://initium-resources.appspot.com/audio/"+id+".ogg", id);
 		audioInstances.push(createjs.Sound.createInstance(id));
 		return;	// Don't play the sound, it wasn't loaded in yet and it'll be too late by the time it is.
 	}
