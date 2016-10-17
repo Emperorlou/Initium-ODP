@@ -80,4 +80,11 @@ public class PropertiesService extends Service {
 		}
 		
 	}
+	
+	public void rediscoverHouses(CachedEntity user)
+	{
+		List<CachedEntity> userCharacters = db.getFilteredList("Character", "userKey", user.getKey());
+		for(CachedEntity character:userCharacters)
+			db.discoverAllPropertiesFor(null, user, character);
+	}
 }

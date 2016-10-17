@@ -531,7 +531,10 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 //			});
 //}
 
-
+function rediscoverHouses(event)
+{
+	doCommand(event, "UserRediscoverHouses");
+}
 
 function buyHouse(eventObject)
 {
@@ -1506,7 +1509,7 @@ function viewSettings()
 function viewProfile()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_profile.jsp");
+	pagePopup("odp/view_profile");
 }
 
 function viewMap()
@@ -2358,7 +2361,7 @@ function toggleMinimizeChat()
 
 function toggleMinimizeSoldItems()
 {
-	$(".soldItems").toggle();
+	$("#soldItems").toggle();
 }
 
 function updateMinimizeBox(buttonElement, selector)
