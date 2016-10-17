@@ -85,7 +85,7 @@ public class ODPDBAccess
 	public enum ScriptType
 	{
 		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
-		onMoveBegin, onMoveEnd, onServerTick, onCombatTick;
+		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem;
 	}
 
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
