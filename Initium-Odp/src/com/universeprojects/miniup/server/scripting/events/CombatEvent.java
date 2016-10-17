@@ -84,11 +84,28 @@ public class CombatEvent extends ScriptEvent {
 	public String eventKind() {
 		return "Combat";
 	}
+
+	public void setContext(ODPDBAccess db, CachedEntity attacker, CachedEntity weapon, CachedEntity defender){
+		setContext(new Character(attacker, db), new Item(weapon, db), new Character(defender, db));
+	}
 	
 	public void setContext(Character attacker, Item weapon, Character defender){
 		this.attacker = attacker;
 		this.weapon = weapon;
 		this.defender = defender;
+	}
+	
+	/**
+	 * Switches the attacker/defender, setting the attacker weapon.
+	 * @param db
+	 * @param attackerWeapon
+	 */
+	public void switchAttackers(ODPDBAccess db, CachedEntity attackerWeapon)
+	{
+		Character newDefender = this.attacker;
+		this.defender = attacker;
+		this.attacker = newDefender;
+		this.weapon = new Item(attackerWeapon, db);
 	}
 	
 	public Long addDamage(String damageType, Long damageDealt)
