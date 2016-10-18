@@ -1573,6 +1573,13 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 	});
 }
 
+function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
+{
+	var params = {"scriptId": effectId };
+	params[sourceType.toLowerCase() + "Id"] = sourceId;
+	doCommand(event, "Script"+effectType, params);
+}
+
 function doAttack(eventObject, charId)
 {
     closeAllPopups();
