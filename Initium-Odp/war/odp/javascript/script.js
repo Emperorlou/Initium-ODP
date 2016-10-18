@@ -1875,7 +1875,7 @@ function doDeleteCharacter(eventObject,characterId,characterName)
 
 function viewExchange()
 {
-	pagePopup("/odp/ajax_exchange.jsp");
+	pagePopup("/odp/ajax_exchange");
 }
 
 
