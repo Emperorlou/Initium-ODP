@@ -23,7 +23,7 @@ import com.universeprojects.web.PageController;
 public class ExchangeController extends PageController {
 	
 	public ExchangeController() {
-		super("exchange");
+		super("ajax_exchange");
 	}
 	
 	@Override
