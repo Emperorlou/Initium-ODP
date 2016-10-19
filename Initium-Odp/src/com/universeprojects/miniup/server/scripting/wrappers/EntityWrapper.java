@@ -52,9 +52,10 @@ public abstract class EntityWrapper
 		return (String) wrappedEntity.getProperty("name");
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void removeScript(String scriptName)
 	{
-		List<CachedEntity> scriptList = db.getFilteredList("Script", "internalName", scriptName);
+		List<CachedEntity> scriptList = db.getFilteredList("Script", "name", scriptName);
 		if(scriptList.size() > 0)
 		{
 			// Should only be a single script returned. Either way, get the first item.
@@ -80,9 +81,10 @@ public abstract class EntityWrapper
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean hasScript(String scriptName)
 	{
-		List<CachedEntity> searchScripts = db.getFilteredList("Script", "internalName", scriptName);
+		List<CachedEntity> searchScripts = db.getFilteredList("Script", "name", scriptName);
 		List<Key> entityScripts = (List<Key>)this.getProperty("scripts");
 		for(CachedEntity script:searchScripts)
 		{
@@ -93,6 +95,29 @@ public abstract class EntityWrapper
 					return true;
 			}
 		}
+		return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean addScript(String scriptName)
+	{
+		List<CachedEntity> addScripts = db.getFilteredList("Script", "name", scriptName);
+		if(!addScripts.isEmpty())
+		{
+			CachedEntity newScript = addScripts.get(0);
+			Key newScriptKey = newScript.getKey();
+			List<Key> entityScripts = (List<Key>)this.getProperty("scripts");
+			if(entityScripts == null) entityScripts = new ArrayList<Key>();
+			for(Key script:entityScripts)
+			{
+				if(GameUtils.equals(script, newScriptKey))
+					return false;
+			}
+			entityScripts.add(newScriptKey);
+			this.setProperty("scripts", entityScripts);
+			return true;
+		}
+		
 		return false;
 	}
 }
