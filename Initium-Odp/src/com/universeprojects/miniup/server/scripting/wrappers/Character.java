@@ -87,6 +87,18 @@ public class Character extends EntityWrapper
 		return buffs;
 	}
 	
+	public List<Buff> getBuffsOfType(String buffName)
+	{
+		List<CachedEntity> playerBuffs = db.getBuffsFor(this.getKey());
+		List<Buff> buffs = new ArrayList<Buff>();
+		for(CachedEntity buff:playerBuffs)
+		{
+			if(buff.getProperty("name").equals(buffName))
+				buffs.add(new Buff(buff, this.db, this));
+		}
+		return buffs;
+	}
+	
 	public Buff addBuff(String buffDefName)
 	{
 		// Get the BuffDef from the ODP. We will use that to create a new Buff, associate
@@ -116,6 +128,10 @@ public class Character extends EntityWrapper
 	{
 		CachedEntity newBuff = db.awardBuff(null, this.getKey(), icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
 		return new Buff(newBuff, db, this);
+	}
+	
+	public String getType() {
+		return (String) this.getProperty("type");
 	}
 
 	public String getMode() {

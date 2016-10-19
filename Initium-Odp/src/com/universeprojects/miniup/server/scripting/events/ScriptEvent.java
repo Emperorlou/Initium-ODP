@@ -1,8 +1,10 @@
 package com.universeprojects.miniup.server.scripting.events;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -52,6 +54,11 @@ public abstract class ScriptEvent
 	 */
 	public boolean haltExecution = false;
 	/**
+	 * Allows scripts to save attributes across script calls utilizing the same event (combat,
+	 * movement, etc).
+	 */
+	protected Map<String, Object> attributes = new HashMap<String, Object>();
+	/**
 	 * Used to indicate to the ODP which objects need to be pushed back to the DB.
 	 */
 	public List<EntityWrapper> saveEntities = new ArrayList<EntityWrapper>();
@@ -67,6 +74,42 @@ public abstract class ScriptEvent
 	 * @return Event type we're dealing with.
 	 */
 	public abstract String eventKind();
+	
+	/**
+	 * Resets all return data to initial state. For event reuse. Does NOT clear out attributes.
+	 */
+	protected void reset()
+	{
+		this.descriptionText = null;
+		this.errorText = null;
+		this.haltExecution = false;
+		this.saveEntities.clear();
+		this.deleteEntities.clear();
+	}
+	
+	/**
+	 * Allows objects to be stored in script context across calls (for commands or
+	 * events that fire multiple times, such as combat or movement)
+	 * @param key Key to put in the attributes map
+	 * @param value Value to persist across calls. Can be null.
+	 */
+	public void setAttribute(String key, Object value)
+	{
+		if(key == null || key.isEmpty()) return;
+		this.attributes.put(key, value);
+	}
+	
+	/**
+	 * Allows objects to be retrieved in script context across calls (for commands or
+	 * events that fire multiple times, such as combat or movement)
+	 * @param key Key to retrieve from the map.
+	 * @return Object from the attributes map. If key does not exist, null is returned.
+	 */
+	public Object getAttribute(String key)
+	{
+		if(attributes.containsKey(key)) return attributes.get(key);
+		return null;
+	}
 	
 	/**
 	 * Helper method used in script context to mark wrapped entities for save in the ODP.

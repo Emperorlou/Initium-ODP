@@ -1,18 +1,18 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
-import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
 import com.universeprojects.miniup.server.scripting.wrappers.Buff;
@@ -98,12 +98,28 @@ public class ScriptService extends Service
 	}
 	
 	/**
+	 * Including ODPDBAccess parameter here, due to issues with type erasure
+	 */
+	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, ODPDBAccess db, List<CachedEntity> entitySources)
+	{
+		List<EntityWrapper> wrappers = new ArrayList<EntityWrapper>();
+		for(CachedEntity entity:entitySources)
+			wrappers.add(ScriptService.wrapEntity(entity, db));
+		return executeScript(event, scriptEntity, wrappers);
+	}
+	
+	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, EntityWrapper entitySource)
+	{
+		return executeScript(event, scriptEntity, Arrays.asList(entitySource));
+	}
+	
+	/**
 	 * Executes the script. Wraps entitySource in the script wrapper type first.  
 	 * @param scriptEntity The actual script entity itself.
 	 * @param entitySource The entity which fired the script, will be passed into the script context to utilize in source.
 	 * @return True if script executed successfully, false otherwise.
 	 */
-	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, EntityWrapper entitySource)
+	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, List<EntityWrapper> entitySources)
 	{
 		if(event == null) throw new IllegalArgumentException("event cannot be null!");
 		
@@ -133,11 +149,20 @@ public class ScriptService extends Service
 			// Put the event into scope, so we can use it
 	    	currentScope.put("event", currentScope, Context.toObject(event, currentScope));
 	    	// Recreate the sourceEntity variable on each hit.
-	    	if(entitySource != null)
-	    		currentScope.put("sourceEntity", currentScope, Context.toObject(entitySource, currentScope));
-	    	// Evaluate the script. We don't need to return anything, everything we need
-	    	// is on the Event object itself.
-	    	jsContext.evaluateString(currentScope, script, scriptName, 0, null);
+	    	for(EntityWrapper src:entitySources)
+	    	{
+	    		// Always delete the sourceEntity from scope.
+	    		if(currentScope.has("sourceEntity", currentScope)) 
+	    			currentScope.delete("sourceEntity");
+	    		
+	    		// Only put it back if it's not null.
+		    	if(src != null)
+		    		currentScope.put("sourceEntity", currentScope, Context.toObject(src, currentScope));
+		    	
+		    	// Evaluate the script. We don't need to return anything, everything we need
+		    	// is on the Event object itself.
+		    	jsContext.evaluateString(currentScope, script, scriptName, 0, null);
+	    	}
 	    	currentScope = null;
 	    	return true;
 	    }

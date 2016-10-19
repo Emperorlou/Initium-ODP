@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,6 +9,8 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -3389,5 +3392,28 @@ public class ODPDBAccess
 	public boolean validateCaptcha(String response, String remoteip)
 	{
 		return false;
+	}
+	
+	public List<CachedEntity> getScriptsOfType(List<Key> scripts, ScriptType... types)
+	{
+		if(scripts == null || scripts.isEmpty()) return new ArrayList<CachedEntity>();
+		List<CachedEntity> scriptEntities = getEntities(scripts);
+		HashSet<ScriptType> validTypes = new HashSet<ScriptType>(Arrays.asList(types));
+		Iterator<CachedEntity> iter = scriptEntities.iterator();
+		while(iter.hasNext())
+		{
+			CachedEntity currentScript = iter.next();
+			String scriptType = (String)currentScript.getProperty("type");
+			if(scriptType == null || scriptType == "")
+				iter.remove();
+			else
+			{
+				ScriptType currentType = ScriptType.valueOf(scriptType);
+				if(!validTypes.contains(currentType))
+					iter.remove();
+			}
+		}
+		
+		return scriptEntities;
 	}
 }
