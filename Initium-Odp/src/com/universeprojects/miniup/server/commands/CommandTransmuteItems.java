@@ -119,8 +119,10 @@ public class CommandTransmuteItems extends Command {
 						
 						// reduce container's durability
 						long durab = (long) container.getProperty("durability");
-						if (durab > 1)
+						if (durab > 1) {
 							container.setProperty("durability", durab - 1);
+							ds.put(container);
+						}
 						else
 							ds.delete(container);
 						
