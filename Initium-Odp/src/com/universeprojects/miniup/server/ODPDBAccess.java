@@ -3431,7 +3431,7 @@ public class ODPDBAccess
 		public int damage = 0;
 		public String status = "";
 	}
-	public String doCharacterAttemptAttack(Authenticator auth, CachedEntity user, CachedEntity sourceCharacter, CachedEntity weapon, CachedEntity targetCharacter)
+	public String doCharacterAttemptAttack(ODPAuthenticator auth, CachedEntity user, CachedEntity sourceCharacter, CachedEntity weapon, CachedEntity targetCharacter)
     {
         if (sourceCharacter==null)
             throw new IllegalArgumentException("Source character cannot be null.");
@@ -3595,8 +3595,12 @@ public class ODPDBAccess
 
 
 
-
-	private Double[] getMaxCharacterStats(Key key)
+	/**
+	 * Placeholder
+	 * @param characterKey
+	 * @return
+	 */
+	public Double[] getMaxCharacterStats(Key characterKey)
 	{
 		// TODO Auto-generated method stub
 		return null;
@@ -4378,7 +4382,7 @@ public class ODPDBAccess
 	
 	
 	
-	private void doCharacterZombify(Authenticator auth, CachedDatastoreService ds, CachedEntity attackingCharacter, CachedEntity zombifyingCharacter)
+	private void doCharacterZombify(ODPAuthenticator auth, CachedDatastoreService ds, CachedEntity attackingCharacter, CachedEntity zombifyingCharacter)
 	{
 		if (ds==null)
 			ds = getDB();
@@ -4429,7 +4433,7 @@ public class ODPDBAccess
 	 * @param zombifyingCharacter
 	 * @return
 	 */
-	public CachedEntity doCreateNewCharacterFromDead(CachedDatastoreService ds2, Authenticator auth, CachedEntity zombifiedUser, CachedEntity zombifyingCharacter) throws UserErrorMessage
+	public CachedEntity doCreateNewCharacterFromDead(CachedDatastoreService ds2, ODPAuthenticator auth, CachedEntity zombifiedUser, CachedEntity zombifyingCharacter) throws UserErrorMessage
 	{
 		return null;
 	}
