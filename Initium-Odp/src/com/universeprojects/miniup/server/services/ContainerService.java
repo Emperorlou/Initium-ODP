@@ -35,7 +35,7 @@ public class ContainerService extends Service {
 						List<CachedEntity> items = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, parentContainer.getKey());
 						
 						for (CachedEntity item:items) {
-							item.setProperty("containerKey", container.getProperty("containerKey"));
+							item.setProperty("containerKey", parentContainer.getKey());
 							item.setProperty("movedDate", new Date());
 							
 							ds.put(item);
