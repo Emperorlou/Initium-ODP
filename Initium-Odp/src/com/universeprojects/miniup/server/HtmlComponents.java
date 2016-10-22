@@ -142,9 +142,9 @@ public class HtmlComponents {
 		}
 		
 		String result = "";
-			   result+="<div class='saleItem' ref="+saleItem.getKey().getId()+">";
+			   result+="<div class='saleItem' ref='"+saleItem.getKey().getId()+"'>";
 		   	   result+="<div class='main-item'>";
-		   	   result+="<input type=checkbox>";
+		   	   result+="<input type='checkbox'>";
 		   	   result+=" ";
 		   	   result+="<div class='main-item-container'>";
 		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
@@ -204,18 +204,18 @@ public class HtmlComponents {
         
       
         String result ="";
-        		result+="<div class='saleItem' ref="+saleItem.getKey().getId()+">";
-				result+="<div class='main-item'>";
-	   	       	result+="<span><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
-	   	       	result+="<span class='"+notEnoughStrengthClass+"'>";
-	   	    if ("Selling".equals(saleItem.getProperty("status")))
-	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
-	   	    else if ("Sold".equals(saleItem.getProperty("status")))   
-	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
-	   	       	result+="</span>";
-	   	    	result+="</div>";
-	   	       	result+="</div>";
-	   	       	result+="<br>";
+		result+="<div class='saleItem' ref='"+saleItem.getKey().getId()+"'>";
+		result+="<div class='main-item'>";
+       	result+="<span><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
+       	result+="<span class='"+notEnoughStrengthClass+"'>";
+       	if ("Selling".equals(saleItem.getProperty("status")))
+   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
+   	    else if ("Sold".equals(saleItem.getProperty("status")))   
+   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
+       	result+="</span>";
+    	result+="</div>";
+       	result+="</div>";
+       	result+="<br>";
 		
 		return result;
 	}
