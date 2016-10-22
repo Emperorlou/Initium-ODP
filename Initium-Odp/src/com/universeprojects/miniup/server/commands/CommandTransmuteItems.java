@@ -56,10 +56,8 @@ public class CommandTransmuteItems extends Command {
 		
 		final List<CachedEntity> materials = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, containerKey);
 		
-		if (materials.size() < 2) {
-			cs.doUse(ds, container, 1);
-			throw new UserErrorMessage("At least two items are required for a successful transmutation.");
-		}
+		if (materials.size() < 2)
+			throw new UserErrorMessage("You must select at least two items to transmute.");
 		
 		List<Key> materialsKeys = new ArrayList<Key>();
 		
