@@ -25,6 +25,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ContainerService;
 
 /**
  * Provides functionailty for transmuting a combination of items into a new resulting item.
@@ -45,6 +46,7 @@ public class CommandTransmuteItems extends Command {
 		final ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
+		ContainerService cs = new ContainerService(db);
 		Long containerId = tryParseId(parameters, "containerId");
 		final Key containerKey = KeyFactory.createKey("Item", containerId);
 		CachedEntity container = db.getEntity(containerKey);
@@ -84,8 +86,10 @@ public class CommandTransmuteItems extends Command {
 		}
 		
 		// perform the actual transmutation of the items
-		if (recipes.size() == 0)
+		if (recipes.size() == 0) {
+			cs.doUse(ds, container, 1);
 			throw new UserErrorMessage("You tried transmuting the items, but nothing happened.");
+		}
 		else if (recipes.size() == 1) {
 			CachedEntity recipe = recipes.get(0);
 			final List<Key> results = (List<Key>) recipe.getProperty("results");
@@ -117,20 +121,12 @@ public class CommandTransmuteItems extends Command {
 						ds.put(rfItem);
 						}
 						
-						// reduce container's durability
-						long durab = (long) container.getProperty("durability");
-						if (durab > 1) {
-							container.setProperty("durability", durab - 1);
-							ds.put(container);
-						}
-						else
-							ds.delete(container);
-						
 						return container;
 					}
 					
 				}.run();
 				
+				cs.doUse(ds, container, 1);
 				setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 			}
 			catch (AbortTransactionException e) {
