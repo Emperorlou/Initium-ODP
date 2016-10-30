@@ -1,20 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Gist
- @thechosenlne
- Watch 5
-  Star 8
-  Fork 28 Emperorlou/Initium-ODP
- Code  Issues 0  Pull requests 0  Projects 0  Wiki  Pulse  Graphs
-Branch: master Find file Copy pathInitium-ODP/Initium-Odp/war/odp/javascript/script.js
-bc14cf7  13 days ago
-@jDyn90 jDyn90 updating viewExchange call
-11 contributors @Emperorlou @Davos-Onomous @SPFiredrake @Atmostphear @NikeJoshua @ABoxOfFoxes @beauiv @jDyn90 @Mego @Murnto @arizonawayfarer
-RawBlameHistory     
-2892 lines (2372 sloc)  86.6 KB
 window.popupsNum = 0;
 window.popupsOpen = 0;
 window.popupsArray = new Array();
