@@ -1,3 +1,20 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+ @thechosenlne
+ Watch 5
+  Star 8
+  Fork 28 Emperorlou/Initium-ODP
+ Code  Issues 0  Pull requests 0  Projects 0  Wiki  Pulse  Graphs
+Branch: master Find file Copy pathInitium-ODP/Initium-Odp/war/odp/javascript/script.js
+bc14cf7  13 days ago
+@jDyn90 jDyn90 updating viewExchange call
+11 contributors @Emperorlou @Davos-Onomous @SPFiredrake @Atmostphear @NikeJoshua @ABoxOfFoxes @beauiv @jDyn90 @Mego @Murnto @arizonawayfarer
+RawBlameHistory     
+2892 lines (2372 sloc)  86.6 KB
 window.popupsNum = 0;
 window.popupsOpen = 0;
 window.popupsArray = new Array();
@@ -25,19 +42,16 @@ $(window).ready(function(e){
 		$(this).parent().toggleClass("boldBoxCollapsed");
 	});
 	
-	// For all inputs under the body: If a text box is selected, don't allow
-	// shortcut keys to process (prevent default)
+	// For all inputs under the body: If a text box is selected, don't allow shortcut keys to process (prevent default)
 	$("body").on("keyup", "input", function(event){
 		event.stopPropagation();
 	});
 	
-	// Any inputs with the main-item-filter-input class should be named (ID)
-	// according to
+	// Any inputs with the main-item-filter-input class should be named (ID) according to 
 	// which div class they will be filtering on.
 	$("#page-popup-root").on("input propertychange paste", "input.main-item-filter-input", function(event)
 	{
-		// If it's the propertychange event, make sure it's the value that
-		// changed.
+		// If it's the propertychange event, make sure it's the value that changed.
 	    if (window.event && event.type == "propertychange" && event.propertyName != "value")
 	        return;
 
@@ -58,8 +72,7 @@ $(window).ready(function(e){
 	    }, 500));
 	});
 	
-	// Unfortunately, we have to use event delegation for checkboxes, since it's
-	// in popup content.
+	// Unfortunately, we have to use event delegation for checkboxes, since it's in popup content.
 	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-all", function(event)
 	{
 		var cb = $(event.currentTarget);
@@ -106,9 +119,7 @@ $(window).ready(function(e){
 		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 		
 
-	// When the window gains focus, call the "flagReadMessages" to indicate that
-	// the user has now read any unread messages that may have been waiting for
-	// him
+	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
 	$(window).focus(function(){
 		flagReadMessages();
 	});
@@ -116,9 +127,8 @@ $(window).ready(function(e){
 });
 
 /**
- * This removes the * from the title, (and by extension the 'unread messages'
- * symbol on chrome browsers).
- * 
+ * This removes the * from the title, (and by extension the 'unread messages' symbol on chrome browsers).
+ *  
  * You can safely call this as often as you want.
  */
 function flagReadMessages()
@@ -133,8 +143,7 @@ function flagReadMessages()
 }
 
 /**
- * This adds a * to the title of the page (and by extension adds an 'unread
- * messages' symbol on chrome browsers).
+ * This adds a * to the title of the page (and by extension adds an 'unread messages' symbol on chrome browsers). 
  * 
  * You can safely call this as often as you want.
  */
@@ -149,7 +158,7 @@ function flagUnreadMessages()
 	}
 }
 
-// Pop up Message
+//Pop up Message
 function popupPermanentOverlay(title, content, popupClassOverride) 
 {
 	if (popupClassOverride==null)
@@ -239,23 +248,20 @@ function expandpopupMessage()
 		popup.css("top", viewportHeight/2-(height/2)+"px");
 	});
 	
-// var winHeight = window.innerHeight;
-// var popupWrapperH = winHeight-125;
-// var popupWrapperM = -popupWrapperH/2;
-// var popupTextH = popupWrapperH-100;
-// $(".popupWrapper").css("height", popupWrapperH + "px");
-// $(".popupWrapper").css("margin-top", popupWrapperM + "px");
-// $(".popup_text").css("max-height", popupTextH + "px");
-// var popupM = (-popupWrapperM - ($("#popup_text_" +
-// currentPopup()).height())); console.log(popupM + '\n' + $("#popup_text_" +
-// currentPopup()).height());
-// if ($("#popup_" + currentPopup()).height() < popupTextH) $("#popup_" +
-// currentPopup()).css("margin-top", popupM + "px");
+//    var winHeight = window.innerHeight;
+//    var popupWrapperH = winHeight-125;
+//    var popupWrapperM = -popupWrapperH/2;
+//    var popupTextH = popupWrapperH-100;
+//    $(".popupWrapper").css("height", popupWrapperH + "px");
+//    $(".popupWrapper").css("margin-top", popupWrapperM + "px");
+//    $(".popup_text").css("max-height", popupTextH + "px");
+//    var popupM = (-popupWrapperM - ($("#popup_text_" + currentPopup()).height())); console.log(popupM + '\n' + $("#popup_text_" + currentPopup()).height());
+//    if ($("#popup_" + currentPopup()).height() < popupTextH) $("#popup_" + currentPopup()).css("margin-top", popupM + "px");
 //    
-// $("#popups").find("img").each(function(index,element)
-// {
-// element.src = element.src+"";
-// });
+//    $("#popups").find("img").each(function(index,element)
+//	{
+//		element.src = element.src+"";
+//	});
 }
 
 
@@ -294,12 +300,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		if (biome=="Dungeon")
 		{
 			// This version uses the new torch walking man
-			// content = "<div class='travel-scene-container'
-			// style='background-image:none; background-color:#000000;'><div
-			// class='travel-scene'><div class='walkingman-container'><img
-			// class='walkingman'
-			// src='https://initium-resources.appspot.com/images/environment/dungeon/walking_torch.gif'
-			// style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			
 			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			var grassTiles = 40;
@@ -328,39 +329,36 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
 			}
 			
-	// var plants = random(0,10);
-	// // Trees and shrubs next
-	// for(var i = 0; i<plants; i++)
-	// {
-	// var filename = "baretree";
-	// // var type=random(0,5);
-	// // if (type==0)
-	// // filename = "tree";
-	// // else if (type==1)
-	// // filename = "tree";
-	// // else if (type==2)
-	// // filename = "shrub";
-	// // else if (type==3)
-	// // filename = "shrub";
-	// // else if (type==4)
-	// // filename = "shrub";
-	// // else if (type==5)
-	// // filename = "baretree";
+	//		var plants = random(0,10);
+	//		// Trees and shrubs next
+	//		for(var i = 0; i<plants; i++)
+	//		{
+	//			var filename = "baretree";
+	////			var type=random(0,5);
+	////			if (type==0)
+	////				filename = "tree";
+	////			else if (type==1)
+	////				filename = "tree";
+	////			else if (type==2)
+	////				filename = "shrub";
+	////			else if (type==3)
+	////				filename = "shrub";
+	////			else if (type==4)
+	////				filename = "shrub";
+	////			else if (type==5)
+	////				filename = "baretree";
 	//			
-	// // if (filename == "tree")
-	// // filename+=random(1,6);
-	// // else if (filename == "shrub")
-	// // filename+=random(1,3);
-	// // else if (filename == "baretree")
-	// filename+=random(1,7);
+	////			if (filename == "tree")
+	////				filename+=random(1,6);
+	////			else if (filename == "shrub")
+	////				filename+=random(1,3);
+	////			else if (filename == "baretree")
+	//			filename+=random(1,7);
 	//	
-	// var y = random(-60, 60);
-	// var x = random(width/2*-1,width/2)-100;
-	// content+="<img class='walkingman-prop'
-	// src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif'
-	// style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";'
-	// />";
-	// }
+	//			var y = random(-60, 60);
+	//			var x = random(width/2*-1,width/2)-100;
+	//			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+	//		}		
 		}
 		else if (biome=="Snow")
 		{
@@ -387,25 +385,25 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<plants; i++)
 			{
 				var filename = "baretree";
-	// var type=random(0,5);
-	// if (type==0)
-	// filename = "tree";
-	// else if (type==1)
-	// filename = "tree";
-	// else if (type==2)
-	// filename = "shrub";
-	// else if (type==3)
-	// filename = "shrub";
-	// else if (type==4)
-	// filename = "shrub";
-	// else if (type==5)
-	// filename = "baretree";
+	//			var type=random(0,5);
+	//			if (type==0)
+	//				filename = "tree";
+	//			else if (type==1)
+	//				filename = "tree";
+	//			else if (type==2)
+	//				filename = "shrub";
+	//			else if (type==3)
+	//				filename = "shrub";
+	//			else if (type==4)
+	//				filename = "shrub";
+	//			else if (type==5)
+	//				filename = "baretree";
 				
-	// if (filename == "tree")
-	// filename+=random(1,6);
-	// else if (filename == "shrub")
-	// filename+=random(1,3);
-	// else if (filename == "baretree")
+	//			if (filename == "tree")
+	//				filename+=random(1,6);
+	//			else if (filename == "shrub")
+	//				filename+=random(1,3);
+	//			else if (filename == "baretree")
 				filename+=random(1,7);
 		
 				var y = random(-60, 60);
@@ -438,25 +436,25 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<plants; i++)
 			{
 				var filename = "baretree";
-	// var type=random(0,5);
-	// if (type==0)
-	// filename = "tree";
-	// else if (type==1)
-	// filename = "tree";
-	// else if (type==2)
-	// filename = "shrub";
-	// else if (type==3)
-	// filename = "shrub";
-	// else if (type==4)
-	// filename = "shrub";
-	// else if (type==5)
-	// filename = "baretree";
+	//			var type=random(0,5);
+	//			if (type==0)
+	//				filename = "tree";
+	//			else if (type==1)
+	//				filename = "tree";
+	//			else if (type==2)
+	//				filename = "shrub";
+	//			else if (type==3)
+	//				filename = "shrub";
+	//			else if (type==4)
+	//				filename = "shrub";
+	//			else if (type==5)
+	//				filename = "baretree";
 				
-	// if (filename == "tree")
-	// filename+=random(1,6);
-	// else if (filename == "shrub")
-	// filename+=random(1,3);
-	// else if (filename == "baretree")
+	//			if (filename == "tree")
+	//				filename+=random(1,6);
+	//			else if (filename == "shrub")
+	//				filename+=random(1,3);
+	//			else if (filename == "baretree")
 				filename+=random(1,7);
 		
 				var y = random(-60, 60);
@@ -534,25 +532,21 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	$(".walkingman").animate({left: "+="+(windowWidth+40)+"px"}, (windowWidth/0.023), "linear");
 }
 
-// function popupPermanentOverlay_Searching(locationName) {
-// var title = "Exploring "+locationName;
-// var content = "You`re wandering about, looking for anything of
-// interest..<br><br><br><img class='walkingman'
-// src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";
-// popupPermanentOverlay(title, content);
-// $(".walkingman").animate({left: "+=60px"}, 800, "linear", function()
-// {
-// var img = $(this);
-// img.attr("src",
-// "https://initium-resources.appspot.com/images/anim/Pixelman_Ducking_by_pfunked.gif");
-// img.animate({left: "+=0px"}, 1250, "linear", function(){
-// var img = $(this);
-// img.attr("src",
-// "https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif");
-// img.animate({left: "+=600px"}, 10000, "linear");
-// });
-// });
-// }
+//function popupPermanentOverlay_Searching(locationName) {
+//	var title = "Exploring "+locationName;
+//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
+//	popupPermanentOverlay(title, content);
+//	$(".walkingman").animate({left: "+=60px"}, 800, "linear", function()
+//			{
+//				var img = $(this);
+//				img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Ducking_by_pfunked.gif");
+//				img.animate({left: "+=0px"}, 1250, "linear", function(){
+//					var img = $(this);
+//					img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif");
+//					img.animate({left: "+=600px"}, 10000, "linear");
+//				});
+//			});
+//}
 
 function rediscoverHouses(event)
 {
@@ -682,42 +676,37 @@ function transmuteItems(eventObject, containerId)
 	doCommand(eventObject, "TransmuteItems", {"containerId":containerId});
 }
 
-// function storeSellItem(itemId)
-// {
-// promptPopup("Sell Item", "How much do you want to sell this item for?", "0",
-// function(confirm){
-// window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
-// });
-// }
+//function storeSellItem(itemId)
+//{
+//	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
+//		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
+//	});
+//}
 
-// function removeAllStoreItems()
-// {
-// confirmPopup("Remove All Items", "Are you sure you want to remove ALL the
-// items from your store?", function(){
-// window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
-// });
-// }
+//function removeAllStoreItems()
+//{
+//	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
+//		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
+//	});
+//}
 
-// function storeDeleteSoldItems()
-// {
-// location.href =
-// "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
-// }
+//function storeDeleteSoldItems()
+//{
+//	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
+//}
 //
-// function storeDeleteItem(saleItemId)
-// {
-// location.href =
-// "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
-// }
+//function storeDeleteItem(saleItemId)
+//{
+//	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
+//}
 
-// function renameStore()
-// {
-// promptPopup("Rename Storefront", "Provide a new name for your store:", "",
-// function(name){
-// if (name!=null && name!="")
-// window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
-// });
-// }
+//function renameStore()
+//{
+//	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
+//		if (name!=null && name!="")
+//			window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
+//	});
+//}
 
 function createCampsite()
 {
@@ -750,8 +739,7 @@ function depositDogecoinsToItem(itemId, event)
 
 function collectDogecoinsFromItem(itemId, event)
 {
-	// Command updates the gold indicator as needed, but not the inventory gold
-	// span.
+	// Command updates the gold indicator as needed, but not the inventory gold span. 
 	// Just reload popup (if one is open, that is).
 	doCommand(event, "DogeCoinsCollectFromItem", {"itemId" : itemId}, function(data, error){
 		if(error) return;
@@ -765,16 +753,15 @@ function collectDogecoinsFromCharacter(characterId, event)
 	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId});
 }
 
-// function tradeSetDogecoin(currentDogecoin)
-// {
-// promptPopup("Trade Gold", "How much gold do you want to add to the trade:",
-// currentDogecoin+"", function(amount){
-// if (amount!=null && amount!="")
-// {
-// window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
-// }
-// });
-// }
+//function tradeSetDogecoin(currentDogecoin)
+//{
+//	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
+//		if (amount!=null && amount!="")
+//		{
+//			window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
+//		}
+//	});
+//}
 
 
 function toggleFullscreenChat()
@@ -794,12 +781,10 @@ function loadLocationItems()
 	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("ajax_moveitems.jsp?preset=location");
-// $("#main-itemlist").load("locationitemlist.jsp");
-// $("#main-itemlist").click(function(){
-// $("#main-itemlist").html("<div class='boldbox'
-// onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby
-// items</h4></div>");
-// });
+//	$("#main-itemlist").load("locationitemlist.jsp");
+//	$("#main-itemlist").click(function(){
+//		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby items</h4></div>");
+//	});
 }
 
 function loadLocationCharacters()
@@ -808,11 +793,9 @@ function loadLocationCharacters()
 	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("locationcharacterlist.jsp");
-// $("#main-characterlist").click(function(){
-// $("#main-characterlist").html("<div class='boldbox'
-// onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby
-// characters</h4></div>");
-// });
+//	$("#main-characterlist").click(function(){
+//		$("#main-characterlist").html("<div class='boldbox' onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby characters</h4></div>");
+//	});
 }
 
 function loadLocationMerchants()
@@ -821,12 +804,10 @@ function loadLocationMerchants()
 	closeAllPopups();
 	closeAllTooltips();
 	pagePopup("locationmerchantlist.jsp");
-// $("#main-merchantlist").load("locationmerchantlist.jsp");
-// $("#main-merchantlist").click(function(){
-// $("#main-merchantlist").html("<div class='boldbox'
-// onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby
-// merchants</h4></div>");
-// });
+//	$("#main-merchantlist").load("locationmerchantlist.jsp");
+//	$("#main-merchantlist").click(function(){
+//		$("#main-merchantlist").html("<div class='boldbox' onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby merchants</h4></div>");
+//	});
 }
 
 function loadInventoryAndEquipment()
@@ -838,19 +819,17 @@ function loadInventoryAndEquipment()
 function loadInventory()
 {
 	$("#inventory").load("/odp/inventorylist.jsp?ajax=true");
-// $("#inventory").click(function(){
-// $("#main-itemlist").html("<div class='boldbox'
-// onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
-// });
+//	$("#inventory").click(function(){
+//		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
+//	});
 }
 
 function loadEquipment()
 {
 	$("#equipment").load("/odp/equipmentlist.jsp?ajax=true");
-// $("#inventory").click(function(){
-// $("#main-itemlist").html("<div class='boldbox'
-// onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
-// });
+//	$("#inventory").click(function(){
+//		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
+//	});
 }
 
 function ajaxAction(url, eventObject, loadFunction)
@@ -921,8 +900,7 @@ function shareItem(itemId)
 
 	
 	messager.sendMessage(message);
-	// popupMessage("Item shared", "Everyone who is in your location can now see
-	// the item you just shared.");
+	//popupMessage("Item shared", "Everyone who is in your location can now see the item you just shared.");
 	
 	closeAllTooltips();
 }
@@ -965,11 +943,10 @@ function leaveGroup(eventObject)
 	});
 }
 
-// function cancelLeaveGroup()
-// {
-// window.location.href =
-// "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
-// }
+//function cancelLeaveGroup()
+//{
+//	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
+//}
 
 function setGroupDescription(eventObject, existingDescription)
 {
@@ -1022,15 +999,15 @@ function makeGroupCreator(eventObject, characterId)
 }
 
 
-// function duelConfirmation_Yes()
-// {
-// window.location.href="ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
-// }
+//function duelConfirmation_Yes()
+//{
+//	window.location.href="ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
+//}
 //
-// function duelConfirmation_No()
-// {
-// window.location.href="ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
-// }
+//function duelConfirmation_No()
+//{
+//	window.location.href="ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
+//}
 
 function reloadPopup(element, backUrl, event)
 {
@@ -1053,8 +1030,9 @@ function reloadPopup(element, backUrl, event)
 }
 
 /**
- * This will refresh the current popup contents, assuming the popup was created
- * via an ajax call. THIS IS A WORK IN PROGRESS, UNFINISHED
+ * This will refresh the current popup contents, assuming the popup
+ * was created via an ajax call.
+ * THIS IS A WORK IN PROGRESS, UNFINISHED
  */
 function refreshPopup(url, event)
 {
@@ -1076,19 +1054,16 @@ function refreshPopup(url, event)
 		event.stopPropagation();
 }
 
-// function changeStoreSale()
-// {
-// promptPopup("Store-wide Price Adjustment", "Enter the percentage you would
-// like to adjust the value of all your wares. For example, 25 will case all the
-// items in your store to sell at 25% of the original value. Another example,
-// 100 will cause your items to sell at full price.", 100, function(sale){
-// if (sale!=null)
-// {
-// window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
-// }
-// });
+//function changeStoreSale()
+//{
+//	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
+//		if (sale!=null)
+//		{
+//			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
+//		}
+//	});
 //	
-// }
+//}
 
 
 function destroyThrowaway()
@@ -1131,9 +1106,8 @@ function popupCharacterTransferService(currentCharacterId, currentCharacterName,
 			"<p><a onclick='acceptCharacterTransfer()'>Accept Character by Name</a></p>" +
 			"<p><a onclick='transferCharacter("+currentCharacterId+",\""+currentCharacterName+"\")'>Transfer Character to Another Account</a></p>" +
 			"";
-// <p><a onclick='acceptCharacterTransfer()'>Accept Character by Name</a></p>
-// <p><a onclick='transferCharacter("${characterName}")'>Transfer Character to
-// Another Account</a></p>
+//	<p><a onclick='acceptCharacterTransfer()'>Accept Character by Name</a></p>
+//	<p><a onclick='transferCharacter("${characterName}")'>Transfer Character to Another Account</a></p>
 	
 	$(".cluetip").hide();
 	
@@ -1167,19 +1141,13 @@ function dropAllInventory(event)
 	});
 }
 
-// //////////////////////////////////////////////////////
-// Batch item functions
+////////////////////////////////////////////////////////
+//Batch item functions
 /**
- * @param fromSelector -
- *            should select the item divs themselves, not the parent
- *            (selection-list)
- * @param toSelector -
- *            this is the encompassing div we'll be adding to
- * @param delimitedIds -
- *            The list of ID's we'll be removing from the original list
- *            (fromSelector)
- * @param newHtml -
- *            Raw HTML to add to the new list (toSelector)
+ * @param fromSelector - should select the item divs themselves, not the parent (selection-list)
+ * @param toSelector - this is the encompassing div we'll be adding to
+ * @param delimitedIds - The list of ID's we'll be removing from the original list (fromSelector)
+ * @param newHtml - Raw HTML to add to the new list (toSelector)
  */
 function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 {
@@ -1195,21 +1163,15 @@ function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 }
 
 /**
- * This call is used to set the checkboxes in the inventory headers. Required to
- * be called using an event, so we can get the root and work from there (on
- * popups with multiple roots, such as inventory/equipment, this keeps us in the
- * correct context).
- * 
- * @param event -
- *            Event object fired from the user action. Used to get context list.
- * @param groupId -
- *            Specified when clicking on a select group checkbox, bypassing
- *            checkbox state for groups entirely
+ * This call is used to set the checkboxes in the inventory headers. Required to be called
+ * using an event, so we can get the root and work from there (on popups with multiple
+ * roots, such as inventory/equipment, this keeps us in the correct context).
+ * @param event - Event object fired from the user action. Used to get context list.
+ * @param groupId - Specified when clicking on a select group checkbox, bypassing checkbox state for groups entirely
  */
 function setSelectionCheckboxes(event, groupId)
 {
-	// On link clicks, currentTarget should be null since it's not assigned from
-	// a shared parent
+	// On link clicks, currentTarget should be null since it's not assigned from a shared parent
 	// The link itself has the onclick, so coalesce to event.target
 	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
 	var allItems = selectRoot.find(".main-item:visible");
@@ -1222,14 +1184,11 @@ function setSelectionCheckboxes(event, groupId)
 			indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
 		});
 	
-	// If we pass in a groupId, that means we've clicked a group checkbox
-	// already.
-	// There won't be any overlapping groups (yet), so don't bother doing
-	// anything else with groups.
+	// If we pass in a groupId, that means we've clicked a group checkbox already.
+	// There won't be any overlapping groups (yet), so don't bother doing anything else with groups.
 	if(groupId == null || groupId == "")
 	{
-		// Check if this event belongs to a group. We can limit our selection
-		// that way.
+		// Check if this event belongs to a group. We can limit our selection that way.
 		var belongsToGroup = $(event.currentTarget || event.target).parents(".selection-group").prop("id");
 		
 		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]" 
@@ -1344,16 +1303,12 @@ function refreshInstanceRespawnWarning()
 	}
 }
 
-// function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId,
-// itemId)
-// {
-// confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue'
-// rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+"
-// gold?", function(){
-// window.location.href =
-// "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
-// });
-// }
+//function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
+//{
+//	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
+//		window.location.href = "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
+//	});
+//}
 
 function giftPremium()
 {
@@ -1686,7 +1641,7 @@ function storeEnabled()
 	location.href = "ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
 }
 
-// //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 // BUTTON BAR TOGGLES
 function toggleStorefront(eventObject)
 {
@@ -1701,8 +1656,7 @@ function togglePartyJoins(eventObject)
 function toggleDuelRequests(eventObject)
 {
 	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
-	// doCommand(eventObject, "ToggleDuelRequests", {"buttonId" :
-	// eventObject.currentTarget.id});
+	//doCommand(eventObject, "ToggleDuelRequests", {"buttonId" : eventObject.currentTarget.id});
 }
 
 function toggleCloaked(eventObject)
@@ -2008,13 +1962,12 @@ function viewExchange()
 
 
 
-// //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 // COMMANDS
 
 function ajaxUpdatePage(ajaxResponseData)
 {
-	// Here we update the screen with fresh html that came along with the
-	// response
+	// Here we update the screen with fresh html that came along with the response
 	if (ajaxResponseData.responseHtml!=null && ajaxResponseData.responseHtml.length>0)
 	{
 		for(var i = 0; i<ajaxResponseData.responseHtml.length; i++)
@@ -2043,16 +1996,13 @@ function ajaxUpdatePage(ajaxResponseData)
 
 function doCommand(eventObject, commandName, parameters, callback)
 {
-	// Changing to a post now, so no need to generate the URL parameter string
-	// anymore.
+	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
 		parameters = {"v":verifyCode};
 	else
 		parameters.v = verifyCode;
 	
-	// Now generate the url. We might use this later on to recall the command
-	// for some reason... probably not though. To be honest, this part was
-	// copypasta from the LongOperation command type
+	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "cmd?cmd="+commandName;
 	
 	var clickedElement = null;
@@ -2064,8 +2014,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 		clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
 	}
 	
-	// We need to post, as larger batch operations failed due to URL string
-	// being too long
+	// We need to post, as larger batch operations failed due to URL string being too long
 	$.post(url, parameters)
 	.done(function(data)
 	{
@@ -2079,14 +2028,12 @@ function doCommand(eventObject, commandName, parameters, callback)
 		if (data.javascriptResponse == "FullPageRefresh")
 		{
 			fullpageRefresh();
-			return;		// No need to go any further, we're refreshing the page
-						// anyway
+			return;		// No need to go any further, we're refreshing the page anyway
 		}
 		else if (data.javascriptResponse == "ReloadPagePopup")
 			reloadPagePopup();
 
-		// Do the page update first, regarless if there was an error. We do this
-		// because even errored responses may contain page updates.
+		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
 
 		// Here we display the system message if there was a system message
@@ -2188,7 +2135,7 @@ function doTerritorySetDefense(eventObject, line)
 
 
 
-// //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 // LONG OPERATIONS
 
 
@@ -2222,25 +2169,12 @@ var lastLongOperationEventObject = null;
  * 
  * @param eventObject
  * @param actionUrl
- * @param responseFunction
- *            This is the handler that is called when the operation returns. The
- *            data that is passed into the handler includes: data.isComplete
- *            (boolean), data.error (boolean), data.timeLeft (seconds remaining
- *            to wait)
- * @param recallFunction
- *            This function should call the original javascript call that
- *            includes the call to longOperation. This handler is invoked when
- *            the time on the long operation runs out.
+ * @param responseFunction This is the handler that is called when the operation returns. The data that is passed into the handler includes: data.isComplete (boolean), data.error (boolean), data.timeLeft (seconds remaining to wait)
+ * @param recallFunction This function should call the original javascript call that includes the call to longOperation. This handler is invoked when the time on the long operation runs out.
  */
 function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 {
-	lastLongOperationEventObject = eventObject;		// We're persisting the
-													// event object because when
-													// the ajax call returns, we
-													// may need to know what
-													// element was clicked when
-													// starting the long
-													// operation
+	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
 
 	if (actionUrl.indexOf("?")>0)
 		actionUrl+="&ajax=true";
@@ -2256,8 +2190,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 			return;
 		}
 		
-		// Do the page update first, regarless if there was an error. We do this
-		// because even errored responses may contain page updates.
+		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
 		
 		if (data.error!=undefined)
@@ -2435,17 +2368,14 @@ function doCollectCollectable(event, collectableId)
 
 
 /*
- * 1. Regular method doGoto() is called which calls longOperation, passes in the
- * doGoto_ajaxResponse() function 2. longOperation() ajax calls the server to
- * setup OR continue the operation 3. Ajax call returns an object with the
- * current state (waitTime, variousArgs) and calls the doGoto_ajaxResponse() 4.
- * For certain return states (like messages/errors) the longOperation will
- * handle it? (maybe) 5. doGoto_ajaxResponse() knows how to handle a completed
- * state and an unfinished state
+ * 1. Regular method doGoto() is called which calls longOperation, passes in the doGoto_ajaxResponse() function
+ * 2. longOperation() ajax calls the server to setup OR continue the operation
+ * 3. Ajax call returns an object with the current state (waitTime, variousArgs) and calls the doGoto_ajaxResponse()
+ * 4. For certain return states (like messages/errors) the longOperation will handle it? (maybe)
+ * 5. doGoto_ajaxResponse() knows how to handle a completed state and an unfinished state
  * 
- * If the page is refreshed, main.jsp will look for an ongoing longOperation
- * before rendering, if it finds one it will include a call to doGoto() with all
- * the same parameters in some script tags.
+ * If the page is refreshed, main.jsp will look for an ongoing longOperation before rendering, if it finds one
+ * it will include a call to doGoto() with all the same parameters in some script tags.
  */
 
 function toggleMinimizeChat()
@@ -2499,7 +2429,7 @@ function isBoxMinimized(selector)
 	return minimized;
 }
 
-// /////////////////////////////////////////
+///////////////////////////////////////////
 // These are notification type handlers
 
 function fullpageRefresh()
@@ -2512,7 +2442,7 @@ function _viewTrade()
     closeAllPopupsTooltips(true);
 	pagePopup("odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
-// popupMessage("Trade Cancelled","This trade has been cancelled.")
+//		popupMessage("Trade Cancelled","This trade has been cancelled.")
 	});	
 }
 
@@ -2541,7 +2471,7 @@ function updateTerritory()
 }
 
 
-// ///////////////////////////////////////
+/////////////////////////////////////////
 // Shortcut key bindings
 
 
@@ -2567,8 +2497,7 @@ $(document).keyup(function(event){
 	{
 		viewProfile();
 	}
-	else if (event.which==76) // Changed to L since B is now for Nearby
-								// Characters list
+	else if (event.which==76) // Changed to L since B is now for Nearby Characters list
 	{
 		window.location.href='main.jsp';
 	}
@@ -2648,30 +2577,30 @@ function stopEventPropagation(evt) {
     }
 }
 
-// function slideLoaded(img){
-// var $img = $(img),
-// $slideWrapper = $img.parent(),
-// total = $slideWrapper.find('img').length,
-// percentLoaded = null;
+//function slideLoaded(img){
+//    var $img = $(img),
+//        $slideWrapper = $img.parent(),
+//         total = $slideWrapper.find('img').length,
+//       percentLoaded = null;
 //
-// $img.addClass('loaded');
+//    $img.addClass('loaded');
 //
-// var loaded = $slideWrapper.find('.loaded').length;
+//    var loaded = $slideWrapper.find('.loaded').length;
 //
-// if(loaded == total){
-// percentLoaded = 100;
-// // INSTANTIATE PLUGIN
-// $slideWrapper.easyFader();
-// } else {
-// // TRACK PROGRESS
-// percentLoaded = loaded/total * 100;
-// };
-// };
+//    if(loaded == total){
+//        percentLoaded = 100;
+//        // INSTANTIATE PLUGIN
+//        $slideWrapper.easyFader();
+//    } else {
+//        // TRACK PROGRESS
+//        percentLoaded = loaded/total * 100;
+//   };
+//};
 
 
 
 
-// //////////////////////////////////////////////////
+////////////////////////////////////////////////////
 // Page popups
 
 
@@ -2762,13 +2691,7 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
     $("#popups").show();
     currentPopups = $("#popups").html();
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p style="margin:0px">' + content + '</p><br><div style="text-align:center"><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/></div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div></div></div></div>');
-    // $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' +
-	// popupsNum + '" class="page-popup"><div id="popup_header_' + popupsNum +
-	// '" class="popup_header">' + title + '</div><p>' + content +
-	// '</p><br><input id="popup_prompt_input_'+unique+'"
-	// class="popup_prompt_input" type="text" value="'+defaultText+'"/><a
-	// id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a
-	// id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div>');
+    //$("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="page-popup"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><p>' + content + '</p><br><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div>');
     expandpopupMessage();
     
     var inputText = $('#popup_prompt_input_'+unique);
@@ -2830,7 +2753,7 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
 
 
 
-// //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 // Game Settings
 
 
@@ -2944,8 +2867,8 @@ function updateEnvironmentSoundEffectsVolume()
 	createjs.Sound.volume = vol;
 }
 
-// //////////////////////////////////////////////////////
-// Notifications
+////////////////////////////////////////////////////////
+//Notifications
 function doPopupNotification(iconUrl, title, text, category, options, onclick, onerror)
 {
 	if(notifyHandler == null || notifyHandler.popupNotify === "undefined") return;
@@ -2954,7 +2877,7 @@ function doPopupNotification(iconUrl, title, text, category, options, onclick, o
 
 
 
-// //////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 // Anti-bot question stuff
 
 function antiBotAnswer(response)
