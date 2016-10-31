@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +32,8 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class GameUtils 
 {
+	final static Logger log = Logger.getLogger(GameUtils.class.getName());
+
 	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,##0.00");
 	final static DecimalFormat noDigitFormat = new DecimalFormat("#,###");
 	final static DateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yyyy HH:mm:ss");
@@ -919,10 +923,10 @@ public class GameUtils
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)
     {
-    	return renderCharacter(userOfCharacter, character, true);
+    	return renderCharacter(userOfCharacter, character, true, false);
     }
     
-    public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character, boolean includePopupLink)
+    public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character, boolean includePopupLink, boolean meStyle)
     {
     	if (character==null)
     		return "";
@@ -939,6 +943,9 @@ public class GameUtils
     	String nameClass = (String)character.getProperty("nameClass");
     	if ((nameClass==null || nameClass.equals("")) && userOfCharacter!=null && Boolean.TRUE.equals(userOfCharacter.getProperty("premium")))
     		nameClass = "premium-character-name";
+    	
+    	if (meStyle)
+    		nameClass = "chatMessage-text";
     	
     	if (includePopupLink)
     		return "<a class='clue "+nameClass+"' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+name+"</a>";
@@ -962,46 +969,105 @@ public class GameUtils
     	if (GameUtils.equals(character.getProperty("cloaked"), true))
     		isCloaked = true;
     	
-		CachedEntity equipmentHelmet = db.getEntity((Key)character.getProperty("equipmentHelmet"));
+    	List<CachedEntity> equipment = db.getEntity((Key)character.getProperty("equipmentHelmet"),
+    												(Key)character.getProperty("equipmentChest"),
+    												(Key)character.getProperty("equipmentLegs"),
+    												(Key)character.getProperty("equipmentBoots"),
+    												(Key)character.getProperty("equipmentGloves"),
+    												(Key)character.getProperty("equipmentLeftHand"),
+    												(Key)character.getProperty("equipmentRightHand"),
+    												(Key)character.getProperty("equipmentShirt"));
+    	
+    	boolean hasInvalidEquipment = false;
+    	
+		CachedEntity equipmentHelmet = equipment.get(0);
+		if (character.getProperty("equipmentHelmet")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentHelmet", null);
+		}
 		String equipmentHelmetUrl = null;
 		if (equipmentHelmet!=null) 
 			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty("icon"));
 
-		CachedEntity equipmentChest = db.getEntity((Key)character.getProperty("equipmentChest"));
+		CachedEntity equipmentChest = equipment.get(1);
+		if (character.getProperty("equipmentChest")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentChest", null);
+		}
 		String equipmentChestUrl = null;
 		if (equipmentChest!=null)
 			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty("icon"));
 
-		CachedEntity equipmentLegs = db.getEntity((Key)character.getProperty("equipmentLegs"));
+		CachedEntity equipmentLegs = equipment.get(2);
+		if (character.getProperty("equipmentLegs")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentLegs", null);
+		}
 		String equipmentLegsUrl = null;
 		if (equipmentLegs!=null)
 			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty("icon"));
 
-		CachedEntity equipmentBoots = db.getEntity((Key)character.getProperty("equipmentBoots"));
+		CachedEntity equipmentBoots = equipment.get(3);
+		if (character.getProperty("equipmentBoots")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentBoots", null);
+		}
 		String equipmentBootsUrl = null;
 		if (equipmentBoots!=null)
 			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty("icon"));
 
-		CachedEntity equipmentGloves = db.getEntity((Key)character.getProperty("equipmentGloves"));
+		CachedEntity equipmentGloves = equipment.get(4);
+		if (character.getProperty("equipmentGloves")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentGloves", null);
+		}
 		String equipmentGlovesUrl = null;
 		if (equipmentGloves!=null)
 			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty("icon"));
 
-		CachedEntity equipmentLeftHand = db.getEntity((Key)character.getProperty("equipmentLeftHand"));
+		CachedEntity equipmentLeftHand = equipment.get(5);
+		if (character.getProperty("equipmentLeftHand")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentLeftHand", null);
+		}
 		String equipmentLeftHandUrl = null;
 		if (equipmentLeftHand!=null)
 			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty("icon"));
 
-		CachedEntity equipmentRightHand = db.getEntity((Key)character.getProperty("equipmentRightHand"));
+		CachedEntity equipmentRightHand = equipment.get(6);
+		if (character.getProperty("equipmentRightHand")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentRightHand", null);
+		}
 		String equipmentRightHandUrl = null;
 		if (equipmentRightHand!=null)
 			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty("icon"));
 
-		CachedEntity equipmentShirt = db.getEntity((Key)character.getProperty("equipmentShirt"));
+		CachedEntity equipmentShirt = equipment.get(7);
+		if (character.getProperty("equipmentShirt")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentShirt", null);
+		}
 		String equipmentShirtUrl = null;
 		if (equipmentShirt!=null)
 			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty("icon"));
 
+		
+		// This is a workaround for the fact that sometimes equipment stays equipped after it has been deleted
+		if (hasInvalidEquipment)
+		{
+			db.getDB().put(character);
+			log.log(Level.SEVERE, "The character had an item equipped that was deleted from the database. The workaround fixed it, but this should be fixed in the future. It's likely a problem with double-saving the character somewhere.");
+		}
+		
 		boolean is2Handed = false;
 		if (equipmentRightHand!=null && "2Hands".equals(equipmentRightHand.getProperty("equipSlot")))
 		{

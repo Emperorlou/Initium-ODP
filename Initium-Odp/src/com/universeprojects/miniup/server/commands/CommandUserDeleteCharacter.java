@@ -40,7 +40,7 @@ public class CommandUserDeleteCharacter extends Command {
 			throw new UserErrorMessage("You can not delete the character you are currently using. Please switch characters and try again.");
 		
 		if(GameUtils.equals(currentUser, character.getProperty("userKey"))){
-			character.setProperty("hitpoints", 0L);
+			character.setProperty("hitpoints", 0d);
 			character.setProperty("mode", CharacterMode.DEAD.toString());
 			character.setProperty("userKey", null);
 			ds.put(character);

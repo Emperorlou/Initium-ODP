@@ -16,6 +16,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
+import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -90,7 +91,9 @@ public abstract class CommandScriptBase extends Command {
 			}
 			case("Location"):
 			{
-				if(db.checkContainerAccessAllowed(character, entitySource)==false)
+				ContainerService cs = new ContainerService(db);
+				
+				if(cs.checkContainerAccessAllowed(character, entitySource)==false)
 					throw new UserErrorMessage("You are not located at the specified trigger location!");
 			}
 			default:

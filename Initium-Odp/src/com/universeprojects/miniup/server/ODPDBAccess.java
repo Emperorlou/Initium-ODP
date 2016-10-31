@@ -455,6 +455,21 @@ public class ODPDBAccess
 	}
 
 	/**
+	 * Fetches a list CachedEntity from the given keys.
+	 * 
+	 * Important: If a given CachedEntity cannot be found in the database, the return will
+	 * contain a null entry for that key's index.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public List<CachedEntity> getEntity(Key...keys)
+	{
+		if (keys == null) return null;
+		return getDB().get(keys);
+	}
+
+	/**
 	 * Use this if you only want to get a count of entities in the database.
 	 * 
 	 * This method will only count up to a maximum of 1000 entities.
@@ -2162,32 +2177,6 @@ public class ODPDBAccess
 		ds.put(item);
 	}
 	
-	/**
-	 * This is for stuff that allows access to a given container (location, item, or character). Returns false if access should not be allowed.
-	 * @param character
-	 * @param container
-	 * @return
-	 */
-	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container)
-	{
-		// If the container is ourselves, it's ok
-		if (container.getKind().equals("Character") && GameUtils.equals(character.getKey(), container.getKey()))
-			return true;
-		
-		// If the container is our location, it's ok
-		if (container.getKind().equals("Location") && GameUtils.equals(character.getProperty("locationKey"), container.getKey()))
-			return true;
-		
-		// If the container is an item in our inventory, it's ok
-		if (container.getKind().equals("Item") && GameUtils.equals(character.getKey(), container.getProperty("containerKey")))
-			return true;
-		
-		// If the container is an item in our location, it's ok
-		if (container.getKind().equals("Item") && GameUtils.equals(character.getProperty("locationKey"), container.getProperty("containerKey")))
-			return true;
-		
-		return false;
-	}
 
 	
 	public void doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage

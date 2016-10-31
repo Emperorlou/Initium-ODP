@@ -104,8 +104,10 @@ messager.onChatMessage = function(chatMessage)
 		html+="<span class='chatMessage-text'>";
 		if (chatMessage.characterId!=null && meMode==false)
 			html+=chatMessage.nicknameStyled;
+		else if (chatMessage.characterId!=null && meMode==true)
+			html+=chatMessage.nicknameMeStyled;
 		else
-			html+=chatMessage.nickname;
+			html+="<span class='meModeNickname'>"+chatMessage.nicknameStyled+"</span>";
 		html+="</span>";
 		html+="<span class='chatMessage-text'>";
 		if (meMode)

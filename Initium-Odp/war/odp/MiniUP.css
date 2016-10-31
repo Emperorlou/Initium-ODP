@@ -28,6 +28,11 @@ a
 	cursor:pointer;
 }
 
+.center
+{
+	text-align:center;
+}
+
 .text-shadow
 {
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
@@ -1135,6 +1140,8 @@ hr.items-separator {
 
 
 /* Chatroom styles */
+
+
 
 .chat_tab_footer
 {
@@ -2560,10 +2567,10 @@ body
 
 	border-style: solid;
 	border-width: 0px 7px;
-	-moz-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	-webkit-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	-o-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 fill round repeat;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 fill round repeat;
 	
 	padding:1px;
 	
@@ -2576,10 +2583,10 @@ body
 	
 	border-style: solid;
 	border-width: 9px;
-	-moz-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 9 stretch;
-	-webkit-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 9 stretch;
-	-o-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 9 stretch;
-	border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 9 fill stretch;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 9 stretch;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 9 stretch;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 9 stretch;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 9 fill stretch;
 	margin:5px;1
 }
 
@@ -2716,10 +2723,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 20px 8px 18px;
-	-moz-border-image: url(/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
-	-webkit-border-image: url(/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
-	-o-border-image: url(/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
-	border-image: url(/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 fill round repeat;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
 .backdrop1b
@@ -2728,10 +2735,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 20px 8px 18px;
-	-moz-border-image: url(/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
-	-webkit-border-image: url(/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
-	-o-border-image: url(/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
-	border-image: url(/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 fill round repeat;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
 .backdrop1c
@@ -2740,10 +2747,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 20px 8px 18px;
-	-moz-border-image: url(/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
-	-webkit-border-image: url(/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
-	-o-border-image: url(/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
-	border-image: url(/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 fill round repeat;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
 .backdrop1d
@@ -2752,10 +2759,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 20px 8px 18px;
-	-moz-border-image: url(/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
-	-webkit-border-image: url(/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
-	-o-border-image: url(/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
-	border-image: url(/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 fill round repeat;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 fill round repeat;
 	
 	margin:8px;
 }
@@ -2766,10 +2773,10 @@ body
 	
 	border-style: solid;
 	border-width: 9px 12px 9px 10px;
-	-moz-border-image: url(/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
-	-webkit-border-image: url(/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
-	-o-border-image: url(/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
-	border-image: url(/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 fill repeat;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 fill repeat;
 }
 
 .button1:before

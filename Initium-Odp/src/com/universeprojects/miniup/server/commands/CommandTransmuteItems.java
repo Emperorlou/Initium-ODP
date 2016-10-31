@@ -51,6 +51,9 @@ public class CommandTransmuteItems extends Command {
 		final Key containerKey = KeyFactory.createKey("Item", containerId);
 		CachedEntity container = db.getEntity(containerKey);
 		
+		if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), container)==false)
+			throw new UserErrorMessage("You do not have access to this container.");
+		
 		if (GameUtils.equals(container.getProperty("transmuteEnabled"), true)==false)
 			throw new UserErrorMessage("You can only transmute items that are in a valid transmuting container.");
 		
@@ -88,6 +91,7 @@ public class CommandTransmuteItems extends Command {
 		// perform the actual transmutation of the items
 		if (recipes.size() == 0) {
 			cs.doUse(ds, container, 1);
+			ds.put(container);
 			throw new UserErrorMessage("You tried transmuting the items, but nothing happened.");
 		}
 		else if (recipes.size() == 1) {
@@ -127,6 +131,7 @@ public class CommandTransmuteItems extends Command {
 				}.run();
 				
 				cs.doUse(ds, container, 1);
+				ds.put(container);
 				setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 			}
 			catch (AbortTransactionException e) {

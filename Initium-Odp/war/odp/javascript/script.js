@@ -1296,7 +1296,7 @@ function refreshInstanceRespawnWarning()
 function giftPremium()
 {
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
-		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose no.", function(){
+		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
 			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
 		}, function(){
 			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;

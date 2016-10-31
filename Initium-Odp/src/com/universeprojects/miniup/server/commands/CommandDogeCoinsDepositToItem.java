@@ -11,6 +11,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
@@ -52,7 +53,9 @@ public class CommandDogeCoinsDepositToItem extends Command {
 		if(itemContainer == null)
 			throw new RuntimeException("itemId " + itemId + " does not have a valid container");
 
-		if(db.checkContainerAccessAllowed(character, itemContainer)==false)
+		ContainerService cs = new ContainerService(db);
+		
+		if(cs.checkContainerAccessAllowed(character, itemContainer)==false)
 			throw new UserErrorMessage("Character does not have access to this container");
 
 		Long containerCoins = (Long)item.getProperty("dogecoins");
@@ -63,8 +66,8 @@ public class CommandDogeCoinsDepositToItem extends Command {
 		ds.put(character);
 		ds.put(item);
 		
-		MainPageUpdateService service = new MainPageUpdateService(db, this);
-		service.updateMoney(character);
+		MainPageUpdateService service = new MainPageUpdateService(db, character, null, this);
+		service.updateMoney();
 	}
 
 }
