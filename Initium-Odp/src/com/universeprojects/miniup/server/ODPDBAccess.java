@@ -3546,10 +3546,8 @@ public class ODPDBAccess
             // Check if the target is killed
             if (targetHitpoints<=0)
             {
-                // If the weapon that did the killing is "zombified" then we will turn the character into a zombie instead of killing them
-            	// Alternatively, if there was no weapon but the attacker is a zombie, we will also turn the character into a zombie
-                if ((weapon!=null && "TRUE".equals(weapon.getProperty("zombifying"))) ||
-                		(weapon==null && "Zombie".equals(sourceCharacter.getProperty("status"))))
+                // If the character who did the killing is a zombie, the target character will be turned into a zombie instead of killing them
+                if ("Zombie".equals(sourceCharacter.getProperty("status")))
                 {
                     doCharacterZombify(auth, db, sourceCharacter, targetCharacter);
                     status+=" The battle is over, you won! But the target character has been turned into a zombie!";
