@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +32,8 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class GameUtils 
 {
+	final static Logger log = Logger.getLogger(GameUtils.class.getName());
+
 	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,##0.00");
 	final static DecimalFormat noDigitFormat = new DecimalFormat("#,###");
 	final static DateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yyyy HH:mm:ss");
@@ -650,6 +654,8 @@ public class GameUtils
 	    		qualityClass = "item-epic";
 	    	else if ("Custom".equals(qualityClassOverride))
 	    		qualityClass = "item-custom";
+	    	else if ("Magic".equals(qualityClassOverride))
+	    		qualityClass = "item-magic";
 	    	
 	    	if (qualityClass!=null)
 	    		return qualityClass;
@@ -890,6 +896,8 @@ public class GameUtils
 		String iconUrl = (String)item.getProperty("icon");
 		if (iconUrl!=null && iconUrl.startsWith("http://"))
 			iconUrl = "https://"+iconUrl.substring(7);
+		else if (iconUrl!=null && iconUrl.startsWith("http")==false)
+			iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
 		
 		if (popupEmbedded)
 			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
@@ -908,17 +916,17 @@ public class GameUtils
     		return "";
     	
     	if (popupEmbedded)
-    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
     	else
-    		return "<a rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
     }
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)
     {
-    	return renderCharacter(userOfCharacter, character, true);
+    	return renderCharacter(userOfCharacter, character, true, false);
     }
     
-    public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character, boolean includePopupLink)
+    public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character, boolean includePopupLink, boolean meStyle)
     {
     	if (character==null)
     		return "";
@@ -935,6 +943,9 @@ public class GameUtils
     	String nameClass = (String)character.getProperty("nameClass");
     	if ((nameClass==null || nameClass.equals("")) && userOfCharacter!=null && Boolean.TRUE.equals(userOfCharacter.getProperty("premium")))
     		nameClass = "premium-character-name";
+    	
+    	if (meStyle)
+    		nameClass = "chatMessage-text";
     	
     	if (includePopupLink)
     		return "<a class='clue "+nameClass+"' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+name+"</a>";
@@ -958,46 +969,105 @@ public class GameUtils
     	if (GameUtils.equals(character.getProperty("cloaked"), true))
     		isCloaked = true;
     	
-		CachedEntity equipmentHelmet = db.getEntity((Key)character.getProperty("equipmentHelmet"));
+    	List<CachedEntity> equipment = db.getEntity((Key)character.getProperty("equipmentHelmet"),
+    												(Key)character.getProperty("equipmentChest"),
+    												(Key)character.getProperty("equipmentLegs"),
+    												(Key)character.getProperty("equipmentBoots"),
+    												(Key)character.getProperty("equipmentGloves"),
+    												(Key)character.getProperty("equipmentLeftHand"),
+    												(Key)character.getProperty("equipmentRightHand"),
+    												(Key)character.getProperty("equipmentShirt"));
+    	
+    	boolean hasInvalidEquipment = false;
+    	
+		CachedEntity equipmentHelmet = equipment.get(0);
+		if (character.getProperty("equipmentHelmet")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentHelmet", null);
+		}
 		String equipmentHelmetUrl = null;
 		if (equipmentHelmet!=null) 
-			equipmentHelmetUrl = (String)equipmentHelmet.getProperty("icon");
+			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty("icon"));
 
-		CachedEntity equipmentChest = db.getEntity((Key)character.getProperty("equipmentChest"));
+		CachedEntity equipmentChest = equipment.get(1);
+		if (character.getProperty("equipmentChest")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentChest", null);
+		}
 		String equipmentChestUrl = null;
 		if (equipmentChest!=null)
-			equipmentChestUrl = (String)equipmentChest.getProperty("icon");
+			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty("icon"));
 
-		CachedEntity equipmentLegs = db.getEntity((Key)character.getProperty("equipmentLegs"));
+		CachedEntity equipmentLegs = equipment.get(2);
+		if (character.getProperty("equipmentLegs")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentLegs", null);
+		}
 		String equipmentLegsUrl = null;
 		if (equipmentLegs!=null)
-			equipmentLegsUrl = (String)equipmentLegs.getProperty("icon");
+			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty("icon"));
 
-		CachedEntity equipmentBoots = db.getEntity((Key)character.getProperty("equipmentBoots"));
+		CachedEntity equipmentBoots = equipment.get(3);
+		if (character.getProperty("equipmentBoots")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentBoots", null);
+		}
 		String equipmentBootsUrl = null;
 		if (equipmentBoots!=null)
-			equipmentBootsUrl = (String)equipmentBoots.getProperty("icon");
+			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty("icon"));
 
-		CachedEntity equipmentGloves = db.getEntity((Key)character.getProperty("equipmentGloves"));
+		CachedEntity equipmentGloves = equipment.get(4);
+		if (character.getProperty("equipmentGloves")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentGloves", null);
+		}
 		String equipmentGlovesUrl = null;
 		if (equipmentGloves!=null)
-			equipmentGlovesUrl = (String)equipmentGloves.getProperty("icon");
+			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty("icon"));
 
-		CachedEntity equipmentLeftHand = db.getEntity((Key)character.getProperty("equipmentLeftHand"));
+		CachedEntity equipmentLeftHand = equipment.get(5);
+		if (character.getProperty("equipmentLeftHand")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentLeftHand", null);
+		}
 		String equipmentLeftHandUrl = null;
 		if (equipmentLeftHand!=null)
-			equipmentLeftHandUrl = (String)equipmentLeftHand.getProperty("icon");
+			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty("icon"));
 
-		CachedEntity equipmentRightHand = db.getEntity((Key)character.getProperty("equipmentRightHand"));
+		CachedEntity equipmentRightHand = equipment.get(6);
+		if (character.getProperty("equipmentRightHand")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentRightHand", null);
+		}
 		String equipmentRightHandUrl = null;
 		if (equipmentRightHand!=null)
-			equipmentRightHandUrl = (String)equipmentRightHand.getProperty("icon");
+			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty("icon"));
 
-		CachedEntity equipmentShirt = db.getEntity((Key)character.getProperty("equipmentShirt"));
+		CachedEntity equipmentShirt = equipment.get(7);
+		if (character.getProperty("equipmentShirt")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentShirt", null);
+		}
 		String equipmentShirtUrl = null;
 		if (equipmentShirt!=null)
-			equipmentShirtUrl = (String)equipmentShirt.getProperty("icon");
+			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty("icon"));
 
+		
+		// This is a workaround for the fact that sometimes equipment stays equipped after it has been deleted
+		if (hasInvalidEquipment)
+		{
+			db.getDB().put(character);
+			log.log(Level.SEVERE, "The character had an item equipped that was deleted from the database. The workaround fixed it, but this should be fixed in the future. It's likely a problem with double-saving the character somewhere.");
+		}
+		
 		boolean is2Handed = false;
 		if (equipmentRightHand!=null && "2Hands".equals(equipmentRightHand.getProperty("equipSlot")))
 		{
@@ -1097,7 +1167,7 @@ public class GameUtils
 		}
 		else
 		{
-			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"images/cloak1.png\")'></div>");
+			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
 		}
 		sb.append("</div>");
 		if (isSelf)
@@ -1142,8 +1212,8 @@ public class GameUtils
 				});
 				for(CachedEntity c:characterList)
 				{
-					if ("Zombie".equals(c.getProperty("status"))==false)
-						sb.append("<li><a onclick='doDeleteCharacter(event,"+c.getId()+",'"+c.getProperty("name")+"')'>X</a> <a onclick='switchCharacter("+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
+					if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
+						sb.append("<li><a onclick='doDeleteCharacter(event,"+c.getId()+",\""+WebUtils.htmlSafe((String)c.getProperty("name"))+"\")'>X</a> <a onclick='switchCharacter("+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
 				}
 				sb.append("</ul>");
 				sb.append("<p><a href='newcharacter.jsp'>Create a new character</a></p>");
@@ -1173,7 +1243,7 @@ public class GameUtils
 				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
 				for(CachedEntity buff:buffs)
 				{
-					sb.append("<img src='"+buff.getProperty("icon")+"' border='0'>");
+					sb.append("<img src='"+"https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'>");
 				}
 				sb.append("</div>");
 				
@@ -1198,7 +1268,7 @@ public class GameUtils
 		for(CachedEntity buff:buffs)
 		{
 			sb.append("<div class='buff-detail'>");
-			sb.append("<img src='"+buff.getProperty("icon")+"' border='0'/>");
+			sb.append("<img src='https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'/>");
 			sb.append("<div class='buff-detail-header'>");
 			sb.append("<h5>"+buff.getProperty("name")+"</h5>");
 			for(int i = 1; i<=3; i++)
@@ -1238,9 +1308,9 @@ public class GameUtils
     		return "";
     	StringBuilder sb = new StringBuilder();
     	
-		sb.append("<img class='main-page-banner-image' src='images/banner-backing.jpg' border=0 />");
+		sb.append("<img class='main-page-banner-image' src='https://initium-resources.appspot.com/images/banner-backing.jpg' border=0 />");
 		sb.append("<div class='main-banner-container' style='z-index:1000100'>");
-		sb.append("	<img class='main-page-banner-image' src='images/banner-backing.jpg' border=0 />");
+		sb.append("	<img class='main-page-banner-image' src='https://initium-resources.appspot.com/images/banner-backing.jpg' border=0 />");
 		sb.append("	<div class='main-banner'>");
 		sb.append("		<img class='main-page-banner-image' src='"+bannerUrl+"' border=0 />");
 		sb.append("		<div class='banner-shadowbox' style=\"background: url('"+bannerUrl+"') no-repeat center / contain;\">");
@@ -1507,7 +1577,7 @@ public class GameUtils
                         if (simpleMode)
                             formula = new Double(jep.getValue()).intValue()+"";
                         else
-                            formula = "<img src='images/dice1.png' border=0/> "+originalFormula+" = "+formula+" = "+jep.getValue()+"";
+                            formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> "+originalFormula+" = "+formula+" = "+jep.getValue()+"";
                     }
                 }
                 catch (org.cheffo.jeplite.ParseException e) {
@@ -1799,5 +1869,21 @@ public class GameUtils
 			return "https://www.playinitium.com/login.jsp?game="+WebUtils.StringToEncryptedForUrl(email);
 		}
 		return null;
+	}
+	
+	public static String getResourceUrl(Object relativeUrlObj)
+	{
+		if (relativeUrlObj==null) return null;
+		String relativeUrl = (String)relativeUrlObj;
+		
+		if (relativeUrl.startsWith("http://"))
+			relativeUrl = "https://"+relativeUrl.substring(7);
+		
+		if (relativeUrl.startsWith("https://"))
+			return relativeUrl;
+		else if (relativeUrl.startsWith("/"))
+			return "https://initium-resources.appspot.com"+relativeUrl;
+		else
+			return "https://initium-resources.appspot.com/"+relativeUrl;
 	}
 }

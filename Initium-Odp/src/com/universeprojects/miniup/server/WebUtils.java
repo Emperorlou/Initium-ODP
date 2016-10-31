@@ -1,11 +1,18 @@
 package com.universeprojects.miniup.server;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
+
 
 
 
@@ -403,5 +411,42 @@ public class WebUtils
             ip = request.getRemoteAddr();  
         }  
         return ip;  
-    } 	
+    }
+	
+	public static boolean validateCaptcha(String secret, String response, String remoteip)
+	{
+	    URLConnection connection = null;
+	    InputStream is = null;
+	    String charset = StandardCharsets.UTF_8.name();
+
+	    String url = "https://www.google.com/recaptcha/api/siteverify";
+	    try {            
+	        String query = String.format("secret=%s&response=%s&remoteip=%s", 
+	        URLEncoder.encode(secret, charset), 
+	        URLEncoder.encode(response, charset),
+	        URLEncoder.encode(remoteip, charset)); 
+
+	        connection = new URL(url + "?" + query).openConnection();
+	        is = connection.getInputStream();
+	        Scanner s = new Scanner(is).useDelimiter("\\A");
+	        String text = s.hasNext() ? s.next() : "";
+	        if (text.contains("\"success\": true,"))
+	        	return true;
+	        else
+	        	return false;
+	        
+	    } catch (Exception ex) {
+	        Logger.getLogger(WebUtils.class.getName()).log(Level.SEVERE, null, ex);
+	        throw new RuntimeException(ex);
+	    }
+	    finally {
+	        if (is != null) {
+	            try {
+	                is.close();
+	            } catch (IOException e) {
+	            }
+
+	        }
+	    }
+	}	
 }

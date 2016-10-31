@@ -6,7 +6,7 @@ var messageCodes = [
              "PrivateChat",
              "Notifications"
              ];
-var messager = new Messager(4000, 15000, 30);
+var messager = new Messager(5000, 15000, 30);
 
 // Here we're overriding the default markers array to include the notifications marker because it is a special flower. Basically, we
 // need to make sure we never execute the same notifications twice, so we'll always remember where we left off.
@@ -104,8 +104,10 @@ messager.onChatMessage = function(chatMessage)
 		html+="<span class='chatMessage-text'>";
 		if (chatMessage.characterId!=null && meMode==false)
 			html+=chatMessage.nicknameStyled;
+		else if (chatMessage.characterId!=null && meMode==true)
+			html+=chatMessage.nicknameMeStyled;
 		else
-			html+=chatMessage.nickname;
+			html+="<span class='meModeNickname'>"+chatMessage.nicknameStyled+"</span>";
 		html+="</span>";
 		html+="<span class='chatMessage-text'>";
 		if (meMode)

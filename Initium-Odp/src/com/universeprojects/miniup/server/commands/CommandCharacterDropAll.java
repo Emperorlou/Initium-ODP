@@ -19,6 +19,12 @@ import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
+/**
+ * Drops all items from a character's inventory, ignoring sale items and equipped items.
+ * 
+ * @author SPFiredrake
+ *
+ */
 public class CommandCharacterDropAll extends Command {
 
 	public CommandCharacterDropAll(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)

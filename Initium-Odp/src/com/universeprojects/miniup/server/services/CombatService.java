@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.services;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
 
@@ -12,6 +13,24 @@ public class CombatService extends Service
 		super(db);
 	}
 
+	public void leaveCombat(CachedEntity attacker, CachedEntity defender)
+	{
+		CachedDatastoreService ds = db.getDB();
+		attacker.setProperty("combatant", null);
+		attacker.setProperty("mode", "NORMAL");
+		attacker.setProperty("combatType", null);
+		ds.put(attacker);
+		
+		if (defender!=null && GameUtils.equals(defender.getProperty("combatant"), attacker.getKey()))
+		{
+			attacker.setProperty("combatant", null);
+			attacker.setProperty("mode", "NORMAL");
+			attacker.setProperty("combatType", null);
+			ds.put(defender);
+		}
+		
+	}
+	
 	public void enterCombat(CachedEntity attacker, CachedEntity defender, boolean autoAttack)
 	{
 		attacker.setProperty("combatant", defender.getKey());

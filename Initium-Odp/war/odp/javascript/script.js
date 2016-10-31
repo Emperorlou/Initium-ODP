@@ -51,6 +51,7 @@ $(window).ready(function(e){
 			
 			showItems.show().next("br").show();
 			hideItems.hide().next("br").hide();
+			setSelectionCheckboxes(event, null);
 	    }, 500));
 	});
 	
@@ -60,15 +61,16 @@ $(window).ready(function(e){
 		var cb = $(event.currentTarget);
 		var selectRoot = cb.parents(".selection-root");
 		selectRoot.find("input:checkbox.check-group:not(:disabled)").prop( {checked:cb.prop("checked"), indeterminate:false});
-		selectRoot.find(".selection-list input:checkbox").prop("checked", cb.prop("checked"));
-		selectRoot.find(".selection-list .main-item").toggleClass("main-item-selected", cb.prop("checked"));
+		var selectItems = selectRoot.find(".selection-list .main-item:visible");
+		selectItems.find("input:checkbox").prop("checked", cb.prop("checked"));
+		selectItems.toggleClass("main-item-selected", cb.prop("checked"));
 	});
 	
 	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-group", function(event)
 	{
 		var cb = $(event.currentTarget);
 		var groupId = cb.attr("ref");
-		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item");
+		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item:visible");
 		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
 		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
 		
@@ -95,9 +97,9 @@ $(window).ready(function(e){
 	
 	// Set the correct image for the header mute button
 	if (isSoundEffectsEnabled())
-		$("#header-mute").attr("src", "images/ui/sound-button1.png");
+		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	else
-		$("#header-mute").attr("src", "images/ui/sound-button1-mute.png");
+		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 		
 
 	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
@@ -154,7 +156,8 @@ function popupPermanentOverlay(title, content, popupClassOverride)
     expandpopupMessage();
 }
 
-function popupMessage(title, content, noBackground) {
+function popupMessage(title, content, noBackground) 
+{
 	noBackgroundHtml = "";
 	if (noBackground==true)
 		noBackgroundHtml = 'style="background:none"';
@@ -166,7 +169,7 @@ function popupMessage(title, content, noBackground) {
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
     expandpopupMessage();
     enterPopupClose();
-    }
+   }
 
 $(document).bind("keydown",function(e) 
 {
@@ -275,14 +278,14 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	if (isAnimationsEnabled())
 	{
 	
-		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 	
 		if (biome=="Dungeon")
 		{
 			// This version uses the new torch walking man
-			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			
-			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			var grassTiles = 40;
 			// The ground first
 			for(var i = 0; i<grassTiles; i++)
@@ -294,11 +297,11 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 				
 				var y = random(-40, 10);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			// Add the dungeon wall
-			content+="<img class='walkingman-prop' src='images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
+			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
 		
 			var torches = random(1,5);
 			var torchXOffset = random(0,100);
@@ -306,7 +309,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			{
 				
 				var x = torchXOffset;
-				content+="<img class='walkingman-prop' src='images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
 			}
 			
 	//		var plants = random(0,10);
@@ -337,7 +340,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	//	
 	//			var y = random(-60, 60);
 	//			var x = random(width/2*-1,width/2)-100;
-	//			content+="<img class='walkingman-prop' src='images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+	//			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 	//		}		
 		}
 		else if (biome=="Snow")
@@ -356,7 +359,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -388,7 +391,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		else if (biome=="Desert")
@@ -407,7 +410,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -439,7 +442,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		else // Temperate by default
@@ -458,7 +461,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -493,7 +496,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		content+="</div>";
@@ -514,21 +517,24 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 
 //function popupPermanentOverlay_Searching(locationName) {
 //	var title = "Exploring "+locationName;
-//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
+//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
 //	popupPermanentOverlay(title, content);
 //	$(".walkingman").animate({left: "+=60px"}, 800, "linear", function()
 //			{
 //				var img = $(this);
-//				img.attr("src", "images/anim/Pixelman_Ducking_by_pfunked.gif");
+//				img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Ducking_by_pfunked.gif");
 //				img.animate({left: "+=0px"}, 1250, "linear", function(){
 //					var img = $(this);
-//					img.attr("src", "images/anim/Pixelman_Walking_by_pfunked.gif");
+//					img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif");
 //					img.animate({left: "+=600px"}, 10000, "linear");
 //				});
 //			});
 //}
 
-
+function rediscoverHouses(event)
+{
+	doCommand(event, "UserRediscoverHouses");
+}
 
 function buyHouse(eventObject)
 {
@@ -549,7 +555,7 @@ function renamePlayerHouse(eventObject)
 
 function deletePlayerHouse(eventObject, pathId)
 {
-	confirmPopup("Delete Player House", "Deleting a house will take with it all items, chests, and gold that are currently inside. Are you absolutely sure you want to delete this house?", function() {
+	confirmPopup("Delete Player House", "Deleting this house will cause THIS character to forget how to get back to this house, however the house itself will still be accessible by other characters who know about it's existence. <br>Are you absolutely sure you want to delete this house?", function() {
 		doCommand(eventObject, "DeletePlayerHouse", {"pathId" : pathId});
 	});
 }
@@ -648,6 +654,11 @@ function storeSetSaleNew(eventObject)
 	
 }
 
+function transmuteItems(eventObject, containerId) 
+{
+	doCommand(eventObject, "TransmuteItems", {"containerId":containerId});
+}
+
 //function storeSellItem(itemId)
 //{
 //	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
@@ -698,22 +709,32 @@ function createCampsite()
 
 function depositDogecoinsToItem(itemId, event)
 {
-	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", "0", function(amount){
+	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", $("#mainGoldIndicator").text().replace(/,/g,""), function(amount){
 		if (amount!=null && amount!="")
 		{
-			ajaxAction('ServletCharacterControl?type=depositDogecoinsToItem&itemId='+itemId+'&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode, event, reloadPagePopup);
+			doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
+				if(error) return;
+				reloadPagePopup();
+			});
 		}
 	});
-	
-	event.stopPropagation();
 }
 
 function collectDogecoinsFromItem(itemId, event)
 {
-	ajaxAction("ServletCharacterControl?type=collectDogecoinsFromItem&itemId="+itemId+"&v="+window.verifyCode, event, reloadPagePopup);	
+	// Command updates the gold indicator as needed, but not the inventory gold span. 
+	// Just reload popup (if one is open, that is).
+	doCommand(event, "DogeCoinsCollectFromItem", {"itemId" : itemId}, function(data, error){
+		if(error) return;
+		reloadPagePopup();
+	});
 }
 
-
+function collectDogecoinsFromCharacter(characterId, event)
+{
+	// Command updates the gold indicator as needed.
+	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId});
+}
 
 //function tradeSetDogecoin(currentDogecoin)
 //{
@@ -836,6 +857,7 @@ function helpPopup()
 			"<li>/premium - Easily share a link to where people can learn about premium accounts.</li>" + 
 			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" + 
 			"<li>/app - This shows all the links to the mobile apps we have available.</li>" +
+			"<li>/competition - This puts up a link to the official competition page. This page allows you to donate to prize pools and is usually used to organize competitions between the content developers for creating new content.</li>" +
 			"</ul>", false);
 	
 }
@@ -1135,7 +1157,7 @@ function setSelectionCheckboxes(event, groupId)
 	// On link clicks, currentTarget should be null since it's not assigned from a shared parent
 	// The link itself has the onclick, so coalesce to event.target
 	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
-	var allItems = selectRoot.find(".main-item");
+	var allItems = selectRoot.find(".main-item:visible");
 	var checkedItems = allItems.has("input:checkbox:checked");
 	
 	// Check-all first
@@ -1171,13 +1193,11 @@ function setSelectionCheckboxes(event, groupId)
 
 function selectedItemsDrop(event, selector)
 {
-	var batchItems = $(selector).has("input:checkbox:checked");
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	
 	confirmPopup("Drop Selected Inventory", "Are you sure you want to drop " + batchItems.length + " selected items on the ground?\n\nPlease note that items for sale in your store will be excluded.", function(){
-		var itemIds = $.makeArray(
-				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
-				.join(",");
+		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
 		// This command causes the popup to reload, so no need for a callback.
 		doCommand(event,"ItemsDrop",{"itemIds":itemIds});
@@ -1186,13 +1206,11 @@ function selectedItemsDrop(event, selector)
 
 function selectedItemsRemoveFromStore(event, selector)
 {
-	var batchItems = $(selector).has("input:checkbox:checked");
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	
 	confirmPopup("Remove Items from Store", "Are you sure you want to remove " + batchItems.length + " selected items from your store?", function(){
-		var itemIds = $.makeArray(
-				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
-				.join(",");
+		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
 		doCommand(event,"ItemsStoreDelete",{"itemIds":itemIds}, function(data, error){
 			if (error) return;
@@ -1204,14 +1222,12 @@ function selectedItemsRemoveFromStore(event, selector)
 
 function selectedItemsSell(event, selector)
 {
-	var batchItems = $(selector).has("input:checkbox:checked");
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	promptPopup("Sell Multiple Items", "How much do you want to sell these " + batchItems.length + " selected items for?", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
-			var itemIds = $.makeArray(
-					batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
-					.join(",");
+			var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 	
 			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
 				if (error) return;
@@ -1224,13 +1240,11 @@ function selectedItemsSell(event, selector)
 
 function selectedItemsTrade(event, selector)
 {
-	var batchItems = $(selector).has("input:checkbox:checked");
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	
 	confirmPopup("Trade Items", "Are you sure you want to trade " + batchItems.length + " selected items?", function(){
-		var itemIds = $.makeArray(
-				batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }))
-				.join(",");
+		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
 		doCommand(event,"ItemsTrade",{"itemIds":itemIds}, function(data, error){
 			if (error) return;
@@ -1251,11 +1265,10 @@ function characterUnequipAll(event)
 	doCommand(event, "CharacterUnequipAll", null, loadInventoryAndEquipment);
 }
 
-function giveHouseToGroup()
+function giveHouseToGroup(eventObject)
 {
 	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
-		window.location.href='ServletCharacterControl?type=giveHouseToGroup'+"&v="+window.verifyCode;
-	});
+		doCommand(eventObject,"GivePlayerHouseToGroup")});
 }
 
 function refreshInstanceRespawnWarning()
@@ -1283,7 +1296,7 @@ function refreshInstanceRespawnWarning()
 function giftPremium()
 {
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
-		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose no.", function(){
+		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
 			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
 		}, function(){
 			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
@@ -1490,13 +1503,13 @@ function viewChangelog()
 function viewSettings()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_settings.jsp");
+	pagePopup("/odp/ajax_settings.jsp");
 }
 
 function viewProfile()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_profile.jsp");
+	pagePopup("odp/view_profile");
 }
 
 function viewMap()
@@ -1560,6 +1573,13 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 	});
 }
 
+function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
+{
+	var params = {"scriptId": effectId };
+	params[sourceType.toLowerCase() + "Id"] = sourceId;
+	doCommand(event, "Script"+effectType, params);
+}
+
 function doAttack(eventObject, charId)
 {
     closeAllPopups();
@@ -1572,11 +1592,6 @@ function leaveParty()
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
 		location.href = "ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
 	});
-}
-
-function collectDogecoinFromCharacter(characterKey)
-{
-	location.href = "ServletCharacterControl?type=collectDogecoin&characterId="+characterKey+"&v="+window.verifyCode;
 }
 
 function combatAttackWithLeftHand()
@@ -1860,7 +1875,7 @@ function doDeleteCharacter(eventObject,characterId,characterName)
 
 function viewExchange()
 {
-	pagePopup("/odp/ajax_exchange.jsp");
+	pagePopup("/odp/ajax_exchange");
 }
 
 
@@ -1949,6 +1964,14 @@ function ajaxUpdatePage(ajaxResponseData)
 			{
 				$(htmlData.selector).replaceWith(htmlData.html);
 			}
+			else if (htmlData.type==2)
+			{
+				$(htmlData.selector).first().before(htmlData.html);
+			}
+			else if (htmlData.type==3)
+			{
+				$(htmlData.selector).last().after(htmlData.html);
+			}
 		}
 	}
 }
@@ -1978,6 +2001,11 @@ function doCommand(eventObject, commandName, parameters, callback)
 	$.post(url, parameters)
 	.done(function(data)
 	{
+		if (data.antiBotQuestionActive == true)
+		{
+			antiBotQuestionPopup();
+			return;
+		}
 		
 		// Refresh the full page or the pagePopup if applicable
 		if (data.javascriptResponse == "FullPageRefresh")
@@ -2130,9 +2158,21 @@ var lastLongOperationEventObject = null;
 function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 {
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
+
+	if (actionUrl.indexOf("?")>0)
+		actionUrl+="&ajax=true";
+	else
+		actionUrl+="?ajax=true";
+	
 	$.get(actionUrl)
 	.done(function(data)
 	{
+		if (data.captcha==true)
+		{
+			antiBotQuestionPopup();
+			return;
+		}
+		
 		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
 		
@@ -2273,7 +2313,7 @@ function doRest()
 				else
 				{
 					hideBannerLoadingIcon();
-					setBannerImage("images/action-campsite1.gif");
+					setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
 					setBannerOverlayText("Resting..", action.description);
 				}
 			},
@@ -2328,7 +2368,7 @@ function toggleMinimizeChat()
 
 function toggleMinimizeSoldItems()
 {
-	$(".soldItems").toggle();
+	$("#soldItems").toggle();
 }
 
 function updateMinimizeBox(buttonElement, selector)
@@ -2754,6 +2794,15 @@ function isAnimationsEnabled()
 		return false;
 }
 
+function isAdsEnabled()
+{
+	var setting = localStorage.getItem("checkboxDisableAds");
+	if (setting!="true")
+		return true;
+	else
+		return false;
+}
+
 function getSoundEffectsVolume()
 {
 	var setting = localStorage.getItem("sliderSoundEffectsVolume");
@@ -2788,9 +2837,9 @@ function toggleEnvironmentSoundEffects(newState)
 	
 	// Set the correct image for the header mute button
 	if (enabled)
-		$("#header-mute").attr("src", "images/ui/sound-button1-mute.png");
+		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 	else
-		$("#header-mute").attr("src", "images/ui/sound-button1.png");
+		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	
 }
 
@@ -2807,4 +2856,36 @@ function doPopupNotification(iconUrl, title, text, category, options, onclick, o
 {
 	if(notifyHandler == null || notifyHandler.popupNotify === "undefined") return;
 	return notifyHandler.popupNotify(iconUrl, title, text, category, options, onclick, onerror);
+}
+
+
+
+////////////////////////////////////////////////////////////
+// Anti-bot question stuff
+
+function antiBotAnswer(response)
+{
+	doCommand(null, "AntiBotAnswer", {response:response}, function(data,error){
+		if (error)
+		{
+			closeAllPopups();
+			antiBotQuestionPopup();
+		}
+		else
+		{
+			closeAllPopups();
+		}
+	});
+}
+
+function antiBotQuestionPopup()
+{
+	popupMessage("Anti Bot Check", "<div id='myCaptcha' style='float:left;margin-right:10px;'></div><p>We have to check from time to time to make sure you're a human playing. This is to prevent people from " +
+			"playing the game automatically using bots.</p>");
+	
+	grecaptcha.render( 'myCaptcha', {
+		  'sitekey' : '6Ldx9wcUAAAAAG78kIIiv-pnhHBaAaTrpcX5ZDwT',  // required
+		  'theme' : 'light',  // optional
+		  'callback': antiBotAnswer  // optional
+		});
 }

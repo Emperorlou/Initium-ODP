@@ -4,7 +4,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 
 public abstract class Service
 {
-	final ODPDBAccess db;
+	final protected ODPDBAccess db;
 	
 	public Service(ODPDBAccess db)
 	{

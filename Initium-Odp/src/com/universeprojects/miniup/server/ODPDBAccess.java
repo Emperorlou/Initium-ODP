@@ -1,18 +1,20 @@
 package com.universeprojects.miniup.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.concurrent.ThreadLocalRandom;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -30,6 +32,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheService.IdentifiableValue;
 import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
+import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -79,6 +82,12 @@ public class ODPDBAccess
 	public enum GroupStatus
 	{
 		Applied, Member, Admin, Kicked
+	}
+	
+	public enum ScriptType
+	{
+		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
+		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem;
 	}
 
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
@@ -443,6 +452,21 @@ public class ODPDBAccess
 			// Ignore
 		}
 		return null;
+	}
+
+	/**
+	 * Fetches a list CachedEntity from the given keys.
+	 * 
+	 * Important: If a given CachedEntity cannot be found in the database, the return will
+	 * contain a null entry for that key's index.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public List<CachedEntity> getEntity(Key...keys)
+	{
+		if (keys == null) return null;
+		return getDB().get(keys);
 	}
 
 	/**
@@ -1464,6 +1488,15 @@ public class ODPDBAccess
 
 		return str;
 	}
+	
+	public Double getCharacterIntelligence(CachedEntity character)
+	{
+		Double val = getDoubleBuffableProperty(character, "intelligence");
+		
+		
+		return val;
+	}
+	
 
 	public Long getItemCarryingSpace(CachedEntity item)
 	{
@@ -2144,32 +2177,6 @@ public class ODPDBAccess
 		ds.put(item);
 	}
 	
-	/**
-	 * This is for stuff that allows access to a given container (location, item, or character). Returns false if access should not be allowed.
-	 * @param character
-	 * @param container
-	 * @return
-	 */
-	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container)
-	{
-		// If the container is ourselves, it's ok
-		if (container.getKind().equals("Character") && GameUtils.equals(character.getKey(), container.getKey()))
-			return true;
-		
-		// If the container is our location, it's ok
-		if (container.getKind().equals("Location") && GameUtils.equals(character.getProperty("locationKey"), container.getKey()))
-			return true;
-		
-		// If the container is an item in our inventory, it's ok
-		if (container.getKind().equals("Item") && GameUtils.equals(character.getKey(), container.getProperty("containerKey")))
-			return true;
-		
-		// If the container is an item in our location, it's ok
-		if (container.getKind().equals("Item") && GameUtils.equals(character.getProperty("locationKey"), container.getProperty("containerKey")))
-			return true;
-		
-		return false;
-	}
 
 	
 	public void doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
@@ -2780,6 +2787,27 @@ public class ODPDBAccess
 		ds.put(character);
 	}
 
+	public void discoverAllPropertiesFor(CachedDatastoreService ds, CachedEntity user, CachedEntity character)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		if (user!=null && Boolean.TRUE.equals(user.getProperty("premium")))
+		{
+			List<CachedEntity> paths = getFilteredList("Path", "ownerKey", user.getKey());
+			
+			for(CachedEntity path:paths)
+				newDiscovery(ds, character, path);
+
+			CachedEntity group = getEntity((Key)character.getProperty("groupKey"));
+			
+			if (group!=null)
+				discoverAllGroupPropertiesFor(ds, character);
+			
+		}
+	}
+	
+	
 	/**
 	 * 
 	 * @param ds
@@ -3232,6 +3260,7 @@ public class ODPDBAccess
 	{
 		return;
 	}
+	
 
 	/**
 	 * This is a placeholder since the actual implementation is not in the ODP.
@@ -3350,5 +3379,1241 @@ public class ODPDBAccess
 		return null;
 	}
 	
+	/**
+	 * Method stub. This is actually implemented in the primary repo because the secret key is there.
+	 * 
+	 * @param response
+	 * @param remoteip
+	 * @return
+	 */
+	public boolean validateCaptcha(String response, String remoteip)
+	{
+		return false;
+	}
 	
+	public List<CachedEntity> getScriptsOfType(List<Key> scripts, ScriptType... types)
+	{
+		if(scripts == null || scripts.isEmpty()) return new ArrayList<CachedEntity>();
+		List<CachedEntity> scriptEntities = getEntities(scripts);
+		HashSet<ScriptType> validTypes = new HashSet<ScriptType>(Arrays.asList(types));
+		Iterator<CachedEntity> iter = scriptEntities.iterator();
+		while(iter.hasNext())
+		{
+			CachedEntity currentScript = iter.next();
+			String scriptType = (String)currentScript.getProperty("type");
+			if(scriptType == null || scriptType == "")
+				iter.remove();
+			else
+			{
+				ScriptType currentType = ScriptType.valueOf(scriptType);
+				if(!validTypes.contains(currentType))
+					iter.remove();
+			}
+		}
+		
+		return scriptEntities;
+	}
+
+
+	private class AttackResult
+	{
+		public int damage = 0;
+		public String status = "";
+	}
+	public String doCharacterAttemptAttack(ODPAuthenticator auth, CachedEntity user, CachedEntity sourceCharacter, CachedEntity weapon, CachedEntity targetCharacter)
+    {
+        if (sourceCharacter==null)
+            throw new IllegalArgumentException("Source character cannot be null.");
+        if (targetCharacter==null)
+            throw new IllegalArgumentException("Target character cannot be null.");
+
+
+        
+        CachedDatastoreService db = getDB();
+
+        
+        // Here we're flagging that a combat action took place so that the cron job in charge of ensuring combat keeps moving along
+        // doesn't automatically attack for us
+        if ("PC".equals(sourceCharacter.getProperty("type")) && "PC".equals(targetCharacter.getProperty("type")))
+            flagCharacterCombatAction(db, sourceCharacter);
+
+        
+        
+        // Regardless of whether or not the attack is successful, give a stat increase
+        if (sourceCharacter.getProperty("type")==null || sourceCharacter.getProperty("type").equals("") || sourceCharacter.getProperty("type").equals("PC"))
+        {
+            // Get the stat increase multiplier...
+            double multiplier = 1d;
+            if (targetCharacter.getProperty("experienceMultiplier")!=null)
+                multiplier = (Double)targetCharacter.getProperty("experienceMultiplier");
+            if (multiplier>5) multiplier = 5d;
+            if (multiplier<0) multiplier = 0d;   
+            
+            
+            Double[] maxStats = getMaxCharacterStats(sourceCharacter.getKey());
+            
+            doCharacterIncreaseStat(db, sourceCharacter, "strength", maxStats[0], 4d*multiplier);
+            doCharacterIncreaseStat(db, sourceCharacter, "dexterity", maxStats[1], 2d*multiplier);
+            doCharacterIncreaseStat(db, sourceCharacter, "intelligence", maxStats[2], 0.5d*multiplier);
+        }
+        
+        Double charDex = getCharacterDexterity(sourceCharacter);
+        Double monsterDex = getCharacterDexterity(targetCharacter);
+        Random rnd = new Random();
+        if (rnd.nextDouble()*charDex>=rnd.nextDouble()*monsterDex)
+        {
+        	
+            AttackResult attackResult = attackWithWeapon(db, sourceCharacter, weapon, targetCharacter);
+            String status = attackResult.status;
+            int damage = attackResult.damage;
+
+            // If we are dual wielding weapons, use the random crit chance to determine if we get a free second hit
+            // with our second weapon...
+            
+        	// Get both weapons on this attacker (in case of dual wielding)
+        	CachedEntity otherWeapon = null;
+        	Key leftHand = (Key)sourceCharacter.getProperty("equipmentLeftHand");
+        	Key rightHand = (Key)sourceCharacter.getProperty("equipmentRightHand");
+        	if (weapon!=null)
+        	{
+        		// If the weapon we're attacking with is in the right hand, the "otherWeapon" should be whatever is in the left hand
+	        	if (GameUtils.equals(weapon.getKey(), rightHand)==true && GameUtils.equals(weapon.getKey(), leftHand)==false)
+	        	{
+	        		otherWeapon = getEntity(leftHand);
+	        		if (otherWeapon!=null && "Weapon".equals(otherWeapon.getProperty("itemType"))==false)
+	        			otherWeapon = null;
+	        	}
+        		// And the opposite
+	        	if (GameUtils.equals(weapon.getKey(), leftHand)==true && GameUtils.equals(weapon.getKey(), rightHand)==false)
+	        	{
+	        		otherWeapon = getEntity(rightHand);
+	        		if (otherWeapon!=null && "Weapon".equals(otherWeapon.getProperty("itemType"))==false)
+	        			otherWeapon = null;
+	        	}
+	        	
+	        	// Now roll to see if we score a double attack with dual wielding...
+	    		if (otherWeapon!=null)
+	    		{
+	    			Double doubleHitChance = 0d;
+	    		    if (weapon.getProperty("weaponDamageCriticalChance")!=null)
+	    		    	doubleHitChance = ((Long)weapon.getProperty("weaponDamageCriticalChance")).doubleValue();
+	    		    
+	        		// Increase the critChance by the character's intelligence such that every point of int 
+	        		// increases the chance by 2.5% (unscaled) starting from 4
+	        		Double intelligence = getCharacterIntelligence(sourceCharacter);
+	        		if (intelligence!=null)
+	        		{
+	        		    double adj = intelligence-4d;
+	        		    adj*=2.5d;
+	        		    doubleHitChance+=adj;
+	        		}
+	        		
+	        		boolean doubleHit = false;
+	        		if (doubleHitChance!=null && GameUtils.roll(doubleHitChance))
+	        		    doubleHit = true;
+	        		
+	        		if (doubleHit)
+	        		{
+	        			status +="<h5>"+sourceCharacter.getProperty("name")+" also attacks with "+otherWeapon.getProperty("name")+"..</h5>";
+	        			AttackResult attackResult2 = attackWithWeapon(db, sourceCharacter, otherWeapon, targetCharacter);
+	        			status += attackResult2.status;
+	        			damage += attackResult2.damage;
+	        		}
+	        		
+	    		}
+        	}
+            
+    		
+            
+            
+            
+            Double targetHitpoints = (Double)targetCharacter.getProperty("hitpoints");
+            targetHitpoints-=damage;
+            
+            targetCharacter.setProperty("hitpoints", targetHitpoints);
+            
+            
+            
+            
+            if (targetCharacter.isUnsaved())
+            	db.put(targetCharacter);
+            if (sourceCharacter.isUnsaved())
+            	db.put(sourceCharacter);
+            if (user!=null && user.isUnsaved())
+            	db.put(user);
+            
+            
+            // Check if the target is killed
+            if (targetHitpoints<=0)
+            {
+                // If the weapon that did the killing is "zombified" then we will turn the character into a zombie instead of killing them
+            	// Alternatively, if there was no weapon but the attacker is a zombie, we will also turn the character into a zombie
+                if ((weapon!=null && "TRUE".equals(weapon.getProperty("zombifying"))) ||
+                		(weapon==null && "Zombie".equals(sourceCharacter.getProperty("status"))))
+                {
+                    doCharacterZombify(auth, db, sourceCharacter, targetCharacter);
+                    status+=" The battle is over, you won! But the target character has been turned into a zombie!";
+                    if (user!=null && user.isUnsaved())
+                    	db.put(user);
+                    db.put(sourceCharacter, targetCharacter);
+                    return status;
+                }
+                else
+                {
+                    String loot = doCharacterKilled(user, targetCharacter, sourceCharacter);
+                    status+=" The battle is over, you won!";
+                    if (loot!=null)
+                    {
+                        status+="<br>";
+                        status+=loot;
+                    }
+                    return status;
+                }
+            }
+            
+            
+            return status; 
+        }
+        else
+        {
+            // The attack missed, pass back null.
+            return null;
+        }
+    }
+
+
+
+
+	/**
+	 * Placeholder
+	 * @param characterKey
+	 * @return
+	 */
+	public Double[] getMaxCharacterStats(Key characterKey)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private AttackResult attackWithWeapon(CachedDatastoreService db, CachedEntity sourceCharacter, CachedEntity weapon, CachedEntity targetCharacter)
+	{
+		AttackResult attackResult = new AttackResult();
+		
+		// First get the weapon we're using...
+		Object result = 0d;
+		if (weapon!=null && weapon.getProperty("weaponDamage")!=null && weapon.getProperty("weaponDamage").toString().trim().equals("")==false)
+		{
+		    result = solveAction("Attack with Weapon", weapon);
+		    if (result==null)
+		        throw new RuntimeException("'Attack with Weapon' failed to solve.");
+		}
+		
+		if (result instanceof Double)
+		    attackResult.damage = ((Double)result).intValue();
+		else if (result instanceof Long)
+			attackResult.damage = ((Long)result).intValue();
+		else if (result instanceof Integer)
+			attackResult.damage = (int)result;
+		
+		
+		// Lets just go ahead and determine the strength bonus of the attack if it succeeds 
+		int strengthDamageBonus = 0;
+		Double str = getDoubleBuffableProperty(sourceCharacter, "strength");
+		if (str==null) str = 3d;
+		str-=3d;
+		// Special case, if the character is using a 2handed weapon, then double the effect of strength...
+		if (weapon!=null && "2Hands".equals(weapon.getProperty("equipSlot")))
+		    str*=1.5;
+		str*=2d;
+		strengthDamageBonus = new Double(GameUtils.rnd.nextDouble()*str).intValue();
+		if (strengthDamageBonus<0) strengthDamageBonus=0;
+		
+		
+		
+		String weaponName = "bare hands";
+		if (weapon!=null)
+		{
+		    weaponName = (String)weapon.getProperty("name");
+		    
+		    // At this point, reduce the durability of the weapon by 1
+		    Long durability = (Long)weapon.getProperty("durability");
+		    if (durability!=null)
+		    {
+		        if (durability<=0)
+		        {
+		            doDestroyEquipment(db, sourceCharacter, weapon);
+		            if (weapon.getProperty("naturalEquipment")!=null && weapon.getProperty("naturalEquipment").equals("TRUE"))
+		            	attackResult.status = "<div class='equipment-destroyed-notice'>"+sourceCharacter.getProperty("name")+"'s "+weapon.getProperty("name")+" is no longer usable. </div>";
+		            else
+		            	attackResult.status = "<div class='equipment-destroyed-notice'>"+sourceCharacter.getProperty("name")+"'s "+weapon.getProperty("name")+" was so badly damaged it has been destroyed. </div>";
+		        }
+		        else
+		        {
+		            weapon.setProperty("durability", durability-1);
+		            db.put(weapon);
+		        }
+		    }
+		}
+		
+		Double critChance = 0d;
+		if (weapon!=null)
+		{
+		    if (weapon.getProperty("weaponDamageCriticalChance")!=null)
+		        critChance = ((Long)weapon.getProperty("weaponDamageCriticalChance")).doubleValue();
+		    
+		}
+		
+		// Increase the critChance by the character's intelligence such that every point of int 
+		// increases the chance by 2.5% (unscaled) starting from 4
+		Double intelligence = getDoubleBuffableProperty(sourceCharacter, "intelligence");
+		if (intelligence!=null)
+		{
+		    double adj = intelligence-4d;
+		    adj*=2.5d;
+		    critChance+=adj;
+		}
+		
+		boolean criticalHit = false;
+		if (critChance!=null && GameUtils.roll(critChance))
+		    criticalHit = true;
+		
+		if (criticalHit)
+		{
+		    // Critical hit!
+		    Double critMultiplier = 2d;
+		    if (weapon!=null && (weapon.getProperty("weaponDamageCriticalMultiplier") instanceof Double))
+		    {
+		        critMultiplier = (Double)weapon.getProperty("weaponDamageCriticalMultiplier");
+		    }
+		    int oldDamage = attackResult.damage+strengthDamageBonus;
+		    attackResult.damage*=critMultiplier;
+		    attackResult.damage += strengthDamageBonus;
+		    
+		    attackResult.status += "It's a critical hit! "+oldDamage+" damage ("+strengthDamageBonus+" was from strength) was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+". But because of the critical hit, an additional "+(attackResult.damage-oldDamage)+" damage was done for a total of "+attackResult.damage+" damage."; 
+		}
+		else
+		{
+		    // Regular hit
+			attackResult.damage+=strengthDamageBonus;
+			attackResult.status += "The attack hit! "+attackResult.damage+" damage ("+strengthDamageBonus+" was from strength) was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+".";
+		}
+		
+		
+		// Try blocking the damage if there is any damage...
+		if (attackResult.damage>0)
+		{
+		    Map<String, Object> blockResult = doBlockAttack(sourceCharacter, weapon, attackResult.damage, targetCharacter);
+		    
+		    
+		    
+		    if (blockResult.get("blocked")!=null && blockResult.get("blocked").equals(true))
+		    {
+		        ArrayList<CachedEntity> blockingArmor = (ArrayList<CachedEntity>)blockResult.get("blockingArmor");
+		        if (blockingArmor!=null && blockingArmor.size()>0)
+		        {
+		            String armorNames = "";
+		            for(int i = 0; i<blockingArmor.size();i++)
+		            {
+		                if (i>0)
+		                    armorNames+=", ";
+		                if (i==blockingArmor.size()-1 && i>0)
+		                    armorNames+="and ";
+		                armorNames+=(String)blockingArmor.get(i).getProperty("name");
+		                
+		            }
+		            long damageReduction = 0l;
+		            if ((Long)blockResult.get("damageReduction")!=null)
+		                damageReduction = (Long)blockResult.get("damageReduction");
+		            if (damageReduction == attackResult.damage)
+		            	attackResult.status += "<br><br>However, this attack was completely blocked due to the "+armorNames+". No "+((String)blockResult.get("damageType")).toLowerCase()+" damage was done.";
+		            else
+		            	attackResult.status += "<br><br>However, this attack was <u>partially</u> blocked.<br> "+blockResult.get("damageType")+" damage was reduced by "+blockResult.get("damageReduction")+" due to the "+armorNames+", "+(attackResult.damage-damageReduction)+" total damage was dealt.";
+		            
+		            if (blockResult.get("status")!=null)
+		            	attackResult.status += "<br>"+(String)blockResult.get("status");
+		                
+		            attackResult.damage-=damageReduction;
+		            
+                    if (attackResult.damage==0)
+                        return attackResult;
+		        }
+		    }
+		}
+		return attackResult;
+	}
+
+	/**Placeholder
+	 * 
+	 * @param string
+	 * @param weapon
+	 * @return
+	 */
+	public Object solveAction(String string, CachedEntity weapon)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	/**
+	 * Returns true if the attack has been completely blocked (so the calling method can stop checking equipment and damaging durability)
+	 * @param result
+	 * @param sourceCharacter
+	 * @param targetCharacter
+	 * @param sourceWeapon
+	 * @param blockingEntity
+	 * @return
+	 */
+	private boolean updateBlockAttackResult(Map<String, Object> result, CachedEntity sourceCharacter, CachedEntity targetCharacter, CachedEntity sourceWeapon, int damage, CachedEntity blockingEntity)
+	{
+		String damageType = null;
+		if (sourceWeapon != null) damageType = (String) sourceWeapon.getProperty("weaponDamageType");
+		if (damageType != null && damageType.equals("")) damageType = null;
+		String blockCapability = "";
+		Long damageReduction = (Long) blockingEntity.getProperty("damageReduction");
+
+		if (damageReduction == null) damageReduction = 10l;
+
+		// If this weapon supports multiple damage types, choose which one is
+		// best depending on the armor's weakness
+		if (damageType != null)
+		{
+			// Decide what damage type to use if there is more than once
+			// choice...
+			if (damageType.contains(" and ") || damageType.contains(","))
+			{
+				String[] damageTypes = damageType.split("( and |,\\s*)");
+				String damageTypeCandidate = null;
+				int damageTypeCandidateOrdinal = 10;
+				for (String candidate : damageTypes)
+				{
+					String blockingCapabilityStr = (String) blockingEntity.getProperty("block" + candidate + "Capability");
+					if (blockingCapabilityStr == null || blockingCapabilityStr.equals("")) blockingCapabilityStr = "Average";
+					int ordinal = BlockCapability.valueOf(blockingCapabilityStr).ordinal();
+					if (damageTypeCandidate == null)
+					{
+						damageTypeCandidate = candidate;
+						damageTypeCandidateOrdinal = ordinal;
+						continue;
+					}
+
+					if (ordinal < damageTypeCandidateOrdinal)
+					{
+						damageTypeCandidate = candidate;
+						damageTypeCandidateOrdinal = ordinal;
+					}
+				}
+
+				damageType = damageTypeCandidate;
+			}
+
+			blockCapability = (String) blockingEntity.getProperty("block" + damageType + "Capability");
+			if (blockCapability == null) blockCapability = "Average";
+
+			// Now figure out how much damage reduction will apply...
+			if (blockCapability.equals("None")) damageReduction = 0l;
+			else if (blockCapability.equals("Minimal")) damageReduction /= 2;
+			else if (blockCapability.equals("Excellent")) damageReduction *= 2;
+			else if (blockCapability.equals("Good")) damageReduction = new Double(damageReduction.doubleValue() * 1.5d).longValue();
+			else if (blockCapability.equals("Poor")) damageReduction = new Double(damageReduction.doubleValue() * 0.75d).longValue();
+			
+		}
+		else
+			damageType = "";
+		result.put("damageType", damageType);
+
+		Long totalBlockedSoFar = (Long) result.get("damageReduction");
+		if (totalBlockedSoFar == null) totalBlockedSoFar = 0l;
+		long reduction = totalBlockedSoFar + damageReduction;
+		if (reduction > damage) reduction = damage;
+
+		result.put("blocked", true);
+		if (result.get("damageReduction") != null)
+		{
+			@SuppressWarnings("unchecked")
+			List<CachedEntity> blockingArmor = (List<CachedEntity>) result.get("blockingArmor");
+			blockingArmor.add(blockingEntity);
+		}
+		else
+		{
+			ArrayList<CachedEntity> blockingEntities = new ArrayList<CachedEntity>();
+			blockingEntities.add(blockingEntity);
+			result.put("blockingArmor", blockingEntities);
+		}
+		result.put("damageReduction", reduction);
+
+		// Now reduce durability of the blocking equipment
+		// At this point, reduce the durability of the weapon by 1
+		Long durability = (Long) blockingEntity.getProperty("durability");
+		if (durability != null)
+		{
+			if (durability <= 0)
+			{
+				doDestroyEquipment(getDB(), targetCharacter, blockingEntity);
+
+				String status = (String) result.get("status");
+				if (status == null) status = "";
+				if (blockingEntity.getProperty("naturalEquipment") != null && blockingEntity.getProperty("naturalEquipment").equals("TRUE"))
+					result.put("status", status + "<div class='equipment-destroyed-notice'>" + targetCharacter.getProperty("name") + "'s " + blockingEntity.getProperty("name")
+							+ " is no longer usable. </div>");
+				else
+					result.put("status", status + "<div class='equipment-destroyed-notice'>" + targetCharacter.getProperty("name") + "'s " + blockingEntity.getProperty("name")
+							+ " was so badly damaged it has been destroyed. </div>");
+
+			}
+			else
+			{
+				blockingEntity.setProperty("durability", durability - 1);
+				getDB().put(blockingEntity);
+			}
+		}
+
+		if (reduction == damage)
+			return true;
+		else
+			return false;
+
+	}
+	 
+	public Map<String, Object> doBlockAttack(CachedEntity sourceCharacter, CachedEntity sourceWeapon, int damage, CachedEntity targetCharacter)
+	{
+		Map<String, Object> result = new HashMap<String, Object>();
+
+		// First see if what the character is holding has blocked the attack
+		CachedEntity leftHand = null;
+		Key leftHandKey = (Key)targetCharacter.getProperty("equipmentLeftHand");
+		if (leftHandKey!=null)
+			leftHand = getEntity(leftHandKey);
+		
+		if (leftHand!=null)
+		{
+			Long blockChance = (Long)leftHand.getProperty("blockChance");
+			if (blockChance!=null && GameUtils.roll(blockChance))
+			{
+				// blocked it!
+				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, leftHand))
+					return result;
+			}
+		}
+
+		CachedEntity rightHand = null;
+		Key rightHandKey = (Key)targetCharacter.getProperty("equipmentRightHand");
+		if (rightHandKey!=null)
+			rightHand = getEntity(rightHandKey);
+		
+		if (rightHand!=null)
+		{
+			Long blockChance = (Long)rightHand.getProperty("blockChance");
+			if (blockChance!=null && GameUtils.roll(blockChance))
+			{
+				// blocked it!
+				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, rightHand))
+					return result;
+			}
+		}
+		
+		
+		CachedEntity rightRing = null;
+		Key rightRingKey = (Key)targetCharacter.getProperty("equipmentRightRing");
+		if (rightRingKey!=null)
+			rightRing = getEntity(rightRingKey);
+		
+		if (rightRing!=null)
+		{
+			Long blockChance = (Long)rightRing.getProperty("blockChance");
+			if (blockChance!=null && GameUtils.roll(blockChance))
+			{
+				// blocked it!
+				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, rightRing))
+					return result;
+			}
+		}
+		
+		
+		CachedEntity leftRing = null;
+		Key leftRingKey = (Key)targetCharacter.getProperty("equipmentLeftRing");
+		if (leftRingKey!=null)
+			leftRing = getEntity(leftRingKey);
+		
+		if (leftRing!=null)
+		{
+			Long blockChance = (Long)leftRing.getProperty("blockChance");
+			if (blockChance!=null && GameUtils.roll(blockChance))
+			{
+				// blocked it!
+				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, leftRing))
+					return result;
+			}
+		}
+		
+		
+		CachedEntity neck = null;
+		Key neckKey = (Key)targetCharacter.getProperty("equipmentNeck");
+		if (neckKey!=null)
+			neck = getEntity(neckKey);
+		
+		if (neck!=null)
+		{
+			Long blockChance = (Long)neck.getProperty("blockChance");
+			if (blockChance!=null && GameUtils.roll(blockChance))
+			{
+				// blocked it!
+				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, neck))
+					return result;
+			}
+		}
+		
+		
+		// First, randomly determine where the attack is likely to land on the body (which piece of equipment will be hit)
+		// Body/Arms = 50%, Legs = 30%, Head = 10%, Hands = 5%, Feet = 5%
+		Random rnd = new Random();
+		int hitPlacement = rnd.nextInt(100);
+		if (GameUtils.between(hitPlacement, 0, 50))
+		{
+			// chest/arms hit
+			CachedEntity chest = null;
+			CachedEntity shirt = null;
+			Key chestKey = (Key)targetCharacter.getProperty("equipmentChest");
+			Key shirtKey = (Key)targetCharacter.getProperty("equipmentShirt");
+			if (chestKey!=null)
+				chest = getEntity(chestKey);
+			if (shirtKey!=null)
+				shirt = getEntity(shirtKey);
+			
+			// Determine if the chestpiece was hit...
+			if (chest!=null)
+			{
+				Long blockChance = (Long)chest.getProperty("blockChance");
+				if (blockChance!=null && GameUtils.roll(blockChance))
+				{
+					// The chest piece blocked it!
+					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, chest))
+						return result;
+				}
+			}
+			
+			if (shirt!=null)
+			{
+				Long blockChance = (Long)shirt.getProperty("blockChance");
+				if (blockChance!=null && GameUtils.roll(blockChance))
+				{
+					// The chest piece blocked it!
+					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, shirt))
+						return result;
+					
+				}
+			}
+			
+			
+		}
+		else if (GameUtils.between(hitPlacement, 50, 80))
+		{
+			// legs hit
+			CachedEntity armor = null;
+			Key armorKey = (Key)targetCharacter.getProperty("equipmentLegs");
+			if (armorKey!=null)
+				armor = getEntity(armorKey);
+			
+			// Determine if the chestpiece was hit...
+			if (armor!=null)
+			{
+				Long blockChance = (Long)armor.getProperty("blockChance");
+				if (blockChance!=null && GameUtils.roll(blockChance))
+				{
+					// The chest piece blocked it!
+					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
+						return result;
+				}
+			}
+			
+		}
+		else if (GameUtils.between(hitPlacement, 80, 90))
+		{
+			// head hit
+			CachedEntity armor = null;
+			Key armorKey = (Key)targetCharacter.getProperty("equipmentHelmet");
+			if (armorKey!=null)
+				armor = getEntity(armorKey);
+			
+			// Determine if the chestpiece was hit...
+			if (armor!=null)
+			{
+				Long blockChance = (Long)armor.getProperty("blockChance");
+				if (blockChance!=null && GameUtils.roll(blockChance))
+				{
+					// blocked it!
+					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
+						return result;
+				}
+			}
+		}
+		else if (GameUtils.between(hitPlacement, 90, 95))
+		{
+			// Hands hit
+			CachedEntity armor = null;
+			Key armorKey = (Key)targetCharacter.getProperty("equipmentGloves");
+			if (armorKey!=null)
+				armor = getEntity(armorKey);
+			
+			// Determine if the chestpiece was hit...
+			if (armor!=null)
+			{
+				Long blockChance = (Long)armor.getProperty("blockChance");
+				if (blockChance!=null && GameUtils.roll(blockChance))
+				{
+					// blocked it!
+					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
+						return result;
+				}
+			}
+		}
+		else if (GameUtils.between(hitPlacement, 95, 100))
+		{
+			// feet hit
+			CachedEntity armor = null;
+			Key armorKey = (Key)targetCharacter.getProperty("equipmentBoots");
+			if (armorKey!=null)
+				armor = getEntity(armorKey);
+			
+			// Determine if the chestpiece was hit...
+			if (armor!=null)
+			{
+				Long blockChance = (Long)armor.getProperty("blockChance");
+				if (blockChance!=null && GameUtils.roll(blockChance))
+				{
+					// blocked it!
+					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
+						return result;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	
+	/**
+	 * 
+	 * @param user
+	 * @param characterToDieFinal
+	 * @param attackingCharacterFinal
+	 * @return If auto-looting took place, this text includes the loot that was collected.
+	 */
+	public String doCharacterKilled(CachedEntity user, final CachedEntity characterToDieFinal, final CachedEntity attackingCharacterFinal)
+	{
+		String loot = "";
+		final CachedDatastoreService db = getDB();
+		
+		final CachedEntity locationFinal = getEntity((Key)characterToDieFinal.getProperty("locationKey"));
+		
+		Map<String, Object> result = null;
+		try 
+		{
+			result = new InitiumTransaction<Map<String, Object>>(db) 
+			{
+				
+				@Override
+				public Map<String, Object> doTransaction(CachedDatastoreService ds) 
+				{
+					boolean giveLootToAttacker = false;
+					CachedEntity characterToDie = db.refetch(characterToDieFinal);
+					CachedEntity attackingCharacter = db.refetch(attackingCharacterFinal);
+					CachedEntity dyingCharacterLocation = db.refetch(locationFinal);
+					
+					// We no longer set the character name to Dead here. We now do that from the death screen.
+//						String charName = (String)characterToDie.getProperty("name");	// Save the character name for later
+//						characterToDie.setProperty("name", "Dead "+characterToDie.getProperty("name"));
+//						db.put(characterToDie);
+					
+					
+					boolean attackingCharacterNeedsNotification = false;
+					if (GameUtils.enumEquals(attackingCharacter.getProperty("combatType"), CombatType.DefenceStructureAttack))
+						attackingCharacterNeedsNotification = false;
+					
+					// Now make the attacking character no longer in combat mode
+					setCharacterMode(null, attackingCharacter, ODPDBAccess.CHARACTER_MODE_NORMAL);
+					attackingCharacter.setProperty("combatant", null);
+					attackingCharacter.setProperty("combatType", null);
+			
+					
+					////////////////////////
+					// Now, depending on if the killed character is an NPC or not, and if the killer is an NPC or not, do some stuff...
+			
+					
+					
+					
+					// If the attacker is a PC
+					if (attackingCharacter.getProperty("type")==null || "".equals(attackingCharacter.getProperty("type")) || "PC".equals(attackingCharacter.getProperty("type")))
+					{
+						if (dyingCharacterLocation.getProperty("type")!=null && dyingCharacterLocation.getProperty("type").equals("CombatSite"))
+						{
+							// Now change the location's banner to the generic defeated banner
+							dyingCharacterLocation.setProperty("banner", "images/npc-defeated1.jpg");
+							dyingCharacterLocation.setProperty("description", "This is the location where a battle took place, but the battle is over now.");
+						}
+					}
+					
+					// If the killed character is a NPC
+					if (characterToDie.getProperty("type")==null || "".equals(characterToDie.getProperty("type")) || "NPC".equals(characterToDie.getProperty("type")))
+					{
+						if ("TRUE".equals(dyingCharacterLocation.getProperty("instanceModeEnabled")) && dyingCharacterLocation.getProperty("instanceRespawnDate")==null)
+						{
+							Date instanceRespawnDate = (Date)dyingCharacterLocation.getProperty("instanceRespawnDate");
+							Long instanceRespawnDelay = (Long)dyingCharacterLocation.getProperty("instanceRespawnDelay");
+							if (instanceRespawnDate==null && instanceRespawnDelay!=null)
+							{
+								GregorianCalendar cal = new GregorianCalendar();
+								cal.add(Calendar.MINUTE, instanceRespawnDelay.intValue());
+								
+								dyingCharacterLocation.setProperty("instanceRespawnDate", cal.getTime());
+								
+							}
+						}
+						
+						
+						characterToDie.setProperty("mode", "DEAD");
+						characterToDie.setProperty("name", "Dead "+characterToDie.getProperty("name"));
+					}
+					else
+					{
+						characterToDie.setProperty("mode", "UNCONSCIOUS");
+						
+						doCharacterDieChance(characterToDie);
+					}
+					
+					// If the attacking character was at full health when he killed his opponent, award a buff
+					if (attackingCharacter.getProperty("hitpoints").equals(attackingCharacter.getProperty("maxHitpoints")))
+					{
+						awardBuff_Pumped(ds, attackingCharacter);
+					}
+					
+
+					// If the character was a party leader, re-assign leader to another player (a LIVE one hopefully)
+					if ("TRUE".equals(characterToDie.getProperty("partyLeader")))
+					{
+						List<CachedEntity> partyMembers = getParty(db, characterToDie);
+						if (partyMembers!=null)
+							for(CachedEntity member:partyMembers)
+								if (GameUtils.isPlayerIncapacitated(member)==false)
+								{
+									characterToDie.setProperty("partyLeader", "FALSE");
+									member.setProperty("partyLeader", "TRUE");
+									db.put(member);
+									break;
+								}
+					}
+					
+					
+					
+					// Here we check if the attacking character was in a rest area AND if it is in a blockade structure. If so,
+					// we will restore his health
+					// ATTACKING CHARS NO LONGER GET FREE HEALS
+//					CachedEntity attackingCharacterLocation = getEntity((Key)attackingCharacter.getProperty("locationKey"));
+//					if (attackingCharacterLocation!=null &&
+//							"RestSite".equals(attackingCharacterLocation.getProperty("type")) && 
+//							attackingCharacterLocation.getProperty("defenceStructure")!=null)
+//					{
+//						Double hitpoints = (Double)attackingCharacter.getProperty("hitpoints");
+//						Double maxHitpoints = (Double)attackingCharacter.getProperty("maxHitpoints");
+//						if (hitpoints<maxHitpoints)
+//							attackingCharacter.setProperty("hitpoints", maxHitpoints);
+//						
+//						
+//						attackingCharacter.setProperty("mode", CHARACTER_MODE_NORMAL);
+//						attackingCharacter.setProperty("combatant", null);
+//						attackingCharacter.setProperty("combatType", null);
+//
+//					}
+					if (attackingCharacterNeedsNotification)
+						sendNotification(db, attackingCharacter.getKey(), NotificationType.fullpageRefresh);
+					
+
+					// Here we check if the battle took place in an instance, defence structure, or territory. If so, 
+					// the attacker will autoloot.
+					// ALSO
+					// If the fight took place in a non-combat site AND the hitpoints is less than 100, we will auto loot
+					Long gold = null;
+					CachedEntity attackerCharacterLocation = getEntity((Key)attackingCharacter.getProperty("locationKey"));
+					if (	
+							/* If the attacker or defender were standing in an instance*/
+							(dyingCharacterLocation.getProperty("territoryKey")!=null || 
+							dyingCharacterLocation.getProperty("defenceStructure")!=null || 
+							"Instance".equals(dyingCharacterLocation.getProperty("combatType")) ||
+							attackerCharacterLocation.getProperty("territoryKey")!=null || 
+							attackerCharacterLocation.getProperty("defenceStructure")!=null || 
+							"Instance".equals(attackerCharacterLocation.getProperty("combatType")))
+							||
+							/* If the fight took place in a non-combat site and the max hitpoints of the defender was less than 100 */
+							("CombatSite".equals(dyingCharacterLocation.getProperty("type"))==false &&
+							(Double)characterToDie.getProperty("maxHitpoints")<100d)
+						)
+					{
+						gold = (Long)characterToDie.getProperty("dogecoins");
+						if (attackingCharacter.getProperty("dogecoins")==null) attackingCharacter.setProperty("dogecoins", 0L);
+						
+						if (gold!=null)
+							attackingCharacter.setProperty("dogecoins", ((Long)attackingCharacter.getProperty("dogecoins"))+gold);
+						characterToDie.setProperty("dogecoins", 0l);
+						giveLootToAttacker = true;
+					}
+					
+
+					characterToDie.setProperty("combatType", null);
+					characterToDie.setProperty("status", CharacterMode.NORMAL.toString());
+					characterToDie.setProperty("combatant", null);
+					
+					// Leave the party if we haven't already
+					doRequestLeaveParty(ds, characterToDie, true);
+					
+					db.put(characterToDie);
+					db.put(dyingCharacterLocation);
+					db.put(attackingCharacter);
+					
+					Map<String, Object> result = new HashMap<String, Object>();
+					
+					result.put("characterToDie", characterToDie);
+					result.put("attackingCharacter", attackingCharacter);
+					result.put("location", dyingCharacterLocation);
+					result.put("giveLootToAttacker", giveLootToAttacker);
+					result.put("goldCollected", gold);
+					
+					return result;
+				}
+			}.run();
+		} 
+		catch (AbortTransactionException e) 
+		{
+			throw new RuntimeException(e.getMessage());
+		}
+
+		CachedEntity characterToDie = (CachedEntity)result.get("characterToDie");
+		CachedEntity location = (CachedEntity)result.get("location");
+		CachedEntity attackingCharacter = (CachedEntity)result.get("attackingCharacter");
+		boolean giveLootToAttacker = (Boolean)result.get("giveLootToAttacker");
+		boolean overburdened = false;
+		
+		// If we're in a territory, always give loot to attacker
+		if (location.getProperty("territoryKey")!=null)
+			giveLootToAttacker = true;
+		
+		// If the character was defending a defence structure, then refresh the leader on that structure
+		if (giveLootToAttacker)
+		{
+			CachedEntity defenceStructure = getEntity((Key)location.getProperty("defenceStructure"));
+			if (defenceStructure!=null)
+				refreshDefenceStructureLeader(db, defenceStructure, null);
+			// Add the gold collected to the loot message...
+			loot+="<h5>Gold Collected</h5>"+result.get("goldCollected")+"<br>";
+			
+			// Check if the character is overburdened or not. If so, we cannot give the loot to the attacker
+			double carryingWeight = getCharacterCarryingWeight(attackingCharacter);
+			double maxCarryingWeight = getCharacterMaxCarryingWeight(attackingCharacter);
+			if (carryingWeight>maxCarryingWeight)
+			{
+				loot+="<div class='highlightbox-red'>You are overburdened so the following loot has been dropped at your feet where other players could potentially take it.</div>";
+				overburdened=true;
+			}
+		}
+		
+		
+		
+		
+		
+		
+		// First, move all items in his inventory to the ground...
+		List<CachedEntity> items = getFilteredList("Item", "containerKey", characterToDie.getKey());
+		
+		if (giveLootToAttacker)
+			loot+="<h5>Items Collected</h5>";
+		for(CachedEntity item:items)
+		{
+			// If the item is a "naturalEquipment", simply delete it instead of moving to the ground
+			if ("TRUE".equals(item.getProperty("naturalEquipment")))
+			{
+				db.delete(item.getKey());
+			}
+			else
+			{
+				if (giveLootToAttacker==false)
+				{
+					item.setProperty("containerKey", location.getKey());
+					item.setProperty("movedTimestamp", new Date());
+				}
+				else
+				{
+					if (overburdened)
+					{
+						item.setProperty("containerKey", location.getKey());
+						item.setProperty("movedTimestamp", new Date());
+						
+						loot+=GameUtils.renderItem(item)+"<br>";
+					}
+					else
+					{
+						item.setProperty("containerKey", attackingCharacter.getKey());
+						item.setProperty("movedTimestamp", new Date());
+						
+						loot+=GameUtils.renderItem(item)+"<br>";
+					}
+				}
+				db.put(item);
+			}
+		}
+		
+		
+		
+		if (loot.equals(""))
+			loot = null;
+		return loot;
+	}
+	
+	
+	
+	
+	private void doCharacterZombify(ODPAuthenticator auth, CachedDatastoreService ds, CachedEntity attackingCharacter, CachedEntity zombifyingCharacter)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		String newZombieName = "Zombie "+(String)zombifyingCharacter.getProperty("name");
+		// First create a new character for the player and set the player to be using the new character on his user entity...
+		try
+		{
+			CachedEntity zombifiedUser = getEntity((Key)zombifyingCharacter.getProperty("userKey"));
+			CachedEntity newCharacter = doCreateNewCharacterFromDead(ds, auth, zombifiedUser, zombifyingCharacter);
+
+			if (zombifiedUser!=null)
+			{
+				zombifiedUser.setProperty("characterKey", newCharacter.getKey());
+				ds.put(zombifiedUser);
+			}
+		}
+		catch (UserErrorMessage e)
+		{
+			Logger.getLogger(this.getClass().getSimpleName()).log(Level.SEVERE, "Couldn't create new character from dead.", e);
+		}
+
+		
+		// Now reset the attacker's combat mode..
+		setCharacterMode(ds, attackingCharacter, ODPDBAccess.CHARACTER_MODE_NORMAL);
+		attackingCharacter.setProperty("combatant", null);
+		attackingCharacter.setProperty("combatType", null);
+		
+		// Now turn the player's old body into a zombie...
+		zombifyingCharacter.setProperty("type", "NPC");
+		zombifyingCharacter.setProperty("hitpoints", zombifyingCharacter.getProperty("maxHitpoints"));
+		zombifyingCharacter.setProperty("name", newZombieName);
+		zombifyingCharacter.setProperty("combatant", null);
+		zombifyingCharacter.setProperty("combatType", null);
+		setCharacterMode(ds, zombifyingCharacter, ODPDBAccess.CHARACTER_MODE_NORMAL);
+		zombifyingCharacter.setProperty("status", "Zombie");
+
+		
+	}
+	
+
+	/**
+	 * Placeholder
+	 * 
+	 * @param ds2
+	 * @param auth
+	 * @param zombifiedUser
+	 * @param zombifyingCharacter
+	 * @return
+	 */
+	public CachedEntity doCreateNewCharacterFromDead(CachedDatastoreService ds2, ODPAuthenticator auth, CachedEntity zombifiedUser, CachedEntity zombifyingCharacter) throws UserErrorMessage
+	{
+		return null;
+	}
+
+	public boolean doCharacterDieChance(CachedEntity character)
+	{
+		if((Double)character.getProperty("hitpoints")<=0d && GameUtils.enumEquals(character.getProperty("mode"), CharacterMode.UNCONSCIOUS))
+		{
+			Double chance = (Double)character.getProperty("hitpoints");
+			chance*=-1;
+			chance+=1;
+			
+			if (GameUtils.roll(chance))
+			{
+				character.setProperty("mode", CharacterMode.DEAD.toString());
+				
+				sendNotification(getDB(), character.getKey(), NotificationType.fullpageRefresh);
+				
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+
+	public void doDestroyEquipment(CachedDatastoreService db, CachedEntity character, CachedEntity equipment)
+	{
+		if (db==null)
+			db = getDB();
+		
+		if (checkCharacterHasItemEquipped(character, equipment.getKey()))
+		{
+			doCharacterUnequipEntity(db, character, equipment.getKey());
+		}
+		
+		db.delete(equipment.getKey());
+	}
+
+	public void doRequestLeaveParty(CachedDatastoreService ds, CachedEntity character)
+	{
+		doRequestLeaveParty(ds, character, false);
+	}
+	
+	public void doRequestLeaveParty(CachedDatastoreService ds, CachedEntity character, boolean dontSave)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		String partyCode = (String)character.getProperty("partyCode");
+		if (partyCode==null || partyCode.equals(""))
+			return;
+		
+		List<CachedEntity> party = getParty(ds, character);
+		if (party==null)
+			return;
+		
+		if ("TRUE".equals(character.getProperty("partyLeader")))
+		{
+			// We need to reassign to a new leader before leaving the party...
+			if ("TRUE".equals(party.get(0).getProperty("partyLeader")))
+			{
+				party.get(1).setProperty("partyLeader", "TRUE");
+				ds.put(party.get(1));
+			}
+			else
+			{
+				party.get(0).setProperty("partyLeader", "TRUE");
+				ds.put(party.get(0));
+			}
+		}
+			
+		
+		
+		character.setProperty("partyCode", null);
+		character.setProperty("partyLeader", null);
+		character.setProperty("partyJoinsAllowed", null);
+		
+		if (dontSave==false)
+			ds.put(character);
+		
+		getParty(ds, partyCode);
+	}
+
+
+	/**
+	 * This will handle the leader state for a defence structure. It ensures the leader is always set properly (or unset).
+	 * 
+	 * @param ds
+	 * @param defenceStructure
+	 * @param charactersAtDefenceStructure
+	 * @return True indicates the leader was changed. False indicates no change.
+	 */
+	public boolean refreshDefenceStructureLeader(CachedDatastoreService ds, CachedEntity defenceStructure, List<CachedEntity> charactersAtDefenceStructure)
+	{
+		// See if we need a new leader or if the old one is ok...
+		CachedEntity currentLeader = getEntity((Key)defenceStructure.getProperty("leaderKey"));
+		
+		if (currentLeader!=null && GameUtils.isPlayerIncapacitated(currentLeader)==false && 
+				currentLeader.getProperty("status")!=null && 
+				((String)currentLeader.getProperty("status")).startsWith("Defending"))
+		{
+			return false;
+		}
+	
+		// If we weren't given a list of characters, then fetch them now...
+		charactersAtDefenceStructure = getFilteredList("Character", "locationKey", defenceStructure.getProperty("locationKey"));
+		
+		
+		// Order the characters by their status...
+		shuffleCharactersByAttackOrder(charactersAtDefenceStructure);	
+		
+		
+		
+		// Assess the situation...
+		for(CachedEntity chr:charactersAtDefenceStructure)
+		{
+			if (GameUtils.isPlayerIncapacitated(chr))
+				continue;
+			
+			if (chr.getProperty("status")!=null && ((String)chr.getProperty("status")).startsWith("Defending"))
+			{
+				defenceStructure.setProperty("leaderKey", chr.getKey());
+				ds.put(defenceStructure);
+				return true;
+			}
+		}
+		
+		
+		
+		if (currentLeader==null)
+			return false;
+		else
+		{
+			defenceStructure.setProperty("leaderKey", null);
+			ds.put(defenceStructure);
+			return true;
+		}
+		
+		
+	}
+
+
+	/**
+	 * The amount is a dynamically scaled number (also scaled down by 100). The maximum for a stat will be 8, minimum 3
+	 * so if the amount = 1 and the current stat is 3, the amount it will increase by
+	 * will literally be .05. If the current stat was 5.5, the amount it would increase by
+	 * would literally be .025.
+	 * 
+	 * @param character
+	 * @param statName
+	 * @param amount
+	 */
+	public void doCharacterIncreaseStat(CachedDatastoreService ds, CachedEntity character, String statName, double maxStat, Double amount)
+	{
+		amount/=500;
+		if(ds==null)
+			ds = getDB();
+		Double currentStat = (Double)character.getProperty(statName);
+		if (currentStat==null) throw new IllegalArgumentException("Stat name is wrong '"+statName+"'.");
+		
+		// Normalize the stat since 3 is our lowest for the purpose of this formula
+		maxStat-=3;
+		currentStat-=3;
+		
+		// Determine the amount to increase...
+		double scale = ((currentStat/maxStat)-1)*-1;
+		amount*=scale;
+		
+		character.setProperty(statName, currentStat+3d+amount);
+		
+		////////////////////
+		// Special cases
+		
+		
+		// If this is strength, also increase hitpoints if necessary...
+		if (statName.equals("strength"))
+		{
+			double newHitpoints = calculateHitpoints((Double)character.getProperty("strength"));
+			if (newHitpoints != (Double)character.getProperty("maxHitpoints"))
+			{
+				double delta = newHitpoints - (Double)character.getProperty("maxHitpoints"); 
+				character.setProperty("hitpoints", (Double)character.getProperty("hitpoints")+delta);
+				character.setProperty("maxHitpoints", newHitpoints);
+			}
+		}
+		
+		ds.put(character);
+	}
+	
+
+
+
 }

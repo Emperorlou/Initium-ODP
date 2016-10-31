@@ -123,7 +123,7 @@ public class HtmlComponents {
 		{
 			itemName = (String)item.getProperty("name");
 			itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
-			itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
+			itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
 		}
 		Long cost = (Long)saleItem.getProperty("dogecoins");
 		cost=Math.round(cost.doubleValue()*(storeSale/100));
@@ -142,12 +142,12 @@ public class HtmlComponents {
 		}
 		
 		String result = "";
-			   result+="<div class='saleItem' ref="+saleItem.getKey().getId()+">";
+			   result+="<div class='saleItem' ref='"+saleItem.getKey().getId()+"'>";
 		   	   result+="<div class='main-item'>";
-		   	   result+="<input type=checkbox>";
+		   	   result+="<input type='checkbox'>";
 		   	   result+=" ";
 		   	   result+="<div class='main-item-container'>";
-		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
+		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
 //		   	   result+="<br>";
 //		   	   result+="<div class='main-item-controls'>";
 //		   	   result+="</div>";
@@ -193,7 +193,7 @@ public class HtmlComponents {
         {
             itemName = (String)item.getProperty("name");
             itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+" ' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
-            itemIconElement = "<img src='"+item.getProperty("icon")+"' border=0/>"; 
+            itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
         }
 
         
@@ -204,18 +204,18 @@ public class HtmlComponents {
         
       
         String result ="";
-        		result+="<div class='saleItem' ref="+saleItem.getKey().getId()+">";
-				result+="<div class='main-item'>";
-	   	       	result+="<span><img src='images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
-	   	       	result+="<span class='"+notEnoughStrengthClass+"'>";
-	   	    if ("Selling".equals(saleItem.getProperty("status")))
-	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
-	   	    else if ("Sold".equals(saleItem.getProperty("status")))   
-	   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
-	   	       	result+="</span>";
-	   	    	result+="</div>";
-	   	       	result+="</div>";
-	   	       	result+="<br>";
+		result+="<div class='saleItem' ref='"+saleItem.getKey().getId()+"'>";
+		result+="<div class='main-item'>";
+       	result+="<span><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
+       	result+="<span class='"+notEnoughStrengthClass+"'>";
+       	if ("Selling".equals(saleItem.getProperty("status")))
+   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
+   	    else if ("Sold".equals(saleItem.getProperty("status")))   
+   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
+       	result+="</span>";
+    	result+="</div>";
+       	result+="</div>";
+       	result+="<br>";
 		
 		return result;
 	}
@@ -316,18 +316,18 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 
 	public static String generateManageStoreButton()
 	{
-		return generateButtonBarItem("manageStore", "Opens your storefront management page so you can setup items for sale", "viewManageStore()", "images/ui/manageStore.png");
+		return generateButtonBarItem("manageStore", "Opens your storefront management page so you can setup items for sale", "viewManageStore()", "https://initium-resources.appspot.com/images/ui/manageStore.png");
 	}
 	
 	public static String generateToggleStorefront(CachedEntity character)
 	{
 		if("MERCHANT".equals(character.getProperty("mode")))
 		{
-			return generateButtonBarItem("toggleStorefront", "Clicking here will DISABLE your storefront so other players can buy your goods.", "storeDisabledNew(event)", "images/ui/storefrontEnabled.png");
+			return generateButtonBarItem("toggleStorefront", "Clicking here will DISABLE your storefront so other players cannot buy your goods.", "storeDisabledNew(event)", "https://initium-resources.appspot.com/images/ui/storefrontEnabled.png");
 		}
 		else
 		{
-			return generateButtonBarItem("toggleStorefront", "Clicking here will ENABLE your storefront so other players cannot buy your goods.", "storeEnabledNew(event)", "images/ui/storefrontDisabled.png");
+			return generateButtonBarItem("toggleStorefront", "Clicking here will ENABLE your storefront so other players can buy your goods.", "storeEnabledNew(event)", "https://initium-resources.appspot.com/images/ui/storefrontDisabled.png");
 		}
 	}
 	
@@ -335,25 +335,25 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 	{
 		if("TRUE".equals(character.getProperty("partyJoinsAllowed")))
 		{
-			return generateButtonBarItem("togglePartyJoin", "Clicking here will DISALLOW other players from joining your party.", "togglePartyJoins(event)", "images/ui/partyJoinsAllowed.png");
+			return generateButtonBarItem("togglePartyJoin", "Clicking here will DISALLOW other players from joining your party.", "togglePartyJoins(event)", "https://initium-resources.appspot.com/images/ui/partyJoinsAllowed.png");
 		}
 		else
 		{
-			return generateButtonBarItem("togglePartyJoin", "Clicking here will ALLOW other players to join your party.", "togglePartyJoins(event)", "images/ui/partyJoinsDisallowed.png");
+			return generateButtonBarItem("togglePartyJoin", "Clicking here will ALLOW other players to join your party.", "togglePartyJoins(event)", "https://initium-resources.appspot.com/images/ui/partyJoinsDisallowed.png");
 		}
 	}
 	
 	public static String generateToggleDuel(CachedEntity character)
 	{
-		return generateButtonBarItem("toggleDuel", "Clicking here will ENABLE duel requests. This would allow other players to request a duel with you.", "allowDuelRequests()", "images/ui/duelRequestsDisallowed.png");
+		return generateButtonBarItem("toggleDuel", "Clicking here will ENABLE duel requests. This would allow other players to request a duel with you.", "allowDuelRequests()", "https://initium-resources.appspot.com/images/ui/duelRequestsDisallowed.png");
 		/*
 		if("TRUE".equals(character.getProperty("duelRequestsAllowed")))
 		{
-			return generateButtonBarItem("toggleDuel", "Clicking here will DISABLE duel requests. This would prevent other players from requesting a duel with you.", "allowDuelRequests()", "images/ui/duelRequestsAllowed.png");
+			return generateButtonBarItem("toggleDuel", "Clicking here will DISABLE duel requests. This would prevent other players from requesting a duel with you.", "allowDuelRequests()", "https://initium-resources.appspot.com/images/ui/duelRequestsAllowed.png");
 		}
 		else
 		{
-			return generateButtonBarItem("toggleDuel", "Clicking here will ENABLE duel requests. This would allow other players to request a duel with you.", "allowDuelRequests()", "images/ui/duelRequestsDisallowed.png");
+			return generateButtonBarItem("toggleDuel", "Clicking here will ENABLE duel requests. This would allow other players to request a duel with you.", "allowDuelRequests()", "https://initium-resources.appspot.com/images/ui/duelRequestsDisallowed.png");
 		}
 		*/
 	}
@@ -362,11 +362,11 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 	{
 		if(Boolean.TRUE.equals(character.getProperty("cloaked")))
 		{
-			return generateButtonBarItem("toggleCloak", "Clicking here will SHOW your equipment and stats to other players.", "toggleCloaked(event)", "images/ui/cloakedEnabled.png");
+			return generateButtonBarItem("toggleCloak", "Clicking here will SHOW your equipment and stats to other players.", "toggleCloaked(event)", "https://initium-resources.appspot.com/images/ui/cloakedEnabled.png");
 		}
 		else
 		{
-			return generateButtonBarItem("toggleCloak", "Clicking here will HIDE your equipment and stats from other players.", "toggleCloaked(event)", "images/ui/cloakedDisabled.png");
+			return generateButtonBarItem("toggleCloak", "Clicking here will HIDE your equipment and stats from other players.", "toggleCloaked(event)", "https://initium-resources.appspot.com/images/ui/cloakedDisabled.png");
 		}
 	}
 	
@@ -382,21 +382,21 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("<span>" + generateToggleCloak(character) + "</span>");
 		// Help text
 		sb.append("<div class='hiddenTooltip' id='buttonbar'><h5>The Button Bar</h5>");
-		sb.append("<img src='images/ui/manageStore.png' border='0' style='float:left; padding:4px;'>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/manageStore.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This button will take you to your storefront management page. This page allows you to setup your storefront by specifying which items you would like to sell to other players and for how much. More help can be found in the storefront page itself.</p>");
-		sb.append("<img src='images/ui/storefrontEnabled.png' border='0' style='float:left;padding:4px;'>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/storefrontEnabled.png' border='0' style='float:left;padding:4px;'>");
 		sb.append("<p>This button will turn on and off your storefront. Since you cannot move while vending, you will need to turn off your store before you go off adventuring. This button makes turning your store on and off quick and easy.</p>");
-		sb.append("<img src='images/ui/partyJoinsAllowed.png' border='0' style='float:left; padding:4px;'>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/partyJoinsAllowed.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This is the party join button. When enabled (without the red cross), other characters will be able to join you in a party. If you are not already in a party then when someone joins you, you will automatically become the party leader. <br>");
 		sb.append("More information on parties and how they work can be found in the <a href='odp/mechanics.jsp#parties'>game mechanics page</a>.</p>");
-		sb.append("<img src='images/ui/duelRequestsAllowed.png' border='0' style='float:left; padding:4px;'>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/duelRequestsAllowed.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This button allows you to control whether or not you are accepting duel requests. When enabled, other players are able to request to duel with you. You will be given the option to accept a duel request or deny it. When you accept, you will be whisked away into a special arena where you and the other player will engage in battle.<br>"); 
 		sb.append("More information on the different types of duels and how they work can be found in the <a href='odp/mechanics.jsp#duels'>game mechanics page</a>.</p>");
-		sb.append("<img src='images/ui/cloakedEnabled.png' border='0' style='float:left; padding:4px;'>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/cloakedEnabled.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This button will not allow other players to see your character stats, referral stats, or equipment. It can be an important tool in PvP to hide your equipment so other players are less prepared to attack you since they do not know what you're weak to. However if you're not planning on doing PvP any time soon, keeping this option off makes it easier for people to see what you have and to help you - or just to show off your great gear.</p>");
 		sb.append("</div>");
 		// Help button
-		sb.append("<span class='hint' rel='#buttonbar' style='float:right'><img src='images/ui/help.png' border='0'></span>");
+		sb.append("<span class='hint' rel='#buttonbar' style='float:right'><img src='https://initium-resources.appspot.com/images/ui/help.png' border='0'></span>");
 		sb.append("</div>");
 		return sb.toString();
 	}

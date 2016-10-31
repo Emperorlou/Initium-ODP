@@ -27,5 +27,4 @@
     stale session data. For details, see
     http://code.google.com/appengine/docs/java/config/appconfig.html#Enabling_Sessions
   -->
-
 </appengine-web-app>
