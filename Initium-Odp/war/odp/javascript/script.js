@@ -1851,6 +1851,17 @@ function doEatBerry(eventObject)
 	});
 }
 
+function doEatCandy(eventObject)
+{	
+	var itemId = $("#popupItemId").val();
+	if (itemId == null) return;
+	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
+		if (error) return;
+		reloadPagePopup();
+		popupMessage("System Message", "You eat the ancient candy bar and your insides gurgle back at you. You probably shouldn't eat too much of this. Who knows what could happen?");
+	});
+}
+
 function doDrinkElixir(eventObject)
 {	
 	var itemId = $("#popupItemId").val();
