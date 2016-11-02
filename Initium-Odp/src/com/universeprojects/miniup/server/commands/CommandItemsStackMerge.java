@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,34 +30,80 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 	@Override
 	protected void processBatchItems(Map<String, String> parameters, ODPDBAccess db, CachedDatastoreService ds,
 			CachedEntity character, List<CachedEntity> batchItems) throws UserErrorMessage {
-		CachedEntity firstEntity; // for readability
-		Map<String, CachedEntity> firstOfKind = new HashMap<String, CachedEntity>();
 		ds.beginTransaction();
+		Map<String, ArrayList<CachedEntity>> sameNameMap = new HashMap<String, ArrayList<CachedEntity>>();
+		ArrayList<CachedEntity> sameNameList;
+		boolean appendToEnd;
+		ArrayList<CachedEntity> needsUpdate = new ArrayList<CachedEntity>();
+		long quantity;
+		String itemName;
 		try {
 			for (CachedEntity mergeItem : batchItems) {
 				if (GameUtils.equals(mergeItem.getProperty("containerKey"), character.getKey()) == false) {
 					throw new UserErrorMessage("Item does not belong to character.");
 				}
 				if (mergeItem.hasProperty("quantity")) {
-					if (firstOfKind.containsKey(mergeItem.getKind())) {
-						firstEntity = firstOfKind.get(mergeItem.getKind());
-						firstEntity.setProperty("quantity",
-								(long) firstEntity.getProperty("quantity") + (long) mergeItem.getProperty("quantity"));
-						ds.delete(mergeItem); // Do I need to use the key here?
-					} else {
-						firstOfKind.put(mergeItem.getKind(), mergeItem);
+					quantity = (long) mergeItem.getProperty("quantity");
+					if (quantity>=1){ // item is "stackable"
+						// to slightly improve efficiency, only compare items against items of the same name
+						itemName = (String) mergeItem.getProperty("name");
+						if (sameNameMap.containsKey(itemName)){
+							// contains a value already, compare down the line
+							sameNameList = sameNameMap.get(itemName);
+							appendToEnd = true;
+							for (CachedEntity checkEntity : sameNameList){
+								if (canStack(checkEntity, mergeItem)) {
+									checkEntity.setProperty("quantity", (long) checkEntity.getProperty("quantity") + quantity);
+									ds.delete(mergeItem);
+									appendToEnd = false;
+									// oh god this is so inefficient, but set takes up way more space and is bad for iterating through
+									if (!needsUpdate.contains(checkEntity)) {needsUpdate.add(checkEntity);}
+									break;
+								}
+							}
+							if (appendToEnd) {
+								sameNameList.add(mergeItem);
+								sameNameMap.put(itemName, sameNameList);
+							}
+							
+						} else {
+							sameNameList= new ArrayList<CachedEntity>();
+							sameNameList.add(mergeItem);
+							sameNameMap.put(itemName, sameNameList);
+						}
 					}
+					
 				}
 			}
-			for (String stackKind : firstOfKind.keySet()) {
-				if (firstOfKind.get(stackKind).isUnsaved()) {
-					ds.put(firstOfKind.get(stackKind));
-				}
+			for (CachedEntity updateEntity : needsUpdate){
+				ds.put(updateEntity);
 			}
 		} finally {
 			ds.rollbackIfActive();
 		}
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+	}
+	
+	/**
+	 * Compares two entities for stackability - that is that all properties are equal
+	 * excluding quantity
+	 * @param entity1 - First entity
+	 * @param entity2 - Second entity
+	 * @return true if they can stack", else false
+	 */
+	protected boolean canStack(CachedEntity entity1, CachedEntity entity2){
+		Map<String, Object> entity1Props = entity1.getProperties();
+		Map<String, Object> entity2Props = entity2.getProperties();
+		if (entity1Props.size()!=entity2Props.size()) {return false;} //simplest check
+		// could instead remove quantity and do equal check between the two maps?
+		for (String checking : entity1Props.keySet()) {
+			if (checking != "quantity") {
+				if (!entity1Props.get(checking).equals(entity2Props.get(checking))){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 }

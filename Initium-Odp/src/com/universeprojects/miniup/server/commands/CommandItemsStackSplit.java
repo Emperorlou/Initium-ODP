@@ -55,7 +55,8 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 
 		ds.beginTransaction();
 		try {
-			CachedEntity newItemStack = db.generateNewObject(splitItem, splitItem.getKind());
+			CachedEntity newItemStack = new CachedEntity(splitItem.getKind());
+			newItemStack.getProperties().putAll(splitItem.getProperties());
 			splitItem.setProperty("quantity", stackSize);
 			ds.put(splitItem);
 			newItemStack.setProperty("quantity", newStackSize);
