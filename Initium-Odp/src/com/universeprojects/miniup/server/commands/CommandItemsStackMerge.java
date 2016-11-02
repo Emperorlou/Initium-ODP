@@ -97,8 +97,8 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		if (entity1Props.size()!=entity2Props.size()) {return false;} //simplest check
 		// could instead remove quantity and do equal check between the two maps?
 		for (String checking : entity1Props.keySet()) {
-			if (checking != "quantity") {
-				if (!entity1Props.get(checking).equals(entity2Props.get(checking))){
+			if (!checking.equals("quantity")) {
+				if (!GameUtils.equals(entity1Props.get(checking), entity2Props.get(checking))){
 					return false;
 				}
 			}
