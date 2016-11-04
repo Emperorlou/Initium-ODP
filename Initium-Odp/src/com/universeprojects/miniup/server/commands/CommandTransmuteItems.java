@@ -62,11 +62,11 @@ public class CommandTransmuteItems extends Command {
 		List<Key> materialsKeys = new ArrayList<Key>();
 		
 		for (CachedEntity material:materials) {
-			long quantity = (long) material.getProperty("quantity");
-			
-			if (GameUtils.equals(quantity, null))
+			if (GameUtils.equals(material.getProperty("quantity"), null))
 				materialsKeys.add((Key) material.getProperty("_definitionKey"));
 			else {
+				long quantity = (long) material.getProperty("quantity");
+				
 				for (int i = 0; i < quantity; i++) {
 					materialsKeys.add((Key) material.getProperty("_definitionKey"));
 				}
