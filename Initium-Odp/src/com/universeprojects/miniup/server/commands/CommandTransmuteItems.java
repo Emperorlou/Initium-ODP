@@ -62,10 +62,11 @@ public class CommandTransmuteItems extends Command {
 			long quantity = (long) material.getProperty("quantity");
 			
 			if (GameUtils.equals(quantity, null))
-				quantity = 1;
-			
-			for (int i = 0; i < quantity; i++) {
 				materialsKeys.add((Key) material.getProperty("_definitionKey"));
+			else {
+				for (int i = 0; i < quantity; i++) {
+					materialsKeys.add((Key) material.getProperty("_definitionKey"));
+				}
 			}
 		}
 		
