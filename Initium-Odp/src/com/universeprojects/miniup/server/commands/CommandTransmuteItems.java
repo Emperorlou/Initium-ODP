@@ -59,14 +59,22 @@ public class CommandTransmuteItems extends Command {
 		
 		final List<CachedEntity> materials = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, containerKey);
 		
-		if (materials.size() < 2)
-			throw new UserErrorMessage("You must select at least two items to transmute.");
-		
 		List<Key> materialsKeys = new ArrayList<Key>();
 		
 		for (CachedEntity material:materials) {
-			materialsKeys.add((Key) material.getProperty("_definitionKey"));
+			long quantity = (long) material.getProperty("quantity");
+			
+			if (GameUtils.equals(quantity, null))
+				materialsKeys.add((Key) material.getProperty("_definitionKey"));
+			else {
+				for (int i = 0; i < quantity; i++) {
+					materialsKeys.add((Key) material.getProperty("_definitionKey"));
+				}
+			}
 		}
+		
+		if (materialsKeys.size() < 2)
+			throw new UserErrorMessage("You must select at least two items to transmute.");
 		
 		// sorting for ease of comparing this list to other material lists
 		Collections.sort(materialsKeys);
