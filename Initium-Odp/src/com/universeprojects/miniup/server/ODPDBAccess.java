@@ -719,7 +719,19 @@ public class ODPDBAccess
 
 	public Key getDefaultLocationKey()
 	{
-		return KeyFactory.createKey("Location", 5629499534213120l);
+		return (Key)getProject().getProperty("defaultSpawnLocationKey");
+	}
+
+	private CachedEntity getProject()
+	{
+		try
+		{
+			return ds.get(KeyFactory.createKey("Project", 4902705788092416L));
+		}
+		catch (EntityNotFoundException e)
+		{
+			throw new RuntimeException("Unable to find the project entity.");
+		}
 	}
 
 	public CachedEntity getLocationById(Long id)

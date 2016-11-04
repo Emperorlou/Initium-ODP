@@ -1381,7 +1381,7 @@ function pagePopup(url, closeCallback)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	
 	if (closeCallback!=null)
@@ -1575,9 +1575,12 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 
 function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
 {
+	closeAllTooltips();
+	
 	var params = {"scriptId": effectId };
 	params[sourceType.toLowerCase() + "Id"] = sourceId;
 	doCommand(event, "Script"+effectType, params);
+	
 }
 
 function doAttack(eventObject, charId)
