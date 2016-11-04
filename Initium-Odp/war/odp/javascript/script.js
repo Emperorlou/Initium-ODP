@@ -2915,7 +2915,7 @@ function mergeItemStacks(eventObject, selector)
 	doCommand(eventObjecet, "ItemsStackMerge",{"itemIds":itemIds});
 }
 
-function splitItemStacks(eventObject)
+function splitItemStack(eventObject)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;

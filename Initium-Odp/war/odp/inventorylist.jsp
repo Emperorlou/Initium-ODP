@@ -48,6 +48,10 @@
 					<label class="command-cell" title="Marks all inventory items for batch operations."><input type="checkbox" class="check-all">Select All</label>
 					<a class="command-cell right" title="Drops any items you've selected in your inventory on the ground." onclick="selectedItemsDrop(event, '#invItems .invItem')">Drop Selected</a>
 				</div>
+				<div class="command-row">
+					<a class="command-cell" title="Merge the selected items." onclick="mergeItemStacks(event, '#invItems .invItem')">Merge Items</a>
+					<a class="command-cell right" title="Split the slected item." onclick="splitItemStack(event, '#invItems .invItem')">Split Item</a>
+				</div>
 			</div>
 		</div>
 		<div id="invItems" class="selection-list">
