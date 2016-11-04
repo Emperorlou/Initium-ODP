@@ -2903,3 +2903,26 @@ function antiBotQuestionPopup()
 		  'callback': antiBotAnswer  // optional
 		});
 }
+
+// ///////////////////////////////////////////////////////////
+// Stack maintenance
+
+function mergeItemStacks(eventObject, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
+	if(batchItems.length == 0) return;
+	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+	doCommand(eventObjecet, "ItemsStackMerge",{"itemIds":itemIds});
+}
+
+function splitItemStacks(eventObject)
+{
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
+	if(batchItems.length == 0) return;
+	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+	promptPopup("Stack Split","Enter a stack size to create:","1",function(stackSize){
+		if (stackSize!=null&&stackSize!=""){
+			doCommand(eventObject, "ItemsStackSplit",{"itemIds":itemIds, "stackSize":stackSize});
+		}
+	});
+}
