@@ -44,7 +44,11 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 					throw new UserErrorMessage("Item does not belong to character.");
 				}
 				if (mergeItem.hasProperty("quantity")) {
-					quantity = (long) mergeItem.getProperty("quantity");
+					if (mergeItem.getProperty("quantity")==null){
+						quantity = 0;
+					} else {
+						quantity = (long) mergeItem.getProperty("quantity");
+					}
 					if (quantity >= 1) { // item is "stackable"
 						// to slightly improve efficiency, only compare items
 						// against items of the same name

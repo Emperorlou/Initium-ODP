@@ -23,6 +23,7 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 	@Override
 	protected void processBatchItems(Map<String, String> parameters, ODPDBAccess db, CachedDatastoreService ds,
 			CachedEntity character, List<CachedEntity> batchItems) throws UserErrorMessage {
+		long splitItemQuantity;
 		if (batchItems.size() > 1) {
 			throw new UserErrorMessage("You can only split one item at a time.");
 		}
@@ -33,7 +34,12 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 		if (!splitItem.hasProperty("quantity")) {
 			throw new UserErrorMessage("You can only split stackable items.");
 		}
-		if ((long) splitItem.getProperty("quantity") < 2) {
+		if (splitItem.getProperty("quantity")==null){
+			throw new UserErrorMessage("You can only split stackable items.");
+		} else {
+			splitItemQuantity = (long) splitItem.getProperty("quantity");
+		}
+		if (splitItemQuantity < 2) {
 			throw new UserErrorMessage("You can only split stacks of two or more items.");
 		}
 		String stackSizeString = parameters.get("stackSize");
@@ -46,12 +52,11 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 		if (stackSize <= 0) {
 			throw new UserErrorMessage("Please input a positive integer value.");
 		}
-		long splitItemStackSize = (long) splitItem.getProperty("quantity");
-		if (stackSize >= splitItemStackSize) {
+		if (stackSize >= splitItemQuantity) {
 			throw new UserErrorMessage(
 					"Please input a quantity smaller than the size of the stack you are trying to split.");
 		}
-		long newStackSize = splitItemStackSize - stackSize;
+		long newStackSize = splitItemQuantity - stackSize;
 
 		ds.beginTransaction();
 		try {
