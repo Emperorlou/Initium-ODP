@@ -1720,6 +1720,16 @@ public class GameUtils
 		if (value==null) return false;
 		return value.equals(e.toString());
 	}
+
+	public static <E extends Enum<E>> boolean enumContains(Class<E> enumClass, String checkValue, boolean caseInsensitive)
+	{
+		for(E option:enumClass.getEnumConstants())
+		{
+			if(caseInsensitive ? option.name().equalsIgnoreCase(checkValue) : option.name().equals(checkValue))
+				return true;
+		}
+		return false;
+	}
 	
 	/**
 	 * This equals can be used to compare anything, but specifically it's useful

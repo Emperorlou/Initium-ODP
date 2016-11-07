@@ -1627,6 +1627,43 @@ public class ODPDBAccess
 		addBuffToBuffsCache(parentKey, buff);
 		return buff;
 	}
+	
+	public CachedEntity awardBuffByDef(String buffDefName, Key characterKey)
+	{
+		List<CachedEntity> buffDefs = getFilteredList("BuffDef", "name", buffDefName);
+		if(buffDefs.size() > 1)
+		{
+			// BuffDef.name must be unique
+			return null; 
+		}
+		
+		// There should only be 1. If not, it will fall through and return a null value. 
+		for(CachedEntity def:buffDefs)
+		{
+			if(def.getProperty("maxCount")!=null)
+			{
+				Long maximumCount = (Long)def.getProperty("maxCount");
+				int existingCount = 0;
+				List<CachedEntity> buffs = buffsCache.get(characterKey);
+				for(CachedEntity appliedBuff:buffs)
+					if(buffDefName.equals(appliedBuff.getProperty("name")))
+						existingCount++;
+				if (existingCount >= maximumCount) return null;
+			}
+			
+			CachedEntity newBuff = generateNewObject(def, "Buff");
+			if(newBuff != null)
+			{
+				int expiry = ((Long)newBuff.getProperty("expiry")).intValue();
+				GregorianCalendar cal = new GregorianCalendar();
+				cal.add(Calendar.SECOND, expiry);
+				newBuff.setProperty("expiry", cal.getTime());
+				newBuff.setProperty("parentKey", characterKey);
+			}
+			return newBuff;
+		}
+		return null;
+	}
 
 	private void addBuffToBuffsCache(Key parentKey, CachedEntity buff)
 	{
@@ -3879,212 +3916,76 @@ public class ODPDBAccess
 	{
 		Map<String, Object> result = new HashMap<String, Object>();
 
+		// Collect all items that will block, to fetch all at once and attempt to block.
+		List<Key> blockItems = new ArrayList<Key>();
 		// First see if what the character is holding has blocked the attack
-		CachedEntity leftHand = null;
-		Key leftHandKey = (Key)targetCharacter.getProperty("equipmentLeftHand");
-		if (leftHandKey!=null)
-			leftHand = getEntity(leftHandKey);
-		
-		if (leftHand!=null)
+		for(Key checkKey:Arrays.asList(
+				(Key)targetCharacter.getProperty("equipmentLeftHand"),
+				(Key)targetCharacter.getProperty("equipmentRightHand"),
+				(Key)targetCharacter.getProperty("equipmentRightRing"),
+				(Key)targetCharacter.getProperty("equipmentLeftRing"),
+				(Key)targetCharacter.getProperty("equipmentNeck")))
 		{
-			Long blockChance = (Long)leftHand.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, leftHand))
-					return result;
-			}
-		}
-
-		CachedEntity rightHand = null;
-		Key rightHandKey = (Key)targetCharacter.getProperty("equipmentRightHand");
-		if (rightHandKey!=null)
-			rightHand = getEntity(rightHandKey);
-		
-		if (rightHand!=null)
-		{
-			Long blockChance = (Long)rightHand.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, rightHand))
-					return result;
-			}
+			if(checkKey!=null)
+				blockItems.add(checkKey);
 		}
 		
-		
-		CachedEntity rightRing = null;
-		Key rightRingKey = (Key)targetCharacter.getProperty("equipmentRightRing");
-		if (rightRingKey!=null)
-			rightRing = getEntity(rightRingKey);
-		
-		if (rightRing!=null)
-		{
-			Long blockChance = (Long)rightRing.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, rightRing))
-					return result;
-			}
-		}
-		
-		
-		CachedEntity leftRing = null;
-		Key leftRingKey = (Key)targetCharacter.getProperty("equipmentLeftRing");
-		if (leftRingKey!=null)
-			leftRing = getEntity(leftRingKey);
-		
-		if (leftRing!=null)
-		{
-			Long blockChance = (Long)leftRing.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, leftRing))
-					return result;
-			}
-		}
-		
-		
-		CachedEntity neck = null;
-		Key neckKey = (Key)targetCharacter.getProperty("equipmentNeck");
-		if (neckKey!=null)
-			neck = getEntity(neckKey);
-		
-		if (neck!=null)
-		{
-			Long blockChance = (Long)neck.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, neck))
-					return result;
-			}
-		}
-		
-		
-		// First, randomly determine where the attack is likely to land on the body (which piece of equipment will be hit)
+		// Next, randomly determine where the attack is likely to land on the body (which piece of equipment will be hit)
 		// Body/Arms = 50%, Legs = 30%, Head = 10%, Hands = 5%, Feet = 5%
 		Random rnd = new Random();
 		int hitPlacement = rnd.nextInt(100);
 		if (GameUtils.between(hitPlacement, 0, 50))
 		{
 			// chest/arms hit
-			CachedEntity chest = null;
-			CachedEntity shirt = null;
-			Key chestKey = (Key)targetCharacter.getProperty("equipmentChest");
-			Key shirtKey = (Key)targetCharacter.getProperty("equipmentShirt");
-			if (chestKey!=null)
-				chest = getEntity(chestKey);
-			if (shirtKey!=null)
-				shirt = getEntity(shirtKey);
-			
-			// Determine if the chestpiece was hit...
-			if (chest!=null)
-			{
-				Long blockChance = (Long)chest.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// The chest piece blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, chest))
-						return result;
-				}
-			}
-			
-			if (shirt!=null)
-			{
-				Long blockChance = (Long)shirt.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// The chest piece blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, shirt))
-						return result;
-					
-				}
-			}
-			
-			
+			for(Key checkKey:Arrays.asList(
+					(Key)targetCharacter.getProperty("equipmentChest"),
+					(Key)targetCharacter.getProperty("equipmentShirt")))
+				if(checkKey != null)
+					blockItems.add(checkKey);
 		}
 		else if (GameUtils.between(hitPlacement, 50, 80))
 		{
 			// legs hit
-			CachedEntity armor = null;
 			Key armorKey = (Key)targetCharacter.getProperty("equipmentLegs");
 			if (armorKey!=null)
-				armor = getEntity(armorKey);
-			
-			// Determine if the chestpiece was hit...
-			if (armor!=null)
-			{
-				Long blockChance = (Long)armor.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// The chest piece blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
-						return result;
-				}
-			}
+				blockItems.add(armorKey);
 			
 		}
 		else if (GameUtils.between(hitPlacement, 80, 90))
 		{
 			// head hit
-			CachedEntity armor = null;
 			Key armorKey = (Key)targetCharacter.getProperty("equipmentHelmet");
 			if (armorKey!=null)
-				armor = getEntity(armorKey);
-			
-			// Determine if the chestpiece was hit...
-			if (armor!=null)
-			{
-				Long blockChance = (Long)armor.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
-						return result;
-				}
-			}
+				blockItems.add(armorKey);
 		}
 		else if (GameUtils.between(hitPlacement, 90, 95))
 		{
 			// Hands hit
-			CachedEntity armor = null;
 			Key armorKey = (Key)targetCharacter.getProperty("equipmentGloves");
 			if (armorKey!=null)
-				armor = getEntity(armorKey);
-			
-			// Determine if the chestpiece was hit...
-			if (armor!=null)
-			{
-				Long blockChance = (Long)armor.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
-						return result;
-				}
-			}
+				blockItems.add(armorKey);
 		}
 		else if (GameUtils.between(hitPlacement, 95, 100))
 		{
 			// feet hit
-			CachedEntity armor = null;
 			Key armorKey = (Key)targetCharacter.getProperty("equipmentBoots");
 			if (armorKey!=null)
-				armor = getEntity(armorKey);
-			
-			// Determine if the chestpiece was hit...
-			if (armor!=null)
+				blockItems.add(armorKey);
+		}
+		
+		// Get all the entities from DB. 
+		// Possible that item has been destroyed, so clear out null entries first.
+		List<CachedEntity> blockEntities = getDB().get(blockItems);
+		for(int i = blockEntities.size()-1; i >= 0; i--)
+			if(blockEntities.get(i) == null) blockEntities.remove(i);
+		
+		// Process all the blocks now. 
+		for(CachedEntity block:GameUtils.roll(blockEntities, "blockChance", null, null))
+		{
+			if (block!=null)
 			{
-				Long blockChance = (Long)armor.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
-						return result;
-				}
+				if(updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, block))
+					break;
 			}
 		}
 		

@@ -38,6 +38,28 @@ public abstract class EntityWrapper
 		wrappedEntity.setProperty(propertyName, propValue);
 	}
 	
+	public boolean hasCharges()
+	{
+		return getCharges() > 0;
+	}
+	
+	public Long getCharges()
+	{
+		return wrappedEntity.hasProperty("charges") ? (Long)this.getProperty("charges") : -1;
+	}
+
+	public boolean adjustCharges(Long addCharges)
+	{
+		Long newCharges = getCharges();
+		if(newCharges > -1)
+		{
+			newCharges += addCharges;
+			this.setProperty("charges", addCharges);
+			return true;
+		}
+		return false;
+	}
+	
 	protected Key getKey()
 	{
 		return wrappedEntity.getKey();

@@ -2,7 +2,10 @@ package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,8 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
 import com.universeprojects.miniup.server.scripting.wrappers.Buff;
@@ -98,28 +103,12 @@ public class ScriptService extends Service
 	}
 	
 	/**
-	 * Including ODPDBAccess parameter here, due to issues with type erasure
-	 */
-	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, ODPDBAccess db, List<CachedEntity> entitySources)
-	{
-		List<EntityWrapper> wrappers = new ArrayList<EntityWrapper>();
-		for(CachedEntity entity:entitySources)
-			wrappers.add(ScriptService.wrapEntity(entity, db));
-		return executeScript(event, scriptEntity, wrappers);
-	}
-	
-	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, EntityWrapper entitySource)
-	{
-		return executeScript(event, scriptEntity, Arrays.asList(entitySource));
-	}
-	
-	/**
 	 * Executes the script. Wraps entitySource in the script wrapper type first.  
 	 * @param scriptEntity The actual script entity itself.
 	 * @param entitySource The entity which fired the script, will be passed into the script context to utilize in source.
 	 * @return True if script executed successfully, false otherwise.
 	 */
-	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, List<EntityWrapper> entitySources)
+	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, EntityWrapper sourceEntity)
 	{
 		if(event == null) throw new IllegalArgumentException("event cannot be null!");
 		
@@ -149,20 +138,11 @@ public class ScriptService extends Service
 			// Put the event into scope, so we can use it
 	    	currentScope.put("event", currentScope, Context.toObject(event, currentScope));
 	    	// Recreate the sourceEntity variable on each hit.
-	    	for(EntityWrapper src:entitySources)
-	    	{
-	    		// Always delete the sourceEntity from scope.
-	    		if(currentScope.has("sourceEntity", currentScope)) 
-	    			currentScope.delete("sourceEntity");
-	    		
-	    		// Only put it back if it's not null.
-		    	if(src != null)
-		    		currentScope.put("sourceEntity", currentScope, Context.toObject(src, currentScope));
-		    	
-		    	// Evaluate the script. We don't need to return anything, everything we need
-		    	// is on the Event object itself.
-		    	jsContext.evaluateString(currentScope, script, scriptName, 0, null);
-	    	}
+	    	if(sourceEntity != null)
+	    		currentScope.put("sourceEntity", currentScope, Context.toObject(sourceEntity, currentScope));
+	    	// Evaluate the script. We don't need to return anything, everything we need
+	    	// is on the Event object itself.
+	    	jsContext.evaluateString(currentScope, script, scriptName, 0, null);
 	    	currentScope = null;
 	    	return true;
 	    }
@@ -195,5 +175,150 @@ public class ScriptService extends Service
 	protected void finalize( ) throws Throwable
 	{
 		close();
+	}
+	
+	/**
+	 * Gets all scripts of a singular type associated with the list of entities. 
+	 * @param db ODPDBAccess instance, to get the script entities themselves
+	 * @param entities List of entities to get the scripts for.
+	 * @param type ScriptType for scripts we want to find
+	 * @return Mapping of all scripts associated to a particular entity.
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map<CachedEntity, List<CachedEntity>>
+		getEntityScriptsOfType(ODPDBAccess db, List<CachedEntity> entities, ScriptType type)
+	{
+		// This will be the return.
+		Map<CachedEntity, List<CachedEntity>> scriptMap = 
+				new HashMap<CachedEntity, List<CachedEntity>>();
+
+		// This map tracks the script -> List<entities>. Only contains 
+		// valid (non-null) entities, and the mapped list could be empty on return.
+		Map<Key, List<CachedEntity>> entityScripts = new HashMap<Key, List<CachedEntity>>();
+		// This will be used to retrieve all the scripts from the DB
+		HashSet<Key> getKeys = new HashSet<Key>();
+		for(CachedEntity curEntity:entities)
+		{
+			// A null entity could be possible, such as fighting bare handed (weapon == null)
+			if(curEntity == null) continue;
+			scriptMap.put(curEntity, new ArrayList<CachedEntity>());
+			List<Key> entityKeys = (List<Key>)curEntity.getProperty("scripts");
+			if(entityKeys == null) continue;
+			for(Key key:entityKeys)
+			{
+				if(key == null) continue;
+				if(!entityScripts.containsKey(key)) entityScripts.put(key, new ArrayList<CachedEntity>());
+				entityScripts.get(key).add(curEntity);
+				getKeys.add(key);
+			}
+		}
+		
+		// Only allow this specific type of script to be processed.
+		List<CachedEntity> scripts = db.getScriptsOfType(new ArrayList<Key>(getKeys), type);
+		
+		// For each script, get the associated entities, and add to the return
+		// of entity -> List<script>. These will fire as one-offs, not in batches.
+		for(CachedEntity script:scripts)
+		{
+			if(script == null) continue;
+			// Get the list of entities associated with this script
+			List<CachedEntity> scriptSources = entityScripts.get(script.getKey());
+			for(CachedEntity entity:scriptSources)
+			{
+				if(!scriptMap.containsKey(entity)) scriptMap.put(entity, new ArrayList<CachedEntity>());
+				scriptMap.get(entity).add(script);
+			}
+		}
+			
+		return scriptMap;
+	}
+	
+	/**
+	 * Gets all combat scripts associated with the common combat entities 
+	 * @param db ODPDBAccess instance, to get the script entities themselves 
+	 * @param attacker CachedEntity of the attacking character
+	 * @param primaryWeapon CachedEntity of the primary (attack command) weapon of the attacking entity
+	 * @param secondaryWeapon CachedEntity of the secondary (offhand) weapon of the attacking entity
+	 * @param defender CachedEntity of the defending character
+	 * @return ScriptType -> Entity -> List<Script> map.
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map<ScriptType, Map<CachedEntity, List<CachedEntity>>> 
+		getCombatScripts(ODPDBAccess db, CachedEntity attacker, CachedEntity primaryWeapon, CachedEntity secondaryWeapon, CachedEntity defender)
+	{
+		// This will be the return. ScriptType -> Entity -> List<Script>
+		Map<ScriptType, Map<CachedEntity, List<CachedEntity>>> scriptMap = 
+				new HashMap<ScriptType, Map<CachedEntity, List<CachedEntity>>>();
+
+		// This map tracks the script -> List<entities>. Only contains 
+		// valid (non-null) entities, and the mapped list could be empty on return.
+		Map<Key, List<CachedEntity>> entityScripts = new HashMap<Key, List<CachedEntity>>();
+		// This will be used to retrieve all the scripts from the DB
+		HashSet<Key> getKeys = new HashSet<Key>();
+		for(CachedEntity curEntity:Arrays.asList(attacker, primaryWeapon, secondaryWeapon, defender))
+		{
+			// A null entity could be possible, such as fighting bare handed (weapon == null)
+			if(curEntity == null) continue;
+			List<Key> entityKeys = (List<Key>)curEntity.getProperty("scripts");
+			if(entityKeys == null) continue; 
+			for(Key key:entityKeys)
+			{
+				if(key == null) continue;
+				if(!entityScripts.containsKey(key)) entityScripts.put(key, new ArrayList<CachedEntity>());
+				entityScripts.get(key).add(curEntity);
+				getKeys.add(key);
+			}
+		}
+		
+		// Only allow these specific types of scripts to be processed.
+		List<CachedEntity> scripts = db.getScriptsOfType(new ArrayList<Key>(getKeys), 
+				ScriptType.onAttack, ScriptType.onAttackHit, ScriptType.onDefend, ScriptType.onDefendHit);
+		
+		List<CachedEntity> attackerEntities = Arrays.asList(attacker, primaryWeapon, secondaryWeapon);
+		for(CachedEntity script:scripts)
+		{
+			if(script == null) continue;
+			ScriptType sType = ScriptType.valueOf((String)script.getProperty("type"));
+			
+			// If allowed event type already exists in the script map, get it.
+			// Otherwise, create a new one, but don't add it yet. We only want
+			// a record in this map if we actually have a (correct) script to execute.
+			Map<CachedEntity, List<CachedEntity>> currentScriptMap = 
+				scriptMap.containsKey(sType) ? 
+					scriptMap.get(sType) : 
+					new HashMap<CachedEntity, List<CachedEntity>>();
+			
+			// Get all the entities associated with this particular script.
+			List<CachedEntity> scriptSources = entityScripts.get(script.getKey());
+			
+			switch(sType)
+			{
+				case onAttack:
+				case onAttackHit:
+					for(CachedEntity attack:attackerEntities)
+					{
+						if(attack != null && scriptSources.contains(attack))
+						{
+							// This entity belongs to this script. Go ahead and add to the underlying list.
+							if(!currentScriptMap.containsKey(attack)) currentScriptMap.put(attack, new ArrayList<CachedEntity>());
+							currentScriptMap.get(attack).add(script);
+						}
+					}
+				case onDefend:
+				case onDefendHit:
+					if(defender != null && scriptSources.contains(defender))
+					{
+						if(!currentScriptMap.containsKey(defender)) currentScriptMap.put(defender, new ArrayList<CachedEntity>());
+						currentScriptMap.get(defender).add(script);
+					}
+				default:
+					break;
+			}
+			// Only adding to the script map if we actually have a script from the correct entity.
+			// Put will replace in the map, which is fine since it's the same instance we originally
+			// got from the map and is a constant time operation
+			if(!currentScriptMap.isEmpty()) scriptMap.put(sType, currentScriptMap);
+		}
+		return scriptMap;
 	}
 }
