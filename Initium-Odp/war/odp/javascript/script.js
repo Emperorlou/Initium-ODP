@@ -1573,14 +1573,23 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 	});
 }
 
+function doTriggerLocation(event, effectId, locationId)
+{
+	doTriggerEffect(event, "Link", effectId, "location", locationId);
+}
+
+function doTriggerItem(event, effectId, itemId)
+{
+	doTriggerEffect(event, "Link", effectId, "item", itemId);
+}
+
 function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
 {
 	closeAllTooltips();
 	
 	var params = {"scriptId": effectId };
-	params[sourceType.toLowerCase() + "Id"] = sourceId;
+	params[sourceType + "Id"] = sourceId;
 	doCommand(event, "Script"+effectType, params);
-	
 }
 
 function doAttack(eventObject, charId)
@@ -2912,7 +2921,7 @@ function mergeItemStacks(eventObject, selector)
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-	doCommand(eventObjecet, "ItemsStackMerge",{"itemIds":itemIds});
+	doCommand(eventObject, "ItemsStackMerge",{"itemIds":itemIds});
 }
 
 function splitItemStack(eventObject)
