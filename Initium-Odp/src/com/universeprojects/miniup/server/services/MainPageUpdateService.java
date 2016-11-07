@@ -43,6 +43,14 @@ public class MainPageUpdateService extends Service
 		return newHtml;
 	}
 	
+	public void setPathCache(List<CachedEntity> discoveries, List<CachedEntity> paths, List<CachedEntity> destLocations, List<Integer> pathEnds, boolean hasHiddenPaths)
+	{
+		this.discoveries = discoveries;
+		this.paths = paths;
+		this.destLocations = destLocations;
+		this.pathEnds = pathEnds;
+		this.hasHiddenPaths = hasHiddenPaths;
+	}
 	/**
 	 * This will load all the path related caches, but only if we haven't loaded them before for
 	 * this particular session.

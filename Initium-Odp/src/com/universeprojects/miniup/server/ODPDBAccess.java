@@ -719,7 +719,19 @@ public class ODPDBAccess
 
 	public Key getDefaultLocationKey()
 	{
-		return KeyFactory.createKey("Location", 5629499534213120l);
+		return (Key)getProject().getProperty("defaultSpawnLocationKey");
+	}
+
+	private CachedEntity getProject()
+	{
+		try
+		{
+			return ds.get(KeyFactory.createKey("Project", 4902705788092416L));
+		}
+		catch (EntityNotFoundException e)
+		{
+			throw new RuntimeException("Unable to find the project entity.");
+		}
 	}
 
 	public CachedEntity getLocationById(Long id)
@@ -1737,7 +1749,7 @@ public class ODPDBAccess
 	
 	public void awardBuff_Sick(CachedDatastoreService ds, CachedEntity character)
 	{
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png", "Sick",
+		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/Pixel_Art-Icons-Poison-S_Poison05.png", "Sick",
 				"You ate entirely too much candy, and now you're sick! You feel terrible, and couldn't possibly eat more candy for at least 30 minutes.",1800, "strength", "-5%", "dexterity", "-5%",
 				"intelligence", "-5%", 6);
 
@@ -1749,38 +1761,38 @@ public class ODPDBAccess
 		Double buffDouble = Math.random();
 		
 		if(buffDouble <= 0.16){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 				"That was some good candy! You feel stronger!",600,"strength","+0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.17) && (buffDouble < 0.32)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 					"That was some good candy! You feel more agile!",600,"dexterity","+0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.32) && (buffDouble < 0.48)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 					"That was some good candy! You feel smarter!",600,"Intelligence","+0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.48) && (buffDouble < 0.64)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 					"That candy was terrible! You feel weaker!",600,"strength","-0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.64) && (buffDouble < 0.80)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 					"That candy was terrible! You feel slower!",600,"strength","-0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.80) && (buffDouble < 0.96)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 					"That candy was terrible! You feel dumb!",600,"intelligence","-0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.96)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
-					"That was some good candy! You feel stronger!",600,"strength","+0.2","dexterity","+0.2","intelligence","+0.2",10);
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+					"That was some good candy! You feel great!",600,"strength","+0.2","dexterity","+0.2","intelligence","+0.2",10);
 			if (buff != null) ds.put(buff);
 		}	
 	}
@@ -3583,10 +3595,8 @@ public class ODPDBAccess
             // Check if the target is killed
             if (targetHitpoints<=0)
             {
-                // If the weapon that did the killing is "zombified" then we will turn the character into a zombie instead of killing them
-            	// Alternatively, if there was no weapon but the attacker is a zombie, we will also turn the character into a zombie
-                if ((weapon!=null && "TRUE".equals(weapon.getProperty("zombifying"))) ||
-                		(weapon==null && "Zombie".equals(sourceCharacter.getProperty("status"))))
+                // If the character who did the killing is a zombie, the target character will be turned into a zombie instead of killing them
+                if ("Zombie".equals(sourceCharacter.getProperty("status")))
                 {
                     doCharacterZombify(auth, db, sourceCharacter, targetCharacter);
                     status+=" The battle is over, you won! But the target character has been turned into a zombie!";

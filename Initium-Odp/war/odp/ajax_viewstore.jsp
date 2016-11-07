@@ -127,7 +127,7 @@
             for(CachedEntity item:items)
             {
                 String itemType = (String)item.getProperty("itemType");
-                if (itemType==null) itemType = "Other";
+                if (itemType==null || itemType.length() == 0) itemType = "Other";
                 
                 if (currentCategory.equals(itemType)==false)
                 {

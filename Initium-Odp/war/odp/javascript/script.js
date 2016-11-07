@@ -1381,7 +1381,7 @@ function pagePopup(url, closeCallback)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	
 	if (closeCallback!=null)
@@ -1575,9 +1575,12 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 
 function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
 {
+	closeAllTooltips();
+	
 	var params = {"scriptId": effectId };
 	params[sourceType.toLowerCase() + "Id"] = sourceId;
 	doCommand(event, "Script"+effectType, params);
+	
 }
 
 function doAttack(eventObject, charId)
@@ -1848,6 +1851,17 @@ function doEatBerry(eventObject)
 		if (error) return;
 		reloadPagePopup();
 		popupMessage("System Message", "That was a tasty berry! Makes you feel kinda weird though, like your insides are trying to become outsides. WOW OK, now you don't feel too good. But you understand why. You feel like you understand a lot of things.");
+	});
+}
+
+function doEatCandy(eventObject)
+{	
+	var itemId = $("#popupItemId").val();
+	if (itemId == null) return;
+	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
+		if (error) return;
+		reloadPagePopup();
+		popupMessage("System Message", "You eat the ancient candy bar and your insides gurgle back at you. You probably shouldn't eat too much of this. Who knows what could happen?");
 	});
 }
 
@@ -2888,4 +2902,27 @@ function antiBotQuestionPopup()
 		  'theme' : 'light',  // optional
 		  'callback': antiBotAnswer  // optional
 		});
+}
+
+// ///////////////////////////////////////////////////////////
+// Stack maintenance
+
+function mergeItemStacks(eventObject, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
+	if(batchItems.length == 0) return;
+	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+	doCommand(eventObjecet, "ItemsStackMerge",{"itemIds":itemIds});
+}
+
+function splitItemStack(eventObject)
+{
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
+	if(batchItems.length == 0) return;
+	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+	promptPopup("Stack Split","Enter a stack size to create:","1",function(stackSize){
+		if (stackSize!=null&&stackSize!=""){
+			doCommand(eventObject, "ItemsStackSplit",{"itemIds":itemIds, "stackSize":stackSize});
+		}
+	});
 }

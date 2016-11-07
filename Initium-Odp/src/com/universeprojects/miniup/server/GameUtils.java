@@ -980,6 +980,7 @@ public class GameUtils
     	
     	boolean hasInvalidEquipment = false;
     	
+    	
 		CachedEntity equipmentHelmet = equipment.get(0);
 		if (character.getProperty("equipmentHelmet")!=null && equipmentHelmet==null)
 		{
@@ -990,8 +991,9 @@ public class GameUtils
 		if (equipmentHelmet!=null) 
 			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty("icon"));
 
+		
 		CachedEntity equipmentChest = equipment.get(1);
-		if (character.getProperty("equipmentChest")!=null && equipmentHelmet==null)
+		if (character.getProperty("equipmentChest")!=null && equipmentChest==null)
 		{
 			hasInvalidEquipment=true;
 			character.setProperty("equipmentChest", null);
@@ -1000,8 +1002,9 @@ public class GameUtils
 		if (equipmentChest!=null)
 			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty("icon"));
 
+		
 		CachedEntity equipmentLegs = equipment.get(2);
-		if (character.getProperty("equipmentLegs")!=null && equipmentHelmet==null)
+		if (character.getProperty("equipmentLegs")!=null && equipmentLegs==null)
 		{
 			hasInvalidEquipment=true;
 			character.setProperty("equipmentLegs", null);
@@ -1010,8 +1013,9 @@ public class GameUtils
 		if (equipmentLegs!=null)
 			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty("icon"));
 
+		
 		CachedEntity equipmentBoots = equipment.get(3);
-		if (character.getProperty("equipmentBoots")!=null && equipmentHelmet==null)
+		if (character.getProperty("equipmentBoots")!=null && equipmentBoots==null)
 		{
 			hasInvalidEquipment=true;
 			character.setProperty("equipmentBoots", null);
@@ -1020,8 +1024,9 @@ public class GameUtils
 		if (equipmentBoots!=null)
 			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty("icon"));
 
+		
 		CachedEntity equipmentGloves = equipment.get(4);
-		if (character.getProperty("equipmentGloves")!=null && equipmentHelmet==null)
+		if (character.getProperty("equipmentGloves")!=null && equipmentGloves==null)
 		{
 			hasInvalidEquipment=true;
 			character.setProperty("equipmentGloves", null);
@@ -1030,8 +1035,9 @@ public class GameUtils
 		if (equipmentGloves!=null)
 			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty("icon"));
 
+		
 		CachedEntity equipmentLeftHand = equipment.get(5);
-		if (character.getProperty("equipmentLeftHand")!=null && equipmentHelmet==null)
+		if (character.getProperty("equipmentLeftHand")!=null && equipmentLeftHand==null)
 		{
 			hasInvalidEquipment=true;
 			character.setProperty("equipmentLeftHand", null);
@@ -1040,8 +1046,9 @@ public class GameUtils
 		if (equipmentLeftHand!=null)
 			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty("icon"));
 
+		
 		CachedEntity equipmentRightHand = equipment.get(6);
-		if (character.getProperty("equipmentRightHand")!=null && equipmentHelmet==null)
+		if (character.getProperty("equipmentRightHand")!=null && equipmentRightHand==null)
 		{
 			hasInvalidEquipment=true;
 			character.setProperty("equipmentRightHand", null);
@@ -1050,8 +1057,9 @@ public class GameUtils
 		if (equipmentRightHand!=null)
 			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty("icon"));
 
+		
 		CachedEntity equipmentShirt = equipment.get(7);
-		if (character.getProperty("equipmentShirt")!=null && equipmentHelmet==null)
+		if (character.getProperty("equipmentShirt")!=null && equipmentShirt==null)
 		{
 			hasInvalidEquipment=true;
 			character.setProperty("equipmentShirt", null);
