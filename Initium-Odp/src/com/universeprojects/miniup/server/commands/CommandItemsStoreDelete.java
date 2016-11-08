@@ -37,7 +37,8 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 		
 		List<Key> invItemKeys = new ArrayList<Key>();
 		for(CachedEntity storeItem:batchItems)
-			invItemKeys.add((Key)storeItem.getProperty("itemKey"));
+			if (storeItem!=null)
+				invItemKeys.add((Key)storeItem.getProperty("itemKey"));
 		
 		Map<CachedEntity, CachedEntity> storeToItemsMap = new HashMap<CachedEntity, CachedEntity>();
 		List<CachedEntity> invItems = ds.fetchEntitiesFromKeys(invItemKeys);
@@ -57,6 +58,8 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 		StringBuilder storeString = new StringBuilder();
 		for(CachedEntity storeItem:batchItems)
 		{
+			if (storeItem==null) continue;
+			
 			if (GameUtils.equals(characterKey, storeItem.getProperty("characterKey"))==false)
 				continue;
 			

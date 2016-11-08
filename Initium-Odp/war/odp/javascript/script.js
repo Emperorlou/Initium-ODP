@@ -1284,6 +1284,12 @@ function refreshInstanceRespawnWarning()
 			warning.text("Reinforcements will arrive in "+secondsElapsed(seconds)+". If you do not vacate the premises before they arrive, you will be forced out!");
 		warning.show();
 	}
+	else
+	{
+		var warning = $("#instanceRespawnWarning");
+		warning.text("");
+		warning.hide();
+	}
 }
 
 //function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
@@ -2912,7 +2918,7 @@ function mergeItemStacks(eventObject, selector)
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-	doCommand(eventObjecet, "ItemsStackMerge",{"itemIds":itemIds});
+	doCommand(eventObject, "ItemsStackMerge",{"itemIds":itemIds});
 }
 
 function splitItemStack(eventObject)

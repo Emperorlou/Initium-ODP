@@ -42,7 +42,6 @@ public class ScriptService extends Service
 	private ScriptService(ODPDBAccess db, HttpServletRequest request)
 	{
 		super(db);
-		log.setLevel(Level.ALL);
 		
 		try
 		{

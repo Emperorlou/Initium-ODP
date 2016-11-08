@@ -1,19 +1,27 @@
 package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
+import com.universeprojects.miniup.server.WebUtils;
 
 public class MainPageUpdateService extends Service
 {
+	final private CachedEntity user;
 	final private CachedEntity character;
 	final private CachedEntity location;
 	final private OperationBase operation;
+
+	private CachedEntity group = null;
 	
 	// Path related caches
 	boolean hasHiddenPaths = false;
@@ -27,10 +35,11 @@ public class MainPageUpdateService extends Service
 	 * @param db
 	 * @param operation Pass in the Command or LongOperation that wants to make use of this service.
 	 */
-	public MainPageUpdateService(ODPDBAccess db, CachedEntity character, CachedEntity location, OperationBase operation)
+	public MainPageUpdateService(ODPDBAccess db, CachedEntity user, CachedEntity character, CachedEntity location, OperationBase operation)
 	{
 		super(db);
 		this.operation = operation;
+		this.user = user;
 		this.character = character;
 		this.location = location;
 	}
@@ -41,6 +50,19 @@ public class MainPageUpdateService extends Service
 			operation.updateHtmlContents(selector, newHtml);
 		
 		return newHtml;
+	}
+
+
+	private boolean isGroupLoaded = false;
+	private CachedEntity getGroup()
+	{
+		if (isGroupLoaded==false)
+		{
+			group = db.getEntity((Key)character.getProperty("groupKey"));
+			isGroupLoaded = true;
+		}
+		
+		return group;
 	}
 	
 	public void setPathCache(List<CachedEntity> discoveries, List<CachedEntity> paths, List<CachedEntity> destLocations, List<Integer> pathEnds, boolean hasHiddenPaths)
@@ -120,7 +142,9 @@ public class MainPageUpdateService extends Service
 			// Get all discovered paths...
 			for(CachedEntity discovery:discoveries)
 			{
-				if (discovery.getProperty("kind").equals("Path"))
+				if (discovery==null) continue;	// Why would it be null I have no idea. Maybe just a race condition when deleting and this fetch took place.
+				
+				if ("Path".equals(discovery.getProperty("kind")))
 				{
 					CachedEntity path = db.getPathById(((Key)discovery.getProperty("entityKey")).getId());
 					if (path==null)
@@ -182,6 +206,7 @@ public class MainPageUpdateService extends Service
 			
 			// Now that we have a list of destLocations to load, we will load them in now and delete any that ended up being null..
 			destLocations = db.getEntities(destLocationsToLoad);
+			List<Key> entitiesToDelete = new ArrayList<Key>();
 			for(int i = destLocations.size()-1; i>=0; i--)
 			{
 				if (destLocations.get(i)==null)
@@ -189,11 +214,104 @@ public class MainPageUpdateService extends Service
 					paths.remove(i);
 					pathEnds.remove(i);
 					destLocations.remove(i);
+					// I kinda wanna delete the null destLocation from the DB but.. what if its just not there because it was only created
+					// recently? Maybe it'll show up soon? :/
 				}
 			}
 			
 		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public String getLocationBanner()
+	{
+		String banner = (String)location.getProperty("banner");
+		if (banner!=null && banner.startsWith("http")==false)
+			return "https://initium-resources.appspot.com/"+banner;
+		else
+			return banner;
+	}
+
+	public String getLocationBiome()
+	{
+		String biome = (String)location.getProperty("biomeType");
+		if (biome==null) biome = "Temperate";
+		return biome;
+	}
+	
+	public Long getInstanceRespawnTime()
+	{
+		if ("TRUE".equals(location.getProperty("instanceModeEnabled")) && location.getProperty("instanceRespawnDate")!=null)
+		{
+			Date respawnDate = (Date)location.getProperty("instanceRespawnDate");
+			return respawnDate.getTime();
+		}
+
+		return null;
+	}
+	
+	private boolean territoryCacheLoaded = false;
+	private CachedEntity territory=null;
+	private CachedEntity territoryOwningGroup=null;
+	private void loadTerritoryEntities()
+	{
+		if (territoryCacheLoaded==false)
+		{
+			
+			territory = db.getEntity((Key)location.getProperty("territoryKey"));
+			territoryOwningGroup = db.getEntity((Key)territory.getProperty("owningGroupKey"));
+			
+			territoryCacheLoaded = true;
+			
+		}
+	}
+	
+	public CachedEntity getTerritory()
+	{
+		loadTerritoryEntities();
+		
+		return territory;
+	}
+	
+	public CachedEntity getTerritoryOwningGroup()
+	{
+		loadTerritoryEntities();
+		
+		return territoryOwningGroup;
+	}
+	
+	private List<CachedEntity> partyMembers = null;
+	public List<CachedEntity> getParty()
+	{
+		if (isInParty() && partyMembers==null)
+		{
+			partyMembers = db.getParty(null, character);
+		}
+		
+		return partyMembers;
+	}
+	
+	public boolean isInParty()
+	{
+		if (character.getProperty("partyCode")!=null)
+			return true;
+		
+		return false;
+	}
+	
+	public boolean isPartyLeader()
+	{
+		return "TRUE".equals(character.getProperty("partyLeader"));
+	}
+	
+	
+	
 	
 	/**
 	 * This updates the gold amount in the header bar.
@@ -226,6 +344,8 @@ public class MainPageUpdateService extends Service
 	
 	public String updateInBannerOverlayLinks()
 	{
+		loadPathCache();
+		
 		StringBuilder newHtml = new StringBuilder();
 		for(int i = 0; i<paths.size(); i++)
 		{
@@ -274,6 +394,302 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
 	}
+
+	public String updateButtonList(CombatService cs)
+	{
+		loadPathCache();
+		
+		if (cs.isInCombat(character))
+			return updateButtonList_CombatMode();
+		else
+			return updateButtonList_NormalMode();
+	}
 	
+	private String updateButtonList_NormalMode()
+	{
+		StringBuilder newHtml = new StringBuilder();
+
+		if ("CampSite".equals(location.getProperty("type")))
+		{
+			newHtml.append("<a onclick='campsiteDefend()' class='main-button' shortcut='68' onclick='popupPermanentOverlay(\"Defending...\", \"You are looking out for threats to your camp.\")'><span class='shortcut-key'>(D)</span>Defend</a>");
+			newHtml.append("<br>");
+		}
+
+		if ("RestSite".equals(location.getProperty("type")) || "CampSite".equals(location.getProperty("type")))
+		{
+			newHtml.append("<a href='#' class='main-button' shortcut='82' onclick='doRest()'><span class='shortcut-key'>(R)</span>Rest</a>");
+			newHtml.append("<br>");
+		}
+
+		// EASTER EGG
+		if (location.getProperty("name").toString().equals("Aera Inn"))
+		{
+			newHtml.append("<a href='#' class='main-button' onclick='doDrinkBeer()'>Drink Beer</a>");
+			newHtml.append("<br>");
+		}
+
+		if (getGroup()!=null && location.getProperty("ownerKey")!=null && ((Key)location.getProperty("ownerKey")).getId() == user.getKey().getId())
+		{
+			newHtml.append("<a href='#' class='main-button' onclick='giveHouseToGroup()'>Give this property to your group</a>");
+			newHtml.append("<br>");
+		}
+		
+		if (db.isCharacterAbleToCreateCampsite(db.getDB(), character, location))
+		{
+			newHtml.append("<a href='#' class='main-button' onclick='createCampsite()'>Create a campsite here</a>");
+			newHtml.append("<br>");
+		}
+
+		if ("CityHall".equals(location.getProperty("type")))
+		{
+			newHtml.append("<a href='#' class='main-button' onclick='buyHouse(event)'>Buy a new house</a>");
+			newHtml.append("<br>");
+		}
+		
+		if (user!=null && GameUtils.equals(location.getProperty("ownerKey"), user.getKey()))
+		{
+			newHtml.append("<a onclick='renamePlayerHouse(event)' class='main-button'>Rename this house</a>");
+		}
+		
+
+		int shortcutStart = 49;
+		int shortcutNumber = 1;
+		for(int i = 0; i<paths.size(); i++)
+		{
+			CachedEntity path = paths.get(i);
+			CachedEntity destLocation = destLocations.get(i);
+			Integer pathEnd = pathEnds.get(i);
+
+			
+			
+				
+			String destLocationName = (String)destLocation.getProperty("name");
+			
+			String buttonCaption = "Head towards "+destLocationName;
+			String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
+			if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
+				buttonCaption = buttonCaptionOverride;
+			
+			Long travelTime = (Long)path.getProperty("travelTime");
+			String onclick = "";
+			if (travelTime==null || travelTime>0)
+				onclick = "onclick='popupPermanentOverlay_Walking(\""+destLocationName+"\")'";
+			
+			String shortcutPart = "";
+			String shortcutKeyIndicatorPart = "";
+			if (shortcutNumber<10)
+			{
+				shortcutPart = "shortcut='"+(shortcutStart+shortcutNumber-1)+"'";
+				shortcutKeyIndicatorPart = "<span class='shortcut-key' title='This indicates the keyboard shortcut to use to activate this button'>("+shortcutNumber+")</span>";
+				shortcutNumber++;
+			}
+
+			boolean defensiveStructureAllowed = false;
+			if ("TRUE".equals(destLocation.getProperty("defenceStructuresAllowed")))
+					defensiveStructureAllowed = true;
+
+			if ("PlayerHouse".equals(path.getProperty("type")))
+			{
+				if (user!=null && Boolean.TRUE.equals(user.getProperty("premium")))
+				{/*Simpler if logic this way*/}
+				else
+					newHtml.append("<p style='text-align:center;' title='Save this link to your house. This is a temporary workaround'>https://www.playinitium.com/ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"</p>");
+			}
+
+
+			
+
+			if ("CombatSite".equals(location.getProperty("type")))
+			{
+				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<br>");
+				newHtml.append("<a onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
+				newHtml.append("<br>");
+			}
+			else if ("CombatSite".equals(destLocation.getProperty("type")))
+				newHtml.append("<a class='main-forgetPath' onclick='forgetCombatSite("+destLocation.getKey().getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+			else if ("BlockadeSite".equals(destLocation.getProperty("type")) || defensiveStructureAllowed)
+				newHtml.append("<a href='#' class='main-button-icon' onclick='doGoto(event, "+path.getKey().getId()+", true)'><img src='https://initium-resources.appspot.com/images/ui/attack1.png' title='This button allows you to travel to this location with the intent to attack any player-made defences without a confirmation' border=0/></a><a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+			else if ("CollectionSite".equals(location.getProperty("type")))
+			{
+				newHtml.append("<br>");
+				newHtml.append("<a onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
+			}
+			// If we're looking at a player-house path, but we're not actually INSIDE the player house currently
+			else if (GameUtils.equals(location.getProperty("ownerKey"), null) && "PlayerHouse".equals(path.getProperty("type")))
+			{
+				newHtml.append("<a class='main-forgetPath' onclick='deletePlayerHouse(event, "+path.getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+			}
+			else
+				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+	//		newHtml.append("<a href='ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"' class='main-button' "+shortcutPart+"  "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+
+		}
+		
+		
+			
+
+		
+		if (hasHiddenPaths)
+		{
+			newHtml.append("<center><a href='main.jsp?showHiddenPaths=true'>Show hidden paths</a></center>");
+		}
+		
+		return updateHtmlContents("#main-button-list", newHtml.toString());
+	}
+	
+	private String updateButtonList_CombatMode()
+	{
+		StringBuilder newHtml = new StringBuilder();
+		
+		return updateHtmlContents("#main-button-list", newHtml.toString());
+		
+	}
+
+	
+	public String updateLocationJs()
+	{
+		StringBuilder newHtml = new StringBuilder();
+		
+		
+		
+		newHtml.append("var bannerUrl = '"+getLocationBanner()+"';");
+
+		newHtml.append("if (isAnimatedBannersEnabled()==false && bannerUrl.indexOf('.gif')>0)");
+		newHtml.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+		newHtml.append("else if (isBannersEnabled()==false)");
+		newHtml.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+		newHtml.append("else if (bannerUrl=='' || bannerUrl == 'null')");
+		newHtml.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+
+		newHtml.append("var serverTime = "+System.currentTimeMillis()+";");
+
+		newHtml.append("var isOutside = '"+location.getProperty("isOutside")+"';");
+	
+		if ("TRADING".equals(character.getProperty("mode")))
+			newHtml.append("$(document).ready(function(){_viewTrade();});");
+
+		
+		
+		newHtml.append("window.biome = '"+getLocationBiome()+"';");
+
+		newHtml.append("window.instanceRespawnMs = "+getInstanceRespawnTime()+";");
+		newHtml.append("if (window.instanceRespawnMs!=null)");
+		newHtml.append("{");
+		newHtml.append("	if (window.instanceRespawnWarningId!=null) clearInterval(window.instanceRespawnWarningId);");
+		newHtml.append("	refreshInstanceRespawnWarning();");
+		newHtml.append("	window.instanceRespawnWarningId = setInterval(refreshInstanceRespawnWarning, 1000);");
+		newHtml.append("}");
+		
+
+		newHtml.append("$(document).ready(updateBannerWeatherSystem);");
+		
+		return updateHtmlContents("#ajaxJs", newHtml.toString());
+	}
+	
+	public String updateActivePlayerCount()
+	{
+		return updateHtmlContents("#activePlayerCount", db.getActivePlayers()+"");
+	}
+	
+	public String updateButtonBar()
+	{
+		return updateHtmlContents("#buttonBar", HtmlComponents.generateButtonBar(character));
+	}
+
+	public String updateLocationDescription()
+	{
+		String desc = (String)location.getProperty("description");
+		if (desc==null) desc = "";
+		return updateHtmlContents("#locationDescription", desc);
+	}
+	
+	
+	public String updateLocationDirectScripts()
+	{
+		StringBuilder newHtml = new StringBuilder();
+		List<Key> scriptKeys = (List<Key>)location.getProperty("scripts");
+		if (scriptKeys!=null && scriptKeys.isEmpty()==false)
+		{
+			List<CachedEntity> directLocationScripts = db.getScriptsOfType(scriptKeys, ScriptType.directLocation);
+			if (directLocationScripts!=null && directLocationScripts.isEmpty()==false)
+			{
+				for(CachedEntity script:directLocationScripts)
+				{
+					String caption = (String)script.getProperty("caption");
+					String id = script.getId().toString();
+					String description = (String)script.getProperty("description");
+					Boolean isEnabled = (Boolean)script.getProperty("isEnabled");
+					if (isEnabled==null) isEnabled = true;
+
+					if (isEnabled)
+						newHtml.append("<a class='main-button-half' title='"+WebUtils.jsSafe(description)+"' onclick='doTriggerEffect(event, \"Link\","+id+",\"Location\","+location.getId()+")'>"+WebUtils.htmlSafe(caption)+"</a>");
+					
+				}
+			}
+		}
+		
+		return updateHtmlContents("#locationScripts", newHtml.toString());
+		
+	}
+
+	
+	public String updateTerritoryView()
+	{
+		if (location.getProperty("territoryKey")!=null)
+		{
+			return HtmlComponents.generateTerritoryView(character, getTerritoryOwningGroup(), getTerritory());
+		}
+
+		return updateHtmlContents("#locationScripts", "");
+	}
+	
+	public String updatePartyView()
+	{
+		StringBuilder newHtml = new StringBuilder();
+
+		if (isInParty())
+		{
+			newHtml.append("<div class='boldbox'>");
+			newHtml.append("<a onclick='leaveParty()' style='float:right'>Leave Party</a>");
+			newHtml.append("<h4>Your party</h4>");
+			List<CachedEntity> party = getParty();
+			if (party!=null)
+			{
+				for(CachedEntity character:party)
+				{
+					boolean isThisMemberTheLeader = false;
+					if ("TRUE".equals(character.getProperty("partyLeader")))
+						isThisMemberTheLeader = true;
+					boolean dead = false;
+					if (((Double)character.getProperty("hitpoints"))<=0)
+						dead = true;
+					newHtml.append("<div class='main-splitScreen-2columns'>");
+					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+character.getProperty("name"));
+					if (isThisMemberTheLeader)
+						newHtml.append("<div class='main-item-controls' style='top:0px;'>(Leader)</div>");
+					if (dead)
+					{
+						newHtml.append("<div class='main-item-controls' style='top:0px'>");
+						newHtml.append("<a onclick='collectDogecoinFromCharacter("+character.getKey().getId()+")'>Collect "+character.getProperty("dogecoins")+" gold</a>");
+						newHtml.append("</div>");
+					}
+					else
+					{
+						newHtml.append("<div class='main-item-controls' style='top:0px'>");
+						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
+						if (isThisMemberTheLeader == false && isPartyLeader())
+							newHtml.append("<a onclick='doSetLeader(event, "+character.getKey().getId()+")'>Make Leader</a>");
+						newHtml.append("</div>");
+					}
+					newHtml.append("</a>");
+					newHtml.append("</div>");
+				}
+			}
+			newHtml.append("</div>");
+		}
+		
+		return updateHtmlContents("#partyPanel", newHtml.toString());
+	}
 	
 }

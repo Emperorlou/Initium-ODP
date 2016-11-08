@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -4145,13 +4146,16 @@ public class ODPDBAccess
 					setCharacterMode(null, attackingCharacter, ODPDBAccess.CHARACTER_MODE_NORMAL);
 					attackingCharacter.setProperty("combatant", null);
 					attackingCharacter.setProperty("combatType", null);
-			
+					attackingCharacter.setProperty("locationEntryDatetime", new Date());
+	
 					
 					////////////////////////
 					// Now, depending on if the killed character is an NPC or not, and if the killer is an NPC or not, do some stuff...
 			
 					
-					
+					// First, always set the timestamp
+					characterToDie.setProperty("locationEntryDatetime", new Date());
+
 					
 					// If the attacker is a PC
 					if (attackingCharacter.getProperty("type")==null || "".equals(attackingCharacter.getProperty("type")) || "PC".equals(attackingCharacter.getProperty("type")))
@@ -4375,6 +4379,13 @@ public class ODPDBAccess
 		
 		if (loot.equals(""))
 			loot = null;
+		
+		
+		// Finally, lets update the character that was passed into this method so further processing will have
+		// the updated field values
+		GameUtils.copyFieldValues(characterToDie, characterToDieFinal);
+		GameUtils.copyFieldValues(attackingCharacter, attackingCharacterFinal);
+		
 		return loot;
 	}
 	
@@ -4624,6 +4635,108 @@ public class ODPDBAccess
 	}
 	
 
+	public boolean isCharacterAbleToCreateCampsite(CachedDatastoreService ds, CachedEntity character, CachedEntity location)
+	{
+		if ((Long)location.getProperty("supportsCamps")==null || (Long)location.getProperty("supportsCamps")==0)
+			return false;
 
+		// Now check if the location has a monster count of less than 25%. If so, allow them to create a camp.
+//		Double monsterCount = getMonsterCountForLocation(ds, location);
+//		Double maxMonsterCount = (Double)location.getProperty("maxMonsterCount");
+//		if (maxMonsterCount==null)
+//			return true;
+//		if (monsterCount/maxMonsterCount>0.25d)
+//			return false;
+		
+		return true;
+		
+	}
+
+	
+	public long getActivePlayers()
+	{
+		CachedDatastoreService ds = getDB();
+		
+		Long count = ds.getStat("ActivePlayerCount");
+		if (count==null)
+		{
+			GregorianCalendar cal = new GregorianCalendar();
+			cal.add(Calendar.MINUTE, -10);
+			count = getFilteredList_Count("Character", "locationEntryDatetime", FilterOperator.GREATER_THAN, cal.getTime()).longValue();
+			ds.setStat("ActivePlayerCount", count, 300);
+		}
+		
+		return count;
+	}
+
+	public List<CachedEntity> getActivePlayers(int minutesSinceLastActivity)
+	{
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.add(Calendar.MINUTE, minutesSinceLastActivity*-1);
+		return getFilteredList("Character", "locationEntryDatetime", FilterOperator.GREATER_THAN, cal.getTime());
+	}
+
+	/**
+	 * Returns the list of users in a group that have been active within the last given minutes.
+	 * 
+	 * @param group
+	 * @param minutesSinceLastActivity
+	 * @return
+	 */
+	public List<CachedEntity> getActiveGroupPlayers(CachedEntity group, List<CachedEntity> groupMembers, int minutesSinceLastActivity)
+	{
+		
+		if (groupMembers==null)
+			groupMembers = getGroupMembers(null, group);
+		else
+			groupMembers = (ArrayList<CachedEntity>)((ArrayList<CachedEntity>)groupMembers).clone();	// lol
+			
+		
+		// GO through the members list and pull out all the applications into a new list
+		for (int i = groupMembers.size() - 1; i >= 0; i--)
+			if ("Applied".equals(groupMembers.get(i).getProperty("groupStatus"))) 
+				groupMembers.remove(i);
+
+		
+		
+		// filter out any members that are not within the last activity range we want...
+		for(int i = groupMembers.size()-1; i>=0; i--)
+		{
+			CachedEntity member = groupMembers.get(i);
+			Date lastAction = (Date)member.getProperty("locationEntryDatetime");
+			Date currentDate = new Date();
+			
+			if (lastAction==null || (lastAction.getTime()<currentDate.getTime()-(minutesSinceLastActivity*60*1000)))
+				groupMembers.remove(i);
+		}
+			
+		
+		// Now pull out all the user keys so we can fetch them all at once
+		Set<Key> usersToFetch = new HashSet<Key>();
+		for(CachedEntity member:groupMembers)
+		{
+			Key userKey = (Key)member.getProperty("userKey");
+			
+			if (userKey!=null)
+				usersToFetch.add(userKey);
+		}
+		List<CachedEntity> users = getDB().get(usersToFetch);
+		
+		
+		// Now go through each of the users in the group and remove non-premium members
+		for(int i = users.size()-1; i>=0; i--)
+		{
+			CachedEntity user = users.get(i);
+			
+			if (GameUtils.equals(user.getProperty("premium"), true)==false)
+				users.remove(i);
+		}
+		
+		return users;
+	}
+
+	
+	
+	
 
 }

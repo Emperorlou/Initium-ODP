@@ -37,7 +37,7 @@
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=51">
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=52">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="javascript/rangeslider/rangeslider.min.js"></script>

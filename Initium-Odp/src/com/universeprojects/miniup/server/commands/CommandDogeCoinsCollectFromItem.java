@@ -62,7 +62,7 @@ public class CommandDogeCoinsCollectFromItem extends Command {
 		ds.put(item);
 		ds.put(character);
 		
-		MainPageUpdateService service = new MainPageUpdateService(db,character, null, this);
+		MainPageUpdateService service = new MainPageUpdateService(db,db.getCurrentUser(), character, null, this);
 		service.updateMoney();
 	}
 

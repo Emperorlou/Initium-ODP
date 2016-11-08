@@ -44,7 +44,7 @@ public class CommandTradeReady extends Command {
     		String complete = "complete";
     		addCallbackData("tradeComplete",complete);
     		
-    		MainPageUpdateService service = new MainPageUpdateService(db, character, null, this);
+    		MainPageUpdateService service = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
     		service.updateMoney();
     		
     	}

@@ -124,6 +124,15 @@
 			return 1000;
 		}
 	});
+	
+	
+	// Get the number of members of this group that were active in the past 3 hours
+	int activeUsersPast3Hours = db.getActiveGroupPlayers(group, members, 60*3).size();
+	request.setAttribute("activeUsersPast3Hours", activeUsersPast3Hours);
+	
+	// Get the number that were active in the past week
+	int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
+	request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
 %>
 
 <div class='main-banner-textonly' style='height:240px; background-color:rgba(0,0,0,0.5)'>
@@ -135,6 +144,10 @@
 			<c:out value="${groupDescription}" />
 		</p>
 	</div>
+</div>
+
+<div class='paragraph'>
+	<span style='font-size:24px'>${activeUsersPast3Hours}</span> group members have been active in the past 3 hours and <span style='font-size:24px'>${activeUsersPastWeek}</span> group members have been active in the past week. 
 </div>
 
 <c:if test="${groupStatus=='Admin' && inThisGroup}">

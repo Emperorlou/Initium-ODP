@@ -29,7 +29,6 @@ public class NPCArmyService extends Service
 		this.npcArmyKey = npcArmy.getKey();
 		this.npcArmy = npcArmy;
 		
-		log.setLevel(Level.FINEST);
 	}
 	
 	public String getUniqueId()

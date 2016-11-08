@@ -64,7 +64,7 @@ public class CommandDogeCoinsCollectFromCharacter extends Command {
 		ds.put(collectFromCharacter);
 		ds.put(character);
 		
-		MainPageUpdateService service = new MainPageUpdateService(db, character, null, this);
+		MainPageUpdateService service = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		service.updateMoney();
 	}
 

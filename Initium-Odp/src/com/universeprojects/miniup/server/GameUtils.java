@@ -1894,4 +1894,22 @@ public class GameUtils
 		else
 			return "https://initium-resources.appspot.com/"+relativeUrl;
 	}
+
+	/**
+	 * Copies all the field values from one entity over to another making 
+	 * sure that the field values on both entities are exactly the same with no extra fields left over.
+	 * 
+	 * @param characterToDie
+	 * @param characterToDieFinal
+	 */
+	public static void copyFieldValues(CachedEntity from, CachedEntity to)
+	{
+		// First, remove all field values from "to"
+		for(String key:to.getProperties().keySet())
+			to.removeProperty(key);
+		
+		// Now copy all the properties from "from", to "to"
+		for(String key:from.getProperties().keySet())
+			to.setProperty(key, from.getProperty(key));
+	}
 }

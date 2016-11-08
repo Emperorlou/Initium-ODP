@@ -56,4 +56,12 @@ public class CombatService extends Service
 		
 		db.sendNotification(ds, defender.getKey(), NotificationType.fullpageRefresh);
 	}
+
+	public boolean isInCombat(CachedEntity character)
+	{
+		if ("COMBAT".equals(character.getProperty("mode")))
+			return true;
+		else
+			return false;
+	}
 }

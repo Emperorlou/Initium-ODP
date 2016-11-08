@@ -66,7 +66,7 @@ public class CommandDogeCoinsDepositToItem extends Command {
 		ds.put(character);
 		ds.put(item);
 		
-		MainPageUpdateService service = new MainPageUpdateService(db, character, null, this);
+		MainPageUpdateService service = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		service.updateMoney();
 	}
 
