@@ -23,7 +23,7 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 	@Override
 	protected void processBatchItems(Map<String, String> parameters, ODPDBAccess db, CachedDatastoreService ds,
 			CachedEntity character, List<CachedEntity> batchItems) throws UserErrorMessage {
-		long splitItemQuantity;
+		Long splitItemQuantity;
 		if (batchItems.size() > 1) {
 			throw new UserErrorMessage("You can only split one item at a time.");
 		}
@@ -34,10 +34,9 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 		if (!splitItem.hasProperty("quantity")) {
 			throw new UserErrorMessage("You can only split stackable items.");
 		}
-		if (splitItem.getProperty("quantity")==null){
+		splitItemQuantity = (Long) splitItem.getProperty("quantity");
+		if (splitItemQuantity==null){
 			throw new UserErrorMessage("You can only split stackable items.");
-		} else {
-			splitItemQuantity = (long) splitItem.getProperty("quantity");
 		}
 		if (splitItemQuantity < 2) {
 			throw new UserErrorMessage("You can only split stacks of two or more items.");
