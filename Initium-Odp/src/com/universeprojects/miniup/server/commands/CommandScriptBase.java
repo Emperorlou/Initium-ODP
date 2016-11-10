@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -57,6 +59,7 @@ public abstract class CommandScriptBase extends Command {
 		//// SECURITY CHECKS
 		@SuppressWarnings("unchecked")
 		List<Key> sourceScriptKeys = (List<Key>)entitySource.getProperty("scripts");
+		if(sourceScriptKeys == null) sourceScriptKeys = new ArrayList<Key>();
 		for(Key scriptKey:sourceScriptKeys)
 		{
 			if (GameUtils.equals(scriptId, scriptKey.getId()))
@@ -75,18 +78,15 @@ public abstract class CommandScriptBase extends Command {
 			case("Character"):
 			{
 				if (GameUtils.equals(entityKey, character.getKey())==false)
-				{
 					throw new UserErrorMessage("You are not allowed to trigger others");
-				}
+				break;
 			}
 			case("Item"):
 			{
 				// ...by being close enough to the item OR having it in their pocket
 				Key itemContainerKey = (Key)entitySource.getProperty("containerKey");
 				if (itemContainerKey==null || GameUtils.equals(character.getKey(), itemContainerKey)==false)
-				{
 					throw new UserErrorMessage("You can only trigger items in your posession!");
-				}
 				break;
 			}
 			case("Location"):
@@ -95,6 +95,7 @@ public abstract class CommandScriptBase extends Command {
 				
 				if(cs.checkContainerAccessAllowed(character, entitySource)==false)
 					throw new UserErrorMessage("You are not located at the specified trigger location!");
+				break;
 			}
 			default:
 			{

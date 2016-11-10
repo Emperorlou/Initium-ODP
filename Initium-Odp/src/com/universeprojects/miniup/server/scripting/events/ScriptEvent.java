@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
@@ -61,12 +62,12 @@ public abstract class ScriptEvent
 	/**
 	 * Used to indicate to the ODP which objects need to be pushed back to the DB.
 	 */
-	public List<EntityWrapper> saveEntities = new ArrayList<EntityWrapper>();
+	public Map<Key, EntityWrapper> saveEntities = new HashMap<Key, EntityWrapper>();
 	
 	/**
 	 * Used to indicate to the ODP which objects need to be deleted from the DB.
 	 */
-	public List<EntityWrapper> deleteEntities = new ArrayList<EntityWrapper>();
+	public Map<Key, EntityWrapper> deleteEntities = new HashMap<Key, EntityWrapper>();
 	
 	/**
 	 * Indicates the event type we're dealing with. Simply used for sanity purposes,
@@ -78,10 +79,10 @@ public abstract class ScriptEvent
 	/**
 	 * Resets all return data to initial state. For event reuse. Does NOT clear out attributes.
 	 */
-	protected void reset()
+	public void reset()
 	{
-		this.descriptionText = null;
-		this.errorText = null;
+		this.descriptionText = "";
+		this.errorText = "";
 		this.haltExecution = false;
 		this.saveEntities.clear();
 		this.deleteEntities.clear();
@@ -120,10 +121,10 @@ public abstract class ScriptEvent
 		ScriptService.log.log(Level.ALL, "SaveEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
-			if(!saveEntities.contains(entity)) 
+			if(!saveEntities.containsKey(entity.wrappedEntity.getKey())) 
 			{
-				ScriptService.log.log(Level.ALL, "Saving " + entity.getKind() + ":"+ entity.getName() + " entity.");
-				saveEntities.add(entity);
+				ScriptService.log.log(Level.ALL, "Saving " + entity.getKind() + ":"+ entity.wrappedEntity.getId() + " entity.");
+				saveEntities.put(entity.wrappedEntity.getKey(), entity);
 			}
 		}
 	}
@@ -136,26 +137,31 @@ public abstract class ScriptEvent
 	public Iterable<CachedEntity> getSaveEntities()
 	{
 		return new Iterable<CachedEntity>()
-		{
-			public Iterator<CachedEntity> iterator()
-			{
-				return new Iterator<CachedEntity>() {
-					private Iterator<EntityWrapper> wrappers = saveEntities.iterator();
+				{
+					public Iterator<CachedEntity> iterator()
+					{
+						return new Iterator<CachedEntity>() {
+							private Iterator<EntityWrapper> wrappers = saveEntities.values().iterator();
 
-					public boolean hasNext() {
-						return wrappers.hasNext();
-					}
+							public boolean hasNext() {
+								return wrappers.hasNext();
+							}
 
-					public CachedEntity next() {
-						return wrappers.next().wrappedEntity;
-					}
+							public CachedEntity next() {
+								return wrappers.next().wrappedEntity;
+							}
 
-					public void remove() {
-						wrappers.remove();
+							public void remove() {
+								wrappers.remove();
+							}
+						};
 					}
 				};
-			}
-		};
+	}
+	
+	public Iterable<EntityWrapper> getSaveWrappers()
+	{
+		return saveEntities.values();
 	}
 	
 	/**
@@ -167,10 +173,10 @@ public abstract class ScriptEvent
 		ScriptService.log.log(Level.ALL, "DeleteEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
-			if(!saveEntities.contains(entity)) 
+			if(!deleteEntities.containsKey(entity.wrappedEntity.getKey())) 
 			{
-				ScriptService.log.log(Level.ALL, "Deleting " + entity.getKind() + ":"+ entity.getName() + " entity.");
-				saveEntities.add(entity);
+				ScriptService.log.log(Level.ALL, "Deleting " + entity.getKind() + ":"+ entity.wrappedEntity.getId() + " entity.");
+				deleteEntities.put(entity.wrappedEntity.getKey(), entity);
 			}
 		}
 	}
@@ -187,7 +193,7 @@ public abstract class ScriptEvent
 			public Iterator<CachedEntity> iterator()
 			{
 				return new Iterator<CachedEntity>() {
-					private Iterator<EntityWrapper> wrappers = deleteEntities.iterator();
+					private Iterator<EntityWrapper> wrappers = deleteEntities.values().iterator();
 
 					public boolean hasNext() {
 						return wrappers.hasNext();
@@ -203,5 +209,10 @@ public abstract class ScriptEvent
 				};
 			}
 		};
+	}
+	
+	public Iterable<EntityWrapper> getDeleteWrappers()
+	{
+		return deleteEntities.values();
 	}
 }
