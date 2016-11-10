@@ -891,6 +891,7 @@ function shareItem(itemId)
 
 function viewGroup(groupId)
 {
+	closeAllTooltips();
 	pagePopup("odp/ajax_group.jsp?groupId=" + groupId);
 }
 
