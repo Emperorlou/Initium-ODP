@@ -53,6 +53,26 @@ public abstract class OperationBase
 	}
 	
 	/**
+	 * When the command returns to the browser, the script that has the given elementId 
+	 * will be deleted and the then a new script tag will be added to the page with the given javascript.
+	 * The new javascript <script> tag will also have the same id as the one deleted.
+	 * 
+	 * 
+	 * @param jquerySelector
+	 * @param newHtml
+	 */
+	public void updateJavascript(String elementId, String newJavascript)
+	{
+		Map<String,String> htmlData = new HashMap<String,String>();
+		
+		htmlData.put("type", "4");
+		htmlData.put("id", elementId);
+		htmlData.put("js", newJavascript);
+		
+		htmlUpdates.add(htmlData);
+	}
+	
+	/**
 	 * When the command returns to the browser, the page will then find the first element 
 	 * that matches the given jquerySelector and will insert the given htmlContents before.
 	 * 

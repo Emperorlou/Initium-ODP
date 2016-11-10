@@ -52,6 +52,14 @@ public class MainPageUpdateService extends Service
 		return newHtml;
 	}
 
+	private String updateJavascript(String id, String js)
+	{
+		if (operation!=null)
+			operation.updateJavascript(id, js);
+		
+		return js;
+	}
+
 
 	private boolean isGroupLoaded = false;
 	private CachedEntity getGroup()
@@ -327,6 +335,11 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#mainGoldIndicator", goldFormatted);
 	}
 	
+	public String updateLocationName()
+	{
+		return updateHtmlContents("#locationName", (String)location.getProperty("name"));
+	}
+	
 	/**
 	 * This updates the html in the character widget that is in the top left corner of the banner.
 	 * 
@@ -409,6 +422,12 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder newHtml = new StringBuilder();
 
+		newHtml.append("<a class='main-button-icon' href='#' shortcut='87' onclick='doExplore(true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
+		newHtml.append("<a href='#' class='main-button' shortcut='69' onclick='doExplore(false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
+					
+		newHtml.append("<br>");
+		
+		
 		if ("CampSite".equals(location.getProperty("type")))
 		{
 			newHtml.append("<a onclick='campsiteDefend()' class='main-button' shortcut='68' onclick='popupPermanentOverlay(\"Defending...\", \"You are looking out for threats to your camp.\")'><span class='shortcut-key'>(D)</span>Defend</a>");
@@ -526,7 +545,8 @@ public class MainPageUpdateService extends Service
 
 		}
 		
-		
+		if (location.getProperty("defenceStructure")!=null)
+			newHtml.append("<a onclick='attackStructure()' shortcut='65' class='main-button'><span class='shortcut-key'>(A)</span>Attack this structure's defenders</a>");
 			
 
 		
@@ -549,42 +569,45 @@ public class MainPageUpdateService extends Service
 	
 	public String updateLocationJs()
 	{
-		StringBuilder newHtml = new StringBuilder();
+		StringBuilder js = new StringBuilder();
 		
 		
 		
-		newHtml.append("var bannerUrl = '"+getLocationBanner()+"';");
+		js.append("var bannerUrl = '"+getLocationBanner()+"';");
 
-		newHtml.append("if (isAnimatedBannersEnabled()==false && bannerUrl.indexOf('.gif')>0)");
-		newHtml.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
-		newHtml.append("else if (isBannersEnabled()==false)");
-		newHtml.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
-		newHtml.append("else if (bannerUrl=='' || bannerUrl == 'null')");
-		newHtml.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+		js.append("if (isAnimatedBannersEnabled()==false && bannerUrl.indexOf('.gif')>0)");
+		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+		js.append("else if (isBannersEnabled()==false)");
+		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+		js.append("else if (bannerUrl=='' || bannerUrl == 'null')");
+		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
 
-		newHtml.append("var serverTime = "+System.currentTimeMillis()+";");
+		js.append("var serverTime = "+System.currentTimeMillis()+";");
 
-		newHtml.append("var isOutside = '"+location.getProperty("isOutside")+"';");
+		js.append("var isOutside = '"+location.getProperty("isOutside")+"';");
 	
 		if ("TRADING".equals(character.getProperty("mode")))
-			newHtml.append("$(document).ready(function(){_viewTrade();});");
+			js.append("$(document).ready(function(){_viewTrade();});");
 
 		
 		
-		newHtml.append("window.biome = '"+getLocationBiome()+"';");
+		js.append("window.biome = '"+getLocationBiome()+"';");
 
-		newHtml.append("window.instanceRespawnMs = "+getInstanceRespawnTime()+";");
-		newHtml.append("if (window.instanceRespawnMs!=null)");
-		newHtml.append("{");
-		newHtml.append("	if (window.instanceRespawnWarningId!=null) clearInterval(window.instanceRespawnWarningId);");
-		newHtml.append("	refreshInstanceRespawnWarning();");
-		newHtml.append("	window.instanceRespawnWarningId = setInterval(refreshInstanceRespawnWarning, 1000);");
-		newHtml.append("}");
+		js.append("window.instanceRespawnMs = "+getInstanceRespawnTime()+";");
+		js.append("if (window.instanceRespawnMs!=null)");
+		js.append("{");
+		js.append("	if (window.instanceRespawnWarningId!=null) clearInterval(window.instanceRespawnWarningId);");
+		js.append("	refreshInstanceRespawnWarning();");
+		js.append("	window.instanceRespawnWarningId = setInterval(refreshInstanceRespawnWarning, 1000);");
+		js.append("}");
 		
 
-		newHtml.append("$(document).ready(updateBannerWeatherSystem);");
+		// Remove the walking man stuff
+		js.append("$('#banner-base').html('');");
 		
-		return updateHtmlContents("#ajaxJs", newHtml.toString());
+		js.append("$(document).ready(updateBannerWeatherSystem);");
+		
+		return updateJavascript("ajaxJs", js.toString());
 	}
 	
 	public String updateActivePlayerCount()

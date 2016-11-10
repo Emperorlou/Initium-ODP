@@ -1993,6 +1993,11 @@ function ajaxUpdatePage(ajaxResponseData)
 			{
 				$(htmlData.selector).last().after(htmlData.html);
 			}
+			else if (htmlData.type==4)
+			{
+				$("#"+htmlData.id).remove();
+				$("body").append("<script id='"+htmlData.id+"' type='text/javascript'>"+htmlData.js+"</script>");
+			}
 		}
 	}
 }
@@ -2210,6 +2215,10 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 			fullpageRefresh();
 			return;
 		}
+		if (data.userMessage!=null)
+		{
+			popupMessage("System Message", data.userMessage, false);
+		}
 		if (responseFunction!=null)
 			responseFunction(data);
 		
@@ -2278,7 +2287,7 @@ function doGoto(event, pathId, attack)
 			{
 				if (action.isComplete)
 				{
-					fullpageRefresh();
+					//fullpageRefresh();
 				}
 				else
 				{

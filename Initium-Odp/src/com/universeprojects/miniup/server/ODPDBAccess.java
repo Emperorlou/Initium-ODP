@@ -3255,9 +3255,9 @@ public class ODPDBAccess
 	 * @param path
 	 * @throws UserErrorMessage
 	 */
-	public void doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
+	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
 	{
-		doCharacterTakePath(db, character, path, false);
+		return doCharacterTakePath(db, character, path, false);
 	}
 	
 	/**
@@ -3269,9 +3269,9 @@ public class ODPDBAccess
 	 * @param allowAttack
 	 * @throws UserErrorMessage
 	 */
-	public void doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
+	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
 	{
-		return;
+		return null;
 	}
 	
 

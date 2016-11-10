@@ -1556,6 +1556,7 @@ hr.items-separator {
 	color:#FFFFFF;
 	z-index:1000;
 	display:inline-block;
+	image-rendering: auto;
 }
 
 .character-display-box a

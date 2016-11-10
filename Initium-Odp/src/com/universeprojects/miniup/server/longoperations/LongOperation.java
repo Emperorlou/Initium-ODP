@@ -33,6 +33,7 @@ public abstract class LongOperation extends OperationBase
 	CachedDatastoreService ds;
 	private Map<String,String> parameters;
 	private String userMessage = null;
+	private boolean fullRefresh = false;
 	
 	public LongOperation(ODPDBAccess db, Map<String, String[]> requestParameters) throws UserErrorMessage
 	{
@@ -153,6 +154,16 @@ public abstract class LongOperation extends OperationBase
 		this.userMessage = message;
 	}
 	
+	/**
+	 * If true, when the request is returned, the page will refresh.
+	 * 
+	 * @param value
+	 */
+	public void setFullRefresh(boolean value)
+	{
+		this.fullRefresh = value;
+	}
+	
 	
 	abstract int doBegin(Map<String, String> parameters) throws UserErrorMessage;
 	
@@ -174,6 +185,8 @@ public abstract class LongOperation extends OperationBase
 		result.put("timeLeft", timeLeft);
 		result.put("isComplete", isComplete());
 		result.put("responseHtml", getHtmlUpdates());
+		
+		result.put("refresh", fullRefresh);
 		
 		
 		return result;
