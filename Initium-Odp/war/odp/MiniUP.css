@@ -704,6 +704,10 @@ a.main-highlight:HOVER
 	max-height:34px;
 	display:inline-block;
 }
+.main-item-quantity-indicator-container
+{
+	position:relative;
+}
 .main-item-quantity-indicator
 {
 	position: absolute;

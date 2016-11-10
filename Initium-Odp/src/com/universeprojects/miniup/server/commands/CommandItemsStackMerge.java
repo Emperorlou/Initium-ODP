@@ -88,6 +88,8 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 			for (CachedEntity deleteEntity : needsDelete) {
 				ds.delete(deleteEntity);
 			}
+			
+			ds.commit();
 		} finally {
 			ds.rollbackIfActive();
 		}
