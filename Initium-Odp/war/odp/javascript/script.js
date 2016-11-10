@@ -1580,14 +1580,23 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 	});
 }
 
+function doTriggerLocation(event, effectId, locationId)
+{
+	doTriggerEffect(event, "Link", effectId, "location", locationId);
+}
+
+function doTriggerItem(event, effectId, itemId)
+{
+	doTriggerEffect(event, "Link", effectId, "item", itemId);
+}
+
 function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
 {
 	closeAllTooltips();
 	
 	var params = {"scriptId": effectId };
-	params[sourceType.toLowerCase() + "Id"] = sourceId;
+	params[sourceType + "Id"] = sourceId;
 	doCommand(event, "Script"+effectType, params);
-	
 }
 
 function doAttack(eventObject, charId)

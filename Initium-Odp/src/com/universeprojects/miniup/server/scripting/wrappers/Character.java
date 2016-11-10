@@ -1,13 +1,20 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Level;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ScriptService;
 
@@ -18,9 +25,81 @@ import com.universeprojects.miniup.server.services.ScriptService;
  */
 public class Character extends EntityWrapper 
 {
+	private List<Item> inventory = null;
+	private Map<String, List<Item>> namedInventory = null;
+	private Map<Key, Item> keyedInventory = null;
+	private Map<String, Item> equippedInventory = null;
+	
 	public Character(CachedEntity character, ODPDBAccess db) 
 	{
 		super(character, db);
+	}
+	
+	private List<Item> getInventory()
+	{
+		if(inventory == null)
+		{
+			populateInventory();
+		}
+		return inventory;
+	}
+	
+	private Map<String, List<Item>> getNamedInventory()
+	{
+		if(namedInventory == null)
+		{
+			populateInventory();
+		}
+		return namedInventory;
+	}
+	
+	private Map<Key, Item> getKeyedInventory()
+	{
+		if(keyedInventory == null)
+		{
+			populateInventory();
+		}
+		return keyedInventory;
+	}
+	
+	private Map<String, Item> getEquippedInventory()
+	{
+		if(equippedInventory == null)
+		{
+			populateInventory();
+		}
+		return equippedInventory;
+	}
+	
+	private void populateInventory()
+	{
+		inventory = new ArrayList<Item>();
+		namedInventory = new HashMap<String, List<Item>>();
+		keyedInventory = new HashMap<Key, Item>();
+		equippedInventory = new HashMap<String, Item>();
+		
+		Map<Key, String> equipKeys = new HashMap<Key, String>();
+		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
+		{
+			Key equipSlot = (Key)wrappedEntity.getProperty("equipment" + slot);
+			if(equipSlot != null)
+				equipKeys.put(equipSlot, slot);
+		}
+			
+		List<CachedEntity> items = db.getFilteredList("Item", "containerKey", this.getKey());
+		for(CachedEntity item:items)
+		{
+			if(item != null)
+			{
+				Item newItem = new Item(item, db);
+				String itemName = newItem.getName();
+				if(!namedInventory.containsKey(itemName)) namedInventory.put(itemName, new ArrayList<Item>());
+				namedInventory.get(itemName).add(newItem);
+				keyedInventory.put(newItem.getKey(), newItem);
+				if(equipKeys.containsKey(item.getKey()))
+					equippedInventory.put(equipKeys.get(item.getKey()), newItem);
+			}
+		}
 	}
 
 	public boolean isMode(String mode) {
@@ -33,7 +112,13 @@ public class Character extends EntityWrapper
 
 	public Long addDogecoins(Long dogecoins) throws UserErrorMessage 
 	{
+		return addDogecoins(dogecoins, false);
+	}
+	
+	public Long addDogecoins(Long dogecoins, boolean takeLast) throws UserErrorMessage 
+	{
 		Long curCoins = (Long)this.getProperty("dogecoins") + dogecoins;
+		if(takeLast && curCoins < 0) curCoins = 0L;
 		if(curCoins < 0) 
 			throw new UserErrorMessage("Character does not have enough coins!");
 		this.setProperty("dogecoins", curCoins);
@@ -101,25 +186,12 @@ public class Character extends EntityWrapper
 	
 	public Buff addBuff(String buffDefName)
 	{
-		// Get the BuffDef from the ODP. We will use that to create a new Buff, associate
-		// it with the current character, then return back the Buff for save (since
-		// we don't save in Script context).
-		List<CachedEntity> buffDefs = db.getFilteredList("BuffDef", "name", buffDefName);
-		if(buffDefs.size() > 1)
-		{
-			// D'oh! Log it, return back null. name should be unique.
-			ScriptService.log.log(Level.WARNING, "BuffDef name not unique: " + buffDefName);
-			return null;
-		}
-		
-		// There should only be 1. If not, it will fall through and return a null value. 
-		for(CachedEntity def:buffDefs)
-		{
-			CachedEntity newBuff = db.generateNewObject(def, "Buff");
-			newBuff.setProperty("parentKey", this.getKey());
-			return new Buff(newBuff, db, this); 
-		}
-		ScriptService.log.log(Level.INFO, "BuffDef name not found: " + buffDefName);
+		ScriptService.log.log(Level.FINE, "Adding BuffDef by name: " + buffDefName);
+		CachedEntity newBuff = db.awardBuffByDef(buffDefName, this.getKey());
+		if(newBuff != null)
+			return new Buff(newBuff, db, this);
+		else
+			ScriptService.log.log(Level.SEVERE, "Unable to create buff via BuffDef: " + buffDefName);
 		return null;
 	}
 	
@@ -130,23 +202,86 @@ public class Character extends EntityWrapper
 		return new Buff(newBuff, db, this);
 	}
 	
-	public String getType() {
+	public String getType() 
+	{
 		return (String) this.getProperty("type");
 	}
 
-	public String getMode() {
+	public String getMode() 
+	{
 		return (String) this.getProperty("mode");
 	}
 
-	public void setMode(String mode) {
-		this.setProperty("mode", mode);
+	public boolean setMode(String mode) 
+	{
+		if(GameUtils.enumContains(CharacterMode.class, mode, false))
+		{
+			this.setProperty("mode", mode);
+			return true;
+		}
+		return false;
+	}
+	
+	public Location getLocation()
+	{
+		Key locKey = getLocationKey();
+		CachedEntity location = db.getEntity(locKey);
+		return new Location(location, db);
+	}
+	
+	/**
+	 * Sets the characters location to new specific location entity.
+	 * @param newLocation Location WrappedEntity object. Will likely get this from core class
+	 * @return Boolean indicating whether the character's location was changed
+	 */
+	public boolean setLocation(Location newLocation)
+	{
+		// TODO: Validate new location, or provide overload to force new location.
+		// Reasons to force: teleportation, phasing, trap doors, etc.
+		setLocationKey(newLocation.getKey());
+		return true;
 	}
 
 	public Key getLocationKey() {
 		return (Key) this.getProperty("locationKey");
 	}
 
-	public void setLocationKey(Key locationKey) {
+	public boolean setLocationKey(Key locationKey) {
+		CachedEntity location = db.getEntity(locationKey);
+		if(location == null) return false;
 		this.setProperty("locationKey", locationKey);
+		return true;
 	}
+	
+	public boolean setLocationID(Long locationId)
+	{
+		Key locKey = KeyFactory.createKey("Location", locationId);
+		return setLocationKey(locKey);
+	}
+	
+	public List<Item> findInInventory(String itemName)
+	{
+		Map<String, List<Item>> invMap = getNamedInventory();
+		if(invMap.containsKey(itemName))
+			return invMap.get(itemName);
+		return new ArrayList<Item>();
+	}
+	
+	public boolean isItemEquipped(Item checkItem)
+	{
+		Map<String, Item> equipItems = getEquippedInventory();
+		return equipItems.containsKey(checkItem.getKey());
+	}
+	
+	public boolean isItemEquippedByName(String itemName)
+	{
+		Map<String, Item> equipItems = getEquippedInventory();
+		for(Item item:equipItems.values())
+		{
+			if(item.getName().equalsIgnoreCase(itemName))
+				return true;
+		}
+		return false;
+	}
+	
 }

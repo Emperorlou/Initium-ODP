@@ -6,6 +6,7 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
  * Scripting engine wrapper for the Item CachedEntity.
@@ -14,42 +15,51 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  */
 public class Item extends EntityWrapper
 {
+	public boolean destroyed = true;
+	protected EntityWrapper containerEntity;
+	
 	public Item(CachedEntity item, ODPDBAccess db)
 	{
 		super(item, db);
+	}
+	
+	public Item(CachedEntity item, ODPDBAccess db, EntityWrapper container)
+	{
+		super(item, db);
+		containerEntity = container;
+	}
+	
+	public EntityWrapper container()
+	{
+		if(this.containerEntity == null)
+		{
+			CachedEntity parEnt = db.getEntity((Key)this.getProperty("containerKey"));
+			if(parEnt != null)
+				containerEntity = ScriptService.wrapEntity(parEnt, db);
+		}
+		return this.containerEntity;
 	}
 
 	public Key getContainerKey() {
 		return (Key) this.getProperty("containerKey");
 	}
-
-	public void moveItem(EntityWrapper currentCharacter, EntityWrapper newContainer) throws UserErrorMessage 
+	
+	public Long getDurability()
 	{
-		db.doMoveItem(null, currentCharacter.wrappedEntity, this.wrappedEntity, newContainer.wrappedEntity);
+		return (Long)this.getProperty("durability");
 	}
 	
-	public boolean hasCharges()
+	public Long getMaxDurability()
 	{
-		return getCharges() > 0;
+		return (Long)this.getProperty("maxDurability");
 	}
 	
-	public int getCharges()
+	public Long adjustDurability(long addDura)
 	{
-		return wrappedEntity.hasProperty("charges") ? (int)this.getProperty("charges") : -1;
-	}
-	
-	public void setCharges(int numCharges)
-	{
-		this.setProperty("charges", numCharges);
-	}
-	
-	public int adjustCharges(int numCharges)
-	{
-		int newCharges = getCharges();
-		if(newCharges == -1)
-			return -1;
-		newCharges += numCharges;
-		this.setProperty("charges", numCharges);
-		return newCharges;
+		long newDura = getDurability();
+		newDura += addDura;
+		this.setProperty("charges", Math.min(newDura, getMaxDurability()));
+		destroyed = newDura < 0;
+		return newDura;
 	}
 }

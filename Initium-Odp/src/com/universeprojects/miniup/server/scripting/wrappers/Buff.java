@@ -10,7 +10,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 public class Buff extends EntityWrapper {
-	public EntityWrapper parentEntity;
+	protected EntityWrapper parentEntity;
 	public Buff(CachedEntity entity, ODPDBAccess db) {
 		super(entity, db);
 		// TODO Auto-generated constructor stub
