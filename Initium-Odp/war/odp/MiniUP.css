@@ -707,6 +707,7 @@ a.main-highlight:HOVER
 .main-item-quantity-indicator-container
 {
 	position:relative;
+	z-index:1;
 }
 .main-item-quantity-indicator
 {

@@ -646,7 +646,7 @@ public class MainPageUpdateService extends Service
 					if (isEnabled==null) isEnabled = true;
 
 					if (isEnabled)
-						newHtml.append("<a class='main-button-half' title='"+WebUtils.jsSafe(description)+"' onclick='doTriggerEffect(event, \"Link\","+id+",\"Location\","+location.getId()+")'>"+WebUtils.htmlSafe(caption)+"</a>");
+						newHtml.append("<a class='main-button-half' title='"+WebUtils.jsSafe(description)+"' onclick='doTriggerLocation(event, "+id+", "+location.getId()+")'>"+WebUtils.htmlSafe(caption)+"</a>");
 					
 				}
 			}

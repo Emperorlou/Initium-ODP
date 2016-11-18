@@ -38,6 +38,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
+import com.universeprojects.miniup.server.services.ContainerService;
 
 public class ODPDBAccess
 {
@@ -1401,7 +1402,7 @@ public class ODPDBAccess
 
 		// Check if the character can actually carry something else or if its
 		// all too heavy...
-		Long newItemWeight = (Long) item.getProperty("weight");
+		Long newItemWeight = getItemWeight(item);
 		if (newItemWeight != null && newItemWeight > 0d)
 		{
 			long carrying = getCharacterCarryingWeight(character);
@@ -1511,105 +1512,6 @@ public class ODPDBAccess
 	}
 	
 
-	public Long getItemCarryingSpace(CachedEntity item)
-	{
-		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", item.getKey());
-		return getItemCarryingSpace(item, inventory);
-	}
-
-	public Long getItemCarryingWeight(CachedEntity item)
-	{
-		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", item.getKey());
-		return getItemCarryingWeight(item, inventory);
-	}
-
-	public Long getCharacterCarryingWeight(CachedEntity character)
-	{
-		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", character.getKey());
-		List<CachedEntity> inventoryCharacters = getFilteredList("Character", "locationKey", character.getKey());
-		return getCharacterCarryingWeight(character, inventory, inventoryCharacters);
-	}
-
-	public Long getCharacterCarryingWeight(CachedEntity character, List<CachedEntity> inventory, List<CachedEntity> inventoryCharacters)
-	{
-		long carrying = 0l;
-
-		for (CachedEntity item : inventory)
-		{
-			Long itemWeight = (Long) item.getProperty("weight");
-			if (itemWeight == null) continue;
-			// If the item is equipped (not in the left/right hand) then don't
-			// count it's weight against us
-			if ("LeftHand".equals(item.getProperty("equipSlot")) == false && "RightHand".equals(item.getProperty("equipSlot")) == false && "2Hands".equals(item.getProperty("equipSlot")) == false
-					&& checkCharacterHasItemEquipped(character, item.getKey())) continue;
-
-			carrying += itemWeight;
-		}
-
-		for (CachedEntity c : inventoryCharacters)
-		{
-			Long weight = getCharacterWeight(c);
-
-			carrying += weight;
-		}
-
-		return carrying;
-	}
-
-	public long getCharacterMaxCarryingWeight(CachedEntity character)
-	{
-		long maxCarryWeight = 60000;
-		Double str = (Double) character.getProperty("strength");
-
-		maxCarryWeight += (long) Math.round((str - 3d) * 50000d);
-		
-		// Allow Buff maxCarryWeight
-		return getLongBuffableValue(character, "maxCarryWeight", maxCarryWeight);
-	}
-
-	public Long getItemCarryingWeight(CachedEntity character, List<CachedEntity> inventory)
-	{
-		long carrying = 0l;
-
-		for (CachedEntity item : inventory)
-		{
-			Long itemWeight = (Long) item.getProperty("weight");
-			if (itemWeight == null) continue;
-
-			carrying += itemWeight;
-		}
-
-		// for(CachedEntity c:inventoryCharacters)
-		// {
-		// Long weight = getCharacterWeight(c);
-		//
-		// carrying+=weight;
-		// }
-
-		return carrying;
-	}
-
-	public Long getItemCarryingSpace(CachedEntity character, List<CachedEntity> inventory)
-	{
-		long space = 0l;
-
-		for (CachedEntity item : inventory)
-		{
-			Long itemWeight = (Long) item.getProperty("space");
-			if (itemWeight == null) continue;
-
-			space += itemWeight;
-		}
-
-		// for(CachedEntity c:inventoryCharacters)
-		// {
-		// Long weight = getCharacterWeight(c);
-		//
-		// carrying+=weight;
-		// }
-
-		return space;
-	}
 
 	public CachedEntity awardBuff(CachedDatastoreService ds, Key parentKey, String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
 			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
@@ -2067,163 +1969,176 @@ public class ODPDBAccess
 
 	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
 	{
-		if (ds == null) ds = getDB();
+		if (ds==null)
+			ds = getDB();
+		
+		if (GameUtils.equals(item.getKey(), newContainer.getKey()))
+			throw new UserErrorMessage("lol, you cannot transfer an item into itself, the universe would explode.");
 
-		if (GameUtils.equals(item.getKey(), newContainer.getKey())) throw new UserErrorMessage("lol, you cannot transfer an item into itself, the universe would explode.");
-
-		if (checkCharacterHasItemEquipped(character, item.getKey())) throw new UserErrorMessage("Your character has this item equipped. You cannot move it until it is unequipped.");
-
+		if (checkCharacterHasItemEquipped(character, item.getKey()))
+			throw new UserErrorMessage("Your character has this item equipped. You cannot move it until it is unequipped.");
+		
 		if (checkItemIsVending(character.getKey(), item.getKey()))
 			throw new UserErrorMessage("The item you are trying to drop is currently in your store. You cannot move an item that you plan on selling.");
-
-		String startKind = ((Key) item.getProperty("containerKey")).getKind();
+		
+		CachedEntity startContainer = getEntity((Key)item.getProperty("containerKey"));
+		String startKind = startContainer.getKind();
 		String endKind = newContainer.getKey().getKind();
 
+		ContainerService cs = new ContainerService(this);
+		
+		if (cs.checkContainerAccessAllowed(character, startContainer)==false)
+			throw new UserErrorMessage("Hey!");
+		if (cs.checkContainerAccessAllowed(character, newContainer)==false)
+			throw new UserErrorMessage("Hey!");
+		
+		
 		boolean handled = false;
 
 		if (startKind.equals("Character"))
 		{
+			
 			if (endKind.equals("Location"))
 			{
 				handled = true;
-				// Make sure we're holding the item that we wish to move to the
-				// ground
-				if (GameUtils.equals(item.getProperty("containerKey"), character.getKey()) == false) throw new UserErrorMessage("You do not have possession of this item and so you cannot move it.");
-
-				// Items can only be moved into locations if the character is
-				// currently in said location
-				if (character.getProperty("locationKey").equals(newContainer.getKey()) == false)
+				// Make sure we're holding the item that we wish to move to the ground
+				if (GameUtils.equals(item.getProperty("containerKey"), character.getKey())==false)
+					throw new UserErrorMessage("You do not have possession of this item and so you cannot move it.");
+				
+				// Items can only be moved into locations if the character is currently in said location
+				if (character.getProperty("locationKey").equals(newContainer.getKey())==false)
 					throw new UserErrorMessage("You are not standing in the same location as the location you wish to move the item to. You cannot do this.");
-
+				
 			}
 			else if (endKind.equals("Item"))
 			{
 				handled = true;
-				// Make sure the container we're moving to is either in our
-				// inventory or in our location...
-				if (GameUtils.equals(newContainer.getProperty("containerKey"), character.getKey()) == false
-						&& GameUtils.equals(newContainer.getProperty("containerKey"), character.getProperty("locationKey")) == false)
+				// Make sure the container we're moving to is either in our inventory or in our location...
+				if (GameUtils.equals(newContainer.getProperty("containerKey"), character.getKey())==false && GameUtils.equals(newContainer.getProperty("containerKey"), character.getProperty("locationKey"))==false)
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
 
-				// Check if the container is already in a container, and if the
-				// item we're transferring is a container. We don't want to
-				// allow that depth.
-				if (item.getProperty("maxWeight") != null)
+
+				// Check if the container is already in a container, and if the item we're transferring is a container. We don't want to allow that depth.
+				if (item.getProperty("maxWeight")!=null)
 				{
-					if (((Key) newContainer.getProperty("containerKey")).getKind().equals("Item"))
+					if (((Key)newContainer.getProperty("containerKey")).getKind().equals("Item"))
 						throw new UserErrorMessage("You cannot put a container within a container within a container. We cannot allow that depth of containering because efficiency.");
 				}
-
-				// Make sure we can actually put things into this item
-				// container...
-				Long maxWeight = (Long) newContainer.getProperty("maxWeight");
-				Long maxSpace = (Long) newContainer.getProperty("maxSpace");
-				if (maxWeight == null || maxSpace == null) throw new UserErrorMessage("This item cannot contain other items.");
-
-				Long itemWeight = (Long) item.getProperty("weight");
-				Long itemSpace = (Long) item.getProperty("space");
-				if (itemWeight == null) itemWeight = 0L;
-				if (itemSpace == null) itemSpace = 0L;
-
+				
+				// Make sure we can actually put things into this item container...
+				Long maxWeight = (Long)newContainer.getProperty("maxWeight");
+				Long maxSpace = (Long)newContainer.getProperty("maxSpace");
+				if (maxWeight==null || maxSpace==null)
+					throw new UserErrorMessage("This item cannot contain other items.");
+				
+				Long itemWeight = getItemWeight(item);
+				Long itemSpace = (Long)item.getProperty("space");
+				if (itemWeight==null) itemWeight = 0L;
+				if (itemSpace==null) itemSpace = 0L;
+				
 				List<CachedEntity> containerInventory = getItemContentsFor(newContainer.getKey());
-
+				
 				Long containerCarryingWeight = getItemCarryingWeight(newContainer, containerInventory);
 				Long containerCarryingSpace = getItemCarryingSpace(newContainer, containerInventory);
-
-				if (containerCarryingWeight + itemWeight > maxWeight) throw new UserErrorMessage("The container cannot accept this item. It the item is too heavy.");
-
-				if (containerCarryingSpace + itemSpace > maxSpace) throw new UserErrorMessage("This item will not fit. There is not enough space.");
-
+				
+				if (containerCarryingWeight+itemWeight>maxWeight)
+					throw new UserErrorMessage("The container cannot accept this item. It the item is too heavy.");
+				
+				if (containerCarryingSpace+itemSpace>maxSpace)
+					throw new UserErrorMessage("This item will not fit. There is not enough space.");
+				
+				// Now we'll reduce the durability of the container
+				if (itemWeight>=1000)
+					cs.doUse(ds, newContainer, 1);
+				if (newContainer.isUnsaved())
+					ds.put(newContainer);
 			}
 			else if (endKind.equals("Character"))
 			{
 				throw new UserErrorMessage("Characters cannot currently put items into other characters except through trade.");
 			}
-
+			
 		}
 		else if (startKind.equals("Location"))
 		{
 			if ("Character".equals(newContainer.getKind()))
 			{
 				handled = true;
-				// Items can only be picked up from locations if the character
-				// is currently in said location
-				if (GameUtils.equals(character.getProperty("locationKey"), item.getProperty("containerKey")) == false)
+				// Items can only be picked up from locations if the character is currently in said location
+				if (GameUtils.equals(character.getProperty("locationKey"), item.getProperty("containerKey"))==false)
 					throw new UserErrorMessage("You are not near this item, you cannot pick it up.");
-
-				// Check if the character can actually carry something else or
-				// if its all too heavy...
-				Long itemWeight = (Long) item.getProperty("weight");
-				if (itemWeight == null) itemWeight = 0L;
-				// If the item has a maxWeight, we will treat it as a container
-				// and include it's contents in the weight calculation..
-				if (item.getProperty("maxWeight") != null)
+				
+				// Check if the character can actually carry something else or if its all too heavy...
+				Long itemWeight = getItemWeight(item);
+				if (itemWeight==null) itemWeight = 0L;
+				// If the item has a maxWeight, we will treat it as a container and include it's contents in the weight calculation..
+				if (item.getProperty("maxWeight")!=null)
 				{
 					Long itemCarryingWeight = getItemCarryingWeight(item);
-					itemWeight += itemCarryingWeight;
+					itemWeight+=itemCarryingWeight;
 				}
-
-				if (itemWeight > 0L)
+				
+				if (itemWeight>0L)
 				{
 					long carrying = getCharacterCarryingWeight(character);
 					long maxCarrying = getCharacterMaxCarryingWeight(character);
-
-					if (carrying + itemWeight > maxCarrying)
-						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying " + GameUtils.formatNumber(carrying) + " grams and can carry a maximum of "
-								+ GameUtils.formatNumber(maxCarrying) + " grams.");
+					
+					if (carrying+itemWeight>maxCarrying)
+						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying "+GameUtils.formatNumber(carrying)+" grams and can carry a maximum of "+GameUtils.formatNumber(maxCarrying)+" grams.");
 				}
-
+				
 			}
-
+			
 		}
 		else if (startKind.equals("Item"))
 		{
 			if ("Character".equals(newContainer.getKind()))
 			{
 				handled = true;
-
-				Key oldContainerKey = (Key) item.getProperty("containerKey");
+				
+				Key oldContainerKey = (Key)item.getProperty("containerKey");
 				CachedEntity oldContainer = getEntity(oldContainerKey);
-
+				
 				CachedEntity characterPickingUp = newContainer;
-
-				// Items can only be picked up from item-containers if the
-				// character is currently in the same location as said container
+				
+				// Items can only be picked up from item-containers if the character is currently in the same location as said container
 				// OR if the container is in the character's inventory
-				if (GameUtils.equals(characterPickingUp.getProperty("locationKey"), oldContainer.getProperty("containerKey")) == false
-						&& GameUtils.equals(characterPickingUp.getKey(), oldContainer.getProperty("containerKey")) == false)
+				if (GameUtils.equals(characterPickingUp.getProperty("locationKey"), oldContainer.getProperty("containerKey"))==false && 
+						GameUtils.equals(characterPickingUp.getKey(), oldContainer.getProperty("containerKey"))==false)
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
-
-				// Check if the character can actually carry something else or
-				// if its all too heavy...
-				Long itemWeight = (Long) item.getProperty("weight");
-				if (itemWeight == null) itemWeight = 0L;
-				// If the item has a maxWeight, we will treat it as a container
-				// and include it's contents in the weight calculation..
-				if (item.getProperty("maxWeight") != null)
+				
+				// Check if the character can actually carry something else or if its all too heavy...
+				Long itemWeight = getItemWeight(item);
+				if (itemWeight==null) itemWeight = 0L;
+				// If the item has a maxWeight, we will treat it as a container and include it's contents in the weight calculation..
+				if (item.getProperty("maxWeight")!=null)
 				{
 					Long itemCarryingWeight = getItemCarryingWeight(item);
-					itemWeight += itemCarryingWeight;
+					itemWeight+=itemCarryingWeight;
 				}
-
-				if (itemWeight > 0L)
+				
+				if (itemWeight>0L)
 				{
 					long carrying = getCharacterCarryingWeight(character);
 					long maxCarrying = getCharacterMaxCarryingWeight(character);
-
-					if (carrying + itemWeight > maxCarrying)
-						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying " + GameUtils.formatNumber(carrying) + " grams and can carry a maximum of "
-								+ GameUtils.formatNumber(maxCarrying) + " grams.");
+					
+					if (carrying+itemWeight>maxCarrying)
+						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying "+GameUtils.formatNumber(carrying)+" grams and can carry a maximum of "+GameUtils.formatNumber(maxCarrying)+" grams.");
 				}
-
+				
 			}
 		}
+		
+		
+		
+		if (handled==false)
+			throw new UserErrorMessage("Unable to move this item. It is probably no longer there. Try hitting the refresh button at the top of this popup?");
 
-		if (handled == false) throw new IllegalArgumentException("Unhandled situation. Staring = " + startKind + ", Ending = " + endKind);
-
+		
+		
 		item.setProperty("containerKey", newContainer.getKey());
 		item.setProperty("movedTimestamp", new Date());
-
+		
 		ds.put(item);
 	}
 	
@@ -3651,7 +3566,7 @@ public class ODPDBAccess
 		Object result = 0d;
 		if (weapon!=null && weapon.getProperty("weaponDamage")!=null && weapon.getProperty("weaponDamage").toString().trim().equals("")==false)
 		{
-		    result = solveAction("Attack with Weapon", weapon);
+		    result = solveProperty("Attack with Weapon", weapon, "weaponDamage");
 		    if (result==null)
 		        throw new RuntimeException("'Attack with Weapon' failed to solve.");
 		}
@@ -3796,9 +3711,8 @@ public class ODPDBAccess
 	 * @param weapon
 	 * @return
 	 */
-	public Object solveAction(String string, CachedEntity weapon)
+	public Object solveProperty(String string, CachedEntity weapon, String fieldName)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -4639,5 +4553,107 @@ public class ODPDBAccess
 	
 	
 	
+	public Long getItemCarryingSpace(CachedEntity item)
+	{
+		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", item.getKey());
+		return getItemCarryingSpace(item, inventory);
+	}
+
+	public Long getItemCarryingWeight(CachedEntity item)
+	{
+		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", item.getKey());
+		return getItemCarryingWeight(item, inventory);
+	}
+	
+	
+	public Long getCharacterCarryingWeight(CachedEntity character)
+	{
+		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", character.getKey());
+		List<CachedEntity> inventoryCharacters = getFilteredList("Character", "locationKey", character.getKey());
+		return getCharacterCarryingWeight(character, inventory, inventoryCharacters);
+	}
+	
+	
+	public Long getCharacterCarryingWeight(CachedEntity character, List<CachedEntity> inventory, List<CachedEntity> inventoryCharacters)
+	{
+		long carrying = 0l;
+		
+		for(CachedEntity item:inventory)
+		{
+			Long weight = getItemWeight(item);
+			
+			if (weight==0L)
+				continue;
+			
+			// If the item is equipped (not in the left/right hand) then don't count it's weight against us
+			if ("LeftHand".equals(item.getProperty("equipSlot"))==false && 
+					"RightHand".equals(item.getProperty("equipSlot"))==false && 
+					"2Hands".equals(item.getProperty("equipSlot"))==false && 
+					checkCharacterHasItemEquipped(character, item.getKey()))
+				continue;
+			
+			carrying+=weight;
+		}
+
+		for(CachedEntity c:inventoryCharacters)
+		{
+			Long weight = getCharacterWeight(c);
+			
+			carrying+=weight;
+		}
+		
+		return carrying;
+	}
+	
+	public long getCharacterMaxCarryingWeight(CachedEntity character)
+	{
+		long maxCarryWeight = 60000;
+		Double str = (Double)character.getProperty("strength");
+		
+		maxCarryWeight += (long)Math.round((str-3d)*50000d);
+		
+		
+		return maxCarryWeight;
+	}
+	
+	public Long getItemCarryingWeight(CachedEntity character, List<CachedEntity> inventory)
+	{
+		long carrying = 0l;
+		
+		for(CachedEntity item:inventory)
+		{
+			carrying+=getItemWeight(item);
+		}
+
+		
+		return carrying;
+	}
+	
+	public Long getItemCarryingSpace(CachedEntity character, List<CachedEntity> inventory)
+	{
+		long space = 0l;
+		
+		for(CachedEntity item:inventory)
+		{
+			Long itemSpace = (Long)item.getProperty("space");
+			if (itemSpace==null)
+				continue;
+			
+			space+=itemSpace;
+		}
+
+		
+		return space;
+	}
+
+	public Long getItemWeight(CachedEntity item)
+	{
+		Long itemQuantity = (Long)item.getProperty("quantity");
+		if (itemQuantity==null) itemQuantity = 1L;
+		Long itemWeight = (Long)item.getProperty("weight");
+		if (itemWeight==null) itemWeight = 0L;
+		
+		return itemWeight*itemQuantity;
+	}
 
 }

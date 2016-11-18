@@ -899,6 +899,8 @@ public class GameUtils
 		else if (iconUrl!=null && iconUrl.startsWith("http")==false)
 			iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
 		
+		
+		
 		Long quantity = (Long)item.getProperty("quantity");
 		String quantityDiv = "";
 		if (quantity!=null){
@@ -995,7 +997,7 @@ public class GameUtils
 		}
 		String equipmentHelmetUrl = null;
 		if (equipmentHelmet!=null) 
-			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty("icon"));
+			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty(GameUtils.getItemIconToUseFor("equipmentHelmet", equipmentHelmet)));
 
 		
 		CachedEntity equipmentChest = equipment.get(1);
@@ -1006,7 +1008,7 @@ public class GameUtils
 		}
 		String equipmentChestUrl = null;
 		if (equipmentChest!=null)
-			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty("icon"));
+			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty(GameUtils.getItemIconToUseFor("equipmentChest", equipmentChest)));
 
 		
 		CachedEntity equipmentLegs = equipment.get(2);
@@ -1017,7 +1019,7 @@ public class GameUtils
 		}
 		String equipmentLegsUrl = null;
 		if (equipmentLegs!=null)
-			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty("icon"));
+			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty(GameUtils.getItemIconToUseFor("equipmentLegs", equipmentLegs)));
 
 		
 		CachedEntity equipmentBoots = equipment.get(3);
@@ -1028,7 +1030,7 @@ public class GameUtils
 		}
 		String equipmentBootsUrl = null;
 		if (equipmentBoots!=null)
-			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty("icon"));
+			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty(GameUtils.getItemIconToUseFor("equipmentBoots", equipmentBoots)));
 
 		
 		CachedEntity equipmentGloves = equipment.get(4);
@@ -1039,7 +1041,7 @@ public class GameUtils
 		}
 		String equipmentGlovesUrl = null;
 		if (equipmentGloves!=null)
-			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty("icon"));
+			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty(GameUtils.getItemIconToUseFor("equipmentGloves", equipmentGloves)));
 
 		
 		CachedEntity equipmentLeftHand = equipment.get(5);
@@ -1050,7 +1052,7 @@ public class GameUtils
 		}
 		String equipmentLeftHandUrl = null;
 		if (equipmentLeftHand!=null)
-			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty("icon"));
+			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty(GameUtils.getItemIconToUseFor("equipmentLeftHand", equipmentLeftHand)));
 
 		
 		CachedEntity equipmentRightHand = equipment.get(6);
@@ -1061,7 +1063,7 @@ public class GameUtils
 		}
 		String equipmentRightHandUrl = null;
 		if (equipmentRightHand!=null)
-			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty("icon"));
+			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", equipmentRightHand)));
 
 		
 		CachedEntity equipmentShirt = equipment.get(7);
@@ -1072,7 +1074,7 @@ public class GameUtils
 		}
 		String equipmentShirtUrl = null;
 		if (equipmentShirt!=null)
-			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty("icon"));
+			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty(GameUtils.getItemIconToUseFor("equipmentShirt", equipmentShirt)));
 
 		
 		// This is a workaround for the fact that sometimes equipment stays equipped after it has been deleted
@@ -1257,7 +1259,7 @@ public class GameUtils
 				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
 				for(CachedEntity buff:buffs)
 				{
-					sb.append("<img src='"+"https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'>");
+					sb.append("<img src='"+""+GameUtils.getResourceUrl(buff.getProperty("icon"))+"' border='0'>");
 				}
 				sb.append("</div>");
 				
@@ -1275,6 +1277,49 @@ public class GameUtils
 		
 		return sb.toString();
     }
+
+    public static String getItemIconToUseFor(String equipmentSlot, CachedEntity itemInSlot)
+    {
+    	// If we only have 1 icon specified anyway, we'll just return that
+    	if (itemInSlot.getProperty("icon2")==null)
+    		return "icon";
+
+    	
+    	equipmentSlot = equipmentSlot.substring(9);
+    	
+		String equipSlotRaw = (String)itemInSlot.getProperty("equipSlot");
+
+		if (equipSlotRaw==null)
+			return "icon";
+		
+		equipSlotRaw = equipSlotRaw.replace(" and ", ",");
+		if (equipSlotRaw.equals("Ring"))
+			equipSlotRaw = "LeftRing, RightRing";
+
+		
+		
+		String[] equipSlots = equipSlotRaw.split(",");
+		
+		int i = 1; 
+		for(String slot:equipSlots)
+		{
+			slot = slot.trim();
+			if (equipmentSlot.equals(slot))
+			{
+				String iconToUse = "icon"+i;
+				if (itemInSlot.getProperty(iconToUse)!=null)
+					return iconToUse;
+				else
+					return "icon";
+			}
+				
+			i++;
+		}
+    	
+		return "icon";
+    }
+    
+    
     
     public static String renderBuffsList(List<CachedEntity> buffs)
     {
