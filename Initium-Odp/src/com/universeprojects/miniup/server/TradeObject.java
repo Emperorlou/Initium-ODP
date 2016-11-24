@@ -83,7 +83,7 @@ public class TradeObject implements Serializable
 		
 		TradeObject tradeObject = null;
 		if (character.getProperty("combatant")!=null)
-			tradeObject = (TradeObject)ds.getSaferMemcacheValue(constructKey(character.getKey(), (Key)character.getProperty("combatant")), numberOfMemcacheBackups);
+			tradeObject = (TradeObject)ds.getMC().get(constructKey(character.getKey(), (Key)character.getProperty("combatant")));
 		
 		// If the tradeObject is null at this point, we gotta fix the character's mode...
 		if (tradeObject==null || tradeObject.isCancelled() || tradeObject.isComplete())
@@ -159,13 +159,13 @@ public class TradeObject implements Serializable
 	
 		version++;
 		
-		ds.setSaferMemcacheValue(constructedKey, this, numberOfMemcacheBackups);
+		ds.getMC().put(constructedKey, this);
 	}
 	
 	private void cancel(CachedDatastoreService ds)
 	{
 		tradeCancelled = true;
-		ds.setSaferMemcacheValue(constructedKey, this, numberOfMemcacheBackups);
+		ds.getMC().put(constructedKey, this);
 	}
 	
 	
@@ -316,7 +316,7 @@ public class TradeObject implements Serializable
 			throw new IllegalArgumentException("Character part of this trade object.");
 
 		// I have to manually save changes here so that the ready doesn't get unchecked.
-		ds.setSaferMemcacheValue(constructedKey, this, numberOfMemcacheBackups);
+		ds.getMC().put(constructedKey, this);
 	}
 	
 	public boolean isReady(CachedDatastoreService ds, CachedEntity character)

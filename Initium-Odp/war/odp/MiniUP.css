@@ -1209,6 +1209,11 @@ hr.items-separator {
 	border-bottom: 1px solid #CCCCCC;	
 }
 
+.chat_tab_button_container
+{
+	position:relative;
+}
+
 .chat_tab
 {
 	display:inline-block; padding:3px; padding-right:7px; padding-left:7px; border-right: 1px solid #CCCCCC;
@@ -2664,7 +2669,7 @@ body
 
 .chat-button-indicator
 {
-	visibility:hidden;
+	display:none;
 	z-index:1;
 	position:absolute;
 	
@@ -2678,8 +2683,8 @@ body
 	border-bottom:1px solid #BA0303;
 	border-right:1px solid #BA0303;
 	
-	top:-5px;
-	right:-8px;
+	top:-12px;
+	right:0px;
 
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 9px;

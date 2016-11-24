@@ -61,7 +61,7 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 			long newStackSize = splitItemQuantity - stackSize;
 
 			CachedEntity newItemStack = new CachedEntity(splitItem.getKind());
-			GameUtils.copyFieldValues(splitItem, newItemStack);
+			CachedDatastoreService.copyFieldValues(splitItem, newItemStack);
 			splitItem.setProperty("quantity", stackSize);
 			ds.put(splitItem);
 			newItemStack.setProperty("quantity", newStackSize);

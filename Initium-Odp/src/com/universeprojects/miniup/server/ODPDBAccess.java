@@ -33,6 +33,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheService.IdentifiableValue;
 import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
+import com.sun.org.apache.bcel.internal.classfile.CodeException;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -980,8 +981,11 @@ public class ODPDBAccess
 	{
 		if (db == null) db = getDB();
 
-		CachedEntity oldDiscovery = getDiscoveryByEntity(character.getKey(), entity.getKey());
-		if (oldDiscovery != null) return oldDiscovery;
+		if (entity.getKey().isComplete())
+		{
+			CachedEntity oldDiscovery = getDiscoveryByEntity(character.getKey(), entity.getKey());
+			if (oldDiscovery != null) return oldDiscovery;
+		}
 
 		if (entity.getKind().equals("Path"))
 		{
@@ -1239,92 +1243,115 @@ public class ODPDBAccess
 
 	public void doCharacterEquipEntity(CachedDatastoreService db, CachedEntity character, CachedEntity equipment) throws UserErrorMessage
 	{
-		doCharacterEquipEntity(db, character, equipment, true);
+		doCharacterEquipEntity(db, character, equipment, true, false);
 	}
 
-	public void doCharacterEquipEntity(CachedDatastoreService db, CachedEntity character, CachedEntity equipment, boolean replaceItem) throws UserErrorMessage
+	public void doCharacterEquipEntity(CachedDatastoreService db, CachedEntity character, CachedEntity equipment, boolean replaceItem, boolean skipSaleCheck) throws UserErrorMessage
 	{
-		if (db == null) db = getDB();
+		if (db==null)
+			db = getDB();
 
-		// Get all the equip slots that this item can fit into and decide which
-		// one to use
-		String equipSlotRaw = (String) equipment.getProperty("equipSlot");
+		// Get all the equip slots that this item can fit into and decide which one to use
+		String equipSlotRaw = (String)equipment.getProperty("equipSlot");
+		
+		if (equipSlotRaw==null)
+			throw new UserErrorMessage("This item not equipable.");
+		
+		if (equipSlotRaw.equals("Ring"))
+			equipSlotRaw = "LeftRing, RightRing";
+		
 		equipSlotRaw = equipSlotRaw.trim();
-		if (equipSlotRaw.endsWith(",")) equipSlotRaw = equipSlotRaw.substring(0, equipSlotRaw.length() - 1);
+		if (equipSlotRaw.endsWith(","))
+			equipSlotRaw = equipSlotRaw.substring(0, equipSlotRaw.length()-1);
 		String[] equipSlotArr = equipSlotRaw.split(",");
-
+		
 		String destinationSlot = null;
-		if (equipSlotArr.length == 0)
-			throw new RuntimeException("No equip slots exist for the '" + equipment.getProperty("name") + "' item.");
-		else if (equipSlotArr.length == 1)
+		if (equipSlotArr.length==0)
+			throw new RuntimeException("No equip slots exist for the '"+equipment.getProperty("name")+"' item.");
+		else if (equipSlotArr.length==1)
 			destinationSlot = equipSlotArr[0];
-		else if (equipSlotArr.length > 1)
+		else if (equipSlotArr.length>1)
 		{
-			for (int i = 0; i < equipSlotArr.length; i++)
+			for(int i = 0; i<equipSlotArr.length; i++)
 			{
-				if (character.getProperty("equipment" + equipSlotArr[i]) == null)
+				if (character.getProperty("equipment"+equipSlotArr[i])==null)
 				{
 					destinationSlot = equipSlotArr[i];
 					break;
 				}
 			}
-
-			if (destinationSlot == null) throw new UserErrorMessage("The equipment slots needed to equip this item are all used. Unequip something first.");
+			
+			if (destinationSlot==null)
+				throw new UserErrorMessage("The equipment slots needed to equip this item are all used. Unequip something first.");
 		}
+		
+		if (destinationSlot==null)
+			throw new RuntimeException("There was no equipSlot specified for this item: "+equipment);
+		
+		
+		if (character==null)
+			throw new IllegalArgumentException("Character cannot be null.");
+		if (equipment==null)
+			throw new IllegalArgumentException("Equipment cannot be null.");
+		if (destinationSlot==null)
+			throw new IllegalArgumentException("destinationSlot cannot be null.");
 
-		if (destinationSlot == null) throw new RuntimeException("There was no equipSlot specified for this item: " + equipment);
-
-		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
-		if (equipment == null) throw new IllegalArgumentException("Equipment cannot be null.");
-		if (destinationSlot == null) throw new IllegalArgumentException("destinationSlot cannot be null.");
-
-		if (character.getKey().equals(equipment.getProperty("containerKey")) == false) throw new IllegalArgumentException("The piece of equipment is not in the character's posession.");
-
+		if (character.getKey().equals(equipment.getProperty("containerKey"))==false)
+			throw new IllegalArgumentException("The piece of equipment is not in the character's posession. Character: "+character.getKey());
+		
+		
 		destinationSlot = destinationSlot.trim(); // Clean it up, just in case
+		
+		String equipmentSlot = (String)equipment.getProperty("equipSlot");
+		if (equipmentSlot==null)
+			throw new UserErrorMessage("You cannot equip this item.");
+//		if (destinationSlot.contains(equipmentSlot)==false)
+//			throw new CodeException("You cannot put a "+equipmentSlot+" item in the "+destinationSlot+" slot.");
 
-		String equipmentSlot = (String) equipment.getProperty("equipSlot");
-		if (equipmentSlot == null) throw new UserErrorMessage("You cannot equip this item.");
-		if (equipmentSlot.contains(destinationSlot) == false) throw new RuntimeException("You cannot put a " + equipmentSlot + " item in the " + destinationSlot + " slot.");
-
-		Double characterStrength = (Double) character.getProperty("strength");
+		Double characterStrength = (Double)character.getProperty("strength");
 		// ROund character strength just like it is rounded for the popup
 		characterStrength = Double.parseDouble(GameUtils.formatNumber(characterStrength));
-		if (equipment.getProperty("strengthRequirement") instanceof String) equipment.setProperty("strengthRequirement", null);
-		Double strengthRequirement = (Double) equipment.getProperty("strengthRequirement");
-		if (strengthRequirement != null && characterStrength != null && strengthRequirement > characterStrength && "NPC".equals(character.getProperty("type")) == false)
+		if (equipment.getProperty("strengthRequirement") instanceof String)
+			equipment.setProperty("strengthRequirement", null);
+		Double strengthRequirement = (Double)equipment.getProperty("strengthRequirement");
+		if (strengthRequirement!=null && characterStrength!=null && strengthRequirement>characterStrength && "NPC".equals(character.getProperty("type"))==false)
 			throw new UserErrorMessage("You cannot equip this item, you do not have the strength to use it.");
+		
+		
+		if (skipSaleCheck==false && isItemForSale(db, equipment))
+			throw new UserErrorMessage("You cannot equip this item, it is currently for sale.");
+		
+		if (destinationSlot.equals("2Hands"))
+			destinationSlot = "LeftHand and RightHand";
 
-		if (isItemForSale(db, equipment)) throw new UserErrorMessage("You cannot equip this item, it is currently for sale.");
-
-		if (destinationSlot.equals("2Hands")) destinationSlot = "LeftHand and RightHand";
-
-		if (destinationSlot != null && destinationSlot.trim().equals("") == false)
+		
+		if (destinationSlot!=null && destinationSlot.trim().equals("")==false)
 		{
 			String[] destinationSlots = destinationSlot.split(" and ");
-
-			// Check if we need to unequip some items first if they're in the
-			// way (and replacing is requested)
-			for (String slot : destinationSlots)
+			
+			// Check if we need to unequip some items first if they're in the way (and replacing is requested)
+			for (String slot:destinationSlots)
 			{
-
-				// If we already have some equipment in the slot we want to
-				// equip to, then unequip it first...
-				if (character.getProperty("equipment" + slot) != null)
+				
+				// If we already have some equipment in the slot we want to equip to, then unequip it first...
+				if (character.getProperty("equipment"+slot)!=null)
 				{
-					if (replaceItem == false) return;
+					if (replaceItem==false)
+						return;
 					doCharacterUnequipEntity(db, character, slot);
 				}
-			}
-
+			}			
+			
 			// Now equip
-			for (String slot : destinationSlots)
+			for (String slot:destinationSlots)
 			{
 				// Now equip this weapon...
-				character.setProperty("equipment" + slot, equipment.getKey());
+				character.setProperty("equipment"+slot, equipment.getKey());
 			}
 		}
-
+		
 		db.put(character);
+		
 
 	}
 
@@ -4198,8 +4225,8 @@ public class ODPDBAccess
 		
 		// Finally, lets update the character that was passed into this method so further processing will have
 		// the updated field values
-		GameUtils.copyFieldValues(characterToDie, characterToDieFinal);
-		GameUtils.copyFieldValues(attackingCharacter, attackingCharacterFinal);
+		CachedDatastoreService.copyFieldValues(characterToDie, characterToDieFinal);
+		CachedDatastoreService.copyFieldValues(attackingCharacter, attackingCharacterFinal);
 		
 		return loot;
 	}
@@ -4656,4 +4683,18 @@ public class ODPDBAccess
 		return itemWeight*itemQuantity;
 	}
 
+	/**THIS IS A PLACEHOLDER. Actual implementation is not in the ODP.
+	 * 
+	 * Using the given entityRequirement, this method will attempt to determine if the given entity 
+	 * meets the requirements laid out in the entityRequirement.
+	 * 
+	 * @param entityRequirement
+	 * @param entity
+	 * @return 
+	 */
+	public boolean validateEntityRequirement(CachedEntity entityRequirement, CachedEntity entity)
+	{
+		return false;
+	}
+	
 }

@@ -1804,6 +1804,12 @@ public class GameUtils
 		
 		if (value1 instanceof Key && value2 instanceof Key)
 		{
+			// This is a special case that is necessary for bulkWriteMode. In bulkWriteMode, 
+			// the value1==value2 test above would have found equality appropriately, therefore 
+			// we must conclude that they are not equal
+			if (((Key)value1).isComplete()==false && ((Key)value2).isComplete()==false)
+				return false;
+			
 			if (((Key)value1).getId() == ((Key)value2).getId() && ((Key)value1).getKind().equals(((Key)value2).getKind()))
 				return true;
 			else 
@@ -1956,21 +1962,4 @@ public class GameUtils
 			return "https://initium-resources.appspot.com/"+relativeUrl;
 	}
 
-	/**
-	 * Copies all the field values from one entity over to another making 
-	 * sure that the field values on both entities are exactly the same with no extra fields left over.
-	 * 
-	 * @param characterToDie
-	 * @param characterToDieFinal
-	 */
-	public static void copyFieldValues(CachedEntity from, CachedEntity to)
-	{
-		// First, remove all field values from "to"
-		for(String key:to.getProperties().keySet())
-			to.removeProperty(key);
-		
-		// Now copy all the properties from "from", to "to"
-		for(String key:from.getProperties().keySet())
-			to.setProperty(key, from.getProperty(key));
-	}
 }

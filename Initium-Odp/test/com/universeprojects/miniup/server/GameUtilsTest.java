@@ -17,8 +17,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 public class GameUtilsTest
 {
 	
-  private final LocalServiceTestHelper helper =
-	      new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+  private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
 	  @Before
 	  public void setUp() {
