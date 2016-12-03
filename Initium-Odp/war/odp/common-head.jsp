@@ -16,6 +16,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/> 
 <!-- <meta name="viewport" content="minimum-scale=0.3, maximum-scale=1"/> -->
 <meta name="keywords" content="initium, game, web game, video game, free to play, mmorpg, mmo">
+<meta name="referrer" content="no-referrer" />
 
 <script type="text/javascript" src="https://code.createjs.com/preloadjs-0.6.2.min.js"></script>
 <script type="text/javascript" src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
@@ -27,7 +28,7 @@
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
 <script type="text/javascript" src="/odp/javascript/script.js?v=57"></script>
 
-<script type="text/javascript" src="javascript/messager.js?v=15"></script>
+<script type="text/javascript" src="javascript/messager.js?v=17"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
 <script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>

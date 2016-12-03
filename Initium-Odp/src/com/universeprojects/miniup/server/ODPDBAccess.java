@@ -33,17 +33,17 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheService.IdentifiableValue;
 import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
-import com.sun.org.apache.bcel.internal.classfile.CodeException;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.MovementService;
 
 public class ODPDBAccess
 {
-	final public static boolean welcomeMessages = true;
+	final public static int welcomeMessagesLimiter = 0;
 	
 	final private HttpServletRequest request;
 	
@@ -3104,6 +3104,7 @@ public class ODPDBAccess
 		if (ds==null)
 			ds = getDB();
 		
+		
 		if (GameUtils.isCharacterInParty(character) && GameUtils.isCharacterPartyLeader(character)==false)
 		{
 			throw new UserErrorMessage("You cannot move your party because you are not the leader.");
@@ -3118,7 +3119,16 @@ public class ODPDBAccess
 			GameUtils.timePasses(travelTime.intValue());
 		
 		
-		if (randomMonsterEncounter(ds, character, getEntity((Key)character.getProperty("locationKey")), 1, 0.5d))
+
+		String forceOneWay = (String)path.getProperty("forceOneWay");
+		if ("FromLocation1Only".equals(forceOneWay) && GameUtils.equals(character.getProperty("locationKey"), path.getProperty("location2Key")))
+			throw new UserErrorMessage("You cannot take this path.");
+		if ("FromLocation2Only".equals(forceOneWay) && GameUtils.equals(character.getProperty("locationKey"), path.getProperty("location1Key")))
+			throw new UserErrorMessage("You cannot take this path.");		
+		
+		
+		CachedEntity startLocation = getEntity((Key)character.getProperty("locationKey"));
+		if (randomMonsterEncounter(ds, character, startLocation, 1, 0.5d))
 		{
 			flagNotALooter(request);
 			throw new AbortedActionException(AbortedActionException.Type.CombataWhileMoving);
@@ -3226,32 +3236,32 @@ public class ODPDBAccess
 	}
 
 
-	/**
-	 * This is a placeholder since the actual implementation is not in the ODP.
-	 * 
-	 * @param db
-	 * @param character
-	 * @param path
-	 * @throws UserErrorMessage
-	 */
-	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
-	{
-		return doCharacterTakePath(db, character, path, false);
-	}
-	
-	/**
-	 * This is a placeholder since the actual implementation is not in the ODP.
-	 * 
-	 * @param db
-	 * @param character
-	 * @param path
-	 * @param allowAttack
-	 * @throws UserErrorMessage
-	 */
-	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
-	{
-		return null;
-	}
+//	/**
+//	 * This is a placeholder since the actual implementation is not in the ODP.
+//	 * 
+//	 * @param db
+//	 * @param character
+//	 * @param path
+//	 * @throws UserErrorMessage
+//	 */
+//	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
+//	{
+//		return doCharacterTakePath(db, character, path, false);
+//	}
+//	
+//	/**
+//	 * This is a placeholder since the actual implementation is not in the ODP.
+//	 * 
+//	 * @param db
+//	 * @param character
+//	 * @param path
+//	 * @param allowAttack
+//	 * @throws UserErrorMessage
+//	 */
+//	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
+//	{
+//		return null;
+//	}
 	
 
 	/**
@@ -4695,6 +4705,268 @@ public class ODPDBAccess
 	public boolean validateEntityRequirement(CachedEntity entityRequirement, CachedEntity entity)
 	{
 		return false;
+	}
+
+	
+	
+	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
+	{
+		return doCharacterTakePath(db, character, path, false);
+	}
+	
+	
+	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
+	{
+		if (db==null)
+			db = getDB();
+
+		if (CHARACTER_MODE_COMBAT.equals(character.getProperty("mode")))
+			throw new UserErrorMessage("You cannot move while you're in combat.");
+		
+		
+		
+		CachedEntity destination = null;
+		Key destinationKey = null;
+		// First get the character's current location
+		Key currentLocationKey = (Key)character.getProperty("locationKey");
+		
+		// Then determine which location the character will end up on.
+		// If we find that the character isn't on either end of the path, we'll throw.
+		Key pathLocation1Key = (Key)path.getProperty("location1Key");
+		Key pathLocation2Key = (Key)path.getProperty("location2Key");
+		if (currentLocationKey.getId()==pathLocation1Key.getId())
+			destinationKey = pathLocation2Key;
+		else if (currentLocationKey.getId()==pathLocation2Key.getId())
+			destinationKey = pathLocation1Key;
+		else
+			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
+		destination = getEntity(destinationKey);
+
+		String forceOneWay = (String)path.getProperty("forceOneWay");
+		if ("FromLocation1Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation2Key.getId())
+			throw new UserErrorMessage("You cannot take this path.");
+		if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
+			throw new UserErrorMessage("You cannot take this path.");
+			
+		boolean isInParty = true;
+		if (character.getProperty("partyCode")==null || character.getProperty("partyCode").equals(""))
+			isInParty = false;
+
+		if (destination.getProperty("ownerKey")!=null)
+		{
+			if (isInParty)
+				throw new UserErrorMessage("You cannot enter a player owned property while in a party. Disband your part first.");
+			
+			Key ownerKey = (Key)destination.getProperty("ownerKey");
+			if (ownerKey.getKind().equals("Group"))
+			{
+				String groupStatus = (String)character.getProperty("groupStatus");
+				if (character.getProperty("groupKey")==null || 
+						ownerKey.getId() != ((Key)character.getProperty("groupKey")).getId() || 
+						("Member".equals(groupStatus)==false && "Admin".equals(groupStatus)==false))
+					throw new UserErrorMessage("You cannot enter a group-owned house unless you are part of that group.");
+			}
+		}
+		
+		MovementService movementService = new MovementService(this);
+		
+		// Check if this property is locked and if so, if we have the key to enter it...
+		movementService.checkForLocks(character, path, destinationKey);
+		
+		
+		
+		// Check if we're being blocked by the blockade
+		CachedEntity blockadeStructure = getBlockadeFor(character, destination);
+		
+		if (isInParty && blockadeStructure!=null)
+			throw new UserErrorMessage("You are approaching a defensive structure but you cannot attack as a party. Disband your party before attacking the defensive structure.");
+		
+		if (isInParty && "Instance".equals(destination.getProperty("combatType")))
+			throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
+		
+		if (allowAttack==false && blockadeStructure!=null)
+			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a href='ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"&attack=true'>Click here to attack!</a>", false);
+
+
+		
+		
+		
+		List<CachedEntity> party = null;
+		EngageBlockadeOpponentResult opponentResult = null; 
+		
+		// Set the character's new location AND all party members if applicable...
+		if (isInParty==false)
+		{
+			// Here is where we'll check if we're entering combat with a defending player...
+			System.out.println("");
+			if (blockadeStructure!=null)
+				opponentResult = engageBlockadeOpponent(db, character.getKey(), currentLocationKey, destination, (Key)blockadeStructure.getProperty("locationKey"), blockadeStructure);
+			
+			if (opponentResult==null || opponentResult.freeToPass)
+			{
+				// There are no opponents at all so allow the player to advance
+				character.setProperty("locationKey", destination.getKey());
+			}
+			else if (opponentResult.defender!=null)
+			{
+				// We're engaging the enemy! We need to get out of here
+				return null;
+			}
+			else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==true)
+			{
+				// There are no opponents available AND all opponents are NPC opponents, so we will let the player pass
+				character.setProperty("locationKey", destination.getKey());
+			}
+			else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==false)
+			{
+				// This situation occurs when all the defenders are busy, the player has to wait for combat
+				throw new UserErrorMessage("There is active combat going on at this site but you have no room to engage and cannot pass. Try again later.", false);
+			}
+			else
+				throw new RuntimeException("Unhandled situation exception.");
+			
+			
+		}
+		else
+		{
+			party = getParty(db, character);
+			if ("TRUE".equals(character.getProperty("partyLeader"))==false)
+				throw new UserErrorMessage("You cannot move the party because you're not the party leader.");
+			
+			setPartiedField(party, character, "locationKey", destination.getKey());
+			
+			// Discover the path the party is taking if we haven't already discovered it..
+			if (party!=null)
+				for(CachedEntity member:party)
+					if (member.getKey().getId()!=character.getKey().getId())
+					{
+						doCharacterDiscoverEntity(db, member, path);
+						
+						sendNotification(db, member.getKey(), NotificationType.fullpageRefresh);
+					}
+			
+//			character.setProperty("locationKey", destination.getKey());
+//			party = getParty(db, character);
+//			if (party!=null)
+//				for(CachedEntity member:party)
+//					if (member.getKey().getId()!=character.getKey().getId())
+//					{
+//						member.setProperty("locationKey", destination.getKey());
+//						doCharacterDiscoverEntity(db, member, path);
+//						
+//						db.put(member);
+//					}
+		}
+
+		// If this destination is a town, then we will want to change the homeTownKey now
+		if ("Town".equals(destination.getProperty("type")))
+			character.setProperty("homeTownKey", destinationKey);
+		
+		
+
+		// Now determine if the path contains an NPC that the character would immediately enter battle with...
+		List<CachedEntity> npcsInTheArea = getFilteredList("Character", "locationKey", destinationKey);
+		npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
+
+		shuffleCharactersByAttackOrder(npcsInTheArea);
+		
+		for(CachedEntity possibleNPC:npcsInTheArea)
+			if ("NPC".equals(possibleNPC.getProperty("type")) && (Double)possibleNPC.getProperty("hitpoints")>0d)
+			{
+				setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
+				setPartiedField(party, character, "combatant", possibleNPC.getKey());
+//				// If we've been interrupted, we'll just get out and not actually travel to the location, but ONLY
+//				// if we're not entering a CombatSite!
+//				if ("CombatSite".equals(destination.getProperty("type"))==false)
+//					return;		
+			}
+		
+		// Now check if we have a discovery for this path we just took...
+		CachedEntity discovery = getDiscoveryByEntity(character.getKey(), path.getKey()); 
+		if (discovery==null)
+		{
+			newDiscovery(db, character, path);
+		}
+		else
+		{
+			if ("TRUE".equals(discovery.getProperty("hidden")))
+			{
+				discovery.setProperty("hidden", "FALSE");
+				db.put(discovery);
+			}
+		}
+		
+		// HACK: We didn't always save the PlayerHouse Paths against users. If this PlayerHouse path doesn't have a user assigned to it, assign it to us
+		if ("PlayerHouse".equals(path.getProperty("type")) && 
+				(path.getProperty("ownerKey")==null || 
+				("Town".equals(destination.getProperty("type"))==false && destination.getProperty("ownerKey")==null)))
+		{
+			CachedEntity user = getUserByCharacterKey(character.getKey());
+			if (user!=null)
+			{
+				path.setProperty("ownerKey", user.getKey());
+				destination.setProperty("ownerKey", user.getKey());
+				
+				db.put(path);
+				db.put(destination);
+			}
+		}
+
+		// Lets just go ahead and reset the status field for the character here (this relates to defence structures)
+		//character.setProperty("status", null);
+		
+		doCharacterTimeRefresh(db, character);	// This is saving the character so no need to save after this
+		
+		putPartyMembersToDB_SkipSelf(db, party, character);
+		
+		
+		// Here we're going to take a list we got from the opponentResult stuff and reuse it for performance reasons...
+		// We're going to determine if we should refresh the leader on the defence structure we just arrived at or left from
+		if (opponentResult!=null && opponentResult.charactersInBlockade!=null)
+		{
+			for(int i = 0; i<opponentResult.charactersInBlockade.size(); i++)
+			{
+				if (opponentResult.charactersInBlockade.get(i).getKey().getId() == character.getKey().getId())
+				{
+					opponentResult.charactersInBlockade.set(i, character);
+					break;
+				}
+			}
+			
+			// Check if we are entering a defence structure location
+			if (blockadeStructure != null)
+			{
+				refreshDefenceStructureLeader(db, blockadeStructure, opponentResult.charactersInBlockade);
+			}
+			
+		}
+		
+		return destination;
+	}
+	
+	
+	public class EngageBlockadeOpponentResult
+	{
+		public CachedEntity defender;
+		public boolean freeToPass;
+		public Boolean hasDefenders;
+		public boolean onlyNPCDefenders;
+		public List<CachedEntity> charactersInBlockade;	// This is a performance related field so we don't have to fetch this list again for other reasons
+		
+	}
+	/**
+	 * This is a placeholder because the actual implementation is not in the ODP.
+	 * @param db
+	 * @param key
+	 * @param currentLocationKey
+	 * @param destination
+	 * @param property
+	 * @param blockadeStructure
+	 * @return
+	 */
+	public EngageBlockadeOpponentResult engageBlockadeOpponent(CachedDatastoreService db, Key key, Key currentLocationKey, CachedEntity destination, Key property, CachedEntity blockadeStructure) throws UserErrorMessage
+	{
+		return null;
 	}
 	
 }
