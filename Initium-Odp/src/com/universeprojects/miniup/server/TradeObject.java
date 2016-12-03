@@ -280,7 +280,7 @@ public class TradeObject implements Serializable
 		if (amount<0)
 			throw new UserErrorMessage("Gold amount must be a number between 0 and "+character.getProperty("dogecoins"));
 		if (amount>(Long)character.getProperty("dogecoins"))
-			throw new UserErrorMessage("You do not have enough gold to add that much.");
+			throw new UserErrorMessage("You do not have enough gold to add that much.  You only have "+character.getProperty("dogecoins"));
 		
 		
 		if (character1Key.getId() == character.getKey().getId())
