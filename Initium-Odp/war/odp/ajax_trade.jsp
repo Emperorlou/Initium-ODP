@@ -117,7 +117,7 @@
         <div class="trade-boxes" style="margin-top: 20px;">
         <div class='main-splitScreen'>
         <div class='${characterTradeWindowClass}'><h4>Your offer</h4>
-        <h4><a onclick='tradeSetGoldNew(event,<%=+tradeObject.getDogecoinsFor(character.getKey())%>)'>Gold: <span id='myTradeGoldAmount'><%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(character.getKey())) %></span></a></h4>
+        <h4><a onclick='tradeSetGoldNew(event,<%=+tradeObject.getDogecoinsFor(character.getKey())%>, <%=character.getProperty("dogecoins")%>)'>Gold: <span id='myTradeGoldAmount'><%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(character.getKey())) %></span></a></h4>
         <div id='yourTrade'>
         <%
             for(CachedEntity item:tradeObject.getItemsFor(character.getKey()))
