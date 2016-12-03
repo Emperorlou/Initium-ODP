@@ -1787,9 +1787,9 @@ function tradeAddItemNew(eventObject,itemId)
 	})
 }
 
-function tradeSetGoldNew(eventObject,currentDogecoin)
+function tradeSetGoldNew(eventObject,currentDogecoin,curAvailDogecoin)
 {
-	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
+	promptPopup("Trade Gold", "How much gold do you want to add to the trade (out of "+ curAvailDogecoin +"):", currentDogecoin+"", function(amount){
 		if (amount!=null && amount!="")
 		{
 			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(data,error){
