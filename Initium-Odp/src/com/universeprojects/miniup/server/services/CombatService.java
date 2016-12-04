@@ -40,11 +40,10 @@ public class CombatService extends Service
 	}
 	
 	/**
-	 * Removes all items on the current character for which the strength requirement
+	 * Removes all items from the specified character for which the strength requirement
 	 * is no longer met (i.e. a buff is applied or expires).
 	 */
-	public void updateEquips(){
-		CachedEntity character = db.getCurrentCharacter();
+	public void updateEquips(CachedEntity character){
 		CachedDatastoreService ds = db.getDB();
 		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
 		{
