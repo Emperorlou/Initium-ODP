@@ -295,19 +295,33 @@ function magicallyDetermineAnimationUrl(urlBase, urlEnd, fps, frameCount,offset)
 	return url;
 }
 
-$(document).ready(function()
+/**
+ * Call this method whenever the location changes so we can enable/disable
+ * banner weather accordingly. We might have gone inside, or outside..etc.
+ */
+var bannerWeatherUpdateTimerId = null;
+function updateBannerWeatherSystem()
 {
 	if (isOutside=="TRUE")
 	{
-		setInterval(updateDayNightCycle, 50);
+		if (bannerWeatherUpdateTimerId==null)
+			bannerWeatherUpdateTimerId = setInterval(updateDayNightCycle, 50);
 		
-		updateDayNightCycle();
+		updateDayNightCycle(true);
 	}
 	else
 	{
+		if (bannerWeatherUpdateTimerId!=null)
+		{
+			clearInterval(bannerWeatherUpdateTimerId);
+			bannerWeatherUpdateTimerId = null;
+		}
+		
 		var banner = $(".banner-shadowbox");
 		banner.css("background", "url('"+bannerUrl+"') no-repeat center center");
 		banner.css("background-blend-mode", "normal");
 		banner.css("background-size", "contain");
 	}
-});
+}
+
+

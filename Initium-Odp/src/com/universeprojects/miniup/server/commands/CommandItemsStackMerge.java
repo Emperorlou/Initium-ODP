@@ -88,6 +88,8 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 			for (CachedEntity deleteEntity : needsDelete) {
 				ds.delete(deleteEntity);
 			}
+			
+			ds.commit();
 		} finally {
 			ds.rollbackIfActive();
 		}
@@ -113,7 +115,7 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		// could instead remove quantity and do equal check between the two
 		// maps?
 		for (String checking : entity1Props.keySet()) {
-			if (!checking.equals("quantity")) {
+			if (!checking.equals("quantity") && !checking.equals("movedTimestamp")) {
 				if (!GameUtils.equals(entity1Props.get(checking), entity2Props.get(checking))) {
 					return false;
 				}

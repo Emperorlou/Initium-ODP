@@ -6,7 +6,7 @@ var messageCodes = [
              "PrivateChat",
              "Notifications"
              ];
-var messager = new Messager(5000, 15000, 30);
+var messager = new Messager(5000, 10000, 30, "https://chat-dot-playinitium.appspot.com", chatIdToken);
 
 // Here we're overriding the default markers array to include the notifications marker because it is a special flower. Basically, we
 // need to make sure we never execute the same notifications twice, so we'll always remember where we left off.
@@ -104,8 +104,10 @@ messager.onChatMessage = function(chatMessage)
 		html+="<span class='chatMessage-text'>";
 		if (chatMessage.characterId!=null && meMode==false)
 			html+=chatMessage.nicknameStyled;
+		else if (chatMessage.characterId!=null && meMode==true)
+			html+=chatMessage.nicknameMeStyled;
 		else
-			html+=chatMessage.nickname;
+			html+="<span class='meModeNickname'>"+chatMessage.nicknameStyled+"</span>";
 		html+="</span>";
 		html+="<span class='chatMessage-text'>";
 		if (meMode)
@@ -145,7 +147,7 @@ function changeChatTab(code)
 	$('#chat_messages_'+code).show();
 	
 	// Reset the unread counter
-	$("#"+code+"_tab").text(code.substring(0, code.length-4));
+	$("#"+code+"-chat-indicator").text("").hide();
 	localStorage.setItem("UnreadCount_"+code, 0);
 	
 	localStorage.setItem("DefaultChatTab", code);
@@ -172,7 +174,10 @@ function notifyNewMessage(code)
 	localStorage.setItem("UnreadCount_"+code, unread);
 	
 	// Now update the chat tab unread counter
-	$("#"+code+"_tab").text(code.substring(0, code.length-4)+"("+unread+")");
+	var indicator = $("#"+code+"-chat-indicator");
+	indicator.text(unread);
+	indicator.show();
+	
 }
 
 function getUnreadFor(code)
@@ -202,9 +207,19 @@ $(document).ready(function(){
 		
 		// Now update the chat tab unread counter
 		if (unread==0)
-			$("#"+code+"_tab").text(code.substring(0, code.length-4));
+		{
+			// Now update the chat tab unread counter
+			var indicator = $("#"+code+"-chat-indicator");
+			indicator.text("");
+			indicator.hide();
+		}
 		else
-			$("#"+code+"_tab").text(code.substring(0, code.length-4)+"("+unread+")");
+		{
+			// Now update the chat tab unread counter
+			var indicator = $("#"+code+"-chat-indicator");
+			indicator.text(unread);
+			indicator.show();
+		}
 			
 		
 	}
@@ -490,4 +505,4 @@ $( document ).ajaxComplete(function( event, xhr, settings ) {
 	if ( settings.url.match("^/odp/ajax_ignore" )) {
 		refreshLists();
 	}
-})
+});

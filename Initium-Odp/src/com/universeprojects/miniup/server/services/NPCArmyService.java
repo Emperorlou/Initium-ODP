@@ -29,7 +29,6 @@ public class NPCArmyService extends Service
 		this.npcArmyKey = npcArmy.getKey();
 		this.npcArmy = npcArmy;
 		
-		log.setLevel(Level.FINEST);
 	}
 	
 	public String getUniqueId()
@@ -105,6 +104,15 @@ public class NPCArmyService extends Service
 	public long getMaxSpawnCount()
 	{
 		return (Long)npcArmy.getProperty("maxSpawnCount");
+	}
+	
+	public Long getMinSpawnsToPropagate()
+	{
+		Long value = (Long)npcArmy.getProperty("minSpawnsToPropagate");
+		if (value==null) 
+			value = getMaxSpawnCount();
+		
+		return value;
 	}
 
 	public void setMaxSpawnCount(long maxSpawnCount)
@@ -213,8 +221,9 @@ public class NPCArmyService extends Service
 		
 		if (getPropagationCount()<=0) return;
 		
+		
 		// If we are at or over the maxSpawnCount, then we will attempt to propagate
-		if (getNPCs().size()>=getMaxSpawnCount())
+		if (getNPCs().size()>=getMinSpawnsToPropagate())
 		{
 			// Get all the "permanent" paths that lead away from here
 			List<CachedEntity> paths = db.getPathsByLocation_PermanentOnly(getLocationKey());

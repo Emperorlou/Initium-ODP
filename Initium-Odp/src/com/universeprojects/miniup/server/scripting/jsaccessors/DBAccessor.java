@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.GlobalEvent;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
@@ -66,9 +67,9 @@ public class DBAccessor {
 		if(executed)
 		{
 			// Same thing, pass off the saving/deleting of entities to the original context. 
-			for(EntityWrapper save:event.saveEntities)
+			for(EntityWrapper save:event.getSaveWrappers())
 				currentEvent.saveEntity(save);
-			for(EntityWrapper delete:event.deleteEntities)
+			for(EntityWrapper delete:event.getDeleteWrappers())
 				currentEvent.deleteEntity(delete);
 			currentEvent.haltExecution |= event.haltExecution;
 			currentEvent.errorText += event.errorText;
@@ -105,5 +106,36 @@ public class DBAccessor {
 	public Item getItemById(Long itemId)
 	{
 		return new Item(db.getEntity("Item", itemId), db);
+	}
+	
+	public boolean transferGold(Long amount, EntityWrapper fromCharacter, EntityWrapper toCharacter)
+	{
+		if(amount == null || amount < 0) return false;
+		CachedEntity fromChar = fromCharacter.wrappedEntity;
+		CachedEntity toChar = toCharacter.wrappedEntity;
+		
+		Long fromCoins = (Long)fromChar.getProperty("dogecoins");
+		if(fromCoins == null) fromCoins = 0L;
+		
+		if(fromCoins > 0)
+		{
+			Long toCoins = (Long)toChar.getProperty("dogecoins");
+			if(toCoins == null) toCoins = 0L;
+			
+			Long transferAmount = amount;
+			if(fromCoins < amount) transferAmount = fromCoins;
+			
+			fromCoins -= transferAmount;
+			toCoins += transferAmount;
+			fromChar.setProperty("dogecoins", fromCoins);
+			toChar.setProperty("dogecoins", toCoins);
+			return true;
+		}
+		return false;
+	}
+	
+	public void moveItem(EntityWrapper currentCharacter, EntityWrapper item, EntityWrapper newContainer) throws UserErrorMessage 
+	{
+		db.doMoveItem(null, currentCharacter.wrappedEntity, item.wrappedEntity, newContainer.wrappedEntity);
 	}
 }

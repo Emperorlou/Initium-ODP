@@ -32,8 +32,16 @@ public class CommandItemsSell extends CommandItemsBase {
 	protected void processBatchItems(Map<String, String> parameters, ODPDBAccess db, CachedDatastoreService ds,
 			CachedEntity character, List<CachedEntity> batchItems)
 			throws UserErrorMessage {
-		// TODO Auto-generated method stub
-		Long amount = Long.parseLong(parameters.get("amount"));
+
+		Long amount = null;
+		try
+		{
+			amount = Long.parseLong(parameters.get("amount").replace(",", "").trim());
+		}
+		catch(Exception e)
+		{
+			throw new UserErrorMessage("Invalid number format. Please use only whole numbers.");
+		}
 		
 		if (amount<0)
 			throw new UserErrorMessage("You cannot sell items for less than 0 gold.");

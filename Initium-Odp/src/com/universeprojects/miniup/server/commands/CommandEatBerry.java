@@ -53,6 +53,7 @@ public class CommandEatBerry extends Command {
 					db.awardBuff_Sick(ds, character);
 				}
 			db.awardBuff_Candy(ds, character);
+			ds.delete(item);
 		}
 		else if("Strange Elixir".equals(item.getProperty("name"))==true){
 			if(db.awardBuff_Elixir(ds, character)==false)

@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +32,8 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class GameUtils 
 {
+	final static Logger log = Logger.getLogger(GameUtils.class.getName());
+
 	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,##0.00");
 	final static DecimalFormat noDigitFormat = new DecimalFormat("#,###");
 	final static DateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yyyy HH:mm:ss");
@@ -895,16 +899,18 @@ public class GameUtils
 		else if (iconUrl!=null && iconUrl.startsWith("http")==false)
 			iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
 		
+		
+		
 		Long quantity = (Long)item.getProperty("quantity");
 		String quantityDiv = "";
 		if (quantity!=null){
-			quantityDiv="<div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div>";
+			quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div></div>";
 		}
 		
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+iconUrl+"' border=0/>"+quantityDiv+"</div><div class='main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+iconUrl+"' border=0/>"+quantityDiv+"</div><div class='main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)
@@ -925,10 +931,10 @@ public class GameUtils
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)
     {
-    	return renderCharacter(userOfCharacter, character, true);
+    	return renderCharacter(userOfCharacter, character, true, false);
     }
     
-    public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character, boolean includePopupLink)
+    public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character, boolean includePopupLink, boolean meStyle)
     {
     	if (character==null)
     		return "";
@@ -945,6 +951,9 @@ public class GameUtils
     	String nameClass = (String)character.getProperty("nameClass");
     	if ((nameClass==null || nameClass.equals("")) && userOfCharacter!=null && Boolean.TRUE.equals(userOfCharacter.getProperty("premium")))
     		nameClass = "premium-character-name";
+    	
+    	if (meStyle)
+    		nameClass = "chatMessage-text";
     	
     	if (includePopupLink)
     		return "<a class='clue "+nameClass+"' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+name+"</a>";
@@ -968,46 +977,113 @@ public class GameUtils
     	if (GameUtils.equals(character.getProperty("cloaked"), true))
     		isCloaked = true;
     	
-		CachedEntity equipmentHelmet = db.getEntity((Key)character.getProperty("equipmentHelmet"));
+    	List<CachedEntity> equipment = db.getEntity((Key)character.getProperty("equipmentHelmet"),
+    												(Key)character.getProperty("equipmentChest"),
+    												(Key)character.getProperty("equipmentLegs"),
+    												(Key)character.getProperty("equipmentBoots"),
+    												(Key)character.getProperty("equipmentGloves"),
+    												(Key)character.getProperty("equipmentLeftHand"),
+    												(Key)character.getProperty("equipmentRightHand"),
+    												(Key)character.getProperty("equipmentShirt"));
+    	
+    	boolean hasInvalidEquipment = false;
+    	
+    	
+		CachedEntity equipmentHelmet = equipment.get(0);
+		if (character.getProperty("equipmentHelmet")!=null && equipmentHelmet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentHelmet", null);
+		}
 		String equipmentHelmetUrl = null;
 		if (equipmentHelmet!=null) 
-			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty("icon"));
+			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty(GameUtils.getItemIconToUseFor("equipmentHelmet", equipmentHelmet)));
 
-		CachedEntity equipmentChest = db.getEntity((Key)character.getProperty("equipmentChest"));
+		
+		CachedEntity equipmentChest = equipment.get(1);
+		if (character.getProperty("equipmentChest")!=null && equipmentChest==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentChest", null);
+		}
 		String equipmentChestUrl = null;
 		if (equipmentChest!=null)
-			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty("icon"));
+			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty(GameUtils.getItemIconToUseFor("equipmentChest", equipmentChest)));
 
-		CachedEntity equipmentLegs = db.getEntity((Key)character.getProperty("equipmentLegs"));
+		
+		CachedEntity equipmentLegs = equipment.get(2);
+		if (character.getProperty("equipmentLegs")!=null && equipmentLegs==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentLegs", null);
+		}
 		String equipmentLegsUrl = null;
 		if (equipmentLegs!=null)
-			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty("icon"));
+			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty(GameUtils.getItemIconToUseFor("equipmentLegs", equipmentLegs)));
 
-		CachedEntity equipmentBoots = db.getEntity((Key)character.getProperty("equipmentBoots"));
+		
+		CachedEntity equipmentBoots = equipment.get(3);
+		if (character.getProperty("equipmentBoots")!=null && equipmentBoots==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentBoots", null);
+		}
 		String equipmentBootsUrl = null;
 		if (equipmentBoots!=null)
-			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty("icon"));
+			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty(GameUtils.getItemIconToUseFor("equipmentBoots", equipmentBoots)));
 
-		CachedEntity equipmentGloves = db.getEntity((Key)character.getProperty("equipmentGloves"));
+		
+		CachedEntity equipmentGloves = equipment.get(4);
+		if (character.getProperty("equipmentGloves")!=null && equipmentGloves==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentGloves", null);
+		}
 		String equipmentGlovesUrl = null;
 		if (equipmentGloves!=null)
-			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty("icon"));
+			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty(GameUtils.getItemIconToUseFor("equipmentGloves", equipmentGloves)));
 
-		CachedEntity equipmentLeftHand = db.getEntity((Key)character.getProperty("equipmentLeftHand"));
+		
+		CachedEntity equipmentLeftHand = equipment.get(5);
+		if (character.getProperty("equipmentLeftHand")!=null && equipmentLeftHand==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentLeftHand", null);
+		}
 		String equipmentLeftHandUrl = null;
 		if (equipmentLeftHand!=null)
-			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty("icon"));
+			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty(GameUtils.getItemIconToUseFor("equipmentLeftHand", equipmentLeftHand)));
 
-		CachedEntity equipmentRightHand = db.getEntity((Key)character.getProperty("equipmentRightHand"));
+		
+		CachedEntity equipmentRightHand = equipment.get(6);
+		if (character.getProperty("equipmentRightHand")!=null && equipmentRightHand==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentRightHand", null);
+		}
 		String equipmentRightHandUrl = null;
 		if (equipmentRightHand!=null)
-			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty("icon"));
+			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", equipmentRightHand)));
 
-		CachedEntity equipmentShirt = db.getEntity((Key)character.getProperty("equipmentShirt"));
+		
+		CachedEntity equipmentShirt = equipment.get(7);
+		if (character.getProperty("equipmentShirt")!=null && equipmentShirt==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentShirt", null);
+		}
 		String equipmentShirtUrl = null;
 		if (equipmentShirt!=null)
-			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty("icon"));
+			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty(GameUtils.getItemIconToUseFor("equipmentShirt", equipmentShirt)));
 
+		
+		// This is a workaround for the fact that sometimes equipment stays equipped after it has been deleted
+		if (hasInvalidEquipment)
+		{
+			db.getDB().put(character);
+			log.log(Level.SEVERE, "The character had an item equipped that was deleted from the database. The workaround fixed it, but this should be fixed in the future. It's likely a problem with double-saving the character somewhere.");
+		}
+		
 		boolean is2Handed = false;
 		if (equipmentRightHand!=null && "2Hands".equals(equipmentRightHand.getProperty("equipSlot")))
 		{
@@ -1183,7 +1259,7 @@ public class GameUtils
 				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
 				for(CachedEntity buff:buffs)
 				{
-					sb.append("<img src='"+"https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'>");
+					sb.append("<img src='"+""+GameUtils.getResourceUrl(buff.getProperty("icon"))+"' border='0'>");
 				}
 				sb.append("</div>");
 				
@@ -1201,6 +1277,49 @@ public class GameUtils
 		
 		return sb.toString();
     }
+
+    public static String getItemIconToUseFor(String equipmentSlot, CachedEntity itemInSlot)
+    {
+    	// If we only have 1 icon specified anyway, we'll just return that
+    	if (itemInSlot.getProperty("icon2")==null)
+    		return "icon";
+
+    	
+    	equipmentSlot = equipmentSlot.substring(9);
+    	
+		String equipSlotRaw = (String)itemInSlot.getProperty("equipSlot");
+
+		if (equipSlotRaw==null)
+			return "icon";
+		
+		equipSlotRaw = equipSlotRaw.replace(" and ", ",");
+		if (equipSlotRaw.equals("Ring"))
+			equipSlotRaw = "LeftRing, RightRing";
+
+		
+		
+		String[] equipSlots = equipSlotRaw.split(",");
+		
+		int i = 1; 
+		for(String slot:equipSlots)
+		{
+			slot = slot.trim();
+			if (equipmentSlot.equals(slot))
+			{
+				String iconToUse = "icon"+i;
+				if (itemInSlot.getProperty(iconToUse)!=null)
+					return iconToUse;
+				else
+					return "icon";
+			}
+				
+			i++;
+		}
+    	
+		return "icon";
+    }
+    
+    
     
     public static String renderBuffsList(List<CachedEntity> buffs)
     {
@@ -1660,6 +1779,16 @@ public class GameUtils
 		if (value==null) return false;
 		return value.equals(e.toString());
 	}
+
+	public static <E extends Enum<E>> boolean enumContains(Class<E> enumClass, String checkValue, boolean caseInsensitive)
+	{
+		for(E option:enumClass.getEnumConstants())
+		{
+			if(caseInsensitive ? option.name().equalsIgnoreCase(checkValue) : option.name().equals(checkValue))
+				return true;
+		}
+		return false;
+	}
 	
 	/**
 	 * This equals can be used to compare anything, but specifically it's useful
@@ -1675,6 +1804,12 @@ public class GameUtils
 		
 		if (value1 instanceof Key && value2 instanceof Key)
 		{
+			// This is a special case that is necessary for bulkWriteMode. In bulkWriteMode, 
+			// the value1==value2 test above would have found equality appropriately, therefore 
+			// we must conclude that they are not equal
+			if (((Key)value1).isComplete()==false && ((Key)value2).isComplete()==false)
+				return false;
+			
 			if (((Key)value1).getId() == ((Key)value2).getId() && ((Key)value1).getKind().equals(((Key)value2).getKind()))
 				return true;
 			else 
@@ -1826,4 +1961,5 @@ public class GameUtils
 		else
 			return "https://initium-resources.appspot.com/"+relativeUrl;
 	}
+
 }

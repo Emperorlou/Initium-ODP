@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,10 +38,12 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
+import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.MovementService;
 
 public class ODPDBAccess
 {
-	final public static boolean welcomeMessages = true;
+	final public static int welcomeMessagesLimiter = 0;
 	
 	final private HttpServletRequest request;
 	
@@ -455,6 +458,21 @@ public class ODPDBAccess
 	}
 
 	/**
+	 * Fetches a list CachedEntity from the given keys.
+	 * 
+	 * Important: If a given CachedEntity cannot be found in the database, the return will
+	 * contain a null entry for that key's index.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public List<CachedEntity> getEntity(Key...keys)
+	{
+		if (keys == null) return null;
+		return getDB().get(keys);
+	}
+
+	/**
 	 * Use this if you only want to get a count of entities in the database.
 	 * 
 	 * This method will only count up to a maximum of 1000 entities.
@@ -704,7 +722,19 @@ public class ODPDBAccess
 
 	public Key getDefaultLocationKey()
 	{
-		return KeyFactory.createKey("Location", 5629499534213120l);
+		return (Key)getProject().getProperty("defaultSpawnLocationKey");
+	}
+
+	private CachedEntity getProject()
+	{
+		try
+		{
+			return ds.get(KeyFactory.createKey("Project", 4902705788092416L));
+		}
+		catch (EntityNotFoundException e)
+		{
+			throw new RuntimeException("Unable to find the project entity.");
+		}
 	}
 
 	public CachedEntity getLocationById(Long id)
@@ -951,8 +981,11 @@ public class ODPDBAccess
 	{
 		if (db == null) db = getDB();
 
-		CachedEntity oldDiscovery = getDiscoveryByEntity(character.getKey(), entity.getKey());
-		if (oldDiscovery != null) return oldDiscovery;
+		if (entity.getKey().isComplete())
+		{
+			CachedEntity oldDiscovery = getDiscoveryByEntity(character.getKey(), entity.getKey());
+			if (oldDiscovery != null) return oldDiscovery;
+		}
 
 		if (entity.getKind().equals("Path"))
 		{
@@ -1210,92 +1243,115 @@ public class ODPDBAccess
 
 	public void doCharacterEquipEntity(CachedDatastoreService db, CachedEntity character, CachedEntity equipment) throws UserErrorMessage
 	{
-		doCharacterEquipEntity(db, character, equipment, true);
+		doCharacterEquipEntity(db, character, equipment, true, false);
 	}
 
-	public void doCharacterEquipEntity(CachedDatastoreService db, CachedEntity character, CachedEntity equipment, boolean replaceItem) throws UserErrorMessage
+	public void doCharacterEquipEntity(CachedDatastoreService db, CachedEntity character, CachedEntity equipment, boolean replaceItem, boolean skipSaleCheck) throws UserErrorMessage
 	{
-		if (db == null) db = getDB();
+		if (db==null)
+			db = getDB();
 
-		// Get all the equip slots that this item can fit into and decide which
-		// one to use
-		String equipSlotRaw = (String) equipment.getProperty("equipSlot");
+		// Get all the equip slots that this item can fit into and decide which one to use
+		String equipSlotRaw = (String)equipment.getProperty("equipSlot");
+		
+		if (equipSlotRaw==null)
+			throw new UserErrorMessage("This item not equipable.");
+		
+		if (equipSlotRaw.equals("Ring"))
+			equipSlotRaw = "LeftRing, RightRing";
+		
 		equipSlotRaw = equipSlotRaw.trim();
-		if (equipSlotRaw.endsWith(",")) equipSlotRaw = equipSlotRaw.substring(0, equipSlotRaw.length() - 1);
+		if (equipSlotRaw.endsWith(","))
+			equipSlotRaw = equipSlotRaw.substring(0, equipSlotRaw.length()-1);
 		String[] equipSlotArr = equipSlotRaw.split(",");
-
+		
 		String destinationSlot = null;
-		if (equipSlotArr.length == 0)
-			throw new RuntimeException("No equip slots exist for the '" + equipment.getProperty("name") + "' item.");
-		else if (equipSlotArr.length == 1)
+		if (equipSlotArr.length==0)
+			throw new RuntimeException("No equip slots exist for the '"+equipment.getProperty("name")+"' item.");
+		else if (equipSlotArr.length==1)
 			destinationSlot = equipSlotArr[0];
-		else if (equipSlotArr.length > 1)
+		else if (equipSlotArr.length>1)
 		{
-			for (int i = 0; i < equipSlotArr.length; i++)
+			for(int i = 0; i<equipSlotArr.length; i++)
 			{
-				if (character.getProperty("equipment" + equipSlotArr[i]) == null)
+				if (character.getProperty("equipment"+equipSlotArr[i])==null)
 				{
 					destinationSlot = equipSlotArr[i];
 					break;
 				}
 			}
-
-			if (destinationSlot == null) throw new UserErrorMessage("The equipment slots needed to equip this item are all used. Unequip something first.");
+			
+			if (destinationSlot==null)
+				throw new UserErrorMessage("The equipment slots needed to equip this item are all used. Unequip something first.");
 		}
+		
+		if (destinationSlot==null)
+			throw new RuntimeException("There was no equipSlot specified for this item: "+equipment);
+		
+		
+		if (character==null)
+			throw new IllegalArgumentException("Character cannot be null.");
+		if (equipment==null)
+			throw new IllegalArgumentException("Equipment cannot be null.");
+		if (destinationSlot==null)
+			throw new IllegalArgumentException("destinationSlot cannot be null.");
 
-		if (destinationSlot == null) throw new RuntimeException("There was no equipSlot specified for this item: " + equipment);
-
-		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
-		if (equipment == null) throw new IllegalArgumentException("Equipment cannot be null.");
-		if (destinationSlot == null) throw new IllegalArgumentException("destinationSlot cannot be null.");
-
-		if (character.getKey().equals(equipment.getProperty("containerKey")) == false) throw new IllegalArgumentException("The piece of equipment is not in the character's posession.");
-
+		if (character.getKey().equals(equipment.getProperty("containerKey"))==false)
+			throw new IllegalArgumentException("The piece of equipment is not in the character's posession. Character: "+character.getKey());
+		
+		
 		destinationSlot = destinationSlot.trim(); // Clean it up, just in case
+		
+		String equipmentSlot = (String)equipment.getProperty("equipSlot");
+		if (equipmentSlot==null)
+			throw new UserErrorMessage("You cannot equip this item.");
+//		if (destinationSlot.contains(equipmentSlot)==false)
+//			throw new CodeException("You cannot put a "+equipmentSlot+" item in the "+destinationSlot+" slot.");
 
-		String equipmentSlot = (String) equipment.getProperty("equipSlot");
-		if (equipmentSlot == null) throw new UserErrorMessage("You cannot equip this item.");
-		if (equipmentSlot.contains(destinationSlot) == false) throw new RuntimeException("You cannot put a " + equipmentSlot + " item in the " + destinationSlot + " slot.");
-
-		Double characterStrength = (Double) character.getProperty("strength");
+		Double characterStrength = (Double)character.getProperty("strength");
 		// ROund character strength just like it is rounded for the popup
 		characterStrength = Double.parseDouble(GameUtils.formatNumber(characterStrength));
-		if (equipment.getProperty("strengthRequirement") instanceof String) equipment.setProperty("strengthRequirement", null);
-		Double strengthRequirement = (Double) equipment.getProperty("strengthRequirement");
-		if (strengthRequirement != null && characterStrength != null && strengthRequirement > characterStrength && "NPC".equals(character.getProperty("type")) == false)
+		if (equipment.getProperty("strengthRequirement") instanceof String)
+			equipment.setProperty("strengthRequirement", null);
+		Double strengthRequirement = (Double)equipment.getProperty("strengthRequirement");
+		if (strengthRequirement!=null && characterStrength!=null && strengthRequirement>characterStrength && "NPC".equals(character.getProperty("type"))==false)
 			throw new UserErrorMessage("You cannot equip this item, you do not have the strength to use it.");
+		
+		
+		if (skipSaleCheck==false && isItemForSale(db, equipment))
+			throw new UserErrorMessage("You cannot equip this item, it is currently for sale.");
+		
+		if (destinationSlot.equals("2Hands"))
+			destinationSlot = "LeftHand and RightHand";
 
-		if (isItemForSale(db, equipment)) throw new UserErrorMessage("You cannot equip this item, it is currently for sale.");
-
-		if (destinationSlot.equals("2Hands")) destinationSlot = "LeftHand and RightHand";
-
-		if (destinationSlot != null && destinationSlot.trim().equals("") == false)
+		
+		if (destinationSlot!=null && destinationSlot.trim().equals("")==false)
 		{
 			String[] destinationSlots = destinationSlot.split(" and ");
-
-			// Check if we need to unequip some items first if they're in the
-			// way (and replacing is requested)
-			for (String slot : destinationSlots)
+			
+			// Check if we need to unequip some items first if they're in the way (and replacing is requested)
+			for (String slot:destinationSlots)
 			{
-
-				// If we already have some equipment in the slot we want to
-				// equip to, then unequip it first...
-				if (character.getProperty("equipment" + slot) != null)
+				
+				// If we already have some equipment in the slot we want to equip to, then unequip it first...
+				if (character.getProperty("equipment"+slot)!=null)
 				{
-					if (replaceItem == false) return;
+					if (replaceItem==false)
+						return;
 					doCharacterUnequipEntity(db, character, slot);
 				}
-			}
-
+			}			
+			
 			// Now equip
-			for (String slot : destinationSlots)
+			for (String slot:destinationSlots)
 			{
 				// Now equip this weapon...
-				character.setProperty("equipment" + slot, equipment.getKey());
+				character.setProperty("equipment"+slot, equipment.getKey());
 			}
 		}
-
+		
 		db.put(character);
+		
 
 	}
 
@@ -1373,7 +1429,7 @@ public class ODPDBAccess
 
 		// Check if the character can actually carry something else or if its
 		// all too heavy...
-		Long newItemWeight = (Long) item.getProperty("weight");
+		Long newItemWeight = getItemWeight(item);
 		if (newItemWeight != null && newItemWeight > 0d)
 		{
 			long carrying = getCharacterCarryingWeight(character);
@@ -1483,105 +1539,6 @@ public class ODPDBAccess
 	}
 	
 
-	public Long getItemCarryingSpace(CachedEntity item)
-	{
-		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", item.getKey());
-		return getItemCarryingSpace(item, inventory);
-	}
-
-	public Long getItemCarryingWeight(CachedEntity item)
-	{
-		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", item.getKey());
-		return getItemCarryingWeight(item, inventory);
-	}
-
-	public Long getCharacterCarryingWeight(CachedEntity character)
-	{
-		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", character.getKey());
-		List<CachedEntity> inventoryCharacters = getFilteredList("Character", "locationKey", character.getKey());
-		return getCharacterCarryingWeight(character, inventory, inventoryCharacters);
-	}
-
-	public Long getCharacterCarryingWeight(CachedEntity character, List<CachedEntity> inventory, List<CachedEntity> inventoryCharacters)
-	{
-		long carrying = 0l;
-
-		for (CachedEntity item : inventory)
-		{
-			Long itemWeight = (Long) item.getProperty("weight");
-			if (itemWeight == null) continue;
-			// If the item is equipped (not in the left/right hand) then don't
-			// count it's weight against us
-			if ("LeftHand".equals(item.getProperty("equipSlot")) == false && "RightHand".equals(item.getProperty("equipSlot")) == false && "2Hands".equals(item.getProperty("equipSlot")) == false
-					&& checkCharacterHasItemEquipped(character, item.getKey())) continue;
-
-			carrying += itemWeight;
-		}
-
-		for (CachedEntity c : inventoryCharacters)
-		{
-			Long weight = getCharacterWeight(c);
-
-			carrying += weight;
-		}
-
-		return carrying;
-	}
-
-	public long getCharacterMaxCarryingWeight(CachedEntity character)
-	{
-		long maxCarryWeight = 60000;
-		Double str = (Double) character.getProperty("strength");
-
-		maxCarryWeight += (long) Math.round((str - 3d) * 50000d);
-		
-		// Allow Buff maxCarryWeight
-		return getLongBuffableValue(character, "maxCarryWeight", maxCarryWeight);
-	}
-
-	public Long getItemCarryingWeight(CachedEntity character, List<CachedEntity> inventory)
-	{
-		long carrying = 0l;
-
-		for (CachedEntity item : inventory)
-		{
-			Long itemWeight = (Long) item.getProperty("weight");
-			if (itemWeight == null) continue;
-
-			carrying += itemWeight;
-		}
-
-		// for(CachedEntity c:inventoryCharacters)
-		// {
-		// Long weight = getCharacterWeight(c);
-		//
-		// carrying+=weight;
-		// }
-
-		return carrying;
-	}
-
-	public Long getItemCarryingSpace(CachedEntity character, List<CachedEntity> inventory)
-	{
-		long space = 0l;
-
-		for (CachedEntity item : inventory)
-		{
-			Long itemWeight = (Long) item.getProperty("space");
-			if (itemWeight == null) continue;
-
-			space += itemWeight;
-		}
-
-		// for(CachedEntity c:inventoryCharacters)
-		// {
-		// Long weight = getCharacterWeight(c);
-		//
-		// carrying+=weight;
-		// }
-
-		return space;
-	}
 
 	public CachedEntity awardBuff(CachedDatastoreService ds, Key parentKey, String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
 			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
@@ -1611,6 +1568,43 @@ public class ODPDBAccess
 
 		addBuffToBuffsCache(parentKey, buff);
 		return buff;
+	}
+	
+	public CachedEntity awardBuffByDef(String buffDefName, Key characterKey)
+	{
+		List<CachedEntity> buffDefs = getFilteredList("BuffDef", "name", buffDefName);
+		if(buffDefs.size() > 1)
+		{
+			// BuffDef.name must be unique
+			return null; 
+		}
+		
+		// There should only be 1. If not, it will fall through and return a null value. 
+		for(CachedEntity def:buffDefs)
+		{
+			if(def.getProperty("maxCount")!=null)
+			{
+				Long maximumCount = (Long)def.getProperty("maxCount");
+				int existingCount = 0;
+				List<CachedEntity> buffs = buffsCache.get(characterKey);
+				for(CachedEntity appliedBuff:buffs)
+					if(buffDefName.equals(appliedBuff.getProperty("name")))
+						existingCount++;
+				if (existingCount >= maximumCount) return null;
+			}
+			
+			CachedEntity newBuff = generateNewObject(def, "Buff");
+			if(newBuff != null)
+			{
+				int expiry = ((Long)newBuff.getProperty("expiry")).intValue();
+				GregorianCalendar cal = new GregorianCalendar();
+				cal.add(Calendar.SECOND, expiry);
+				newBuff.setProperty("expiry", cal.getTime());
+				newBuff.setProperty("parentKey", characterKey);
+			}
+			return newBuff;
+		}
+		return null;
 	}
 
 	private void addBuffToBuffsCache(Key parentKey, CachedEntity buff)
@@ -1685,7 +1679,7 @@ public class ODPDBAccess
 	
 	public void awardBuff_Sick(CachedDatastoreService ds, CachedEntity character)
 	{
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png", "Sick",
+		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/Pixel_Art-Icons-Poison-S_Poison05.png", "Sick",
 				"You ate entirely too much candy, and now you're sick! You feel terrible, and couldn't possibly eat more candy for at least 30 minutes.",1800, "strength", "-5%", "dexterity", "-5%",
 				"intelligence", "-5%", 6);
 
@@ -1697,38 +1691,38 @@ public class ODPDBAccess
 		Double buffDouble = Math.random();
 		
 		if(buffDouble <= 0.16){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 				"That was some good candy! You feel stronger!",600,"strength","+0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.17) && (buffDouble < 0.32)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 					"That was some good candy! You feel more agile!",600,"dexterity","+0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.32) && (buffDouble < 0.48)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 					"That was some good candy! You feel smarter!",600,"Intelligence","+0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.48) && (buffDouble < 0.64)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 					"That candy was terrible! You feel weaker!",600,"strength","-0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.64) && (buffDouble < 0.80)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 					"That candy was terrible! You feel slower!",600,"strength","-0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.80) && (buffDouble < 0.96)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Trick!",
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 					"That candy was terrible! You feel dumb!",600,"intelligence","-0.2",null,null,null,null,10);
 			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.96)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png","Treat!",
-					"That was some good candy! You feel stronger!",600,"strength","+0.2","dexterity","+0.2","intelligence","+0.2",10);
+			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+					"That was some good candy! You feel great!",600,"strength","+0.2","dexterity","+0.2","intelligence","+0.2",10);
 			if (buff != null) ds.put(buff);
 		}	
 	}
@@ -2002,192 +1996,179 @@ public class ODPDBAccess
 
 	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
 	{
-		if (ds == null) ds = getDB();
+		if (ds==null)
+			ds = getDB();
+		
+		if (GameUtils.equals(item.getKey(), newContainer.getKey()))
+			throw new UserErrorMessage("lol, you cannot transfer an item into itself, the universe would explode.");
 
-		if (GameUtils.equals(item.getKey(), newContainer.getKey())) throw new UserErrorMessage("lol, you cannot transfer an item into itself, the universe would explode.");
-
-		if (checkCharacterHasItemEquipped(character, item.getKey())) throw new UserErrorMessage("Your character has this item equipped. You cannot move it until it is unequipped.");
-
+		if (checkCharacterHasItemEquipped(character, item.getKey()))
+			throw new UserErrorMessage("Your character has this item equipped. You cannot move it until it is unequipped.");
+		
 		if (checkItemIsVending(character.getKey(), item.getKey()))
 			throw new UserErrorMessage("The item you are trying to drop is currently in your store. You cannot move an item that you plan on selling.");
-
-		String startKind = ((Key) item.getProperty("containerKey")).getKind();
+		
+		CachedEntity startContainer = getEntity((Key)item.getProperty("containerKey"));
+		String startKind = startContainer.getKind();
 		String endKind = newContainer.getKey().getKind();
 
+		ContainerService cs = new ContainerService(this);
+		
+		if (cs.checkContainerAccessAllowed(character, startContainer)==false)
+			throw new UserErrorMessage("Hey!");
+		if (cs.checkContainerAccessAllowed(character, newContainer)==false)
+			throw new UserErrorMessage("Hey!");
+		
+		
 		boolean handled = false;
 
 		if (startKind.equals("Character"))
 		{
+			
 			if (endKind.equals("Location"))
 			{
 				handled = true;
-				// Make sure we're holding the item that we wish to move to the
-				// ground
-				if (GameUtils.equals(item.getProperty("containerKey"), character.getKey()) == false) throw new UserErrorMessage("You do not have possession of this item and so you cannot move it.");
-
-				// Items can only be moved into locations if the character is
-				// currently in said location
-				if (character.getProperty("locationKey").equals(newContainer.getKey()) == false)
+				// Make sure we're holding the item that we wish to move to the ground
+				if (GameUtils.equals(item.getProperty("containerKey"), character.getKey())==false)
+					throw new UserErrorMessage("You do not have possession of this item and so you cannot move it.");
+				
+				// Items can only be moved into locations if the character is currently in said location
+				if (character.getProperty("locationKey").equals(newContainer.getKey())==false)
 					throw new UserErrorMessage("You are not standing in the same location as the location you wish to move the item to. You cannot do this.");
-
+				
 			}
 			else if (endKind.equals("Item"))
 			{
 				handled = true;
-				// Make sure the container we're moving to is either in our
-				// inventory or in our location...
-				if (GameUtils.equals(newContainer.getProperty("containerKey"), character.getKey()) == false
-						&& GameUtils.equals(newContainer.getProperty("containerKey"), character.getProperty("locationKey")) == false)
+				// Make sure the container we're moving to is either in our inventory or in our location...
+				if (GameUtils.equals(newContainer.getProperty("containerKey"), character.getKey())==false && GameUtils.equals(newContainer.getProperty("containerKey"), character.getProperty("locationKey"))==false)
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
 
-				// Check if the container is already in a container, and if the
-				// item we're transferring is a container. We don't want to
-				// allow that depth.
-				if (item.getProperty("maxWeight") != null)
+
+				// Check if the container is already in a container, and if the item we're transferring is a container. We don't want to allow that depth.
+				if (item.getProperty("maxWeight")!=null)
 				{
-					if (((Key) newContainer.getProperty("containerKey")).getKind().equals("Item"))
+					if (((Key)newContainer.getProperty("containerKey")).getKind().equals("Item"))
 						throw new UserErrorMessage("You cannot put a container within a container within a container. We cannot allow that depth of containering because efficiency.");
 				}
-
-				// Make sure we can actually put things into this item
-				// container...
-				Long maxWeight = (Long) newContainer.getProperty("maxWeight");
-				Long maxSpace = (Long) newContainer.getProperty("maxSpace");
-				if (maxWeight == null || maxSpace == null) throw new UserErrorMessage("This item cannot contain other items.");
-
-				Long itemWeight = (Long) item.getProperty("weight");
-				Long itemSpace = (Long) item.getProperty("space");
-				if (itemWeight == null) itemWeight = 0L;
-				if (itemSpace == null) itemSpace = 0L;
-
+				
+				// Make sure we can actually put things into this item container...
+				Long maxWeight = (Long)newContainer.getProperty("maxWeight");
+				Long maxSpace = (Long)newContainer.getProperty("maxSpace");
+				if (maxWeight==null || maxSpace==null)
+					throw new UserErrorMessage("This item cannot contain other items.");
+				
+				Long itemWeight = getItemWeight(item);
+				Long itemSpace = (Long)item.getProperty("space");
+				if (itemWeight==null) itemWeight = 0L;
+				if (itemSpace==null) itemSpace = 0L;
+				
 				List<CachedEntity> containerInventory = getItemContentsFor(newContainer.getKey());
-
+				
 				Long containerCarryingWeight = getItemCarryingWeight(newContainer, containerInventory);
 				Long containerCarryingSpace = getItemCarryingSpace(newContainer, containerInventory);
-
-				if (containerCarryingWeight + itemWeight > maxWeight) throw new UserErrorMessage("The container cannot accept this item. It the item is too heavy.");
-
-				if (containerCarryingSpace + itemSpace > maxSpace) throw new UserErrorMessage("This item will not fit. There is not enough space.");
-
+				
+				if (containerCarryingWeight+itemWeight>maxWeight)
+					throw new UserErrorMessage("The container cannot accept this item. It the item is too heavy.");
+				
+				if (containerCarryingSpace+itemSpace>maxSpace)
+					throw new UserErrorMessage("This item will not fit. There is not enough space.");
+				
+				// Now we'll reduce the durability of the container
+				if (itemWeight>=1000)
+					cs.doUse(ds, newContainer, 1);
+				if (newContainer.isUnsaved())
+					ds.put(newContainer);
 			}
 			else if (endKind.equals("Character"))
 			{
 				throw new UserErrorMessage("Characters cannot currently put items into other characters except through trade.");
 			}
-
+			
 		}
 		else if (startKind.equals("Location"))
 		{
 			if ("Character".equals(newContainer.getKind()))
 			{
 				handled = true;
-				// Items can only be picked up from locations if the character
-				// is currently in said location
-				if (GameUtils.equals(character.getProperty("locationKey"), item.getProperty("containerKey")) == false)
+				// Items can only be picked up from locations if the character is currently in said location
+				if (GameUtils.equals(character.getProperty("locationKey"), item.getProperty("containerKey"))==false)
 					throw new UserErrorMessage("You are not near this item, you cannot pick it up.");
-
-				// Check if the character can actually carry something else or
-				// if its all too heavy...
-				Long itemWeight = (Long) item.getProperty("weight");
-				if (itemWeight == null) itemWeight = 0L;
-				// If the item has a maxWeight, we will treat it as a container
-				// and include it's contents in the weight calculation..
-				if (item.getProperty("maxWeight") != null)
+				
+				// Check if the character can actually carry something else or if its all too heavy...
+				Long itemWeight = getItemWeight(item);
+				if (itemWeight==null) itemWeight = 0L;
+				// If the item has a maxWeight, we will treat it as a container and include it's contents in the weight calculation..
+				if (item.getProperty("maxWeight")!=null)
 				{
 					Long itemCarryingWeight = getItemCarryingWeight(item);
-					itemWeight += itemCarryingWeight;
+					itemWeight+=itemCarryingWeight;
 				}
-
-				if (itemWeight > 0L)
+				
+				if (itemWeight>0L)
 				{
 					long carrying = getCharacterCarryingWeight(character);
 					long maxCarrying = getCharacterMaxCarryingWeight(character);
-
-					if (carrying + itemWeight > maxCarrying)
-						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying " + GameUtils.formatNumber(carrying) + " grams and can carry a maximum of "
-								+ GameUtils.formatNumber(maxCarrying) + " grams.");
+					
+					if (carrying+itemWeight>maxCarrying)
+						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying "+GameUtils.formatNumber(carrying)+" grams and can carry a maximum of "+GameUtils.formatNumber(maxCarrying)+" grams.");
 				}
-
+				
 			}
-
+			
 		}
 		else if (startKind.equals("Item"))
 		{
 			if ("Character".equals(newContainer.getKind()))
 			{
 				handled = true;
-
-				Key oldContainerKey = (Key) item.getProperty("containerKey");
+				
+				Key oldContainerKey = (Key)item.getProperty("containerKey");
 				CachedEntity oldContainer = getEntity(oldContainerKey);
-
+				
 				CachedEntity characterPickingUp = newContainer;
-
-				// Items can only be picked up from item-containers if the
-				// character is currently in the same location as said container
+				
+				// Items can only be picked up from item-containers if the character is currently in the same location as said container
 				// OR if the container is in the character's inventory
-				if (GameUtils.equals(characterPickingUp.getProperty("locationKey"), oldContainer.getProperty("containerKey")) == false
-						&& GameUtils.equals(characterPickingUp.getKey(), oldContainer.getProperty("containerKey")) == false)
+				if (GameUtils.equals(characterPickingUp.getProperty("locationKey"), oldContainer.getProperty("containerKey"))==false && 
+						GameUtils.equals(characterPickingUp.getKey(), oldContainer.getProperty("containerKey"))==false)
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
-
-				// Check if the character can actually carry something else or
-				// if its all too heavy...
-				Long itemWeight = (Long) item.getProperty("weight");
-				if (itemWeight == null) itemWeight = 0L;
-				// If the item has a maxWeight, we will treat it as a container
-				// and include it's contents in the weight calculation..
-				if (item.getProperty("maxWeight") != null)
+				
+				// Check if the character can actually carry something else or if its all too heavy...
+				Long itemWeight = getItemWeight(item);
+				if (itemWeight==null) itemWeight = 0L;
+				// If the item has a maxWeight, we will treat it as a container and include it's contents in the weight calculation..
+				if (item.getProperty("maxWeight")!=null)
 				{
 					Long itemCarryingWeight = getItemCarryingWeight(item);
-					itemWeight += itemCarryingWeight;
+					itemWeight+=itemCarryingWeight;
 				}
-
-				if (itemWeight > 0L)
+				
+				if (itemWeight>0L)
 				{
 					long carrying = getCharacterCarryingWeight(character);
 					long maxCarrying = getCharacterMaxCarryingWeight(character);
-
-					if (carrying + itemWeight > maxCarrying)
-						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying " + GameUtils.formatNumber(carrying) + " grams and can carry a maximum of "
-								+ GameUtils.formatNumber(maxCarrying) + " grams.");
+					
+					if (carrying+itemWeight>maxCarrying)
+						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying "+GameUtils.formatNumber(carrying)+" grams and can carry a maximum of "+GameUtils.formatNumber(maxCarrying)+" grams.");
 				}
-
+				
 			}
 		}
+		
+		
+		
+		if (handled==false)
+			throw new UserErrorMessage("Unable to move this item. It is probably no longer there. Try hitting the refresh button at the top of this popup?");
 
-		if (handled == false) throw new IllegalArgumentException("Unhandled situation. Staring = " + startKind + ", Ending = " + endKind);
-
+		
+		
 		item.setProperty("containerKey", newContainer.getKey());
 		item.setProperty("movedTimestamp", new Date());
-
+		
 		ds.put(item);
 	}
 	
-	/**
-	 * This is for stuff that allows access to a given container (location, item, or character). Returns false if access should not be allowed.
-	 * @param character
-	 * @param container
-	 * @return
-	 */
-	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container)
-	{
-		// If the container is ourselves, it's ok
-		if (container.getKind().equals("Character") && GameUtils.equals(character.getKey(), container.getKey()))
-			return true;
-		
-		// If the container is our location, it's ok
-		if (container.getKind().equals("Location") && GameUtils.equals(character.getProperty("locationKey"), container.getKey()))
-			return true;
-		
-		// If the container is an item in our inventory, it's ok
-		if (container.getKind().equals("Item") && GameUtils.equals(character.getKey(), container.getProperty("containerKey")))
-			return true;
-		
-		// If the container is an item in our location, it's ok
-		if (container.getKind().equals("Item") && GameUtils.equals(character.getProperty("locationKey"), container.getProperty("containerKey")))
-			return true;
-		
-		return false;
-	}
 
 	
 	public void doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
@@ -3123,6 +3104,7 @@ public class ODPDBAccess
 		if (ds==null)
 			ds = getDB();
 		
+		
 		if (GameUtils.isCharacterInParty(character) && GameUtils.isCharacterPartyLeader(character)==false)
 		{
 			throw new UserErrorMessage("You cannot move your party because you are not the leader.");
@@ -3137,7 +3119,16 @@ public class ODPDBAccess
 			GameUtils.timePasses(travelTime.intValue());
 		
 		
-		if (randomMonsterEncounter(ds, character, getEntity((Key)character.getProperty("locationKey")), 1, 0.5d))
+
+		String forceOneWay = (String)path.getProperty("forceOneWay");
+		if ("FromLocation1Only".equals(forceOneWay) && GameUtils.equals(character.getProperty("locationKey"), path.getProperty("location2Key")))
+			throw new UserErrorMessage("You cannot take this path.");
+		if ("FromLocation2Only".equals(forceOneWay) && GameUtils.equals(character.getProperty("locationKey"), path.getProperty("location1Key")))
+			throw new UserErrorMessage("You cannot take this path.");		
+		
+		
+		CachedEntity startLocation = getEntity((Key)character.getProperty("locationKey"));
+		if (randomMonsterEncounter(ds, character, startLocation, 1, 0.5d))
 		{
 			flagNotALooter(request);
 			throw new AbortedActionException(AbortedActionException.Type.CombataWhileMoving);
@@ -3245,32 +3236,32 @@ public class ODPDBAccess
 	}
 
 
-	/**
-	 * This is a placeholder since the actual implementation is not in the ODP.
-	 * 
-	 * @param db
-	 * @param character
-	 * @param path
-	 * @throws UserErrorMessage
-	 */
-	public void doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
-	{
-		doCharacterTakePath(db, character, path, false);
-	}
-	
-	/**
-	 * This is a placeholder since the actual implementation is not in the ODP.
-	 * 
-	 * @param db
-	 * @param character
-	 * @param path
-	 * @param allowAttack
-	 * @throws UserErrorMessage
-	 */
-	public void doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
-	{
-		return;
-	}
+//	/**
+//	 * This is a placeholder since the actual implementation is not in the ODP.
+//	 * 
+//	 * @param db
+//	 * @param character
+//	 * @param path
+//	 * @throws UserErrorMessage
+//	 */
+//	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
+//	{
+//		return doCharacterTakePath(db, character, path, false);
+//	}
+//	
+//	/**
+//	 * This is a placeholder since the actual implementation is not in the ODP.
+//	 * 
+//	 * @param db
+//	 * @param character
+//	 * @param path
+//	 * @param allowAttack
+//	 * @throws UserErrorMessage
+//	 */
+//	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
+//	{
+//		return null;
+//	}
 	
 
 	/**
@@ -3557,10 +3548,8 @@ public class ODPDBAccess
             // Check if the target is killed
             if (targetHitpoints<=0)
             {
-                // If the weapon that did the killing is "zombified" then we will turn the character into a zombie instead of killing them
-            	// Alternatively, if there was no weapon but the attacker is a zombie, we will also turn the character into a zombie
-                if ((weapon!=null && "TRUE".equals(weapon.getProperty("zombifying"))) ||
-                		(weapon==null && "Zombie".equals(sourceCharacter.getProperty("status"))))
+                // If the character who did the killing is a zombie, the target character will be turned into a zombie instead of killing them
+                if ("Zombie".equals(sourceCharacter.getProperty("status")))
                 {
                     doCharacterZombify(auth, db, sourceCharacter, targetCharacter);
                     status+=" The battle is over, you won! But the target character has been turned into a zombie!";
@@ -3614,7 +3603,7 @@ public class ODPDBAccess
 		Object result = 0d;
 		if (weapon!=null && weapon.getProperty("weaponDamage")!=null && weapon.getProperty("weaponDamage").toString().trim().equals("")==false)
 		{
-		    result = solveAction("Attack with Weapon", weapon);
+		    result = solveProperty("Attack with Weapon", weapon, "weaponDamage");
 		    if (result==null)
 		        throw new RuntimeException("'Attack with Weapon' failed to solve.");
 		}
@@ -3759,9 +3748,8 @@ public class ODPDBAccess
 	 * @param weapon
 	 * @return
 	 */
-	public Object solveAction(String string, CachedEntity weapon)
+	public Object solveProperty(String string, CachedEntity weapon, String fieldName)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -3890,212 +3878,76 @@ public class ODPDBAccess
 	{
 		Map<String, Object> result = new HashMap<String, Object>();
 
+		// Collect all items that will block, to fetch all at once and attempt to block.
+		List<Key> blockItems = new ArrayList<Key>();
 		// First see if what the character is holding has blocked the attack
-		CachedEntity leftHand = null;
-		Key leftHandKey = (Key)targetCharacter.getProperty("equipmentLeftHand");
-		if (leftHandKey!=null)
-			leftHand = getEntity(leftHandKey);
-		
-		if (leftHand!=null)
+		for(Key checkKey:Arrays.asList(
+				(Key)targetCharacter.getProperty("equipmentLeftHand"),
+				(Key)targetCharacter.getProperty("equipmentRightHand"),
+				(Key)targetCharacter.getProperty("equipmentRightRing"),
+				(Key)targetCharacter.getProperty("equipmentLeftRing"),
+				(Key)targetCharacter.getProperty("equipmentNeck")))
 		{
-			Long blockChance = (Long)leftHand.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, leftHand))
-					return result;
-			}
-		}
-
-		CachedEntity rightHand = null;
-		Key rightHandKey = (Key)targetCharacter.getProperty("equipmentRightHand");
-		if (rightHandKey!=null)
-			rightHand = getEntity(rightHandKey);
-		
-		if (rightHand!=null)
-		{
-			Long blockChance = (Long)rightHand.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, rightHand))
-					return result;
-			}
+			if(checkKey!=null)
+				blockItems.add(checkKey);
 		}
 		
-		
-		CachedEntity rightRing = null;
-		Key rightRingKey = (Key)targetCharacter.getProperty("equipmentRightRing");
-		if (rightRingKey!=null)
-			rightRing = getEntity(rightRingKey);
-		
-		if (rightRing!=null)
-		{
-			Long blockChance = (Long)rightRing.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, rightRing))
-					return result;
-			}
-		}
-		
-		
-		CachedEntity leftRing = null;
-		Key leftRingKey = (Key)targetCharacter.getProperty("equipmentLeftRing");
-		if (leftRingKey!=null)
-			leftRing = getEntity(leftRingKey);
-		
-		if (leftRing!=null)
-		{
-			Long blockChance = (Long)leftRing.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, leftRing))
-					return result;
-			}
-		}
-		
-		
-		CachedEntity neck = null;
-		Key neckKey = (Key)targetCharacter.getProperty("equipmentNeck");
-		if (neckKey!=null)
-			neck = getEntity(neckKey);
-		
-		if (neck!=null)
-		{
-			Long blockChance = (Long)neck.getProperty("blockChance");
-			if (blockChance!=null && GameUtils.roll(blockChance))
-			{
-				// blocked it!
-				if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, neck))
-					return result;
-			}
-		}
-		
-		
-		// First, randomly determine where the attack is likely to land on the body (which piece of equipment will be hit)
+		// Next, randomly determine where the attack is likely to land on the body (which piece of equipment will be hit)
 		// Body/Arms = 50%, Legs = 30%, Head = 10%, Hands = 5%, Feet = 5%
 		Random rnd = new Random();
 		int hitPlacement = rnd.nextInt(100);
 		if (GameUtils.between(hitPlacement, 0, 50))
 		{
 			// chest/arms hit
-			CachedEntity chest = null;
-			CachedEntity shirt = null;
-			Key chestKey = (Key)targetCharacter.getProperty("equipmentChest");
-			Key shirtKey = (Key)targetCharacter.getProperty("equipmentShirt");
-			if (chestKey!=null)
-				chest = getEntity(chestKey);
-			if (shirtKey!=null)
-				shirt = getEntity(shirtKey);
-			
-			// Determine if the chestpiece was hit...
-			if (chest!=null)
-			{
-				Long blockChance = (Long)chest.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// The chest piece blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, chest))
-						return result;
-				}
-			}
-			
-			if (shirt!=null)
-			{
-				Long blockChance = (Long)shirt.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// The chest piece blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, shirt))
-						return result;
-					
-				}
-			}
-			
-			
+			for(Key checkKey:Arrays.asList(
+					(Key)targetCharacter.getProperty("equipmentChest"),
+					(Key)targetCharacter.getProperty("equipmentShirt")))
+				if(checkKey != null)
+					blockItems.add(checkKey);
 		}
 		else if (GameUtils.between(hitPlacement, 50, 80))
 		{
 			// legs hit
-			CachedEntity armor = null;
 			Key armorKey = (Key)targetCharacter.getProperty("equipmentLegs");
 			if (armorKey!=null)
-				armor = getEntity(armorKey);
-			
-			// Determine if the chestpiece was hit...
-			if (armor!=null)
-			{
-				Long blockChance = (Long)armor.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// The chest piece blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
-						return result;
-				}
-			}
+				blockItems.add(armorKey);
 			
 		}
 		else if (GameUtils.between(hitPlacement, 80, 90))
 		{
 			// head hit
-			CachedEntity armor = null;
 			Key armorKey = (Key)targetCharacter.getProperty("equipmentHelmet");
 			if (armorKey!=null)
-				armor = getEntity(armorKey);
-			
-			// Determine if the chestpiece was hit...
-			if (armor!=null)
-			{
-				Long blockChance = (Long)armor.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
-						return result;
-				}
-			}
+				blockItems.add(armorKey);
 		}
 		else if (GameUtils.between(hitPlacement, 90, 95))
 		{
 			// Hands hit
-			CachedEntity armor = null;
 			Key armorKey = (Key)targetCharacter.getProperty("equipmentGloves");
 			if (armorKey!=null)
-				armor = getEntity(armorKey);
-			
-			// Determine if the chestpiece was hit...
-			if (armor!=null)
-			{
-				Long blockChance = (Long)armor.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
-						return result;
-				}
-			}
+				blockItems.add(armorKey);
 		}
 		else if (GameUtils.between(hitPlacement, 95, 100))
 		{
 			// feet hit
-			CachedEntity armor = null;
 			Key armorKey = (Key)targetCharacter.getProperty("equipmentBoots");
 			if (armorKey!=null)
-				armor = getEntity(armorKey);
-			
-			// Determine if the chestpiece was hit...
-			if (armor!=null)
+				blockItems.add(armorKey);
+		}
+		
+		// Get all the entities from DB. 
+		// Possible that item has been destroyed, so clear out null entries first.
+		List<CachedEntity> blockEntities = getDB().get(blockItems);
+		for(int i = blockEntities.size()-1; i >= 0; i--)
+			if(blockEntities.get(i) == null) blockEntities.remove(i);
+		
+		// Process all the blocks now. 
+		for(CachedEntity block:GameUtils.roll(blockEntities, "blockChance", null, null))
+		{
+			if (block!=null)
 			{
-				Long blockChance = (Long)armor.getProperty("blockChance");
-				if (blockChance!=null && GameUtils.roll(blockChance))
-				{
-					// blocked it!
-					if (updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, armor))
-						return result;
-				}
+				if(updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, block))
+					break;
 			}
 		}
 		
@@ -4146,13 +3998,16 @@ public class ODPDBAccess
 					setCharacterMode(null, attackingCharacter, ODPDBAccess.CHARACTER_MODE_NORMAL);
 					attackingCharacter.setProperty("combatant", null);
 					attackingCharacter.setProperty("combatType", null);
-			
+					attackingCharacter.setProperty("locationEntryDatetime", new Date());
+	
 					
 					////////////////////////
 					// Now, depending on if the killed character is an NPC or not, and if the killer is an NPC or not, do some stuff...
 			
 					
-					
+					// First, always set the timestamp
+					characterToDie.setProperty("locationEntryDatetime", new Date());
+
 					
 					// If the attacker is a PC
 					if (attackingCharacter.getProperty("type")==null || "".equals(attackingCharacter.getProperty("type")) || "PC".equals(attackingCharacter.getProperty("type")))
@@ -4376,6 +4231,13 @@ public class ODPDBAccess
 		
 		if (loot.equals(""))
 			loot = null;
+		
+		
+		// Finally, lets update the character that was passed into this method so further processing will have
+		// the updated field values
+		CachedDatastoreService.copyFieldValues(characterToDie, characterToDieFinal);
+		CachedDatastoreService.copyFieldValues(attackingCharacter, attackingCharacterFinal);
+		
 		return loot;
 	}
 	
@@ -4625,6 +4487,486 @@ public class ODPDBAccess
 	}
 	
 
+	public boolean isCharacterAbleToCreateCampsite(CachedDatastoreService ds, CachedEntity character, CachedEntity location)
+	{
+		if ((Long)location.getProperty("supportsCamps")==null || (Long)location.getProperty("supportsCamps")==0)
+			return false;
+
+		// Now check if the location has a monster count of less than 25%. If so, allow them to create a camp.
+//		Double monsterCount = getMonsterCountForLocation(ds, location);
+//		Double maxMonsterCount = (Double)location.getProperty("maxMonsterCount");
+//		if (maxMonsterCount==null)
+//			return true;
+//		if (monsterCount/maxMonsterCount>0.25d)
+//			return false;
+		
+		return true;
+		
+	}
+
+	
+	public long getActivePlayers()
+	{
+		CachedDatastoreService ds = getDB();
+		
+		Long count = ds.getStat("ActivePlayerCount");
+		if (count==null)
+		{
+			GregorianCalendar cal = new GregorianCalendar();
+			cal.add(Calendar.MINUTE, -10);
+			count = getFilteredList_Count("Character", "locationEntryDatetime", FilterOperator.GREATER_THAN, cal.getTime()).longValue();
+			ds.setStat("ActivePlayerCount", count, 300);
+		}
+		
+		return count;
+	}
+
+	public List<CachedEntity> getActivePlayers(int minutesSinceLastActivity)
+	{
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.add(Calendar.MINUTE, minutesSinceLastActivity*-1);
+		return getFilteredList("Character", "locationEntryDatetime", FilterOperator.GREATER_THAN, cal.getTime());
+	}
+
+	/**
+	 * Returns the list of users in a group that have been active within the last given minutes.
+	 * 
+	 * @param group
+	 * @param minutesSinceLastActivity
+	 * @return
+	 */
+	public List<CachedEntity> getActiveGroupPlayers(CachedEntity group, List<CachedEntity> groupMembers, int minutesSinceLastActivity)
+	{
+		
+		if (groupMembers==null)
+			groupMembers = getGroupMembers(null, group);
+		else
+			groupMembers = (ArrayList<CachedEntity>)((ArrayList<CachedEntity>)groupMembers).clone();	// lol
+			
+		
+		// GO through the members list and pull out all the applications into a new list
+		for (int i = groupMembers.size() - 1; i >= 0; i--)
+			if ("Applied".equals(groupMembers.get(i).getProperty("groupStatus"))) 
+				groupMembers.remove(i);
+
+		
+		
+		// filter out any members that are not within the last activity range we want...
+		for(int i = groupMembers.size()-1; i>=0; i--)
+		{
+			CachedEntity member = groupMembers.get(i);
+			Date lastAction = (Date)member.getProperty("locationEntryDatetime");
+			Date currentDate = new Date();
+			
+			if (lastAction==null || (lastAction.getTime()<currentDate.getTime()-(minutesSinceLastActivity*60*1000)))
+				groupMembers.remove(i);
+		}
+			
+		
+		// Now pull out all the user keys so we can fetch them all at once
+		Set<Key> usersToFetch = new HashSet<Key>();
+		for(CachedEntity member:groupMembers)
+		{
+			Key userKey = (Key)member.getProperty("userKey");
+			
+			if (userKey!=null)
+				usersToFetch.add(userKey);
+		}
+		List<CachedEntity> users = getDB().get(usersToFetch);
+		
+		
+		// Now go through each of the users in the group and remove non-premium members
+		for(int i = users.size()-1; i>=0; i--)
+		{
+			CachedEntity user = users.get(i);
+			
+			if (GameUtils.equals(user.getProperty("premium"), true)==false)
+				users.remove(i);
+		}
+		
+		return users;
+	}
+
+	
+	
+	
+	public Long getItemCarryingSpace(CachedEntity item)
+	{
+		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", item.getKey());
+		return getItemCarryingSpace(item, inventory);
+	}
+
+	public Long getItemCarryingWeight(CachedEntity item)
+	{
+		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", item.getKey());
+		return getItemCarryingWeight(item, inventory);
+	}
+	
+	
+	public Long getCharacterCarryingWeight(CachedEntity character)
+	{
+		List<CachedEntity> inventory = getFilteredList("Item", "containerKey", character.getKey());
+		List<CachedEntity> inventoryCharacters = getFilteredList("Character", "locationKey", character.getKey());
+		return getCharacterCarryingWeight(character, inventory, inventoryCharacters);
+	}
+	
+	
+	public Long getCharacterCarryingWeight(CachedEntity character, List<CachedEntity> inventory, List<CachedEntity> inventoryCharacters)
+	{
+		long carrying = 0l;
+		
+		for(CachedEntity item:inventory)
+		{
+			Long weight = getItemWeight(item);
+			
+			if (weight==0L)
+				continue;
+			
+			// If the item is equipped (not in the left/right hand) then don't count it's weight against us
+			if ("LeftHand".equals(item.getProperty("equipSlot"))==false && 
+					"RightHand".equals(item.getProperty("equipSlot"))==false && 
+					"2Hands".equals(item.getProperty("equipSlot"))==false && 
+					checkCharacterHasItemEquipped(character, item.getKey()))
+				continue;
+			
+			carrying+=weight;
+		}
+
+		for(CachedEntity c:inventoryCharacters)
+		{
+			Long weight = getCharacterWeight(c);
+			
+			carrying+=weight;
+		}
+		
+		return carrying;
+	}
+	
+	public long getCharacterMaxCarryingWeight(CachedEntity character)
+	{
+		long maxCarryWeight = 60000;
+		Double str = (Double)character.getProperty("strength");
+		
+		maxCarryWeight += (long)Math.round((str-3d)*50000d);
+		
+		
+		return maxCarryWeight;
+	}
+	
+	public Long getItemCarryingWeight(CachedEntity character, List<CachedEntity> inventory)
+	{
+		long carrying = 0l;
+		
+		for(CachedEntity item:inventory)
+		{
+			carrying+=getItemWeight(item);
+		}
+
+		
+		return carrying;
+	}
+	
+	public Long getItemCarryingSpace(CachedEntity character, List<CachedEntity> inventory)
+	{
+		long space = 0l;
+		
+		for(CachedEntity item:inventory)
+		{
+			Long itemSpace = (Long)item.getProperty("space");
+			if (itemSpace==null)
+				continue;
+			
+			space+=itemSpace;
+		}
+
+		
+		return space;
+	}
+
+	public Long getItemWeight(CachedEntity item)
+	{
+		Long itemQuantity = (Long)item.getProperty("quantity");
+		if (itemQuantity==null) itemQuantity = 1L;
+		Long itemWeight = (Long)item.getProperty("weight");
+		if (itemWeight==null) itemWeight = 0L;
+		
+		return itemWeight*itemQuantity;
+	}
+
+	/**THIS IS A PLACEHOLDER. Actual implementation is not in the ODP.
+	 * 
+	 * Using the given entityRequirement, this method will attempt to determine if the given entity 
+	 * meets the requirements laid out in the entityRequirement.
+	 * 
+	 * @param entityRequirement
+	 * @param entity
+	 * @return 
+	 */
+	public boolean validateEntityRequirement(CachedEntity entityRequirement, CachedEntity entity)
+	{
+		return false;
+	}
+
+	
+	
+	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path) throws UserErrorMessage
+	{
+		return doCharacterTakePath(db, character, path, false);
+	}
+	
+	
+	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
+	{
+		if (db==null)
+			db = getDB();
+
+		if (CHARACTER_MODE_COMBAT.equals(character.getProperty("mode")))
+			throw new UserErrorMessage("You cannot move while you're in combat.");
+		
+		
+		
+		CachedEntity destination = null;
+		Key destinationKey = null;
+		// First get the character's current location
+		Key currentLocationKey = (Key)character.getProperty("locationKey");
+		
+		// Then determine which location the character will end up on.
+		// If we find that the character isn't on either end of the path, we'll throw.
+		Key pathLocation1Key = (Key)path.getProperty("location1Key");
+		Key pathLocation2Key = (Key)path.getProperty("location2Key");
+		if (currentLocationKey.getId()==pathLocation1Key.getId())
+			destinationKey = pathLocation2Key;
+		else if (currentLocationKey.getId()==pathLocation2Key.getId())
+			destinationKey = pathLocation1Key;
+		else
+			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
+		destination = getEntity(destinationKey);
+
+		String forceOneWay = (String)path.getProperty("forceOneWay");
+		if ("FromLocation1Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation2Key.getId())
+			throw new UserErrorMessage("You cannot take this path.");
+		if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
+			throw new UserErrorMessage("You cannot take this path.");
+			
+		boolean isInParty = true;
+		if (character.getProperty("partyCode")==null || character.getProperty("partyCode").equals(""))
+			isInParty = false;
+
+		if (destination.getProperty("ownerKey")!=null)
+		{
+			if (isInParty)
+				throw new UserErrorMessage("You cannot enter a player owned property while in a party. Disband your part first.");
+			
+			Key ownerKey = (Key)destination.getProperty("ownerKey");
+			if (ownerKey.getKind().equals("Group"))
+			{
+				String groupStatus = (String)character.getProperty("groupStatus");
+				if (character.getProperty("groupKey")==null || 
+						ownerKey.getId() != ((Key)character.getProperty("groupKey")).getId() || 
+						("Member".equals(groupStatus)==false && "Admin".equals(groupStatus)==false))
+					throw new UserErrorMessage("You cannot enter a group-owned house unless you are part of that group.");
+			}
+		}
+		
+		MovementService movementService = new MovementService(this);
+		
+		// Check if this property is locked and if so, if we have the key to enter it...
+		movementService.checkForLocks(character, path, destinationKey);
+		
+		
+		
+		// Check if we're being blocked by the blockade
+		CachedEntity blockadeStructure = getBlockadeFor(character, destination);
+		
+		if (isInParty && blockadeStructure!=null)
+			throw new UserErrorMessage("You are approaching a defensive structure but you cannot attack as a party. Disband your party before attacking the defensive structure.");
+		
+		if (isInParty && "Instance".equals(destination.getProperty("combatType")))
+			throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
+		
+		if (allowAttack==false && blockadeStructure!=null)
+			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a href='ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"&attack=true'>Click here to attack!</a>", false);
 
 
+		
+		
+		
+		List<CachedEntity> party = null;
+		EngageBlockadeOpponentResult opponentResult = null; 
+		
+		// Set the character's new location AND all party members if applicable...
+		if (isInParty==false)
+		{
+			// Here is where we'll check if we're entering combat with a defending player...
+			System.out.println("");
+			if (blockadeStructure!=null)
+				opponentResult = engageBlockadeOpponent(db, character.getKey(), currentLocationKey, destination, (Key)blockadeStructure.getProperty("locationKey"), blockadeStructure);
+			
+			if (opponentResult==null || opponentResult.freeToPass)
+			{
+				// There are no opponents at all so allow the player to advance
+				character.setProperty("locationKey", destination.getKey());
+			}
+			else if (opponentResult.defender!=null)
+			{
+				// We're engaging the enemy! We need to get out of here
+				return null;
+			}
+			else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==true)
+			{
+				// There are no opponents available AND all opponents are NPC opponents, so we will let the player pass
+				character.setProperty("locationKey", destination.getKey());
+			}
+			else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==false)
+			{
+				// This situation occurs when all the defenders are busy, the player has to wait for combat
+				throw new UserErrorMessage("There is active combat going on at this site but you have no room to engage and cannot pass. Try again later.", false);
+			}
+			else
+				throw new RuntimeException("Unhandled situation exception.");
+			
+			
+		}
+		else
+		{
+			party = getParty(db, character);
+			if ("TRUE".equals(character.getProperty("partyLeader"))==false)
+				throw new UserErrorMessage("You cannot move the party because you're not the party leader.");
+			
+			setPartiedField(party, character, "locationKey", destination.getKey());
+			
+			// Discover the path the party is taking if we haven't already discovered it..
+			if (party!=null)
+				for(CachedEntity member:party)
+					if (member.getKey().getId()!=character.getKey().getId())
+					{
+						doCharacterDiscoverEntity(db, member, path);
+						
+						sendNotification(db, member.getKey(), NotificationType.fullpageRefresh);
+					}
+			
+//			character.setProperty("locationKey", destination.getKey());
+//			party = getParty(db, character);
+//			if (party!=null)
+//				for(CachedEntity member:party)
+//					if (member.getKey().getId()!=character.getKey().getId())
+//					{
+//						member.setProperty("locationKey", destination.getKey());
+//						doCharacterDiscoverEntity(db, member, path);
+//						
+//						db.put(member);
+//					}
+		}
+
+		// If this destination is a town, then we will want to change the homeTownKey now
+		if ("Town".equals(destination.getProperty("type")))
+			character.setProperty("homeTownKey", destinationKey);
+		
+		
+
+		// Now determine if the path contains an NPC that the character would immediately enter battle with...
+		List<CachedEntity> npcsInTheArea = getFilteredList("Character", "locationKey", destinationKey);
+		npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
+
+		shuffleCharactersByAttackOrder(npcsInTheArea);
+		
+		for(CachedEntity possibleNPC:npcsInTheArea)
+			if ("NPC".equals(possibleNPC.getProperty("type")) && (Double)possibleNPC.getProperty("hitpoints")>0d)
+			{
+				setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
+				setPartiedField(party, character, "combatant", possibleNPC.getKey());
+//				// If we've been interrupted, we'll just get out and not actually travel to the location, but ONLY
+//				// if we're not entering a CombatSite!
+//				if ("CombatSite".equals(destination.getProperty("type"))==false)
+//					return;		
+			}
+		
+		// Now check if we have a discovery for this path we just took...
+		CachedEntity discovery = getDiscoveryByEntity(character.getKey(), path.getKey()); 
+		if (discovery==null)
+		{
+			newDiscovery(db, character, path);
+		}
+		else
+		{
+			if ("TRUE".equals(discovery.getProperty("hidden")))
+			{
+				discovery.setProperty("hidden", "FALSE");
+				db.put(discovery);
+			}
+		}
+		
+		// HACK: We didn't always save the PlayerHouse Paths against users. If this PlayerHouse path doesn't have a user assigned to it, assign it to us
+		if ("PlayerHouse".equals(path.getProperty("type")) && 
+				(path.getProperty("ownerKey")==null || 
+				("Town".equals(destination.getProperty("type"))==false && destination.getProperty("ownerKey")==null)))
+		{
+			CachedEntity user = getUserByCharacterKey(character.getKey());
+			if (user!=null)
+			{
+				path.setProperty("ownerKey", user.getKey());
+				destination.setProperty("ownerKey", user.getKey());
+				
+				db.put(path);
+				db.put(destination);
+			}
+		}
+
+		// Lets just go ahead and reset the status field for the character here (this relates to defence structures)
+		//character.setProperty("status", null);
+		
+		doCharacterTimeRefresh(db, character);	// This is saving the character so no need to save after this
+		
+		putPartyMembersToDB_SkipSelf(db, party, character);
+		
+		
+		// Here we're going to take a list we got from the opponentResult stuff and reuse it for performance reasons...
+		// We're going to determine if we should refresh the leader on the defence structure we just arrived at or left from
+		if (opponentResult!=null && opponentResult.charactersInBlockade!=null)
+		{
+			for(int i = 0; i<opponentResult.charactersInBlockade.size(); i++)
+			{
+				if (opponentResult.charactersInBlockade.get(i).getKey().getId() == character.getKey().getId())
+				{
+					opponentResult.charactersInBlockade.set(i, character);
+					break;
+				}
+			}
+			
+			// Check if we are entering a defence structure location
+			if (blockadeStructure != null)
+			{
+				refreshDefenceStructureLeader(db, blockadeStructure, opponentResult.charactersInBlockade);
+			}
+			
+		}
+		
+		return destination;
+	}
+	
+	
+	public class EngageBlockadeOpponentResult
+	{
+		public CachedEntity defender;
+		public boolean freeToPass;
+		public Boolean hasDefenders;
+		public boolean onlyNPCDefenders;
+		public List<CachedEntity> charactersInBlockade;	// This is a performance related field so we don't have to fetch this list again for other reasons
+		
+	}
+	/**
+	 * This is a placeholder because the actual implementation is not in the ODP.
+	 * @param db
+	 * @param key
+	 * @param currentLocationKey
+	 * @param destination
+	 * @param property
+	 * @param blockadeStructure
+	 * @return
+	 */
+	public EngageBlockadeOpponentResult engageBlockadeOpponent(CachedDatastoreService db, Key key, Key currentLocationKey, CachedEntity destination, Key property, CachedEntity blockadeStructure) throws UserErrorMessage
+	{
+		return null;
+	}
+	
 }

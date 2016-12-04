@@ -842,6 +842,9 @@ function ajaxAction(url, eventObject, loadFunction)
 }
 
 
+/**
+ * Displays a popup that shows various chat commands available.
+ */
 function helpPopup()
 {
 	popupMessage("Help", "The following chat commands exist:" +
@@ -858,8 +861,12 @@ function helpPopup()
 			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" + 
 			"<li>/app - This shows all the links to the mobile apps we have available.</li>" +
 			"<li>/competition - This puts up a link to the official competition page. This page allows you to donate to prize pools and is usually used to organize competitions between the content developers for creating new content.</li>" +
+			"<li>/faq - This puts up a link to a player made Frequently Asked Questions document which <a href='http://initium.wikia.com/wiki/Staub%27s_FAQ_Guide' target='_blank'>you can also find here.</a></li>" +
+			"<li>/guide - This puts up a link to a player made Starter Guide which <a href='http://initium.wikia.com/wiki/Starter_Guide' target='_blank'>you can also find here.</a></li>" +
+			"<li>/group - This puts up a link to the group that you belong to if you belong to one.</li>" +
+			"<li>/groups - This puts up a link to a player made list of groups in Initium which <a href='http://initium.wikia.com/wiki/Category:Player_Groups' target='_blank'>you can also find here.</a></li>" +
+			"<li>/wiki - This puts up a link to a player made wiki for Initium which <a href='http://initium.wikia.com/wiki/Initium_Wiki' target='_blank'>you can also find here.</a></li>" +
 			"</ul>", false);
-	
 }
 
 
@@ -891,6 +898,7 @@ function shareItem(itemId)
 
 function viewGroup(groupId)
 {
+	closeAllTooltips();
 	pagePopup("odp/ajax_group.jsp?groupId=" + groupId);
 }
 
@@ -1284,6 +1292,12 @@ function refreshInstanceRespawnWarning()
 			warning.text("Reinforcements will arrive in "+secondsElapsed(seconds)+". If you do not vacate the premises before they arrive, you will be forced out!");
 		warning.show();
 	}
+	else
+	{
+		var warning = $("#instanceRespawnWarning");
+		warning.text("");
+		warning.hide();
+	}
 }
 
 //function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
@@ -1296,7 +1310,7 @@ function refreshInstanceRespawnWarning()
 function giftPremium()
 {
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
-		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose no.", function(){
+		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
 			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
 		}, function(){
 			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
@@ -1381,7 +1395,7 @@ function pagePopup(url, closeCallback)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	
 	if (closeCallback!=null)
@@ -1573,10 +1587,22 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 	});
 }
 
+function doTriggerLocation(event, effectId, locationId)
+{
+	doTriggerEffect(event, "Link", effectId, "location", locationId);
+}
+
+function doTriggerItem(event, effectId, itemId)
+{
+	doTriggerEffect(event, "Link", effectId, "item", itemId);
+}
+
 function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
 {
+	closeAllTooltips();
+	
 	var params = {"scriptId": effectId };
-	params[sourceType.toLowerCase() + "Id"] = sourceId;
+	params[sourceType + "Id"] = sourceId;
 	doCommand(event, "Script"+effectType, params);
 }
 
@@ -1761,9 +1787,9 @@ function tradeAddItemNew(eventObject,itemId)
 	})
 }
 
-function tradeSetGoldNew(eventObject,currentDogecoin)
+function tradeSetGoldNew(eventObject,currentDogecoin,curAvailDogecoin)
 {
-	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
+	promptPopup("Trade Gold", "How much gold do you want to add to the trade (out of "+ curAvailDogecoin +"):", currentDogecoin+"", function(amount){
 		if (amount!=null && amount!="")
 		{
 			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(data,error){
@@ -1848,6 +1874,17 @@ function doEatBerry(eventObject)
 		if (error) return;
 		reloadPagePopup();
 		popupMessage("System Message", "That was a tasty berry! Makes you feel kinda weird though, like your insides are trying to become outsides. WOW OK, now you don't feel too good. But you understand why. You feel like you understand a lot of things.");
+	});
+}
+
+function doEatCandy(eventObject)
+{	
+	var itemId = $("#popupItemId").val();
+	if (itemId == null) return;
+	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
+		if (error) return;
+		reloadPagePopup();
+		popupMessage("System Message", "You eat the ancient candy bar and your insides gurgle back at you. You probably shouldn't eat too much of this. Who knows what could happen?");
 	});
 }
 
@@ -1971,6 +2008,11 @@ function ajaxUpdatePage(ajaxResponseData)
 			else if (htmlData.type==3)
 			{
 				$(htmlData.selector).last().after(htmlData.html);
+			}
+			else if (htmlData.type==4)
+			{
+				$("#"+htmlData.id).remove();
+				$("body").append("<script id='"+htmlData.id+"' type='text/javascript'>"+htmlData.js+"</script>");
 			}
 		}
 	}
@@ -2189,6 +2231,10 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 			fullpageRefresh();
 			return;
 		}
+		if (data.userMessage!=null)
+		{
+			popupMessage("System Message", data.userMessage, false);
+		}
 		if (responseFunction!=null)
 			responseFunction(data);
 		
@@ -2257,7 +2303,7 @@ function doGoto(event, pathId, attack)
 			{
 				if (action.isComplete)
 				{
-					fullpageRefresh();
+					//fullpageRefresh();
 				}
 				else
 				{
@@ -2901,7 +2947,7 @@ function mergeItemStacks(eventObject, selector)
 	doCommand(eventObject, "ItemsStackMerge",{"itemIds":itemIds});
 }
 
-function splitItemStack(eventObject)
+function splitItemStack(eventObject, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;

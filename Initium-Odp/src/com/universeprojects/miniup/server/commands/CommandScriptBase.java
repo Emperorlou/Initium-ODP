@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -16,6 +18,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
+import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -56,6 +59,7 @@ public abstract class CommandScriptBase extends Command {
 		//// SECURITY CHECKS
 		@SuppressWarnings("unchecked")
 		List<Key> sourceScriptKeys = (List<Key>)entitySource.getProperty("scripts");
+		if(sourceScriptKeys == null) sourceScriptKeys = new ArrayList<Key>();
 		for(Key scriptKey:sourceScriptKeys)
 		{
 			if (GameUtils.equals(scriptId, scriptKey.getId()))
@@ -74,24 +78,24 @@ public abstract class CommandScriptBase extends Command {
 			case("Character"):
 			{
 				if (GameUtils.equals(entityKey, character.getKey())==false)
-				{
 					throw new UserErrorMessage("You are not allowed to trigger others");
-				}
+				break;
 			}
 			case("Item"):
 			{
 				// ...by being close enough to the item OR having it in their pocket
 				Key itemContainerKey = (Key)entitySource.getProperty("containerKey");
 				if (itemContainerKey==null || GameUtils.equals(character.getKey(), itemContainerKey)==false)
-				{
 					throw new UserErrorMessage("You can only trigger items in your posession!");
-				}
 				break;
 			}
 			case("Location"):
 			{
-				if(db.checkContainerAccessAllowed(character, entitySource)==false)
+				ContainerService cs = new ContainerService(db);
+				
+				if(cs.checkContainerAccessAllowed(character, entitySource)==false)
 					throw new UserErrorMessage("You are not located at the specified trigger location!");
+				break;
 			}
 			default:
 			{

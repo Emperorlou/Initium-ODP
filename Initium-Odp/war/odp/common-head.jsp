@@ -16,6 +16,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/> 
 <!-- <meta name="viewport" content="minimum-scale=0.3, maximum-scale=1"/> -->
 <meta name="keywords" content="initium, game, web game, video game, free to play, mmorpg, mmo">
+<meta name="referrer" content="no-referrer" />
 
 <script type="text/javascript" src="https://code.createjs.com/preloadjs-0.6.2.min.js"></script>
 <script type="text/javascript" src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
@@ -25,9 +26,9 @@
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=55"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=57"></script>
 
-<script type="text/javascript" src="javascript/messager.js?v=5"></script>
+<script type="text/javascript" src="javascript/messager.js?v=17"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
 <script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
@@ -37,7 +38,7 @@
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=50">
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=54">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="javascript/rangeslider/rangeslider.min.js"></script>
@@ -60,6 +61,7 @@
 
 
 <script type="text/javascript">
+	window.chatIdToken = "${chatIdToken}";
 	window.characterId = ${characterId};
 	window.verifyCode = "${verifyCode}";
 	window.serverTime=<c:out value="${serverTime}"/>;

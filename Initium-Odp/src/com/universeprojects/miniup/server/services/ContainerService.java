@@ -9,6 +9,7 @@ import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.Transaction;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
@@ -23,35 +24,53 @@ public class ContainerService extends Service {
 		
 		if (durability > 0) {
 			container.setProperty("durability", durability - durabilityLoss);
-			ds.put(container);
 		}
 		else { // items inside are moved to the container's container, and container is destroyed {
-			try {	
-				CachedEntity parentContainer = (CachedEntity) new Transaction<CachedEntity>(ds) {
-					
-					@Override
-					public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
-						CachedEntity parentContainer = db.getEntity((Key) container.getProperty("containerKey"));
-						List<CachedEntity> items = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, parentContainer.getKey());
-						
-						for (CachedEntity item:items) {
-							item.setProperty("containerKey", parentContainer.getKey());
-							item.setProperty("movedDate", new Date());
-							
-							ds.put(item);
-						}
-						
-						ds.delete(container);
-						
-						return parentContainer;
-					}
-				}.run();
+			CachedEntity parentContainer = db.getEntity((Key) container.getProperty("containerKey"));
+			List<CachedEntity> items = db.getFilteredList("Item", "containerKey", FilterOperator.EQUAL, parentContainer.getKey());
+			
+			for (CachedEntity item:items) {
+				item.setProperty("containerKey", parentContainer.getKey());
+				item.setProperty("movedDate", new Date());
+				
+				ds.put(item);
 			}
-			catch (AbortTransactionException e) {
-				throw new RuntimeException(e);
-			}
+			
+			Long coins = (Long)container.getProperty("dogecoins");
+			if (coins<=0)
+				ds.delete(container);
+						
 			
 			throw new UserErrorMessage("The container has been destroyed due to durability loss, and any items inside have fallen out of it.");
 		}
 	}
+	
+	
+	/**
+	 * This is for stuff that allows access to a given container (location, item, or character). Returns false if access should not be allowed.
+	 * @param character
+	 * @param container
+	 * @return
+	 */
+	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container)
+	{
+		// If the container is ourselves, it's ok
+		if (container.getKind().equals("Character") && GameUtils.equals(character.getKey(), container.getKey()))
+			return true;
+		
+		// If the container is our location, it's ok
+		if (container.getKind().equals("Location") && GameUtils.equals(character.getProperty("locationKey"), container.getKey()))
+			return true;
+		
+		// If the container is an item in our inventory, it's ok
+		if (container.getKind().equals("Item") && GameUtils.equals(character.getKey(), container.getProperty("containerKey")))
+			return true;
+		
+		// If the container is an item in our location, it's ok
+		if (container.getKind().equals("Item") && GameUtils.equals(character.getProperty("locationKey"), container.getProperty("containerKey")))
+			return true;
+		
+		return false;
+	}
+	
 }

@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
@@ -48,7 +48,9 @@ public class CommandDogeCoinsCollectFromItem extends Command {
 		if(itemContainer == null)
 			throw new RuntimeException("itemId " + itemId + " does not have a valid container");
 
-		if(db.checkContainerAccessAllowed(character, itemContainer)==false)
+		ContainerService cs = new ContainerService(db);
+		
+		if(cs.checkContainerAccessAllowed(character, itemContainer)==false)
 			throw new UserErrorMessage("Character does not have access to this container");
 
 		Long characterCoins = (Long)character.getProperty("dogecoins");
@@ -60,8 +62,8 @@ public class CommandDogeCoinsCollectFromItem extends Command {
 		ds.put(item);
 		ds.put(character);
 		
-		MainPageUpdateService service = new MainPageUpdateService(db, this);
-		service.updateMoney(character);
+		MainPageUpdateService service = new MainPageUpdateService(db,db.getCurrentUser(), character, null, this);
+		service.updateMoney();
 	}
 
 }

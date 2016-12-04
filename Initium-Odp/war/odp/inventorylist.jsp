@@ -64,7 +64,7 @@
 				for(CachedEntity c:carryingChars)
 				{
 					out.println("<div class='main-item-container'>");
-					out.println(GameUtils.renderCharacter(null, c, true));
+					out.println(GameUtils.renderCharacter(null, c, true, false));
 					out.println("<br>");
 					out.println("<div class='main-item-controls'>");
 					out.println("<a onclick='ajaxAction(\"ServletCharacterControl?type=dropCharacter&characterId="+c.getKey().getId()+"\", event, loadInventoryAndEquipment)'>Put on ground</a>");
