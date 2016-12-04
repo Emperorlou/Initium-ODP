@@ -4754,8 +4754,55 @@ public class ODPDBAccess
 
 		if (destination.getProperty("ownerKey")!=null)
 		{
-			if (isInParty)
+			if (isInParty) {
+				List<CachedEntity> partyMembers = getParty(db, character);
+				List<CachedEntity> partyGroups = new ArrayList<CachedEntity>();
+				List<CachedEntity> partyUsers = new ArrayList<CachedEntity>();
+				for(CachedEntity partyMember: partyMembers) {
+					//Removes those who have just applied
+					String groupStatus = (String)character.getProperty("groupStatus");
+					if(("Member".equals(groupStatus)==false && "Admin".equals(groupStatus)==false)) {
+						partyGroups.add(new CachedEntity());
+					} else {
+						partyGroups.add(partyMember.getProperty("groupKey"));
+					}
+					partyUsers.add(partyMember.getProperty("userKey"));
+				}
+				Key ownerKey = (Key)destination.getProperty("ownerKey");
+				if(ownerKey.getKind().equals("Group")){
+					//iterates through the list of groups that the party members belong to.
+					//if there are any differences, set the flag to false
+					boolean allInSameGroup = true;
+					for(int i = 0; i < partyGroup.size() - 1; i++) {
+						if(!partyGroups.get(i).equals(partyGroups.get(i+1))){
+							allInSameGroup = false;
+						}
+					}
+					if(allInSameGroup && ownerKey.equals(partyGroups.get(0))) {
+						return destination;
+					} else {
+						throw new UserErrorMessage("You cannot enter a group owned house in a party unless all members of the party are part of that group.");
+					}
+				} else if(ownerKey.getKind().equals("User")) {
+					//iterates through the list of accounts that the party members belong to.
+					//if there are any differences, set the flag to false
+					boolean allOfSameUser = true;
+					for(int i = 0; i < partyUsers.size() - 1; i++) {
+						if(!partyUsers.get(i).equals(partyUsers.get(i+1))){
+							allOfSameUser = false;
+						}
+					}
+					if(allOfSameUser && ownerKey.equals(partyUsers.get(0))) {
+						return destination;
+					} else {
+						throw new UserErrorMessage("You cannot enter a player owned house in a party unless all members of the party are characters of that player.");
+					}
+				}
+				
+				
 				throw new UserErrorMessage("You cannot enter a player owned property while in a party. Disband your part first.");
+			}
+				
 			
 			Key ownerKey = (Key)destination.getProperty("ownerKey");
 			if (ownerKey.getKind().equals("Group"))
