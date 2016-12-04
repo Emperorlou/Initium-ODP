@@ -3,13 +3,13 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CachedDatastore"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-codec-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/rhino1.7.6/rhinojs.jar" sourcepath="libs/rhino1.7.6/src"/>
-	<classpathentry exported="true" kind="lib" path="war/WEB-INF/lib/javassist-3.12.1.GA.jar"/>
-	<classpathentry exported="true" kind="lib" path="war/WEB-INF/lib/reflections-0.9.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="war/WEB-INF/lib/slf4j-api-1.6.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="war/WEB-INF/lib/java-webapp-lite-v1.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="war/WEB-INF/lib/guava-16.0.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Cached-Datastore"/>
+	<classpathentry kind="lib" path="libs/guava-16.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/java-webapp-lite-v1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/javassist-3.12.1.GA.jar"/>
+	<classpathentry kind="lib" path="libs/reflections-0.9.10.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
