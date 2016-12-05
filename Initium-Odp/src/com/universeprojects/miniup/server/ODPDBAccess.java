@@ -4755,6 +4755,8 @@ public class ODPDBAccess
 		if (destination.getProperty("ownerKey")!=null)
 		{
 			if (isInParty) {
+				//We check to see if all members of the party have access by default to enter
+				//the owned housing.  If not, we reject.
 				List<CachedEntity> partyMembers = getParty(db, character);
 				List<CachedEntity> partyGroups = new ArrayList<CachedEntity>();
 				List<CachedEntity> partyUsers = new ArrayList<CachedEntity>();
@@ -4762,7 +4764,7 @@ public class ODPDBAccess
 					//Removes those who have just applied
 					String groupStatus = (String)character.getProperty("groupStatus");
 					if(("Member".equals(groupStatus)==false && "Admin".equals(groupStatus)==false)) {
-						partyGroups.add(new CachedEntity());
+						partyGroups.add(null);
 					} else {
 						partyGroups.add(partyMember.getProperty("groupKey"));
 					}
@@ -4774,13 +4776,12 @@ public class ODPDBAccess
 					//if there are any differences, set the flag to false
 					boolean allInSameGroup = true;
 					for(int i = 0; i < partyGroup.size() - 1; i++) {
-						if(!partyGroups.get(i).equals(partyGroups.get(i+1))){
+						if(!GameUtils.equals(partyGroups.get(i), partyGroups.get(i+1))){
 							allInSameGroup = false;
+							break;
 						}
 					}
-					if(allInSameGroup && ownerKey.equals(partyGroups.get(0))) {
-						return destination;
-					} else {
+					if(!allInSameGroup && !GameUtils.equals(ownerKey, partyGroups.get(0))) {
 						throw new UserErrorMessage("You cannot enter a group owned house in a party unless all members of the party are part of that group.");
 					}
 				} else if(ownerKey.getKind().equals("User")) {
@@ -4788,19 +4789,15 @@ public class ODPDBAccess
 					//if there are any differences, set the flag to false
 					boolean allOfSameUser = true;
 					for(int i = 0; i < partyUsers.size() - 1; i++) {
-						if(!partyUsers.get(i).equals(partyUsers.get(i+1))){
+						if(!GameUtils.equals(partyUsers.get(i), partyUsers.get(i+1))){
 							allOfSameUser = false;
+							break;
 						}
 					}
-					if(allOfSameUser && ownerKey.equals(partyUsers.get(0))) {
-						return destination;
-					} else {
+					if(!allOfSameUser && !GameUtils.equals(ownerKey, partyUsers.get(0))) {
 						throw new UserErrorMessage("You cannot enter a player owned house in a party unless all members of the party are characters of that player.");
 					}
 				}
-				
-				
-				throw new UserErrorMessage("You cannot enter a player owned property while in a party. Disband your part first.");
 			}
 				
 			
