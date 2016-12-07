@@ -4758,17 +4758,17 @@ public class ODPDBAccess
 				//We check to see if all members of the party have access by default to enter
 				//the owned housing.  If not, we reject.
 				List<CachedEntity> partyMembers = getParty(db, character);
-				List<CachedEntity> partyGroups = new ArrayList<CachedEntity>();
-				List<CachedEntity> partyUsers = new ArrayList<CachedEntity>();
+				List<Key> partyGroups = new ArrayList<Key>();
+				List<Key> partyUsers = new ArrayList<Key>();
 				for(CachedEntity partyMember: partyMembers) {
 					//Removes those who have just applied
 					String groupStatus = (String)character.getProperty("groupStatus");
 					if(("Member".equals(groupStatus)==false && "Admin".equals(groupStatus)==false)) {
 						partyGroups.add(null);
 					} else {
-						partyGroups.add(partyMember.getProperty("groupKey"));
+						partyGroups.add((Key)partyMember.getProperty("groupKey"));
 					}
-					partyUsers.add(partyMember.getProperty("userKey"));
+					partyUsers.add((Key)partyMember.getProperty("userKey"));
 				}
 				Key ownerKey = (Key)destination.getProperty("ownerKey");
 				if(ownerKey.getKind().equals("Group")){
