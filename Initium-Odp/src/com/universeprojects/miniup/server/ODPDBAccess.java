@@ -4775,7 +4775,7 @@ public class ODPDBAccess
 					//iterates through the list of groups that the party members belong to.
 					//if there are any differences, set the flag to false
 					boolean allInSameGroup = true;
-					for(int i = 0; i < partyGroup.size() - 1; i++) {
+					for(int i = 0; i < partyGroups.size() - 1; i++) {
 						if(!GameUtils.equals(partyGroups.get(i), partyGroups.get(i+1))){
 							allInSameGroup = false;
 							break;
