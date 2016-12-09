@@ -2958,3 +2958,13 @@ function splitItemStack(eventObject, selector)
 		}
 	});
 }
+
+function renameUnnamedPlayer(eventObject)
+{
+	promptPopup("Rename Player", "Enter a new name for your character:", "", function(newName) {
+		if (newName != null && newName != "")
+		{
+			doCommand(eventObject, "RenameUnnamedPlayer", {"newName" : newName});
+		}
+	});
+}
