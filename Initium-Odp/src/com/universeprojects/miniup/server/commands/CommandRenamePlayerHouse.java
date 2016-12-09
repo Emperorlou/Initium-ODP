@@ -36,6 +36,9 @@ public class CommandRenamePlayerHouse extends Command {
 		Key locationKey = (Key)character.getProperty("locationKey");
 		CachedEntity location = db.getEntity(locationKey);
 		
+		if (character.getProperty("userKey")==null)
+			throw new UserErrorMessage("Unfortunately throwaway accounts cannot currently rename houses. It's weird I know.");
+		
 		// check if player is house owner
 		if (!GameUtils.equals(location.getProperty("ownerKey"), character.getProperty("userKey")))
 			throw new UserErrorMessage("You cannot rename a house you do not own.");
