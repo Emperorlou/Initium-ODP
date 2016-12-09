@@ -160,13 +160,19 @@ public class HtmlComponents {
 	
 	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity selfCharacter, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request)
 	{
-
+				
 		boolean hasRequiredStrength = true;
+		double maxDura;
+		double currentDura;
+		String lowDurabilityClass = "";
 		if (selfCharacter!=null)
 		{
 			Double characterStrength = db.getCharacterStrength(selfCharacter);
-			
 			Double strengthRequirement = null;
+			
+			maxDura = (Double)item.getProperty("maxDurability");
+			currentDura = (Double)item.getProperty("durability");
+				
 			try
 			{
 				strengthRequirement = (Double)item.getProperty("strengthRequirement");
@@ -178,6 +184,11 @@ public class HtmlComponents {
 			
 			if (strengthRequirement!=null && characterStrength<strengthRequirement)
 				hasRequiredStrength = false;
+			
+			if (currentDura < maxDura * .1)
+				lowDurabilityClass = " low-durability";
+			if (currentDura < maxDura * .03)
+				lowDurabilityClass = " very-low-durability";
 		}
 		String notEnoughStrengthClass = "";
 		if (hasRequiredStrength==false)
@@ -207,7 +218,7 @@ public class HtmlComponents {
 		result+="<div class='saleItem' ref='"+saleItem.getKey().getId()+"'>";
 		result+="<div class='main-item'>";
        	result+="<span><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
-       	result+="<span class='"+notEnoughStrengthClass+"'>";
+       	result+="<span class='"+notEnoughStrengthClass+lowDurabilityClass+"'>";
        	if ("Selling".equals(saleItem.getProperty("status")))
    	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
    	    else if ("Sold".equals(saleItem.getProperty("status")))   
