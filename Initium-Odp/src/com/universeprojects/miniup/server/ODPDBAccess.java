@@ -5008,7 +5008,7 @@ public class ODPDBAccess
 	 * @param blockadeStructure
 	 * @return
 	 */
-	public EngageBlockadeOpponentResult engageBlockadeOpponent(CachedDatastoreService db, Key key, Key currentLocationKey, CachedEntity destination, Key property, CachedEntity blockadeStructure) throws UserErrorMessage
+	public EngageBlockadeOpponentResult engageBlockadeOpponent(CachedDatastoreService db, Key key, Key currentLocationKey, CachedEntity destination, Key property, CachedEntity blockadeStructure)  throws UserErrorMessage
 	{
 		return null;
 	}

@@ -1,4 +1,8 @@
-/Initium-Odp/war/WEB-INF/lib
-
 /Initium-Odp/war/WEB-INF/classes
 /Initium-Odp/.settings
+/Initium-Odp/war/WEB-INF/lib/jsr107cache-1.1.jar
+/Initium-Odp/war/WEB-INF/lib/appengine-api-1.0-sdk-1.9.36.jar
+/Initium-Odp/war/WEB-INF/lib/appengine-api-labs.jar
+/Initium-Odp/war/WEB-INF/lib/appengine-endpoints.jar
+/Initium-Odp/war/WEB-INF/lib/appengine-endpoints-deps.jar
+/Initium-Odp/war/WEB-INF/lib/appengine-jsr107cache-1.9.36.jar
