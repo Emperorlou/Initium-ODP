@@ -2022,13 +2022,13 @@ hr.items-separator {
 {
 	background-color:rgba(255,0,0,0.2)
 }
-.low-durability::after {
-	content: " 10% Durability Left";
-	font-size: 12px;
+.low-durability {
+	background-image: url('https://initium-resources.appspot.com/images/ui/equipment-warning1.png');
+	background-repeat: no-repeat;
 }
-.very-low-durability::after {
-	content: " 3% Durability Left";
-	font-size: 12px;
+.very-low-durability {
+	background-image: url('https://initium-resources.appspot.com/images/ui/equipment-warning2.png');
+	background-repeat: no-repeat;
 }
 .big-link
 {
