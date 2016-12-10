@@ -864,7 +864,8 @@ public class GameUtils
     {
 		if (item==null)
 			return "";
-
+		
+		String lowDurabilityClass = "";
 		boolean hasRequiredStrength = true;
 		if (character!=null)
 		{
@@ -882,6 +883,13 @@ public class GameUtils
 			
 			if (strengthRequirement!=null && characterStrength<strengthRequirement)
 				hasRequiredStrength = false;
+			
+			double maxDura = (Double)item.getProperty("maxDurability");
+			double currentDura = (Double)item.getProperty("durability");
+			if (currentDura < maxDura * .2)
+				lowDurabilityClass = "low-durability ";
+			if (currentDura < maxDura * .1)
+				lowDurabilityClass = "very-low-durability ";
 		}
         String notEnoughStrengthClass = "";
         if (hasRequiredStrength==false)
@@ -910,7 +918,7 @@ public class GameUtils
 		if (popupEmbedded)
 			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='"+lowDurabilityClass+"main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)

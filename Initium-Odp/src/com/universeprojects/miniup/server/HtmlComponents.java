@@ -160,13 +160,13 @@ public class HtmlComponents {
 	
 	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity selfCharacter, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request)
 	{
-
+				
 		boolean hasRequiredStrength = true;
 		if (selfCharacter!=null)
 		{
 			Double characterStrength = db.getCharacterStrength(selfCharacter);
-			
 			Double strengthRequirement = null;
+				
 			try
 			{
 				strengthRequirement = (Double)item.getProperty("strengthRequirement");
@@ -178,6 +178,7 @@ public class HtmlComponents {
 			
 			if (strengthRequirement!=null && characterStrength<strengthRequirement)
 				hasRequiredStrength = false;
+			
 		}
 		String notEnoughStrengthClass = "";
 		if (hasRequiredStrength==false)
