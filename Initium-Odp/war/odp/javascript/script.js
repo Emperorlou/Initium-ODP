@@ -1263,6 +1263,10 @@ function selectedItemsTrade(event, selector)
 	});
 }
 
+function characterEquipSet(event, containerId){
+	doCommand(event, "CharacterEquipSet", {"containerId":containerId}, loadInventoryAndEquipment);
+}
+
 function characterUnequipItem(event, itemId)
 {
 	doCommand(event, "CharacterUnequipItem", {"itemId":itemId}, loadInventoryAndEquipment);
