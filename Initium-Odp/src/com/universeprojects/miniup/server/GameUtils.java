@@ -884,8 +884,8 @@ public class GameUtils
 			if (strengthRequirement!=null && characterStrength<strengthRequirement)
 				hasRequiredStrength = false;
 			
-			long maxDura = (Long)item.getProperty("maxDurability");
-			long currentDura = (Long)item.getProperty("durability");
+			Long maxDura = (Long)item.getProperty("maxDurability");
+			Long currentDura = (Long)item.getProperty("durability");
 			if (currentDura < maxDura * .2)
 				lowDurabilityClass = "low-durability ";
 			if (currentDura < maxDura * .1)
