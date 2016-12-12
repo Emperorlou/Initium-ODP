@@ -62,6 +62,9 @@ public class CommandRenameUnnamedPlayer extends Command {
 					ds.beginBulkWriteMode();
 					ds.put(character);
 					ds.commitBulkWrite();
+					
+					//refresh the page to show new name
+					setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 			}			
 		}
 		else{
