@@ -1208,6 +1208,8 @@ public class GameUtils
 			sb.append("<div class=avatar-equip-backing"+sizePrepend+"'>");
 
 			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
+			
+			sb.append("</div>");
 		}
 		sb.append("</div>");
 		if (isSelf)
