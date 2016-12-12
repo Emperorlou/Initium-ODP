@@ -1170,11 +1170,11 @@ public class GameUtils
 		String sizePrepend = "";
 		if (largeSize)
 			sizePrepend = "-64px";
-		
-		sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+"'>");
-		
+				
 		if (isCloaked==false)
 		{
+			sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+"'>");
+
 			if (equipmentBootsUrl!=null)
 				sb.append("<div class='avatar-equip-boots"+sizePrepend+"' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
 			if (equipmentLegsUrl!=null)
@@ -1205,6 +1205,8 @@ public class GameUtils
 		}
 		else
 		{
+			sb.append("<div class=avatar-equip-backing"+sizePrepend+"'>");
+
 			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
 		}
 		sb.append("</div>");
