@@ -1205,7 +1205,7 @@ public class GameUtils
 		}
 		else
 		{
-			sb.append("<div class=avatar-equip-backing"+sizePrepend+"'>");
+			sb.append("<div class='avatar-equip-backing"+sizePrepend+"'>");
 
 			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
 			
