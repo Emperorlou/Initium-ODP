@@ -1088,11 +1088,16 @@ public class GameUtils
 
 		for (int i = 0; i < equipment.size(); i++)
 		{
-			if (equipment.get(i) != null && isDurabilityLow(equipment.get(i)))
+			if (equipment.get(i) != null && isDurabilityVeryLow(equipment.get(i)))
 			{
-				lowDurabilityClass = "low-durability ";
+				lowDurabilityClass = "very-low-durability ";
 				break;
 			}
+			else if (equipment.get(i) != null && isDurabilityLow(equipment.get(i)))
+			{
+				lowDurabilityClass = "low-durability ";
+			}
+				
 		}
 		// This is a workaround for the fact that sometimes equipment stays equipped after it has been deleted
 		if (hasInvalidEquipment)
@@ -1770,7 +1775,11 @@ public class GameUtils
 		return isInParty;
     }
     public static boolean isDurabilityLow(CachedEntity item) {
-    	if (item != null)
+    	if (item == null)
+    		return false;
+    	if (item.getProperty("durability") == null || item.getProperty("maxDurability") == null)
+    		return false;
+    	else
     	{
     		Long maxDura = (Long)item.getProperty("maxDurability");
     		Long currentDura = (Long)item.getProperty("durability");
@@ -1779,8 +1788,21 @@ public class GameUtils
     		else
     			return false;
     	}
-    	else 
+    }
+    public static boolean isDurabilityVeryLow(CachedEntity item) {
+    	if (item == null)
     		return false;
+    	if (item.getProperty("durability") == null || item.getProperty("maxDurability") == null)
+    	return false;
+    	else
+    	{
+    		Long maxDura = (Long)item.getProperty("maxDurability");
+    		Long currentDura = (Long)item.getProperty("durability");
+    		if (currentDura < maxDura * .1)
+    			return true;
+    		else
+    			return false;
+    	}
     }
 
 	public static boolean isCharacterPartyLeader(CachedEntity character) {
