@@ -1088,7 +1088,7 @@ public class GameUtils
 
 		for (int i = 0; i < equipment.size(); i++)
 		{
-			if (isDurabilityLow(equipment.get(i)))
+			if (equipment.get(i) != null && isDurabilityLow(equipment.get(i)))
 			{
 				lowDurabilityClass = "low-durability ";
 				break;
@@ -1770,10 +1770,10 @@ public class GameUtils
 		return isInParty;
     }
     public static boolean isDurabilityLow(CachedEntity item) {
-    	Long maxDura = (Long)item.getProperty("maxDurability");
-    	Long currentDura = (Long)item.getProperty("durability");
-    	if (maxDura != null && currentDura != null)
+    	if (item != null)
     	{
+    		Long maxDura = (Long)item.getProperty("maxDurability");
+    		Long currentDura = (Long)item.getProperty("durability");
     		if (currentDura < maxDura * .2)
     			return true;
     		else
