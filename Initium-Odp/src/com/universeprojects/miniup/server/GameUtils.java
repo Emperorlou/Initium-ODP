@@ -886,8 +886,8 @@ public class GameUtils
         String notEnoughStrengthClass = "";
         if (hasRequiredStrength==false)
         	notEnoughStrengthClass = "not-enough-strength";
-		
-		String lowDurabilityClass = "";		
+			
+        String lowDurabilityClass = "";
 		Long maxDura = (Long)item.getProperty("maxDurability");
 		Long currentDura = (Long)item.getProperty("durability");
 		boolean durabilityNotNull = maxDura != null && currentDura != null;
@@ -979,6 +979,7 @@ public class GameUtils
     public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean largeSize, boolean showGroup)
     {
     	boolean isSelf = false;
+    	String lowDurabilityClass = "";
     	if (selfUser!=null)
     		isSelf = true;
     	
@@ -1085,7 +1086,14 @@ public class GameUtils
 		if (equipmentShirt!=null)
 			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty(GameUtils.getItemIconToUseFor("equipmentShirt", equipmentShirt)));
 
-		
+		for (int i = 0; i < equipment.size(); i++)
+		{
+			if (isDurabilityLow(equipment.get(i)))
+			{
+				lowDurabilityClass = "low-durability ";
+				break;
+			}
+		}
 		// This is a workaround for the fact that sometimes equipment stays equipped after it has been deleted
 		if (hasInvalidEquipment)
 		{
@@ -1158,7 +1166,7 @@ public class GameUtils
 		if (largeSize)
 			sizePrepend = "-64px";
 		
-		sb.append("<div class='avatar-equip-backing"+sizePrepend+"'>");
+		sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+"'>");
 		
 		if (isCloaked==false)
 		{
@@ -1760,6 +1768,19 @@ public class GameUtils
 			isInParty = false;
 		
 		return isInParty;
+    }
+    public static boolean isDurabilityLow(CachedEntity item) {
+    	Long maxDura = (Long)item.getProperty("maxDurability");
+    	Long currentDura = (Long)item.getProperty("durability");
+    	if (maxDura != null && currentDura != null)
+    	{
+    		if (currentDura < maxDura * .2)
+    			return true;
+    		else
+    			return false;
+    	}
+    	else 
+    		return false;
     }
 
 	public static boolean isCharacterPartyLeader(CachedEntity character) {
