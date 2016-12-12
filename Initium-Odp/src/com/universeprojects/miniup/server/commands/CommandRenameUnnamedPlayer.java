@@ -59,12 +59,11 @@ public class CommandRenameUnnamedPlayer extends Command {
 					//everything looks good. Update the CachedEntity and put it in the database.
 					character.setProperty("name", newName);
 					
-					ds.beginBulkWriteMode();
 					ds.put(character);
-					ds.commitBulkWrite();
-					
+        
 					//refresh the page to show new name
 					setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+
 			}			
 		}
 		else{
