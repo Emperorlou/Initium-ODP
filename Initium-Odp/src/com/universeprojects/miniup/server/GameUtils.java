@@ -1088,7 +1088,7 @@ public class GameUtils
 
 		for (int i = 0; i < equipment.size(); i++)
 		{
-			if (isDurabilityLow(equipment.get(i)))
+			if (equipment.get(i) != null && isDurabilityLow(equipment.get(i)))
 			{
 				lowDurabilityClass = "low-durability ";
 				break;
