@@ -1223,21 +1223,20 @@ public class ODPDBAccess
 
 	public boolean isCharacterNameOk(HttpServletRequest request, String characterName) throws UserErrorMessage
 	{
-		if (characterName == null) throw new UserErrorMessage("Character name cannot be blank.");
+		if (characterName==null) throw new UserErrorMessage("Character name cannot be blank.");
 		characterName = characterName.trim();
-		if (characterName.length() < 1 || characterName.length() > 30 || !characterName.matches("[A-Za-z ]+"))
+		if (characterName.length()<1 || characterName.length()>30 || !characterName.matches("[A-Za-z ]+"))
 			throw new UserErrorMessage("Character name must contain only letters and spaces, and must be between 1 and 30 characters long.");
-
-		if (characterName.startsWith("Dead ")) throw new UserErrorMessage("Character name cannot start with the word Dead.");
-
-		if (characterName.startsWith("Unconscious ")) throw new UserErrorMessage("Character name cannot start with the word Unconscious.");
-
-		if (getCharacterByName(characterName) != null) throw new UserErrorMessage("Character name already exists in our database. Please choose another.");
-
-		String ip = WebUtils.getClientIpAddr(request);
-		CachedDatastoreService ds = getDB();
-		if (ds.flagActionLimiter("signupIPLimiter" + ip, 600, 1)) throw new UserErrorMessage("Please report this error to the admin.");
-
+		
+		if (characterName.startsWith("Dead "))
+			throw new UserErrorMessage("Character name cannot start with the word Dead.");
+		
+		if (characterName.startsWith("Unconscious "))
+			throw new UserErrorMessage("Character name cannot start with the word Unconscious.");
+		
+		if (getCharacterByName(characterName)!=null) throw new UserErrorMessage("Character name already exists in our database. Please choose another.");
+		
+		
 		return true;
 	}
 
