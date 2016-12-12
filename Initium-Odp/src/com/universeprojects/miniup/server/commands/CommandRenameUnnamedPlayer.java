@@ -60,6 +60,10 @@ public class CommandRenameUnnamedPlayer extends Command {
 					character.setProperty("name", newName);
 					
 					ds.put(character);
+        
+					//refresh the page to show new name
+					setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+
 			}			
 		}
 		else{
