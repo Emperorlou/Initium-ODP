@@ -43,16 +43,16 @@ public class CommandCharacterEquipSet extends Command {
 		Long containerId = tryParseId(parameters, "containerId");
 		final Key containerKey = KeyFactory.createKey("Item", containerId);
 		CachedEntity container = db.getEntity(containerKey);
-		
+
 		if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), container) == false)
 			throw new UserErrorMessage(
 					"You do not have access to this container.");
 
 		final List<CachedEntity> setEquip = db.getFilteredList("Item",
 				"containerKey", FilterOperator.EQUAL, containerKey);
-		
-		if(setEquip.size() == 0) throw new UserErrorMessage("The container is empty");
-	
+
+		if (setEquip.size() == 0)
+			throw new UserErrorMessage("The container is empty");
 
 		// Checking that the container we were given doesn't have any equipment
 		// duplicates.
@@ -62,13 +62,27 @@ public class CommandCharacterEquipSet extends Command {
 															// item to every
 															// other item not
 															// yet compared to
-				if (GameUtils.equals(setEquip.get(i).getKey(), setEquip.get(j).getKey())) {
+				if (GameUtils.equals(setEquip.get(i).getKey(), setEquip.get(j)
+						.getKey())) {
 					throw new UserErrorMessage(
-							"There are duplicate equipment items in the container");
+							"There are duplicate equipment items in the container. Id: "+setEquip.get(i).getKey().getId());
 				}
+				
+
+				if(setEquip.get(i).getKey().getKind().equals(setEquip.get(j).getKey().getKind())){
+					throw new UserErrorMessage(
+							"There are duplicate equipment items in the container. Kind: "+setEquip.get(i).getKey().getKind());
+				}
+				
+				if(setEquip.get(i).getKey().getName().equals(setEquip.get(j).getKey().getName())){
+					throw new UserErrorMessage(
+							"There are duplicate equipment items in the container. Name: "+setEquip.get(i).getKey().getName());
+				}
+				// Testing how to check for duplicate items.
 			}
 		}
 
+		
 		// Check if we can equip everything from the given container
 
 		Double characterStrength = (Double) character.getProperty("strength");
@@ -83,18 +97,22 @@ public class CommandCharacterEquipSet extends Command {
 			if (equipment == null)
 				throw new IllegalArgumentException("Equipment cannot be null.");
 
-			if (character.getKey()
-					.equals(equipment.getProperty("containerKey")) == false)
-				throw new IllegalArgumentException(
-						"The piece of equipment is not in the character's posession.");
+			/*
+			 * 
+			 * if (character.getKey()
+			 * .equals(equipment.getProperty("containerKey")) == false) throw
+			 * new IllegalArgumentException(
+			 * "The piece of equipment is not in the character's posession.");
+			 * 
+			 * Of course this would throw Expression always -.- 
+			 */
 
 			String equipmentSlot = (String) equipment.getProperty("equipSlot");
 			if (equipmentSlot == null)
 				throw new UserErrorMessage("You cannot equip this item.");
-			
+
 			// NOT SURE if the above checks are all needed in this case
 
-			
 			if (equipment.getProperty("strengthRequirement") instanceof String)
 				equipment.setProperty("strengthRequirement", null);
 			Double strengthRequirement = (Double) equipment
@@ -106,30 +124,28 @@ public class CommandCharacterEquipSet extends Command {
 						"You cannot equip an item from the given container, you do not have the strength to use it.");
 		}
 
-		
-		// Unequip all equipment we already have equipped and put them in the container.
+		// Unequip all equipment we already have equipped and put them in the
+		// container.
 		List<CachedEntity> currentEquipment = new ArrayList<CachedEntity>();
-		for(String slot: ODPDBAccess.EQUIPMENT_SLOTS){
-			if (character.getProperty("equipment" + slot) != null)
-			{
-				currentEquipment.add((CachedEntity) character.getProperty("equipment"
-						+ slot));
+		for (String slot : ODPDBAccess.EQUIPMENT_SLOTS) {
+			if (character.getProperty("equipment" + slot) != null) {
+				currentEquipment.add((CachedEntity) character
+						.getProperty("equipment" + slot));
 			}
 		}
-		for(CachedEntity equipment: currentEquipment){
+		for (CachedEntity equipment : currentEquipment) {
 			db.doCharacterUnequipEntity(ds, character, equipment);
 			equipment.setProperty("containerKey", container);
 			equipment.setProperty("movedTimestamp", new Date());
-			
-			ds.put(equipment); //NOT SURE if needed
+
+			ds.put(equipment); // NOT SURE if needed
 		}
-		
 
 		// Equip the set from the container
 		for (CachedEntity equipment : setEquip) {
 			db.doCharacterEquipEntity(ds, character, equipment);
 		}
-		
+
 		ds.put(character);
 	}
 }
