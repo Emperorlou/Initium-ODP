@@ -1770,7 +1770,7 @@ public class GameUtils
 		return isInParty;
     }
     public static boolean isDurabilityLow(CachedEntity item) {
-    	if (item.getProperty("maxDurability") != null && item.getProperty("durability") != null)
+    	if (item != null)
     	{
     		Long maxDura = (Long)item.getProperty("maxDurability");
     		Long currentDura = (Long)item.getProperty("durability");
