@@ -126,9 +126,12 @@ public class CommandCharacterEquipSet extends Command {
 				currentEquipment.add(db.getEntity((Key)character.getProperty("equipment" + slot)));
 			}
 		}
+		
+		ds.beginBulkWriteMode();
+		
 		for (CachedEntity equipment : currentEquipment) {
 			db.doCharacterUnequipEntity(ds, character, equipment);
-			equipment.setProperty("containerKey", container);
+			equipment.setProperty("containerKey", containerKey);
 			equipment.setProperty("movedTimestamp", new Date());
 
 			ds.put(equipment); // NOT SURE if needed
@@ -140,5 +143,6 @@ public class CommandCharacterEquipSet extends Command {
 		}
 
 		ds.put(character);
+		ds.commitBulkWrite();
 	}
 }
