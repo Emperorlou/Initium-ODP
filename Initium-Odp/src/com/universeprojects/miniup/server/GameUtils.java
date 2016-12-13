@@ -1209,7 +1209,6 @@ public class GameUtils
 
 			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
 			
-			sb.append("</div>");
 		}
 		sb.append("</div>");
 		if (isSelf)
@@ -1603,12 +1602,13 @@ public class GameUtils
                     }
 
                     // Put the formula together...
-                    for(int i=0;i<rolls.size(); i++)
-                    {
-                        if (!result.equals(""))
-                            result+="+";
-                        result += ""+rolls.get(i);
-                    }
+                    if (rolls.size()<12)
+	                    for(int i=0;i<rolls.size(); i++)
+	                    {
+	                        if (!result.equals(""))
+	                            result+="+";
+	                        result += ""+rolls.get(i);
+	                    }
 
                     formula = formula.replaceFirst("(?i)\\d+d\\d+d(l|h)\\d+", "("+result.toString()+")");
 
