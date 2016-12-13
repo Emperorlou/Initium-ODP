@@ -54,14 +54,16 @@ public class CommandRenameUnnamedPlayer extends Command {
 		if(charName.equals("Unnamed")){
 			//looking at ODPDBAccess.isCharacterNameOk(), it appears to do all the validation. Other than checking
 			//if the character is named "Unnamed" no extra validation will be done here.
-			if(db.isCharacterNameOk(this.request, charName)){
+			if(db.isCharacterNameOk(this.request, newName)){
 				
 					//everything looks good. Update the CachedEntity and put it in the database.
 					character.setProperty("name", newName);
 					
-					ds.beginBulkWriteMode();
 					ds.put(character);
-					ds.commitBulkWrite();
+        
+					//refresh the page to show new name
+					setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+
 			}			
 		}
 		else{
