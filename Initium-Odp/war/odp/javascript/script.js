@@ -1745,7 +1745,7 @@ function groupMergeSubmitRequest(event, groupId)
 {
 	confirmPopup("Submit Merge Request", "Are you sure you want to submit this merge request? All group members and group houses will transfer to the group.<br/>Note that you can only have 1 active merge request at a time.", function(){
 		doCommand(eventObject, "GroupMergeSubmitRequest", {"groupId" : groupId});
-	}
+	});
 }
 
 function groupMergeCancelRequest(event, groupId, removeElement)
@@ -1756,7 +1756,7 @@ function groupMergeCancelRequest(event, groupId, removeElement)
 			if(error) return;
 			if(removeElement) $(clicked).remove();
 		});
-	}
+	});
 }
 
 function tradeRemoveItem(itemId)
