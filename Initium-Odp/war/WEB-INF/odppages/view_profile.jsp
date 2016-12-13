@@ -138,11 +138,13 @@
 				<span class='main-highlight'><c:out value="${groupDescription}" /></span>
 				<c:if test="${isLeavingGroup!=true}">
 					<a class='big-link' href='#' onclick='leaveGroup()'>Leave this group</a>
+					<br><br>
 				</c:if>
 				<c:if test="${isLeavingGroup==true}">
 					<br>
 					You are leaving the group but still have to wait <c:out value="${leavingGroupWaitTime}" />.
 					<a class='big-link' onclick='cancelLeaveGroup()'>Cancel leaving group</a>
+					<br><br>
 				</c:if>
 			</c:if>
 			<a class='big-link' onclick='viewGroup(${groupId})'>View Group Page</a>

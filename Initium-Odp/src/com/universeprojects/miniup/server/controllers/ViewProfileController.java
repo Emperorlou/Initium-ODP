@@ -84,6 +84,8 @@ public class ViewProfileController extends PageController {
 		else
 			request.setAttribute("premium", false);
 		
+		request.setAttribute("charName", character.getProperty("name"));
+		
 		if (totalDonations==null) totalDonations = 0L;
 		if (donationHistory==null) donationHistory = 0L;
 		Double donationHistoryDollars = donationHistory.doubleValue()/100;
