@@ -128,7 +128,7 @@ public class CommandCharacterEquipSet extends Command {
 		}
 		for (CachedEntity equipment : currentEquipment) {
 			db.doCharacterUnequipEntity(ds, character, equipment);
-			equipment.setProperty("containerKey", container);
+			equipment.setProperty("containerKey", containerKey);
 			equipment.setProperty("movedTimestamp", new Date());
 
 			ds.put(equipment); // NOT SURE if needed
