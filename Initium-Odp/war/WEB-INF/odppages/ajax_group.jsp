@@ -26,7 +26,7 @@
 	<div class='main-description'>	
 		<h2>Admin Controls</h2>
 		<div class='main-item-controls'>
-			<a onclick='setGroupDescription(event, "<c:out value="${groupDescriptionEscaped}"/>")'>Set&nbsp;group&nbsp;description</a>
+			<a onclick='setGroupDescription(event, "<c:out value="${groupDescriptionEscaped}"/>")'>Set group description</a>
 			<br/><br/>
 			${mergeRequestToggleButton}
 			<br/><br/>
@@ -44,7 +44,7 @@
 	</div>
 	<hr>
 	</c:if>
-	<c:if test={inGroup == false && allowMergeRequests}>
+	<c:if test="{inGroup == false && allowMergeRequests}">
 	<div class='main-description'>	
 		<h2>Admin Controls</h2>
 		<div class='main-item-controls'>
