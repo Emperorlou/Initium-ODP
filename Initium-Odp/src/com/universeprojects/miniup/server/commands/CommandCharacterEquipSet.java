@@ -130,15 +130,20 @@ public class CommandCharacterEquipSet extends Command {
 		ds.beginBulkWriteMode();
 		
 		for (CachedEntity equipment : currentEquipment) {
+			
 			db.doCharacterUnequipEntity(ds, character, equipment);
 			equipment.setProperty("containerKey", containerKey);
 			equipment.setProperty("movedTimestamp", new Date());
 
-			ds.put(equipment); // NOT SURE if needed
+			ds.put(equipment);
 		}
 
 		// Equip the set from the container
 		for (CachedEntity equipment : setEquip) {
+			equipment.setProperty("containerKey", character.getKey());
+			equipment.setProperty("movedTimestamp", new Date());
+			ds.put(equipment);
+			
 			db.doCharacterEquipEntity(ds, character, equipment);
 		}
 
