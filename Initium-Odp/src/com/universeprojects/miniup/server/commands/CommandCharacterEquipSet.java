@@ -67,18 +67,12 @@ public class CommandCharacterEquipSet extends Command {
 					throw new UserErrorMessage(
 							"There are duplicate equipment items in the container. Id: "+setEquip.get(i).getKey().getId());
 				}
-				
-
-				if(setEquip.get(i).getKey().getKind().equals(setEquip.get(j).getKey().getKind())){
-					throw new UserErrorMessage(
-							"There are duplicate equipment items in the container. Kind: "+setEquip.get(i).getKey().getKind());
-				}
-				
+				/*
 				if(setEquip.get(i).getKey().getName().equals(setEquip.get(j).getKey().getName())){
 					throw new UserErrorMessage(
 							"There are duplicate equipment items in the container. Name: "+setEquip.get(i).getKey().getName());
 				}
-				// Testing how to check for duplicate items.
+				// Testing how to check for duplicate items. */
 			}
 		}
 
@@ -129,8 +123,7 @@ public class CommandCharacterEquipSet extends Command {
 		List<CachedEntity> currentEquipment = new ArrayList<CachedEntity>();
 		for (String slot : ODPDBAccess.EQUIPMENT_SLOTS) {
 			if (character.getProperty("equipment" + slot) != null) {
-				currentEquipment.add((CachedEntity) character
-						.getProperty("equipment" + slot));
+				currentEquipment.add(db.getEntity((Key)character.getProperty("equipment" + slot)));
 			}
 		}
 		for (CachedEntity equipment : currentEquipment) {
