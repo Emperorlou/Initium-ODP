@@ -98,6 +98,18 @@ public class GroupService extends Service {
 	}
 	
 	/**
+	 * Returns whether the specified group has already been merged.
+	 * Checks for a null creatorKey and a valid pendingMergeGroupKey
+	 * @param group
+	 * @return
+	 */
+	public boolean isSpecifiedGroupMerged(CachedEntity group)
+	{
+		return group != null && group.getProperty("creatorKey") == null &&
+				getMergeRequestGroupKeyFor(group) != null;
+	}
+	
+	/**
 	 * Returns whether the characters group has requested to merge with the specified group.
 	 * @param mergeGroup
 	 * @return
@@ -206,9 +218,14 @@ public class GroupService extends Service {
 				{
 					member.setProperty("groupKey", this.characterGroup.getKey());
 					member.setProperty("groupStatus", GroupStatus.Member);
-					member.setProperty("groupRank", null);
-					saveEntities.add(member);
 				}
+				else
+				{
+					member.setProperty("groupKey", null);
+					member.setProperty("groupStatus", null);
+				}
+				member.setProperty("groupRank", null);
+				saveEntities.add(member);
 			}
 			
 			mergeGroupEntities = db.getFilteredList("Location", "ownerKey", mergeGroup.getKey());
@@ -227,10 +244,21 @@ public class GroupService extends Service {
 				saveEntities.add(reqGroup);
 			}
 			
-			// Save all the modified entities.
-			ds.put(saveEntities);
+			// Likely going to need to remove alliances/warring groups from the
+			// merged group, but will handle that later.
 			
-			// Discover all group houses.
+			// Set the owner key to null, to indicate that the group has been
+			// merged and no one belongs to this group anymore.
+			mergeGroup.setProperty("creatorKey", null);
+			saveEntities.add(mergeGroup);
+			
+			// Save all the modified entities.
+			ds.beginBulkWriteMode();
+			ds.put(saveEntities);
+			ds.commitBulkWrite();
+			
+			// Discover all group houses. Do this outside of block, since we don't
+			// care as much if this fails (since it can be fired off).
 			List<CachedEntity> allGroupMembers = db.getGroupMembers(ds, this.characterGroup);
 			for(CachedEntity member:allGroupMembers)
 				db.discoverAllGroupPropertiesFor(ds, member);

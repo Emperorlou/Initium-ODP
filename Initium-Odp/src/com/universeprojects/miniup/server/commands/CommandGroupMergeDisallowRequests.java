@@ -36,7 +36,7 @@ public class CommandGroupMergeDisallowRequests extends Command {
 		{
 			// property was updated by the service. Save group and update the HTML. 
 			ds.put(charGroup);
-			updateHtml("#grpRequestsDisallow", "<a id='grpRequestsAllow' onclick='groupMergeRequestsAllow(event, " + charGroup.getId() + ")'>Allow Merge Requests</a>");
+			updateHtml("#mergeRequestDisallow", "<a id='mergeRequestAllow' onclick='groupMergeRequestsAllow(event)'>Allow Merge Requests</a>");
 		}
 		else
 		{

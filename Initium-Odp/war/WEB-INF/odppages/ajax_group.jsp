@@ -10,6 +10,13 @@
 	</div>
 </div>
 
+<c:if test="${isGroupMerged}">
+	<div class='main-description'>	
+		<h4>This group has merged with <a onclick='viewGroup(${mergedGroupId})'>${mergedGroupName}</a>. 
+	</div>
+</c:if>
+
+<c:if test="${isGroupMerged == false}">
 <div class='paragraph'>
 	<span style='font-size:24px'>${activeUsersPast3Hours}</span> group members have been active in the past 3 hours and <span style='font-size:24px'>${activeUsersPastWeek}</span> group members have been active in the past week. 
 </div>
@@ -72,4 +79,6 @@
 		<a onclick='groupRequestJoin(event, ${groupId})'
 			class='main-button'>Request to join this group</a>
 	</div>
+</c:if>
+
 </c:if>
