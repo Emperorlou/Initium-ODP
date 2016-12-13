@@ -1295,7 +1295,8 @@ public class ODPDBAccess
 		if (destinationSlot==null)
 			throw new IllegalArgumentException("destinationSlot cannot be null.");
 
-		if (character.getKey().equals(equipment.getProperty("containerKey"))==false)
+		ContainerService cs = new ContainerService(this);
+		if (!cs.checkContainerAccessAllowed(character, getEntity((Key) equipment.getProperty("containerKey"))))
 			throw new IllegalArgumentException("The piece of equipment is not in the character's posession. Character: "+character.getKey());
 		
 		
