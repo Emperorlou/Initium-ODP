@@ -7,8 +7,11 @@
 		<p>
 			<c:out value="${groupDescription}" />
 			<br />
-			<c:forEach value="declaredGroups" items="${warDecGroupNames}">
-				${declaredGroups}
+			<a onclick='declareWar(event)'/>
+			<br />
+			<c:forEach var="declaredGroups" items="${warDecGroupNames}">
+				<p>${declaredGroups}</p>
+				<br />
 			</c:forEach>
 		</p>
 	</div>

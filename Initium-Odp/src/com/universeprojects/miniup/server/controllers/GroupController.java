@@ -227,11 +227,14 @@ public class GroupController extends PageController {
 			
 			List<Key> keyOfDecs = GroupService.getWarDeclarations(group);
 			List<String> warDecGroupNames = new ArrayList<String>();
+			if (!keyOfDecs.isEmpty())
+			{
 			for (Key decs : keyOfDecs) 
 			{
 				warDecGroupNames.add(decs.getName());
 			}
 			request.setAttribute("warDecGroupNames", warDecGroupNames);
+			}
 		}
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}
