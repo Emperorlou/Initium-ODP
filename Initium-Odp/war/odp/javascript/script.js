@@ -3014,3 +3014,13 @@ function renameUnnamedPlayer(eventObject)
 		}
 	});
 }
+
+function swapContainers(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
+	if(batchItems.length == 0) return;	
+	
+	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+
+	doCommand(event,"ItemsSwapStorageContainers",{"itemIds":itemIds});
+}
