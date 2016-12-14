@@ -28,9 +28,11 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 	protected void processBatchItems(Map<String, String> parameters, ODPDBAccess db, 
 			CachedDatastoreService ds, CachedEntity character, List<CachedEntity> batchItems) throws UserErrorMessage{
 		
+			setPopupMessage("Number of items selected: " + batchItems.size());
+		
 			//we're swapping 2 containers here. If there's more than 2 items in the list, something went wrong.
 			if(batchItems.size() != 2)
-				throw new UserErrorMessage("Error in item selection. Only 2 containers can be involved in a swap.");
+				throw new UserErrorMessage("Error in item selection. 2 (and only 2) containers must be involved in a swap.");
 				
 			ContainerService cs = new ContainerService(db);
 				
@@ -39,7 +41,7 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 				if(!GameUtils.isStorageItem(item))
 					throw new UserErrorMessage("You must select two storage items to swap.");
 				if(!cs.checkContainerAccessAllowed(character, item))
-					throw new UserErrorMessage("Character does not have access to container.");
+					throw new UserErrorMessage("You do not have access to one of these containers.");
 			}
 			
 			CachedEntity containerOne = batchItems.get(0);
@@ -80,12 +82,16 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			ds.beginBulkWriteMode();
 			for(CachedEntity item : itemsToMove){
 				
+				setPopupMessage("Moving: " + item.getProperty("name"));
+				
 				item.setProperty("containerKey",emptyContainer.getKey());
 				item.setProperty("moveTimestamp", new Date());
 				
 				ds.put(item);				
 			}			
 			ds.commitBulkWrite();
+			
+			setPopupMessage("Container contents have been swapped. Yay!");
 	}
 
 }
