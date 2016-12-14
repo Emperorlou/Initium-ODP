@@ -87,7 +87,8 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			}			
 			ds.commitBulkWrite();
 			
-			setPopupMessage("Container contents have been swapped. Yay!");
+			setPopupMessage("Container contents in " + fullContainer.getProperty("label") + "container " +
+					"have been moved into the " + emptyContainer.getProperty("label") + "container!");
 	}
 
 }
