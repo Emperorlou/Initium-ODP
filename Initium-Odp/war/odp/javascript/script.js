@@ -1748,11 +1748,11 @@ function groupMergeSubmitRequest(eventObject, groupId)
 	});
 }
 
-function groupMergeCancelRequest(eventObject, groupId, removeElement)
+function groupMergeCancelRequest(eventObject, removeElement)
 {
 	var clicked = this;
 	confirmPopup("Cancel Merge Request", "Are you sure you want to cancel this merge request?", function(){
-		doCommand(eventObject, "GroupMergeCancelRequest", {"groupId" : groupId}, function(data, error) {
+		doCommand(eventObject, "GroupMergeCancelRequest", null, function(data, error) {
 			if(error) return;
 			if(removeElement) $(clicked).remove();
 		});
