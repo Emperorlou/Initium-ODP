@@ -32,6 +32,6 @@ public class CommandBuyHouse extends Command {
 		
 		new PropertiesService(db).buyHouse(db, ds, user, character, currentLocation, houseName, DOGECOIN_COST);
 
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 	}
 }
