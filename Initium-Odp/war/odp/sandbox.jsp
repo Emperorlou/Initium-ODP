@@ -55,10 +55,10 @@
 	                        fullDocs: true
 	                    }
 	                },                    
-	                useWorker: true,
+	                useWorker: true
 	            },
 	            enableSnippets: true,
-	            enableBasicAutocompletion: true,
+	            enableBasicAutocompletion: true
 	        });
 	    });
 	</script>
