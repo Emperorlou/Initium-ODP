@@ -18,8 +18,10 @@ import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.services.GroupService;
+import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
+@Controller
 public class GroupController extends PageController {
 
 	public GroupController() {
