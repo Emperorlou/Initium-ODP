@@ -135,7 +135,6 @@
 	int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
 	request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
 
-	String warDecs = GroupService.getWarDeclarations(group);
 %>
 
 <div class='main-banner-textonly' style='height:240px; background-color:rgba(0,0,0,0.5)'>
@@ -160,7 +159,6 @@
 		<div class='main-item-controls'>
 			<a
 				onclick='setGroupDescription(event, "<c:out value="${groupDescriptionEscaped}"/>")'>Set&nbsp;group&nbsp;description</a>
-				<p> <c:out value="${warDecs}" /> </p>
 
 		</div>
 
