@@ -29,7 +29,7 @@ public class GroupService extends Service {
 		{
 			this.characterGroup = db.getEntity((Key)this.character.getProperty("groupKey"));
 			this.isAdmin = this.characterGroup != null && 
-					(GameUtils.enumEquals(this.character.getProperty("groupStatus"), GroupStatus.Admin) ||
+					(GameUtils.enumEquals(charGroupStatus, GroupStatus.Admin) ||
 					 GameUtils.equals(this.character.getKey(), this.characterGroup.getProperty("creatorKey")));
 		}
 		else
@@ -218,7 +218,7 @@ public class GroupService extends Service {
 						GameUtils.enumEquals(charGroupStatus, GroupStatus.Member))
 				{
 					member.setProperty("groupKey", this.characterGroup.getKey());
-					member.setProperty("groupStatus", GroupStatus.Member);
+					member.setProperty("groupStatus", GroupStatus.Member.toString());
 				}
 				else
 				{
