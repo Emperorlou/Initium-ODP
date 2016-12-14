@@ -156,6 +156,7 @@ public class GroupController extends PageController {
 						List<String> mergeApplicationsOutput = new ArrayList<String>();
 						for(CachedEntity candidate:mergeGroupApplications)
 						{
+							if(candidate.getProperty("creatorKey") == null) continue;
 							String output = HtmlComponents.generateGroupMergeApplication(candidate);
 							mergeApplicationsOutput.add(output);
 						}
