@@ -1727,28 +1727,28 @@ function groupMergeRequestsDisallow(eventObject)
 	doCommand(eventObject, "GroupMergeDisallowRequests");
 }
 
-function groupMergeDenyApplication(event, groupId)
+function groupMergeDenyApplication(eventObject, groupId)
 {
 	confirmPopup("Deny Merge Request", "Are you sure you want to deny this merge request?", function(){
 		doCommand(eventObject, "GroupMergeDenyApplication", {"groupId" : groupId});
 	});
 }
 
-function groupMergeAcceptApplication(event, groupId)
+function groupMergeAcceptApplication(eventObject, groupId)
 {
 	confirmPopup("Accept Merge Request", "Are you sure you want to accept this merge request? All group members and group houses will transfer to this group.", function(){
 		doCommand(eventObject, "GroupMergeAcceptApplication", {"groupId" : groupId});
 	});
 }
 
-function groupMergeSubmitRequest(event, groupId)
+function groupMergeSubmitRequest(eventObject, groupId)
 {
 	confirmPopup("Submit Merge Request", "Are you sure you want to submit this merge request? All group members and group houses will transfer to the group.<br/>Note that you can only have 1 active merge request at a time.", function(){
 		doCommand(eventObject, "GroupMergeSubmitRequest", {"groupId" : groupId});
 	});
 }
 
-function groupMergeCancelRequest(event, groupId, removeElement)
+function groupMergeCancelRequest(eventObject, groupId, removeElement)
 {
 	var clicked = this;
 	confirmPopup("Cancel Merge Request", "Are you sure you want to cancel this merge request?", function(){
