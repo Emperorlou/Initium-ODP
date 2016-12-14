@@ -42,37 +42,45 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 					throw new UserErrorMessage("Character does not have access to container.");
 			}
 			
+			CachedEntity containerOne = batchItems.get(0);
+			CachedEntity containerTwo = batchItems.get(1);
+			List<CachedEntity> itemOneContents = db.getItemContentsFor(containerOne.getKey());
+			List<CachedEntity> itemTwoContents = db.getItemContentsFor(containerTwo.getKey());
+			
 			//check that at least one container is empty.
-			if(db.getItemContentsFor(batchItems.get(0).getKey()).size() != 0 && 
-					db.getItemContentsFor(batchItems.get(1).getKey()).size() != 0){
+			if(itemOneContents.size() != 0 && 
+					itemTwoContents.size() != 0){
 				throw new UserErrorMessage("At least one storage item must be empty in order to swap contents.");
 			}				
 			
+					
 			//determine which container is empty. Since we checked that at least one container is empty,
 			//we can assume that if index 1 has equipment, then index 0 is empty.
-			int emptyContainerIndex = 0;
-			int fullContainerIndex = 1;
-			if(db.getItemContentsFor(batchItems.get(1).getKey()).size() == 0){
-				emptyContainerIndex = 1;
-				fullContainerIndex = 0;
+			CachedEntity emptyContainer = containerOne;
+			CachedEntity fullContainer = containerTwo;
+			List<CachedEntity> itemsToMove = itemTwoContents;
+			if(itemTwoContents.size() == 0){
+				emptyContainer = containerTwo;
+				fullContainer = containerOne;
+				itemsToMove = itemOneContents;
 			}
 			
-			Long spaceReq = db.getItemCarryingSpace(batchItems.get(fullContainerIndex));
-			Long weightReq = db.getItemCarryingWeight(batchItems.get(fullContainerIndex));
-			Long spaceAvail = (Long) batchItems.get(emptyContainerIndex).getProperty("maxSpace");
-			Long weightAvail = (Long) batchItems.get(emptyContainerIndex).getProperty("maxWeight");
+			Long spaceReq = db.getItemCarryingSpace(fullContainer);
+			Long weightReq = db.getItemCarryingWeight(fullContainer);
+			Long spaceAvail = (Long) emptyContainer.getProperty("maxSpace");
+			Long weightAvail = (Long) emptyContainer.getProperty("maxWeight");
 			
 			//check that we have room in the new container to fit everything.
 			if(spaceAvail < spaceReq)
-				throw new UserErrorMessage("There is not enough space available in the new container.");
+				throw new UserErrorMessage("You don't have enough space available in the new container. Maybe try a different one?");
 			if(weightAvail < weightReq)
-				throw new UserErrorMessage("There is not enough weight available in the new container.");
+				throw new UserErrorMessage("The container you're swapping in to cannot carry so much weight. Try a different container.");
 			
 			//actually move the content now and save to database.
 			ds.beginBulkWriteMode();
-			for(CachedEntity item : db.getItemContentsFor(batchItems.get(fullContainerIndex).getKey())){
+			for(CachedEntity item : itemsToMove){
 				
-				item.setProperty("containerKey",batchItems.get(emptyContainerIndex));
+				item.setProperty("containerKey",emptyContainer);
 				item.setProperty("moveTimestamp", new Date());
 				
 				ds.put(item);				
