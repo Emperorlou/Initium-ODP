@@ -44,7 +44,7 @@
 	</div>
 	<hr>
 	</c:if>
-	<c:if test="{inThisGroup == false && allowMergeRequests}">
+	<c:if test="${inThisGroup == false && allowMergeRequests}">
 	<div class='main-description'>	
 		<h2>Admin Controls</h2>
 		<div class='main-item-controls'>
