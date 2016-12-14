@@ -12,7 +12,7 @@
 
 <c:if test="${isGroupMerged}">
 	<div class='main-description'>	
-		<h4>This group has merged with <a onclick='viewGroup(${mergedGroupId})'>${mergedGroupName}</a>. 
+		<h4>This group has merged with <a class='link' onclick='viewGroup(${mergedGroupId})'>${mergedGroupName}</a>. 
 	</div>
 </c:if>
 
