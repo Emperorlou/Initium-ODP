@@ -30,22 +30,18 @@ public class CommandGroupMergeCancelRequest extends Command {
 		if(character.getProperty("groupKey") == null)
 			throw new UserErrorMessage("Character does not belong to a group!");
 		
-		Long groupID = parameters.containsKey("groupId") ? tryParseId(parameters, "groupId") : null;
-		if(groupID == null) throw new RuntimeException("Command missing parameter groupId");
-		
-		CachedEntity group = db.getEntity("Group", groupID);
-		
 		// Group refers to the group we will be merging with. GroupService handles security 
 		// permissions, determining whether the character is an admin of his group.
 		GroupService service = new GroupService(db, character);
-		if(!service.cancelMergeRequestWith(group))
+		CachedEntity group = service.getCharacterGroup();
+		if(!service.cancelMergeRequest())
 		{
 			if(service.characterHasGroup() == false)
-				throw new UserErrorMessage("Character does not belong to a group");
-			if(service.isCharacterInSpecifiedGroup(group) == false)
-				throw new UserErrorMessage("Character does not belong to the specified group");
+				throw new UserErrorMessage("You do not currently belong to a group");
 			if(service.isCharacterGroupAdmin() == false)
-				throw new UserErrorMessage("Character is not a group admin");
+				throw new UserErrorMessage("You are not a group admin");
+			if(service.getMergeRequestGroupKeyFor(group) == null)
+				throw new UserErrorMessage("Your group does not have a pending merge request with any group");
 			throw new UserErrorMessage("Unexpected error cancelling merge requests! Please contact a dev.");
 		}
 		

@@ -188,7 +188,7 @@ public class GroupController extends PageController {
 						{
 							CachedEntity mergeGroup = db.getEntity(mergeGroupKey);
 							if(mergeGroup != null)
-								currentMergeRequestString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event, "+mergeGroup.getId()+", true)' title='Clicking this will cancel the pending merge request with the specified group'>Cancel merge request with "+mergeGroup.getProperty("name")+"</a>";
+								currentMergeRequestString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event, true)' title='Clicking this will cancel the pending merge request with the specified group'>Cancel merge request with "+mergeGroup.getProperty("name")+"</a>";
 						}
 						request.setAttribute("currentMergeRequest", currentMergeRequestString);
 					}
@@ -203,7 +203,7 @@ public class GroupController extends PageController {
 						// Need to determine which version of the request merge to show.
 						String requestMergeString = "";
 						if(service.hasGroupRequestedMergeWith(group))
-							requestMergeString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event, "+group.getId()+")' title='Clicking this will cancel the pending merge request with the specified group'>Cancel Merge Request</a>";
+							requestMergeString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event, false)' title='Clicking this will cancel the pending merge request with the specified group'>Cancel Merge Request</a>";
 						else
 							requestMergeString = "<a id='groupMergeRequest' onclick='groupMergeSubmitRequest(event, "+group.getId()+")' title='Clicking this will submit a request to merge with the current group.'>Request Merge With Group</a>";
 						request.setAttribute("currentMergeRequest", requestMergeString);

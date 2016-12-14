@@ -174,11 +174,11 @@ public class GroupService extends Service {
 	 * Clears out the pendingMergeGroupKey of the current users Group.
 	 * @return True if specified group is current users group. False otherwise.
 	 */
-	public boolean cancelMergeRequestWith(CachedEntity group)
+	public boolean cancelMergeRequest()
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(group))
+		if(this.isAdmin && getMergeRequestGroupKeyFor(this.characterGroup) != null)
 		{
-			group.setProperty("pendingMergeGroupKey", null);
+			this.characterGroup.setProperty("pendingMergeGroupKey", null);
 			return true;
 		}
 		return false;
