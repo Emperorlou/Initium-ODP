@@ -80,7 +80,7 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			ds.beginBulkWriteMode();
 			for(CachedEntity item : itemsToMove){
 				
-				item.setProperty("containerKey",emptyContainer);
+				item.setProperty("containerKey",emptyContainer.getKey());
 				item.setProperty("moveTimestamp", new Date());
 				
 				ds.put(item);				
