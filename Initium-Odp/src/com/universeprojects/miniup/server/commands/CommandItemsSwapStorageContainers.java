@@ -82,7 +82,7 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			ds.beginBulkWriteMode();
 			for(CachedEntity item : itemsToMove){
 				
-				setPopupMessage("Moving: " + item.getProperty("name"));
+				setPopupMessage(getPopupMessage() + "\n" + "Moving: " + item.getProperty("name"));
 				
 				item.setProperty("containerKey",emptyContainer.getKey());
 				item.setProperty("moveTimestamp", new Date());
@@ -91,7 +91,7 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			}			
 			ds.commitBulkWrite();
 			
-			setPopupMessage("Container contents have been swapped. Yay!");
+			setPopupMessage(getPopupMessage() + "\n" + "Container contents have been swapped. Yay!");
 	}
 
 }
