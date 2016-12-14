@@ -172,7 +172,7 @@ public class GroupService extends Service {
 	
 	/**
 	 * Clears out the pendingMergeGroupKey of the current users Group.
-	 * @return True if specified group is current users group. False otherwise.
+	 * @return True if character is admin of group and has a pending merge. False otherwise.
 	 */
 	public boolean cancelMergeRequest()
 	{
