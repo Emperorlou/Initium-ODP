@@ -1748,10 +1748,10 @@ function groupMergeSubmitRequest(eventObject, groupId)
 	});
 }
 
-function groupMergeCancelRequest(eventObject, groupId, ownGroup)
+function groupMergeCancelRequest(eventObject)
 {
 	confirmPopup("Cancel Merge Request", "Are you sure you want to cancel this merge request?", function(){
-		doCommand(eventObject, "GroupMergeCancelRequest", {"groupId" : groupId, "ownGroup" : ownGroup});
+		doCommand(eventObject, "GroupMergeCancelRequest");
 	});
 }
 

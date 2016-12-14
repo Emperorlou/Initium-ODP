@@ -30,15 +30,6 @@ public class CommandGroupMergeCancelRequest extends Command {
 		if(character.getProperty("groupKey") == null)
 			throw new UserErrorMessage("Character does not belong to a group!");
 		
-		Long groupID = parameters.containsKey("groupId") ? tryParseId(parameters, "groupId") : null;
-		if(groupID == null) throw new RuntimeException("Command missing parameter groupId");
-		
-		CachedEntity group = db.getEntity("Group", groupID);
-		boolean viewingOwnGroup = false;
-		try{
-			viewingOwnGroup = parameters.containsKey("ownGroup") && Boolean.parseBoolean(parameters.get("ownGroup"));
-		} catch(Exception x){}
-		
 		// Group refers to the group we will be merging with. GroupService handles security 
 		// permissions, determining whether the character is an admin of his group.
 		GroupService service = new GroupService(db, character);
@@ -56,10 +47,7 @@ public class CommandGroupMergeCancelRequest extends Command {
 		
 		// property was updated by the service. Save group and update the HTML. 
 		ds.put(charGroup);
-		if(viewingOwnGroup)
-			updateHtml("#groupMergeRequest", "Pending merge cancelled.");
-		else
-			updateHtml("#groupMergeRequest", "<a id='groupMergeRequest' onclick='groupMergeSubmitRequest(event, "+group.getId()+")' title='Clicking this will submit a request to merge with the current group.'>Request Merge With Group</a>");
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 
 }
