@@ -44,7 +44,7 @@
 	</div>
 	<hr>
 	</c:if>
-	<c:if test="{inGroup == false && allowMergeRequests}">
+	<c:if test="${inThisGroup == false && allowMergeRequests}">
 	<div class='main-description'>	
 		<h2>Admin Controls</h2>
 		<div class='main-item-controls'>
@@ -57,7 +57,7 @@
 
 <c:if test="${inGroup == false}">
 	<div class='main-buttonbox'>
-		<a onclick='groupRequestJoin(event, ${groupId})>)'
+		<a onclick='groupRequestJoin(event, ${groupId})'
 			class='main-button'>Request to join this group</a>
 	</div>
 </c:if>
