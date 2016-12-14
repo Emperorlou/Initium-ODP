@@ -65,8 +65,8 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 				itemsToMove = itemOneContents;
 			}
 			
-			Long spaceReq = db.getItemCarryingSpace(fullContainer);
-			Long weightReq = db.getItemCarryingWeight(fullContainer);
+			Long spaceReq = db.getItemCarryingSpace(character, itemsToMove);
+			Long weightReq = db.getItemCarryingWeight(character, itemsToMove);
 			Long spaceAvail = (Long) emptyContainer.getProperty("maxSpace");
 			Long weightAvail = (Long) emptyContainer.getProperty("maxWeight");
 			
