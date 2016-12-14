@@ -178,9 +178,9 @@ public class GroupController extends PageController {
 						request.setAttribute("newMemberApplicants", appliedMembersOutput);
 						
 						if(allowMergeRequests)
-							request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestAllow' onclick='groupMergeRequestsAllow(event)' title='Clicking this will allow other groups to request merging with this group.'>Allow Merge Requests</a>");
-						else
 							request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestDisallow' onclick='groupMergeRequestsDisallow(event)' title='Clicking this will prevent other groups from requesting to merge with this group.'>Disallow Merge Requests</a>");
+						else
+							request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestAllow' onclick='groupMergeRequestsAllow(event)' title='Clicking this will allow other groups to request merging with this group.'>Allow Merge Requests</a>");
 						
 						String currentMergeRequestString = "No pending merge requests.";
 						Key mergeGroupKey = service.getMergeRequestGroupKeyFor(group);
