@@ -87,8 +87,11 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			}			
 			ds.commitBulkWrite();
 			
-			setPopupMessage("Container contents in " + fullContainer.getProperty("label") + "container " +
-					"have been moved into the " + emptyContainer.getProperty("label") + "container!");
+			String fullLabel = (String) fullContainer.getProperty("label");
+			String emptyLabel = (String) fullContainer.getProperty("label");
+			
+			setPopupMessage("Container contents in " + cs.getContainerDisplayName(fullContainer) + "container " +
+					"have been moved into the " + cs.getContainerDisplayName(emptyContainer) + "container!");
 	}
 
 }
