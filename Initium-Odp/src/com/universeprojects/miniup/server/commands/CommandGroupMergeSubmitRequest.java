@@ -11,6 +11,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 import com.universeprojects.miniup.server.services.GroupService;
 
 public class CommandGroupMergeSubmitRequest extends Command {
@@ -55,7 +56,7 @@ public class CommandGroupMergeSubmitRequest extends Command {
 		
 		// Key was set by the service, just save the entity.
 		ds.put(charGroup);
-		updateHtml("#groupMergeRequest", "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event, "+group.getId()+")' title='Clicking this will cancel the pending merge request with the specified group'>Cancel Merge Request</a>");
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 
 }

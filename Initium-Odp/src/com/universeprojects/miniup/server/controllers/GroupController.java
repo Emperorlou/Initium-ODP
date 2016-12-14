@@ -156,6 +156,7 @@ public class GroupController extends PageController {
 						List<String> mergeApplicationsOutput = new ArrayList<String>();
 						for(CachedEntity candidate:mergeGroupApplications)
 						{
+							if(candidate.getProperty("creatorKey") == null) continue;
 							String output = HtmlComponents.generateGroupMergeApplication(candidate);
 							mergeApplicationsOutput.add(output);
 						}
@@ -178,9 +179,9 @@ public class GroupController extends PageController {
 						request.setAttribute("newMemberApplicants", appliedMembersOutput);
 						
 						if(allowMergeRequests)
-							request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestAllow' onclick='groupMergeRequestsAllow(event)' title='Clicking this will allow other groups to request merging with this group.'>Allow Merge Requests</a>");
-						else
 							request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestDisallow' onclick='groupMergeRequestsDisallow(event)' title='Clicking this will prevent other groups from requesting to merge with this group.'>Disallow Merge Requests</a>");
+						else
+							request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestAllow' onclick='groupMergeRequestsAllow(event)' title='Clicking this will allow other groups to request merging with this group.'>Allow Merge Requests</a>");
 						
 						String currentMergeRequestString = "No pending merge requests.";
 						Key mergeGroupKey = service.getMergeRequestGroupKeyFor(group);
@@ -188,7 +189,7 @@ public class GroupController extends PageController {
 						{
 							CachedEntity mergeGroup = db.getEntity(mergeGroupKey);
 							if(mergeGroup != null)
-								currentMergeRequestString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event, "+mergeGroup.getId()+", true)' title='Clicking this will cancel the pending merge request with the specified group'>Cancel merge request with "+mergeGroup.getProperty("name")+"</a>";
+								currentMergeRequestString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event)' title='Clicking this will cancel the pending merge request with the specified group'>Cancel merge request with "+mergeGroup.getProperty("name")+"</a>";
 						}
 						request.setAttribute("currentMergeRequest", currentMergeRequestString);
 					}
@@ -203,7 +204,7 @@ public class GroupController extends PageController {
 						// Need to determine which version of the request merge to show.
 						String requestMergeString = "";
 						if(service.hasGroupRequestedMergeWith(group))
-							requestMergeString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event, "+group.getId()+")' title='Clicking this will cancel the pending merge request with the specified group'>Cancel Merge Request</a>";
+							requestMergeString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event)' title='Clicking this will cancel the pending merge request with the specified group'>Cancel Merge Request</a>";
 						else
 							requestMergeString = "<a id='groupMergeRequest' onclick='groupMergeSubmitRequest(event, "+group.getId()+")' title='Clicking this will submit a request to merge with the current group.'>Request Merge With Group</a>";
 						request.setAttribute("currentMergeRequest", requestMergeString);

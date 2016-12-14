@@ -19,7 +19,7 @@
 
 <c:if test="${isGroupMerged}">
 	<div class='main-description'>	
-		<h4>This group has merged with <a onclick='viewGroup(${mergedGroupId})'>${mergedGroupName}</a>. 
+		<h4>This group has merged with <a class='link' onclick='viewGroup(${mergedGroupId})'>${mergedGroupName}</a>. 
 	</div>
 </c:if>
 
@@ -51,7 +51,7 @@
 	</div>
 	<hr>
 	</c:if>
-	<c:if test="{inGroup == false && allowMergeRequests}">
+	<c:if test="${inThisGroup == false && allowMergeRequests}">
 	<div class='main-description'>	
 		<h2>Admin Controls</h2>
 		<div class='main-item-controls'>
@@ -64,7 +64,7 @@
 
 <c:if test="${inGroup == false}">
 	<div class='main-buttonbox'>
-		<a onclick='groupRequestJoin(event, ${groupId})>)'
+		<a onclick='groupRequestJoin(event, ${groupId})'
 			class='main-button'>Request to join this group</a>
 	</div>
 </c:if>
