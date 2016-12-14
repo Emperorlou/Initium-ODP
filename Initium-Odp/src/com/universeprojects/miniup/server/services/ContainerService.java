@@ -73,4 +73,14 @@ public class ContainerService extends Service {
 		return false;
 	}
 	
+	public String getContainerDisplayName(final CachedEntity container){
+		
+		String displayName = (String) container.getProperty("label");
+		
+		if (displayName==null || displayName.trim().equals(""))
+            displayName = (String)container.getProperty("name");
+		
+		return displayName;
+	}
+	
 }

@@ -28,8 +28,6 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 	protected void processBatchItems(Map<String, String> parameters, ODPDBAccess db, 
 			CachedDatastoreService ds, CachedEntity character, List<CachedEntity> batchItems) throws UserErrorMessage{
 		
-			setPopupMessage("Number of items selected: " + batchItems.size());
-		
 			//we're swapping 2 containers here. If there's more than 2 items in the list, something went wrong.
 			if(batchItems.size() != 2)
 				throw new UserErrorMessage("Error in item selection. 2 (and only 2) containers must be involved in a swap.");
@@ -82,8 +80,6 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			ds.beginBulkWriteMode();
 			for(CachedEntity item : itemsToMove){
 				
-				setPopupMessage(getPopupMessage() + "\n" + "Moving: " + item.getProperty("name"));
-				
 				item.setProperty("containerKey",emptyContainer.getKey());
 				item.setProperty("moveTimestamp", new Date());
 				
@@ -91,7 +87,11 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			}			
 			ds.commitBulkWrite();
 			
-			setPopupMessage(getPopupMessage() + "\n" + "Container contents have been swapped. Yay!");
+			String fullLabel = (String) fullContainer.getProperty("label");
+			String emptyLabel = (String) fullContainer.getProperty("label");
+			
+			setPopupMessage("Container contents in " + cs.getContainerDisplayName(fullContainer) + "container " +
+					"have been moved into the " + cs.getContainerDisplayName(emptyContainer) + "container!");
 	}
 
 }
