@@ -6,3 +6,8 @@
 /Initium-Odp/war/WEB-INF/lib/appengine-endpoints.jar
 /Initium-Odp/war/WEB-INF/lib/appengine-endpoints-deps.jar
 /Initium-Odp/war/WEB-INF/lib/appengine-jsr107cache-1.9.36.jar
+*.iml
+*.eml
+.idea/
+.classpath
+/Initium-Odp/.classpath
