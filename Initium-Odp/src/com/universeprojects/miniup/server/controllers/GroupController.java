@@ -225,6 +225,17 @@ public class GroupController extends PageController {
 			// Get the number that were active in the past week
 			int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
+			
+			List<Key> keyOfDecs = GroupService.getWarDeclarations(group);
+			List<String> warDecGroupNames = new ArrayList<String>();
+			if (!keyOfDecs.isEmpty())
+			{
+			for (Key decs : keyOfDecs) 
+			{
+				warDecGroupNames.add(decs.getName());
+			}
+			request.setAttribute("warDecGroupNames", warDecGroupNames);
+			}
 		}
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}

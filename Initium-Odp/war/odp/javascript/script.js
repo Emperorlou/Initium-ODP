@@ -934,6 +934,16 @@ function leaveGroup(eventObject)
 	});
 }
 
+function declareWar(eventObject)
+{
+	promptPopup("Declare War", "Enter the name of the group you want to declare on.", "",  function(groupName) {
+		if (groupName != null || groupName != "") {
+			doCommand(eventObject, "GroupDeclareWar", {"groupName" : groupName}, function(error)  {
+				if (error) return;
+			})
+		}
+	});
+}
 //function cancelLeaveGroup()
 //{
 //	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;

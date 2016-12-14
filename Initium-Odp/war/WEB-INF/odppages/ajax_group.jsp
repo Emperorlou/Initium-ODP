@@ -6,6 +6,13 @@
 		</h1>
 		<p>
 			<c:out value="${groupDescription}" />
+			<br />
+			<a onclick='declareWar(event)'/>
+			<br />
+			<c:forEach var="declaredGroups" items="${warDecGroupNames}">
+				<p>${declaredGroups}</p>
+				<br />
+			</c:forEach>
 		</p>
 	</div>
 </div>
