@@ -487,7 +487,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 		sb.append("<div class='main-item-container'><div class='main-item'>");
-		sb.append("<a onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 		sb.append("</div><div class='main-item-controls'>");
 		sb.append("<a onclick='groupMergeDenyApplication(event, "+group.getId()+")'>Deny Merge</a>");
 		sb.append("<a onclick='groupMergeAcceptApplication(event, "+group.getId()+")'>Accept Merge</a>");
