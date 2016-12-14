@@ -67,7 +67,6 @@ public class CommandGroupDelete extends Command
 		{
 			throw new UserErrorMessage("Only the creator can delete the group.");
 		}
-
 		// Deleting the group
 		ds.delete(group);
 

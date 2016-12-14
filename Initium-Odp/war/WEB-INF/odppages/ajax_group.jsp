@@ -6,6 +6,10 @@
 		</h1>
 		<p>
 			<c:out value="${groupDescription}" />
+			<br />
+			<c:forEach value="declaredGroups" items="${warDecGroupNames}">
+				${declaredGroups}
+			</c:forEach>
 		</p>
 	</div>
 </div>
