@@ -1547,13 +1547,9 @@ function deleteAndRecreateCharacter(currentCharName)
 	});
 }
 
-function doDrinkBeer()
+function doDrinkBeer(eventObject)
 {
-	confirmPopup("Drink Beer", "Are you sure you want to drink? It might affect your combat abilities...", function(){
-		window.location.href = "ServletCharacterControl?type=drinkBeer"+"&v="+window.verifyCode;
-		
-	});
-		
+	doCommand(eventObject,"DrinkBeer");
 }
 
 function resendVerificationEmail()
