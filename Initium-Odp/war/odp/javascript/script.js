@@ -1549,12 +1549,8 @@ function deleteAndRecreateCharacter(currentCharName)
 
 function doDrinkBeer(eventObject)
 {
-	confirmPopup("Drink Beer", "Are you sure you want to drink? It might affect your combat abilities...", function(){
-        closeAllPopups();
-        closeAllTooltips();
-        doCommand(eventObject,"DrinkBeer");
-	});
-		
+    closeAllPopupsTooltips();
+	doCommand(eventObject,"DrinkBeer");
 }
 
 function resendVerificationEmail()
