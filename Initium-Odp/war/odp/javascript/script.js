@@ -938,13 +938,18 @@ function declareWar(eventObject)
 {
 	promptPopup("Declare War", "Enter the name of the group you want to declare on.", "",  function(groupName) {
 		if (groupName != null || groupName != "") {
-			doCommand(eventObject, "GroupDeclareWar", {"groupName" : groupName}, function(error)  {
+			doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName}, function(error)  {
 				if (error) return;
 			})
 		}
 	});
 }
-//function cancelLeaveGroup()
+function declareWar(eventObject, groupName) 
+{
+confirmPopup("End War", "Are you sure you want to end war with" + groupName + "?", function(){
+	doCommand(eventObject, "GroupDoSetWar" {"groupName" : groupName});
+}
+//function cancelLeaveGroup()d
 //{
 //	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
 //}

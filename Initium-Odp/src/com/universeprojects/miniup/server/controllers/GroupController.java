@@ -236,7 +236,7 @@ public class GroupController extends PageController {
 			}
 			request.setAttribute("warDecGroupNames", warDecGroupNames);
 			}
-		}
+		}	
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}
 

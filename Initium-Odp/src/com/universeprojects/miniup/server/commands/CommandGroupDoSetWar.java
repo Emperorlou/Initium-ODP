@@ -2,10 +2,8 @@ package com.universeprojects.miniup.server.commands;
 
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -14,14 +12,21 @@ import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
-public class CommandGroupEndWar extends Command {
+/** 
+ * 
+ * @author poolrequest
+ *
+ */
 
-	public CommandGroupEndWar(final ODPDBAccess db,
+public class CommandGroupDoSetWar extends Command {
+
+	public CommandGroupDoSetWar(final ODPDBAccess db,
 			final HttpServletRequest request, final HttpServletResponse response)
 	{
 		super(db, request, response);
 	}
 	
+	@Override
 	public final void run(final Map<String, String> parameters)
 			throws UserErrorMessage
 	{
@@ -31,8 +36,8 @@ public class CommandGroupEndWar extends Command {
 		CachedEntity admin = db.getCurrentCharacter();		
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity warDeclarer = db.getEntity(groupKey);
-		CachedEntity warReceiver = db.getGroupByName(groupName);
-
+		CachedEntity warReceiver = db.getGroupByName(groupName);	
+		
 		if (warDeclarer == null)
 		{
 			throw new UserErrorMessage("You are not currently in a group.");
@@ -47,21 +52,24 @@ public class CommandGroupEndWar extends Command {
 		if (warReceiver == null)
 		{
 			throw new UserErrorMessage(
-					"Cannot end war on a group that does not exist.");
+					"Cannot declare war on a group that does not exist.");
 		}
 		
-		List<Key> declarerCurrent = (List<Key>)warReceiver.getProperty("declaredWarGroups");
-		if (!declarerCurrent.contains(warReceiver.getKey()))
+		//Removes the declaration if it exists
+		List<Key> declarerCurrent = (List<Key>)warDeclarer.getProperty("declaredWarGroups");
+		if (declarerCurrent.contains(warReceiver.getKey()))
 				{
-					throw new UserErrorMessage(
-							"There is no current war with this group.");
+					declarerCurrent.remove(warReceiver.getKey());
 				}
-		declarerCurrent.remove(warReceiver.getKey());
+		else if (!declarerCurrent.contains(warReceiver.getKey()))
+				{
+					declarerCurrent.add(warReceiver.getKey());
+				}
 		warDeclarer.setProperty("declaredWarGroups", declarerCurrent);
 		
 		ds.put(warDeclarer);
 		
-		setPopupMessage("War has ended.");
+		setPopupMessage("War has been declared!");
 		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 
