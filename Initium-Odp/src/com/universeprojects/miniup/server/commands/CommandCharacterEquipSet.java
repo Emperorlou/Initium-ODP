@@ -98,7 +98,7 @@ public class CommandCharacterEquipSet extends Command {
 
 		for (CachedEntity equipment : setEquip) {
 
-			if (slotList.size() == 0 || slotList==null) {
+			if (slotList==null||slotList.size() == 0) {
 				break;
 			}
 
@@ -126,8 +126,8 @@ public class CommandCharacterEquipSet extends Command {
 					if (slotList.contains(destinationSlot)) {
 						slotList.remove(destinationSlot);
 						toEquip.add(equipment);
-
 					}
+					
 				} else if (equipSlotArrAnd.length > 1) {
 
 					boolean equippable = true;
