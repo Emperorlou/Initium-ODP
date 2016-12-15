@@ -45,7 +45,7 @@ public class CommandGroupMergeDenyApplication extends Command {
 		if(service.denyMergeApplicationFrom(group))
 		{
 			ds.put(group);
-			updateHtmlContents(".group-container[ref='"+group.getId()+"']' .main-item-container", "Denied " + group.getProperty("name") + "'s Merge Request");
+			updateHtmlContents(".group-container[ref='"+group.getId()+"'] .main-item-container", "Denied " + group.getProperty("name") + "'s Merge Request");
 		}
 	}
 

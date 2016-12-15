@@ -4653,26 +4653,42 @@ public class ODPDBAccess
 		return maxCarryWeight;
 	}
 	
-	public Long getItemCarryingWeight(CachedEntity character, List<CachedEntity> inventory)
+	/**
+	 * This variation of the method accepts a list of the contents of the container (the inventory argument) if
+	 * you happen to already have it. This saves an extra query of the database and is an optimization.
+	 * 
+	 * @param container
+	 * @param containerInventory
+	 * @return
+	 */
+	public Long getItemCarryingWeight(CachedEntity container, List<CachedEntity> containerInventory)
 	{
 		long carrying = 0l;
 		
-		for(CachedEntity item:inventory)
+		for(CachedEntity internalItem:containerInventory)
 		{
-			carrying+=getItemWeight(item);
+			carrying+=getItemWeight(internalItem);
 		}
 
 		
 		return carrying;
 	}
 	
-	public Long getItemCarryingSpace(CachedEntity character, List<CachedEntity> inventory)
+	/**
+	 * This variation of the method accepts a list of the contents of the container (the inventory argument) if
+	 * you happen to already have it. This saves an extra query of the database and is an optimization.
+	 * 
+	 * @param container
+	 * @param containerInventory
+	 * @return
+	 */
+	public Long getItemCarryingSpace(CachedEntity container, List<CachedEntity> containerInventory)
 	{
 		long space = 0l;
 		
-		for(CachedEntity item:inventory)
+		for(CachedEntity internalItem:containerInventory)
 		{
-			Long itemSpace = (Long)item.getProperty("space");
+			Long itemSpace = (Long)internalItem.getProperty("space");
 			if (itemSpace==null)
 				continue;
 			

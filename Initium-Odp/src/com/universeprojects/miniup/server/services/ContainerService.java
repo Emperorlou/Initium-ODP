@@ -73,4 +73,22 @@ public class ContainerService extends Service {
 		return false;
 	}
 	
+	/**
+	 * 
+	 * Retrieves the display name to use for a specific container. Will return the container's label unless the label is null
+	 * or empty. If label is null or empty, will return the item name.
+	 * 
+	 * @param container
+	 * @return
+	 */
+	public String getContainerDisplayName(final CachedEntity container){
+		
+		String displayName = (String) container.getProperty("label");
+		
+		if (displayName==null || displayName.trim().equals(""))
+            displayName = (String)container.getProperty("name");
+		
+		return displayName;
+	}
+	
 }
