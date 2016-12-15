@@ -1,6 +1,9 @@
 package com.universeprojects.miniup.server.commands;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -65,47 +68,108 @@ public class CommandCharacterEquipSet extends Command {
 				if (GameUtils.equals(setEquip.get(i).getKey(), setEquip.get(j)
 						.getKey())) {
 					throw new UserErrorMessage(
-							"There are duplicate equipment items in the container. Id: "+setEquip.get(i).getKey().getId());
+							"There are duplicate equipment items in the container. Id: "
+									+ setEquip.get(i).getKey().getId());
 				}
-				/*
-				if(setEquip.get(i).getKey().getName().equals(setEquip.get(j).getKey().getName())){
-					throw new UserErrorMessage(
-							"There are duplicate equipment items in the container. Name: "+setEquip.get(i).getKey().getName());
-				}
-				// Testing how to check for duplicate items. */
 			}
 		}
 
-		
-		// Check if we can equip everything from the given container
+		// Sort the items in container and get only one for each slot for
+		// equipping
+		Collections.sort(setEquip, new Comparator<CachedEntity>() {
+			@Override
+			public int compare(CachedEntity e1, CachedEntity e2) {
 
+				if (e1.getProperty("movedTimestamp") == null
+						|| e2.getProperty("movedTimestamp") == null) {
+					return 0;
+				}
+
+				return ((Date) e1.getProperty("movedTimestamp"))
+						.compareTo((Date) e2.getProperty("movedTimestamp"));
+			}
+		});
+
+		List<CachedEntity> toEquip = new ArrayList<CachedEntity>();
+		List<String> slotList = Arrays.asList(ODPDBAccess.EQUIPMENT_SLOTS);
+
+		// "Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand",
+		// "LeftHand", "RightRing", "LeftRing", "Neck"
+
+		for (CachedEntity equipment : setEquip) {
+
+			if (slotList.size() == 0) {
+				break;
+			}
+
+			String equipSlotRaw = (String) equipment.getProperty("equipSlot");
+
+			if (equipSlotRaw.equals("Ring"))
+				equipSlotRaw = "LeftRing, RightRing";
+
+			equipSlotRaw = equipSlotRaw.trim();
+			if (equipSlotRaw.endsWith(","))
+				equipSlotRaw = equipSlotRaw.substring(0,
+						equipSlotRaw.length() - 1);
+			String[] equipSlotArr = equipSlotRaw.split(",");
+
+			if (equipSlotArr.length == 0)
+				throw new RuntimeException("No equip slots exist for the '"
+						+ equipment.getProperty("name") + "' item.");
+
+			else if (equipSlotArr.length == 1) {
+
+				String[] equipSlotArrAnd = equipSlotArr[0].split(" and ");
+				if (equipSlotArrAnd.length == 1) {
+
+					String destinationSlot = equipSlotArr[0].trim();
+					if (slotList.contains(destinationSlot)) {
+						slotList.remove(destinationSlot);
+						toEquip.add(equipment);
+
+					}
+				} else if (equipSlotArrAnd.length > 1) {
+
+					boolean equippable = true;
+					for (String andSlot : equipSlotArrAnd) {
+						if (!slotList.contains(andSlot)) {
+							equippable = false;
+							break;
+						}
+					}
+					if (equippable) {
+						slotList.removeAll(Arrays.asList(equipSlotArrAnd));
+						toEquip.add(equipment);
+					}
+				}
+			} else if (equipSlotArr.length > 1) {
+				for (int i = 0; i < equipSlotArr.length; i++) {
+					String destinationSlot = equipSlotArr[i].trim();
+					if (slotList.contains(destinationSlot)) {
+						slotList.remove(destinationSlot);
+						toEquip.add(equipment);
+						break;
+					}
+				}
+			}
+		}
+
+		// Check if we can equip everything from the given container
 		Double characterStrength = (Double) character.getProperty("strength");
 		// Round character strength just like it is rounded for the popup
 		characterStrength = Double.parseDouble(GameUtils
 				.formatNumber(characterStrength));
 
-		for (CachedEntity equipment : setEquip) {
+		for (CachedEntity equipment : toEquip) {
 
 			if (character == null)
 				throw new IllegalArgumentException("Character cannot be null.");
 			if (equipment == null)
 				throw new IllegalArgumentException("Equipment cannot be null.");
 
-			/*
-			 * 
-			 * if (character.getKey()
-			 * .equals(equipment.getProperty("containerKey")) == false) throw
-			 * new IllegalArgumentException(
-			 * "The piece of equipment is not in the character's posession.");
-			 * 
-			 * Of course this would throw Expression always -.- 
-			 */
-
 			String equipmentSlot = (String) equipment.getProperty("equipSlot");
 			if (equipmentSlot == null)
 				throw new UserErrorMessage("You cannot equip this item.");
-
-			// NOT SURE if the above checks are all needed in this case
 
 			if (equipment.getProperty("strengthRequirement") instanceof String)
 				equipment.setProperty("strengthRequirement", null);
@@ -118,19 +182,50 @@ public class CommandCharacterEquipSet extends Command {
 						"You cannot equip an item from the given container, you do not have the strength to use it.");
 		}
 
-		// Unequip all equipment we already have equipped and put them in the
-		// container.
+		// Get our current equipment
 		List<CachedEntity> currentEquipment = new ArrayList<CachedEntity>();
 		for (String slot : ODPDBAccess.EQUIPMENT_SLOTS) {
 			if (character.getProperty("equipment" + slot) != null) {
-				currentEquipment.add(db.getEntity((Key)character.getProperty("equipment" + slot)));
+				currentEquipment.add(db.getEntity((Key) character
+						.getProperty("equipment" + slot)));
 			}
 		}
 		
-		ds.beginBulkWriteMode();
 		
+		Long containerMaxWeight = ((Long) container.getProperty("maxWeight"));
+		Long currentEquipmentWeight = db.getItemCarryingWeight(character, currentEquipment);
+		Long toEquipEquipmentWeight = db.getItemCarryingWeight(character, toEquip);
+		Long containerRemainingWeight = containerMaxWeight - db.getItemCarryingWeight(character, setEquip);
+
+		Long containerMaxSpace = ((Long) container.getProperty("maxSpace"));
+		Long currentEquipmentSpace = db.getItemCarryingSpace(character, currentEquipment);
+		Long toEquipEquipmentSpace = db.getItemCarryingSpace(character, toEquip);
+		Long containerRemainingSpace = containerMaxSpace - db.getItemCarryingSpace(character, setEquip);
+		
+		//if(containerRemainingWeight (currentEquipment-toEquipEquipmentWeight)
+
+
+		
+		
+		
+		
+
+		// TODO db.getItemWeight(item)
+		/*
+		 * 
+		 * 
+		 * Long spaceReq = db.getItemCarryingSpace(character, itemsToMove); Long
+		 * weightReq = db.getItemCarryingWeight(character, itemsToMove); Long
+		 * spaceAvail = (Long) emptyContainer.getProperty("maxSpace"); Long
+		 * weightAvail = (Long) emptyContainer.getProperty("maxWeight");
+		 */
+
+		// Unequip all equipment we already have equipped and put them in the
+		// container.
+		ds.beginBulkWriteMode();
+
 		for (CachedEntity equipment : currentEquipment) {
-			
+
 			db.doCharacterUnequipEntity(ds, character, equipment);
 			equipment.setProperty("containerKey", containerKey);
 			equipment.setProperty("movedTimestamp", new Date());
@@ -139,11 +234,11 @@ public class CommandCharacterEquipSet extends Command {
 		}
 
 		// Equip the set from the container
-		for (CachedEntity equipment : setEquip) {
+		for (CachedEntity equipment : toEquip) {
 			equipment.setProperty("containerKey", character.getKey());
 			equipment.setProperty("movedTimestamp", new Date());
 			ds.put(equipment);
-			
+
 			db.doCharacterEquipEntity(ds, character, equipment);
 		}
 
