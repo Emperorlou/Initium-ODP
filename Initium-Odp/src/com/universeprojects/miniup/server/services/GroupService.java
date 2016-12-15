@@ -268,4 +268,12 @@ public class GroupService extends Service {
 		}
 		return false;
 	}
+	public static List<Key> getWarDeclarations(CachedEntity group) {
+		List<Key> warDecs = (List<Key>)group.getProperty("declaredWarGroups");
+		if (warDecs.isEmpty())
+			return null;
+		else
+			return warDecs;
+		
+	}
 }

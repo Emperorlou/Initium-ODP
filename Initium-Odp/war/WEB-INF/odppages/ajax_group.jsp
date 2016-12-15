@@ -6,6 +6,16 @@
 		</h1>
 		<p>
 			<c:out value="${groupDescription}" />
+			<br />
+			<a onclick='declareWar(event)'>Declare War</a>
+			<br />
+			<c:if test="${not empty warDecGroupNames}">
+			<c:forEach var="declaredGroups" items="${warDecGroupNames}">
+				<p>${declaredGroups}</p>
+				<a onclick='declareWar(event, "<c:out value="${declaredGroups}"/>")'>End War</a>
+				<br />
+			</c:forEach>
+			</c:if>
 		</p>
 	</div>
 </div>
