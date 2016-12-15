@@ -7,7 +7,7 @@
 		<p>
 			<c:out value="${groupDescription}" />
 			<br />
-			<a onclick='declareWar(event)'>Declare War</a>
+			<a onclick="declareWar(event)">Declare War</a>
 			<br />
 			<c:if test="${not empty warDecGroupNames}">
 			<c:forEach var="declaredGroups" items="${warDecGroupNames}">
