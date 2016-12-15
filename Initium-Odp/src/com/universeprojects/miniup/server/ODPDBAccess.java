@@ -4653,36 +4653,42 @@ public class ODPDBAccess
 		return maxCarryWeight;
 	}
 	
-	public Long getItemCarryingWeight(CachedEntity container, List<CachedEntity> inventory)
+	/**
+	 * This variation of the method accepts a list of the contents of the container (the inventory argument) if
+	 * you happen to already have it. This saves an extra query of the database and is an optimization.
+	 * 
+	 * @param container
+	 * @param containerInventory
+	 * @return
+	 */
+	public Long getItemCarryingWeight(CachedEntity container, List<CachedEntity> containerInventory)
 	{
-		
-		ContainerService cs = new ContainerService(this);
-		if(!cs.containsAll(container, inventory))
-			throw new RuntimeException("The container doesn't contain the items");
-		
 		long carrying = 0l;
 		
-		for(CachedEntity item:inventory)
+		for(CachedEntity internalItem:containerInventory)
 		{
-			carrying+=getItemWeight(item);
+			carrying+=getItemWeight(internalItem);
 		}
 
 		
 		return carrying;
 	}
 	
-	public Long getItemCarryingSpace(CachedEntity container, List<CachedEntity> inventory)
+	/**
+	 * This variation of the method accepts a list of the contents of the container (the inventory argument) if
+	 * you happen to already have it. This saves an extra query of the database and is an optimization.
+	 * 
+	 * @param container
+	 * @param containerInventory
+	 * @return
+	 */
+	public Long getItemCarryingSpace(CachedEntity container, List<CachedEntity> containerInventory)
 	{
-		
-		ContainerService cs = new ContainerService(this);
-		if(!cs.containsAll(container, inventory))
-			throw new RuntimeException("The container doesn't contain the items");
-		
 		long space = 0l;
 		
-		for(CachedEntity item:inventory)
+		for(CachedEntity internalItem:containerInventory)
 		{
-			Long itemSpace = (Long)item.getProperty("space");
+			Long itemSpace = (Long)internalItem.getProperty("space");
 			if (itemSpace==null)
 				continue;
 			
@@ -4692,7 +4698,7 @@ public class ODPDBAccess
 		
 		return space;
 	}
-	
+
 	public Long getItemWeight(CachedEntity item)
 	{
 		Long itemQuantity = (Long)item.getProperty("quantity");
@@ -4701,16 +4707,6 @@ public class ODPDBAccess
 		if (itemWeight==null) itemWeight = 0L;
 		
 		return itemWeight*itemQuantity;
-	}
-	
-	public Long getItemSpace(CachedEntity item)
-	{
-		Long itemQuantity = (Long)item.getProperty("quantity");
-		if (itemQuantity==null) itemQuantity = 1L;
-		Long itemSpace = (Long)item.getProperty("space");
-		if (itemSpace==null) itemSpace = 0L;
-		
-		return itemSpace*itemQuantity;
 	}
 
 	/**THIS IS A PLACEHOLDER. Actual implementation is not in the ODP.

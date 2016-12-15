@@ -29,7 +29,8 @@ public class GroupService extends Service {
 		{
 			this.characterGroup = db.getEntity((Key)this.character.getProperty("groupKey"));
 			this.isAdmin = this.characterGroup != null && 
-					GameUtils.enumEquals(this.character.getProperty("groupStatus"), GroupStatus.Admin);
+					(GameUtils.enumEquals(charGroupStatus, GroupStatus.Admin) ||
+					 GameUtils.equals(this.character.getKey(), this.characterGroup.getProperty("creatorKey")));
 		}
 		else
 		{
@@ -68,7 +69,7 @@ public class GroupService extends Service {
 	
 	/**
 	 * Returns the characters group CachedEntity. Initialized in service constructor,
-	 * and can be null if character is not a member or admin of the group.
+	 * and can be null if character is not in a group.
 	 * @return Group CachedEntity the character belongs to.
 	 */
 	public CachedEntity getCharacterGroup()
@@ -117,7 +118,7 @@ public class GroupService extends Service {
 	public boolean hasGroupRequestedMergeWith(CachedEntity mergeGroup)
 	{
 		return this.isCharacterInSpecifiedGroup(mergeGroup) == false &&
-				GameUtils.equals(mergeGroup.getKey(), this.characterGroup.getProperty("pendingMergeGroupKey"));
+				GameUtils.equals(mergeGroup.getKey(), getMergeRequestGroupKeyFor(this.characterGroup));
 	}
 	
 	/**
@@ -171,13 +172,13 @@ public class GroupService extends Service {
 	
 	/**
 	 * Clears out the pendingMergeGroupKey of the current users Group.
-	 * @return True if specified group is current users group. False otherwise.
+	 * @return True if character is admin of group and has a pending merge. False otherwise.
 	 */
-	public boolean cancelMergeRequestWith(CachedEntity group)
+	public boolean cancelMergeRequest()
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(group))
+		if(this.isAdmin && getMergeRequestGroupKeyFor(this.characterGroup) != null)
 		{
-			group.setProperty("pendingMergeGroupKey", null);
+			this.characterGroup.setProperty("pendingMergeGroupKey", null);
 			return true;
 		}
 		return false;
@@ -217,7 +218,7 @@ public class GroupService extends Service {
 						GameUtils.enumEquals(charGroupStatus, GroupStatus.Member))
 				{
 					member.setProperty("groupKey", this.characterGroup.getKey());
-					member.setProperty("groupStatus", GroupStatus.Member);
+					member.setProperty("groupStatus", GroupStatus.Member.toString());
 				}
 				else
 				{
