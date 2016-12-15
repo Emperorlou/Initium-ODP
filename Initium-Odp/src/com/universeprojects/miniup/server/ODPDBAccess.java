@@ -4663,6 +4663,11 @@ public class ODPDBAccess
 	 */
 	public Long getItemCarryingWeight(CachedEntity container, List<CachedEntity> containerInventory)
 	{
+		
+		ContainerService cs = new ContainerService(this);
+		if(!cs.containsAll(container, containerInventory))
+			throw new RuntimeException("Container doesn't contain all items from given list");
+		
 		long carrying = 0l;
 		
 		for(CachedEntity internalItem:containerInventory)
@@ -4684,6 +4689,11 @@ public class ODPDBAccess
 	 */
 	public Long getItemCarryingSpace(CachedEntity container, List<CachedEntity> containerInventory)
 	{
+		
+		ContainerService cs = new ContainerService(this);
+		if(!cs.containsAll(container, containerInventory))
+			throw new RuntimeException("Container doesn't contain all items from given list");
+		
 		long space = 0l;
 		
 		for(CachedEntity internalItem:containerInventory)
@@ -4707,6 +4717,16 @@ public class ODPDBAccess
 		if (itemWeight==null) itemWeight = 0L;
 		
 		return itemWeight*itemQuantity;
+	}
+	
+	public Long getItemSpace(CachedEntity item)
+	{
+		Long itemQuantity = (Long)item.getProperty("quantity");
+		if (itemQuantity==null) itemQuantity = 1L;
+		Long itemSpace = (Long)item.getProperty("space");
+		if (itemSpace==null) itemSpace = 0L;
+		
+		return itemSpace*itemQuantity;
 	}
 
 	/**THIS IS A PLACEHOLDER. Actual implementation is not in the ODP.
