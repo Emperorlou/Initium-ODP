@@ -98,7 +98,7 @@ public class CommandCharacterEquipSet extends Command {
 
 		for (CachedEntity equipment : setEquip) {
 
-			if (slotList.size() == 0) {
+			if (slotList.size() == 0 || slotList==null) {
 				break;
 			}
 
@@ -122,7 +122,7 @@ public class CommandCharacterEquipSet extends Command {
 				String[] equipSlotArrAnd = equipSlotArr[0].split(" and ");
 				if (equipSlotArrAnd.length == 1) {
 
-					String destinationSlot = equipSlotArr[0].trim();
+					String destinationSlot = equipSlotArrAnd[0].trim();
 					if (slotList.contains(destinationSlot)) {
 						slotList.remove(destinationSlot);
 						toEquip.add(equipment);
