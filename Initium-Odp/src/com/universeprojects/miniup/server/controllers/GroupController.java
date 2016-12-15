@@ -228,14 +228,16 @@ public class GroupController extends PageController {
 			
 			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
 			List<String> warDecGroupNames = new ArrayList<String>();
-			if (!keyOfDecs.isEmpty() && keyOfDecs != null)
+			if (keyOfDecs.isEmpty() || keyOfDecs == null)
+				warDecGroupNames.add("No current wars.");
+			else
 			{
-			for (Key decs : keyOfDecs) 
-			{
-				warDecGroupNames.add(decs.getName());
+				for (Key decs : keyOfDecs) 
+				{
+					warDecGroupNames.add(decs.getName());
+				}
 			}
 			request.setAttribute("warDecGroupNames", warDecGroupNames);
-			}
 		}	
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}
