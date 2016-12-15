@@ -4653,8 +4653,13 @@ public class ODPDBAccess
 		return maxCarryWeight;
 	}
 	
-	public Long getItemCarryingWeight(CachedEntity character, List<CachedEntity> inventory)
+	public Long getItemCarryingWeight(CachedEntity container, List<CachedEntity> inventory)
 	{
+		
+		ContainerService cs = new ContainerService(this);
+		if(!cs.containsAll(container, inventory))
+			throw new RuntimeException("The container doesn't contain the items");
+		
 		long carrying = 0l;
 		
 		for(CachedEntity item:inventory)
@@ -4666,8 +4671,13 @@ public class ODPDBAccess
 		return carrying;
 	}
 	
-	public Long getItemCarryingSpace(CachedEntity character, List<CachedEntity> inventory)
+	public Long getItemCarryingSpace(CachedEntity container, List<CachedEntity> inventory)
 	{
+		
+		ContainerService cs = new ContainerService(this);
+		if(!cs.containsAll(container, inventory))
+			throw new RuntimeException("The container doesn't contain the items");
+		
 		long space = 0l;
 		
 		for(CachedEntity item:inventory)
@@ -4682,7 +4692,7 @@ public class ODPDBAccess
 		
 		return space;
 	}
-
+	
 	public Long getItemWeight(CachedEntity item)
 	{
 		Long itemQuantity = (Long)item.getProperty("quantity");
@@ -4691,6 +4701,16 @@ public class ODPDBAccess
 		if (itemWeight==null) itemWeight = 0L;
 		
 		return itemWeight*itemQuantity;
+	}
+	
+	public Long getItemSpace(CachedEntity item)
+	{
+		Long itemQuantity = (Long)item.getProperty("quantity");
+		if (itemQuantity==null) itemQuantity = 1L;
+		Long itemSpace = (Long)item.getProperty("space");
+		if (itemSpace==null) itemSpace = 0L;
+		
+		return itemSpace*itemQuantity;
 	}
 
 	/**THIS IS A PLACEHOLDER. Actual implementation is not in the ODP.

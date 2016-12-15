@@ -73,4 +73,19 @@ public class ContainerService extends Service {
 		return false;
 	}
 	
+	public boolean contains(CachedEntity container, CachedEntity item){
+		
+		final List<CachedEntity> content = db.getFilteredList("Item",
+				"containerKey", FilterOperator.EQUAL, container.getKey());
+		
+		return content.contains(item);
+	}
+	
+	public boolean containsAll(CachedEntity container, List<CachedEntity> items){
+		
+		final List<CachedEntity> content = db.getFilteredList("Item",
+				"containerKey", FilterOperator.EQUAL, container.getKey());
+		
+		return content.containsAll(items);
+	}
 }

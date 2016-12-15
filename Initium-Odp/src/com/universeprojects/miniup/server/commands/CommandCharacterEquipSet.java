@@ -194,31 +194,21 @@ public class CommandCharacterEquipSet extends Command {
 		
 		Long containerMaxWeight = ((Long) container.getProperty("maxWeight"));
 		Long currentEquipmentWeight = db.getItemCarryingWeight(character, currentEquipment);
-		Long toEquipEquipmentWeight = db.getItemCarryingWeight(character, toEquip);
-		Long containerRemainingWeight = containerMaxWeight - db.getItemCarryingWeight(character, setEquip);
+		Long toEquipEquipmentWeight = db.getItemCarryingWeight(container, toEquip);
+		Long containerRemainingWeight = containerMaxWeight - db.getItemCarryingWeight(container, setEquip);
 
 		Long containerMaxSpace = ((Long) container.getProperty("maxSpace"));
 		Long currentEquipmentSpace = db.getItemCarryingSpace(character, currentEquipment);
-		Long toEquipEquipmentSpace = db.getItemCarryingSpace(character, toEquip);
-		Long containerRemainingSpace = containerMaxSpace - db.getItemCarryingSpace(character, setEquip);
+		Long toEquipEquipmentSpace = db.getItemCarryingSpace(container, toEquip);
+		Long containerRemainingSpace = containerMaxSpace - db.getItemCarryingSpace(container, setEquip);
 		
-		//if(containerRemainingWeight (currentEquipment-toEquipEquipmentWeight)
+		if(containerRemainingWeight<(currentEquipmentWeight-toEquipEquipmentWeight)){
+			throw new UserErrorMessage("Cannot swap out set, not enough free weight in the container");
+		}
 
-
-		
-		
-		
-		
-
-		// TODO db.getItemWeight(item)
-		/*
-		 * 
-		 * 
-		 * Long spaceReq = db.getItemCarryingSpace(character, itemsToMove); Long
-		 * weightReq = db.getItemCarryingWeight(character, itemsToMove); Long
-		 * spaceAvail = (Long) emptyContainer.getProperty("maxSpace"); Long
-		 * weightAvail = (Long) emptyContainer.getProperty("maxWeight");
-		 */
+		if(containerRemainingSpace<(currentEquipmentSpace-toEquipEquipmentSpace)){
+			throw new UserErrorMessage("Cannot swap out set, not enough free space in the container");
+		}
 
 		// Unequip all equipment we already have equipped and put them in the
 		// container.
