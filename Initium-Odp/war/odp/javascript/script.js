@@ -946,8 +946,9 @@ function declareWar(eventObject)
 }
 function declareWar(eventObject, groupName) 
 {
-confirmPopup("End War", "Are you sure you want to end war with" + groupName + "?", function(){
-	doCommand(eventObject, "GroupDoSetWar" {"groupName" : groupName});
+	confirmPopup("End War", "Are you sure you want to end this war?", function(){
+		doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName});
+	});
 }
 //function cancelLeaveGroup()d
 //{
