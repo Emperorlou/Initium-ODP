@@ -944,7 +944,7 @@ function declareWar(eventObject)
 		}
 	});
 }
-function declareWar(eventObject, groupName) 
+function endWar(eventObject, groupName) 
 {
 	confirmPopup("End War", "Are you sure you want to end this war?", function(){
 		doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName});
