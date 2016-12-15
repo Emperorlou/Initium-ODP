@@ -344,7 +344,6 @@ public class MainPageUpdateService extends Service
 	 * This updates the html in the character widget that is in the top left corner of the banner.
 	 * 
 	 * @param userOfViewer
-	 * @param character
 	 * @param groupOfCharacter
 	 */
 	public String updateInBannerCharacterWidget(CachedEntity userOfViewer, CachedEntity groupOfCharacter)
