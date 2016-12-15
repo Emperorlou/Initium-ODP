@@ -346,9 +346,9 @@ public class MainPageUpdateService extends Service
 	 * @param userOfViewer
 	 * @param groupOfCharacter
 	 */
-	public String updateInBannerCharacterWidget(CachedEntity userOfViewer, CachedEntity groupOfCharacter)
+	public String updateInBannerCharacterWidget()
 	{
-		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, character, userOfViewer, groupOfCharacter, true, true, false, false);
+		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, character, user, true);
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
 	}
@@ -439,10 +439,9 @@ public class MainPageUpdateService extends Service
 			newHtml.append("<br>");
 		}
 
-		// EASTER EGG
 		if (location.getProperty("name").toString().equals("Aera Inn"))
 		{
-			newHtml.append("<a href='#' class='main-button' onclick='doDrinkBeer()'>Drink Beer</a>");
+			newHtml.append("<a class='main-button' onclick='doDrinkBeer(event)'>Drink Beer</a>");
 			newHtml.append("<br>");
 		}
 
