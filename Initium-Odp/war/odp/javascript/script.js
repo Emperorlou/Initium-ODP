@@ -1549,7 +1549,6 @@ function deleteAndRecreateCharacter(currentCharName)
 
 function doDrinkBeer(eventObject)
 {
-    closeAllPopupsTooltips();
 	doCommand(eventObject,"DrinkBeer");
 }
 
