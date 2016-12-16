@@ -1460,22 +1460,42 @@ public class ODPDBAccess
 		return carrying + charWeight;
 	}
 
+	/**
+	 * Performs the drop of the item from the character and saves the entity. 
+	 * Calls tryCharacterDropItem, which will throw if not successful. 
+	 */
 	public void doCharacterDropItem(CachedEntity character, CachedEntity item) throws UserErrorMessage
+	{
+		tryCharacterDropItem(character, item, true);
+		getDB().put(item);
+	}
+	
+	/**
+	 * Attempts to drop the item, setting the appropriate fields on the Item entity.
+	 * @return True if item was dropped, false only if throwError is false and the item is equipped or vending.
+	 * @throws UserErrorMessage Thrown if item is equipped or vending, and throwError parameter is true.
+	 */
+	public boolean tryCharacterDropItem(CachedEntity character, CachedEntity item, boolean throwError) throws UserErrorMessage
 	{
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
 		if (item == null) throw new IllegalArgumentException("Item cannot be null.");
 
 		Key characterLocationKey = (Key) character.getProperty("locationKey");
 
-		if (checkCharacterHasItemEquipped(character, item.getKey())) throw new UserErrorMessage("Your character has this item equipped. You cannot drop it until it is unequipped.");
+		if (checkCharacterHasItemEquipped(character, item.getKey())) {
+			if(throwError) throw new UserErrorMessage("Your character has this item equipped. You cannot drop it until it is unequipped.");
+			return false;
+		}
 
-		if (checkItemIsVending(character.getKey(), item.getKey()))
-			throw new UserErrorMessage("The item you are trying to drop is currently in your store. You cannot drop an item that you plan on selling.");
+		if (checkItemIsVending(character.getKey(), item.getKey())) {
+			if(throwError) throw new UserErrorMessage("The item you are trying to drop is currently in your store. You cannot drop an item that you plan on selling.");
+			return false;
+		}
 
 		item.setProperty("containerKey", characterLocationKey);
 		item.setProperty("movedTimestamp", new Date());
 
-		getDB().put(item);
+		return true;
 	}
 
 	/**
