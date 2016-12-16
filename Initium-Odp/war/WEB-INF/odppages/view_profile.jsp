@@ -43,6 +43,7 @@
 <h4>Account options</h4>
 <p>
 	<a onclick='changeEmailAddress("${userEmail}")'>Change your account's email address</a>
+	<br>
 	<a onclick='toggleHideUserActivity(event)' id="toggleHideUserActivity">
 		<c:if test="${hideUserActivity!=true}">
 			Click here to hide your online status from your friends.
