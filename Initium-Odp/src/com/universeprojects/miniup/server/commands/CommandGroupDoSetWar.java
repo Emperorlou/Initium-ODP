@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -54,24 +55,33 @@ public class CommandGroupDoSetWar extends Command {
 			throw new UserErrorMessage(
 					"Cannot declare war on a group that does not exist.");
 		}
-		
-		//Removes the declaration if it exists
+				
 		List<Key> declarerCurrent = (List<Key>)warDeclarer.getProperty("declaredWarGroups");
-		if (declarerCurrent.contains(warReceiver.getKey()))
-				{
-					declarerCurrent.remove(warReceiver.getKey());
-				}
-		else if (!declarerCurrent.contains(warReceiver.getKey()))
-				{
-					declarerCurrent.add(warReceiver.getKey());
-				}
-		warDeclarer.setProperty("declaredWarGroups", declarerCurrent);
+		if (declarerCurrent == null)
+		{
+			List<Key> newWarDecs = new ArrayList<Key>();
+			newWarDecs.add(warReceiver.getKey());
+			setPopupMessage("War has been declared!");
+			warDeclarer.setProperty("declaredWarGroups", newWarDecs);
+			ds.put(warDeclarer);
+		}
 		
-		ds.put(warDeclarer);
-		
-		setPopupMessage("War has been declared!");
-		
+		else 
+		{
+			if (!declarerCurrent.contains(warReceiver.getKey()))
+			{
+				declarerCurrent.add(warReceiver.getKey());
+				setPopupMessage("War has been declared!");
+			}
+			
+			if (declarerCurrent.contains(warReceiver.getKey()))
+			{
+				declarerCurrent.remove(warReceiver.getKey());
+				setPopupMessage("War has ended.");
+			}	
+			
+		ds.put(warDeclarer);	
+		}		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
-
 	}
 }
