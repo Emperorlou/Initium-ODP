@@ -41,7 +41,7 @@ public class CommandItemsStoreDelete extends CommandItemsBase {
 				invItemKeys.add((Key)storeItem.getProperty("itemKey"));
 		
 		Map<CachedEntity, CachedEntity> storeToItemsMap = new HashMap<CachedEntity, CachedEntity>();
-		List<CachedEntity> invItems = ds.fetchEntitiesFromKeys(invItemKeys);
+		List<CachedEntity> invItems = ds.get(invItemKeys);
 		for(CachedEntity storeItem:batchItems)
 		{
 			for(CachedEntity item:invItems)

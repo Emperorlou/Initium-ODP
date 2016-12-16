@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,22 +46,17 @@ public class CommandItemsTrade extends CommandItemsBase {
 			throw new UserErrorMessage("Not currently trading with other character.");
 		
 		StringBuilder tradedString = new StringBuilder();
+		List<CachedEntity> tradeItems = new ArrayList<CachedEntity>();
 		for(CachedEntity tradeItem:batchItems)
 		{
-			try
-			{
-				db.addTradeItem(ds, tradeObject, character, tradeItem);
-				tradedString.append(HtmlComponents.generatePlayerTradeItemHtml(tradeItem));
-				processedItems.add(tradeItem.getKey().getId());
-			}
-			catch(UserErrorMessage ex)
-			{
-				// Ignore. Indicates the trade is cancelled or the item doesn't belong
-				// to the current user. We don't generate the HTML if this happens,
-				// effectively skipping the trade for this item.
-			}
+			tradeItems.add(tradeItem);
+			tradedString.append(HtmlComponents.generatePlayerTradeItemHtml(tradeItem));
+			processedItems.add(tradeItem.getKey().getId());
 		}
 		
+		// addTradeItems will throw a UEM, we'll allow it since it doesn't save
+		// unless it was successful (and should bail on the rest of the process).
+		db.addTradeItems(ds, tradeObject, character, tradeItems);
 		db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
         Integer tradeVersion = tradeObject.getVersion();
