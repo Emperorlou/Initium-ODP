@@ -1689,6 +1689,11 @@ function toggleCloaked(eventObject)
 	doCommand(eventObject, "ToggleCloak", {"buttonId" : eventObject.currentTarget.id});
 }
 
+function toggleHideUserActivity(eventObject)
+{
+	doCommand(eventObject, "ToggleHideUserActivity");
+}
+
 function campsiteDefend()
 {
 	location.href = "ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
