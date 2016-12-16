@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -44,8 +43,14 @@ public class CommandToggleHideUserActivity extends Command
 		CachedEntity user = db.getCurrentUser();
 		
 		//toggle the hide user activity status
-		boolean hideActivity = (boolean) user.getProperty("hideUserActivity");
-		hideActivity = !hideActivity;
+		Boolean hideActivity = (Boolean) user.getProperty("hideUserActivity");
+		
+		//if hideActivity is null, that means the user has never toggled this. Thus, I am assuming
+		//the display text read "Click here to hide" and setting it to true.
+		if(hideActivity == null) 
+			hideActivity = true;
+		else
+			hideActivity = !hideActivity;
 		
 		user.setProperty("hideUserActivity", hideActivity);
 		
