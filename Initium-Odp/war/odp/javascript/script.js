@@ -1691,7 +1691,7 @@ function toggleCloaked(eventObject)
 
 function toggleHideUserActivity(eventObject)
 {
-	doCommand(eventObject, "ToggleHideUserActivity", {"buttonId" : eventObject.currentTarget.id});
+	doCommand(eventObject, "ToggleHideUserActivity");
 }
 
 function campsiteDefend()
