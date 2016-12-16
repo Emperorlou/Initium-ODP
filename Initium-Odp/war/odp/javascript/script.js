@@ -2094,14 +2094,22 @@ function doCommand(eventObject, commandName, parameters, callback)
 	if (eventObject!=null)
 	{
 		clickedElement = $(eventObject.currentTarget);
-		originalText = clickedElement.html();
-		clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
+		if(clickedElement.find("img.wait").length == 0) {
+			originalText = clickedElement.html();
+			clickedElement.html("<img class='wait' src='javascript/images/wait.gif' border=0/>");
+		}
 	}
 	
 	// We need to post, as larger batch operations failed due to URL string being too long
 	$.post(url, parameters)
 	.done(function(data)
 	{
+		// Return clicked element back to original state first.
+		// Ajax updates get overwritten if they're not simple updates
+		// on the original element.
+		if (eventObject!=null && originalText)
+			clickedElement.html(originalText);
+		
 		if (data.antiBotQuestionActive == true)
 		{
 			antiBotQuestionPopup();
@@ -2132,12 +2140,6 @@ function doCommand(eventObject, commandName, parameters, callback)
 			popupMessage("System Message", data.errorMessage);
 		}
 
-
-		
-		
-		if (eventObject!=null)
-			clickedElement.html(originalText);
-		
 		if (callback!=null && data!=null)
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
