@@ -21,7 +21,7 @@ public class CommandToggleHideUserActivity extends Command
 {
 
 	/**
-	 * Command toggles cloaking, enabling or disabling based on current character entity state
+	 * Command toggles hide/show user activity.
 	 * 
 	 * @param request
 	 *            Server request
@@ -60,8 +60,6 @@ public class CommandToggleHideUserActivity extends Command
 			updateHtmlContents("#toggleHideUserActivity", "Click here to show your online status to your friends.");
 		else
 			updateHtmlContents("#toggleHideUserActivity", "Click here to hide your online status from your friends.");
-		
-		//temporary, remove after debug
-		setPopupMessage("New hideActivity: " + hideActivity);
+
 	}
 }
