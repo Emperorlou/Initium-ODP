@@ -29,6 +29,7 @@ import com.universeprojects.web.PageController;
  *  userId - ID of the current user
  *  donationHistory - How much the user has donated
  *  totalDonations - Donation credits currently available to user
+ *  hideUserActivity = Boolean indicating whether to hide this user's online status from their friends. - added by RevMuun
  * @author spfiredrake
  */
 @Controller
@@ -43,6 +44,7 @@ public class ViewProfileController extends PageController {
 
 		ODPDBAccess db = new ODPDBAccess(request);
 		CachedEntity character = db.getCurrentCharacter();
+		CachedEntity user = db.getCurrentUser();
 		if(character == null)
 			throw new ServletException("Unable to get current character from request");
 		
@@ -69,7 +71,6 @@ public class ViewProfileController extends PageController {
 
 		
 		// User specific info
-		CachedEntity user = db.getCurrentUser();
 		Long totalDonations = null;
 		Long donationHistory = null;
 		if (user!=null)
@@ -83,6 +84,9 @@ public class ViewProfileController extends PageController {
 		}
 		else
 			request.setAttribute("premium", false);
+		
+		request.setAttribute("charName", character.getProperty("name"));
+		request.setAttribute("hideUserActivity", user.getProperty("hideUserActivity"));
 		
 		if (totalDonations==null) totalDonations = 0L;
 		if (donationHistory==null) donationHistory = 0L;

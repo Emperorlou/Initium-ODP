@@ -80,7 +80,7 @@ return;
 			<h4>Strength</h4>
 			<p>
 				<ul>
-					<li>For every strength point you have, you get +2 hitpoints</li>
+					<li>For every strength point you have, you get +3 hitpoints</li>
 					<li>Strength increases the weight you can carry</li>
 					<li>It increases the amount of damage you do per hit</li>
 					<li>Equipments have strength requirements.</li>

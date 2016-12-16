@@ -899,7 +899,7 @@ function shareItem(itemId)
 function viewGroup(groupId)
 {
 	closeAllTooltips();
-	pagePopup("odp/ajax_group.jsp?groupId=" + groupId);
+	pagePopup("odp/ajax_group?groupId=" + groupId);
 }
 
 
@@ -934,7 +934,23 @@ function leaveGroup(eventObject)
 	});
 }
 
-//function cancelLeaveGroup()
+function declareWar(eventObject)
+{
+	promptPopup("Declare War", "Enter the name of the group you want to declare on.", "",  function(groupName) {
+		if (groupName != null || groupName != "") {
+			doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName}, function(error)  {
+				if (error) return;
+			})
+		}
+	});
+}
+function endWar(eventObject, groupName) 
+{
+	confirmPopup("End War", "Are you sure you want to end this war?", function(){
+		doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName});
+	});
+}
+//function cancelLeaveGroup()d
 //{
 //	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
 //}
@@ -1263,6 +1279,10 @@ function selectedItemsTrade(event, selector)
 	});
 }
 
+function characterEquipSet(event, containerId){
+	doCommand(event, "CharacterEquipSet", {"containerId":containerId}, loadInventoryAndEquipment);
+}
+
 function characterUnequipItem(event, itemId)
 {
 	doCommand(event, "CharacterUnequipItem", {"itemId":itemId}, loadInventoryAndEquipment);
@@ -1543,13 +1563,9 @@ function deleteAndRecreateCharacter(currentCharName)
 	});
 }
 
-function doDrinkBeer()
+function doDrinkBeer(eventObject)
 {
-	confirmPopup("Drink Beer", "Are you sure you want to drink? It might affect your combat abilities...", function(){
-		window.location.href = "ServletCharacterControl?type=drinkBeer"+"&v="+window.verifyCode;
-		
-	});
-		
+	doCommand(eventObject,"DrinkBeer");
 }
 
 function resendVerificationEmail()
@@ -1673,6 +1689,11 @@ function toggleCloaked(eventObject)
 	doCommand(eventObject, "ToggleCloak", {"buttonId" : eventObject.currentTarget.id});
 }
 
+function toggleHideUserActivity(eventObject)
+{
+	doCommand(eventObject, "ToggleHideUserActivity");
+}
+
 function campsiteDefend()
 {
 	location.href = "ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
@@ -1711,6 +1732,44 @@ function groupMemberKickCancel(characterId)
 function groupRequestJoin(eventObject, groupId)
 {
 	doCommand(eventObject, "GroupRequestJoin", {"groupId" : groupId});
+}
+
+function groupMergeRequestsAllow(eventObject)
+{
+	doCommand(eventObject, "GroupMergeAllowRequests");
+}
+
+function groupMergeRequestsDisallow(eventObject)
+{
+	doCommand(eventObject, "GroupMergeDisallowRequests");
+}
+
+function groupMergeDenyApplication(eventObject, groupId)
+{
+	confirmPopup("Deny Merge Request", "Are you sure you want to deny this merge request?", function(){
+		doCommand(eventObject, "GroupMergeDenyApplication", {"groupId" : groupId});
+	});
+}
+
+function groupMergeAcceptApplication(eventObject, groupId)
+{
+	confirmPopup("Accept Merge Request", "Are you sure you want to accept this merge request? All group members and group houses will transfer to this group.", function(){
+		doCommand(eventObject, "GroupMergeAcceptApplication", {"groupId" : groupId});
+	});
+}
+
+function groupMergeSubmitRequest(eventObject, groupId)
+{
+	confirmPopup("Submit Merge Request", "Are you sure you want to submit this merge request? All group members and group houses will transfer to the group.<br/>Note that you can only have 1 active merge request at a time.", function(){
+		doCommand(eventObject, "GroupMergeSubmitRequest", {"groupId" : groupId});
+	});
+}
+
+function groupMergeCancelRequest(eventObject)
+{
+	confirmPopup("Cancel Merge Request", "Are you sure you want to cancel this merge request?", function(){
+		doCommand(eventObject, "GroupMergeCancelRequest");
+	});
 }
 
 function tradeRemoveItem(itemId)
@@ -2035,14 +2094,22 @@ function doCommand(eventObject, commandName, parameters, callback)
 	if (eventObject!=null)
 	{
 		clickedElement = $(eventObject.currentTarget);
-		originalText = clickedElement.html();
-		clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
+		if(clickedElement.find("img.wait").length == 0) {
+			originalText = clickedElement.html();
+			clickedElement.html("<img class='wait' src='javascript/images/wait.gif' border=0/>");
+		}
 	}
 	
 	// We need to post, as larger batch operations failed due to URL string being too long
 	$.post(url, parameters)
 	.done(function(data)
 	{
+		// Return clicked element back to original state first.
+		// Ajax updates get overwritten if they're not simple updates
+		// on the original element.
+		if (eventObject!=null && originalText)
+			clickedElement.html(originalText);
+		
 		if (data.antiBotQuestionActive == true)
 		{
 			antiBotQuestionPopup();
@@ -2073,12 +2140,6 @@ function doCommand(eventObject, commandName, parameters, callback)
 			popupMessage("System Message", data.errorMessage);
 		}
 
-
-		
-		
-		if (eventObject!=null)
-			clickedElement.html(originalText);
-		
 		if (callback!=null && data!=null)
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
@@ -2957,4 +3018,24 @@ function splitItemStack(eventObject, selector)
 			doCommand(eventObject, "ItemsStackSplit",{"itemIds":itemIds, "stackSize":stackSize});
 		}
 	});
+}
+
+function renameUnnamedPlayer(eventObject)
+{
+	promptPopup("Rename Player", "Enter a new name for your character:", "", function(newName) {
+		if (newName != null && newName != "")
+		{
+			doCommand(eventObject, "RenameUnnamedPlayer", {"newName" : newName});
+		}
+	});
+}
+
+function swapContainers(event, selector)
+{
+	var batchItems = $(selector).has("input:checkbox:visible:checked");
+	if(batchItems.length == 0) return;	
+	
+	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+
+	doCommand(event,"ItemsSwapStorageContainers",{"itemIds":itemIds});
 }

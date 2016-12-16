@@ -414,6 +414,11 @@ p a, li a
 	color: #DAA520;
 }
 
+.link
+{
+	color: #DAA520;
+}
+
 .main-highlight
 {
 	color:#777777;
@@ -2022,10 +2027,21 @@ hr.items-separator {
 {
 	background-color:rgba(255,0,0,0.2)
 }
-
+.low-durability:before {
+	content: url('https://initium-resources.appspot.com/images/ui/equipment-warning1.png');
+	position: relative;
+	right: 5%;
+	top: -5px;
+}
+.very-low-durability:before {
+	content: url('https://initium-resources.appspot.com/images/ui/equipment-warning2.png');
+	position: relative;
+	right: 5%;
+	top: -5px;
+}
 .big-link
 {
-	font-size:36px;
+	font-size:30px;
 	color: #DAA520;
 	text-shadow: 3px 3px 5px rgba(0, 0, 0, 1);
 	margin-bottom:8px;
@@ -2036,7 +2052,18 @@ hr.items-separator {
 	text-align:center;
 }
 
+.landing-logo
+{
+	text-align:center; 
+	padding:10px; 
+	margin-top:8px;
+}
 
+.landing-logo img
+{
+	max-height:80px;
+	max-width:100%;
+}
 
 
 

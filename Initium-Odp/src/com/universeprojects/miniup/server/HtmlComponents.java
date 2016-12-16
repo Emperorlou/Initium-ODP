@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -398,6 +399,99 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		// Help button
 		sb.append("<span class='hint' rel='#buttonbar' style='float:right'><img src='https://initium-resources.appspot.com/images/ui/help.png' border='0'></span>");
 		sb.append("</div>");
+		return sb.toString();
+	}
+	
+	public static String generateGroupMemberApplication(CachedEntity applied)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div><div class='main-item-container'>");
+		sb.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId=" + applied.getId() + "'>" + applied.getProperty("name"));
+		sb.append("<div class='main-item-controls' style='top:0px'>");
+		sb.append("<a onclick='groupAcceptJoinGroupApplication(event, " + applied.getId() + ")'>Accept</a>");
+		sb.append("<a onclick='groupDenyJoinGroupApplication(event, " + applied.getId() + ")'>Deny</a>");
+		sb.append("</div></a></div></div>");
+		return sb.toString();
+	}
+	
+	public static String generateGroupMember(CachedEntity viewingChar, CachedEntity character, CachedEntity group, boolean inGroup, boolean canDeleteGroup)
+	{
+		String viewStatus = (String)viewingChar.getProperty("groupStatus");
+		boolean viewAdmin = inGroup && "Admin".equals(viewStatus);
+		boolean viewCreator = inGroup && GameUtils.equals((Key)group.getProperty("creatorKey"), viewingChar.getKey());
+
+		String groupStatus = (String)character.getProperty("groupStatus");
+		boolean isAdmin = "Admin".equals(groupStatus);
+		boolean isCreator = GameUtils.equals((Key)group.getProperty("creatorKey"), character.getKey());
+		String groupPermissionTag = "";
+		if (isAdmin)
+			groupPermissionTag = "(Admin)";
+		if (isCreator)
+			groupPermissionTag = "(Creator)";
+
+		String groupRank = "";
+		if (character.getProperty("groupRank") != null)
+			groupRank = (String) character.getProperty("groupRank");
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div>");
+		sb.append("<div class='main-item-container'>");
+		sb.append("<div class='main-item clue' rel='viewcharactermini.jsp?characterId=" + character.getKey().getId() + "'>" + character.getProperty("name"));
+		sb.append("</div>");
+		sb.append("<div class='main-item-controls' style='top:0px; display:block; margin-bottom:25px;'>");
+		sb.append("<span>" + groupPermissionTag + "</span> ");
+		
+		if (groupStatus.equals("Kicked") == false) {
+			sb.append("Position: " + groupRank + "<br>");
+			if (character.getProperty("groupLeaveDate") != null)
+				sb.append("(This member is leaving the group. They will be out of the group in: "
+						+ GameUtils.getTimePassedShortString((Date)character.getProperty("groupLeaveDate"))
+						+ ")<br>");
+		} 
+		else
+			sb.append("(Member is being kicked from the group. They will be out of the group in: "
+					+ GameUtils.getTimePassedShortString((Date)character.getProperty("leaveGroupDate"))
+					+ ")<br>");
+		
+		if (viewAdmin || viewCreator) 
+		{
+			sb.append("<a href='#' onclick='setGroupMemberRank(event, \""+ character.getProperty("groupRank") + "\", "+ character.getKey().getId()+ ")'>Set position</a>");
+			if (viewCreator) 
+			{
+				if (isAdmin == false)
+					sb.append("<a href='#' onclick='promoteToAdmin(event, "+ character.getKey().getId()+ ")'>Promote to admin</a>");
+				else 
+				{
+					if (!isCreator)
+						sb.append("<a href='#' onclick='makeGroupCreator(event, " + character.getKey().getId() + ")' title='Setting this member to group creator will permanently make him in charge of adding and removing admins'>Promote to group creator</a>");
+					
+					sb.append("<a href='#' onclick='demoteFromAdmin(event, " + character.getKey().getId() + ")'>Demote from admin</a>");
+				}
+			}
+			
+			if (groupStatus.equals("Kicked") == false)
+				sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ")'>Kick</a>");
+			else
+				sb.append("<a onclick='groupMemberKickCancel(" + character.getKey().getId() + ")'>Cancel Kick</a>");
+			
+			if (viewCreator && canDeleteGroup)
+				sb.append("<a onclick='deleteGroup(event)'>Delete group</a>");
+		}
+		sb.append("</div></div></div>");
+		return sb.toString();
+	}
+	
+	public static String generateGroupMergeApplication(CachedEntity group)
+	{
+		// This only gets generated within the admin block, so we know the viewing user has access.
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("</div><div class='main-item-controls'>");
+		sb.append("<a onclick='groupMergeDenyApplication(event, "+group.getId()+")'>Deny Merge</a>");
+		sb.append("<a onclick='groupMergeAcceptApplication(event, "+group.getId()+")'>Accept Merge</a>");
+		sb.append("</div></div></div>");
 		return sb.toString();
 	}
 }

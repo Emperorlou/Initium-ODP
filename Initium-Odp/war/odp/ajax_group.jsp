@@ -10,6 +10,7 @@
 <%@page import="com.google.appengine.api.datastore.KeyFactory"%>
 <%@page import="com.universeprojects.miniup.server.WebUtils"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
+<%@page import="com.universeprojects.miniup.server.services.GroupService"%>
 <%@page import="com.universeprojects.miniup.server.GameFunctions"%>
 <%@page import="com.universeprojects.miniup.server.SecurityException"%>
 <%@page import="com.universeprojects.miniup.server.CommonEntities"%>
@@ -133,6 +134,7 @@
 	// Get the number that were active in the past week
 	int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
 	request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
+
 %>
 
 <div class='main-banner-textonly' style='height:240px; background-color:rgba(0,0,0,0.5)'>
@@ -157,6 +159,7 @@
 		<div class='main-item-controls'>
 			<a
 				onclick='setGroupDescription(event, "<c:out value="${groupDescriptionEscaped}"/>")'>Set&nbsp;group&nbsp;description</a>
+
 		</div>
 
 		<h4>New Member Applications</h4>

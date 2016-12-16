@@ -43,6 +43,15 @@
 <h4>Account options</h4>
 <p>
 	<a onclick='changeEmailAddress("${userEmail}")'>Change your account's email address</a>
+	<br>
+	<a onclick='toggleHideUserActivity(event)' id="toggleHideUserActivity">
+		<c:if test="${hideUserActivity!=true}">
+			Click here to hide your online status from your friends.
+		</c:if>
+		<c:if test="${hideUserActivity==true}">
+			Click here to show your online status to your friends.
+		</c:if>
+	</a>
 </p>
 
 <h4>Premium Membership</h4>
@@ -138,11 +147,13 @@
 				<span class='main-highlight'><c:out value="${groupDescription}" /></span>
 				<c:if test="${isLeavingGroup!=true}">
 					<a class='big-link' href='#' onclick='leaveGroup()'>Leave this group</a>
+					<br><br>
 				</c:if>
 				<c:if test="${isLeavingGroup==true}">
 					<br>
 					You are leaving the group but still have to wait <c:out value="${leavingGroupWaitTime}" />.
 					<a class='big-link' onclick='cancelLeaveGroup()'>Cancel leaving group</a>
+					<br><br>
 				</c:if>
 			</c:if>
 			<a class='big-link' onclick='viewGroup(${groupId})'>View Group Page</a>

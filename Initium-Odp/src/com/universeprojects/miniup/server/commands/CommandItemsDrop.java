@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,8 @@ public class CommandItemsDrop extends CommandItemsBase {
 			ODPDBAccess db, CachedDatastoreService ds,
 			CachedEntity character, List<CachedEntity> batchItems)
 			throws UserErrorMessage {
-		// TODO Auto-generated method stub
+		
+		List<CachedEntity> saveEntities = new ArrayList<CachedEntity>();
 		for(CachedEntity dropItem:batchItems)
 		{
 			if(GameUtils.equals(dropItem.getProperty("containerKey"), character.getKey()) == false)
@@ -40,16 +42,13 @@ public class CommandItemsDrop extends CommandItemsBase {
 				throw new UserErrorMessage("Item does not belong to character");
 			}
 			
-			try
-			{
-				db.doCharacterDropItem(character, dropItem);
-			}
-			catch(UserErrorMessage ex)
-			{
-				// Ignore. Indicates the item is either equipped or for sale.
-				// Just swallow the exception, to drop the rest of the items.
-			}
+			if(db.tryCharacterDropItem(character, dropItem, false))
+				saveEntities.add(dropItem);
 		}
+		
+		ds.beginBulkWriteMode();
+		ds.put(saveEntities);
+		ds.commitBulkWrite();
 		
 		// Reload the popup to show the modified inventory.
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);

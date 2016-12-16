@@ -1223,21 +1223,20 @@ public class ODPDBAccess
 
 	public boolean isCharacterNameOk(HttpServletRequest request, String characterName) throws UserErrorMessage
 	{
-		if (characterName == null) throw new UserErrorMessage("Character name cannot be blank.");
+		if (characterName==null) throw new UserErrorMessage("Character name cannot be blank.");
 		characterName = characterName.trim();
-		if (characterName.length() < 1 || characterName.length() > 30 || !characterName.matches("[A-Za-z ]+"))
+		if (characterName.length()<1 || characterName.length()>30 || !characterName.matches("[A-Za-z ]+"))
 			throw new UserErrorMessage("Character name must contain only letters and spaces, and must be between 1 and 30 characters long.");
-
-		if (characterName.startsWith("Dead ")) throw new UserErrorMessage("Character name cannot start with the word Dead.");
-
-		if (characterName.startsWith("Unconscious ")) throw new UserErrorMessage("Character name cannot start with the word Unconscious.");
-
-		if (getCharacterByName(characterName) != null) throw new UserErrorMessage("Character name already exists in our database. Please choose another.");
-
-		String ip = WebUtils.getClientIpAddr(request);
-		CachedDatastoreService ds = getDB();
-		if (ds.flagActionLimiter("signupIPLimiter" + ip, 600, 1)) throw new UserErrorMessage("Please report this error to the admin.");
-
+		
+		if (characterName.startsWith("Dead "))
+			throw new UserErrorMessage("Character name cannot start with the word Dead.");
+		
+		if (characterName.startsWith("Unconscious "))
+			throw new UserErrorMessage("Character name cannot start with the word Unconscious.");
+		
+		if (getCharacterByName(characterName)!=null) throw new UserErrorMessage("Character name already exists in our database. Please choose another.");
+		
+		
 		return true;
 	}
 
@@ -1296,7 +1295,8 @@ public class ODPDBAccess
 		if (destinationSlot==null)
 			throw new IllegalArgumentException("destinationSlot cannot be null.");
 
-		if (character.getKey().equals(equipment.getProperty("containerKey"))==false)
+		ContainerService cs = new ContainerService(this);
+		if (!character.getKey().equals(equipment.getProperty("containerKey")))
 			throw new IllegalArgumentException("The piece of equipment is not in the character's posession. Character: "+character.getKey());
 		
 		
@@ -1460,22 +1460,42 @@ public class ODPDBAccess
 		return carrying + charWeight;
 	}
 
+	/**
+	 * Performs the drop of the item from the character and saves the entity. 
+	 * Calls tryCharacterDropItem, which will throw if not successful. 
+	 */
 	public void doCharacterDropItem(CachedEntity character, CachedEntity item) throws UserErrorMessage
+	{
+		tryCharacterDropItem(character, item, true);
+		getDB().put(item);
+	}
+	
+	/**
+	 * Attempts to drop the item, setting the appropriate fields on the Item entity.
+	 * @return True if item was dropped, false only if throwError is false and the item is equipped or vending.
+	 * @throws UserErrorMessage Thrown if item is equipped or vending, and throwError parameter is true.
+	 */
+	public boolean tryCharacterDropItem(CachedEntity character, CachedEntity item, boolean throwError) throws UserErrorMessage
 	{
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
 		if (item == null) throw new IllegalArgumentException("Item cannot be null.");
 
 		Key characterLocationKey = (Key) character.getProperty("locationKey");
 
-		if (checkCharacterHasItemEquipped(character, item.getKey())) throw new UserErrorMessage("Your character has this item equipped. You cannot drop it until it is unequipped.");
+		if (checkCharacterHasItemEquipped(character, item.getKey())) {
+			if(throwError) throw new UserErrorMessage("Your character has this item equipped. You cannot drop it until it is unequipped.");
+			return false;
+		}
 
-		if (checkItemIsVending(character.getKey(), item.getKey()))
-			throw new UserErrorMessage("The item you are trying to drop is currently in your store. You cannot drop an item that you plan on selling.");
+		if (checkItemIsVending(character.getKey(), item.getKey())) {
+			if(throwError) throw new UserErrorMessage("The item you are trying to drop is currently in your store. You cannot drop an item that you plan on selling.");
+			return false;
+		}
 
 		item.setProperty("containerKey", characterLocationKey);
 		item.setProperty("movedTimestamp", new Date());
 
-		getDB().put(item);
+		return true;
 	}
 
 	/**
@@ -4653,26 +4673,52 @@ public class ODPDBAccess
 		return maxCarryWeight;
 	}
 	
-	public Long getItemCarryingWeight(CachedEntity character, List<CachedEntity> inventory)
+	/**
+	 * This variation of the method accepts a list of the contents of the container (the inventory argument) if
+	 * you happen to already have it. This saves an extra query of the database and is an optimization.
+	 * 
+	 * @param container
+	 * @param containerInventory
+	 * @return
+	 */
+	public Long getItemCarryingWeight(CachedEntity container, List<CachedEntity> containerInventory)
 	{
+		
+		ContainerService cs = new ContainerService(this);
+		if(!cs.containsAll(container, containerInventory))
+			throw new RuntimeException("Container doesn't contain all items from given list");
+		
 		long carrying = 0l;
 		
-		for(CachedEntity item:inventory)
+		for(CachedEntity internalItem:containerInventory)
 		{
-			carrying+=getItemWeight(item);
+			carrying+=getItemWeight(internalItem);
 		}
 
 		
 		return carrying;
 	}
 	
-	public Long getItemCarryingSpace(CachedEntity character, List<CachedEntity> inventory)
+	/**
+	 * This variation of the method accepts a list of the contents of the container (the inventory argument) if
+	 * you happen to already have it. This saves an extra query of the database and is an optimization.
+	 * 
+	 * @param container
+	 * @param containerInventory
+	 * @return
+	 */
+	public Long getItemCarryingSpace(CachedEntity container, List<CachedEntity> containerInventory)
 	{
+		
+		ContainerService cs = new ContainerService(this);
+		if(!cs.containsAll(container, containerInventory))
+			throw new RuntimeException("Container doesn't contain all items from given list");
+		
 		long space = 0l;
 		
-		for(CachedEntity item:inventory)
+		for(CachedEntity internalItem:containerInventory)
 		{
-			Long itemSpace = (Long)item.getProperty("space");
+			Long itemSpace = (Long)internalItem.getProperty("space");
 			if (itemSpace==null)
 				continue;
 			
@@ -4691,6 +4737,16 @@ public class ODPDBAccess
 		if (itemWeight==null) itemWeight = 0L;
 		
 		return itemWeight*itemQuantity;
+	}
+	
+	public Long getItemSpace(CachedEntity item)
+	{
+		Long itemQuantity = (Long)item.getProperty("quantity");
+		if (itemQuantity==null) itemQuantity = 1L;
+		Long itemSpace = (Long)item.getProperty("space");
+		if (itemSpace==null) itemSpace = 0L;
+		
+		return itemSpace*itemQuantity;
 	}
 
 	/**THIS IS A PLACEHOLDER. Actual implementation is not in the ODP.

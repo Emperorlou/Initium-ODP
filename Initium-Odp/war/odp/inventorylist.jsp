@@ -52,6 +52,9 @@
 					<a class="command-cell" title="Merge the selected items." onclick="mergeItemStacks(event, '#invItems .invItem')">Merge Items</a>
 					<a class="command-cell right" title="Split the slected item." onclick="splitItemStack(event, '#invItems .invItem')">Split Item</a>
 				</div>
+				<div class="command-row">
+					<a class="command-cell" title="Select 2 containers and click this link to quickly swap the contents of one container for the other. One container must be empty." onclick="swapContainers(event, '#invItems .invItem')">Swap Containers</a>
+				</div>
 			</div>
 		</div>
 		<div id="invItems" class="selection-list">

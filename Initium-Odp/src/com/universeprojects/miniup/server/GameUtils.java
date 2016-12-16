@@ -864,7 +864,7 @@ public class GameUtils
     {
 		if (item==null)
 			return "";
-
+		
 		boolean hasRequiredStrength = true;
 		if (character!=null)
 		{
@@ -886,7 +886,16 @@ public class GameUtils
         String notEnoughStrengthClass = "";
         if (hasRequiredStrength==false)
         	notEnoughStrengthClass = "not-enough-strength";
+			
+        String lowDurabilityClass = "";
+		Long maxDura = (Long)item.getProperty("maxDurability");
+		Long currentDura = (Long)item.getProperty("durability");
+		boolean durabilityNotNull = maxDura != null && currentDura != null;
 		
+		if (durabilityNotNull && currentDura < maxDura * .2)
+			lowDurabilityClass = "low-durability ";
+		if (durabilityNotNull && currentDura < maxDura * .1)
+			lowDurabilityClass = "very-low-durability ";
 		
 		String qualityClass = determineQuality(item.getProperties());
 		String label = (String)item.getProperty("label"); 
@@ -908,9 +917,9 @@ public class GameUtils
 		}
 		
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)
@@ -970,6 +979,7 @@ public class GameUtils
     public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean largeSize, boolean showGroup)
     {
     	boolean isSelf = false;
+    	String lowDurabilityClass = "";
     	if (selfUser!=null)
     		isSelf = true;
     	
@@ -1076,7 +1086,19 @@ public class GameUtils
 		if (equipmentShirt!=null)
 			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty(GameUtils.getItemIconToUseFor("equipmentShirt", equipmentShirt)));
 
-		
+		for (int i = 0; i < equipment.size(); i++)
+		{
+			if (equipment.get(i) != null && isDurabilityVeryLow(equipment.get(i)))
+			{
+				lowDurabilityClass = "very-low-durability ";
+				break;
+			}
+			else if (equipment.get(i) != null && isDurabilityLow(equipment.get(i)))
+			{
+				lowDurabilityClass = "low-durability ";
+			}
+				
+		}
 		// This is a workaround for the fact that sometimes equipment stays equipped after it has been deleted
 		if (hasInvalidEquipment)
 		{
@@ -1148,11 +1170,11 @@ public class GameUtils
 		String sizePrepend = "";
 		if (largeSize)
 			sizePrepend = "-64px";
-		
-		sb.append("<div class='avatar-equip-backing"+sizePrepend+"'>");
-		
+				
 		if (isCloaked==false)
 		{
+			sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+"'>");
+
 			if (equipmentBootsUrl!=null)
 				sb.append("<div class='avatar-equip-boots"+sizePrepend+"' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
 			if (equipmentLegsUrl!=null)
@@ -1183,7 +1205,10 @@ public class GameUtils
 		}
 		else
 		{
+			sb.append("<div class='avatar-equip-backing"+sizePrepend+"'>");
+
 			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
+			
 		}
 		sb.append("</div>");
 		if (isSelf)
@@ -1577,12 +1602,13 @@ public class GameUtils
                     }
 
                     // Put the formula together...
-                    for(int i=0;i<rolls.size(); i++)
-                    {
-                        if (!result.equals(""))
-                            result+="+";
-                        result += ""+rolls.get(i);
-                    }
+                    if (rolls.size()<12)
+	                    for(int i=0;i<rolls.size(); i++)
+	                    {
+	                        if (!result.equals(""))
+	                            result+="+";
+	                        result += ""+rolls.get(i);
+	                    }
 
                     formula = formula.replaceFirst("(?i)\\d+d\\d+d(l|h)\\d+", "("+result.toString()+")");
 
@@ -1636,7 +1662,12 @@ public class GameUtils
                         if (simpleMode)
                             formula = new Double(jep.getValue()).intValue()+"";
                         else
-                            formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> "+originalFormula+" = "+formula+" = "+jep.getValue()+"";
+                        {
+                        	if (formula.length()>50)
+                        		formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> "+originalFormula+" = "+jep.getValue()+"";
+                        	else
+                        		formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> "+originalFormula+" = "+formula+" = "+jep.getValue()+"";
+                        }
                     }
                 }
                 catch (org.cheffo.jeplite.ParseException e) {
@@ -1751,6 +1782,36 @@ public class GameUtils
 			isInParty = false;
 		
 		return isInParty;
+    }
+    public static boolean isDurabilityLow(CachedEntity item) {
+    	if (item == null)
+    		return false;
+    	if (item.getProperty("durability") == null || item.getProperty("maxDurability") == null)
+    		return false;
+    	else
+    	{
+    		Long maxDura = (Long)item.getProperty("maxDurability");
+    		Long currentDura = (Long)item.getProperty("durability");
+    		if (currentDura < maxDura * .2)
+    			return true;
+    		else
+    			return false;
+    	}
+    }
+    public static boolean isDurabilityVeryLow(CachedEntity item) {
+    	if (item == null)
+    		return false;
+    	if (item.getProperty("durability") == null || item.getProperty("maxDurability") == null)
+    	return false;
+    	else
+    	{
+    		Long maxDura = (Long)item.getProperty("maxDurability");
+    		Long currentDura = (Long)item.getProperty("durability");
+    		if (currentDura < maxDura * .1)
+    			return true;
+    		else
+    			return false;
+    	}
     }
 
 	public static boolean isCharacterPartyLeader(CachedEntity character) {
