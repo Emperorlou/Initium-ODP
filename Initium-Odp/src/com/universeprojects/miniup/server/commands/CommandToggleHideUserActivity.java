@@ -57,9 +57,9 @@ public class CommandToggleHideUserActivity extends Command
 		ds.put(user);
 		
 		if(hideActivity)
-			updateHtml("#toggleHideUserActivity", "Click here to show your online status to your friends.");
+			updateHtmlContents("#toggleHideUserActivity", "Click here to show your online status to your friends.");
 		else
-			updateHtml("#toggleHideUserActivity", "Click here to hide your online status from your friends.");
+			updateHtmlContents("#toggleHideUserActivity", "Click here to hide your online status from your friends.");
 		
 		//temporary, remove after debug
 		setPopupMessage("New hideActivity: " + hideActivity);
