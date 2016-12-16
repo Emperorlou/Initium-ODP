@@ -27,6 +27,7 @@ public class CommandGroupDoSetWar extends Command {
 		super(db, request, response);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public final void run(final Map<String, String> parameters)
 			throws UserErrorMessage
@@ -53,7 +54,7 @@ public class CommandGroupDoSetWar extends Command {
 		if (warReceiver == null)
 		{
 			throw new UserErrorMessage(
-					"Cannot declare war on a group that does not exist.");
+					"Cannot declare war on a group that does not ex	ist.");
 		}
 				
 		List<Key> declarerCurrent = (List<Key>)warDeclarer.getProperty("declaredWarGroups");
