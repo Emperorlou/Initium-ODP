@@ -9,7 +9,7 @@
 			<br />
 			<c:if test="${not empty warDecGroupNames}">
 			<c:forEach var="declaredGroups" items="${warDecGroupNames}">
-				<p>${declaredGroups}</p>
+				<p><c:out value="${declaredGroups}"/></p>
 				<a onclick='endWar(event, "<c:out value="${declaredGroups}"/>")'>End War</a>
 				<br />
 			</c:forEach>

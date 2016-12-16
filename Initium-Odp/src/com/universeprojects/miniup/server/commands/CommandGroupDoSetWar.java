@@ -75,7 +75,7 @@ public class CommandGroupDoSetWar extends Command {
 				setPopupMessage("War has been declared!");
 			}
 			
-			if (declarerCurrent.contains(warReceiver.getKey()))
+			else if (declarerCurrent.contains(warReceiver.getKey()))
 			{
 				declarerCurrent.remove(warReceiver.getKey());
 				setPopupMessage("War has ended.");
