@@ -2,7 +2,9 @@ package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -17,7 +19,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 public class FriendService extends Service {
 	
 	private CachedEntity user;
-	private List<CachedEntity> friendsOfUser;
+	private Map<CachedEntity, CachedEntity> friendsOfUser;
 
 	public FriendService(ODPDBAccess db, CachedEntity user) {
 		super(db);
@@ -30,31 +32,35 @@ public class FriendService extends Service {
 	 * Returns a list of User entities that are friends of the user.
 	 * @return List of CachedEntity representing Users that are friends of User.
 	 */
-	public List<CachedEntity> getFriendsOfUser(){
+	public  Map<CachedEntity, CachedEntity> getFriendsOfUser(){
 		
 		return friendsOfUser;	
 		
 	}
 	
 	/**
-	 * Returns a list of friends (User entities) that have been active in the past 10 minutes and aren't hiding
+	 * Returns a map of friends <User,Character. that have been active in the past 10 minutes and aren't hiding
 	 * online activity.
-	 * @return List of CachedEntity representing Users that are online.
+	 * @return Map<User,Character> representing Users that are online.
 	 */
-	public List<CachedEntity> getOnlineFriends(){
+	public Map<CachedEntity, CachedEntity> getOnlineFriends(){
 		
-		List<CachedEntity> onlineFriends = new ArrayList<CachedEntity>();
+		Map<CachedEntity, CachedEntity> onlineFriends = new HashMap<CachedEntity, CachedEntity>();
 		
-		for(CachedEntity friend : friendsOfUser){
-			Date lastMovement = (Date) friend.getProperty("locationEntryDatetime");
+		//iterate through the user/char map
+		for(CachedEntity user : friendsOfUser.keySet()){
 			
-			boolean online = ((new Date().getTime() - lastMovement.getTime()) >= (10*60*1000));
-			Boolean hideActivity = (Boolean) friend.getProperty("hideUserActivity");
+			CachedEntity character = friendsOfUser.get(user);
+			
+			Date lastMovement = (Date) character.getProperty("locationEntryDatetime");
+			
+			boolean online = ((new Date().getTime() - lastMovement.getTime()) < (10*60*1000));
+			Boolean hideActivity = (Boolean) user.getProperty("hideUserActivity");
 			
 			//if the entry datetime has occured within the past 10 minutes and user activity isn't hidden
 			if(lastMovement != null && online && !hideActivity.booleanValue())
 				//add friend to list of online friends.
-				onlineFriends.add(friend);
+				onlineFriends.put(user,character);
 			
 		}
 		
@@ -63,33 +69,39 @@ public class FriendService extends Service {
 	}
 	
 	/**
-	 * Returns a list of friends (User entities) that have not been active in the past 10 minutes or have hidden online activity.
-	 * @return List of CachedEntity representing Users that are offline.
+	 * Returns a map of friends <User,Character> that have not been active in the past 10 minutes
+	 *  or have hidden online activity.
+	 * @return Map<User,Character> representing Users that are offline.
 	 */
-	public List<CachedEntity> getOfflineFriends(){
+	public Map<CachedEntity, CachedEntity> getOfflineFriends(){
 		
-		List<CachedEntity> offlineFriends = new ArrayList<CachedEntity>();
+		Map<CachedEntity, CachedEntity> offlineFriends = new HashMap<CachedEntity, CachedEntity>();
 		
-		for(CachedEntity friend : friendsOfUser){
-			Date lastMovement = (Date) friend.getProperty("locationEntryDatetime");
+		//iterate through the user/char map
+		for(CachedEntity user : friendsOfUser.keySet()){
 			
-			boolean online = ((new Date().getTime() - lastMovement.getTime()) >= (10*60*1000));
-			Boolean hideActivity = (Boolean) friend.getProperty("hideUserActivity");
+			CachedEntity character = friendsOfUser.get(user);
 			
-			//if the entry datetime hasn't occured in the past ten minutes or online activity is hidden..
-			if(lastMovement != null && (online || hideActivity.booleanValue()))
-				//add friend to list of offline friends.
-				offlineFriends.add(friend);			
+			Date lastMovement = (Date) character.getProperty("locationEntryDatetime");
+			
+			boolean online = ((new Date().getTime() - lastMovement.getTime()) < (10*60*1000));
+			Boolean hideActivity = (Boolean) user.getProperty("hideUserActivity");
+			
+			//if the entry datetime has not occured within the past 10 minutes or user activity is hidden
+			if(lastMovement != null && (!online || hideActivity.booleanValue()))
+				//add friend to map of offline friends.
+				offlineFriends.put(user,character);
+			
 		}
 			
 		return offlineFriends;
 
 	}
 	
-	private List<CachedEntity> _getFriendsOfUser(){
+	private Map<CachedEntity,CachedEntity> _getFriendsOfUser(){
 		//get a list of Friend entities who's userKey is equal to the user.
 		List<CachedEntity> friends = db.getFilteredList("Friend","userKey", this.user.getKey());
-				
+		
 		//From the list of friends, get all of their user keys.
 		List<Key> friendUserKeys = new ArrayList<Key>();
 		for(CachedEntity friend : friends){
@@ -99,8 +111,21 @@ public class FriendService extends Service {
 			friendUserKeys.add(friendKey);
 		}
 		
-		//return a list of User entities from the friend's user keys.
-		return db.getEntities(friendUserKeys);
+		List<CachedEntity> users = db.getEntities(friendUserKeys);
+		List<Key> characterKeys = new ArrayList<Key>();
+		for(CachedEntity user : users){			
+			characterKeys.add( (Key) user.getProperty("characterKey"));			
+		}
+		
+		List<CachedEntity> characters = db.getEntities(characterKeys);		
+		
+		Map<CachedEntity,CachedEntity> userCharMap = new HashMap<CachedEntity,CachedEntity>();
+		
+		for(int i=0; i<users.size(); i++){
+			userCharMap.put(users.get(i), characters.get(i));
+		}
+		
+		return userCharMap;
 	}
 
 }
