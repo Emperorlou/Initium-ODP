@@ -5068,5 +5068,17 @@ public class ODPDBAccess
 	{
 		return null;
 	}
+
+	/**
+	 * This is a placeholder because the actual implementation is not in the ODP.
+	 * 
+	 * @param object
+	 * @param currentCharacter
+	 * @param key
+	 */
+	public void doDeleteCombatSite(Object object, CachedEntity currentCharacter, Key key) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

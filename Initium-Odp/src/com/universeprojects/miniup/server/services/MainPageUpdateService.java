@@ -524,7 +524,7 @@ public class MainPageUpdateService extends Service
 				newHtml.append("<br>");
 			}
 			else if ("CombatSite".equals(destLocation.getProperty("type")))
-				newHtml.append("<a class='main-forgetPath' onclick='forgetCombatSite("+destLocation.getKey().getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<a class='main-forgetPath' onclick='doForgetCombatSite(event,"+destLocation.getKey().getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 			else if ("BlockadeSite".equals(destLocation.getProperty("type")) || defensiveStructureAllowed)
 				newHtml.append("<a href='#' class='main-button-icon' onclick='doGoto(event, "+path.getKey().getId()+", true)'><img src='https://initium-resources.appspot.com/images/ui/attack1.png' title='This button allows you to travel to this location with the intent to attack any player-made defences without a confirmation' border=0/></a><a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 			else if ("CollectionSite".equals(location.getProperty("type")))
