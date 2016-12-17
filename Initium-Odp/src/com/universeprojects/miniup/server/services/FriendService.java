@@ -112,6 +112,8 @@ public class FriendService extends Service {
 		}
 		
 		List<CachedEntity> users = db.getEntities(friendUserKeys);
+		
+		//From the list of users, get their character keys.
 		List<Key> characterKeys = new ArrayList<Key>();
 		for(CachedEntity user : users){			
 			characterKeys.add( (Key) user.getProperty("characterKey"));			
@@ -119,8 +121,8 @@ public class FriendService extends Service {
 		
 		List<CachedEntity> characters = db.getEntities(characterKeys);		
 		
-		Map<CachedEntity,CachedEntity> userCharMap = new HashMap<CachedEntity,CachedEntity>();
-		
+		//Map users to the current character.
+		Map<CachedEntity,CachedEntity> userCharMap = new HashMap<CachedEntity,CachedEntity>();		
 		for(int i=0; i<users.size(); i++){
 			userCharMap.put(users.get(i), characters.get(i));
 		}
