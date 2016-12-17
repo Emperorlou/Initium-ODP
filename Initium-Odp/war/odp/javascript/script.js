@@ -1568,6 +1568,11 @@ function doDrinkBeer(eventObject)
 	doCommand(eventObject,"DrinkBeer");
 }
 
+function doForgetCombatSite(eventObject, pathId)
+{
+	doCommand(eventObject, "ForgetCombatSite", {"pathId" : pathId});
+}
+
 function resendVerificationEmail()
 {
 	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
