@@ -92,7 +92,7 @@ public class CommandCharacterEquipSet extends Command {
 
 		List<CachedEntity> toEquip = new ArrayList<CachedEntity>();
 		String[] tempArray = ODPDBAccess.EQUIPMENT_SLOTS;
-		List<String> slotList = Arrays.asList(tempArray);
+		List<String> slotList = new ArrayList<String>(Arrays.asList(tempArray));
 
 		// "Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand",
 		// "LeftHand", "RightRing", "LeftRing", "Neck"
