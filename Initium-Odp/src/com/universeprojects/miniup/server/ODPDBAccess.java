@@ -2089,7 +2089,7 @@ public class ODPDBAccess
 				Long containerCarryingSpace = getItemCarryingSpace(newContainer, containerInventory);
 				
 				if (containerCarryingWeight+itemWeight>maxWeight)
-					throw new UserErrorMessage("The container cannot accept this item. It the item is too heavy.");
+					throw new UserErrorMessage("The container cannot accept this item. It is too heavy.");
 				
 				if (containerCarryingSpace+itemSpace>maxSpace)
 					throw new UserErrorMessage("This item will not fit. There is not enough space.");
