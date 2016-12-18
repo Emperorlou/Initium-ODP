@@ -471,6 +471,7 @@ public class MainPageUpdateService extends Service
 
 		int shortcutStart = 49;
 		int shortcutNumber = 1;
+		int forgettableCombatSites = 0;
 		for(int i = 0; i<paths.size(); i++)
 		{
 			CachedEntity path = paths.get(i);
@@ -523,8 +524,10 @@ public class MainPageUpdateService extends Service
 				newHtml.append("<a onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
 				newHtml.append("<br>");
 			}
-			else if ("CombatSite".equals(destLocation.getProperty("type")))
+			else if ("CombatSite".equals(destLocation.getProperty("type"))) {
 				newHtml.append("<a class='main-forgetPath' onclick='doForgetCombatSite(event,"+destLocation.getKey().getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				forgettableCombatSites++;
+			}
 			else if ("BlockadeSite".equals(destLocation.getProperty("type")) || defensiveStructureAllowed)
 				newHtml.append("<a href='#' class='main-button-icon' onclick='doGoto(event, "+path.getKey().getId()+", true)'><img src='https://initium-resources.appspot.com/images/ui/attack1.png' title='This button allows you to travel to this location with the intent to attack any player-made defences without a confirmation' border=0/></a><a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 			else if ("CollectionSite".equals(location.getProperty("type")))
@@ -547,6 +550,9 @@ public class MainPageUpdateService extends Service
 			newHtml.append("<a onclick='attackStructure()' shortcut='65' class='main-button'><span class='shortcut-key'>(A)</span>Attack this structure's defenders</a>");
 			
 
+		
+		if(forgettableCombatSites > 1) 
+			newHtml.append("<center><a onclick='doForgetAllCombatSites(event, "+location.getKey().getId()+"))'>Forget all forgettable sites</a></center>");
 		
 		if (hasHiddenPaths)
 		{
