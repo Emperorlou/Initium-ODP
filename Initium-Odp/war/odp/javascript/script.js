@@ -1585,7 +1585,7 @@ function doForgetCombatSite(eventObject, locationId)
  */
 function doForgetAllCombatSites(eventObject, locationId)
 {
-	confirmPopup("Forget All Combat Sites","Are you sure you want to forget all combat sites?", function(){doCommand(eventObject, "ForgetAllCombatSites", {"locationId" : locationId})});
+	confirmPopup("System","Are you sure you want to forget all combat sites in this location?", function(){doCommand(eventObject, "ForgetAllCombatSites", {"locationId" : locationId})});
 }
 
 function resendVerificationEmail()
