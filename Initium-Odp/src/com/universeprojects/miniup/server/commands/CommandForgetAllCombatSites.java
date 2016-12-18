@@ -13,15 +13,13 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
- * Allows the player to attempt to forget a combat site.
- * (press the x next to a combat site)
+ * Allows the player to attempt to forget all combat sites at their location.
  * 
  * @author tacobowl8
  * 
@@ -51,8 +49,8 @@ public class CommandForgetAllCombatSites extends Command {
 		for(CachedEntity discovery : discoveries) {
 			//If the discovery is not hidden, we proceed
 			if("FALSE".equals(discovery.getProperty("hidden"))) {
-				//If the type of discovery is a CombatSite, we proceed
-
+				//We need to figure out which of the location keys for the discovery represents the combat site
+				//This should be the one that the character is not currently at.
 				Key location1Key = (Key)discovery.getProperty("location1Key");
 				Key location2Key = (Key)discovery.getProperty("location2Key");
 				Key combatSiteLocationKey = null;
@@ -61,14 +59,9 @@ public class CommandForgetAllCombatSites extends Command {
 				else
 					combatSiteLocationKey = location1Key;
 				
-				if("CombatSite".equals(db.getLocationById(combatSiteLocationKey.getId()).getProperty("type"))) {
-					//We need to figure out which of the location keys for the discovery represents the combat site
-					//This should be the one that the character is not currently at.
-					if(GameUtils.equals(characterLocationKey, location1Key))
-						db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", location2Key.getId()));
-					else
-						db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", location1Key.getId()));
-				}
+				//If the type of discovery is a CombatSite, we proceed
+				if("CombatSite".equals(db.getLocationById(combatSiteLocationKey.getId()).getProperty("type")))
+					db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", combatSiteLocationKey.getId()));
 			}
 		}
 		ds.commitBulkWrite();
