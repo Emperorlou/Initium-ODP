@@ -91,14 +91,15 @@ public class CommandCharacterEquipSet extends Command {
 		});
 
 		List<CachedEntity> toEquip = new ArrayList<CachedEntity>();
-		List<String> slotList = Arrays.asList(ODPDBAccess.EQUIPMENT_SLOTS);
+		String[] tempArray = ODPDBAccess.EQUIPMENT_SLOTS;
+		List<String> slotList = new ArrayList<String>(Arrays.asList(tempArray));
 
 		// "Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand",
 		// "LeftHand", "RightRing", "LeftRing", "Neck"
 
 		for (CachedEntity equipment : setEquip) {
 
-			if (slotList==null||slotList.size() == 0) {
+			if (slotList == null || slotList.size() == 0) {
 				break;
 			}
 
@@ -127,7 +128,7 @@ public class CommandCharacterEquipSet extends Command {
 						slotList.remove(destinationSlot);
 						toEquip.add(equipment);
 					}
-					
+
 				} else if (equipSlotArrAnd.length > 1) {
 
 					boolean equippable = true;
@@ -190,24 +191,31 @@ public class CommandCharacterEquipSet extends Command {
 						.getProperty("equipment" + slot)));
 			}
 		}
-		
-		
+
 		Long containerMaxWeight = ((Long) container.getProperty("maxWeight"));
-		Long currentEquipmentWeight = db.getItemCarryingWeight(character, currentEquipment);
-		Long toEquipEquipmentWeight = db.getItemCarryingWeight(container, toEquip);
-		Long containerRemainingWeight = containerMaxWeight - db.getItemCarryingWeight(container, setEquip);
+		Long currentEquipmentWeight = db.getItemCarryingWeight(character,
+				currentEquipment);
+		Long toEquipEquipmentWeight = db.getItemCarryingWeight(container,
+				toEquip);
+		Long containerRemainingWeight = containerMaxWeight
+				- db.getItemCarryingWeight(container, setEquip);
 
 		Long containerMaxSpace = ((Long) container.getProperty("maxSpace"));
-		Long currentEquipmentSpace = db.getItemCarryingSpace(character, currentEquipment);
-		Long toEquipEquipmentSpace = db.getItemCarryingSpace(container, toEquip);
-		Long containerRemainingSpace = containerMaxSpace - db.getItemCarryingSpace(container, setEquip);
-		
-		if(containerRemainingWeight<(currentEquipmentWeight-toEquipEquipmentWeight)){
-			throw new UserErrorMessage("Cannot swap out set, not enough free weight in the container");
+		Long currentEquipmentSpace = db.getItemCarryingSpace(character,
+				currentEquipment);
+		Long toEquipEquipmentSpace = db
+				.getItemCarryingSpace(container, toEquip);
+		Long containerRemainingSpace = containerMaxSpace
+				- db.getItemCarryingSpace(container, setEquip);
+
+		if (containerRemainingWeight < (currentEquipmentWeight - toEquipEquipmentWeight)) {
+			throw new UserErrorMessage(
+					"Cannot swap out set, not enough free weight in the container");
 		}
 
-		if(containerRemainingSpace<(currentEquipmentSpace-toEquipEquipmentSpace)){
-			throw new UserErrorMessage("Cannot swap out set, not enough free space in the container");
+		if (containerRemainingSpace < (currentEquipmentSpace - toEquipEquipmentSpace)) {
+			throw new UserErrorMessage(
+					"Cannot swap out set, not enough free space in the container");
 		}
 
 		// Unequip all equipment we already have equipped and put them in the
