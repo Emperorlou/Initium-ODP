@@ -107,7 +107,7 @@ public class CommandCharacterEquipSet extends Command {
 			String equipSlotRaw = (String) equipment.getProperty("equipSlot");
 
 			if (equipSlotRaw == null){
-				throw new UserErrorMessage("An item from the container cannot be equipped: "+ equipment.getProperty("name"));
+				continue;
 			}
 			
 			if (equipSlotRaw.equals("Ring"))
