@@ -1568,9 +1568,14 @@ function doDrinkBeer(eventObject)
 	doCommand(eventObject,"DrinkBeer");
 }
 
-function doForgetCombatSite(eventObject, pathId)
+/**
+ * Calls the command to forget the combat site
+ * @param eventObject
+ * @param locationId   This is the locationId of the combat site you want to forget.
+ */
+function doForgetCombatSite(eventObject, locationId)
 {
-	doCommand(eventObject, "ForgetCombatSite", {"locationId" : pathId});
+	doCommand(eventObject, "ForgetCombatSite", {"locationId" : locationId});
 }
 
 function resendVerificationEmail()
