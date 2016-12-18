@@ -33,6 +33,8 @@ public class CommandForgetAllCombatSites extends Command {
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
+		ds.beginBulkWriteMode();
+		
 		CachedEntity character = db.getCurrentCharacter();
 		Key characterLocationKey = (Key)character.getProperty("locationKey");
 		
@@ -44,7 +46,7 @@ public class CommandForgetAllCombatSites extends Command {
 		
 		//We first get all the discoveries for the character and the character's current location.
 		List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), characterLocationKey);
-		ds.beginBulkWriteMode();
+		
 		//We then loop through the list of discoveries.
 		for(CachedEntity discovery : discoveries) {
 			//If the discovery is not hidden, we proceed
