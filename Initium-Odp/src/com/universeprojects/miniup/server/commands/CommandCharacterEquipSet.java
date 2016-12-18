@@ -107,6 +107,10 @@ public class CommandCharacterEquipSet extends Command {
 
 			if (equipSlotRaw.equals("Ring"))
 				equipSlotRaw = "LeftRing, RightRing";
+			
+			if (equipSlotRaw.equals("2Hands"))
+				equipSlotRaw = "LeftHand and RightHand";
+				
 
 			equipSlotRaw = equipSlotRaw.trim();
 			if (equipSlotRaw.endsWith(","))
