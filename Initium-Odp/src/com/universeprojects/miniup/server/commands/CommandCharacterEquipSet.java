@@ -86,8 +86,8 @@ public class CommandCharacterEquipSet extends Command {
 					return 0;
 				}
 
-				return ((Date) e1.getProperty("movedTimestamp"))
-						.compareTo((Date) e2.getProperty("movedTimestamp"));
+				return ((Date) e2.getProperty("movedTimestamp"))
+						.compareTo((Date) e1.getProperty("movedTimestamp"));
 			}
 		});
 
