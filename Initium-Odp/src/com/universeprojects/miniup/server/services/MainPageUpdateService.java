@@ -552,7 +552,7 @@ public class MainPageUpdateService extends Service
 
 		
 		if(forgettableCombatSites > 1) 
-			newHtml.append("<center><a onclick='doForgetAllCombatSites(event, "+location.getKey().getId()+"))'>Forget all forgettable sites</a></center>");
+			newHtml.append("<center><a onclick='doForgetAllCombatSites(event, "+location.getKey().getId()+")'>Forget all forgettable sites</a></center>");
 		
 		if (hasHiddenPaths)
 		{
