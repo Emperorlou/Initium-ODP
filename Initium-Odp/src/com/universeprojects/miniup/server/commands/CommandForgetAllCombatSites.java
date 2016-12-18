@@ -41,9 +41,9 @@ public class CommandForgetAllCombatSites extends Command {
 		//The location the command is being called from
 		CachedEntity location = db.getLocationById(tryParseId(parameters, "locationId"));
 		
-		if(!GameUtils.equals(location.getKey(), characterLocationKey))
+		/*if(!GameUtils.equals(location.getKey(), characterLocationKey))
 			throw new RuntimeException("Player is not at the location they are forgetting combat sites from.");
-		
+		*/
 		//We first get all the discoveries for the character and the character's current location.
 		List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), characterLocationKey);
 		
