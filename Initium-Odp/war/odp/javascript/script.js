@@ -1581,6 +1581,7 @@ function doForgetCombatSite(eventObject, locationId)
 /**
  * Calls the command to forget all combat sites/destroyed camps
  * @param eventObject
+ * @param locationId   This is the locationId of the location the command is being called from.
  */
 function doForgetAllCombatSites(eventObject, locationId)
 {
