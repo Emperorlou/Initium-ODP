@@ -21,6 +21,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
  * Equips a set of items from container and puts previously equipped items into
@@ -246,5 +247,9 @@ public class CommandCharacterEquipSet extends Command {
 
 		ds.put(character);
 		ds.commitBulkWrite();
+		
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		mpus.updateInBannerCharacterWidget();
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }
