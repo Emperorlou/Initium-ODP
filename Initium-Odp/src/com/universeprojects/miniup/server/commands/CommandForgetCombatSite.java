@@ -34,9 +34,9 @@ public class CommandForgetCombatSite extends Command {
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 		CachedEntity character = db.getCurrentCharacter();
-		CachedEntity path = db.getPathById(tryParseId(parameters, "pathId"));
+		Long locationId = WebUtils.getLongParam(request, "locationId");
 
-		db.doDeleteCombatSite(null, db.getCurrentCharacter(), path.getKey());		
+		db.doDeleteCombatSite(null, character, KeyFactory.createKey("Location", locationId));		
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, (CachedEntity)character.getProperty("locationKey"), this);
 		mpus.updateButtonList(new CombatService(db));

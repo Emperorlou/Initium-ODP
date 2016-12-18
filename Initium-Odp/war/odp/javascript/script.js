@@ -1570,7 +1570,7 @@ function doDrinkBeer(eventObject)
 
 function doForgetCombatSite(eventObject, pathId)
 {
-	doCommand(eventObject, "ForgetCombatSite", {"pathId" : pathId});
+	doCommand(eventObject, "ForgetCombatSite", {"locationId" : pathId});
 }
 
 function resendVerificationEmail()
