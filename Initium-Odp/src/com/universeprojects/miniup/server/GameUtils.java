@@ -1662,7 +1662,12 @@ public class GameUtils
                         if (simpleMode)
                             formula = new Double(jep.getValue()).intValue()+"";
                         else
-                            formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> "+originalFormula+" = "+formula+" = "+jep.getValue()+"";
+                        {
+                        	if (formula.length()>50)
+                        		formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> "+originalFormula+" = "+jep.getValue()+"";
+                        	else
+                        		formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> "+originalFormula+" = "+formula+" = "+jep.getValue()+"";
+                        }
                     }
                 }
                 catch (org.cheffo.jeplite.ParseException e) {

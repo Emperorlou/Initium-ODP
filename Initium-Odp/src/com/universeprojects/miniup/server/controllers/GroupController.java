@@ -226,16 +226,18 @@ public class GroupController extends PageController {
 			int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
 			
-			List<Key> keyOfDecs = GroupService.getWarDeclarations(group);
+			@SuppressWarnings("unchecked")
+			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
 			List<String> warDecGroupNames = new ArrayList<String>();
-			if (!keyOfDecs.isEmpty())
+			
+			if (keyOfDecs != null)
 			{
 			for (Key decs : keyOfDecs) 
 			{
 				warDecGroupNames.add(decs.getName());
 			}
 			request.setAttribute("warDecGroupNames", warDecGroupNames);
-			}
+			}			
 		}	
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}

@@ -30,7 +30,7 @@ public class CommandDrinkBeer extends Command {
         MainPageUpdateService service = new MainPageUpdateService(db, user, character, null, this);
 
         db.doDrinkBeer(ds, character);
-        service.updateInBannerCharacterWidget(user, character);
+        service.updateInBannerCharacterWidget();
     }
 
 }

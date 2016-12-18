@@ -1,4 +1,5 @@
 var messageCodes = [
+             "GameMessages",
              "GlobalChat",
              "LocationChat",
              "GroupChat",
@@ -159,6 +160,11 @@ function changeChatTab(code)
 	}	
 	
 	$("#"+code+"_tab").addClass("chat_tab_selected");
+	
+	if (code === "GameMessages")
+		$("#chat_form_wrapper").hide();
+	else
+		$("#chat_form_wrapper").show();
 }
 
 function notifyNewMessage(code)

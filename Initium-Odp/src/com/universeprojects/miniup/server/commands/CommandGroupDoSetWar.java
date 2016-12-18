@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ public class CommandGroupDoSetWar extends Command {
 		super(db, request, response);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public final void run(final Map<String, String> parameters)
 			throws UserErrorMessage
@@ -52,26 +54,35 @@ public class CommandGroupDoSetWar extends Command {
 		if (warReceiver == null)
 		{
 			throw new UserErrorMessage(
-					"Cannot declare war on a group that does not exist.");
+					"Cannot declare war on a group that does not ex	ist.");
+		}
+				
+		List<Key> declarerCurrent = (List<Key>)warDeclarer.getProperty("declaredWarGroups");
+		if (declarerCurrent == null)
+		{
+			List<Key> newWarDecs = new ArrayList<Key>();
+			newWarDecs.add(warReceiver.getKey());
+			setPopupMessage("War has been declared!");
+			warDeclarer.setProperty("declaredWarGroups", newWarDecs);
+			ds.put(warDeclarer);
 		}
 		
-		//Removes the declaration if it exists
-		List<Key> declarerCurrent = (List<Key>)warDeclarer.getProperty("declaredWarGroups");
-		if (declarerCurrent.contains(warReceiver.getKey()))
-				{
-					declarerCurrent.remove(warReceiver.getKey());
-				}
-		else if (!declarerCurrent.contains(warReceiver.getKey()))
-				{
-					declarerCurrent.add(warReceiver.getKey());
-				}
-		warDeclarer.setProperty("declaredWarGroups", declarerCurrent);
-		
-		ds.put(warDeclarer);
-		
-		setPopupMessage("War has been declared!");
-		
+		else 
+		{
+			if (!declarerCurrent.contains(warReceiver.getKey()))
+			{
+				declarerCurrent.add(warReceiver.getKey());
+				setPopupMessage("War has been declared!");
+			}
+			
+			else if (declarerCurrent.contains(warReceiver.getKey()))
+			{
+				declarerCurrent.remove(warReceiver.getKey());
+				setPopupMessage("War has ended.");
+			}	
+			
+		ds.put(warDeclarer);	
+		}		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
-
 	}
 }
