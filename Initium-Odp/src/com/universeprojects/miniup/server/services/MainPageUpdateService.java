@@ -473,6 +473,7 @@ public class MainPageUpdateService extends Service
 		int shortcutNumber = 1;
 		int forgettableCombatSites = 0;
 		StringBuilder forgettableCombatSiteList = new StringBuilder();
+		forgettableCombatSiteList.append("\"");
 		for(int i = 0; i<paths.size(); i++)
 		{
 			CachedEntity path = paths.get(i);
@@ -554,8 +555,13 @@ public class MainPageUpdateService extends Service
 			
 
 		
-		if(forgettableCombatSites > 1) 
-			newHtml.append("<center><a onclick='doForgetAllCombatSites(event, \'"+forgettableCombatSiteList.toString()+"\')'>Forget all forgettable sites</a></center><br/>");
+		if(forgettableCombatSites > 1) {
+			//remove the last comma
+			forgettableCombatSiteList.deleteCharAt(forgettableCombatSiteList.length()-1);
+			forgettableCombatSiteList.append("\"");
+			newHtml.append("<center><a onclick='doForgetAllCombatSites(event, "+forgettableCombatSiteList.toString()+")'>Forget all forgettable sites</a></center><br/>");
+		}
+			
 		
 		if (hasHiddenPaths)
 		{
