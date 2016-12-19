@@ -1581,11 +1581,12 @@ function doForgetCombatSite(eventObject, locationId)
 /**
  * Calls the command to forget all combat sites/destroyed camps
  * @param eventObject
- * @param locationId   This is the locationId of the location the command is being called from.
+ * @param forgettableCombatSiteArray
  */
-function doForgetAllCombatSites(eventObject, locationId)
+function doForgetAllCombatSites(eventObject, forgettableCombatSiteArray)
 {
-	confirmPopup("System","Are you sure you want to forget all combat sites in this location?", function(){doCommand(eventObject, "ForgetAllCombatSites", {"locationId" : locationId})});
+	confirmPopup("System Message","Are you sure you want to forget all combat sites in this location?", 
+			function(){doCommand(eventObject, "ForgetAllCombatSites", {"forgettableCombatSiteArray" : forgettableCombatSiteArray})});
 }
 
 function resendVerificationEmail()
