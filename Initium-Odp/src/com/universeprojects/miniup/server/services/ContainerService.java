@@ -112,12 +112,15 @@ public class ContainerService extends Service {
 	
 		final List<CachedEntity> content;
 		
-		if(containerContent!=null && containerContent.size()!=0){
+		if(containerContent!=null){
 			content = containerContent;
 		}else{
 			content = db.getFilteredList("Item",
 					"containerKey", FilterOperator.EQUAL, container.getKey());
 		}
+		
+		if(content.size() == 0)
+			return false;
 		
 		for(CachedEntity item:content){
 			if(item.getProperty("equipSlot")!=null && item.getProperty("equipSlot")!=""){
