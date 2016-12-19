@@ -7,13 +7,6 @@
 		<p>
 			<c:out value="${groupDescription}" />
 			<br />
-			<c:if test="${not empty warDecGroupNames}">
-			<c:forEach var="declaredGroups" items="${warDecGroupNames}">
-				${declaredGroups}
-				<a onclick='endWar(event, ${declaredGroups})'>End War</a>
-				<br />
-			</c:forEach>
-			</c:if>
 		</p>
 	</div>
 </div>
@@ -35,8 +28,6 @@
 		<h2>Admin Controls</h2>
 		<div class='main-item-controls'>
 			<a onclick='setGroupDescription(event, "<c:out value="${groupDescriptionEscaped}"/>")'>Set group description</a>
-			<br/><br/>
-			<a onclick="declareWar(event)">Declare War</a>
 			<br/><br/>
 			${mergeRequestToggleButton}
 			<br/><br/>
