@@ -12,7 +12,6 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -38,20 +37,10 @@ public class CommandForgetAllCombatSites extends Command {
 		
 		CachedEntity character = db.getCurrentCharacter();
 		List<Long> forgettableCombatSiteList = tryParseStringToArray(parameters, "forgettableCombatSiteArray", ",");
-		
-		
-		
-		
-		
-		
-		
+	
 		//The location the command is being called from
 		Key characterLocationKey = (Key)character.getProperty("locationKey");
-		//CachedEntity location = db.getLocationById(tryParseId(parameters, "locationId"));
-		
-		/*if(!GameUtils.equals(location.getKey(), characterLocationKey))
-			throw new RuntimeException("Player is not at the location they are forgetting combat sites from.");
-		*/
+
 		
 		for(Long forgettableCombatSite : forgettableCombatSiteList) {
 			db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", forgettableCombatSite));
@@ -60,41 +49,6 @@ public class CommandForgetAllCombatSites extends Command {
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(characterLocationKey.getId()), this);
 		mpus.updateButtonList(new CombatService(db));
-		
-		
-		
-		
-		
-		
-		
-		/*
-		//We first get all the discoveries for the character and the character's current location.
-		List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), characterLocationKey);
-		
-		//We then loop through the list of discoveries.
-		for(CachedEntity discovery : discoveries) {
-			//If the discovery is not hidden, we proceed
-			if("FALSE".equals(discovery.getProperty("hidden"))) {
-				//We need to figure out which of the location keys for the discovery represents the combat site
-				//This should be the one that the character is not currently at.
-				Key location1Key = (Key)discovery.getProperty("location1Key");
-				Key location2Key = (Key)discovery.getProperty("location2Key");
-				Key combatSiteLocationKey = null;
-				if(GameUtils.equals(characterLocationKey, location1Key))
-					combatSiteLocationKey = location2Key;
-				else
-					combatSiteLocationKey = location1Key;
-				
-				//If the type of discovery is a CombatSite, we proceed
-				CachedEntity siteLocation = db.getLocationById(combatSiteLocationKey.getId());
-				if("CombatSite".equals(siteLocation.getProperty("type")))
-					db.doDeleteCombatSite(ds, character, combatSiteLocationKey);
-			}
-		}
-		ds.commitBulkWrite();
-		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(characterLocationKey.getId()), this);
-		mpus.updateButtonList(new CombatService(db));*/
 	}
 	
 	/**
@@ -116,7 +70,7 @@ public class CommandForgetAllCombatSites extends Command {
 			}
 			return parsedList;
 		} catch (Exception _) {
-			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid array.");
+			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid delimited list.");
 		}
 	}
 }
