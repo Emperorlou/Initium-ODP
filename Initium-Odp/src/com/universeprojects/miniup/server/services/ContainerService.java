@@ -107,4 +107,18 @@ public class ContainerService extends Service {
 		return content.containsAll(items);
 	}
 	
+	public boolean containsEquippable(CachedEntity container){
+	
+		final List<CachedEntity> content = db.getFilteredList("Item",
+				"containerKey", FilterOperator.EQUAL, container.getKey());
+		
+		for(CachedEntity item:content){
+			if(item.getProperty("equipSlot")!=null && item.getProperty("equipSlot")!=""){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 }
