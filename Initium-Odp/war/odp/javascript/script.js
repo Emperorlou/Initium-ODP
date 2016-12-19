@@ -847,7 +847,7 @@ function ajaxAction(url, eventObject, loadFunction)
  */
 function helpPopup()
 {
-	popupMessage("Help", "The following chat commands exist:" +
+	/*popupMessage("Help", "The following chat commands exist:" +
 			"<ul>" +
 			"<li>/changelog - This displays the latest changes to the game. <a onclick='viewChangelog()'>View change log.</a></li>" +
 			"<li>/me - This allows you to say something in 3rd person</li>" +
@@ -866,7 +866,8 @@ function helpPopup()
 			"<li>/group - This puts up a link to the group that you belong to if you belong to one.</li>" +
 			"<li>/groups - This puts up a link to a player made list of groups in Initium which <a href='http://initium.wikia.com/wiki/Category:Player_Groups' target='_blank'>you can also find here.</a></li>" +
 			"<li>/wiki - This puts up a link to a player made wiki for Initium which <a href='http://initium.wikia.com/wiki/Initium_Wiki' target='_blank'>you can also find here.</a></li>" +
-			"</ul>", false);
+			"</ul>", false);*/
+	pagePopup("/odp/chatHelp.html");
 }
 
 
