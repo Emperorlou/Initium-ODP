@@ -184,18 +184,7 @@ public class CommandCharacterEquipSet extends Command {
 				}
 			}
 		}
-
-		// Check if we can equip everything from the given container
-
-
 		
-		for (CachedEntity equipment : toEquip) {
-
-			
-				
-		}
-		//toEquip.removeAll(equipment);
-
 		// Get our current equipment
 		List<CachedEntity> currentEquipment = new ArrayList<CachedEntity>();
 		for (String slot : ODPDBAccess.EQUIPMENT_SLOTS) {
