@@ -97,12 +97,33 @@ public class CommandCharacterEquipSet extends Command {
 
 		// "Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand",
 		// "LeftHand", "RightRing", "LeftRing", "Neck"
+		
+		
+		
+		Double characterStrength = (Double) character.getProperty("strength");
+		// Round character strength just like it is rounded for the popup
+		characterStrength = Double.parseDouble(GameUtils
+				.formatNumber(characterStrength));
 
 		for (CachedEntity equipment : setEquip) {
 
 			if (slotList == null || slotList.size() == 0) {
 				break;
 			}
+			
+			//Don't add toEquip if we cannot wear it.
+			if (character == null)
+				throw new IllegalArgumentException("Character cannot be null.");
+
+			if (equipment.getProperty("strengthRequirement") instanceof String)
+				equipment.setProperty("strengthRequirement", null);
+			Double strengthRequirement = (Double) equipment
+					.getProperty("strengthRequirement");
+			if (strengthRequirement != null && characterStrength != null
+					&& strengthRequirement > characterStrength
+					&& "NPC".equals(character.getProperty("type")) == false)
+				continue;
+			
 
 			String equipSlotRaw = (String) equipment.getProperty("equipSlot");
 
@@ -163,35 +184,7 @@ public class CommandCharacterEquipSet extends Command {
 				}
 			}
 		}
-
-		// Check if we can equip everything from the given container
-		Double characterStrength = (Double) character.getProperty("strength");
-		// Round character strength just like it is rounded for the popup
-		characterStrength = Double.parseDouble(GameUtils
-				.formatNumber(characterStrength));
-
-		for (CachedEntity equipment : toEquip) {
-
-			if (character == null)
-				throw new IllegalArgumentException("Character cannot be null.");
-			if (equipment == null)
-				throw new IllegalArgumentException("Equipment cannot be null.");
-
-			String equipmentSlot = (String) equipment.getProperty("equipSlot");
-			if (equipmentSlot == null)
-				throw new UserErrorMessage("You cannot equip this item.");
-
-			if (equipment.getProperty("strengthRequirement") instanceof String)
-				equipment.setProperty("strengthRequirement", null);
-			Double strengthRequirement = (Double) equipment
-					.getProperty("strengthRequirement");
-			if (strengthRequirement != null && characterStrength != null
-					&& strengthRequirement > characterStrength
-					&& "NPC".equals(character.getProperty("type")) == false)
-				throw new UserErrorMessage(
-						"You cannot equip an item from the given container, you do not have the strength to use it.");
-		}
-
+		
 		// Get our current equipment
 		List<CachedEntity> currentEquipment = new ArrayList<CachedEntity>();
 		for (String slot : ODPDBAccess.EQUIPMENT_SLOTS) {
