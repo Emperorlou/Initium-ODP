@@ -81,12 +81,24 @@ public class MainPageUpdateService extends Service
 		this.pathEnds = pathEnds;
 		this.hasHiddenPaths = hasHiddenPaths;
 	}
+	
 	/**
 	 * This will load all the path related caches, but only if we haven't loaded them before for
 	 * this particular session.
 	 * @return
 	 */
-	private void loadPathCache()
+	private void loadPathCache() {
+		loadPathCache(false);
+	}
+	
+	/**
+	 * This will load all the path related caches, but only if we haven't loaded them before for
+	 * this particular session.
+	 * 
+	 * @param showHidden  A boolean value that determines whether we should load the hidden paths.
+	 * @return
+	 */
+	private void loadPathCache(boolean showHidden)
 	{
 		if (paths==null)
 		{
@@ -197,7 +209,7 @@ public class MainPageUpdateService extends Service
 						if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
 							continue;
 				
-						if ("TRUE".equals(discovery.getProperty("hidden")) && db.getRequest().getParameter("showHiddenPaths")==null)
+						if ("TRUE".equals(discovery.getProperty("hidden")) && (db.getRequest().getParameter("showHiddenPaths")==null || !showHidden))
 						{
 							// Skip this path, it's hidden
 							hasHiddenPaths = true;
@@ -407,14 +419,18 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
 	}
 
-	public String updateButtonList(CombatService cs)
-	{
-		loadPathCache();
+	public String updateButtonList(CombatService cs, boolean showHidden){
+		loadPathCache(showHidden);
 		
 		if (cs.isInCombat(character))
 			return updateButtonList_CombatMode();
 		else
 			return updateButtonList_NormalMode();
+	}
+	
+	public String updateButtonList(CombatService cs)
+	{
+		return updateButtonList(cs, false);
 	}
 	
 	private String updateButtonList_NormalMode()
