@@ -26,7 +26,7 @@ import com.universeprojects.miniup.server.services.MainPageUpdateService;
  */
 public class CommandForgetAllCombatSites extends Command {
 	
-	private static final long MAX_MILLISECONDS_TO_SPEND = 27000;
+	private static final long MAX_MILLISECONDS_TO_SPEND = 10000;
 	
 	public CommandForgetAllCombatSites(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
 		super(db, request, response);
@@ -34,27 +34,29 @@ public class CommandForgetAllCombatSites extends Command {
 	
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
 		long startTime = System.currentTimeMillis();
+		int numberOfSitesForgotten = 0;
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		ds.beginBulkWriteMode();
-		
+
 		CachedEntity character = db.getCurrentCharacter();
 		List<Long> forgettableCombatSiteList = tryParseStringToArray(parameters, "forgettableCombatSiteArray", ",");
-	
 		//The location the command is being called from
 		Key characterLocationKey = (Key)character.getProperty("locationKey");
-
-		
-		for(Long forgettableCombatSite : forgettableCombatSiteList) {
-			if(System.currentTimeMillis() - startTime >= MAX_MILLISECONDS_TO_SPEND)
-				break;
-			db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", forgettableCombatSite));
-			
+		try {
+			for(Long forgettableCombatSite : forgettableCombatSiteList) {
+				if(System.currentTimeMillis() - startTime >= MAX_MILLISECONDS_TO_SPEND)
+					throw new UserErrorMessage("The bulk forgetting of sites has stopped due to it taking a while.  A total of "+numberOfSitesForgotten+" sites were forgotten.");
+				db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", forgettableCombatSite));
+				numberOfSitesForgotten++;
+			}
+		} catch (UserErrorMessage e) {
+			throw e;
+		} finally {
+			ds.commitBulkWrite();
+			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(characterLocationKey.getId()), this);
+			mpus.updateButtonList(new CombatService(db));
 		}
-		ds.commitBulkWrite();
-		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(characterLocationKey.getId()), this);
-		mpus.updateButtonList(new CombatService(db));
 	}
 	
 	/**
