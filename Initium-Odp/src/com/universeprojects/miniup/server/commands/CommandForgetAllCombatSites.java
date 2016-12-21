@@ -26,11 +26,14 @@ import com.universeprojects.miniup.server.services.MainPageUpdateService;
  */
 public class CommandForgetAllCombatSites extends Command {
 	
+	private static final long MAX_MILLISECONDS_TO_SPEND = 27000;
+	
 	public CommandForgetAllCombatSites(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
 		super(db, request, response);
 	}
 	
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
+		long startTime = System.currentTimeMillis();
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		ds.beginBulkWriteMode();
@@ -43,7 +46,10 @@ public class CommandForgetAllCombatSites extends Command {
 
 		
 		for(Long forgettableCombatSite : forgettableCombatSiteList) {
+			if(System.currentTimeMillis() - startTime >= MAX_MILLISECONDS_TO_SPEND)
+				break;
 			db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", forgettableCombatSite));
+			
 		}
 		ds.commitBulkWrite();
 		
