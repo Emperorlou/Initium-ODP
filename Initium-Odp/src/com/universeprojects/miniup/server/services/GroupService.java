@@ -229,6 +229,7 @@ public class GroupService extends Service {
 				saveEntities.add(member);
 			}
 			
+			// Transfer all group houses.
 			mergeGroupEntities = db.getFilteredList("Location", "ownerKey", mergeGroup.getKey());
 			if(mergeGroupEntities == null) mergeGroupEntities = new ArrayList<CachedEntity>();
 			for(CachedEntity house:mergeGroupEntities)
@@ -237,6 +238,14 @@ public class GroupService extends Service {
 				saveEntities.add(house);
 			}
 			
+			// Re-assign all group paths.
+			mergeGroupEntities = db.getFilteredList("Path", "ownerKey", mergeGroup.getKey());
+			for(CachedEntity path:mergeGroupEntities)
+			{
+				path.setProperty("ownerKey", this.characterGroup.getKey());
+				saveEntities.add(path);
+			}
+						
 			// Find all groups that were wanting to merge with this group and clear it out.
 			mergeGroupEntities = db.getFilteredList("Group", "pendingMergeGroupKey", mergeGroup.getKey());
 			for(CachedEntity reqGroup:mergeGroupEntities)
