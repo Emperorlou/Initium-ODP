@@ -1590,6 +1590,15 @@ function doForgetAllCombatSites(eventObject, forgettableCombatSiteArray)
 			function(){doCommand(eventObject, "ForgetAllCombatSites", {"forgettableCombatSiteArray" : forgettableCombatSiteArray})});
 }
 
+/**
+ * Calls the command to show all hidden sites.
+ * @param eventObject
+ */
+function doShowHiddenSites(eventObject)
+{
+	doCommand(eventObject, "ShowHiddenSites");
+}
+
 function resendVerificationEmail()
 {
 	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
