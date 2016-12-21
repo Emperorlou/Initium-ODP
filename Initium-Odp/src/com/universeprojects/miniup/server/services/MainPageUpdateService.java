@@ -209,7 +209,7 @@ public class MainPageUpdateService extends Service
 						if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
 							continue;
 				
-						if ("TRUE".equals(discovery.getProperty("hidden")) && (db.getRequest().getParameter("showHiddenPaths")==null || !showHidden))
+						if ("TRUE".equals(discovery.getProperty("hidden")) && !showHidden)
 						{
 							// Skip this path, it's hidden
 							hasHiddenPaths = true;
