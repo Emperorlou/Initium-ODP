@@ -581,7 +581,7 @@ public class MainPageUpdateService extends Service
 		
 		if (hasHiddenPaths)
 		{
-			newHtml.append("<center><a href='main.jsp?showHiddenPaths=true'>Show hidden paths</a></center>");
+			newHtml.append("<center><a onclick='doShowHiddenSites(event)'>Show hidden paths</a></center>");
 		}
 		
 		return updateHtmlContents("#main-button-list", newHtml.toString());
