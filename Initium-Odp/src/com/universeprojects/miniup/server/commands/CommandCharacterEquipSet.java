@@ -21,6 +21,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
  * Equips a set of items from container and puts previously equipped items into
@@ -85,27 +86,57 @@ public class CommandCharacterEquipSet extends Command {
 					return 0;
 				}
 
-				return ((Date) e1.getProperty("movedTimestamp"))
-						.compareTo((Date) e2.getProperty("movedTimestamp"));
+				return ((Date) e2.getProperty("movedTimestamp"))
+						.compareTo((Date) e1.getProperty("movedTimestamp"));
 			}
 		});
 
 		List<CachedEntity> toEquip = new ArrayList<CachedEntity>();
-		List<String> slotList = Arrays.asList(ODPDBAccess.EQUIPMENT_SLOTS);
+		String[] tempArray = ODPDBAccess.EQUIPMENT_SLOTS;
+		List<String> slotList = new ArrayList<String>(Arrays.asList(tempArray));
 
 		// "Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand",
 		// "LeftHand", "RightRing", "LeftRing", "Neck"
+		
+		
+		
+		Double characterStrength = (Double) character.getProperty("strength");
+		// Round character strength just like it is rounded for the popup
+		characterStrength = Double.parseDouble(GameUtils
+				.formatNumber(characterStrength));
 
 		for (CachedEntity equipment : setEquip) {
 
-			if (slotList==null||slotList.size() == 0) {
+			if (slotList == null || slotList.size() == 0) {
 				break;
 			}
+			
+			//Don't add toEquip if we cannot wear it.
+			if (character == null)
+				throw new IllegalArgumentException("Character cannot be null.");
+
+			if (equipment.getProperty("strengthRequirement") instanceof String)
+				equipment.setProperty("strengthRequirement", null);
+			Double strengthRequirement = (Double) equipment
+					.getProperty("strengthRequirement");
+			if (strengthRequirement != null && characterStrength != null
+					&& strengthRequirement > characterStrength
+					&& "NPC".equals(character.getProperty("type")) == false)
+				continue;
+			
 
 			String equipSlotRaw = (String) equipment.getProperty("equipSlot");
 
+			if (equipSlotRaw == null){
+				continue;
+			}
+			
 			if (equipSlotRaw.equals("Ring"))
 				equipSlotRaw = "LeftRing, RightRing";
+			
+			if (equipSlotRaw.equals("2Hands"))
+				equipSlotRaw = "LeftHand and RightHand";
+				
 
 			equipSlotRaw = equipSlotRaw.trim();
 			if (equipSlotRaw.endsWith(","))
@@ -127,7 +158,7 @@ public class CommandCharacterEquipSet extends Command {
 						slotList.remove(destinationSlot);
 						toEquip.add(equipment);
 					}
-					
+
 				} else if (equipSlotArrAnd.length > 1) {
 
 					boolean equippable = true;
@@ -153,35 +184,7 @@ public class CommandCharacterEquipSet extends Command {
 				}
 			}
 		}
-
-		// Check if we can equip everything from the given container
-		Double characterStrength = (Double) character.getProperty("strength");
-		// Round character strength just like it is rounded for the popup
-		characterStrength = Double.parseDouble(GameUtils
-				.formatNumber(characterStrength));
-
-		for (CachedEntity equipment : toEquip) {
-
-			if (character == null)
-				throw new IllegalArgumentException("Character cannot be null.");
-			if (equipment == null)
-				throw new IllegalArgumentException("Equipment cannot be null.");
-
-			String equipmentSlot = (String) equipment.getProperty("equipSlot");
-			if (equipmentSlot == null)
-				throw new UserErrorMessage("You cannot equip this item.");
-
-			if (equipment.getProperty("strengthRequirement") instanceof String)
-				equipment.setProperty("strengthRequirement", null);
-			Double strengthRequirement = (Double) equipment
-					.getProperty("strengthRequirement");
-			if (strengthRequirement != null && characterStrength != null
-					&& strengthRequirement > characterStrength
-					&& "NPC".equals(character.getProperty("type")) == false)
-				throw new UserErrorMessage(
-						"You cannot equip an item from the given container, you do not have the strength to use it.");
-		}
-
+		
 		// Get our current equipment
 		List<CachedEntity> currentEquipment = new ArrayList<CachedEntity>();
 		for (String slot : ODPDBAccess.EQUIPMENT_SLOTS) {
@@ -190,24 +193,31 @@ public class CommandCharacterEquipSet extends Command {
 						.getProperty("equipment" + slot)));
 			}
 		}
-		
-		
+
 		Long containerMaxWeight = ((Long) container.getProperty("maxWeight"));
-		Long currentEquipmentWeight = db.getItemCarryingWeight(character, currentEquipment);
-		Long toEquipEquipmentWeight = db.getItemCarryingWeight(container, toEquip);
-		Long containerRemainingWeight = containerMaxWeight - db.getItemCarryingWeight(container, setEquip);
+		Long currentEquipmentWeight = db.getItemCarryingWeight(character,
+				currentEquipment);
+		Long toEquipEquipmentWeight = db.getItemCarryingWeight(container,
+				toEquip);
+		Long containerRemainingWeight = containerMaxWeight
+				- db.getItemCarryingWeight(container, setEquip);
 
 		Long containerMaxSpace = ((Long) container.getProperty("maxSpace"));
-		Long currentEquipmentSpace = db.getItemCarryingSpace(character, currentEquipment);
-		Long toEquipEquipmentSpace = db.getItemCarryingSpace(container, toEquip);
-		Long containerRemainingSpace = containerMaxSpace - db.getItemCarryingSpace(container, setEquip);
-		
-		if(containerRemainingWeight<(currentEquipmentWeight-toEquipEquipmentWeight)){
-			throw new UserErrorMessage("Cannot swap out set, not enough free weight in the container");
+		Long currentEquipmentSpace = db.getItemCarryingSpace(character,
+				currentEquipment);
+		Long toEquipEquipmentSpace = db
+				.getItemCarryingSpace(container, toEquip);
+		Long containerRemainingSpace = containerMaxSpace
+				- db.getItemCarryingSpace(container, setEquip);
+
+		if (containerRemainingWeight < (currentEquipmentWeight - toEquipEquipmentWeight)) {
+			throw new UserErrorMessage(
+					"Cannot swap out set, not enough free weight in the container");
 		}
 
-		if(containerRemainingSpace<(currentEquipmentSpace-toEquipEquipmentSpace)){
-			throw new UserErrorMessage("Cannot swap out set, not enough free space in the container");
+		if (containerRemainingSpace < (currentEquipmentSpace - toEquipEquipmentSpace)) {
+			throw new UserErrorMessage(
+					"Cannot swap out set, not enough free space in the container");
 		}
 
 		// Unequip all equipment we already have equipped and put them in the
@@ -234,5 +244,9 @@ public class CommandCharacterEquipSet extends Command {
 
 		ds.put(character);
 		ds.commitBulkWrite();
+		
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		mpus.updateInBannerCharacterWidget();
+		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }

@@ -81,12 +81,24 @@ public class MainPageUpdateService extends Service
 		this.pathEnds = pathEnds;
 		this.hasHiddenPaths = hasHiddenPaths;
 	}
+	
 	/**
 	 * This will load all the path related caches, but only if we haven't loaded them before for
 	 * this particular session.
 	 * @return
 	 */
-	private void loadPathCache()
+	private void loadPathCache() {
+		loadPathCache(false);
+	}
+	
+	/**
+	 * This will load all the path related caches, but only if we haven't loaded them before for
+	 * this particular session.
+	 * 
+	 * @param showHidden  A boolean value that determines whether we should load the hidden paths.
+	 * @return
+	 */
+	private void loadPathCache(boolean showHidden)
 	{
 		if (paths==null)
 		{
@@ -197,7 +209,7 @@ public class MainPageUpdateService extends Service
 						if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
 							continue;
 				
-						if ("TRUE".equals(discovery.getProperty("hidden")) && db.getRequest().getParameter("showHiddenPaths")==null)
+						if ("TRUE".equals(discovery.getProperty("hidden")) && !showHidden)
 						{
 							// Skip this path, it's hidden
 							hasHiddenPaths = true;
@@ -407,14 +419,18 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
 	}
 
-	public String updateButtonList(CombatService cs)
-	{
-		loadPathCache();
+	public String updateButtonList(CombatService cs, boolean showHidden){
+		loadPathCache(showHidden);
 		
 		if (cs.isInCombat(character))
 			return updateButtonList_CombatMode();
 		else
 			return updateButtonList_NormalMode();
+	}
+	
+	public String updateButtonList(CombatService cs)
+	{
+		return updateButtonList(cs, false);
 	}
 	
 	private String updateButtonList_NormalMode()
@@ -471,6 +487,9 @@ public class MainPageUpdateService extends Service
 
 		int shortcutStart = 49;
 		int shortcutNumber = 1;
+		int forgettableCombatSites = 0;
+		StringBuilder forgettableCombatSiteList = new StringBuilder();
+		forgettableCombatSiteList.append("\"");
 		for(int i = 0; i<paths.size(); i++)
 		{
 			CachedEntity path = paths.get(i);
@@ -523,8 +542,12 @@ public class MainPageUpdateService extends Service
 				newHtml.append("<a onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
 				newHtml.append("<br>");
 			}
-			else if ("CombatSite".equals(destLocation.getProperty("type")))
-				newHtml.append("<a class='main-forgetPath' onclick='forgetCombatSite("+destLocation.getKey().getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+			else if ("CombatSite".equals(destLocation.getProperty("type"))) {
+				newHtml.append("<a class='main-forgetPath' onclick='doForgetCombatSite(event,"+destLocation.getKey().getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				forgettableCombatSites++;
+				String destLocationKeyId = String.valueOf(destLocation.getKey().getId());
+				forgettableCombatSiteList.append(destLocationKeyId+",");
+			}
 			else if ("BlockadeSite".equals(destLocation.getProperty("type")) || defensiveStructureAllowed)
 				newHtml.append("<a href='#' class='main-button-icon' onclick='doGoto(event, "+path.getKey().getId()+", true)'><img src='https://initium-resources.appspot.com/images/ui/attack1.png' title='This button allows you to travel to this location with the intent to attack any player-made defences without a confirmation' border=0/></a><a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 			else if ("CollectionSite".equals(location.getProperty("type")))
@@ -548,9 +571,17 @@ public class MainPageUpdateService extends Service
 			
 
 		
+		if(forgettableCombatSites > 1) {
+			//remove the last comma
+			forgettableCombatSiteList.deleteCharAt(forgettableCombatSiteList.length()-1);
+			forgettableCombatSiteList.append("\"");
+			newHtml.append("<center><a onclick='doForgetAllCombatSites(event, "+forgettableCombatSiteList.toString()+")'>Forget all forgettable sites</a></center><br/>");
+		}
+			
+		
 		if (hasHiddenPaths)
 		{
-			newHtml.append("<center><a href='main.jsp?showHiddenPaths=true'>Show hidden paths</a></center>");
+			newHtml.append("<center><a onclick='doShowHiddenSites(event)'>Show hidden paths</a></center>");
 		}
 		
 		return updateHtmlContents("#main-button-list", newHtml.toString());

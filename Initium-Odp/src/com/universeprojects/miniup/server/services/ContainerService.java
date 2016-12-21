@@ -107,4 +107,26 @@ public class ContainerService extends Service {
 		return content.containsAll(items);
 	}
 	
+	// the List can be passed in as null, if you dont have a list. 
+	public boolean containsEquippable(CachedEntity container, List<CachedEntity> containerContent){
+	
+		final List<CachedEntity> content;
+		
+		if(containerContent!=null){
+			content = containerContent;
+		}else{
+			content = db.getFilteredList("Item",
+					"containerKey", FilterOperator.EQUAL, container.getKey());
+		}
+		
+		if(content.size() == 0)
+			return false;
+		
+		for(CachedEntity item:content){
+			if(item.getProperty("equipSlot")!=null && item.getProperty("equipSlot")!=""){
+				return true;
+			}
+		}
+		return false;
+	}
 }
