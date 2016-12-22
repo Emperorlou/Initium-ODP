@@ -230,22 +230,22 @@ public class GroupController extends PageController {
 			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
 			List<String> groupNames = new ArrayList<String>();
 			
-			if (keyOfDecs == null)
+			if (keyOfDecs == null || keyOfDecs.isEmpty())
 			{
 				groupNames.add("No current wars active.");
-
 			}
 			
 			else if (keyOfDecs != null)
 			{
 				List<CachedEntity> groups = db.getEntities(keyOfDecs);
-				
-			for (CachedEntity declaredGroup : groups) 
-			{
-				groupNames.add(declaredGroup.getNamespace());
+			
+				for (CachedEntity declaredGroup : groups) 
+				{
+					groupNames.add(declaredGroup.getProperty("name").toString());
+				}
 			}
 			request.setAttribute("warDecGroupNames", groupNames);
-			}	
+
 		}	
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}
