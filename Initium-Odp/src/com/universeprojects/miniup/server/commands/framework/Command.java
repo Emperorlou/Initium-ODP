@@ -1,6 +1,8 @@
 package com.universeprojects.miniup.server.commands.framework;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,8 +73,31 @@ public abstract class Command extends OperationBase
 	{
 		try {
 			return Long.parseLong(params.get(fieldName));
-		} catch (Exception _) {
-			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid id.");
+		} catch (Exception e) {
+			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid id.", e);
+		}
+	}
+	
+	/** 
+	 * Tries to fetch fieldName from param list and throws if it cannot.
+	 * 
+	 * @param params
+	 * @param fieldName
+	 * @param delimitingCharacter
+	 * @return List of longs, parsed from param string
+	 */
+	protected List<Long> tryParseStringToLongList(Map<String,String> params, String fieldName, String delimitingCharacter)
+	{
+		try {
+			String unparsedString = params.get(fieldName);
+			String[] parsedArray = unparsedString.split(delimitingCharacter);
+			ArrayList<Long> parsedList = new ArrayList<Long>();
+			for(int i = 0; i < parsedArray.length; i++) {
+				parsedList.add(Long.parseLong(parsedArray[i]));
+			}
+			return parsedList;
+		} catch (Exception e) {
+			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid delimited list.", e);
 		}
 	}
 
