@@ -11,7 +11,7 @@
 			<c:forEach var="groups" items="${warDecGroupNames}">
 				<p>${$groups}</p>
 				<br/>
-				<a onclick='endWar(event, "<c:out value="${groups}"/>")'>End War</a>
+				<a onclick='endWar(event, ${groups})'>End War</a>
 			</c:forEach>
 	</div>
 </div>
