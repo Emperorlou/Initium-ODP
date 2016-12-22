@@ -73,8 +73,8 @@ public abstract class Command extends OperationBase
 	{
 		try {
 			return Long.parseLong(params.get(fieldName));
-		} catch (Exception _) {
-			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid id.");
+		} catch (Exception e) {
+			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid id.", e);
 		}
 	}
 	
@@ -86,7 +86,7 @@ public abstract class Command extends OperationBase
 	 * @param delimitingCharacter
 	 * @return List of longs, parsed from param string
 	 */
-	protected List<Long> tryParseStringToList(Map<String,String> params, String fieldName, String delimitingCharacter)
+	protected List<Long> tryParseStringToLongList(Map<String,String> params, String fieldName, String delimitingCharacter)
 	{
 		try {
 			String unparsedString = params.get(fieldName);
@@ -96,8 +96,8 @@ public abstract class Command extends OperationBase
 				parsedList.add(Long.parseLong(parsedArray[i]));
 			}
 			return parsedList;
-		} catch (Exception _) {
-			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid delimited list.");
+		} catch (Exception e) {
+			throw new RuntimeException(this.getClass().getSimpleName()+" invalid call format, '"+fieldName+"' is not a valid delimited list.", e);
 		}
 	}
 

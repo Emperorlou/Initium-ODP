@@ -39,7 +39,7 @@ public class CommandForgetAllCombatSites extends Command {
 		ds.beginBulkWriteMode();
 
 		CachedEntity character = db.getCurrentCharacter();
-		List<Long> forgettableCombatSiteList = tryParseStringToList(parameters, "forgettableCombatSiteArray", ",");
+		List<Long> forgettableCombatSiteList = tryParseStringToLongList(parameters, "forgettableCombatSiteArray", ",");
 		//The location the command is being called from
 		Key characterLocationKey = (Key)character.getProperty("locationKey");
 		try {
