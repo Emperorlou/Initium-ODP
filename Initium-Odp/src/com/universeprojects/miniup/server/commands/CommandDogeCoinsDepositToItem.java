@@ -9,7 +9,7 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.commands.framework.Command;
+import com.universeprojects.miniup.server.commands.framework.TransactionCommand;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
@@ -24,17 +24,25 @@ import com.universeprojects.miniup.server.services.MainPageUpdateService;
  * @author SPFiredrake
  *
  */
-public class CommandDogeCoinsDepositToItem extends Command {
+public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 
 	public CommandDogeCoinsDepositToItem(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
 		super(db, request, response);
 	}
 	
 	@Override
-	public void run(Map<String, String> parameters) throws UserErrorMessage {
+	public void runBeforeTransaction(Map<String, String> parameters) throws UserErrorMessage
+	{
+		
+	}
+
+	@Override
+	public void runInsideTransaction(Map<String, String> parameters) throws UserErrorMessage
+	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
+		character = ds.refetch(character);
 		
 		long itemId = tryParseId(parameters, "itemId");
 		CachedEntity item = db.getEntity("Item", itemId);
@@ -67,7 +75,13 @@ public class CommandDogeCoinsDepositToItem extends Command {
 		ds.put(item);
 		
 		MainPageUpdateService service = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
-		service.updateMoney();
+		service.updateMoney();		
+	}
+
+	@Override
+	public void runAfterTransaction(Map<String, String> parameters) throws UserErrorMessage
+	{
+		
 	}
 
 }

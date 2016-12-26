@@ -228,16 +228,24 @@ public class GroupController extends PageController {
 			
 			@SuppressWarnings("unchecked")
 			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
-			List<String> warDecGroupNames = new ArrayList<String>();
+			List<String> groupNames = new ArrayList<String>();
 			
-			if (keyOfDecs != null)
+			if (keyOfDecs == null || keyOfDecs.isEmpty())
 			{
-			for (Key decs : keyOfDecs) 
-			{
-				warDecGroupNames.add(decs.getName());
+				groupNames.add("No current wars active.");
 			}
-			request.setAttribute("warDecGroupNames", warDecGroupNames);
-			}			
+			
+			else if (keyOfDecs != null)
+			{
+				List<CachedEntity> groups = db.getEntities(keyOfDecs);
+			
+				for (CachedEntity declaredGroup : groups) 
+				{
+					groupNames.add(declaredGroup.getProperty("name").toString());
+				}
+			}
+			request.setAttribute("warDecGroupNames", groupNames);
+
 		}	
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}

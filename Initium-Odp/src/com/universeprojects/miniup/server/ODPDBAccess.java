@@ -36,6 +36,7 @@ import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.ContainerService;
@@ -2089,7 +2090,7 @@ public class ODPDBAccess
 				Long containerCarryingSpace = getItemCarryingSpace(newContainer, containerInventory);
 				
 				if (containerCarryingWeight+itemWeight>maxWeight)
-					throw new UserErrorMessage("The container cannot accept this item. It the item is too heavy.");
+					throw new UserErrorMessage("The container cannot accept this item. It is too heavy.");
 				
 				if (containerCarryingSpace+itemSpace>maxSpace)
 					throw new UserErrorMessage("This item will not fit. There is not enough space.");
@@ -5076,9 +5077,408 @@ public class ODPDBAccess
 	 * @param currentCharacter
 	 * @param key
 	 */
-	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity currentCharacter, Key key) {
-		// TODO Auto-generated method stub
-		
+	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey)
+	{
+		doDeleteCombatSite(ds, playerCharacter, locationKey, false);
 	}
+	
+	/**This will need to be updated as we add more stuff.
+	 * We already need to delete items contained by monsters and items on the ground.
+	 * 
+	 * @param monster
+	 */
+	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey, boolean forceDelete)
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		// Check if the player character is standing in this location, if so get out!
+		if (playerCharacter!=null && playerCharacter.getProperty("locationKey").equals(locationKey))
+			throw new IllegalArgumentException("Not allowed to delete a combat site that still has the player character in it.");
+		
+		
+		CachedEntity location = getEntity(locationKey);
+		if (location==null)
+			return;
+		if ("CombatSite".equals(location.getProperty("type"))==false)
+			return;
+		
+		QueryHelper q = new QueryHelper(ds);
+		List<CachedEntity> characters = q.getFilteredList("Character", "locationKey", locationKey);
+		List<CachedEntity> paths = getPathsByLocation_KeysOnly(locationKey);
+		List<CachedEntity> discoveries = new ArrayList<CachedEntity>();
+		if (playerCharacter!=null)
+			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey);
+		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
+		
+
+		boolean hasLiveNpc = false;
+		boolean hideOnly = false;
+		for(CachedEntity character:characters)
+		{
+			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
+				hideOnly = true;
+			else if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d)
+				hasLiveNpc=true;
+		}
+		
+		
+		// Having the paths size>1 cancels the deletion of the combat site. This is very important so that people don't get
+		// stranded in rare cases where there are other sites branching from this one. The outer branches must be deleted first, 
+		// but we can do that lazily.
+		if ((hideOnly && forceDelete==false) || 
+				(paths.size()>1 && forceDelete==false) || 
+				(hasLiveNpc && forceDelete==false) /*Now we don't delete the site if the NPC is alive*/)
+		{
+			// Delete the discoveries of the paths to this location
+			for(CachedEntity discovery:discoveries)
+			{
+				for(CachedEntity path:paths)
+				{
+					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
+					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
+					{
+						discovery.setProperty("hidden", "TRUE");
+						ds.put(discovery);
+					}
+				}
+				
+				// Right now discoveries are only used for paths. More may need to be handled later on.
+			}
+			
+			return;
+		}
+		else
+		{
+			
+			
+			// Delete all characters standing in this place (should only be NPCs)
+			for(CachedEntity character:characters)
+				ds.delete(character.getKey());
+			
+			// Delete all items on the ground
+			for(CachedEntity item:items)
+				ds.delete(item.getKey());
+			
+			// Delete all paths to this location
+			for(CachedEntity path:paths)
+				ds.delete(path.getKey());
+			
+			// Delete the discoveries of the paths to this location
+			for(CachedEntity discovery:discoveries)
+			{
+				if (discovery==null)
+					continue;
+				for(CachedEntity path:paths)
+				{
+					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
+					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
+						ds.delete(discovery.getKey());
+				}
+				
+				// Right now discoveries are only used for paths. More may need to be handled later on.
+			}
+			
+			// Finally delete the location itself
+			ds.delete(locationKey);
+			
+			
+		}
+	}
+	
+	
+
+	/**
+	 * Determines the parent location for the given location. This is used for certain 
+	 * game mechanics that require a parent/child concept. For example, running will always cause you 
+	 * to run to the parent location.
+	 *  
+	 * @param ds
+	 * @param location
+	 * @return The location that is considered to be the parent of the given location.
+	 */
+	public CachedEntity getParentLocation(CachedDatastoreService ds, CachedEntity location)
+	{
+		if (location.getProperty("parentLocationKey")==null)
+		{
+			// FOR LAZY MIGRATION OF THE DATABASE, KEEP THIS PART ACTIVE.
+			List<CachedEntity> paths = getPathsByLocation(location.getKey());
+			
+			if (paths.isEmpty())
+				return null;	// This should never happen, but basically there is no escape from this combat site. Let's not throw here though.
+			
+			CachedEntity path = paths.get(0);
+			Key properLocationKey = null;
+			if (GameUtils.equals(path.getProperty("location1Key"), location.getKey()))
+				properLocationKey = (Key)path.getProperty("location2Key");
+			else
+				properLocationKey = (Key)path.getProperty("location1Key");
+			
+			location.setProperty("parentLocationKey", properLocationKey);
+			if (ds==null) ds = getDB();
+			ds.put(location);
+ 			
+			CachedEntity exitLocation = getEntity(properLocationKey);
+			
+			Logger.getLogger("GameFunctions").log(Level.SEVERE, "Parent location on a "+location.getProperty("type")+" was not set properly. - We decided to associate it."); 
+			
+			return exitLocation;
+		}
+		else
+		{
+			Key key = (Key)location.getProperty("parentLocationKey");
+			return getEntity(key);
+		}
+	}
+
+	
+	
+	
+	
+	/**
+	 * If we return true, it's because the escape was successful and the
+	 * character will have already been placed in the new location.
+	 * 
+	 * @param character
+	 * @param monster
+	 * @return
+	 * @throws UserErrorMessage 
+	 */
+	public boolean doCharacterAttemptEscape(CachedEntity characterLocation, CachedEntity character, CachedEntity monster) throws UserErrorMessage
+	{
+		CachedDatastoreService db = getDB();
+//		db.beginTransaction();
+		
+		try
+		{
+			String mode = (String)character.getProperty("mode");
+			
+			if (mode==null || mode.equals(ODPDBAccess.CHARACTER_MODE_COMBAT)==false)
+				throw new UserErrorMessage("Character must be in combat in order to attempt to escape.");
+			
+			if ("NPC".equals(monster.getProperty("type"))==false && isCharacterDefending(characterLocation, character))
+				throw new UserErrorMessage("You cannot escape while defending.");
+			
+			if (character.getProperty("partyCode")!=null && character.getProperty("partyCode").equals("")==false)
+			{
+				if ("TRUE".equals(character.getProperty("partyLeader"))==false)
+					throw new UserErrorMessage("You are not the party leader and therefore cannot choose to have the party run from the fight. If you want to run anyway, you will have to leave your party first.");
+			}
+
+			// Here we're flagging that a combat action took place so that the cron job in charge of ensuring combat keeps moving along
+			// doesn't automatically attack for us
+			if ("PC".equals(character.getProperty("type")) && "PC".equals(monster.getProperty("type")))
+				flagCharacterCombatAction(db, character);
+			
+			
+			Double characterDex = getCharacterDexterity(character);
+			Double monsterDex = getCharacterDexterity(monster);
+			
+			
+			Random rnd = new Random();
+			if (rnd.nextDouble()*characterDex>rnd.nextDouble()*monsterDex)
+			{
+				boolean defenceStructureAttack = "DefenceStructureAttack".equals(character.getProperty("combatType"));
+				List<CachedEntity> party = getParty(db, character);
+				
+				
+				
+				setPartiedField(party, character, "mode", CHARACTER_MODE_NORMAL);
+				setPartiedField(party, character, "combatant", null);
+				setPartiedField(party, character, "combatType", null);
+				putPartyMembersToDB(db, party, character);
+
+				// now notify the party members to refresh
+				if (party!=null)
+					for(CachedEntity member:party)
+						if (member.getKey().getId()!=character.getKey().getId())
+							sendNotification(db, member.getKey(), NotificationType.fullpageRefresh);
+				
+				
+				// Now we want to check if the monster should regain hitpoints or not
+				// Hitpoints should be regenerated if the monster is in a rest area 
+				CachedEntity monsterLocation = getEntity((Key)monster.getProperty("locationKey"));
+				
+				boolean isTerritoryCombat = false;
+				if (monsterLocation.getProperty("territoryKey")!=null || characterLocation.getProperty("territoryKey")!=null)
+					isTerritoryCombat = true;
+				
+				
+				if (monsterLocation!=null && (defenceStructureAttack || isTerritoryCombat))
+				{
+					Double hitpoints = (Double)monster.getProperty("hitpoints");
+					Double maxHitpoints = (Double)monster.getProperty("maxHitpoints");
+					if (hitpoints<maxHitpoints)
+						monster.setProperty("hitpoints", maxHitpoints);
+					
+					monster.setProperty("mode", CHARACTER_MODE_NORMAL);
+					monster.setProperty("combatant", null);
+					monster.setProperty("combatType", null);
+					
+					db.put(monster);
+					
+					sendNotification(db, monster.getKey(), NotificationType.fullpageRefresh);
+				}
+				else
+				{
+
+					// First lets take the monster out of combat
+					monster.setProperty("mode", CHARACTER_MODE_NORMAL);
+					monster.setProperty("combatant", null);
+					monster.setProperty("combatType", null);
+					
+					db.put(monster);					
+					
+					// Move locations! But only if we're in the same location as the monster..
+					if (GameUtils.equals(monster.getProperty("locationKey"), character.getProperty("locationKey")))
+					{
+						// Don't discover the path to the combat area, we shouldn't be able to remember how to get back there
+						// Take the path back to the source location. First we need to find the path..
+						List<CachedEntity> paths = getPathsByLocation((Key)character.getProperty("locationKey"));
+						CachedEntity parentLocation = getParentLocation(db, monsterLocation);
+					
+					
+						// Escape down the parent location if one exists
+						if (parentLocation!=null)
+						{
+							for(CachedEntity path:paths)
+								if (((Key)path.getProperty("location1Key")).getId()==parentLocation.getKey().getId() ||
+										((Key)path.getProperty("location2Key")).getId()==parentLocation.getKey().getId())
+								{
+									doCharacterTakePath(db, character, path, true);
+									return true;
+								}
+						}
+	
+						// Now shuffle the paths, looks like the parent location wasn't set right or at all
+						Collections.shuffle(paths);
+						
+						// Otherwise, escape down the first permanent location we find
+						for(CachedEntity path:paths)
+							if ("Permanent".equals(path.getProperty("type")))
+							{
+								doCharacterTakePath(db, character, path, true);
+								return true;
+							}
+						
+		
+						// If we're here, we didn't go down ANY path, so just go down the first one then...
+						doCharacterTakePath(db, character, paths.get(0), true);
+					}
+				}				
+
+				
+				
+				return true;
+			}
+			else
+			{
+				
+				
+//				db.commit();
+				return false;
+			}
+		}
+		finally
+		{
+//			db.rollbackIfActive();
+		}
+	}
+
+	
+	public String doMonsterCounterAttack(ODPAuthenticator auth, CachedEntity user, CachedEntity monster, CachedEntity character)
+	{
+		// Decide what weapon to use...
+		CachedEntity weaponToUse = null;
+		CachedEntity leftHand = null;
+		CachedEntity rightHand = null;
+		
+		if ((Double)monster.getProperty("hitpoints")>0)
+		{
+			leftHand = getEntity((Key)monster.getProperty("equipmentLeftHand"));
+			rightHand = getEntity((Key)monster.getProperty("equipmentRightHand"));
+			
+			// Here we're choosing the weapon to use as the left hand by default, if it is a weapon
+			if (leftHand!=null)
+			{
+				String itemType = (String)leftHand.getProperty("itemType");
+				if (itemType!=null && itemType.equals("Weapon"))
+					weaponToUse = leftHand;
+			}
+			
+			// Here we're getting the right hand item (if it's a weapon) and choosing a weapon if we're dual wielding
+			if (rightHand!=null)
+			{
+				String itemType = (String)rightHand.getProperty("itemType");
+				if (itemType!=null && itemType.equals("Weapon"))
+					if (weaponToUse!=null)
+					{
+						// Both hands have weapons, choose randomly between them by default or if automaticWeaponChoiceMethod==Random
+						if (GameUtils.enumEquals(monster.getProperty("automaticWeaponChoiceMethod"), AutomaticWeaponChoiceMethod.HighestDamage) || 
+								GameUtils.enumEquals(monster.getProperty("type"), CharacterType.PC) && (monster.getProperty("automaticWeaponChoiceMethod")==null || ((String)monster.getProperty("automaticWeaponChoiceMethod")).trim().equals("")))
+						{
+							Double maxDamageLeftHand = GameUtils.getWeaponMaxDamage(leftHand);
+							Double maxDamageRightHand = GameUtils.getWeaponMaxDamage(rightHand);
+							
+							if ((maxDamageLeftHand!=null && maxDamageRightHand!=null && maxDamageLeftHand>maxDamageRightHand))
+								weaponToUse = leftHand;
+							else
+								weaponToUse = rightHand;
+							
+						}
+						else
+						{
+							if (new Random().nextBoolean())
+								weaponToUse = leftHand;
+							else
+								weaponToUse = rightHand;
+						}
+					}
+					else
+						weaponToUse = rightHand;
+			}
+		
+			return doCharacterAttemptAttack(auth, user, monster, weaponToUse, character);
+		}		
+		else
+		{
+			return monster.getProperty("name")+" is dead.";
+		}
+	}
+	
+	public CachedEntity getCharacterStrongestWeapon(CachedEntity character)
+	{
+		CachedEntity result = null;
+		
+		CachedEntity leftHand = getEntity((Key)character.getProperty("equipmentLeftHand"));
+		CachedEntity rightHand = getEntity((Key)character.getProperty("equipmentRightHand"));
+		
+		if (leftHand!=null && rightHand!=null)
+		{
+			String leftType = (String)leftHand.getProperty("type");
+			String rightType = (String)rightHand.getProperty("type");
+			
+			if (leftType==null)leftType = "";
+			if (rightType==null) rightType = "";
+			
+			if (leftType.contains("Weapon") && rightType.contains("Weapon"))
+			{
+				// Now compare the two
+				long leftScore = GameUtils.determineQualityScore(leftHand.getProperties());
+				long rightScore = GameUtils.determineQualityScore(rightHand.getProperties());
+				if (leftScore>rightScore)
+					result = leftHand;
+				else
+					result = rightHand;
+			}
+			else if (leftType.contains("Weapon"))
+				result = leftHand;
+			else if (rightType.contains("Weapon"))
+				result = rightHand;
+		}
+		
+		return result;
+	}
+
 	
 }
