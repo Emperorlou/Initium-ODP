@@ -17,10 +17,10 @@
 	</p>
 	<br>
 	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-		<input type='hidden' name='custom' value='${userId}' /> 
-		<input type="hidden" name="cmd" value="_s-xclick"> 
+		<input type='hidden' name='custom' value='${userId}' />
+		<input type="hidden" name="cmd" value="_s-xclick">
 		<input type="hidden" name="hosted_button_id" value="3XHAZVVPB3KH2">
-		<input type="image" src="https://initium-resources.appspot.com/images/ui/paypal-donate-button.png" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"> 
+		<input type="image" src="https://initium-resources.appspot.com/images/ui/paypal-donate-button.png" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 		<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
 	</form>
 	<img src='https://initium-resources.appspot.com/images/paypal-cards.jpg' border=0 />
@@ -100,15 +100,15 @@
 		another player. Please note that this token has no real-world value;
 		the token cannot be converted to cash and taken out of the game. The
 		token can only be used to gift premium membership to someone, or to
-		give yourself a premium membership. 
+		give yourself a premium membership.
 		<br>
-		<br> 
+		<br>
 		All you have to do is have at least $10 is donations on your
 		account and click the button below. $5 will be subtracted from your
 		account and you will find a new premium membership token in your
-		inventory. 
+		inventory.
 		<br>
-		<br> 
+		<br>
 		<a class='big-link' onclick='newPremiumToken()'>Create 1 premium membership token</a>
 	</p>
 </div>
@@ -119,16 +119,16 @@
 	<h2>Your Group</h2>
 	<c:if test="${inGroup==false}">
 		<p>
-			You are not currently in a group. 
+			You are not currently in a group.
 			<br>
-			<br> 
+			<br>
 			If you wish to join a group, you can find somebody who is
 			already in a group and click on their name. Then click on the group
 			that he is in to go to their group's join page. Once you have
 			requested to join, the group administrator will have to approve or
-			reject your application. 
+			reject your application.
 			<br>
-			<br> 
+			<br>
 			<a class='big-link' href='#' onclick='createNewGroup()'>Create a new group</a>
 		</p>
 	</c:if>
@@ -165,6 +165,13 @@
 <hr>
 
 <h2>Your Character</h2>
+
+<c:if test="${charName=='Unnamed'}">
+	<p>
+		<br> <br> <a class='big-link' href='#' onclick='renameCharacter("${charName}")' id='btnRenameCharacter'>Rename your character</a>
+	</p>
+</c:if>
+
 <p>
 	<br> <br> <a class='big-link' href='#' onclick='deleteAndRecreateCharacter("${charName}")' id='btnNewCharacter'>Delete your character and recreate</a>
 </p>
