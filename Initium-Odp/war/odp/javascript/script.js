@@ -1553,6 +1553,13 @@ function viewMap()
 	openMap();
 }
 
+function renameCharacter(currentCharName)
+{
+	promptPopup("Rename Character", "Ok, what will you call your character?", currentCharName, function(name){
+		doCommand(eventObject, "RenameUnnamedPlayer", {"newName":name});
+	});
+}
+
 function deleteAndRecreateCharacter(currentCharName)
 {
 	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
