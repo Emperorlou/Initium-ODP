@@ -166,6 +166,7 @@
 
 <h2>Your Character</h2>
 
+
 <c:if test="${charName=='Unnamed'}">
 	<p>
 		<br> <br> <a class='big-link' href='#' onclick='renameCharacter("${charName}")' id='btnRenameCharacter'>Rename your character</a>
