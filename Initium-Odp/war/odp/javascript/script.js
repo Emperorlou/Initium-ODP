@@ -15,22 +15,22 @@ $(window).ready(function(e){
 		else
 			window.singlePostFormSubmitted = true;
 	});
-
+	
 	$(window).resize(function() {
 		expandpopupMessage();
 	});
 
-
+	
 	$(".boldBoxCollapsed > h4").click(function(){
 		$(this).parent().toggleClass("boldBoxCollapsed");
 	});
-
+	
 	// For all inputs under the body: If a text box is selected, don't allow shortcut keys to process (prevent default)
 	$("body").on("keyup", "input", function(event){
 		event.stopPropagation();
 	});
-
-	// Any inputs with the main-item-filter-input class should be named (ID) according to
+	
+	// Any inputs with the main-item-filter-input class should be named (ID) according to 
 	// which div class they will be filtering on.
 	$("#page-popup-root").on("input propertychange paste", "input.main-item-filter-input", function(event)
 	{
@@ -48,13 +48,13 @@ $(window).ready(function(e){
 			var filterItems = $(selector);
 			var showItems = filterItems.has(conditionSelector);
 			var hideItems = filterItems.not(showItems);
-
+			
 			showItems.show().next("br").show();
 			hideItems.hide().next("br").hide();
 			setSelectionCheckboxes(event, null);
 	    }, 500));
 	});
-
+	
 	// Unfortunately, we have to use event delegation for checkboxes, since it's in popup content.
 	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-all", function(event)
 	{
@@ -65,7 +65,7 @@ $(window).ready(function(e){
 		selectItems.find("input:checkbox").prop("checked", cb.prop("checked"));
 		selectItems.toggleClass("main-item-selected", cb.prop("checked"));
 	});
-
+	
 	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-group", function(event)
 	{
 		var cb = $(event.currentTarget);
@@ -73,45 +73,45 @@ $(window).ready(function(e){
 		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item:visible");
 		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
 		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
-
+		
 		setSelectionCheckboxes(event, groupId);
 	});
-
+	
 	$("#page-popup-root").on("click", ".selection-list input:checkbox", function(event)
 	{
 		var cb = $(event.currentTarget);
 		cb.parent(".main-item").toggleClass("main-item-selected", cb.prop("checked"));
-
+		
 		setSelectionCheckboxes(event);
 	});
-
+	
 	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
 	{
 		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
-
+	
 	$(".main-expandable .main-expandable-title").click(function(){
 		$(this).parent().find(".main-expandable-content").show();
 		$(this).hide();
 	});
-
+	
 	// Set the correct image for the header mute button
 	if (isSoundEffectsEnabled())
 		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	else
 		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
-
+		
 
 	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
 	$(window).focus(function(){
 		flagReadMessages();
 	});
-
+	
 });
 
 /**
  * This removes the * from the title, (and by extension the 'unread messages' symbol on chrome browsers).
- *
+ *  
  * You can safely call this as often as you want.
  */
 function flagReadMessages()
@@ -126,8 +126,8 @@ function flagReadMessages()
 }
 
 /**
- * This adds a * to the title of the page (and by extension adds an 'unread messages' symbol on chrome browsers).
- *
+ * This adds a * to the title of the page (and by extension adds an 'unread messages' symbol on chrome browsers). 
+ * 
  * You can safely call this as often as you want.
  */
 function flagUnreadMessages()
@@ -142,7 +142,7 @@ function flagUnreadMessages()
 }
 
 //Pop up Message
-function popupPermanentOverlay(title, content, popupClassOverride)
+function popupPermanentOverlay(title, content, popupClassOverride) 
 {
 	if (popupClassOverride==null)
 		popupClassOverride = "popup";
@@ -156,7 +156,7 @@ function popupPermanentOverlay(title, content, popupClassOverride)
     expandpopupMessage();
 }
 
-function popupMessage(title, content, noBackground)
+function popupMessage(title, content, noBackground) 
 {
 	noBackgroundHtml = "";
 	if (noBackground==true)
@@ -171,18 +171,18 @@ function popupMessage(title, content, noBackground)
     enterPopupClose();
    }
 
-$(document).bind("keydown",function(e)
+$(document).bind("keydown",function(e) 
 {
-    if (popupsOpen >= 1)
+    if (popupsOpen >= 1) 
     {
-        if ((e.keyCode == 13) || (e.keyCode == 27))
+        if ((e.keyCode == 13) || (e.keyCode == 27)) 
         {
             closepopupMessage(currentPopup());
         }
     }
 });
 
-function enterPopupClose()
+function enterPopupClose() 
 {
 }
 
@@ -215,22 +215,22 @@ function closepopupMessage(popupID) {
     else
     	enterPopupClose();
 }
-function expandpopupMessage()
+function expandpopupMessage() 
 {
 	var win = $(window);
 	var viewportHeight = win.height();
 	var viewportWidth = win.width();
-
+	
 	$(".popup").each(function(index)
 	{
 		var popup = $(this);
 		var width = popup.width();
 		var height = popup.height();
-
+		
 		popup.css("left", viewportWidth/2-(width/2)+"px");
 		popup.css("top", viewportHeight/2-(height/2)+"px");
 	});
-
+	
 //    var winHeight = window.innerHeight;
 //    var popupWrapperH = winHeight-125;
 //    var popupWrapperM = -popupWrapperH/2;
@@ -240,7 +240,7 @@ function expandpopupMessage()
 //    $(".popup_text").css("max-height", popupTextH + "px");
 //    var popupM = (-popupWrapperM - ($("#popup_text_" + currentPopup()).height())); console.log(popupM + '\n' + $("#popup_text_" + currentPopup()).height());
 //    if ($("#popup_" + currentPopup()).height() < popupTextH) $("#popup_" + currentPopup()).css("margin-top", popupM + "px");
-//
+//    
 //    $("#popups").find("img").each(function(index,element)
 //	{
 //		element.src = element.src+"";
@@ -274,44 +274,44 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	var yOffset = 180;
 
 	var content = "";
-
+	
 	if (isAnimationsEnabled())
 	{
-
+	
 		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
-
+	
 		if (biome=="Dungeon")
 		{
 			// This version uses the new torch walking man
 			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
-
+			
 			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			var grassTiles = 40;
 			// The ground first
 			for(var i = 0; i<grassTiles; i++)
 			{
 				var filename = "ground";
-
+				
 				filename+=random(1,4);
-
-
+					
+				
 				var y = random(-40, 10);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
-
+			
 			// Add the dungeon wall
 			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
-
+		
 			var torches = random(1,5);
 			var torchXOffset = random(0,100);
 			for(var i = 0; i<torches; i++)
 			{
-
+				
 				var x = torchXOffset;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
 			}
-
+			
 	//		var plants = random(0,10);
 	//		// Trees and shrubs next
 	//		for(var i = 0; i<plants; i++)
@@ -330,18 +330,18 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	////				filename = "shrub";
 	////			else if (type==5)
 	////				filename = "baretree";
-	//
+	//			
 	////			if (filename == "tree")
 	////				filename+=random(1,6);
 	////			else if (filename == "shrub")
 	////				filename+=random(1,3);
 	////			else if (filename == "baretree")
 	//			filename+=random(1,7);
-	//
+	//	
 	//			var y = random(-60, 60);
 	//			var x = random(width/2*-1,width/2)-100;
 	//			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
-	//		}
+	//		}		
 		}
 		else if (biome=="Snow")
 		{
@@ -350,19 +350,19 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<grassTiles; i++)
 			{
 				var filename = "snow";
-
+				
 				if (random(1,2)==1)
 					filename+=random(1,6);
 				else
 					filename+=random(1,4);
-
-
+					
+		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
-
-
+			
+			
 			var plants = random(0,10);
 			// Trees and shrubs next
 			for(var i = 0; i<plants; i++)
@@ -381,14 +381,14 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	//				filename = "shrub";
 	//			else if (type==5)
 	//				filename = "baretree";
-
+				
 	//			if (filename == "tree")
 	//				filename+=random(1,6);
 	//			else if (filename == "shrub")
 	//				filename+=random(1,3);
 	//			else if (filename == "baretree")
 				filename+=random(1,7);
-
+		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
@@ -401,19 +401,19 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<grassTiles; i++)
 			{
 				var filename = "sand";
-
+				
 				if (random(1,2)==1)
 					filename+=random(1,6);
 				else
 					filename+=random(1,4);
-
-
+					
+		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
-
-
+			
+			
 			var plants = random(-5,20);
 			// Trees and shrubs next
 			for(var i = 0; i<plants; i++)
@@ -432,14 +432,14 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	//				filename = "shrub";
 	//			else if (type==5)
 	//				filename = "baretree";
-
+				
 	//			if (filename == "tree")
 	//				filename+=random(1,6);
 	//			else if (filename == "shrub")
 	//				filename+=random(1,3);
 	//			else if (filename == "baretree")
 				filename+=random(1,7);
-
+		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
@@ -452,19 +452,19 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<grassTiles; i++)
 			{
 				var filename = "grass";
-
+				
 				if (random(1,2)==1)
 					filename+=random(1,6);
 				else
 					filename+=random(3,6);
-
-
+					
+		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
-
-
+			
+			
 			var plants = 40;
 			// Trees and shrubs next
 			for(var i = 0; i<plants; i++)
@@ -493,7 +493,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 				        filename = "baretree" + random(1,7);
 				        break;
 				}
-
+		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
@@ -506,8 +506,8 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		text = "<p class='text-shadow'>"+text+"</p>";
 	else
 		text = "";
-
-
+	
+	
 	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
 	content+="</div>";
 
@@ -517,7 +517,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 
 //function popupPermanentOverlay_Searching(locationName) {
 //	var title = "Exploring "+locationName;
-//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";
+//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
 //	popupPermanentOverlay(title, content);
 //	$(".walkingman").animate({left: "+=60px"}, 800, "linear", function()
 //			{
@@ -607,12 +607,12 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 {
 	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":saleItemId,"itemId":itemId},function(data,error){
 		if (error) return;
-
+		
 		$(".saleItem[ref='"+saleItemId+"']").remove();
 		var container = $("#invItems");
 		container.html(data.createInvItem+container.html());
 		});
-
+		
 }
 
 function storeRenameNew(eventObject)
@@ -622,7 +622,7 @@ function storeRenameNew(eventObject)
 		{
 			doCommand(eventObject,"StoreRename",{"name":name});
 		}
-	});
+	});	
 }
 
 function storeDisabledNew(eventObject)
@@ -651,10 +651,10 @@ function storeSetSaleNew(eventObject)
 			doCommand(eventObject,"StoreSetSale",{"sale":sale});
 		}
 	});
-
+	
 }
 
-function transmuteItems(eventObject, containerId)
+function transmuteItems(eventObject, containerId) 
 {
 	doCommand(eventObject, "TransmuteItems", {"containerId":containerId});
 }
@@ -680,7 +680,7 @@ function transmuteItems(eventObject, containerId)
 //
 //function storeDeleteItem(saleItemId)
 //{
-//	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
+//	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
 //}
 
 //function renameStore()
@@ -696,7 +696,7 @@ function createCampsite()
 	var lastNameUsed = localStorage.getItem("campsiteName");
 	if (lastNameUsed==null)
 		lastNameUsed = "";
-
+	
 	promptPopup("New Campsite", "Provide a new name for your campsite:", lastNameUsed, function(name){
 		if (name!=null && name!="")
 		{
@@ -722,7 +722,7 @@ function depositDogecoinsToItem(itemId, event)
 
 function collectDogecoinsFromItem(itemId, event)
 {
-	// Command updates the gold indicator as needed, but not the inventory gold span.
+	// Command updates the gold indicator as needed, but not the inventory gold span. 
 	// Just reload popup (if one is open, that is).
 	doCommand(event, "DogeCoinsCollectFromItem", {"itemId" : itemId}, function(data, error){
 		if(error) return;
@@ -821,7 +821,7 @@ function ajaxAction(url, eventObject, loadFunction)
 		url+="&ajax=true";
 	else
 		url+="?ajax=true";
-
+	
 	url += "&v="+window.verifyCode;
 
 	var clickedElement = $(eventObject.currentTarget);
@@ -837,7 +837,7 @@ function ajaxAction(url, eventObject, loadFunction)
 		popupMessage("ERROR", "There was a server error when trying to perform the action. Feel free to report this on /r/initium. A log has been generated.");
 		clickedElement.html(originalText);
 	});
-
+	
 	eventObject.stopPropagation();
 }
 
@@ -857,8 +857,8 @@ function helpPopup()
 			"<li>/quickstart - A quick start guide for new players who want to play efficiently as quick as possible! <a href='quickstart.jsp'>Open quick start page.</a></li>" +
 			"<li>/about - Easily share the link to the official 'about' page on this site. <a href='about.jsp'>Open about page.</a></li>" +
 			"<li>/mechanics - Easily share the link to the official 'mechanics' page on this site. It goes into more detail about how the game works. <a href='mechanics.jsp'>Open mechanics page.</a></li>" +
-			"<li>/premium - Easily share a link to where people can learn about premium accounts.</li>" +
-			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" +
+			"<li>/premium - Easily share a link to where people can learn about premium accounts.</li>" + 
+			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" + 
 			"<li>/app - This shows all the links to the mobile apps we have available.</li>" +
 			"<li>/competition - This puts up a link to the official competition page. This page allows you to donate to prize pools and is usually used to organize competitions between the content developers for creating new content.</li>" +
 			"<li>/faq - This puts up a link to a player made Frequently Asked Questions document which <a href='http://initium.wikia.com/wiki/Staub%27s_FAQ_Guide' target='_blank'>you can also find here.</a></li>" +
@@ -889,10 +889,10 @@ function shareItem(itemId)
 		return;
 	}
 
-
+	
 	messager.sendMessage(message);
 	//popupMessage("Item shared", "Everyone who is in your location can now see the item you just shared.");
-
+	
 	closeAllTooltips();
 }
 
@@ -945,7 +945,7 @@ function declareWar(eventObject)
 		}
 	});
 }
-function endWar(eventObject, groupName)
+function endWar(eventObject, groupName) 
 {
 	confirmPopup("End War", "Are you sure you want to end this war?", function(){
 		doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName});
@@ -967,7 +967,7 @@ function setGroupDescription(eventObject, existingDescription)
 		{
 			doCommand(eventObject, "GroupChangeDescription", {"description" : description});
 		}
-
+		
 	});
 }
 
@@ -1021,18 +1021,18 @@ function reloadPopup(element, backUrl, event)
 {
 	var reloadDiv = $("#reload-div");
 	var reloadDivReturn = $("#reload-div-return");
-
+	
 	var url = $(element).attr("rel");
-
+	
 	if (url==null)
 		return;
 	reloadDiv.load(url);
-
+	
 	if (backUrl==null)
 		reloadDivReturn.html("");
 	else
 		reloadDivReturn.html("<a onclick='reloadPopup(this, null, event)' rel='"+backUrl+"'>&lt;&lt; Back</a>");
-
+	
 	if (event!=null)
 		event.stopPropagation();
 }
@@ -1046,18 +1046,18 @@ function refreshPopup(url, event)
 {
 	var reloadDiv = $("#reload-div");
 	var reloadDivReturn = $("#reload-div-return");
-
+	
 	var url = $(element).attr("rel");
-
+	
 	if (url==null)
 		return;
 	reloadDiv.load(url);
-
+	
 	if (backUrl==null)
 		reloadDivReturn.html("");
 	else
 		reloadDivReturn.html("<a onclick='reloadPopup(this, null, event)' rel='"+backUrl+"'>&lt;&lt; Back</a>");
-
+	
 	if (event!=null)
 		event.stopPropagation();
 }
@@ -1070,7 +1070,7 @@ function refreshPopup(url, event)
 //			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
 //		}
 //	});
-//
+//	
 //}
 
 
@@ -1099,7 +1099,7 @@ function popupCharacterTransferService(currentCharacterId, currentCharacterName,
 {
 	if (characterNameToAccept==null || characterNameToAccept=="")
 		characterNameToAccept = "[No character specified]";
-
+		
 	var content = "This service allows you to transfer characters between user accounts. In order to transfer a character " +
 			"you have to first click on the `Accept Character by Name` link and type the name of the character that you will " +
 			"accept. Then log into the account with the character you want to transfer and click the `Transfer Character to Another Account` " +
@@ -1116,9 +1116,9 @@ function popupCharacterTransferService(currentCharacterId, currentCharacterName,
 			"";
 //	<p><a onclick='acceptCharacterTransfer()'>Accept Character by Name</a></p>
 //	<p><a onclick='transferCharacter("${characterName}")'>Transfer Character to Another Account</a></p>
-
+	
 	$(".cluetip").hide();
-
+	
 	popupMessage("Character Transfer Service", content, false);
 }
 
@@ -1160,12 +1160,12 @@ function dropAllInventory(event)
 function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 {
 	var itemsList = "[ref="+(delimitedIds || "").split(",").join("],[ref=")+"]";
-
+	
 	var selectedItems = $(fromSelector).filter(itemsList);
 	// Get rid of following line breaks first.
 	selectedItems.next("br").remove();
 	selectedItems.remove();
-
+	
 	var container = $(toSelector);
 	container.html(newHtml+container.html());
 }
@@ -1184,22 +1184,22 @@ function setSelectionCheckboxes(event, groupId)
 	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
 	var allItems = selectRoot.find(".main-item:visible");
 	var checkedItems = allItems.has("input:checkbox:checked");
-
+	
 	// Check-all first
 	selectRoot.find("input:checkbox.check-all")
 		.prop({
 			checked: allItems.length > 0 && checkedItems.length == allItems.length,
 			indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
 		});
-
+	
 	// If we pass in a groupId, that means we've clicked a group checkbox already.
 	// There won't be any overlapping groups (yet), so don't bother doing anything else with groups.
 	if(groupId == null || groupId == "")
 	{
 		// Check if this event belongs to a group. We can limit our selection that way.
 		var belongsToGroup = $(event.currentTarget || event.target).parents(".selection-group").prop("id");
-
-		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]"
+		
+		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]" 
 		selectRoot.find("input:checkbox.check-group" + groupFilter).each(function(idx, grp) {
 			var groupCB = $(grp);
 			var groupItems = allItems.filter("#" + groupCB.attr("ref") + " .main-item");
@@ -1220,7 +1220,7 @@ function selectedItemsDrop(event, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
-
+	
 	confirmPopup("Drop Selected Inventory", "Are you sure you want to drop " + batchItems.length + " selected items on the ground?\n\nPlease note that items for sale in your store will be excluded.", function(){
 		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
@@ -1233,7 +1233,7 @@ function selectedItemsRemoveFromStore(event, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
-
+	
 	confirmPopup("Remove Items from Store", "Are you sure you want to remove " + batchItems.length + " selected items from your store?", function(){
 		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
@@ -1253,7 +1253,7 @@ function selectedItemsSell(event, selector)
 		if (amount!=null && amount!="")
 		{
 			var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-
+	
 			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
 				if (error) return;
 				moveSelectedElements(selector, "#saleItems", data.processedItems || "", data.createSellItem);
@@ -1267,7 +1267,7 @@ function selectedItemsTrade(event, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
-
+	
 	confirmPopup("Trade Items", "Are you sure you want to trade " + batchItems.length + " selected items?", function(){
 		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
@@ -1389,7 +1389,7 @@ function decrementStackIndex()
 {
 	if (currentPopupStackIndex==0)
 		return 0;
-
+	
 	currentPopupStackIndex--;
 	if (currentPopupStackIndex==0)
 	{
@@ -1410,15 +1410,15 @@ function pagePopup(url, closeCallback)
 		url+="&ajax=true";
 	else
 		url+="?ajax=true";
-
+	
 	exitFullscreenChat();
-
+	
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
-
+	
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
-
+	
 	if (closeCallback!=null)
 		popupStackCloseCallbackHandlers.push(closeCallback);
 	else
@@ -1427,14 +1427,14 @@ function pagePopup(url, closeCallback)
 
 function pagePopupIframe(url)
 {
-
+	
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
 	else
 		url+="?ajax=true";
-
+	
 	exitFullscreenChat();
-
+	
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><iframe id='"+pagePopupId+"-content' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div>");
@@ -1447,9 +1447,9 @@ function closePagePopup(doNotCallback)
 	{
 		closeMap();
 	}
-
+	
 	decrementStackIndex();
-
+	
 	if (doNotCallback!=true)
 	{
 		var func = popupStackCloseCallbackHandlers.pop();
@@ -1461,7 +1461,7 @@ function closePagePopup(doNotCallback)
 function closeAllPagePopups(doNotCallback)
 {
 	while (currentPopupStackIndex>0)
-	{
+	{		
 		closePagePopup(doNotCallback);
 	}
 }
@@ -1485,7 +1485,7 @@ function reloadPagePopup(quietly)
 	var content = $("#"+pagePopupId+"-content");
 	if (content.length==0)
 		return;
-
+	
 	var url = content.attr("src");
 
 	if (quietly==false)
@@ -1497,7 +1497,7 @@ function reloadPagePopup(quietly)
 	{
 		content.attr('src', url);
 	}
-	else
+	else 
 	{
 		content.load(url, null, function(){
 			$(".page-popup-Reload").html("&#8635;");
@@ -1514,13 +1514,13 @@ function moveItem(event, itemId, newContainerKind, newContainerId)
 
 function loadInlineItemsAndCharacters()
 {
-	$("#inline-items").load("locationitemlist.jsp?ajax=true");
-	$("#inline-characters").load("locationcharacterlist.jsp?ajax=true");
+	$("#inline-items").load("locationitemlist.jsp?ajax=true");	
+	$("#inline-characters").load("locationcharacterlist.jsp?ajax=true");	
 }
 
 function loadInlineCollectables()
 {
-	$("#collectables-area").load("ajax_collectables.jsp?ajax=true");
+	$("#collectables-area").load("ajax_collectables.jsp?ajax=true");	
 }
 
 function inventory()
@@ -1593,7 +1593,7 @@ function doForgetCombatSite(eventObject, locationId)
  */
 function doForgetAllCombatSites(eventObject, forgettableCombatSiteArray)
 {
-	confirmPopup("System Message","Are you sure you want to forget all combat sites in this location?",
+	confirmPopup("System Message","Are you sure you want to forget all combat sites in this location?", 
 			function(){doCommand(eventObject, "ForgetAllCombatSites", {"forgettableCombatSiteArray" : forgettableCombatSiteArray})});
 }
 
@@ -1611,7 +1611,7 @@ function resendVerificationEmail()
 	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
 		location.href = "ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode;
 	});
-
+	
 }
 
 function changeEmailAddress(oldEmail)
@@ -1654,7 +1654,7 @@ function doTriggerItem(event, effectId, itemId)
 function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
 {
 	closeAllTooltips();
-
+	
 	var params = {"scriptId": effectId };
 	params[sourceType + "Id"] = sourceId;
 	doCommand(event, "Script"+effectType, params);
@@ -1723,7 +1723,7 @@ function toggleDuelRequests(eventObject)
 }
 
 function toggleCloaked(eventObject)
-{
+{	
 	doCommand(eventObject, "ToggleCloak", {"buttonId" : eventObject.currentTarget.id});
 }
 
@@ -1841,7 +1841,7 @@ function tradeStartTradeNew(eventObject,characterId)
 	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
 		if (error) return;
 		_viewTrade();
-		popupMessage("Trade Started", data.tradePrompt);
+		popupMessage("Trade Started", data.tradePrompt);	
 	})
 }
 
@@ -1894,7 +1894,7 @@ function tradeSetGoldNew(eventObject,currentDogecoin,curAvailDogecoin)
 				$("#myTradeGoldAmount").text(data.newTradeGoldAmount);
 				tradeVersion = data.tradeVersion;
 			})
-
+			
 		}
 	});
 }
@@ -1904,7 +1904,7 @@ function tradeAddAllItemsNew(eventObject)
 	doCommand(eventObject,"TradeAddAllItems");
 	reloadPagePopup();
 }
-
+	
 
 function duelRequest(characterId)
 {
@@ -1964,7 +1964,7 @@ function setBlockadeRule(rule)
 }
 
 function doEatBerry(eventObject)
-{
+{	
 	var itemId = $("#popupItemId").val();
 	if (itemId == null) return;
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
@@ -1975,7 +1975,7 @@ function doEatBerry(eventObject)
 }
 
 function doEatCandy(eventObject)
-{
+{	
 	var itemId = $("#popupItemId").val();
 	if (itemId == null) return;
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
@@ -1986,7 +1986,7 @@ function doEatCandy(eventObject)
 }
 
 function doDrinkElixir(eventObject)
-{
+{	
 	var itemId = $("#popupItemId").val();
 	if (itemId == null) return;
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
@@ -2123,10 +2123,10 @@ function doCommand(eventObject, commandName, parameters, callback)
 		parameters = {"v":verifyCode};
 	else
 		parameters.v = verifyCode;
-
+	
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "cmd?cmd="+commandName;
-
+	
 	var clickedElement = null;
 	var originalText = null;
 	if (eventObject!=null)
@@ -2137,7 +2137,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 			clickedElement.html("<img class='wait' src='javascript/images/wait.gif' border=0/>");
 		}
 	}
-
+	
 	// We need to post, as larger batch operations failed due to URL string being too long
 	$.post(url, parameters)
 	.done(function(data)
@@ -2147,13 +2147,13 @@ function doCommand(eventObject, commandName, parameters, callback)
 		// on the original element.
 		if (eventObject!=null && originalText)
 			clickedElement.html(originalText);
-
+		
 		if (data.antiBotQuestionActive == true)
 		{
 			antiBotQuestionPopup();
 			return;
 		}
-
+		
 		// Refresh the full page or the pagePopup if applicable
 		if (data.javascriptResponse == "FullPageRefresh")
 		{
@@ -2182,7 +2182,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
 			callback(null, error);
-
+	
 	})
 	.fail(function(data)
 	{
@@ -2190,10 +2190,10 @@ function doCommand(eventObject, commandName, parameters, callback)
 		if (eventObject!=null)
 			clickedElement.html(originalText);
 	});
-
+	
 	if (eventObject!=null)
 		eventObject.stopPropagation();
-
+	
 }
 
 function doSetLeader(eventObject, charId)
@@ -2282,15 +2282,15 @@ function longOperation_fullPageRefresh(eventObject, operationName, operationDesc
 		popupMessage("ERROR", "There was a server error when trying to perform the "+operationName+" action. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
 		$(eventObject.currentTarget).html(originalText);
 	});
-
+	
 	eventObject.stopPropagation();
-
+	
 }
 
 
 var lastLongOperationEventObject = null;
 /**
- *
+ * 
  * @param eventObject
  * @param actionUrl
  * @param responseFunction This is the handler that is called when the operation returns. The data that is passed into the handler includes: data.isComplete (boolean), data.error (boolean), data.timeLeft (seconds remaining to wait)
@@ -2304,7 +2304,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 		actionUrl+="&ajax=true";
 	else
 		actionUrl+="?ajax=true";
-
+	
 	$.get(actionUrl)
 	.done(function(data)
 	{
@@ -2313,10 +2313,10 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 			antiBotQuestionPopup();
 			return;
 		}
-
+		
 		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
-
+		
 		if (data.error!=undefined)
 		{
 			hideBannerLoadingIcon();
@@ -2336,7 +2336,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 		}
 		if (responseFunction!=null)
 			responseFunction(data);
-
+		
 		if (data.isComplete==false)
 		{
 			if (data.timeLeft>=0)
@@ -2361,7 +2361,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 
 		lastLongOperationEventObject = null;
 	});
-
+	
 	if (eventObject!=null)
 		eventObject.stopPropagation();
 }
@@ -2382,7 +2382,7 @@ function setBannerOverlayText(title, text)
 	if (text==null)
 		text = "";
 	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a href='ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
-
+	
 	$(".travel-scene-text").remove();
 	$("#banner-base").append(contents);
 }
@@ -2397,7 +2397,7 @@ function doGoto(event, pathId, attack)
 	if (attack == null)
 		attack = false;
 	showBannerLoadingIcon();
-	longOperation(event, "ServletCharacterControl?type=goto_ajax&pathId="+pathId+"&attack="+attack+"&v="+window.verifyCode,
+	longOperation(event, "ServletCharacterControl?type=goto_ajax&pathId="+pathId+"&attack="+attack+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2424,7 +2424,7 @@ function doExplore(ignoreCombatSites)
 	if (ignoreCombatSites == null)
 		ignoreCombatSites = false;
 	showBannerLoadingIcon();
-	longOperation(null, "ServletCharacterControl?type=explore_ajax&ignoreCombatSites="+ignoreCombatSites+"&v="+window.verifyCode,
+	longOperation(null, "ServletCharacterControl?type=explore_ajax&ignoreCombatSites="+ignoreCombatSites+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2448,7 +2448,7 @@ function doExplore(ignoreCombatSites)
 function doRest()
 {
 	showBannerLoadingIcon();
-	longOperation(null, "ServletCharacterControl?type=rest_ajax"+"&v="+window.verifyCode,
+	longOperation(null, "ServletCharacterControl?type=rest_ajax"+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2472,7 +2472,7 @@ function doRest()
 function doCollectCollectable(event, collectableId)
 {
 	showBannerLoadingIcon();
-	longOperation(event, "ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode,
+	longOperation(event, "ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2501,7 +2501,7 @@ function doCollectCollectable(event, collectableId)
  * 3. Ajax call returns an object with the current state (waitTime, variousArgs) and calls the doGoto_ajaxResponse()
  * 4. For certain return states (like messages/errors) the longOperation will handle it? (maybe)
  * 5. doGoto_ajaxResponse() knows how to handle a completed state and an unfinished state
- *
+ * 
  * If the page is refreshed, main.jsp will look for an ongoing longOperation before rendering, if it finds one
  * it will include a call to doGoto() with all the same parameters in some script tags.
  */
@@ -2571,7 +2571,7 @@ function _viewTrade()
 	pagePopup("odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
 //		popupMessage("Trade Cancelled","This trade has been cancelled.")
-	});
+	});	
 }
 
 function updateTradeWindow()
@@ -2680,12 +2680,12 @@ function secondsElapsed(secondsToConvert)
 }
 
 
-function xorShift32(seed)
+function xorShift32(seed) 
 {
     seed ^= (seed << 11);
     seed ^= (seed >>> 25);
     seed ^= (seed << 8);
-    var out = seed % 127521;
+    var out = seed % 127521;     
     return (out < 0) ? -out : out;
 }
 
@@ -2693,7 +2693,7 @@ function rnd(seed, min, max)
 {
 	var rand = xorShift32(seed);
 	var dbl = (rand/127521);
-
+ 
     return (dbl*(max-min))+min;
 }
 
@@ -2746,18 +2746,18 @@ function confirmPopup(title, content, yesFunction, noFunction)
     currentPopups = $("#popups").html();
     $("#popups").html(currentPopups + '<div tabindex="0" id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p><br></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_yes">Yes</a><a id="'+unique+'-no"  class="popup_confirm_no">No</a></div></div></div></div>');
     expandpopupMessage();
-
+    
     var popupRoot = $('#popupWrapperBackground_' + popupsNum).focus();
 
     popupRoot.css("outline", "0px solid tranparent");
     popupRoot.focus();
-
+    
     popupRoot.keyup(function(e){
     	stopEventPropagation(e);
     });
     popupRoot.keydown(function(e){
     	stopEventPropagation(e);
-        if (e.keyCode == 13)
+        if (e.keyCode == 13) 
         {
         	closepopupMessage(currentPopup());
         	if (yesFunction)
@@ -2774,9 +2774,9 @@ function confirmPopup(title, content, yesFunction, noFunction)
         	}
         }
     });
-
-
-
+    
+    
+    
     $("#"+unique+"-yes").click(function(){
     	closepopupMessage(currentPopup());
     	if (yesFunction)
@@ -2791,23 +2791,23 @@ function confirmPopup(title, content, yesFunction, noFunction)
     		noFunction();
     	}
     });
-
-
+    
+    
 }
 
 function promptPopup(title, content, defaultText, yesFunction, noFunction)
 {
 	if (content!=null)
 		content = content.replace("\n", "<br>");
-
+	
 	if (defaultText==null)
 		defaultText = "";
-
+	
 	defaultText = defaultText+"";
-
+	
 	defaultText = defaultText.replace("\"", "`").replace("'", "`")
-
-
+	
+	
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
@@ -2821,9 +2821,9 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p style="margin:0px">' + content + '</p><br><div style="text-align:center"><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/></div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div></div></div></div>');
     //$("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="page-popup"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><p>' + content + '</p><br><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div>');
     expandpopupMessage();
-
+    
     var inputText = $('#popup_prompt_input_'+unique);
-
+    
     inputText.focus();
     inputText.select();
 
@@ -2832,14 +2832,14 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
     });
     inputText.keydown(function(e){
     	stopEventPropagation(e);
-        if (e.keyCode == 13)
+        if (e.keyCode == 13) 
         {
         	var value = null;
         	if (yesFunction)
             	value = $('#popup_prompt_input_'+unique).val();
-
+        	
         	closepopupMessage(currentPopup());
-
+        	
         	if (yesFunction)
         		yesFunction(value);
         }
@@ -2851,19 +2851,19 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
         		noFunction();
         	}
         }
-
+        
         e.stopPropagation();
     });
-
-
-
+    
+    
+    
     $("#"+unique+"-yes").click(function(){
     	var value = null;
     	if (yesFunction)
         	value = $('#popup_prompt_input_'+unique).val();
-
+    	
     	closepopupMessage(currentPopup());
-
+    	
     	if (yesFunction)
     		yesFunction(value);
     });
@@ -2874,8 +2874,8 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
     		noFunction();
     	}
     });
-
-
+    
+    
 }
 
 
@@ -2970,7 +2970,7 @@ function toggleEnvironmentSoundEffects(newState)
 	if (newState !== undefined) {
 		enabled = newState;
 	}
-
+	
 	createjs.Sound.muted = enabled;
 	localStorage.setItem("checkboxDisableEnvironmentSoundEffects", enabled+"");
 
@@ -2979,13 +2979,13 @@ function toggleEnvironmentSoundEffects(newState)
 		setAudioDescriptor(requestedAudioDescriptor[0], requestedAudioDescriptor[1], requestedAudioDescriptor[2]);
 		requestedAudioDescriptor = null;
 	}
-
+	
 	// Set the correct image for the header mute button
 	if (enabled)
 		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 	else
 		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
-
+	
 }
 
 function updateEnvironmentSoundEffectsVolume()
@@ -3027,7 +3027,7 @@ function antiBotQuestionPopup()
 {
 	popupMessage("Anti Bot Check", "<div id='myCaptcha' style='float:left;margin-right:10px;'></div><p>We have to check from time to time to make sure you're a human playing. This is to prevent people from " +
 			"playing the game automatically using bots.</p>");
-
+	
 	grecaptcha.render( 'myCaptcha', {
 		  'sitekey' : '6Ldx9wcUAAAAAG78kIIiv-pnhHBaAaTrpcX5ZDwT',  // required
 		  'theme' : 'light',  // optional
@@ -3071,8 +3071,8 @@ function renameUnnamedPlayer(eventObject)
 function swapContainers(event, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;
-
+	if(batchItems.length == 0) return;	
+	
 	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
 	doCommand(event,"ItemsSwapStorageContainers",{"itemIds":itemIds});
