@@ -168,7 +168,7 @@
 
 <c:if test="${charName=='Unnamed'}">
 	<p>
-		<br> <br> <a class='big-link' href='#' onclick='renameCharacter("${charName}")' id='btnRenameCharacter'>Rename your character</a>
+		<br> <br> <a class='big-link' href='#' onclick='renameCharacter(event, "${charName}")' id='btnRenameCharacter'>Rename your character</a>
 	</p>
 </c:if>
 
