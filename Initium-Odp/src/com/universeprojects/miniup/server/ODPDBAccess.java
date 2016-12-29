@@ -2942,7 +2942,7 @@ public class ODPDBAccess
 	 * @param character, the entity to leave the party
 	 * Takes in an entity and sets their partyCode and partyLeader properties to null (safety checks are done in CommandLeaveParty.java)
 	 */
-	public void doLeaveParty(CachedDatastoreService db, CachedEntity character) {
+	public void doLeaveParty(CachedDatastoreService ds, CachedEntity character) {
 		if (ds == null)
 		{
 			ds = getDB();
@@ -2954,7 +2954,7 @@ public class ODPDBAccess
 		ds.put(character);
 	}
 	
-	public void doJoinParty(CachedDatastoreService ds2, CachedEntity character, String toJoin) {
+	public void doJoinParty(CachedDatastoreService ds, CachedEntity character, String toJoin) {
 		if (ds == null)
 		{
 			ds = getDB();
