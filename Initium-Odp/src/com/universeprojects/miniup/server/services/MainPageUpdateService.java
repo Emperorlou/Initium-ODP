@@ -731,7 +731,7 @@ public class MainPageUpdateService extends Service
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
 						if (isThisMemberTheLeader == false && isPartyLeader())
-							newHtml.append("<a onclick='doSetLeader(event, "+character.getKey().getId()+")'>Make Leader</a>");
+							newHtml.append("<a onclick='doSetLeader(event, " + character.getKey().getId() + ", \"" + character.getProperty("name") + "\")'>Make Leader</a>");
 						newHtml.append("</div>");
 					}
 					newHtml.append("</a>");
