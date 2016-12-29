@@ -1553,7 +1553,7 @@ function viewMap()
 	openMap();
 }
 
-function renameCharacter(currentCharName)
+function renameCharacter(eventObject, currentCharName)
 {
 	promptPopup("Rename Character", "Ok, what will you call your character?", currentCharName, function(name){
 		doCommand(eventObject, "RenameUnnamedPlayer", {"newName":name});
