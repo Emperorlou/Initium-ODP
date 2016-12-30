@@ -8,14 +8,18 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class MovementService extends Service {
-	
+
+	private QueryHelper queryHelper;
+
 	public MovementService(ODPDBAccess db) {
 		super(db);
+		this.queryHelper = new QueryHelper(super.db.getDB());
 	}
 	
 	public void checkForLocks(CachedEntity character, CachedEntity pathToTake, Key destinationLocationKey) throws UserErrorMessage
@@ -61,5 +65,15 @@ public class MovementService extends Service {
 		
 		return (matchingKeys > 0);
 	}
-	
+
+	/**
+	 * Returns true if the character has a Discovery for the path.
+	 * 
+	 * @param characterKey
+	 * @param pathKey
+	 * @return
+	 */
+	public boolean isPathDiscovered(Key characterKey, Key pathKey) {
+		return queryHelper.getFilteredList_Count("Discovery", "characterKey", FilterOperator.EQUAL, characterKey, "entityKey", FilterOperator.EQUAL, pathKey) > 0;
+	}
 }
