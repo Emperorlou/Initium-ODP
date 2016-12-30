@@ -2196,11 +2196,11 @@ function doCommand(eventObject, commandName, parameters, callback)
 	
 }
 
-function doSetLeader(eventObject, charId)
+function doSetLeader(eventObject, charId, charName)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	confirmPopup("Set new leader", "Are you sure you want set someone else to be the leader of your group?", function(){
+	confirmPopup("Set new leader", "Are you sure you want set " + charName + " to be the leader of your group?", function(){
 		doCommand(eventObject,"SetLeader",{"charId":charId});
 	});
 }
