@@ -2954,18 +2954,6 @@ public class ODPDBAccess
 		ds.put(character);
 	}
 	
-	public void doJoinParty(CachedDatastoreService ds, CachedEntity character, String toJoin) {
-		if (ds == null)
-		{
-			ds = getDB();
-		}
-		
-		character.setProperty("partyCode", toJoin);
-		character.setProperty("partyLeader", "FALSE");
-		
-		ds.put(character);
-	}
-	
 	public void doCharacterDiscoverEntity(CachedDatastoreService db, CachedEntity character, CachedEntity entityToDiscover)
 	{
 		//TODO: Probably implement some sort of caching for this. Check the cache first for the discovery and add to the cache new discoveries.
@@ -2982,20 +2970,25 @@ public class ODPDBAccess
 	/**
 	 * Returns the CachedEntity object representing the party leader of @partyCode
 	 * Will return null if the partyCode is empty or null (or if for some reason no one in the party is a leader).
+	 * Can optionally pass a list of members instead of a party code to search for a party member.
 	 * 
 	 * @param ds
 	 * @param partyCode code of the party to grab the leader from
+	 * @param members list of cachedentitys in a party
 	 * @return the party leader of the party.
 	 */
-	public CachedEntity getPartyLeader(CachedDatastoreService ds, String partyCode) {
+	public CachedEntity getPartyLeader(CachedDatastoreService ds, String partyCode, List<CachedEntity> members) {
 		if (partyCode == null || partyCode.trim().equals("")) {
 			return null;
 		}
 		
-		List<CachedEntity> members = getParty(ds, partyCode);
+		if (members == null) {
+			members = getParty(ds, partyCode);
+		}
 		
 		for (CachedEntity member : members) {
-			if (member.getProperty("partyLeader").equals("TRUE")) {
+			String leader = (String) member.getProperty("partyLeader");
+			if (leader != null && leader.equals("TRUE")) {
 				return member;
 			}
 		}

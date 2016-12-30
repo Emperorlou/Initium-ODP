@@ -42,15 +42,18 @@ public class CommandPartyJoin extends Command {
 			throw new UserErrorMessage("You are already in a party! You must leave this one first!");
 		}
 		
-		CachedEntity leader = db.getPartyLeader(ds, toJoin);
+		CachedEntity leader = db.getPartyLeader(ds, toJoin, null);
 		if (leader.getProperty("partyJoinsAllowed").equals("FALSE")) {
 			throw new UserErrorMessage("This party is not accepting members currently!");
 		}
-		
-		if (character.getProperty("mode").equals("COMBAT")) {
+		String mode = (String) character.getProperty("mode");
+		if (mode != null && mode.equals("COMBAT")) {
 			throw new UserErrorMessage("You cannot join a party while in combat!");
 		}
 		
-		db.doJoinParty(ds, character, toJoin);
+		character.setProperty("partyCode", toJoin);
+		character.setProperty("partyLeader", "FALSE");
+		
+		ds.put(character);
 	}
 }
