@@ -14,11 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import org.datanucleus.util.StringUtils;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.EntityNotFoundException;
@@ -2936,6 +2939,23 @@ public class ODPDBAccess
 	////////// END GROUP METHODS //////////
 	///////////////////////////////////////
 	
+	/**
+	 * 
+	 * @param db
+	 * @param character, the entity to leave the party
+	 * Takes in an entity and sets their partyCode and partyLeader properties to null (safety checks are done in CommandLeaveParty.java)
+	 */
+	public void doLeaveParty(CachedDatastoreService ds, CachedEntity character) {
+		if (ds == null)
+		{
+			ds = getDB();
+		}
+
+		character.setProperty("partyCode", null);
+		character.setProperty("partyLeader", null);
+
+		ds.put(character);
+	}
 	
 	public void doCharacterDiscoverEntity(CachedDatastoreService db, CachedEntity character, CachedEntity entityToDiscover)
 	{
@@ -2949,7 +2969,35 @@ public class ODPDBAccess
 		name = name.replace("  ", " ");
 		return name;
 	}
-
+	
+	/**
+	 * Returns the CachedEntity object representing the party leader of @partyCode
+	 * Will return null if the partyCode is empty or null (or if for some reason no one in the party is a leader).
+	 * Can optionally pass a list of members instead of a party code to search for a party member.
+	 * 
+	 * @param ds
+	 * @param partyCode code of the party to grab the leader from
+	 * @param members list of cachedentitys in a party
+	 * @return the party leader of the party.
+	 */
+	public CachedEntity getPartyLeader(CachedDatastoreService ds, String partyCode, List<CachedEntity> members) {
+		if (partyCode == null || partyCode.trim().equals("")) {
+			return null;
+		}
+		
+		if (members == null) {
+			members = getParty(ds, partyCode);
+		}
+		
+		for (CachedEntity member : members) {
+			String leader = (String) member.getProperty("partyLeader");
+			if (leader != null && leader.equals("TRUE")) {
+				return member;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Returns all party members belonging to the party that the selfCharacter belongs to.
 	 * 
@@ -2967,7 +3015,7 @@ public class ODPDBAccess
 		
 		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
 	
-		if (result.size()==1)
+		if (result.size() == 1)
 		{
 			selfCharacter.setProperty("partyCode", null);
 			if (ds==null)
@@ -3026,9 +3074,7 @@ public class ODPDBAccess
 			throw new UserErrorMessage("You are in a party but you are not the leader, therefore you do not have permission to decide whether or not joins are allowed.");
 		
 		if (joinsAllowed)
-			leader.setProperty("partyJoinsAllowed", "TRUE");
-		else
-			leader.setProperty("partyJoinsAllowed", "FALSE");
+			leader.setProperty("partyJoinsAllowed", joinsAllowed ? "TRUE" : "FALSE");
 		
 		ds.put(leader);
 		return;
@@ -4805,72 +4851,48 @@ public class ODPDBAccess
 		if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
 			throw new UserErrorMessage("You cannot take this path.");
 			
-		boolean isInParty = true;
-		if (character.getProperty("partyCode")==null || character.getProperty("partyCode").equals(""))
-			isInParty = false;
+		boolean isInParty = StringUtils.notEmpty((String) character.getProperty("partyCode"));
 
-		if (destination.getProperty("ownerKey")!=null)
-		{
-			if (isInParty) {
-				//We check to see if all members of the party have access by default to enter
-				//the owned housing.  If not, we reject.
-				List<CachedEntity> partyMembers = getParty(db, character);
-				List<Key> partyGroups = new ArrayList<Key>();
-				List<Key> partyUsers = new ArrayList<Key>();
+		Key ownerKey = (Key) destination.getProperty("ownerKey");
+		if (ownerKey != null) {
+			// Check to see if all members of the party have access to enter owned housing.
+			List<CachedEntity> partyMembers = getParty(db, character);
+			if (partyMembers == null) partyMembers = Collections.singletonList(character); // You are the only party member
+
+			if("Group".equals(ownerKey.getKind())){
+				Set<String> groupKeySet = new HashSet<String>(); // Sets guarantee one and only one entry per unique value
+				List<String> isActiveInGroupStatusList = Arrays.asList(GroupStatus.Admin.name(), GroupStatus.Member.name()); // Wish we had streaming to build this appropriately
 				for(CachedEntity partyMember: partyMembers) {
-					//Removes those who have just applied
-					String groupStatus = (String)character.getProperty("groupStatus");
-					if(("Member".equals(groupStatus)==false && "Admin".equals(groupStatus)==false)) {
-						partyGroups.add(null);
-					} else {
-						partyGroups.add((Key)partyMember.getProperty("groupKey"));
-					}
-					partyUsers.add((Key)partyMember.getProperty("userKey"));
+					//Removes those who have just applied or have been kicked
+					boolean belongstoGroup = isActiveInGroupStatusList.contains(partyMember.getProperty("groupStatus"));
+					Key groupKey = (Key) partyMember.getProperty("groupKey"); // This should always be here if they belong to a group
+					String mapKey = belongstoGroup ? groupKey.toString() : UUID.randomUUID().toString(); // random UUID to ensure uniqueness
+					groupKeySet.add(mapKey);
 				}
-				Key ownerKey = (Key)destination.getProperty("ownerKey");
-				if(ownerKey.getKind().equals("Group")){
-					//iterates through the list of groups that the party members belong to.
-					//if there are any differences, set the flag to false
-					boolean allInSameGroup = true;
-					for(int i = 0; i < partyGroups.size() - 1; i++) {
-						if(!GameUtils.equals(partyGroups.get(i), partyGroups.get(i+1))){
-							allInSameGroup = false;
-							break;
-						}
-					}
-					if(!allInSameGroup && !GameUtils.equals(ownerKey, partyGroups.get(0))) {
-						throw new UserErrorMessage("You cannot enter a group owned house in a party unless all members of the party are part of that group.");
-					}
-				} else if(ownerKey.getKind().equals("User")) {
-					//iterates through the list of accounts that the party members belong to.
-					//if there are any differences, set the flag to false
-					boolean allOfSameUser = true;
-					for(int i = 0; i < partyUsers.size() - 1; i++) {
-						if(!GameUtils.equals(partyUsers.get(i), partyUsers.get(i+1))){
-							allOfSameUser = false;
-							break;
-						}
-					}
-					if(!allOfSameUser && !GameUtils.equals(ownerKey, partyUsers.get(0))) {
-						throw new UserErrorMessage("You cannot enter a player owned house in a party unless all members of the party are characters of that player.");
+
+				if(!groupKeySet.contains(ownerKey.toString()) || groupKeySet.size() != 1) { // Check for non-matching keys
+					throw new UserErrorMessage(String.format("You cannot enter a group owned house unless %s.", partyMembers.size() > 1 ? "all members of your party are members of the group" : "you are a member of the group"));
+				}
+			} else if("User".equals(ownerKey.getKind())) {
+				boolean ownerIsPresent = false;
+				Key pathOwner = (Key) path.getProperty("ownerKey");
+				for (CachedEntity partyMember : partyMembers) {
+					if (GameUtils.equals(pathOwner, partyMember.getProperty("ownerKey"))) {
+						ownerIsPresent = true;
+						break;
 					}
 				}
-			}
-				
-			
-			Key ownerKey = (Key)destination.getProperty("ownerKey");
-			if (ownerKey.getKind().equals("Group"))
-			{
-				String groupStatus = (String)character.getProperty("groupStatus");
-				if (character.getProperty("groupKey")==null || 
-						ownerKey.getId() != ((Key)character.getProperty("groupKey")).getId() || 
-						("Member".equals(groupStatus)==false && "Admin".equals(groupStatus)==false))
-					throw new UserErrorMessage("You cannot enter a group-owned house unless you are part of that group.");
+
+				if (!ownerIsPresent) {
+					throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", partyMembers.size() > 1 ? "the owner is a character in your party" : "you are the owner"));
+				}
+			} else {
+				// TODO - Exception? If we can't determine the owner type; the character will be allowed to take the path. 
 			}
 		}
 		
 		MovementService movementService = new MovementService(this);
-		
+
 		// Check if this property is locked and if so, if we have the key to enter it...
 		movementService.checkForLocks(character, path, destinationKey);
 		
@@ -5479,6 +5501,4 @@ public class ODPDBAccess
 		
 		return result;
 	}
-
-	
 }

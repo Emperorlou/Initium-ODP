@@ -1553,6 +1553,13 @@ function viewMap()
 	openMap();
 }
 
+function renameCharacter(eventObject, currentCharName)
+{
+	promptPopup("Rename Character", "Ok, what will you call your character?", currentCharName, function(name){
+		doCommand(eventObject, "RenameUnnamedPlayer", {"newName":name});
+	});
+}
+
 function deleteAndRecreateCharacter(currentCharName)
 {
 	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
@@ -1660,6 +1667,17 @@ function doAttack(eventObject, charId)
     doCommand(eventObject,"Attack",{"charId":charId});
 }
 
+function leaveParty(eventObject) {
+	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
+		doCommand(eventObject, "LeaveParty");
+	});
+}
+
+function joinParty(eventObject, partyCode) {
+	doCommand(eventObject, "PartyJoin", {"partyCode": partyCode});
+}
+
+//Old leave party function
 function leaveParty()
 {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
@@ -2189,11 +2207,11 @@ function doCommand(eventObject, commandName, parameters, callback)
 	
 }
 
-function doSetLeader(eventObject, charId)
+function doSetLeader(eventObject, charId, charName)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	confirmPopup("Set new leader", "Are you sure you want set someone else to be the leader of your group?", function(){
+	confirmPopup("Set new leader", "Are you sure you want set " + charName + " to be the leader of your group?", function(){
 		doCommand(eventObject,"SetLeader",{"charId":charId});
 	});
 }

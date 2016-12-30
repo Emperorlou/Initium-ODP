@@ -703,7 +703,7 @@ public class MainPageUpdateService extends Service
 		if (isInParty())
 		{
 			newHtml.append("<div class='boldbox'>");
-			newHtml.append("<a onclick='leaveParty()' style='float:right'>Leave Party</a>");
+			newHtml.append("<a onclick='leaveParty(event)' style='float:right'>Leave Party</a>");
 			newHtml.append("<h4>Your party</h4>");
 			List<CachedEntity> party = getParty();
 			if (party!=null)
@@ -731,7 +731,7 @@ public class MainPageUpdateService extends Service
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
 						if (isThisMemberTheLeader == false && isPartyLeader())
-							newHtml.append("<a onclick='doSetLeader(event, "+character.getKey().getId()+")'>Make Leader</a>");
+							newHtml.append("<a onclick='doSetLeader(event, " + character.getKey().getId() + ", \"" + character.getProperty("name") + "\")'>Make Leader</a>");
 						newHtml.append("</div>");
 					}
 					newHtml.append("</a>");
