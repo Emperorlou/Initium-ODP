@@ -2040,13 +2040,13 @@ hr.items-separator {
 .low-durability:before {
 	content: url('https://initium-resources.appspot.com/images/ui/equipment-warning1.png');
 	position: relative;
-	right: 5%;
+	right: 0.5%;
 	top: -5px;
 }
 .very-low-durability:before {
 	content: url('https://initium-resources.appspot.com/images/ui/equipment-warning2.png');
 	position: relative;
-	right: 5%;
+	right: 0.5%;
 	top: -5px;
 }
 .big-link
