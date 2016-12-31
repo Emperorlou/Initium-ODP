@@ -21,8 +21,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.datanucleus.util.StringUtils;
-
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
@@ -4850,8 +4848,9 @@ public class ODPDBAccess
 			throw new UserErrorMessage("You cannot take this path.");
 		if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
 			throw new UserErrorMessage("You cannot take this path.");
-			
-		boolean isInParty = StringUtils.notEmpty((String) character.getProperty("partyCode"));
+
+		String partyCode = (String) character.getProperty("partyCode");
+		boolean isInParty = partyCode != null && !"".equals(partyCode);
 
 		Key ownerKey = (Key) destination.getProperty("ownerKey");
 		if (ownerKey != null) {
