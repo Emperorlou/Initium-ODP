@@ -44,35 +44,49 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 		CachedEntity character = db.getCurrentCharacter();
 		character = ds.refetch(character);
 		
-		long itemId = tryParseId(parameters, "itemId");
-		CachedEntity item = db.getEntity("Item", itemId);
-		if(item == null)
-			throw new UserErrorMessage("Item does not exist");
-		
 		long depositAmount = tryParseId(parameters, "amount");
 		if(depositAmount < 0)
 			throw new UserErrorMessage("Cannot deposit a negative amount");
-
-		Long characterCoins = (Long)character.getProperty("dogecoins");
-		if(depositAmount > characterCoins)
-			throw new UserErrorMessage("Character does not have the specified coins to deposit");
 		
-		CachedEntity itemContainer = db.getEntity((Key)item.getProperty("containerKey"));
-		if(itemContainer == null)
-			throw new RuntimeException("itemId " + itemId + " does not have a valid container");
+		try
+		{
+			ds.beginTransaction(true);
+			
+			long itemId = tryParseId(parameters, "itemId");
+			CachedEntity item = db.getEntity("Item", itemId);
+			if(item == null)
+				throw new UserErrorMessage("Item does not exist");
+			
+			Long characterCoins = (Long)character.getProperty("dogecoins");
+			if(depositAmount > characterCoins)
+				throw new UserErrorMessage("Character does not have the specified coins to deposit");
+			
+			CachedEntity itemContainer = db.getEntity((Key)item.getProperty("containerKey"));
+			if(itemContainer == null)
+				throw new RuntimeException("itemId " + itemId + " does not have a valid container");
 
-		ContainerService cs = new ContainerService(db);
-		
-		if(cs.checkContainerAccessAllowed(character, itemContainer)==false)
-			throw new UserErrorMessage("Character does not have access to this container");
+			ContainerService cs = new ContainerService(db);
+			
+			if(cs.checkContainerAccessAllowed(character, itemContainer)==false)
+				throw new UserErrorMessage("Character does not have access to this container");
 
-		Long containerCoins = (Long)item.getProperty("dogecoins");
-		character.setProperty("dogecoins", characterCoins - depositAmount);
-		item.setProperty("dogecoins", containerCoins + depositAmount);
-		
-		// Order matters! Always subtract coins first!
-		ds.put(character);
-		ds.put(item);
+			Long containerCoins = (Long)item.getProperty("dogecoins");
+			character.setProperty("dogecoins", characterCoins - depositAmount);
+			item.setProperty("dogecoins", containerCoins + depositAmount);
+			
+			// Order matters! Always subtract coins first!
+			ds.put(character);
+			ds.put(item);
+			ds.commit();
+		}
+		catch(UserErrorMessage uex)
+		{
+			throw uex;
+		}
+		finally
+		{
+			ds.rollbackIfActive();
+		}
 		
 		MainPageUpdateService service = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		service.updateMoney();		

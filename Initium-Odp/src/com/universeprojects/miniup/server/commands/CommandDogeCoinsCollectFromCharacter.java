@@ -45,33 +45,47 @@ public class CommandDogeCoinsCollectFromCharacter extends TransactionCommand {
 		CachedEntity character = db.getCurrentCharacter();
 		character = ds.refetch(character);
 
-		long charId = tryParseId(parameters, "characterId");
-		CachedEntity collectFromCharacter = db.getEntity("Character", charId);
-		if(collectFromCharacter == null)
-			throw new UserErrorMessage("Body no longer exists");
-		
-		if(GameUtils.isPlayerIncapacitated(collectFromCharacter)==false)
-			throw new UserErrorMessage("Cannot collect coins from a living character");
-		
-		// If character we collect from has no coins, we don't need to do anything.
-		if(collectFromCharacter.getProperty("dogecoins").equals(0L))
-			return;
-		
-		ContainerService cs = new ContainerService(db);
-		
-		// Check whether character can access this body's container/location.
-		CachedEntity otherCharacterLocation = db.getEntity((Key)collectFromCharacter.getProperty("locationKey"));
-		if(cs.checkContainerAccessAllowed(character, otherCharacterLocation)==false)
-			throw new UserErrorMessage("You cannot collect coins from this body because you're not in the same location as it.");
-		
-		Long characterCoins = (Long)character.getProperty("dogecoins");
-		Long collectCoins = (Long)collectFromCharacter.getProperty("dogecoins");
-		character.setProperty("dogecoins", characterCoins + collectCoins);
-		collectFromCharacter.setProperty("dogecoins", 0L);
-		
-		// Order matters! Always subtract coins first!
-		ds.put(collectFromCharacter);
-		ds.put(character);
+		try
+		{
+			ds.beginTransaction(true);
+			
+			Long charId = tryParseId(parameters, "characterId");
+			CachedEntity collectFromCharacter = db.getEntity("Character", charId);
+			if(collectFromCharacter == null)
+				throw new UserErrorMessage("Body no longer exists");
+			
+			if(GameUtils.isPlayerIncapacitated(collectFromCharacter)==false)
+				throw new UserErrorMessage("Cannot collect coins from a living character");
+			
+			// If character we collect from has no coins, we don't need to do anything.
+			if(collectFromCharacter.getProperty("dogecoins").equals(0L))
+				return;
+			
+			ContainerService cs = new ContainerService(db);
+			
+			// Check whether character can access this body's container/location.
+			CachedEntity otherCharacterLocation = db.getEntity((Key)collectFromCharacter.getProperty("locationKey"));
+			if(cs.checkContainerAccessAllowed(character, otherCharacterLocation)==false)
+				throw new UserErrorMessage("You cannot collect coins from this body because you're not in the same location as it.");
+			
+			Long characterCoins = (Long)character.getProperty("dogecoins");
+			Long collectCoins = (Long)collectFromCharacter.getProperty("dogecoins");
+			character.setProperty("dogecoins", characterCoins + collectCoins);
+			collectFromCharacter.setProperty("dogecoins", 0L);
+			
+			// Order matters! Always subtract coins first!
+			ds.put(collectFromCharacter);
+			ds.put(character);
+			ds.commit();
+		}
+		catch(UserErrorMessage uex)
+		{
+			throw uex;
+		}
+		finally
+		{
+			ds.rollbackIfActive();
+		}
 		
 		MainPageUpdateService service = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		service.updateMoney();
