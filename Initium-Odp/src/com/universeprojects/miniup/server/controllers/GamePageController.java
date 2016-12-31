@@ -13,6 +13,7 @@ import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.GamePageUpdateService;
 import com.universeprojects.web.PageController;
 
+@Controller
 public class GamePageController extends PageController {
 
 	protected GamePageController() {
