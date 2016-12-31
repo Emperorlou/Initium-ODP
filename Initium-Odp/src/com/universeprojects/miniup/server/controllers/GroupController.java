@@ -246,6 +246,17 @@ public class GroupController extends PageController {
 			}
 			request.setAttribute("warDecGroupNames", groupNames);
 
+			List<CachedEntity> allyRequests = db.getFilteredList("Group", "pendingAllianceGroupKey", group.getKey());
+			List<String> pendingGroupAllies = new ArrayList<String>();
+			if (allyRequests != null)
+			{
+				for (CachedEntity allyGroups : allyRequests)
+				{
+					String output = HtmlComponents.generateGroupAllianceRequest(allyGroups);
+					pendingGroupAllies.add(output);
+				}
+				request.setAttribute("pendingGroupAllies", pendingGroupAllies);
+			}
 		}	
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}

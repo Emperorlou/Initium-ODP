@@ -38,14 +38,18 @@
 			<br/><br/>
 			${currentMergeRequest}
 			<br/><br/>
-			<a onclick='declareWar(event)'>Declare War</a>;
+			<a onclick='declareWar(event)'>Declare War</a>
+			<br/>
 			<br/><br/>
 		</div>
 		<h4>Group Merge Applications</h4>
 		<c:forEach var="groupApp" items="${groupMergeApplications}">
 			${groupApp}
 		</c:forEach>
-
+		<h4>Group Alliance Applications</h4>
+		<c:forEach var="allyApp" items="${pendingGroupAllies}">
+			${allyApp}
+		</c:forEach>
 		<h4>New Member Applications</h4>
 		<c:forEach var="memberApp" items="${newMemberApplicants}">
 			${memberApp}
