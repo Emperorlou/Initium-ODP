@@ -15,7 +15,7 @@ import com.universeprojects.web.PageController;
 @Controller
 public class GameController extends PageController {
 	public GameController() {
-		super("view_profile");
+		super("test");
 	}
 
 	@Override
