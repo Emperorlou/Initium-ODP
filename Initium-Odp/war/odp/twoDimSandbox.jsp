@@ -15,7 +15,7 @@ Seed: <input type='text' id='seed' value=123456 />
 <script>
     $(document).on("click", "#somebutton", function() {
         $.ajax({
-            url: "MyServlet",
+            url: "SandboxServlet",
             data:{width:$("#width").val(), height:$("#height").val(), seed:$("#seed").val()},
             type: 'POST',
             success: function(responseJson) {
