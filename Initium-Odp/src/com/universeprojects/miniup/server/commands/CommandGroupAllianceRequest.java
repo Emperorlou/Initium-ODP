@@ -52,7 +52,7 @@ public class CommandGroupAllianceRequest extends Command {
 				throw new UserErrorMessage("Character is not a group admin");
 			throw new UserErrorMessage("Unable to ally with specified group.");
 		}
-		
+		setPopupMessage("Request submitted successfully.");
 		// Key was set by the service, just save the entity.
 		ds.put(charGroup);
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
