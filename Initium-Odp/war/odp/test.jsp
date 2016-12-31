@@ -43,7 +43,6 @@
 		return;
 	}
 
-
 	Authenticator auth = Authenticator.getInstance(request);
 	GameFunctions db = auth.getDB(request);
 	CachedDatastoreService ds = db.getDB();
@@ -88,7 +87,6 @@
 		return;
 	}
 	
-
 	CombatService combatService = new CombatService(db);
 	
 	String characterMode = (String)db.getCurrentCharacter().getProperty("mode");
@@ -159,7 +157,6 @@
 	String locationAudioDescriptor = (String)location.getProperty("audioDescriptor");
 	if (locationAudioDescriptor==null) locationAudioDescriptor = "";
 	request.setAttribute("locationAudioDescriptor", locationAudioDescriptor);
-
 	
 	
 	String locationAudioDescriptorPreset = (String)location.getProperty("audioDescriptorPreset");
@@ -174,7 +171,6 @@
 	if (((String)location.getProperty("name")).startsWith("Combat site: "))
 		combatSite = true;
 	request.setAttribute("combatSite", combatSite);
-
 	
 	
 	Double monsterCount = db.getMonsterCountForLocation(ds, location);
@@ -552,8 +548,6 @@ Did you know you can help code Initium?
 Check out our github and get yourself setup,
 then talk to the lead dev so you can get yourself
 on our slack channel!
-
-http://github.com/Emperorlou/Initium-ODP 
 
                                            -->
 
