@@ -230,12 +230,7 @@ public class GroupController extends PageController {
 			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
 			List<String> groupNames = new ArrayList<String>();
 			
-			if (keyOfDecs == null || keyOfDecs.isEmpty())
-			{
-				groupNames.add("No current wars active.");
-			}
-			
-			else if (keyOfDecs != null)
+			if (keyOfDecs != null)
 			{
 				List<CachedEntity> groups = db.getEntities(keyOfDecs);
 			
