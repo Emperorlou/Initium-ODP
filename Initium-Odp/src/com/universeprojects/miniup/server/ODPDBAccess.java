@@ -21,8 +21,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.datanucleus.util.StringUtils;
-
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
@@ -2939,6 +2937,23 @@ public class ODPDBAccess
 	////////// END GROUP METHODS //////////
 	///////////////////////////////////////
 	
+	/**
+	 * 
+	 * @param db
+	 * @param character, the entity to leave the party
+	 * Takes in an entity and sets their partyCode and partyLeader properties to null (safety checks are done in CommandLeaveParty.java)
+	 */
+	public void doLeaveParty(CachedDatastoreService ds, CachedEntity character) {
+		if (ds == null)
+		{
+			ds = getDB();
+		}
+
+		character.setProperty("partyCode", null);
+		character.setProperty("partyLeader", null);
+
+		ds.put(character);
+	}
 	
 	public void doCharacterDiscoverEntity(CachedDatastoreService db, CachedEntity character, CachedEntity entityToDiscover)
 	{
@@ -2952,7 +2967,35 @@ public class ODPDBAccess
 		name = name.replace("  ", " ");
 		return name;
 	}
-
+	
+	/**
+	 * Returns the CachedEntity object representing the party leader of @partyCode
+	 * Will return null if the partyCode is empty or null (or if for some reason no one in the party is a leader).
+	 * Can optionally pass a list of members instead of a party code to search for a party member.
+	 * 
+	 * @param ds
+	 * @param partyCode code of the party to grab the leader from
+	 * @param members list of cachedentitys in a party
+	 * @return the party leader of the party.
+	 */
+	public CachedEntity getPartyLeader(CachedDatastoreService ds, String partyCode, List<CachedEntity> members) {
+		if (partyCode == null || partyCode.trim().equals("")) {
+			return null;
+		}
+		
+		if (members == null) {
+			members = getParty(ds, partyCode);
+		}
+		
+		for (CachedEntity member : members) {
+			String leader = (String) member.getProperty("partyLeader");
+			if (leader != null && leader.equals("TRUE")) {
+				return member;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Returns all party members belonging to the party that the selfCharacter belongs to.
 	 * 
@@ -2970,7 +3013,7 @@ public class ODPDBAccess
 		
 		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
 	
-		if (result.size()==1)
+		if (result.size() == 1)
 		{
 			selfCharacter.setProperty("partyCode", null);
 			if (ds==null)
@@ -3029,9 +3072,7 @@ public class ODPDBAccess
 			throw new UserErrorMessage("You are in a party but you are not the leader, therefore you do not have permission to decide whether or not joins are allowed.");
 		
 		if (joinsAllowed)
-			leader.setProperty("partyJoinsAllowed", "TRUE");
-		else
-			leader.setProperty("partyJoinsAllowed", "FALSE");
+			leader.setProperty("partyJoinsAllowed", joinsAllowed ? "TRUE" : "FALSE");
 		
 		ds.put(leader);
 		return;
@@ -4807,8 +4848,9 @@ public class ODPDBAccess
 			throw new UserErrorMessage("You cannot take this path.");
 		if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
 			throw new UserErrorMessage("You cannot take this path.");
-			
-		boolean isInParty = StringUtils.notEmpty((String) character.getProperty("partyCode"));
+
+		String partyCode = (String) character.getProperty("partyCode");
+		boolean isInParty = partyCode != null && !"".equals(partyCode);
 
 		Key ownerKey = (Key) destination.getProperty("ownerKey");
 		if (ownerKey != null) {
@@ -5458,6 +5500,4 @@ public class ODPDBAccess
 		
 		return result;
 	}
-
-	
 }

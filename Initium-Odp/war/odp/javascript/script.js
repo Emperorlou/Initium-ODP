@@ -1667,6 +1667,17 @@ function doAttack(eventObject, charId)
     doCommand(eventObject,"Attack",{"charId":charId});
 }
 
+function leaveParty(eventObject) {
+	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
+		doCommand(eventObject, "LeaveParty");
+	});
+}
+
+function joinParty(eventObject, partyCode) {
+	doCommand(eventObject, "PartyJoin", {"partyCode": partyCode});
+}
+
+//Old leave party function
 function leaveParty()
 {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){

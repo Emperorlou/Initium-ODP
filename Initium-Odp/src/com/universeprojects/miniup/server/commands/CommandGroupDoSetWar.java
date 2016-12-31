@@ -54,7 +54,7 @@ public class CommandGroupDoSetWar extends Command {
 		if (warReceiver == null)
 		{
 			throw new UserErrorMessage(
-					"Cannot declare war on a group that does not ex	ist.");
+					"Cannot declare war on a group that does not exist.");
 		}
 				
 		List<Key> declarerCurrent = (List<Key>)warDeclarer.getProperty("declaredWarGroups");
