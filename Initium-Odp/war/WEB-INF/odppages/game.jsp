@@ -184,7 +184,7 @@ http://github.com/Emperorlou/Initium-ODP
 						<div id="chat_tab">
 				<div id="chat_form_wrapper">
 					<form id="chat_form">
-						<span class='fullscreenChatButton' onclick='toggleFullscreenChat()'>[&nbsp;]</span><input type='hidden' id='chatroomId' value='L<%=location.getKey().getId()%>' />
+						<span class='fullscreenChatButton' onclick='toggleFullscreenChat()'>[&nbsp;]</span><input type='hidden' id='chatroomId' value='L${locationId}' />
 						<div class='chat_form_input'>
 							<input id="chat_input" type="text" autocomplete="off" placeholder='Chat with anyone else in this location' maxlength='2000'/>
 						</div>

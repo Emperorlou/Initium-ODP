@@ -11,8 +11,10 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.GamePageUpdateService;
+import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
+@Controller
 public class GamePageController extends PageController {
 
 	protected GamePageController() {
@@ -31,6 +33,7 @@ public class GamePageController extends PageController {
 		
 		request.setAttribute("bannerTextOverlay", updateService.updateInBannerOverlayLinks());
 		request.setAttribute("inBannerCharacterWidget", updateService.updateInBannerCharacterWidget());
+		request.setAttribute("locationId", location.getKey().getId());
 		
 		return "/WEB-INF/odppages/game.jsp";
 	}
