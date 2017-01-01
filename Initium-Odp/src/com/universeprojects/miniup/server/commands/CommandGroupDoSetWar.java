@@ -36,21 +36,25 @@ public class CommandGroupDoSetWar extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();		
+		String groupName = parameters.get("groupName");
 		String decision = parameters.get("decision");
 		Long groupID = parameters.containsKey("groupId") ? tryParseId(parameters, "groupId") : null;
 		if(groupID == null) throw new RuntimeException("Command missing parameter groupId");	
 		
-		CachedEntity group = db.getEntity("Group", groupID);
 		GroupService service = new GroupService(db, character);
 		
 		if (decision.equals("begin"))
 		{
+			CachedEntity group = db.getGroupByName(groupName);
 			service.beginWar(ds, group);
 			setPopupMessage("War has been declared!");			
 		}
 		else
+		{
+			CachedEntity group = db.getEntity("Group", groupID);
 			service.endWar(ds, group);
 			setPopupMessage("War has ended.");
+		}
 						
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}

@@ -363,6 +363,7 @@ public class GroupService extends Service {
 	return false;
 }
 	
+	@SuppressWarnings("unchecked")
 	public boolean endWar(CachedDatastoreService ds, CachedEntity warGroup)
 	{
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
