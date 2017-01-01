@@ -35,12 +35,14 @@
 
 <%
 	response.setHeader("Access-Control-Allow-Origin", "*");		// This is absolutely necessary for phonegap to work
+
 	if (request.getServerName().equals("www.playinitium.appspot.com"))
 	{ 
 		response.setStatus(301);
 		response.setHeader("Location", "http://www.playinitium.com");
 		return;
 	}
+
 	Authenticator auth = Authenticator.getInstance(request);
 	GameFunctions db = auth.getDB(request);
 	CachedDatastoreService ds = db.getDB();
@@ -53,6 +55,7 @@
 		JspSnippets.handleSecurityException(e, request, response);
 		return;
 	}
+
 	request.setAttribute("isThrowawayInSession", auth.isThrowawayCharacterInSession());
 	if (auth.isThrowawayCharacterInSession())
 	{
@@ -60,6 +63,7 @@
 	}
 	
 	CommonEntities common = CommonEntities.getInstance(request);
+
 	
 	// Check if the user has a verified account. If not, send them back to the quickstart page with a message...
 	/*
@@ -327,12 +331,14 @@
 		else if ("Defending2".equals(chrStatus) && (Double)chr.getProperty("hitpoints")>0)
 		{
 			defending2++;
+
 			if ("COMBAT".equals(chr.getProperty("mode")))
 		defendingEngaged2++;
 		}
 		else if ("Defending3".equals(chrStatus) && (Double)chr.getProperty("hitpoints")>0)
 		{
 			defending3++;
+
 			if ("COMBAT".equals(chr.getProperty("mode")))
 		defendingEngaged3++;
 		}
@@ -542,7 +548,7 @@ Did you know you can help code Initium?
 Check out our github and get yourself setup,
 then talk to the lead dev so you can get yourself
 on our slack channel!
-http://github.com/Emperorlou/Initium-ODP 
+
                                            -->
 
 <body>
