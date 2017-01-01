@@ -508,18 +508,13 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		return sb.toString();
 	}
 	
-	public static String generateAlliedGroups(CachedEntity viewingChar, CachedEntity character, CachedEntity group, boolean inGroup)
+	public static String generateAlliedGroups(CachedEntity viewingChar, CachedEntity group, boolean inGroup)
 	{
 		String viewStatus = (String)viewingChar.getProperty("groupStatus");
 		boolean viewAdmin = inGroup && "Admin".equals(viewStatus);
-		boolean viewCreator = inGroup && GameUtils.equals((Key)group.getProperty("creatorKey"), viewingChar.getKey());
-
-		String groupStatus = (String)character.getProperty("groupStatus");
-		boolean isAdmin = "Admin".equals(groupStatus);
-		boolean isCreator = GameUtils.equals((Key)group.getProperty("creatorKey"), character.getKey());
 		
 		StringBuilder sb = new StringBuilder();
-		if (viewAdmin || viewCreator)
+		if (viewAdmin)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 			sb.append("<div class='main-item-container'><div class='main-item'>");
@@ -539,18 +534,13 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		
 	}
 	
-	public static String generateWarDeclarations(CachedEntity viewingChar, CachedEntity character, CachedEntity group, boolean inGroup)
+	public static String generateWarDeclarations(CachedEntity viewingChar, CachedEntity group, boolean inGroup)
 	{
 		String viewStatus = (String)viewingChar.getProperty("groupStatus");
 		boolean viewAdmin = inGroup && "Admin".equals(viewStatus);
-		boolean viewCreator = inGroup && GameUtils.equals((Key)group.getProperty("creatorKey"), viewingChar.getKey());
-
-		String groupStatus = (String)character.getProperty("groupStatus");
-		boolean isAdmin = "Admin".equals(groupStatus);
-		boolean isCreator = GameUtils.equals((Key)group.getProperty("creatorKey"), character.getKey());
 		
 		StringBuilder sb = new StringBuilder();
-		if (viewAdmin || viewCreator)
+		if (viewAdmin)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 			sb.append("<div class='main-item-container'><div class='main-item'>");

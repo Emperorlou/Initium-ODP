@@ -239,7 +239,7 @@ public class GroupController extends PageController {
 			
 				for (CachedEntity declaredGroup : warGroups) 
 				{
-					String output = HtmlComponents.generateWarDeclarations(character, character, declaredGroup, inGroup);
+					String output = HtmlComponents.generateWarDeclarations(character, declaredGroup, inGroup);
 					warGroupNames.add(output);
 				}
 				request.setAttribute("warDecGroupNames", warGroupNames);
@@ -251,7 +251,7 @@ public class GroupController extends PageController {
 				
 				for (CachedEntity allies : alliedGroups)
 				{
-					String output = HtmlComponents.generateAlliedGroups(character, character, group, inGroup);
+					String output = HtmlComponents.generateAlliedGroups(character, allies, inGroup);
 					alliedGroupNames.add(output);
 				}
 				request.setAttribute("declaredAlliedGroups", alliedGroupNames);
