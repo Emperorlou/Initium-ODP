@@ -494,4 +494,17 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("</div></div></div>");
 		return sb.toString();
 	}
+	
+	public static String generateGroupAllianceRequest(CachedEntity group)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("</div><div class='main-item-controls'>");
+		sb.append("<a onclick='groupAcceptAllianceRequest(event, "+group.getId()+" accept)'>Accept Alliance</a>");
+		sb.append("<a onclick='groupDeclineAllianceRequest(event, "+group.getId()+" decline)'>Deny Alliance</a>");
+		sb.append("</div></div></div>");
+		return sb.toString();
+	}
 }

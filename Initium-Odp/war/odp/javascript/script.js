@@ -955,6 +955,19 @@ function endWar(eventObject, groupName)
 //{
 //	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
 //}
+function groupAcceptAllianceRequest(eventObject, groupId, accept)
+{
+	confirmPopup("Accept Alliance", "Are you sure you want to ally yourself with this group?", function() {
+		doCommand(eventObject, "GroupProcessAllianceReq", {"groupId" : groupId, "decision" : accept});
+	})
+}
+
+function groupDeclineAllianceRequest(eventObject, groupId, decline)
+{
+	confirmPop("Decline Alliance", "Are you sure you want to decline this alliance?", function() {
+		doCommand(eventObject, "GroupProcessAllianceReq", {"groupId" : groupId, "decision" : decline});
+	})
+}
 
 function setGroupDescription(eventObject, existingDescription)
 {

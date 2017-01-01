@@ -8,11 +8,13 @@
 			<c:out value="${groupDescription}" />
 			<br />
 		</p>
+		<c:if test="${not empty warDecGroupNames}">
 			<c:forEach var="groups" items="${warDecGroupNames}">
 				<p>${groups}</p>
 				<br/>
 -				<a onclick='endWar(event, "<c:out value="${groups}"/>")'>End War</a>
 			</c:forEach>
+		</c:if>
 	</div>
 </div>
 
@@ -38,14 +40,18 @@
 			<br/><br/>
 			${currentMergeRequest}
 			<br/><br/>
-			<a onclick='declareWar(event)'>Declare War</a>;
+			<a onclick='declareWar(event)'>Declare War</a>
+			<br/>
 			<br/><br/>
 		</div>
 		<h4>Group Merge Applications</h4>
 		<c:forEach var="groupApp" items="${groupMergeApplications}">
 			${groupApp}
 		</c:forEach>
-
+		<h4>Group Alliance Applications</h4>
+		<c:forEach var="allyApp" items="${pendingGroupAllies}">
+			${allyApp}
+		</c:forEach>
 		<h4>New Member Applications</h4>
 		<c:forEach var="memberApp" items="${newMemberApplicants}">
 			${memberApp}
