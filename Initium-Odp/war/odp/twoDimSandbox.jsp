@@ -5,7 +5,7 @@ Seed: <input type='text' id='seed' value=123456 />
 
 <div id="somediv"></div>
 
-<script type="text/javascript" src="javascript/Sandbox.js"></script>
+<script type="text/javascript" src="/odp/javascript/Sandbox.js"></script>
 <script>
     $(document).on("click", "#somebutton", function() {
         getTilePos();
