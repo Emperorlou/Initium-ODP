@@ -507,4 +507,63 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("</div></div></div>");
 		return sb.toString();
 	}
+	
+	public static String generateAlliedGroups(CachedEntity viewingChar, CachedEntity character, CachedEntity group, boolean inGroup)
+	{
+		String viewStatus = (String)viewingChar.getProperty("groupStatus");
+		boolean viewAdmin = inGroup && "Admin".equals(viewStatus);
+		boolean viewCreator = inGroup && GameUtils.equals((Key)group.getProperty("creatorKey"), viewingChar.getKey());
+
+		String groupStatus = (String)character.getProperty("groupStatus");
+		boolean isAdmin = "Admin".equals(groupStatus);
+		boolean isCreator = GameUtils.equals((Key)group.getProperty("creatorKey"), character.getKey());
+		
+		StringBuilder sb = new StringBuilder();
+		if (viewAdmin || viewCreator)
+		{
+			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+			sb.append("<div class='main-item-container'><div class='main-item'>");
+			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+			sb.append("</div><div class='main-item-controls'>");
+			sb.append("<a onclick='groupDeleteAlliance(event, "+group.getId()+")'>End Alliance</a>");
+			sb.append("</div></div></div>");
+		}
+		else
+		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("</div></div></div>");
+		
+		return sb.toString();
+		
+	}
+	
+	public static String generateWarDeclarations(CachedEntity viewingChar, CachedEntity character, CachedEntity group, boolean inGroup)
+	{
+		String viewStatus = (String)viewingChar.getProperty("groupStatus");
+		boolean viewAdmin = inGroup && "Admin".equals(viewStatus);
+		boolean viewCreator = inGroup && GameUtils.equals((Key)group.getProperty("creatorKey"), viewingChar.getKey());
+
+		String groupStatus = (String)character.getProperty("groupStatus");
+		boolean isAdmin = "Admin".equals(groupStatus);
+		boolean isCreator = GameUtils.equals((Key)group.getProperty("creatorKey"), character.getKey());
+		
+		StringBuilder sb = new StringBuilder();
+		if (viewAdmin || viewCreator)
+		{
+			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+			sb.append("<div class='main-item-container'><div class='main-item'>");
+			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+			sb.append("</div><div class='main-item-controls'>");
+			sb.append("<a onclick='endWar(event, "+group.getId()+")'>End War</a>");
+			sb.append("</div></div></div>");
+		}
+		else
+		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("</div></div></div>");
+		
+		return sb.toString();
+	}
 }

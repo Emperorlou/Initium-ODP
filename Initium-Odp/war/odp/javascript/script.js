@@ -939,16 +939,16 @@ function declareWar(eventObject)
 {
 	promptPopup("Declare War", "Enter the name of the group you want to declare on.", "",  function(groupName) {
 		if (groupName != null || groupName != "") {
-			doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName}, function(error)  {
+			doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName, "decision" : "begin"}, function(error)  {
 				if (error) return;
 			})
 		}
 	});
 }
-function endWar(eventObject, groupName) 
+function endWar(eventObject, groupId) 
 {
 	confirmPopup("End War", "Are you sure you want to end this war?", function(){
-		doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName});
+		doCommand(eventObject, "GroupDoSetWar", {"groupId" : groupId, "decision" : "end"});
 	});
 }
 //function cancelLeaveGroup()d
@@ -962,10 +962,16 @@ function groupAcceptAllianceRequest(eventObject, groupId)
 	})
 }
 
+function deleteGroupAlliance(eventObject, groupId)
+{
+	confirmPopup("End Alliance", "Are you sure you want to end this alliance?", function() {
+		doCommand(eventObject, "GroupDeleteAlliance", {"groupId" : groupId});
+	})
+}
 function groupDeclineAllianceRequest(eventObject, groupId)
 {
 	var decision = "decline";
-	confirmPop("Decline Alliance", "Are you sure you want to decline this alliance?", function() {
+	confirmPopup("Decline Alliance", "Are you sure you want to decline this alliance?", function() {
 		doCommand(eventObject, "GroupProcessAllianceReq", {"groupId" : groupId, "decision" : "decline"});
 	})
 }
