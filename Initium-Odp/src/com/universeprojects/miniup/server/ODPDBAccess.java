@@ -4876,7 +4876,7 @@ public class ODPDBAccess
 				boolean ownerIsPresent = false;
 				Key pathOwner = (Key) path.getProperty("ownerKey");
 				for (CachedEntity partyMember : partyMembers) {
-					if (GameUtils.equals(pathOwner, partyMember.getProperty("ownerKey"))) {
+					if (GameUtils.equals(pathOwner, partyMember.getProperty("userKey"))) {
 						ownerIsPresent = true;
 						break;
 					}
