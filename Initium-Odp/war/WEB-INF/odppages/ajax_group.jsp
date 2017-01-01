@@ -42,6 +42,7 @@
 			<br/><br/>
 			<a onclick='declareWar(event)'>Declare War</a>
 			<br/>
+			<a onclick='submitGroupAllianceRequest(event)'>Request Alliance</a>
 			<br/><br/>
 		</div>
 		<h4>Group Merge Applications</h4>
