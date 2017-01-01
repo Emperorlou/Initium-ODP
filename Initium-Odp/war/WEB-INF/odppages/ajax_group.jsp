@@ -34,7 +34,7 @@
 			${currentMergeRequest}
 			<br/><br/>
 			<a onclick='declareWar(event)'>Declare War</a>
-			<br/>
+			<br/><br/>
 			<a onclick='submitGroupAllianceRequest(event)'>Request Alliance</a>
 			<br/><br/>
 		</div>

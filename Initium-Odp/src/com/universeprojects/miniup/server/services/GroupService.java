@@ -293,7 +293,8 @@ public class GroupService extends Service {
 	@SuppressWarnings("unchecked")
 	public boolean beginWar(CachedDatastoreService ds, CachedEntity warGroup)
 	{
-		
+	if (warGroup == null)
+		return false;
 	List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
 	if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
 	{
@@ -390,14 +391,22 @@ public class GroupService extends Service {
 		return false;
 	}
 	
-	public CachedEntity setAllianceRequest(CachedEntity allyGroup)
+	public CachedEntity setAllianceRequest(CachedEntity allyGroup) throws UserErrorMessage
 	{
+		if (allyGroup != null)
+		{
 			if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
 			{
 					this.characterGroup.setProperty("pendingAllianceGroupKey", allyGroup.getKey());
 					return this.characterGroup;
 			}
-			return null;
+		}
+		else
+		{
+			throw new UserErrorMessage(
+					"Group does not exist!");
+		}
+		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
