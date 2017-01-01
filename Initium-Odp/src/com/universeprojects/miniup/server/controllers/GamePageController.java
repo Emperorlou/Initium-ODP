@@ -17,7 +17,7 @@ import com.universeprojects.web.PageController;
 @Controller
 public class GamePageController extends PageController {
 
-	protected GamePageController() {
+	public GamePageController() {
 		super("game");
 	}
 
@@ -26,14 +26,16 @@ public class GamePageController extends PageController {
 			HttpServletResponse arg1) throws ServletException, IOException {
 		
 		ODPDBAccess db = new ODPDBAccess(request);
-		CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
+		CachedEntity character = db.getCurrentCharacter();
+		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		CombatService combatService = new CombatService(db);
 
-		GamePageUpdateService updateService = new GamePageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, null);
+		GamePageUpdateService updateService = new GamePageUpdateService(db, db.getCurrentUser(), character, location, null);
 		
 		request.setAttribute("bannerTextOverlay", updateService.updateInBannerOverlayLinks());
 		request.setAttribute("inBannerCharacterWidget", updateService.updateInBannerCharacterWidget());
 		request.setAttribute("locationId", location.getKey().getId());
+		request.setAttribute("mainGoldIndicator", updateService.updateMoney());
 		
 		return "/WEB-INF/odppages/game.jsp";
 	}
