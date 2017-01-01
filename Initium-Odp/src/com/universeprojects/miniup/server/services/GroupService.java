@@ -254,6 +254,18 @@ public class GroupService extends Service {
 				saveEntities.add(reqGroup);
 			}
 			
+			//Removing wars/alliances from merge group
+			mergeGroup.setProperty("declaredAlliedGroups", null);
+			mergeGroup.setProperty("declaredWarGroups", null);
+			
+			//Clean any pending alliances with merge group
+			mergeGroupEntities = db.getFilteredList("Group", "pendingAllianceGroupKey", mergeGroup.getKey());
+			for (CachedEntity reqGroup : mergeGroupEntities)
+			{
+				reqGroup.setProperty("pendingAllianceGroupKey", null);
+				saveEntities.add(reqGroup);
+			}
+			
 			// Likely going to need to remove alliances/warring groups from the
 			// merged group, but will handle that later.
 			
@@ -277,14 +289,106 @@ public class GroupService extends Service {
 		}
 		return false;
 	}
-	public static List<Key> getWarDeclarations(CachedEntity group) {
-		List<Key> warDecs = (List<Key>)group.getProperty("declaredWarGroups");
-		if (warDecs.isEmpty())
-			return null;
-		else
-			return warDecs;
+	
+	@SuppressWarnings("unchecked")
+	public boolean beginWar(CachedDatastoreService ds, CachedEntity warGroup)
+	{
 		
+	List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
+	if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
+	{
+		List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredWarGroups");
+		List<Key> warGroupWars = (List<Key>)warGroup.getProperty("declaredWarGroups");
+		
+		if (charGroupWars == null && warGroupWars == null)
+		{
+			List<Key> createWarListCharGroup = new ArrayList<Key>();
+			List<Key> createWarListAllyGroup = new ArrayList<Key>();
+
+			createWarListCharGroup.add(warGroup.getKey());
+			createWarListAllyGroup.add(this.characterGroup.getKey());
+
+			this.characterGroup.setProperty("declaredWarGroups", createWarListCharGroup);
+			warGroup.setProperty("declaredWarGroups", createWarListAllyGroup);
+			
+			groupsToSave.add(this.characterGroup);
+			groupsToSave.add(warGroup);
+			ds.put(groupsToSave);
+			return true;
+		}
+		else if (charGroupWars == null && warGroupWars != null)
+		{
+			List<Key> createWarListCharGroup = new ArrayList<Key>();
+
+			createWarListCharGroup.add(warGroup.getKey());
+			warGroupWars.add(this.characterGroup.getKey());
+			this.characterGroup.setProperty("declaredWarGroups", createWarListCharGroup);
+			warGroup.setProperty("declaredAlliedGroups", warGroupWars);
+			
+			groupsToSave.add(this.characterGroup);
+			groupsToSave.add(warGroup);
+			ds.put(groupsToSave);
+			return true;
+		}
+		else if (charGroupWars != null && warGroupWars == null)
+		{
+			List<Key> createWarListAllyGroup = new ArrayList<Key>();
+
+			charGroupWars.add(warGroup.getKey());
+			createWarListAllyGroup.add(this.characterGroup.getKey());
+
+			this.characterGroup.setProperty("declaredWarGroups", charGroupWars);
+			warGroup.setProperty("declaredWarGroups", createWarListAllyGroup);
+			
+			groupsToSave.add(this.characterGroup);
+			groupsToSave.add(warGroup);
+			ds.put(groupsToSave);
+			return true;
+		}
+		else if (charGroupWars.contains(warGroup.getKey()) || warGroupWars.contains(this.characterGroup.getKey()))
+		{				
+			return false;
+		}
+		else if (charGroupWars != null && warGroupWars != null)
+		{
+			charGroupWars.add(warGroup.getKey());
+			warGroupWars.add(this.characterGroup.getKey());
+			this.characterGroup.setProperty("declaredWarGroups", charGroupWars);
+			groupsToSave.add(this.characterGroup);
+			groupsToSave.add(warGroup);
+			ds.put(groupsToSave);
+			return true;
+		}	
 	}
+	return false;
+}
+	
+	public boolean endWar(CachedDatastoreService ds, CachedEntity warGroup)
+	{
+		if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
+		{
+			List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
+			List<Key> warGroupWars = (List<Key>)warGroup.getProperty("declaredAlliedGroups");
+			List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
+			
+			if (charGroupWars != null && warGroupWars != null)
+			{
+				charGroupWars.remove(warGroup.getKey());
+				this.characterGroup.setProperty("declaredWarGroups", charGroupWars);
+				
+				warGroupWars.remove(this.characterGroup.getKey());
+				warGroup.setProperty("declaredAlliedGroups", warGroupWars);
+				
+				groupsToSave.add(warGroup);
+				groupsToSave.add(this.characterGroup);
+				ds.put(groupsToSave);
+				return true;			
+			}
+			return false;
+		}
+		return false;
+	}
+	
 	public CachedEntity setAllianceRequest(CachedEntity allyGroup)
 	{
 			if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
@@ -295,23 +399,78 @@ public class GroupService extends Service {
 			return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean acceptAllianceRequest(CachedDatastoreService ds, CachedEntity allyGroup)
 	{
+		List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
 		{
-			List<Key> currentAlliances = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
-			if (currentAlliances == null)
+			List<Key> charGroupAlliances = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
+			List<Key> allyGroupAlliances = (List<Key>)allyGroup.getProperty("declaredAlliedGroups");
+			
+			if (charGroupAlliances == null && allyGroupAlliances == null)
 			{
-				List<Key> createAllianceList = new ArrayList<Key>();
-				createAllianceList.add(allyGroup.getKey());
-				this.characterGroup.setProperty("declaredAlliedGroups", createAllianceList);
+				List<Key> createAllianceListCharGroup = new ArrayList<Key>();
+				List<Key> createAllianceListAllyGroup = new ArrayList<Key>();
+
+				createAllianceListCharGroup.add(allyGroup.getKey());
+				createAllianceListAllyGroup.add(this.characterGroup.getKey());
+
+				this.characterGroup.setProperty("declaredAlliedGroups", createAllianceListCharGroup);
+				allyGroup.setProperty("declaredAlliedGroups", createAllianceListAllyGroup);
+				allyGroup.setProperty("pendingAllianceGroupKey", null);
+				
+				groupsToSave.add(this.characterGroup);
+				groupsToSave.add(allyGroup);
+				ds.put(groupsToSave);
 				return true;
 			}
-			else 
+			else if (charGroupAlliances == null && allyGroupAlliances != null)
 			{
-				currentAlliances.add(allyGroup.getKey());
-				this.characterGroup.setProperty("declaredAlliedGroups", currentAlliances);
+				List<Key> createAllianceListCharGroup = new ArrayList<Key>();
+
+				createAllianceListCharGroup.add(allyGroup.getKey());
+				allyGroupAlliances.add(this.characterGroup.getKey());
+				this.characterGroup.setProperty("declaredAlliedGroups", createAllianceListCharGroup);
+				allyGroup.setProperty("declaredAlliedGroups", allyGroupAlliances);
+				allyGroup.setProperty("pendingAllianceGroupKey", null);
+				
+				groupsToSave.add(this.characterGroup);
+				groupsToSave.add(allyGroup);
+				ds.put(groupsToSave);
 				return true;
+			}
+			else if (charGroupAlliances != null && allyGroupAlliances == null)
+			{
+				List<Key> createAllianceListAllyGroup = new ArrayList<Key>();
+
+				charGroupAlliances.add(allyGroup.getKey());
+				createAllianceListAllyGroup.add(this.characterGroup.getKey());
+
+				this.characterGroup.setProperty("declaredAlliedGroups", charGroupAlliances);
+				allyGroup.setProperty("declaredAlliedGroups", createAllianceListAllyGroup);
+				allyGroup.setProperty("pendingAllianceGroupKey", null);
+				
+				groupsToSave.add(this.characterGroup);
+				groupsToSave.add(allyGroup);
+				ds.put(groupsToSave);
+				return true;
+			}
+			else if (charGroupAlliances != null && allyGroupAlliances != null)
+			{
+				charGroupAlliances.add(allyGroup.getKey());
+				allyGroupAlliances.add(this.characterGroup.getKey());
+				this.characterGroup.setProperty("declaredAlliedGroups", charGroupAlliances);
+				allyGroup.setProperty("pendingAllianceGroupKey", null);
+				groupsToSave.add(this.characterGroup);
+				groupsToSave.add(allyGroup);
+				ds.put(groupsToSave);
+				return true;
+			}
+			
+			else if (charGroupAlliances.contains(allyGroup.getKey()) || allyGroupAlliances.contains(this.characterGroup.getKey()))
+			{				
+				return false;
 			}	
 		}
 		return false;
@@ -322,7 +481,35 @@ public class GroupService extends Service {
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
 		{
 			allyGroup.setProperty("pendingAllianceGroupKey", null);
+			ds.put(allyGroup);
 			return true;
+		}
+		return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean deleteAlliance(CachedDatastoreService ds, CachedEntity allyGroup)
+	{
+		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
+		{
+			List<Key> charGroupAlliances = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
+			List<Key> allyGroupAlliances = (List<Key>)allyGroup.getProperty("declaredAlliedGroups");
+			List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
+			
+			if (charGroupAlliances != null && allyGroupAlliances != null)
+			{
+				charGroupAlliances.remove(allyGroup);
+				this.characterGroup.setProperty("declaredAlliedGroups", charGroupAlliances);
+				
+				allyGroupAlliances.remove(this.characterGroup.getKey());
+				allyGroup.setProperty("declaredAlliedGroups", allyGroupAlliances);
+				
+				groupsToSave.add(allyGroup);
+				groupsToSave.add(this.characterGroup);
+				ds.put(groupsToSave);
+				return true;			
+			}
+			return false;
 		}
 		return false;
 	}

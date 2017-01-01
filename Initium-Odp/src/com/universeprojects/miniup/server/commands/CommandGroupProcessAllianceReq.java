@@ -52,14 +52,14 @@ public class CommandGroupProcessAllianceReq extends Command {
 				throw ex;
 			}		
 		}
-		else if (decision.equals("decline"))
+		else
 		{
 			try 
 			{
 				if (service.declineAllianceRequest(ds, group))
 					setPopupMessage("Request declined.");
 				else 
-					throw new UserErrorMessage("Unexpected error when accepting alliance request.");
+					throw new UserErrorMessage("You are either not an admin or the groups are already allied.");
 			}
 			catch(Exception ex)
 			{

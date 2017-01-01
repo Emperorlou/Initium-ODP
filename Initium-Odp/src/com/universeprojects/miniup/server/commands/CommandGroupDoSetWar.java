@@ -12,6 +12,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
+import com.universeprojects.miniup.server.services.GroupService;
 
 /** 
  * 
@@ -34,55 +35,23 @@ public class CommandGroupDoSetWar extends Command {
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		String groupName = parameters.get("groupName");
-		CachedEntity admin = db.getCurrentCharacter();		
-		Key groupKey = (Key) admin.getProperty("groupKey");
-		CachedEntity warDeclarer = db.getEntity(groupKey);
-		CachedEntity warReceiver = db.getGroupByName(groupName);	
+		CachedEntity character = db.getCurrentCharacter();		
+		String decision = parameters.get("decision");
+		Long groupID = parameters.containsKey("groupId") ? tryParseId(parameters, "groupId") : null;
+		if(groupID == null) throw new RuntimeException("Command missing parameter groupId");	
 		
-		if (warDeclarer == null)
-		{
-			throw new UserErrorMessage("You are not currently in a group.");
-		}
+		CachedEntity group = db.getEntity("Group", groupID);
+		GroupService service = new GroupService(db, character);
 		
-		if (("Admin".equals(admin.getProperty("groupStatus"))) == false)
+		if (decision.equals("begin"))
 		{
-			throw new UserErrorMessage(
-					"You are not an admin of your group and cannot perform this action.");
+			service.beginWar(ds, group);
+			setPopupMessage("War has been declared!");			
 		}
-		
-		if (warReceiver == null)
-		{
-			throw new UserErrorMessage(
-					"Cannot declare war on a group that does not exist.");
-		}
-				
-		List<Key> declarerCurrent = (List<Key>)warDeclarer.getProperty("declaredWarGroups");
-		if (declarerCurrent == null)
-		{
-			List<Key> newWarDecs = new ArrayList<Key>();
-			newWarDecs.add(warReceiver.getKey());
-			setPopupMessage("War has been declared!");
-			warDeclarer.setProperty("declaredWarGroups", newWarDecs);
-			ds.put(warDeclarer);
-		}
-		
-		else 
-		{
-			if (!declarerCurrent.contains(warReceiver.getKey()))
-			{
-				declarerCurrent.add(warReceiver.getKey());
-				setPopupMessage("War has been declared!");
-			}
-			
-			else if (declarerCurrent.contains(warReceiver.getKey()))
-			{
-				declarerCurrent.remove(warReceiver.getKey());
-				setPopupMessage("War has ended.");
-			}	
-			
-		ds.put(warDeclarer);	
-		}		
+		else
+			service.endWar(ds, group);
+			setPopupMessage("War has ended.");
+						
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }

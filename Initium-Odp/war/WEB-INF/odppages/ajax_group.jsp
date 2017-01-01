@@ -8,13 +8,6 @@
 			<c:out value="${groupDescription}" />
 			<br />
 		</p>
-		<c:if test="${not empty warDecGroupNames}">
-			<c:forEach var="groups" items="${warDecGroupNames}">
-				<p>${groups}</p>
-				<br/>
--				<a onclick='endWar(event, "<c:out value="${groups}"/>")'>End War</a>
-			</c:forEach>
-		</c:if>
 	</div>
 </div>
 
@@ -49,14 +42,18 @@
 		<c:forEach var="groupApp" items="${groupMergeApplications}">
 			${groupApp}
 		</c:forEach>
-		<h4>Group Alliance Applications</h4>
-		<c:forEach var="allyApp" items="${pendingGroupAllies}">
-			${allyApp}
-		</c:forEach>
 		<h4>New Member Applications</h4>
 		<c:forEach var="memberApp" items="${newMemberApplicants}">
 			${memberApp}
 		</c:forEach>
+		<h4>Group Alliance Applications</h4>
+		<c:forEach var="allyApp" items="${pendingGroupAllies}">
+			${allyApp}
+		</c:forEach>	
+		<h4>Active Wars</h4>
+		<c:forEach var="warGroup" items="${warDecGroupNames}">
+			${warGroup}
+		</c:forEach>			
 	</div>
 	<hr>
 	</c:if>
@@ -83,6 +80,14 @@
 	<c:forEach var="curMember" items="${groupMembers}">
 		${curMember}
 	</c:forEach>
+	<h4>Declared Alliances</h4>
+	<c:forEach var="ally" items="${declaredAlliedGroups}">
+		${ally}
+	</c:forEach>
+	<h4>Active Wars</h4>
+	<c:forEach var="warGroup" items="${warDecGroupNames}">
+		${warGroup}
+	</c:forEach>	
 </div>
 
 <c:if test="${inGroup == true && inThisGroup!=true}">

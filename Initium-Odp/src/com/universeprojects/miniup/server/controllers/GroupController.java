@@ -228,29 +228,45 @@ public class GroupController extends PageController {
 			
 			@SuppressWarnings("unchecked")
 			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
-			List<String> groupNames = new ArrayList<String>();
+			List<Key> keyOfAllies = (List<Key>)group.getProperty("declaredAlliedGroups");
+			List<String> warGroupNames = new ArrayList<String>();
+			List<String> alliedGroupNames = new ArrayList<String>();
+
 			
 			if (keyOfDecs != null)
 			{
-				List<CachedEntity> groups = db.getEntities(keyOfDecs);
+				List<CachedEntity> warGroups = db.getEntities(keyOfDecs);
 			
-				for (CachedEntity declaredGroup : groups) 
+				for (CachedEntity declaredGroup : warGroups) 
 				{
-					groupNames.add(declaredGroup.getProperty("name").toString());
+					String output = HtmlComponents.generateWarDeclarations(character, character, declaredGroup, inGroup);
+					warGroupNames.add(output);
 				}
+				request.setAttribute("warDecGroupNames", warGroupNames);
+			}	
+			
+			if (keyOfAllies != null)
+			{
+				List<CachedEntity> alliedGroups = db.getEntities(keyOfAllies);
+				
+				for (CachedEntity allies : alliedGroups)
+				{
+					String output = HtmlComponents.generateAlliedGroups(character, character, group, inGroup);
+					alliedGroupNames.add(output);
+				}
+				request.setAttribute("declaredAlliedGroups", alliedGroupNames);
 			}
-			request.setAttribute("warDecGroupNames", groupNames);
 
 			List<CachedEntity> allyRequests = db.getFilteredList("Group", "pendingAllianceGroupKey", group.getKey());
-			List<String> pendingGroupAllies = new ArrayList<String>();
+			List<String> outputAllyRequests = new ArrayList<String>();
 			if (allyRequests != null)
 			{
-				for (CachedEntity allyGroups : allyRequests)
+				for (CachedEntity allyReq : allyRequests)
 				{
-					String output = HtmlComponents.generateGroupAllianceRequest(allyGroups);
-					pendingGroupAllies.add(output);
+					String output = HtmlComponents.generateGroupAllianceRequest(allyReq);
+					outputAllyRequests.add(output);
 				}
-				request.setAttribute("pendingGroupAllies", pendingGroupAllies);
+				request.setAttribute("pendingGroupAllies", outputAllyRequests);
 			}
 		}	
 		return "/WEB-INF/odppages/ajax_group.jsp";
