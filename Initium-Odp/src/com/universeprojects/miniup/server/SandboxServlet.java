@@ -1,18 +1,19 @@
 package com.universeprojects.miniup.server;
 
-import com.google.appengine.repackaged.com.google.gson.Gson;
-
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@WebServlet(name = "SandboxServlet")
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.google.appengine.repackaged.com.google.gson.Gson;
+
 public class SandboxServlet extends HttpServlet {
+	private static final long serialVersionUID = 9209182266946047848L;
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
