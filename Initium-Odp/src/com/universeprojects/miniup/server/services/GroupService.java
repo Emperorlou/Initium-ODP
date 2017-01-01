@@ -287,20 +287,17 @@ public class GroupService extends Service {
 	}
 	public CachedEntity setAllianceRequest(CachedEntity allyGroup)
 	{
-			if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) != false)
+			if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
 			{
-				if(doesGroupAllowMergeRequests(allyGroup))
-				{
 					this.characterGroup.setProperty("pendingAllianceGroupKey", allyGroup.getKey());
 					return this.characterGroup;
-				}
 			}
 			return null;
 	}
 	
 	public boolean acceptAllianceRequest(CachedDatastoreService ds, CachedEntity allyGroup)
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) != false)
+		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
 		{
 			List<Key> currentAlliances = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
 			if (currentAlliances == null)
@@ -322,7 +319,7 @@ public class GroupService extends Service {
 	
 	public boolean declineAllianceRequest(CachedDatastoreService ds, CachedEntity allyGroup)
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) != false)
+		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
 		{
 			allyGroup.setProperty("pendingAllianceGroupKey", null);
 			return true;
