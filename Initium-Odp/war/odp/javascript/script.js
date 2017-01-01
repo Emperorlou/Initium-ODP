@@ -962,7 +962,7 @@ function groupAcceptAllianceRequest(eventObject, groupId)
 	})
 }
 
-function deleteGroupAlliance(eventObject, groupId)
+function groupDeleteGroupAlliance(eventObject, groupId)
 {
 	confirmPopup("End Alliance", "Are you sure you want to end this alliance?", function() {
 		doCommand(eventObject, "GroupDeleteAlliance", {"groupId" : groupId});

@@ -34,7 +34,7 @@
 			${currentMergeRequest}
 			<br/><br/>
 			<a onclick='declareWar(event)'>Declare War</a>
-			<br/>
+			<br/><br/>
 			<a onclick='submitGroupAllianceRequest(event)'>Request Alliance</a>
 			<br/><br/>
 		</div>
@@ -76,10 +76,6 @@
 </c:if>
 
 <div class='main-description'>
-	<h4>Members</h4>
-	<c:forEach var="curMember" items="${groupMembers}">
-		${curMember}
-	</c:forEach>
 	<h4>Declared Alliances</h4>
 	<c:forEach var="ally" items="${declaredAlliedGroups}">
 		${ally}
@@ -87,6 +83,10 @@
 	<h4>Active Wars</h4>
 	<c:forEach var="warGroup" items="${warDecGroupNames}">
 		${warGroup}
+	</c:forEach>
+	<h4>Members</h4>
+	<c:forEach var="curMember" items="${groupMembers}">
+		${curMember}
 	</c:forEach>	
 </div>
 
