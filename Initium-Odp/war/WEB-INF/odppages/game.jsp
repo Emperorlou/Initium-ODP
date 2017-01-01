@@ -32,6 +32,9 @@
 <script id='ajaxJs' type='text/javascript'>
 ${bannerJs}
 </script>
+	
+<script type="text/javascript" src="./script.js"></script>
+
 
 
 <%-- <script type='text/javascript'>
