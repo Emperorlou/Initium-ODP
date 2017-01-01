@@ -32,6 +32,9 @@
 <script id='ajaxJs' type='text/javascript'>
 ${bannerJs}
 </script>
+	
+<script type="text/javascript" src="./script.js"></script>
+
 
 
 <%-- <script type='text/javascript'>
@@ -136,6 +139,8 @@ ${longOperationRecallJs}
 	window.isPremium = ${isPremium};
 </script>
 
+<link rel="stylesheet" href="./MiniUp.css">
+
 </head>
 
 <!--
@@ -152,6 +157,27 @@ http://github.com/Emperorlou/Initium-ODP
 
 <body>
 	<div class='page'>
+			<div class='main-banner' >
+			<img class='main-page-banner-image' src="https://initium-resources.appspot.com/images/banner---placeholder.gif" border=0/>
+			<c:if test="${isOutside=='TRUE' }">
+				<div class='banner-shadowbox'>
+			</c:if>
+			<c:if test="${isOutside!='TRUE' }">
+				<div class='banner-shadowbox' style="background: url('https://initium-resources.appspot.com/images/banner---placeholder.gif') no-repeat center center">
+			</c:if>
+				
+			
+				<div style="overflow:hidden;position:absolute;width:100%;height:100%;">
+					<div id='banner-base' class='banner-daynight'></div>
+					<div id='banner-text-overlay'>${bannerTextOverlay}</div>
+				
+					<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
+						${inBannerCharacterWidget}
+					</div>				
+				</div>
+				</div>
+			</div>
+		</div>
 		<div class='page-upperhalf'>
 			<div class='header1'>
 				<div class='header1-spacer'></div>
@@ -265,6 +291,10 @@ http://github.com/Emperorlou/Initium-ODP
 
 				</div>
 			</div>
+			
+		<div id='territoryView'>
+		${territoryViewHtml}
+		</div>
 		</div>
 		<div class='location-controls-container'>
 			<div class='header1'></div>
@@ -336,52 +366,16 @@ http://github.com/Emperorlou/Initium-ODP
 								</span>
 							</c:if>
 
-							<div class='hiddenTooltip' id='buttonbar'>
-								<h5>The Button Bar</h5>
-								<img
-									src='https://initium-resources.appspot.com/images/ui/manageStore.png'
-									border=0 style='float: left; padding: 4px;' />
-								<p>This button will take you to your storefront management
-									page. This page allows you to setup your storefront by
-									specifying which items you would like to sell to other players
-									and for how much. More help can be found in the storefront page
-									itself.</p>
-								<img
-									src='https://initium-resources.appspot.com/images/ui/storefrontEnabled.png'
-									border=0 style='float: left; padding: 4px;' />
-								<p>This button will turn on and off your storefront. Since
-									you cannot move while vending, you will need to turn off your
-									store before you go off adventuring. This button makes turning
-									your store on and off quick and easy.</p>
-								<img
-									src='https://initium-resources.appspot.com/images/ui/partyJoinsAllowed.png'
-									border=0 style='float: left; padding: 4px;' />
-								<p>
-									This is the party join button. When enabled (without the red
-									cross), other characters will be able to join you in a party.
-									If you are not already in a party then when someone joins you,
-									you will automatically become the party leader. <br> More
-									information on parties and how they work can be found in the <a
-										href='odp/mechanics.jsp#parties'>game mechanics page</a>.
-								</p>
-								<img
-									src='https://initium-resources.appspot.com/images/ui/duelRequestsAllowed.png'
-									border=0 style='float: left; padding: 4px;' />
-								<p>
-									This button allows you to control whether or not you are
-									accepting duel requests. When enabled, other players are able
-									to request to duel with you. You will be given the option to
-									accept a duel request or deny it. When you accept, you will be
-									whisked away into a special arena where you and the other
-									player will engage in battle.<br> More information on the
-									different types of duels and how they work can be found in the
-									<a href='odp/mechanics.jsp#duels'>game mechanics page</a>.
-								</p>
+							<div id='buttonBar'>${buttonBar}</div>
+							
 							</div>
 							<span class='hint' rel='#buttonbar' style='float: right'><img
 								src='https://initium-resources.appspot.com/images/ui/help.png'
 								border=0 /></span>
 						</div>
+								<div id='partyPanel' class='main-splitScreen'>
+		${partyPanel}
+		</div>
 					</div>
 					<div class='main1-inset1 location-controls-navigation'>
 						<div class='titlebar'>NAVIGATION</div>
