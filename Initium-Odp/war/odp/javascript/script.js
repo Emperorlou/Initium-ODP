@@ -984,6 +984,16 @@ function setGroupDescription(eventObject, existingDescription)
 	});
 }
 
+function submitGroupAllianceRequest(eventObject) 
+{
+	promptPopup("Declare War", "Enter the name of the group you want to ally with.", "",  function(groupName) {
+		if (groupName != null || groupName != "") {
+			doCommand(eventObject, "GroupAllianceRequest", {"groupName" : groupName}, function(error)  {
+				if (error) return;
+			})
+		}
+	});
+}
 function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
 	if (oldPosition==null || oldPosition=="")
