@@ -136,6 +136,8 @@ ${longOperationRecallJs}
 	window.isPremium = ${isPremium};
 </script>
 
+<link rel="stylesheet" href="./MiniUp.css">
+
 </head>
 
 <!--
