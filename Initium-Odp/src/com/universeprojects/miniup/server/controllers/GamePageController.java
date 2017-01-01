@@ -36,7 +36,17 @@ public class GamePageController extends PageController {
 		request.setAttribute("inBannerCharacterWidget", updateService.updateInBannerCharacterWidget());
 		request.setAttribute("locationId", location.getKey().getId());
 		request.setAttribute("mainGoldIndicator", updateService.updateMoney());
-		
+		request.setAttribute("mainButtonList", updateService.updateButtonList(combatService));
+		request.setAttribute("bannerJs", updateService.updateLocationJs());	
+		request.setAttribute("activePlayers", updateService.updateActivePlayerCount());
+		request.setAttribute("buttonBar", updateService.updateButtonBar());
+		request.setAttribute("locationDescription", updateService.updateLocationDescription());
+		request.setAttribute("territoryViewHtml", updateService.updateTerritoryView());
+		request.setAttribute("partyPanel", updateService.updatePartyView());
+		request.setAttribute("locationScripts", updateService.updateLocationDirectScripts());
+		request.setAttribute("locationName", updateService.updateLocationName());
+		request.setAttribute("locationDescription", updateService.updateLocationDescription());
+
 		return "/WEB-INF/odppages/game.jsp";
 	}
 }
