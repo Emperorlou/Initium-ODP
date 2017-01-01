@@ -34,7 +34,7 @@ public class CommandGroupProcessAllianceReq extends Command {
 		CachedEntity group = db.getEntity("Group", groupID);
 		GroupService service = new GroupService(db, character);
 		
-		if (decision == "accept")
+		if (decision.equals("accept"))
 		{
 			try
 			{
@@ -52,7 +52,7 @@ public class CommandGroupProcessAllianceReq extends Command {
 				throw ex;
 			}		
 		}
-		else if (decision == "decline")
+		else if (decision.equals("decline"))
 		{
 			try 
 			{
