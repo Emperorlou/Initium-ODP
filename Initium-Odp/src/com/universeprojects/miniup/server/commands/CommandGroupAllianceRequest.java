@@ -27,14 +27,12 @@ public class CommandGroupAllianceRequest extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
+		String groupName = parameters.get("groupName");
 
 		if(character.getProperty("groupKey") == null)
 			throw new UserErrorMessage("Character does not belong to a group!");
-		
-		Long groupID = parameters.containsKey("groupId") ? tryParseId(parameters, "groupId") : null;
-		if(groupID == null) throw new RuntimeException("Command missing parameter groupId");
-		
-		CachedEntity group = db.getEntity("Group", groupID);
+				
+		CachedEntity group = db.getGroupByName(groupName);
 		
 		// Group refers to the group we will be merging with. GroupService handles security 
 		// permissions, determining whether the character is an admin of his group.

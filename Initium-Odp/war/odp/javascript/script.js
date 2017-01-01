@@ -786,7 +786,7 @@ function loadLocationMerchants()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("locationmerchantlist.jsp");
+	pagePopup("/odp/twoDimSandbox.jsp");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
 //	$("#main-merchantlist").click(function(){
 //		$("#main-merchantlist").html("<div class='boldbox' onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby merchants</h4></div>");
@@ -984,6 +984,16 @@ function setGroupDescription(eventObject, existingDescription)
 	});
 }
 
+function submitGroupAllianceRequest(eventObject) 
+{
+	promptPopup("Request Alliance", "Enter the name of the group you want to ally with.", "",  function(groupName) {
+		if (groupName != null || groupName != "") {
+			doCommand(eventObject, "GroupAllianceRequest", {"groupName" : groupName}, function(error)  {
+				if (error) return;
+			})
+		}
+	});
+}
 function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
 	if (oldPosition==null || oldPosition=="")
