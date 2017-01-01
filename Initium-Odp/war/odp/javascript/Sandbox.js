@@ -14,9 +14,11 @@ function getTilePos() {
 
             // Iterate through JSON and place images at offset distances, starting at 0x64
             var $select = $("#somediv");
+            var $offset = ~~document.getElementById("offset").value;
+            
             var $xCoord = 0;
             var $yCoord = 64;
-            var $offset = 32;
+
             var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
             $.each(responseJson, function (index, value) {
                 $.each(value, function (innerIndex, innerValue) {
