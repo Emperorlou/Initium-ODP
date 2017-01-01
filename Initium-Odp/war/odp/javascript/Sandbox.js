@@ -13,7 +13,7 @@ function getTilePos() {
             }
 
             // Iterate through JSON and place images at offset distances, starting at 0x64
-            var $select = $("#somebody");
+            var $select = $("#somediv");
             var $xCoord = 0;
             var $yCoord = 64;
             var $offset = 32;
