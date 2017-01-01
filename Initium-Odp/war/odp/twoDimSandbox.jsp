@@ -1,17 +1,8 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" import="com.universeprojects.miniup.server.RandomTileGenerator" %>
-
-<html>
-<head>
-    <title>Sandbox 2D Tiles</title>
-</head>
-<body id="somebody">
-
 Width: <input type='text' id='width' value=20 />
 Height: <input type='text' id='height' value=20 />
 Seed: <input type='text' id='seed' value=123456 />
 <button id="somebutton">press here</button>
 
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script>
     $(document).on("click", "#somebutton", function() {
         $.ajax({
@@ -45,6 +36,3 @@ Seed: <input type='text' id='seed' value=123456 />
         });
     });
 </script>
-
-</body>
-</html>
