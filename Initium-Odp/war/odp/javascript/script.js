@@ -786,7 +786,7 @@ function loadLocationMerchants()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("twoDimSandbox.jsp");
+	pagePopup("/odp/twoDimSandbox.jsp");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
 //	$("#main-merchantlist").click(function(){
 //		$("#main-merchantlist").html("<div class='boldbox' onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby merchants</h4></div>");
