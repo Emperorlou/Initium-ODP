@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,11 +8,11 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.BuffDef;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class BuffDefDao extends OdpDao<BuffDef> {
-
 	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public BuffDefDao(CachedDatastoreService datastore) {
@@ -31,17 +31,17 @@ public class BuffDefDao extends OdpDao<BuffDef> {
 	}
 
 	@Override
-	public List<BuffDef> findAll() {
-		List<BuffDef> all = new ArrayList<>();
-		for (CachedEntity entity : findAllCachedEntities(BuffDef.KIND)) {
-			if (entity == null) {
-				getLogger().warning("Null entity received from query");
-				continue;
-			}
+	public List<BuffDef> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(BuffDef.KIND), BuffDef.class);
+	}
 
-			all.add(new BuffDef(entity));
+	@Override
+	public List<BuffDef> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
 		}
-		return all;
+
+		return buildList(getDatastore().get(keyList), BuffDef.class);
 	}
 
 }

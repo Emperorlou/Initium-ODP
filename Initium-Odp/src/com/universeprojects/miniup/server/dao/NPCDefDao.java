@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,38 +8,40 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.NPCDef;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class NPCDefDao extends OdpDao<NPCDef> {
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
-private static final Logger log = Logger.getLogger(ClassName.class.getName());
+	public NPCDefDao(CachedDatastoreService datastore) {
+		super(datastore);
+	}
 
-public NPCDefDao(CachedDatastoreService datastore) {
-super(datastore);
-}
+	@Override
+	protected Logger getLogger() {
+		return log;
+	}
 
-@Override
-protected Logger getLogger() {
-return log;
-}
+	@Override
+	public NPCDef get(Key key) {
+		CachedEntity entity = getCachedEntity(key);
+		return entity == null ? null : new NPCDef(entity);
+	}
 
-@Override
-public NPCDef get(Key key) {
-CachedEntity entity = getCachedEntity(key);
-return entity == null ? null : new NPCDef(entity);
-}@Override
-public List<NPCDef> findAll() {
-List<NPCDef> all = new ArrayList<>();
-for (CachedEntity entity : findAllCachedEntities(NPCDef.KIND)) {
-if (entity == null) {
-getLogger().warning("Null entity received from query");
-continue;
-}
+	@Override
+	public List<NPCDef> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(NPCDef.KIND), NPCDef.class);
+	}
 
-all.add(new NPCDef(entity));
-}
-return all;
-}
+	@Override
+	public List<NPCDef> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return buildList(getDatastore().get(keyList), NPCDef.class);
+	}
 
 }

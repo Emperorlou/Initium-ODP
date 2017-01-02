@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,11 +8,11 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.CollectableDef;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class CollectableDefDao extends OdpDao<CollectableDef> {
-
 	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public CollectableDefDao(CachedDatastoreService datastore) {
@@ -31,17 +31,17 @@ public class CollectableDefDao extends OdpDao<CollectableDef> {
 	}
 
 	@Override
-	public List<CollectableDef> findAll() {
-		List<CollectableDef> all = new ArrayList<>();
-		for (CachedEntity entity : findAllCachedEntities(CollectableDef.KIND)) {
-			if (entity == null) {
-				getLogger().warning("Null entity received from query");
-				continue;
-			}
+	public List<CollectableDef> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(CollectableDef.KIND), CollectableDef.class);
+	}
 
-			all.add(new CollectableDef(entity));
+	@Override
+	public List<CollectableDef> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
 		}
-		return all;
+
+		return buildList(getDatastore().get(keyList), CollectableDef.class);
 	}
 
 }

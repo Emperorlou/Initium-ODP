@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,11 +8,11 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.Schema;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class SchemaDao extends OdpDao<Schema> {
-
 	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public SchemaDao(CachedDatastoreService datastore) {
@@ -31,17 +31,17 @@ public class SchemaDao extends OdpDao<Schema> {
 	}
 
 	@Override
-	public List<Schema> findAll() {
-		List<Schema> all = new ArrayList<>();
-		for (CachedEntity entity : findAllCachedEntities(Schema.KIND)) {
-			if (entity == null) {
-				getLogger().warning("Null entity received from query");
-				continue;
-			}
+	public List<Schema> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(Schema.KIND), Schema.class);
+	}
 
-			all.add(new Schema(entity));
+	@Override
+	public List<Schema> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
 		}
-		return all;
+
+		return buildList(getDatastore().get(keyList), Schema.class);
 	}
 
 }

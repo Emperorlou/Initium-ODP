@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,38 +8,40 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.CustomOrder;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class CustomOrderDao extends OdpDao<CustomOrder> {
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
-private static final Logger log = Logger.getLogger(ClassName.class.getName());
+	public CustomOrderDao(CachedDatastoreService datastore) {
+		super(datastore);
+	}
 
-public CustomOrderDao(CachedDatastoreService datastore) {
-super(datastore);
-}
+	@Override
+	protected Logger getLogger() {
+		return log;
+	}
 
-@Override
-protected Logger getLogger() {
-return log;
-}
+	@Override
+	public CustomOrder get(Key key) {
+		CachedEntity entity = getCachedEntity(key);
+		return entity == null ? null : new CustomOrder(entity);
+	}
 
-@Override
-public CustomOrder get(Key key) {
-CachedEntity entity = getCachedEntity(key);
-return entity == null ? null : new CustomOrder(entity);
-}@Override
-public List<CustomOrder> findAll() {
-List<CustomOrder> all = new ArrayList<>();
-for (CachedEntity entity : findAllCachedEntities(CustomOrder.KIND)) {
-if (entity == null) {
-getLogger().warning("Null entity received from query");
-continue;
-}
+	@Override
+	public List<CustomOrder> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(CustomOrder.KIND), CustomOrder.class);
+	}
 
-all.add(new CustomOrder(entity));
-}
-return all;
-}
+	@Override
+	public List<CustomOrder> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return buildList(getDatastore().get(keyList), CustomOrder.class);
+	}
 
 }

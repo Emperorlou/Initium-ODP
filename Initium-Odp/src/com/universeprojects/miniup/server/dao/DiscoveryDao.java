@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,11 +8,11 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.Discovery;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class DiscoveryDao extends OdpDao<Discovery> {
-
 	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public DiscoveryDao(CachedDatastoreService datastore) {
@@ -31,17 +31,17 @@ public class DiscoveryDao extends OdpDao<Discovery> {
 	}
 
 	@Override
-	public List<Discovery> findAll() {
-		List<Discovery> all = new ArrayList<>();
-		for (CachedEntity entity : findAllCachedEntities(Discovery.KIND)) {
-			if (entity == null) {
-				getLogger().warning("Null entity received from query");
-				continue;
-			}
+	public List<Discovery> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(Discovery.KIND), Discovery.class);
+	}
 
-			all.add(new Discovery(entity));
+	@Override
+	public List<Discovery> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
 		}
-		return all;
+
+		return buildList(getDatastore().get(keyList), Discovery.class);
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,11 +8,11 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.Tag;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class TagDao extends OdpDao<Tag> {
-
 	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public TagDao(CachedDatastoreService datastore) {
@@ -31,17 +31,17 @@ public class TagDao extends OdpDao<Tag> {
 	}
 
 	@Override
-	public List<Tag> findAll() {
-		List<Tag> all = new ArrayList<>();
-		for (CachedEntity entity : findAllCachedEntities(Tag.KIND)) {
-			if (entity == null) {
-				getLogger().warning("Null entity received from query");
-				continue;
-			}
+	public List<Tag> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(Tag.KIND), Tag.class);
+	}
 
-			all.add(new Tag(entity));
+	@Override
+	public List<Tag> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
 		}
-		return all;
+
+		return buildList(getDatastore().get(keyList), Tag.class);
 	}
 
 }

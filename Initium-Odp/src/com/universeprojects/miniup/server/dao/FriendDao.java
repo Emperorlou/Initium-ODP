@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,11 +8,11 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.Friend;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class FriendDao extends OdpDao<Friend> {
-
 	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public FriendDao(CachedDatastoreService datastore) {
@@ -31,17 +31,17 @@ public class FriendDao extends OdpDao<Friend> {
 	}
 
 	@Override
-	public List<Friend> findAll() {
-		List<Friend> all = new ArrayList<>();
-		for (CachedEntity entity : findAllCachedEntities(Friend.KIND)) {
-			if (entity == null) {
-				getLogger().warning("Null entity received from query");
-				continue;
-			}
+	public List<Friend> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(Friend.KIND), Friend.class);
+	}
 
-			all.add(new Friend(entity));
+	@Override
+	public List<Friend> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
 		}
-		return all;
+
+		return buildList(getDatastore().get(keyList), Friend.class);
 	}
 
 }

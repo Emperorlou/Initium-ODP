@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -8,11 +8,11 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.Quotes;
+import com.universeprojects.miniup.server.exceptions.DaoException;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
 public class QuotesDao extends OdpDao<Quotes> {
-
 	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public QuotesDao(CachedDatastoreService datastore) {
@@ -31,17 +31,17 @@ public class QuotesDao extends OdpDao<Quotes> {
 	}
 
 	@Override
-	public List<Quotes> findAll() {
-		List<Quotes> all = new ArrayList<>();
-		for (CachedEntity entity : findAllCachedEntities(Quotes.KIND)) {
-			if (entity == null) {
-				getLogger().warning("Null entity received from query");
-				continue;
-			}
+	public List<Quotes> findAll() throws DaoException {
+		return buildList(findAllCachedEntities(Quotes.KIND), Quotes.class);
+	}
 
-			all.add(new Quotes(entity));
+	@Override
+	public List<Quotes> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
 		}
-		return all;
+
+		return buildList(getDatastore().get(keyList), Quotes.class);
 	}
 
 }
