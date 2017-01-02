@@ -63,18 +63,6 @@ public class CommandGroupDelete extends Command
 			throw new UserErrorMessage(
 					"The group must have no members before it can be deleted.");
 		}
-
-		if (alliances != null)
-		{
-			throw new UserErrorMessage(
-					"The group must end all alliances before it can be deleted.");
-		}
-		
-		if (wars != null)
-		{
-			throw new UserErrorMessage(
-					"The group must end all wars before it can be deleted.");
-		}
 		
 		if (GameUtils.equals((Key) group.getProperty("creatorKey"),
 				(Key) character.getKey()) == false)
