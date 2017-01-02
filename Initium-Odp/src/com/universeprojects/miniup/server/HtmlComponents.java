@@ -508,13 +508,10 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		return sb.toString();
 	}
 	
-	public static String generateAlliedGroups(CachedEntity viewingChar, CachedEntity group, boolean inGroup)
-	{
-		String viewStatus = (String)viewingChar.getProperty("groupStatus");
-		boolean viewAdmin = inGroup && "Admin".equals(viewStatus);
-		
+	public static String generateAlliedGroups(CachedEntity group, boolean isAdmin)
+	{		
 		StringBuilder sb = new StringBuilder();
-		if (viewAdmin)
+		if (isAdmin)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 			sb.append("<div class='main-item-container'><div class='main-item'>");
@@ -534,13 +531,10 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		
 	}
 	
-	public static String generateWarDeclarations(CachedEntity viewingChar, CachedEntity group, boolean inGroup)
-	{
-		String viewStatus = (String)viewingChar.getProperty("groupStatus");
-		boolean viewAdmin = inGroup && "Admin".equals(viewStatus);
-		
+	public static String generateWarDeclarations(CachedEntity group, boolean isAdmin)
+	{	
 		StringBuilder sb = new StringBuilder();
-		if (viewAdmin)
+		if (isAdmin)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 			sb.append("<div class='main-item-container'><div class='main-item'>");

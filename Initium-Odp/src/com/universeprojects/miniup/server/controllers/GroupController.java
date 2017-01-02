@@ -228,6 +228,7 @@ public class GroupController extends PageController {
 			
 			@SuppressWarnings("unchecked")
 			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
+			@SuppressWarnings("unchecked")
 			List<Key> keyOfAllies = (List<Key>)group.getProperty("declaredAlliedGroups");
 			List<String> warGroupNames = new ArrayList<String>();
 			List<String> alliedGroupNames = new ArrayList<String>();
@@ -236,10 +237,11 @@ public class GroupController extends PageController {
 			if (keyOfDecs != null)
 			{
 				List<CachedEntity> warGroups = db.getEntities(keyOfDecs);
-			
+				boolean isAdmin = service.isCharacterGroupAdmin();
+
 				for (CachedEntity declaredGroup : warGroups) 
 				{
-					String output = HtmlComponents.generateWarDeclarations(character, declaredGroup, inGroup);
+					String output = HtmlComponents.generateWarDeclarations(declaredGroup, isAdmin);
 					warGroupNames.add(output);
 				}
 				request.setAttribute("warDecGroupNames", warGroupNames);
@@ -248,10 +250,12 @@ public class GroupController extends PageController {
 			if (keyOfAllies != null)
 			{
 				List<CachedEntity> alliedGroups = db.getEntities(keyOfAllies);
+				boolean isAdmin = service.isCharacterGroupAdmin();
+
 				
 				for (CachedEntity allies : alliedGroups)
 				{
-					String output = HtmlComponents.generateAlliedGroups(character, allies, inGroup);
+					String output = HtmlComponents.generateAlliedGroups(allies, isAdmin);
 					alliedGroupNames.add(output);
 				}
 				request.setAttribute("declaredAlliedGroups", alliedGroupNames);
