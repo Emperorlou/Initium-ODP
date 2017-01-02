@@ -324,7 +324,7 @@ public class GroupService extends Service {
 			createWarListCharGroup.add(warGroup.getKey());
 			warGroupWars.add(this.characterGroup.getKey());
 			this.characterGroup.setProperty("declaredWarGroups", createWarListCharGroup);
-			warGroup.setProperty("declaredAlliedGroups", warGroupWars);
+			warGroup.setProperty("declaredWarGroups", warGroupWars);
 			
 			groupsToSave.add(this.characterGroup);
 			groupsToSave.add(warGroup);
