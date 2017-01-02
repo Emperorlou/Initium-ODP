@@ -428,7 +428,6 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 			groupPermissionTag = "(Admin)";
 		if (isCreator)
 			groupPermissionTag = "(Creator)";
-
 		String groupRank = "";
 		if (character.getProperty("groupRank") != null)
 			groupRank = (String) character.getProperty("groupRank");
