@@ -293,104 +293,49 @@ public class GroupService extends Service {
 	@SuppressWarnings("unchecked")
 	public boolean beginWar(CachedDatastoreService ds, CachedEntity warGroup)
 	{
+		//null check
 	if (warGroup == null)
 		return false;
-	List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
+	
 	if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
 	{
 		List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredWarGroups");
-		List<Key> warGroupWars = (List<Key>)warGroup.getProperty("declaredWarGroups");
 		
-		if (charGroupWars == null && warGroupWars == null)
+		if (charGroupWars == null)
 		{
-			List<Key> createWarListCharGroup = new ArrayList<Key>();
-			List<Key> createWarListAllyGroup = new ArrayList<Key>();
-
-			createWarListCharGroup.add(warGroup.getKey());
-			createWarListAllyGroup.add(this.characterGroup.getKey());
-
-			this.characterGroup.setProperty("declaredWarGroups", createWarListCharGroup);
-			warGroup.setProperty("declaredWarGroups", createWarListAllyGroup);
-			
-			groupsToSave.add(this.characterGroup);
-			groupsToSave.add(warGroup);
-			ds.put(groupsToSave);
+			List<Key> createCharGroupWars = new ArrayList<Key>();
+			createCharGroupWars.add(warGroup.getKey());
+			this.characterGroup.setProperty("declaredWarGroups", createCharGroupWars);
+			ds.put(this.characterGroup);
 			return true;
 		}
-		else if (charGroupWars == null && warGroupWars != null)
-		{
-			List<Key> createWarListCharGroup = new ArrayList<Key>();
-
-			createWarListCharGroup.add(warGroup.getKey());
-			warGroupWars.add(this.characterGroup.getKey());
-			this.characterGroup.setProperty("declaredWarGroups", createWarListCharGroup);
-			warGroup.setProperty("declaredWarGroups", warGroupWars);
-			
-			groupsToSave.add(this.characterGroup);
-			groupsToSave.add(warGroup);
-			ds.put(groupsToSave);
-			return true;
-		}
-		else if (charGroupWars != null && warGroupWars == null)
-		{
-			List<Key> createWarListAllyGroup = new ArrayList<Key>();
-
-			charGroupWars.add(warGroup.getKey());
-			createWarListAllyGroup.add(this.characterGroup.getKey());
-
-			this.characterGroup.setProperty("declaredWarGroups", charGroupWars);
-			warGroup.setProperty("declaredWarGroups", createWarListAllyGroup);
-			
-			groupsToSave.add(this.characterGroup);
-			groupsToSave.add(warGroup);
-			ds.put(groupsToSave);
-			return true;
-		}
-		else if (charGroupWars.contains(warGroup.getKey()) || warGroupWars.contains(this.characterGroup.getKey()))
-		{				
-			return false;
-		}
-		else if (charGroupWars != null && warGroupWars != null)
+		else if (charGroupWars != null)
 		{
 			charGroupWars.add(warGroup.getKey());
-			warGroupWars.add(this.characterGroup.getKey());
 			this.characterGroup.setProperty("declaredWarGroups", charGroupWars);
-			groupsToSave.add(this.characterGroup);
-			groupsToSave.add(warGroup);
-			ds.put(groupsToSave);
+			ds.put(this.characterGroup);
 			return true;
-		}	
+		}
 	}
 	return false;
 }
-	
 	@SuppressWarnings("unchecked")
 	public boolean endWar(CachedDatastoreService ds, CachedEntity warGroup) throws UserErrorMessage
 	{
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
 		{
 			List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
-			List<Key> warGroupWars = (List<Key>)warGroup.getProperty("declaredAlliedGroups");
-			List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
 			
-			if (charGroupWars != null && warGroupWars != null)
+			if (charGroupWars != null)
 			{
 				charGroupWars.remove(warGroup.getKey());
 				this.characterGroup.setProperty("declaredWarGroups", charGroupWars);
-				
-				warGroupWars.remove(this.characterGroup.getKey());
-				warGroup.setProperty("declaredAlliedGroups", warGroupWars);
-				
-				groupsToSave.add(warGroup);
-				groupsToSave.add(this.characterGroup);
-				ds.put(groupsToSave);	
+				ds.put(this.characterGroup);
 				return true;
 			}
-			throw new UserErrorMessage(
-					"One of the lists is null");
+			return false;
 		}
-		throw new UserErrorMessage(
-				"Either not admin or in the ally group.");
+		return false;
 	}
 	
 	public CachedEntity setAllianceRequest(CachedEntity allyGroup) throws UserErrorMessage
@@ -414,76 +359,25 @@ public class GroupService extends Service {
 	@SuppressWarnings("unchecked")
 	public boolean acceptAllianceRequest(CachedDatastoreService ds, CachedEntity allyGroup)
 	{
-		List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
 		{
 			List<Key> charGroupAlliances = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
-			List<Key> allyGroupAlliances = (List<Key>)allyGroup.getProperty("declaredAlliedGroups");
 			
-			if (charGroupAlliances == null && allyGroupAlliances == null)
+			if (charGroupAlliances == null)
 			{
-				List<Key> createAllianceListCharGroup = new ArrayList<Key>();
-				List<Key> createAllianceListAllyGroup = new ArrayList<Key>();
-
-				createAllianceListCharGroup.add(allyGroup.getKey());
-				createAllianceListAllyGroup.add(this.characterGroup.getKey());
-
-				this.characterGroup.setProperty("declaredAlliedGroups", createAllianceListCharGroup);
-				allyGroup.setProperty("declaredAlliedGroups", createAllianceListAllyGroup);
-				allyGroup.setProperty("pendingAllianceGroupKey", null);
-				
-				groupsToSave.add(this.characterGroup);
-				groupsToSave.add(allyGroup);
-				ds.put(groupsToSave);
+				List<Key> createCharGroupAlliances = new ArrayList<Key>();
+				createCharGroupAlliances.add(allyGroup.getKey());
+				this.characterGroup.setProperty("declaredAlliedGroups", createCharGroupAlliances);
+				ds.put(this.characterGroup);
 				return true;
 			}
-			else if (charGroupAlliances == null && allyGroupAlliances != null)
-			{
-				List<Key> createAllianceListCharGroup = new ArrayList<Key>();
-
-				createAllianceListCharGroup.add(allyGroup.getKey());
-				allyGroupAlliances.add(this.characterGroup.getKey());
-				this.characterGroup.setProperty("declaredAlliedGroups", createAllianceListCharGroup);
-				allyGroup.setProperty("declaredAlliedGroups", allyGroupAlliances);
-				allyGroup.setProperty("pendingAllianceGroupKey", null);
-				
-				groupsToSave.add(this.characterGroup);
-				groupsToSave.add(allyGroup);
-				ds.put(groupsToSave);
-				return true;
-			}
-			else if (charGroupAlliances != null && allyGroupAlliances == null)
-			{
-				List<Key> createAllianceListAllyGroup = new ArrayList<Key>();
-
-				charGroupAlliances.add(allyGroup.getKey());
-				createAllianceListAllyGroup.add(this.characterGroup.getKey());
-
-				this.characterGroup.setProperty("declaredAlliedGroups", charGroupAlliances);
-				allyGroup.setProperty("declaredAlliedGroups", createAllianceListAllyGroup);
-				allyGroup.setProperty("pendingAllianceGroupKey", null);
-				
-				groupsToSave.add(this.characterGroup);
-				groupsToSave.add(allyGroup);
-				ds.put(groupsToSave);
-				return true;
-			}
-			else if (charGroupAlliances != null && allyGroupAlliances != null)
+			else
 			{
 				charGroupAlliances.add(allyGroup.getKey());
-				allyGroupAlliances.add(this.characterGroup.getKey());
 				this.characterGroup.setProperty("declaredAlliedGroups", charGroupAlliances);
-				allyGroup.setProperty("pendingAllianceGroupKey", null);
-				groupsToSave.add(this.characterGroup);
-				groupsToSave.add(allyGroup);
-				ds.put(groupsToSave);
+				ds.put(this.characterGroup);
 				return true;
-			}
-			
-			else if (charGroupAlliances.contains(allyGroup.getKey()) || allyGroupAlliances.contains(this.characterGroup.getKey()))
-			{				
-				return false;
-			}	
+			}			
 		}
 		return false;
 	}
@@ -505,27 +399,17 @@ public class GroupService extends Service {
 		if(this.isAdmin)
 		{
 			List<Key> charGroupAlliances = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
-			List<Key> allyGroupAlliances = (List<Key>)allyGroup.getProperty("declaredAlliedGroups");
-			List<CachedEntity> groupsToSave = new ArrayList<CachedEntity>();
 			
-			if (charGroupAlliances != null && allyGroupAlliances != null)
+			if (charGroupAlliances != null)
 			{
 				charGroupAlliances.remove(allyGroup.getKey());
-				this.characterGroup.setProperty("declaredAlliedGroups", charGroupAlliances);
+				this.characterGroup.setProperty("declaredAlliedGroups", charGroupAlliances);			
 				
-				allyGroupAlliances.remove(this.characterGroup.getKey());
-				allyGroup.setProperty("declaredAlliedGroups", allyGroupAlliances);
-				
-				groupsToSave.add(allyGroup);
-				groupsToSave.add(this.characterGroup);
-				ds.put(groupsToSave);		
+				ds.put(this.characterGroup);
 				return true;
 			}
-			else
-			throw new UserErrorMessage(
-					"One list is null");
+			return false;
 		}
-		throw new UserErrorMessage(
-				"Character is not admin");
+		return false;
 	}
 }
