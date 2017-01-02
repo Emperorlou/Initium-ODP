@@ -33,7 +33,7 @@
 ${bannerJs}
 </script>
 	
-<script type="text/javascript" src="./script.js"></script>
+<script type="text/javascript" src="./javascript/script.js"></script>
 
 
 
