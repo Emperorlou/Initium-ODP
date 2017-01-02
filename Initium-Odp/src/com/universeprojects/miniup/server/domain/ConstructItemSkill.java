@@ -10,7 +10,7 @@ public class ConstructItemSkill extends OdpDomain {
 	}
 
 	public ConstructItemSkill(CachedEntity cachedEntity) {
-		super(cachedEntity, "ConstructionItemSkill");
+		super(cachedEntity, "ConstructItemSkill");
 	}
 
 }

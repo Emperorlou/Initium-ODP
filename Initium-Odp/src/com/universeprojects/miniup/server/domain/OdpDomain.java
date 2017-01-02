@@ -19,4 +19,8 @@ public abstract class OdpDomain {
 	public CachedEntity getCachedEntity() {
 		return this.cachedEntity;
 	}
+
+	public boolean equals(Object o) {
+		return (o != null) && (o instanceof OdpDomain) && getCachedEntity().getKey().equals(((OdpDomain) o).getCachedEntity().getKey());
+	}
 }

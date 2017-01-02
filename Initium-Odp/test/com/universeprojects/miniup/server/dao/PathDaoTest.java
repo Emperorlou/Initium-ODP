@@ -1,0 +1,44 @@
+package com.universeprojects.miniup.server.dao;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.domain.Path;
+
+import helper.utilities.HttpServletRequestImpl;
+
+public class PathDaoTest {
+
+	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+
+	private PathDao testObj;
+
+	@Before
+	public void before() {
+		helper.setUp();
+		CachedDatastoreService.disableRemoteAPI();
+		testObj = new PathDao(new ODPDBAccess(new HttpServletRequestImpl()).getDB());
+	}
+
+	@After
+	public void after() {
+		helper.tearDown();
+	}
+
+	@Test
+	public void saveAndGet() { // This works because of the caching
+		Path expectedPath = new Path();
+
+		testObj.save(expectedPath);
+		Path actualPath = testObj.get(expectedPath.getCachedEntity().getKey());
+
+		assertEquals(expectedPath, actualPath);
+	}
+}
