@@ -309,7 +309,7 @@ public class GroupService extends Service {
 		List<Key> keys = (List<Key>)group.getProperty("declaredAlliedGroups");
 		
 		if (keys != null)
-			return db.getEntities(keys);
+			return db.getFilteredList("Group", "declaredAlliedGroups", keys);
 		else
 			return null;
 	}
@@ -355,7 +355,7 @@ public class GroupService extends Service {
 	{
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
 		{
-			List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
+			List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredWarGroups");
 			
 			if (charGroupWars != null)
 			{
