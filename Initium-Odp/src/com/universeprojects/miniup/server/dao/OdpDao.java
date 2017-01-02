@@ -22,7 +22,7 @@ public abstract class OdpDao<T extends OdpDomain> {
 	}
 
 	public boolean save(T o) {
-		datastore.put(o.getCachedEntity());
+		getDatastore().put(o.getCachedEntity());
 		return true;
 	}
 
@@ -39,6 +39,5 @@ public abstract class OdpDao<T extends OdpDomain> {
 	}
 
 	public abstract T get(Key key);
-
 	public abstract List<T> findAll();
 }
