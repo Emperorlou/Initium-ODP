@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.dao;
 
-import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -14,15 +13,7 @@ public class TransmuteRecipeDao extends OdpDao<TransmuteRecipe> {
 
 	@Override
 	public TransmuteRecipe get(Key key) {
-		TransmuteRecipe o = null;
-		try {
-			CachedEntity oEntity = getDatastore().get(key);
-			if (oEntity != null) {
-				o = new TransmuteRecipe(oEntity);
-			}
-		} catch (EntityNotFoundException e) {
-
-		}
-		return o;
+		CachedEntity entity = getCachedEntity(key);
+		return entity == null ? null : new TransmuteRecipe(entity);
 	}
 }

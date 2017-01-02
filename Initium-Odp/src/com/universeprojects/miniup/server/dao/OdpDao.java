@@ -1,7 +1,9 @@
 package com.universeprojects.miniup.server.dao;
 
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.OdpDomain;
 
 public abstract class OdpDao<T extends OdpDomain> {
@@ -20,6 +22,14 @@ public abstract class OdpDao<T extends OdpDomain> {
 	public boolean save(T o) {
 		datastore.put(o.getCachedEntity());
 		return true;
+	}
+
+	protected CachedEntity getCachedEntity(Key key) {
+		try {
+			return getDatastore().get(key);
+		} catch (EntityNotFoundException e) {
+			return null;
+		}
 	}
 
 	public abstract T get(Key key);

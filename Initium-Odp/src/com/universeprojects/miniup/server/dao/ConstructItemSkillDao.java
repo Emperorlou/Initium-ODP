@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.dao;
 
-import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -14,15 +13,7 @@ public class ConstructItemSkillDao extends OdpDao<ConstructItemSkill> {
 
 	@Override
 	public ConstructItemSkill get(Key key) {
-		ConstructItemSkill o = null;
-		try {
-			CachedEntity oEntity = getDatastore().get(key);
-			if (oEntity != null) {
-				o = new ConstructItemSkill(oEntity);
-			}
-		} catch (EntityNotFoundException e) {
-
-		}
-		return o;
+		CachedEntity entity = getCachedEntity(key);
+		return entity == null ? null : new ConstructItemSkill(entity);
 	}
 }
