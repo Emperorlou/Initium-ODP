@@ -309,7 +309,7 @@ public class GroupService extends Service {
 		List<Key> keys = (List<Key>)group.getProperty("declaredAlliedGroups");
 		
 		if (keys != null)
-			return db.getFilteredList("Group", "declaredAlliedGroups", keys);
+			return db.getEntities(keys);
 		else
 			return null;
 	}
