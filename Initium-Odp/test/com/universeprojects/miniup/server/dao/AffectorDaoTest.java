@@ -2,10 +2,13 @@ package com.universeprojects.miniup.server.dao;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -32,7 +35,7 @@ public class AffectorDaoTest {
 		helper.tearDown();
 	}
 
-	@Test (expected = AssertionError.class)
+	@Test(expected = AssertionError.class)
 	public void nullCachedEntity() {
 		new Affector(null);
 	}
@@ -45,5 +48,15 @@ public class AffectorDaoTest {
 		Affector actualAffector = testObj.get(expectedAffector.getCachedEntity().getKey());
 
 		assertEquals(expectedAffector, actualAffector);
+	}
+
+	@Test
+	public void findAll() {
+		testObj.findAll(); // Testing for no exceptions
+	}
+
+	@Test
+	public void getByKeys() {
+		testObj.get(Collections.<Key>emptyList()); // Testing for no exceptions
 	}
 }

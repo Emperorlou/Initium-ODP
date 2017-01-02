@@ -65,6 +65,7 @@ public abstract class OdpDao<T extends OdpDomain> {
 			}
 			return all;
 		} catch (ReflectiveOperationException e) {
+			// Each DAO should have tests ensuring this doesn't happen
 			throw new DaoException(String.format("%s is set up incorrectly", getClass().getName()), e);
 		}
 	}
@@ -73,7 +74,7 @@ public abstract class OdpDao<T extends OdpDomain> {
 
 	public abstract T get(Key key);
 
-	public abstract List<T> get(List<Key> keyList);
+	public abstract List<T> get(List<Key> keyList) throws DaoException;
 
-	public abstract List<T> findAll();
+	public abstract List<T> findAll() throws DaoException;
 }
