@@ -10,21 +10,23 @@ import com.universeprojects.miniup.server.domain.Item;
 
 public class ItemDao extends OdpDao<Item> {
 
-public ItemDao(CachedDatastoreService datastore) {
-super(datastore);
-}
+	public ItemDao(CachedDatastoreService datastore) {
+		super(datastore);
+	}
 
-@Override
-public Item get(Key key) {
-CachedEntity entity = getCachedEntity(key);
-return entity == null ? null : new Item(entity);
-}@Override
-public List<Item> findAll() {
-List<Item> all = new ArrayList<>();
-for (CachedEntity entity : findAllCachedEntities(Item.KIND)) {
-all.add(new Item(entity));
-}
-return all;
-}
+	@Override
+	public Item get(Key key) {
+		CachedEntity entity = getCachedEntity(key);
+		return entity == null ? null : new Item(entity);
+	}
+
+	@Override
+	public List<Item> findAll() {
+		List<Item> all = new ArrayList<>();
+		for (CachedEntity entity : findAllCachedEntities(Item.KIND)) {
+			all.add(new Item(entity));
+		}
+		return all;
+	}
 
 }

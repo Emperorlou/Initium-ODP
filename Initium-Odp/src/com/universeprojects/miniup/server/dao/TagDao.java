@@ -10,21 +10,23 @@ import com.universeprojects.miniup.server.domain.Tag;
 
 public class TagDao extends OdpDao<Tag> {
 
-public TagDao(CachedDatastoreService datastore) {
-super(datastore);
-}
+	public TagDao(CachedDatastoreService datastore) {
+		super(datastore);
+	}
 
-@Override
-public Tag get(Key key) {
-CachedEntity entity = getCachedEntity(key);
-return entity == null ? null : new Tag(entity);
-}@Override
-public List<Tag> findAll() {
-List<Tag> all = new ArrayList<>();
-for (CachedEntity entity : findAllCachedEntities(Tag.KIND)) {
-all.add(new Tag(entity));
-}
-return all;
-}
+	@Override
+	public Tag get(Key key) {
+		CachedEntity entity = getCachedEntity(key);
+		return entity == null ? null : new Tag(entity);
+	}
+
+	@Override
+	public List<Tag> findAll() {
+		List<Tag> all = new ArrayList<>();
+		for (CachedEntity entity : findAllCachedEntities(Tag.KIND)) {
+			all.add(new Tag(entity));
+		}
+		return all;
+	}
 
 }

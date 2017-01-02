@@ -10,21 +10,23 @@ import com.universeprojects.miniup.server.domain.NPCDef;
 
 public class NPCDefDao extends OdpDao<NPCDef> {
 
-public NPCDefDao(CachedDatastoreService datastore) {
-super(datastore);
-}
+	public NPCDefDao(CachedDatastoreService datastore) {
+		super(datastore);
+	}
 
-@Override
-public NPCDef get(Key key) {
-CachedEntity entity = getCachedEntity(key);
-return entity == null ? null : new NPCDef(entity);
-}@Override
-public List<NPCDef> findAll() {
-List<NPCDef> all = new ArrayList<>();
-for (CachedEntity entity : findAllCachedEntities(NPCDef.KIND)) {
-all.add(new NPCDef(entity));
-}
-return all;
-}
+	@Override
+	public NPCDef get(Key key) {
+		CachedEntity entity = getCachedEntity(key);
+		return entity == null ? null : new NPCDef(entity);
+	}
+
+	@Override
+	public List<NPCDef> findAll() {
+		List<NPCDef> all = new ArrayList<>();
+		for (CachedEntity entity : findAllCachedEntities(NPCDef.KIND)) {
+			all.add(new NPCDef(entity));
+		}
+		return all;
+	}
 
 }

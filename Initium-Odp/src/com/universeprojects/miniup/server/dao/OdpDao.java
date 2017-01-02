@@ -39,5 +39,6 @@ public abstract class OdpDao<T extends OdpDomain> {
 	}
 
 	public abstract T get(Key key);
+
 	public abstract List<T> findAll();
 }
