@@ -13,7 +13,7 @@ public abstract class OdpDao<T extends OdpDomain> {
 	private CachedDatastoreService datastore;
 
 	public OdpDao(CachedDatastoreService datastore) {
-		assert datastore != null : "DatastoreService cannot be null";
+		assert datastore != null : "Datastore service cannot be null";
 		this.datastore = datastore;
 	}
 
