@@ -307,7 +307,11 @@ public class GroupService extends Service {
 	public List<CachedEntity> getGroupAlliances(CachedEntity group)
 	{
 		List<Key> keys = (List<Key>)group.getProperty("declaredAlliedGroups");
-		return db.getEntities(keys);
+		
+		if (keys != null)
+			return db.getEntities(keys);
+		else
+			return null;
 	}
 	
 	public List<CachedEntity> getCharGroupAlliances(CachedEntity character)
@@ -369,19 +373,15 @@ public class GroupService extends Service {
 	{
 		if (allyGroup != null)
 		{
-			if (allyGroup.getKey().equals(this.characterGroup.getKey()))
+			if (GameUtils.equals(allyGroup.getKey(), this.characterGroup.getKey()))
 				throw new UserErrorMessage(
 						"Group to ally is character's own group.");
-			List<CachedEntity> charGroupAlliances = getCharGroupAlliances(this.characterGroup);
-			
-			if (charGroupAlliances.contains(allyGroup.getKey()))
-				throw new UserErrorMessage(
-						"You are already allied with this group.");
-			if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
-			{
-					this.characterGroup.setProperty("pendingAllianceGroupKey", allyGroup.getKey());
-					return this.characterGroup;
-			}
+				
+				if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
+				{
+						this.characterGroup.setProperty("pendingAllianceGroupKey", allyGroup.getKey());
+						return this.characterGroup;
+				}
 		}
 		else
 		{
