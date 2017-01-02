@@ -225,33 +225,28 @@ public class GroupController extends PageController {
 			// Get the number that were active in the past week
 			int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
-			
-			@SuppressWarnings("unchecked")
-			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
-			@SuppressWarnings("unchecked")
-			List<Key> keyOfAllies = (List<Key>)group.getProperty("declaredAlliedGroups");
+
+			List<CachedEntity> warGroups = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
+			List<CachedEntity> alliedGroups = db.getFilteredList("Group", "declaredAlliedGroups", group.getKey());
 			List<String> warGroupNames = new ArrayList<String>();
 			List<String> alliedGroupNames = new ArrayList<String>();
-
 			
-			if (keyOfDecs != null)
+			if (warGroups != null)
 			{
-				List<CachedEntity> warGroups = db.getEntities(keyOfDecs);
 				boolean isAdmin = service.isCharacterGroupAdmin();
 
-				for (CachedEntity declaredGroup : warGroups) 
+				for (CachedEntity war : warGroups) 
 				{
-					if (declaredGroup == null)
+					if (group == null)
 						continue;
-					String output = HtmlComponents.generateWarDeclarations(declaredGroup, isAdmin);
+					String output = HtmlComponents.generateWarDeclarations(war, isAdmin);
 					warGroupNames.add(output);
 				}
 				request.setAttribute("warDecGroupNames", warGroupNames);
 			}	
 			
-			if (keyOfAllies != null)
+			if (alliedGroups != null)
 			{
-				List<CachedEntity> alliedGroups = db.getEntities(keyOfAllies);
 				boolean isAdmin = service.isCharacterGroupAdmin();
 				
 				for (CachedEntity allies : alliedGroups)
