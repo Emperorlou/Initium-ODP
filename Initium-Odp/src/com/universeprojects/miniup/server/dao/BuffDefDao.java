@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -10,8 +11,15 @@ import com.universeprojects.miniup.server.domain.BuffDef;
 
 public class BuffDefDao extends OdpDao<BuffDef> {
 
+	private static final Logger log = Logger.getLogger("BuffDefDao");
+
 	public BuffDefDao(CachedDatastoreService datastore) {
 		super(datastore);
+	}
+
+	@Override
+	protected Logger getLogger() {
+		return log;
 	}
 
 	@Override
@@ -24,6 +32,11 @@ public class BuffDefDao extends OdpDao<BuffDef> {
 	public List<BuffDef> findAll() {
 		List<BuffDef> all = new ArrayList<>();
 		for (CachedEntity entity : findAllCachedEntities(BuffDef.KIND)) {
+			if (entity == null) {
+				getLogger().warning("Null entity received from query");
+				continue;
+			}
+
 			all.add(new BuffDef(entity));
 		}
 		return all;
