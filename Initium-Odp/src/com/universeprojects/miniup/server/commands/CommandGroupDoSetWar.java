@@ -44,18 +44,17 @@ public class CommandGroupDoSetWar extends Command {
 		{
 			String groupName = parameters.get("groupName");
 			CachedEntity group = db.getGroupByName(groupName);
-			service.beginWar(ds, group);
-			setPopupMessage("War has been declared!");			
+			if (service.beginWar(ds, group))
+				setPopupMessage("War has been declared!");	
 		}
 		else if (decision.equals("end"))
 		{
 			Long groupID = parameters.containsKey("groupId") ? tryParseId(parameters, "groupId") : null;
 			if(groupID == null) throw new RuntimeException("Command missing parameter groupId");	
 			CachedEntity group = db.getEntity("Group", groupID);
-			service.endWar(ds, group);
-			setPopupMessage("War has ended.");
-		}
-						
+			if (service.endWar(ds, group))
+				setPopupMessage("War has ended.");
+		}						
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }
