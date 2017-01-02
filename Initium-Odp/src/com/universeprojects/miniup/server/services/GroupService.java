@@ -365,7 +365,7 @@ public class GroupService extends Service {
 }
 	
 	@SuppressWarnings("unchecked")
-	public boolean endWar(CachedDatastoreService ds, CachedEntity warGroup)
+	public boolean endWar(CachedDatastoreService ds, CachedEntity warGroup) throws UserErrorMessage
 	{
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
 		{
@@ -383,12 +383,14 @@ public class GroupService extends Service {
 				
 				groupsToSave.add(warGroup);
 				groupsToSave.add(this.characterGroup);
-				ds.put(groupsToSave);
-				return true;			
+				ds.put(groupsToSave);	
+				return true;
 			}
-			return false;
+			throw new UserErrorMessage(
+					"One of the lists is null");
 		}
-		return false;
+		throw new UserErrorMessage(
+				"Either not admin or in the ally group.");
 	}
 	
 	public CachedEntity setAllianceRequest(CachedEntity allyGroup) throws UserErrorMessage
@@ -498,9 +500,9 @@ public class GroupService extends Service {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean deleteAlliance(CachedDatastoreService ds, CachedEntity allyGroup)
+	public boolean deleteAlliance(CachedDatastoreService ds, CachedEntity allyGroup) throws UserErrorMessage
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(allyGroup) == false)
+		if(this.isAdmin)
 		{
 			List<Key> charGroupAlliances = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
 			List<Key> allyGroupAlliances = (List<Key>)allyGroup.getProperty("declaredAlliedGroups");
@@ -508,7 +510,7 @@ public class GroupService extends Service {
 			
 			if (charGroupAlliances != null && allyGroupAlliances != null)
 			{
-				charGroupAlliances.remove(allyGroup);
+				charGroupAlliances.remove(allyGroup.getKey());
 				this.characterGroup.setProperty("declaredAlliedGroups", charGroupAlliances);
 				
 				allyGroupAlliances.remove(this.characterGroup.getKey());
@@ -516,11 +518,14 @@ public class GroupService extends Service {
 				
 				groupsToSave.add(allyGroup);
 				groupsToSave.add(this.characterGroup);
-				ds.put(groupsToSave);
-				return true;			
+				ds.put(groupsToSave);		
+				return true;
 			}
-			return false;
+			else
+			throw new UserErrorMessage(
+					"One list is null");
 		}
-		return false;
+		throw new UserErrorMessage(
+				"Character is not admin");
 	}
 }
