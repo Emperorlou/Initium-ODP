@@ -241,6 +241,8 @@ public class GroupController extends PageController {
 
 				for (CachedEntity declaredGroup : warGroups) 
 				{
+					if (declaredGroup == null)
+						continue;
 					String output = HtmlComponents.generateWarDeclarations(declaredGroup, isAdmin);
 					warGroupNames.add(output);
 				}
@@ -251,10 +253,11 @@ public class GroupController extends PageController {
 			{
 				List<CachedEntity> alliedGroups = db.getEntities(keyOfAllies);
 				boolean isAdmin = service.isCharacterGroupAdmin();
-
 				
 				for (CachedEntity allies : alliedGroups)
 				{
+					if (allies == null)
+						continue;
 					String output = HtmlComponents.generateAlliedGroups(allies, isAdmin);
 					alliedGroupNames.add(output);
 				}
