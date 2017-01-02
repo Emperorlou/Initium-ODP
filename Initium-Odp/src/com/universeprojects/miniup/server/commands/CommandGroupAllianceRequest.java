@@ -28,16 +28,13 @@ public class CommandGroupAllianceRequest extends Command {
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
 		String groupName = parameters.get("groupName");
-
 		if(character.getProperty("groupKey") == null)
 			throw new UserErrorMessage("Character does not belong to a group!");
-				
 		CachedEntity group = db.getGroupByName(groupName);
 		
 		// Group refers to the group we will be merging with. GroupService handles security 
 		// permissions, determining whether the character is an admin of his group.
 		GroupService service = new GroupService(db, character);
-		
 		
 		CachedEntity charGroup = service.setAllianceRequest(group);
 		if(charGroup == null)
@@ -46,9 +43,6 @@ public class CommandGroupAllianceRequest extends Command {
 				throw new UserErrorMessage("Character does not belong to a group");
 			if(service.isCharacterInSpecifiedGroup(group))
 				throw new RuntimeException("Specified group is characters own group");
-			if(service.isCharacterGroupAdmin() == false)
-				throw new UserErrorMessage("Character is not a group admin");
-			throw new UserErrorMessage("Unable to ally with specified group.");
 		}
 		setPopupMessage("Request submitted successfully.");
 		// Key was set by the service, just save the entity.

@@ -1,16 +1,20 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
+import com.universeprojects.miniup.server.commands.framework.TransactionCommand;
 import com.universeprojects.miniup.server.services.GroupService;
 
 public class CommandGroupProcessAllianceReq extends Command {
@@ -36,42 +40,15 @@ public class CommandGroupProcessAllianceReq extends Command {
 		
 		if (decision.equals("accept"))
 		{
-			try
-			{
-				if(service.acceptAllianceRequest(ds, group))
-					setPopupMessage("Request accepted.");
-				else
-					throw new UserErrorMessage("Unexpected error when accepting alliance request.");
-			}
-			catch(Exception ex)
-			{
-				if(service.characterHasGroup() == false)
-					throw new UserErrorMessage("Character does not belong to a group!");
-				if(service.isCharacterGroupAdmin() == false)
-					throw new UserErrorMessage("Character is not an admin of the group!");
-				throw ex;
-			}		
-		}
+			if(service.acceptAllianceRequest(ds, group))
+				setPopupMessage("Request accepted.");
+		}		
 		else
 		{
-			try 
-			{
-				if (service.declineAllianceRequest(ds, group))
-					setPopupMessage("Request declined.");
-				else 
-					throw new UserErrorMessage("You are either not an admin or the groups are already allied.");
-			}
-			catch(Exception ex)
-			{
-				if(service.characterHasGroup() == false)
-					throw new UserErrorMessage("Character does not belong to a group!");
-				if(service.isCharacterGroupAdmin() == false)
-					throw new UserErrorMessage("Character is not an admin of the group!");
-				throw ex;
-			}
-
+			if(service.declineAllianceRequest(ds, group))
+				setPopupMessage("Request declined.");
 		}
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
-
 }
+

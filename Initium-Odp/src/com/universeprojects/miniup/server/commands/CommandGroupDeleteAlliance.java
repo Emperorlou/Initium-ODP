@@ -37,8 +37,6 @@ public class CommandGroupDeleteAlliance extends Command {
 		{
 			setPopupMessage("Alliance with "+ group.getProperty("name").toString()+ " has ended.");
 		}
-		else
-			throw new UserErrorMessage("Unexpected error when attemping to end alliance.");
 
 	setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}

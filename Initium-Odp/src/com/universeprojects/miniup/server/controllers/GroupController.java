@@ -226,25 +226,39 @@ public class GroupController extends PageController {
 			int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
 
-			List<CachedEntity> warGroups = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
+			List<CachedEntity> receivedWars = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
 			List<CachedEntity> alliedGroups = db.getFilteredList("Group", "declaredAlliedGroups", group.getKey());
-			List<String> warGroupNames = new ArrayList<String>();
+			List<Key> declaredWars = (List<Key>)group.getProperty("declaredWarGroups");
 			List<String> alliedGroupNames = new ArrayList<String>();
 			
-			if (warGroups != null)
+			if (declaredWars != null)
 			{
 				boolean isAdmin = service.isCharacterGroupAdmin();
+				List<CachedEntity> declaredWarGroups = db.getEntities(declaredWars);
+				List<String> warGroupNames = new ArrayList<String>();
 
-				for (CachedEntity war : warGroups) 
+				for (CachedEntity war : declaredWarGroups) 
 				{
-					if (group == null)
+					if (war == null)
 						continue;
 					String output = HtmlComponents.generateWarDeclarations(war, isAdmin);
 					warGroupNames.add(output);
 				}
-				request.setAttribute("warDecGroupNames", warGroupNames);
+				request.setAttribute("declaredWars", warGroupNames);
 			}	
-			
+			if (receivedWars != null)
+			{
+				List<String> warGroupNames = new ArrayList<String>();
+				
+				for (CachedEntity war : receivedWars)
+				{
+					if (war == null)
+						continue;
+					String output = HtmlComponents.generateWarsReceived(war);
+					warGroupNames.add(output);
+				}
+				request.setAttribute("receivedWars", warGroupNames);
+			}
 			if (alliedGroups != null)
 			{
 				boolean isAdmin = service.isCharacterGroupAdmin();
@@ -256,7 +270,7 @@ public class GroupController extends PageController {
 					String output = HtmlComponents.generateAlliedGroups(allies, isAdmin);
 					alliedGroupNames.add(output);
 				}
-				request.setAttribute("declaredAlliedGroups", alliedGroupNames);
+				request.setAttribute("alliedGroups", alliedGroupNames);
 			}
 
 			List<CachedEntity> allyRequests = db.getFilteredList("Group", "pendingAllianceGroupKey", group.getKey());

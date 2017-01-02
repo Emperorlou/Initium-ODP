@@ -77,11 +77,15 @@
 
 <div class='main-description'>
 	<h4>Declared Alliances</h4>
-	<c:forEach var="ally" items="${declaredAlliedGroups}">
+	<c:forEach var="ally" items="${alliedGroups}">
 		${ally}
 	</c:forEach>
-	<h4>Active Wars</h4>
-	<c:forEach var="warGroup" items="${warDecGroupNames}">
+	<h4>Declared Wars</h4>
+	<c:forEach var="warGroup" items="${declaredWars}">
+		${warGroup}
+	</c:forEach>
+	<h4>Received Wars</h4>
+	<c:forEach var="warGroup" items="${receivedWars}">
 		${warGroup}
 	</c:forEach>
 	<h4>Members</h4>
