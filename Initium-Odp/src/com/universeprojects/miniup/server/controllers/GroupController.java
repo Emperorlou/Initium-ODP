@@ -225,43 +225,53 @@ public class GroupController extends PageController {
 			// Get the number that were active in the past week
 			int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
-			
-			@SuppressWarnings("unchecked")
-			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
-			@SuppressWarnings("unchecked")
-			List<Key> keyOfAllies = (List<Key>)group.getProperty("declaredAlliedGroups");
-			List<String> warGroupNames = new ArrayList<String>();
-			List<String> alliedGroupNames = new ArrayList<String>();
 
+			List<CachedEntity> receivedWars = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
+			List<Key> alliedGroups = (List<Key>)group.getProperty("declaredAlliedGroups");
+			List<Key> declaredWars = (List<Key>)group.getProperty("declaredWarGroups");
 			
-			if (keyOfDecs != null)
+			if (declaredWars != null)
 			{
-				List<CachedEntity> warGroups = db.getEntities(keyOfDecs);
 				boolean isAdmin = service.isCharacterGroupAdmin();
+				List<CachedEntity> declaredWarGroups = db.getEntities(declaredWars);
+				List<String> warGroupNames = new ArrayList<String>();
 
-				for (CachedEntity declaredGroup : warGroups) 
+				for (CachedEntity war : declaredWarGroups) 
 				{
-					if (declaredGroup == null)
+					if (war == null)
 						continue;
-					String output = HtmlComponents.generateWarDeclarations(declaredGroup, isAdmin);
+					String output = HtmlComponents.generateWarDeclarations(war, isAdmin);
 					warGroupNames.add(output);
 				}
-				request.setAttribute("warDecGroupNames", warGroupNames);
+				request.setAttribute("declaredWars", warGroupNames);
 			}	
-			
-			if (keyOfAllies != null)
+			if (receivedWars != null)
 			{
-				List<CachedEntity> alliedGroups = db.getEntities(keyOfAllies);
-				boolean isAdmin = service.isCharacterGroupAdmin();
+				List<String> warGroupNames = new ArrayList<String>();
 				
-				for (CachedEntity allies : alliedGroups)
+				for (CachedEntity war : receivedWars)
+				{
+					if (war == null)
+						continue;
+					String output = HtmlComponents.generateWarsReceived(war);
+					warGroupNames.add(output);
+				}
+				request.setAttribute("receivedWars", warGroupNames);
+			}
+			if (alliedGroups != null)
+			{
+				boolean isAdmin = service.isCharacterGroupAdmin();
+				List<CachedEntity> declaredAlliedGroups = db.getEntities(alliedGroups);
+				List<String> alliedGroupNames = new ArrayList<String>();
+				
+				for (CachedEntity allies : declaredAlliedGroups)
 				{
 					if (allies == null)
 						continue;
 					String output = HtmlComponents.generateAlliedGroups(allies, isAdmin);
 					alliedGroupNames.add(output);
 				}
-				request.setAttribute("declaredAlliedGroups", alliedGroupNames);
+				request.setAttribute("alliedGroups", alliedGroupNames);
 			}
 
 			List<CachedEntity> allyRequests = db.getFilteredList("Group", "pendingAllianceGroupKey", group.getKey());

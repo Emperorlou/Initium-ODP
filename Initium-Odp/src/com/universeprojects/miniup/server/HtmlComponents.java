@@ -428,7 +428,6 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 			groupPermissionTag = "(Admin)";
 		if (isCreator)
 			groupPermissionTag = "(Creator)";
-
 		String groupRank = "";
 		if (character.getProperty("groupRank") != null)
 			groupRank = (String) character.getProperty("groupRank");
@@ -550,6 +549,17 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 		sb.append("</div></div></div>");
 		}
+		return sb.toString();
+	}
+	
+	public static String generateWarsReceived(CachedEntity group)
+	{	
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("</div></div></div>");
+
 		return sb.toString();
 	}
 }
