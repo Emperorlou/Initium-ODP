@@ -6,13 +6,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Tags are categorical concepts that are applied to an item. Items with the same tags are considered to have the same use or conceptual properties in-game. The more tags items have in common, the more similar in form and function the items are.
 public class Tag extends OdpDomain {
+	public static final String KIND = "Tag";
 
 	public Tag() {
-		super(new CachedEntity("Tag"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Tag(CachedEntity cachedEntity) {
-		super(cachedEntity, "Tag");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (Affector)

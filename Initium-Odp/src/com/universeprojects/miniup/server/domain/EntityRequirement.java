@@ -7,13 +7,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This is used to describe an entity and it is used for matching/validation purposes. For example it could be used to describe an item required for a recipe, or it could be used to describe a tool that is required for construction or resource collection.
 public class EntityRequirement extends OdpDomain {
+	public static final String KIND = "EntityRequirement";
 
 	public EntityRequirement() {
-		super(new CachedEntity("EntityRequirement"));
+		super(new CachedEntity(KIND));
 	}
 
 	public EntityRequirement(CachedEntity cachedEntity) {
-		super(cachedEntity, "EntityRequirement");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// A definition entity that was used to generate the entity we require. For example, an ItemDef that was used to generate an Item.

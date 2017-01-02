@@ -7,13 +7,19 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
 public class Character extends OdpDomain {
+	public static final String KIND = "Character";
 
 	public Character() {
-		super(new CachedEntity("Character"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Character(CachedEntity cachedEntity) {
-		super(cachedEntity, "Character");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	public enum AutomaticWeaponChoiceMethod {

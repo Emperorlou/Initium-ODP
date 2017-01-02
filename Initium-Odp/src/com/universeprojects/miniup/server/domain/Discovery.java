@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This entry tells us whether or not a character can see a given entity. If they cannot see it, they can usually try to search to find it. Discoveries are generally used for finding: Paths, and Items.
 public class Discovery extends OdpDomain {
+	public static final String KIND = "Discovery";
 
 	public Discovery() {
-		super(new CachedEntity("Discovery"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Discovery(CachedEntity cachedEntity) {
-		super(cachedEntity, "Discovery");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (Character)
@@ -58,16 +64,16 @@ public class Discovery extends OdpDomain {
 		return (Boolean) getCachedEntity().getProperty("hidden");
 	}
 
-	public enum Kind {
+	public enum DiscoveryKind {
 		Path,
 	}
 
-	public void setKind(Kind kind) {
-		getCachedEntity().setProperty("kind", kind);
+	public void setDiscoveryKind(DiscoveryKind discoveryKind) {
+		getCachedEntity().setProperty("kind", discoveryKind);
 	}
 
-	public Kind getKind() {
-		return (Kind) getCachedEntity().getProperty("kind");
+	public DiscoveryKind getDiscoveryKind() {
+		return (DiscoveryKind) getCachedEntity().getProperty("kind");
 	}
 
 }

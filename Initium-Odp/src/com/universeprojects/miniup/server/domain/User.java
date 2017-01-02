@@ -8,13 +8,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //When a user signs up, they get one and only one of these.
 public class User extends OdpDomain {
+	public static final String KIND = "User";
 
 	public User() {
-		super(new CachedEntity("User"));
+		super(new CachedEntity(KIND));
 	}
 
 	public User(CachedEntity cachedEntity) {
-		super(cachedEntity, "User");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// We may periodically require a player to answer a question as a break from regular gameplay. This is done to try to make it harder to bot in the game.

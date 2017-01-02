@@ -4,13 +4,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This type of affector allows us to describe how a we (the tool/material..etc) are to affect the process of building/gathering/doing something.
 public class AffectorProcess extends OdpDomain {
+	public static final String KIND = "AffectorProcess";
 
 	public AffectorProcess() {
-		super(new CachedEntity("AffectorProcess"));
+		super(new CachedEntity(KIND));
 	}
 
 	public AffectorProcess(CachedEntity cachedEntity) {
-		super(cachedEntity, "AffectorProcess");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	public void setMaximumMultiplier(Double maximumMultiplier) {

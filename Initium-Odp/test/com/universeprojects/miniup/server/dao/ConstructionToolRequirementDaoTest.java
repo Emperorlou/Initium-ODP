@@ -32,6 +32,11 @@ public class ConstructionToolRequirementDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new ConstructionToolRequirement(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		ConstructionToolRequirement expectedConstructionToolRequirement = new ConstructionToolRequirement();

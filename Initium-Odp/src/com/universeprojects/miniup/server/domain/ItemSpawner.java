@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Item spawners are used to define which items should spawn on an NPC when it is created. It includes spawn odds as well. The NPC has a special field that specifies exactly how many of any type of item needs to spawn at a minimum.
 public class ItemSpawner extends OdpDomain {
+	public static final String KIND = "ItemSpawner";
 
 	public ItemSpawner() {
-		super(new CachedEntity("ItemSpawner"));
+		super(new CachedEntity(KIND));
 	}
 
 	public ItemSpawner(CachedEntity cachedEntity) {
-		super(cachedEntity, "ItemSpawner");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (ItemDef)

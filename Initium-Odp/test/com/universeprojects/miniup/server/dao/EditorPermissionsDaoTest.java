@@ -32,6 +32,11 @@ public class EditorPermissionsDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new EditorPermissions(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		EditorPermissions expectedEditorPermissions = new EditorPermissions();

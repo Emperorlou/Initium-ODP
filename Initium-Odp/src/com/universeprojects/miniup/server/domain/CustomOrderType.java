@@ -5,14 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //All the different types of orders a user can make for customizing things for donation credit.
 public class CustomOrderType extends OdpDomain {
-
+	public static final String KIND = "CustomOrderType";
 
 	public CustomOrderType() {
-		super(new CachedEntity("CustomOrderType"));
+		super(new CachedEntity(KIND));
 	}
 
 	public CustomOrderType(CachedEntity cachedEntity) {
-		super(cachedEntity, "CustomOrderType");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// If there is a special deal for ordering bulk amounts of this order type, this is done by specifying a maximum cost of the total batch here. Use this field in conjunction with the maxCount field.

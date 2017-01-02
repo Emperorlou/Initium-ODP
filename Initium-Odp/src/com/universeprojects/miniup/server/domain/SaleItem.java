@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This entity is used to reference an item in a character's inventory that is for sale.
 public class SaleItem extends OdpDomain {
+	public static final String KIND = "SaleItem";
 
 	public SaleItem() {
-		super(new CachedEntity("SaleItem"));
+		super(new CachedEntity(KIND));
 	}
 
 	public SaleItem(CachedEntity cachedEntity) {
-		super(cachedEntity, "SaleItem");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (Character)

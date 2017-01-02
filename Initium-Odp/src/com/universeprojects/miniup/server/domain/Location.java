@@ -7,13 +7,19 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
 public class Location extends OdpDomain {
+	public static final String KIND = "Location";
 
 	public Location() {
-		super(new CachedEntity("Location"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Location(CachedEntity cachedEntity) {
-		super(cachedEntity, "Location");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	public enum AudioDescriptorPreset {

@@ -32,6 +32,11 @@ public class SaleItemDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new SaleItem(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		SaleItem expectedSaleItem = new SaleItem();

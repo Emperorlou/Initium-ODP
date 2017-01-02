@@ -32,6 +32,11 @@ public class MonsterSpawnerDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new MonsterSpawner(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		MonsterSpawner expectedMonsterSpawner = new MonsterSpawner();

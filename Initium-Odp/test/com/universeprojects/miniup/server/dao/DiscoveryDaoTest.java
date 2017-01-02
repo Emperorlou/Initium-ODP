@@ -32,6 +32,11 @@ public class DiscoveryDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Discovery(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Discovery expectedDiscovery = new Discovery();

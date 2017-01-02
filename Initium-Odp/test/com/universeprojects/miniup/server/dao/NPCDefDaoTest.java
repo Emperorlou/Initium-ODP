@@ -32,6 +32,11 @@ public class NPCDefDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new NPCDef(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		NPCDef expectedNPCDef = new NPCDef();

@@ -6,13 +6,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This is used as a complete definition of a tool "slot". It includes rules for how to identify a valid tool for this slot, and the effect the tool has on the outcome of thing the tool is being used to create.
 public class ConstructionToolRequirement extends OdpDomain {
+	public static final String KIND = "ConstructionToolRequirement";
 
 	public ConstructionToolRequirement() {
-		super(new CachedEntity("ConstructionToolRequirement"));
+		super(new CachedEntity(KIND));
 	}
 
 	public ConstructionToolRequirement(CachedEntity cachedEntity) {
-		super(cachedEntity, "ConstructionToolRequirement");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (EntityRequirement|type==Tool)

@@ -32,6 +32,11 @@ public class BuffDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Buff(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Buff expectedBuff = new Buff();

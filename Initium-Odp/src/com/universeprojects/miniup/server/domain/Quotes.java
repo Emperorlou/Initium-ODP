@@ -4,13 +4,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Things people have said about the game. These quotes could appear on the website (possibly randomly). It's better to have sources to the quotes if possible.
 public class Quotes extends OdpDomain {
+	public static final String KIND = "Quotes";
 
 	public Quotes() {
-		super(new CachedEntity("Quotes"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Quotes(CachedEntity cachedEntity) {
-		super(cachedEntity, "Quotes");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The name of the person who we are quoting.

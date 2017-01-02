@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //A collection of stats on the Initium project level.
 public class Project extends OdpDomain {
+	public static final String KIND = "Project";
 
 	public Project() {
-		super(new CachedEntity("Project"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Project(CachedEntity cachedEntity) {
-		super(cachedEntity, "Project");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (Location|type==Town)

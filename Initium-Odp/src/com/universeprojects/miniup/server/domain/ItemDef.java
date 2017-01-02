@@ -9,13 +9,19 @@ import com.universeprojects.miniup.server.domain.Item.EquipSlot;
 
 //Item definitions. This entity describes how to create an instance of an item.
 public class ItemDef extends OdpDomain {
+	public static final String KIND = "ItemDef";
 
 	public ItemDef() {
-		super(new CachedEntity("ItemDef"));
+		super(new CachedEntity(KIND));
 	}
 
 	public ItemDef(CachedEntity cachedEntity) {
-		super(cachedEntity, "ItemDef");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The percentage chance of a successfully blocked attack. Critical hits cannot be blocked by this block chance.

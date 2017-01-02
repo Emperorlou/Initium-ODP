@@ -32,6 +32,11 @@ public class EntityRequirementDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new EntityRequirement(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		EntityRequirement expectedEntityRequirement = new EntityRequirement();

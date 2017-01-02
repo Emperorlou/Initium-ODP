@@ -7,13 +7,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Collectable definitions. This entity describes how to create an instance of a Collectable.
 public class CollectableDef extends OdpDomain {
+	public static final String KIND = "CollectableDef";
 
 	public CollectableDef() {
-		super(new CachedEntity("CollectableDef"));
+		super(new CachedEntity(KIND));
 	}
 
 	public CollectableDef(CachedEntity cachedEntity) {
-		super(cachedEntity, "CollectableDef");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The banner url that is to be used in the CollectionSite location generated for this collectable.

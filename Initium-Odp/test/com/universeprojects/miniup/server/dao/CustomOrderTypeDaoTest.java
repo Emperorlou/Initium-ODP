@@ -32,6 +32,11 @@ public class CustomOrderTypeDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new CustomOrderType(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		CustomOrderType expectedCustomOrderType = new CustomOrderType();

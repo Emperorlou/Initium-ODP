@@ -9,13 +9,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This is a live instance of an item in the game world.
 public class Item extends OdpDomain {
+	public static final String KIND = "Item";
 
 	public Item() {
-		super(new CachedEntity("Item"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Item(CachedEntity cachedEntity) {
-		super(cachedEntity, "Item");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	public void setBlockChance(Long blockChance) {

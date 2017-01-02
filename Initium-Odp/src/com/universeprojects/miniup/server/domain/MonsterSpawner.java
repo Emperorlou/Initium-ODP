@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //A monster spawner belongs to a location. It defines the odds of a player finding a monster, and links to a NPCDef for creating the monster in the game world.
 public class MonsterSpawner extends OdpDomain {
+	public static final String KIND = "MonsterSpawner";
 
 	public MonsterSpawner() {
-		super(new CachedEntity("MonsterSpawner"));
+		super(new CachedEntity(KIND));
 	}
 
 	public MonsterSpawner(CachedEntity cachedEntity) {
-		super(cachedEntity, "MonsterSpawner");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The number of monsters that will always spawn during the instance spawning routine.

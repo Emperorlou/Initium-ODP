@@ -32,6 +32,11 @@ public class ChangeLogDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new ChangeLog(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		ChangeLog expectedChangeLog = new ChangeLog();

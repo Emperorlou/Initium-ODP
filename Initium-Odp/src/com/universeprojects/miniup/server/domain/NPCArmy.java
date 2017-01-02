@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This entity is used for the "NPC army" mechanic. This mechanic basically spawns monsters over time and automatically propagates them on the map so they "spread" if they are not contained by players.
 public class NPCArmy extends OdpDomain {
+	public static final String KIND = "NPCArmy";
 
 	public NPCArmy() {
-		super(new CachedEntity("NPCArmy"));
+		super(new CachedEntity(KIND));
 	}
 
 	public NPCArmy(CachedEntity cachedEntity) {
-		super(cachedEntity, "NPCArmy");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (Location|type==Permanent)

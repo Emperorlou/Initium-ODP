@@ -32,6 +32,11 @@ public class PathDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Path(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Path expectedPath = new Path();

@@ -7,13 +7,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This entity is used to describe a defensive structure in the game world. It has hitpoints so it can be destroyed. It is attached to a location and acts as a blockade to keep other players from entering said location.
 public class DefenceStructure extends OdpDomain {
+	public static final String KIND = "DefenceStructure";
 
 	public DefenceStructure() {
-		super(new CachedEntity("DefenceStructure"));
+		super(new CachedEntity(KIND));
 	}
 
 	public DefenceStructure(CachedEntity cachedEntity) {
-		super(cachedEntity, "DefenceStructure");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The banner that will be used when a player is not in combat at the defence structure site.

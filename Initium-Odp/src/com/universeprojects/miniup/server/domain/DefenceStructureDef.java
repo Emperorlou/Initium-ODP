@@ -4,13 +4,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This is used to describe how to create a DefenceStructure object for the game.
 public class DefenceStructureDef extends OdpDomain {
+	public static final String KIND = "DefenceStructureDef";
 
 	public DefenceStructureDef() {
-		super(new CachedEntity("DefenceStructureDef"));
+		super(new CachedEntity(KIND));
 	}
 
 	public DefenceStructureDef(CachedEntity cachedEntity) {
-		super(cachedEntity, "DefenceStructureDef");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	public void setBannerUrl(String bannerUrl) {

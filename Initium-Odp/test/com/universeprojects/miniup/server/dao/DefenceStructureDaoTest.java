@@ -32,6 +32,11 @@ public class DefenceStructureDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new DefenceStructure(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		DefenceStructure expectedDefenceStructure = new DefenceStructure();

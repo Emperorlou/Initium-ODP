@@ -32,6 +32,11 @@ public class TerritoryDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Territory(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Territory expectedTerritory = new Territory();

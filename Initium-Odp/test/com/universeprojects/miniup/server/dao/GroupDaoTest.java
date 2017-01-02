@@ -32,6 +32,11 @@ public class GroupDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Group(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Group expectedGroup = new Group();

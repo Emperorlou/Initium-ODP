@@ -8,13 +8,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //These orders are for customizations that players would like to see for various things. This can include item customizations, houses...and more as we add them.
 public class CustomOrder extends OdpDomain {
+	public static final String KIND = "CustomOrder";
 
 	public CustomOrder() {
-		super(new CachedEntity("CustomOrder"));
+		super(new CachedEntity(KIND));
 	}
 
 	public CustomOrder(CachedEntity cachedEntity) {
-		super(cachedEntity, "CustomOrder");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The date this order was created by the user.

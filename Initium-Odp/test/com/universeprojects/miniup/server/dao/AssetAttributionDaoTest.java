@@ -32,6 +32,11 @@ public class AssetAttributionDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new AssetAttribution(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		AssetAttribution expectedAssetAttribution = new AssetAttribution();

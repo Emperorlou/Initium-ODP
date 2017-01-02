@@ -7,13 +7,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This is a "node" that is used to extract items from the game world. Use it for gathering wood, food (like berries/apples/wheat), stone, iron ore...etc.
 public class Collectable extends OdpDomain {
+	public static final String KIND = "Collectable";
 
 	public Collectable() {
-		super(new CachedEntity("Collectable"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Collectable(CachedEntity cachedEntity) {
-		super(cachedEntity, "Collectable");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The image used for the CollectionSite location.

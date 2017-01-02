@@ -4,13 +4,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This type of affector allows us to describe how a we (the tool/material..etc) are to affect the field on an item.
 public class AffectorItemField extends OdpDomain {
+	public static final String KIND = "AffectorItemField";
 
 	public AffectorItemField() {
-		super(new CachedEntity("AffectorItemField"));
+		super(new CachedEntity(KIND));
 	}
 
 	public AffectorItemField(CachedEntity cachedEntity) {
-		super(cachedEntity, "AffectorItemField");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (Item)

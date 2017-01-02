@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This entity is used to create a friends list for a user with other users.
 public class Friend extends OdpDomain {
+	public static final String KIND = "Friend";
 
 	public Friend() {
-		super(new CachedEntity("Friend"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Friend(CachedEntity cachedEntity) {
-		super(cachedEntity, "Friend");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (Character)

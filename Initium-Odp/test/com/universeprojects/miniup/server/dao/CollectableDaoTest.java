@@ -32,6 +32,11 @@ public class CollectableDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Collectable(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Collectable expectedCollectable = new Collectable();

@@ -32,6 +32,11 @@ public class CollectableSpawnerDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new CollectableSpawner(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		CollectableSpawner expectedCollectableSpawner = new CollectableSpawner();

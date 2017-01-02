@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Paths are connections between 2 locations.
 public class Path extends OdpDomain {
+	public static final String KIND = "Path";
 
 	public Path() {
-		super(new CachedEntity("Path"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Path(CachedEntity cachedEntity) {
-		super(cachedEntity, "Path");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (100.0)

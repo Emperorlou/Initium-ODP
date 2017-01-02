@@ -32,6 +32,11 @@ public class FriendDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Friend(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Friend expectedFriend = new Friend();

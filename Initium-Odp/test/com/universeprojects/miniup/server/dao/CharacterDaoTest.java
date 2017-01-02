@@ -32,6 +32,11 @@ public class CharacterDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Character(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Character expectedCharacter = new Character();

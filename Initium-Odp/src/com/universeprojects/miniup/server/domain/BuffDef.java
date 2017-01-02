@@ -8,13 +8,19 @@ import com.universeprojects.miniup.server.domain.Buff.BuffType;
 
 //Buff definitions. This entity describes how to create an instance of a Buff.
 public class BuffDef extends OdpDomain {
+	public static final String KIND = "BuffDef";
 
 	public BuffDef() {
-		super(new CachedEntity("BuffDef"));
+		super(new CachedEntity(KIND));
 	}
 
 	public BuffDef(CachedEntity cachedEntity) {
-		super(cachedEntity, "BuffDef");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The description the player sees when they click on the buff.

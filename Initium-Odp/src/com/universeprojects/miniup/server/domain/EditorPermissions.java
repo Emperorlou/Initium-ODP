@@ -4,13 +4,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This entity defines the permissions for a user of this editor. The email must correspond with the email the user used to sign in to the admin section.
 public class EditorPermissions extends OdpDomain {
+	public static final String KIND = "EditorPermissions";
 
 	public EditorPermissions() {
-		super(new CachedEntity("EditorPermissions"));
+		super(new CachedEntity(KIND));
 	}
 
 	public EditorPermissions(CachedEntity cachedEntity) {
-		super(cachedEntity, "EditorPermissions");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// TRUE or FALSE if this email has admin priviledges. Admins have access to everything, regardless to what settings are setup here.

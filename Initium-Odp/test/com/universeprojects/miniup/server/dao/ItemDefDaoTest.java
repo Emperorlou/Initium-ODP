@@ -32,6 +32,11 @@ public class ItemDefDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new ItemDef(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		ItemDef expectedItemDef = new ItemDef();

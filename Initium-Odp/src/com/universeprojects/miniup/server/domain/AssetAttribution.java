@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Represents the credit given to an artist for one piece of artwork or other asset used in the game. AssetAttribution entities will get listed on a credits page in the game so that artists receive proper attribution.
 public class AssetAttribution extends OdpDomain {
+	public static final String KIND = "AssetAttribution";
 
 	public AssetAttribution() {
-		super(new CachedEntity("AssetAttribution"));
+		super(new CachedEntity(KIND));
 	}
 
 	public AssetAttribution(CachedEntity cachedEntity) {
-		super(cachedEntity, "AssetAttribution");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// An easily recognizable way to refer to the artist. This should be the name that the artist chooses to go by professionally.

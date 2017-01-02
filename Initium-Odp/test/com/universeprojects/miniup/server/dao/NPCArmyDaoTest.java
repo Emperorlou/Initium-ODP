@@ -32,6 +32,11 @@ public class NPCArmyDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new NPCArmy(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		NPCArmy expectedNPCArmy = new NPCArmy();

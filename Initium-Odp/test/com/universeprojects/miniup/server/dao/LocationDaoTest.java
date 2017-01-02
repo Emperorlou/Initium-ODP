@@ -32,6 +32,11 @@ public class LocationDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Location(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Location expectedLocation = new Location();

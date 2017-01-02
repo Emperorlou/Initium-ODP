@@ -32,6 +32,11 @@ public class ProjectDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Project(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Project expectedProject = new Project();

@@ -32,6 +32,11 @@ public class SchemaDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Schema(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Schema expectedSchema = new Schema();

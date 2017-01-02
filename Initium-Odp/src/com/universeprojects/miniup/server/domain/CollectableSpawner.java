@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //A collectable spawner belongs to a location. It defines the odds of a player finding a collectable, and links to a CollectableDef for creating the collectable in the game world.
 public class CollectableSpawner extends OdpDomain {
+	public static final String KIND = "CollectableSpawner";
 
 	public CollectableSpawner() {
-		super(new CachedEntity("CollectableSpawner"));
+		super(new CachedEntity(KIND));
 	}
 
 	public CollectableSpawner(CachedEntity cachedEntity) {
-		super(cachedEntity, "CollectableSpawner");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (CollectableDef)

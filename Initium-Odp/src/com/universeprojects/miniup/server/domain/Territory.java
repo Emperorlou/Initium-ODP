@@ -7,13 +7,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //This entity defines a group of locations that are controllable by a player.
 public class Territory extends OdpDomain {
+	public static final String KIND = "Territory";
 
 	public Territory() {
-		super(new CachedEntity("Territory"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Territory(CachedEntity cachedEntity) {
-		super(cachedEntity, "Territory");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (Character)

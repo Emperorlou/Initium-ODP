@@ -6,13 +6,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Defines how to generate a new NPC for the character entity type.
 public class NPCDef extends OdpDomain {
+	public static final String KIND = "NPCDef";
 
 	public NPCDef() {
-		super(new CachedEntity("NPCDef"));
+		super(new CachedEntity(KIND));
 	}
 
 	public NPCDef(CachedEntity cachedEntity) {
-		super(cachedEntity, "NPCDef");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// (images/npc-generic1.jpg)

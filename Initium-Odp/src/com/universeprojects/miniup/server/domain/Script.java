@@ -5,13 +5,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Javascript that can be written directly from the editor to perform various actions in-game without requiring a code deployment.
 public class Script extends OdpDomain {
+	public static final String KIND = "Script";
 
 	public Script() {
-		super(new CachedEntity("Script"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Script(CachedEntity cachedEntity) {
-		super(cachedEntity, "Script");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// This text would get displayed to the user. It is the link name the user would click on to activate this script.

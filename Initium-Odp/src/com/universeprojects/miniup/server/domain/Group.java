@@ -7,13 +7,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //A player group.
 public class Group extends OdpDomain {
+	public static final String KIND = "Group";
 
 	public Group() {
-		super(new CachedEntity("Group"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Group(CachedEntity cachedEntity) {
-		super(cachedEntity, "Group");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// If true, this group is allowing other groups to request to merge with them.

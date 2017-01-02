@@ -7,13 +7,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Set a description
 public class ChangeLog extends OdpDomain {
+	public static final String KIND = "ChangeLog";
 
 	public ChangeLog() {
-		super(new CachedEntity("ChangeLog"));
+		super(new CachedEntity(KIND));
 	}
 
 	public ChangeLog(CachedEntity cachedEntity) {
-		super(cachedEntity, "ChangeLog");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	public void setCreatedDate(Date createdDate) {

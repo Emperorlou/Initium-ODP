@@ -8,13 +8,19 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 //Defines an instance of a buff that is currently active on a character (or on some other entity).
 public class Buff extends OdpDomain {
+	public static final String KIND = "Buff";
 
 	public Buff() {
-		super(new CachedEntity("Buff"));
+		super(new CachedEntity(KIND));
 	}
 
 	public Buff(CachedEntity cachedEntity) {
-		super(cachedEntity, "Buff");
+		super(cachedEntity);
+	}
+
+	@Override
+	public String getKind() {
+		return KIND;
 	}
 
 	// The description the player sees when they click on the buff.

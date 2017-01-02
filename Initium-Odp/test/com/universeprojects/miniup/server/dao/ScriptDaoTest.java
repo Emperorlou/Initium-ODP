@@ -32,6 +32,11 @@ public class ScriptDaoTest {
 		helper.tearDown();
 	}
 
+	@Test (expected = AssertionError.class)
+	public void nullCachedEntity() {
+		new Script(null);
+	}
+
 	@Test
 	public void saveAndGet() { // This works because of the caching
 		Script expectedScript = new Script();
