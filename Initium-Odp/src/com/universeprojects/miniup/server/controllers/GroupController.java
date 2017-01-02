@@ -227,9 +227,8 @@ public class GroupController extends PageController {
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
 
 			List<CachedEntity> receivedWars = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
-			List<CachedEntity> alliedGroups = db.getFilteredList("Group", "declaredAlliedGroups", group.getKey());
+			List<Key> alliedGroups = (List<Key>)group.getProperty("declaredAlliedGroups");
 			List<Key> declaredWars = (List<Key>)group.getProperty("declaredWarGroups");
-			List<String> alliedGroupNames = new ArrayList<String>();
 			
 			if (declaredWars != null)
 			{
@@ -262,8 +261,10 @@ public class GroupController extends PageController {
 			if (alliedGroups != null)
 			{
 				boolean isAdmin = service.isCharacterGroupAdmin();
+				List<CachedEntity> declaredAlliedGroups = db.getEntities(alliedGroups);
+				List<String> alliedGroupNames = new ArrayList<String>();
 				
-				for (CachedEntity allies : alliedGroups)
+				for (CachedEntity allies : declaredAlliedGroups)
 				{
 					if (allies == null)
 						continue;
