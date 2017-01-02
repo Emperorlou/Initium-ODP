@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.ChangeLog;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class ChangeLogDao extends OdpDao<ChangeLog> {
 
-	private static final Logger log = Logger.getLogger("ChangeLogDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public ChangeLogDao(CachedDatastoreService datastore) {
 		super(datastore);

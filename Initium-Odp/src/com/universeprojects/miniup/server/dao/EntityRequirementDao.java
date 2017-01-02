@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.EntityRequirement;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class EntityRequirementDao extends OdpDao<EntityRequirement> {
 
-	private static final Logger log = Logger.getLogger("EntityRequirementDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public EntityRequirementDao(CachedDatastoreService datastore) {
 		super(datastore);

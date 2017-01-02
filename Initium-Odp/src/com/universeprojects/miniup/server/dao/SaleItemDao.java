@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.SaleItem;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class SaleItemDao extends OdpDao<SaleItem> {
 
-	private static final Logger log = Logger.getLogger("SaleItemDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public SaleItemDao(CachedDatastoreService datastore) {
 		super(datastore);

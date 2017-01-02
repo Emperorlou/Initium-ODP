@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.MonsterSpawner;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class MonsterSpawnerDao extends OdpDao<MonsterSpawner> {
 
-	private static final Logger log = Logger.getLogger("MonsterSpawnerDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public MonsterSpawnerDao(CachedDatastoreService datastore) {
 		super(datastore);

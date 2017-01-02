@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.ConstructItemSkill;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class ConstructItemSkillDao extends OdpDao<ConstructItemSkill> {
 
-	private static final Logger log = Logger.getLogger("ConstructItemSkillDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public ConstructItemSkillDao(CachedDatastoreService datastore) {
 		super(datastore);

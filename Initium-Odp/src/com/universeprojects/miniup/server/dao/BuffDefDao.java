@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.BuffDef;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class BuffDefDao extends OdpDao<BuffDef> {
 
-	private static final Logger log = Logger.getLogger("BuffDefDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public BuffDefDao(CachedDatastoreService datastore) {
 		super(datastore);

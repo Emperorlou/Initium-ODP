@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.TransmuteRecipe;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class TransmuteRecipeDao extends OdpDao<TransmuteRecipe> {
 
-	private static final Logger log = Logger.getLogger("TransmuteRecipeDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public TransmuteRecipeDao(CachedDatastoreService datastore) {
 		super(datastore);

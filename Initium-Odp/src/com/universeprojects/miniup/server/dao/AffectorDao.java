@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.Affector;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class AffectorDao extends OdpDao<Affector> {
 
-	private static final Logger log = Logger.getLogger("AffectorDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public AffectorDao(CachedDatastoreService datastore) {
 		super(datastore);

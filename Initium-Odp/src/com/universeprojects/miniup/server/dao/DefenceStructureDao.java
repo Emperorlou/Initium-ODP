@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.DefenceStructure;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class DefenceStructureDao extends OdpDao<DefenceStructure> {
 
-	private static final Logger log = Logger.getLogger("DefenceStructureDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public DefenceStructureDao(CachedDatastoreService datastore) {
 		super(datastore);

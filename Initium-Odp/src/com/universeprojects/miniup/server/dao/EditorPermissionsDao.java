@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.EditorPermissions;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class EditorPermissionsDao extends OdpDao<EditorPermissions> {
 
-	private static final Logger log = Logger.getLogger("EditorPermissionsDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public EditorPermissionsDao(CachedDatastoreService datastore) {
 		super(datastore);

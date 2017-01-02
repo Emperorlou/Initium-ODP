@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.CollectableDef;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class CollectableDefDao extends OdpDao<CollectableDef> {
 
-	private static final Logger log = Logger.getLogger("CollectableDefDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public CollectableDefDao(CachedDatastoreService datastore) {
 		super(datastore);

@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.CustomOrderType;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class CustomOrderTypeDao extends OdpDao<CustomOrderType> {
 
-	private static final Logger log = Logger.getLogger("CustomOrderTypeDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public CustomOrderTypeDao(CachedDatastoreService datastore) {
 		super(datastore);

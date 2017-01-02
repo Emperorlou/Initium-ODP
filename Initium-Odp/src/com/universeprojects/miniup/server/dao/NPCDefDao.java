@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.NPCDef;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class NPCDefDao extends OdpDao<NPCDef> {
 
-private static final Logger log = Logger.getLogger("NPCDefDao");
+private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 public NPCDefDao(CachedDatastoreService datastore) {
 super(datastore);

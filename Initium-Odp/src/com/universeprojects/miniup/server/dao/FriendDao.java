@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.Friend;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class FriendDao extends OdpDao<Friend> {
 
-	private static final Logger log = Logger.getLogger("FriendDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public FriendDao(CachedDatastoreService datastore) {
 		super(datastore);

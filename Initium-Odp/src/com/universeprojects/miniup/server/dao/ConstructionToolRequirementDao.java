@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.ConstructionToolRequirement;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class ConstructionToolRequirementDao extends OdpDao<ConstructionToolRequirement> {
 
-private static final Logger log = Logger.getLogger("ConstructionToolRequirementDao");
+private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 public ConstructionToolRequirementDao(CachedDatastoreService datastore) {
 super(datastore);

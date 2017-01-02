@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.AssetAttribution;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class AssetAttributionDao extends OdpDao<AssetAttribution> {
 
-	private static final Logger log = Logger.getLogger("AssetAttributionDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public AssetAttributionDao(CachedDatastoreService datastore) {
 		super(datastore);

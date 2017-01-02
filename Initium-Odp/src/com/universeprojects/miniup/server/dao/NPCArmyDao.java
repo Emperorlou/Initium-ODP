@@ -9,9 +9,11 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.domain.NPCArmy;
 
+import javassist.bytecode.stackmap.TypeData.ClassName;
+
 public class NPCArmyDao extends OdpDao<NPCArmy> {
 
-	private static final Logger log = Logger.getLogger("NPCArmyDao");
+	private static final Logger log = Logger.getLogger(ClassName.class.getName());
 
 	public NPCArmyDao(CachedDatastoreService datastore) {
 		super(datastore);
