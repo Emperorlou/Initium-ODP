@@ -372,20 +372,22 @@ public class MainPageUpdateService extends Service
 	public String updateTestPanel()
 	{
 		if (db.getRequest().getRequestURL().toString().contains("test")) {
-			return "Width: <input type='text' id='width' value=20 />\n"
-					+ "Height: <input type='text' id='height' value=20 />\n"
-					+ "Offset: <input type='text' id='offset' value=32 />\n"
-					+ "Seed: <input type='text' id='seed' value=123456 />\n"
-					+ "<button id=\"somebutton\">press here</button>\n"
-					+ "\n"
-					+ "<div id=\"somediv\"></div>\n"
-					+ "\n"
-					+ "<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>\n"
-					+ "<script>\n"
-					+ "    $(document).on(\"click\", \"#somebutton\", function() {\n"
-					+ "        getTilePos();\n"
-					+ "    });\n"
-					+ "</script>\n";
+			
+			StringBuilder newHtml = new StringBuilder();
+			
+			newHtml.append("Width: <input type='text' id='width' value=20 />");
+			newHtml.append("Offset: <input type='text' id='offset' value=32 />");
+			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
+			newHtml.append("<button id=\"somebutton\">press here</button>");
+			newHtml.append("<div id=\"somediv\"></div>");
+			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
+			newHtml.append("<script>");
+			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
+			newHtml.append("getTilePos();");
+			newHtml.append("});");
+			newHtml.append("</script>");
+			
+			return updateHtmlContents("#test-panel", newHtml.toString());
 		}
 		return "";
 	}
