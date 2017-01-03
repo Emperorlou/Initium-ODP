@@ -4,7 +4,7 @@ Offset: <input type='text' id='offset' value=32 />
 Seed: <input type='text' id='seed' value=123456 />
 <button id="somebutton">press here</button>
 
-<div id="somediv"></div>
+<div id="ground-layer"></div>
 
 <script type="text/javascript" src="/odp/javascript/Sandbox.js"></script>
 <script>
