@@ -33,10 +33,12 @@
 			<br/><br/>
 			${currentMergeRequest}
 			<br/><br/>
-			<a onclick='declareWar(event)'>Declare War</a>
+			<c:if test="${isCreator}">
+				<a onclick='declareWar(event)'>Declare War</a>
+				<br/><br/>
+				<a onclick='submitGroupAllianceRequest(event)'>Request Alliance</a>
 			<br/><br/>
-			<a onclick='submitGroupAllianceRequest(event)'>Request Alliance</a>
-			<br/><br/>
+			</c:if>
 		</div>
 		<h4>Group Merge Applications</h4>
 		<c:forEach var="groupApp" items="${groupMergeApplications}">

@@ -141,7 +141,9 @@ public class GroupController extends PageController {
 			if (service.characterHasGroup()) {
 				request.setAttribute("inGroup", true);
 				boolean isAdmin = service.isCharacterGroupAdmin();
+				boolean isCreator = service.isCharacterGroupCreator();
 				request.setAttribute("isAdmin", isAdmin);
+				request.setAttribute("isCreator", isCreator);
 				
 				// Group merge information.
 				boolean allowMergeRequests = service.doesGroupAllowMergeRequests(group);
