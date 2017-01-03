@@ -233,10 +233,10 @@ public class GroupController extends PageController {
 			List<Key> alliedGroups = (List<Key>)group.getProperty("declaredAlliedGroups");
 			@SuppressWarnings("unchecked")
 			List<Key> declaredWars = (List<Key>)group.getProperty("declaredWarGroups");
-			
+			boolean isCreator = service.isCharacterGroupCreator();
+
 			if (declaredWars != null)
 			{
-				boolean isCreator = service.isCharacterGroupCreator();
 				List<CachedEntity> declaredWarGroups = db.getEntities(declaredWars);
 				List<String> warGroupNames = new ArrayList<String>();
 				
@@ -244,7 +244,7 @@ public class GroupController extends PageController {
 				{
 					if (war == null)
 						continue;
-					String output = HtmlComponents.generateWarDeclarations(war, isCreator);
+					String output = HtmlComponents.generateWarDeclarations(war, isCreator, inGroup);
 					warGroupNames.add(output);
 				}
 				request.setAttribute("declaredWars", warGroupNames);
@@ -264,15 +264,15 @@ public class GroupController extends PageController {
 			}
 			if (alliedGroups != null)
 			{
-				boolean isCreator = service.isCharacterGroupCreator();
 				List<CachedEntity> declaredAlliedGroups = db.getEntities(alliedGroups);
 				List<String> alliedGroupNames = new ArrayList<String>();
+				boolean isAdmin = service.isCharacterGroupAdmin();
 				
 				for (CachedEntity allies : declaredAlliedGroups)
 				{
 					if (allies == null)
 						continue;
-					String output = HtmlComponents.generateAlliedGroups(allies, isCreator);
+					String output = HtmlComponents.generateAlliedGroups(allies, isCreator, inGroup);
 					alliedGroupNames.add(output);
 				}
 				request.setAttribute("alliedGroups", alliedGroupNames);
@@ -283,7 +283,7 @@ public class GroupController extends PageController {
 			
 				for (CachedEntity allyReq : allyRequests)
 				{
-					String output = HtmlComponents.generateGroupAllianceRequest(allyReq);
+					String output = HtmlComponents.generateGroupAllianceRequest(allyReq, isCreator, inGroup);
 					outputAllyRequests.add(output);
 				}
 				if (outputAllyRequests.isEmpty())
