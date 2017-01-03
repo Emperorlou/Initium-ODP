@@ -229,7 +229,9 @@ public class GroupController extends PageController {
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
 
 			List<CachedEntity> receivedWars = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
+			@SuppressWarnings("unchecked")
 			List<Key> alliedGroups = (List<Key>)group.getProperty("declaredAlliedGroups");
+			@SuppressWarnings("unchecked")
 			List<Key> declaredWars = (List<Key>)group.getProperty("declaredWarGroups");
 			
 			if (declaredWars != null)
