@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -13,19 +15,33 @@ public class RandomTileGenerator {
     private RandomTileGenerator() {
     }
 
-    public static BuildingCell[][] getBuildingCells(int seed, int row, int col) {
+    public static List<List<BuildingCell>> getBuildingCells(int seed, int hexEdge) {
 
-        BuildingCell[][] buildingCells = new BuildingCell[row][col];
-        for(int i = 0;i < row;i++) {
-            for(int j = 0;j < col;j++) {
-                //TODO: Turn this into a int and mod(%) it down, will need to take in number of possible tiles, and change BuildingCells filename to a index.
-                buildingCells[i][j] = new BuildingCell(
-                        "tile-grass" + (new Random(seed * (i*j+ i*10 + j)).nextInt(7)) + ".png",
-                        (new Random(seed * (i*10 + j)).nextInt(10))
+        List<List<BuildingCell>> grid = new ArrayList<>();
+
+        int rowLength = hexEdge;
+        int diagonalLength = hexEdge*2 - 1;
+        boolean reachedHalf = false;
+
+        // Loop over left sides of hexagon
+        for(int i = 0;i < diagonalLength; i++) {
+            List<BuildingCell> hexRow = new ArrayList<>();
+            for(int j = 0;j < rowLength; j++) {
+                hexRow.add(new BuildingCell("tile-grass" + (new Random(seed * (i*j+ i*10 + j)).nextInt(7)) + ".png",
+                        (new Random(seed * (i*10 + j)).nextInt(10)))
                 );
             }
+            grid.add(hexRow);
+            if (rowLength < diagonalLength && !reachedHalf) {
+                rowLength++;
+                if (rowLength == diagonalLength) {
+                    reachedHalf = true;
+                }
+            } else {
+                rowLength--;
+            }
         }
-        return buildingCells;
+        return grid;
     }
 }
 
