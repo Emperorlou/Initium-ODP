@@ -375,11 +375,12 @@ public class MainPageUpdateService extends Service
 			
 			StringBuilder newHtml = new StringBuilder();
 			
-			newHtml.append("Width: <input type='text' id='width' value=20 />");
-			newHtml.append("Offset: <input type='text' id='offset' value=32 />");
+			newHtml.append("Width: <input type='text' id='width' value=750 />");
+			newHtml.append("Height: <input type='text' id='height' value=5000 />");
+			newHtml.append("Offset: <input type='text' id='offset' value=8 />");
 			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
 			newHtml.append("<button id=\"somebutton\">press here</button>");
-			newHtml.append("<div id=\"somediv\"></div>");
+			newHtml.append("<div id=\"ground-layer\"></div>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
 			newHtml.append("<script>");
 			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
