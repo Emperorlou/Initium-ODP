@@ -227,12 +227,12 @@ public class GroupController extends PageController {
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
 
 			List<CachedEntity> receivedWars = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
-			List<Key> alliedGroups = (List<Key>)group.getProperty("declaredAlliedGroups");
-			List<Key> declaredWars = (List<Key>)group.getProperty("declaredWarGroups");
+			List<Key> alliedGroups = service.getCharGroupAllianceKeys();
+			List<Key> declaredWars = service.getCharGroupWarKeys();
 			
 			if (declaredWars != null)
 			{
-				boolean isAdmin = service.isCharacterGroupAdmin();
+				boolean isCreator = service.isCharacterGroupCreator();
 				List<CachedEntity> declaredWarGroups = db.getEntities(declaredWars);
 				List<String> warGroupNames = new ArrayList<String>();
 				
@@ -240,7 +240,7 @@ public class GroupController extends PageController {
 				{
 					if (war == null)
 						continue;
-					String output = HtmlComponents.generateWarDeclarations(war, isAdmin);
+					String output = HtmlComponents.generateWarDeclarations(war, isCreator);
 					warGroupNames.add(output);
 				}
 				request.setAttribute("declaredWars", warGroupNames);
@@ -260,7 +260,7 @@ public class GroupController extends PageController {
 			}
 			if (alliedGroups != null)
 			{
-				boolean isAdmin = service.isCharacterGroupAdmin();
+				boolean isCreator = service.isCharacterGroupCreator();
 				List<CachedEntity> declaredAlliedGroups = db.getEntities(alliedGroups);
 				List<String> alliedGroupNames = new ArrayList<String>();
 				
@@ -268,7 +268,7 @@ public class GroupController extends PageController {
 				{
 					if (allies == null)
 						continue;
-					String output = HtmlComponents.generateAlliedGroups(allies, isAdmin);
+					String output = HtmlComponents.generateAlliedGroups(allies, isCreator);
 					alliedGroupNames.add(output);
 				}
 				request.setAttribute("alliedGroups", alliedGroupNames);

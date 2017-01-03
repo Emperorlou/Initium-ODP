@@ -49,11 +49,7 @@
 		<h4>Group Alliance Applications</h4>
 		<c:forEach var="allyApp" items="${pendingGroupAllies}">
 			${allyApp}
-		</c:forEach>	
-		<h4>Active Wars</h4>
-		<c:forEach var="warGroup" items="${warDecGroupNames}">
-			${warGroup}
-		</c:forEach>			
+		</c:forEach>				
 	</div>
 	<hr>
 	</c:if>
