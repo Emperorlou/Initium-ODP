@@ -485,7 +485,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		// This only gets generated within the admin block, so we know the viewing user has access.
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<div class='main-item-container'><div class=''>");
 		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 		sb.append("</div><div class='main-item-controls'>");
 		sb.append("<a onclick='groupMergeDenyApplication(event, "+group.getId()+")'>Deny Merge</a>");
@@ -501,7 +501,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		if (isCreator && inGroup)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-			sb.append("<div class='main-item-container'><div class='main-item'>");
+			sb.append("<div class='main-item-container'><div class=''>");
 			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 			sb.append("</div><div class='main-item-controls'>");
 			sb.append("<a onclick='groupAcceptAllianceRequest(event, "+group.getId()+")'>Accept Alliance</a>");
@@ -511,7 +511,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		else
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-			sb.append("<div class='main-item-container'><div class='main-item'>");
+			sb.append("<div class='main-item-container'><div class=''>");
 			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 			sb.append("</div></div></div>");
 		}
@@ -524,7 +524,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		if (isCreator && inGroup)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-			sb.append("<div class='main-item-container'><div class='main-item'>");
+			sb.append("<div class='main-item-container'><div class=''>");
 			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 			sb.append("</div><div class='main-item-controls'>");
 			sb.append("<a onclick='groupDeleteAlliance(event, "+group.getId()+")'>End Alliance</a>");
@@ -533,7 +533,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		else
 		{
 		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<div class='main-item-container'><div class=''>");
 		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 		sb.append("</div></div></div>");
 		}
@@ -547,7 +547,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		if (isCreator && inGroup)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-			sb.append("<div class='main-item-container'><div class='main-item'>");
+			sb.append("<div class='main-item-container'><div class=''>");
 			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 			sb.append("</div><div class='main-item-controls'>");
 			sb.append("<a onclick='endWar(event, "+group.getId()+")'>End War</a>");
@@ -556,7 +556,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		else
 		{
 		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<div class='main-item-container'><div class=''>");
 		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 		sb.append("</div></div></div>");
 		}
@@ -567,7 +567,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 	{	
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<div class='main-item-container'><div class=''>");
 		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 		sb.append("</div></div></div>");
 
