@@ -278,16 +278,18 @@ public class GroupController extends PageController {
 
 			List<CachedEntity> allyRequests = db.getFilteredList("Group", "pendingAllianceGroupKey", group.getKey());
 			List<String> outputAllyRequests = new ArrayList<String>();
-			if (allyRequests != null)
-			{
+			
 				for (CachedEntity allyReq : allyRequests)
 				{
 					String output = HtmlComponents.generateGroupAllianceRequest(allyReq);
 					outputAllyRequests.add(output);
 				}
+				if (outputAllyRequests.isEmpty())
+					outputAllyRequests.add("No group alliance requests at this time.");
+				
 				request.setAttribute("pendingGroupAllies", outputAllyRequests);
 			}
-		}	
+		
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}
 
