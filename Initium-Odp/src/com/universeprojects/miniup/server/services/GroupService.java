@@ -368,6 +368,8 @@ public class GroupService extends Service {
 			if (warGroupAllies != null && isGroupAlliedWithCharGroup(warGroup))
 				throw new UserErrorMessage(
 						"Cannot start a war with an allied group.");
+			if (GameUtils.equals(this.characterGroup.getProperty("pendingAllianceGroupKey"), warGroup.getKey()))
+					this.characterGroup.setProperty("pendingAllianceGroupKey", null);
 			List<Key> createCharGroupWars = new ArrayList<Key>();
 			createCharGroupWars.add(warGroup.getKey());
 			this.characterGroup.setProperty("declaredWarGroups", createCharGroupWars);
