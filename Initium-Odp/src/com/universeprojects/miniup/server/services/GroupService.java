@@ -311,10 +311,13 @@ public class GroupService extends Service {
 	public boolean isGroupAtWarWithCharGroup(CachedEntity group) 
 	{
 		List<Key> charGroupWars = getCharGroupWarKeys();
-		if (charGroupWars != null)
-			return charGroupWars.contains(group.getKey());
+		List<Key> groupWars = getGroupWarKeys(group);
+		if (charGroupWars != null && charGroupWars.contains(group.getKey()))
+			return true;
+		else if (groupWars != null && groupWars.contains(this.characterGroup.getKey()))
+			return true;
 		else
-			return false;
+			return false;					
 	}
 	
 	public boolean isGroupAlliedWithCharGroup(CachedEntity group)
@@ -408,7 +411,7 @@ public class GroupService extends Service {
 	{
 		if (allyGroup != null)
 		{
-			List<Key> allyGroupWars = (List<Key>)allyGroup.getProperty("declaredWarGroups");
+			List<Key> allyGroupWars = getGroupWarKeys(allyGroup);
 			if (allyGroupWars != null && isGroupAtWarWithCharGroup(allyGroup))
 				throw new UserErrorMessage(
 						"Cannot request an alliance with a group you are at war with.");
