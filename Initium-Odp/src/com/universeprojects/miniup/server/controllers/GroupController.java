@@ -235,7 +235,7 @@ public class GroupController extends PageController {
 				boolean isAdmin = service.isCharacterGroupAdmin();
 				List<CachedEntity> declaredWarGroups = db.getEntities(declaredWars);
 				List<String> warGroupNames = new ArrayList<String>();
-
+				
 				for (CachedEntity war : declaredWarGroups) 
 				{
 					if (war == null)

@@ -355,7 +355,7 @@ public class GroupService extends Service {
 	{
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
 		{
-			List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
+			List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredWarGroups");
 			
 			if (charGroupWars != null)
 			{
@@ -491,7 +491,7 @@ public class GroupService extends Service {
 			
 			if (charGroupAlliances != null && allyGroupAlliances != null)
 			{
-				if (charGroupAlliances.remove(allyGroup))
+				if (charGroupAlliances.remove(allyGroup.getKey()))
 				this.characterGroup.setProperty("declaredAlliedGroups", cleanNullKeysFromList(charGroupAlliances));
 				
 				allyGroupAlliances.remove(this.characterGroup.getKey());
