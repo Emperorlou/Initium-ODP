@@ -507,10 +507,10 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		return sb.toString();
 	}
 	
-	public static String generateAlliedGroups(CachedEntity group, boolean isAdmin)
+	public static String generateAlliedGroups(CachedEntity group, boolean isCreator)
 	{		
 		StringBuilder sb = new StringBuilder();
-		if (isAdmin)
+		if (isCreator)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 			sb.append("<div class='main-item-container'><div class='main-item'>");
@@ -530,10 +530,10 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		
 	}
 	
-	public static String generateWarDeclarations(CachedEntity group, boolean isAdmin)
+	public static String generateWarDeclarations(CachedEntity group, boolean isCreator)
 	{	
 		StringBuilder sb = new StringBuilder();
-		if (isAdmin)
+		if (isCreator)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 			sb.append("<div class='main-item-container'><div class='main-item'>");
