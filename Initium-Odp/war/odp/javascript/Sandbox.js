@@ -4,8 +4,9 @@ function getTilePos() {
     var $pxHeight = $("#height").val();
     var $offset = ~~document.getElementById("offset").value;
     var $tileMaxPx = 128;
-    document.getElementById("somediv").style.maxWidth = $pxWidth + "px";
-    document.getElementById("somediv").style.maxHeight = $pxHeight + "px";
+    document.getElementById("ground-layer").style.maxWidth = $pxWidth + "px";
+    document.getElementById("ground-layer").style.maxHeight = $pxHeight + "px";
+    document.getElementById("ground-layer").style.overflow = "hidden";
 
     var $shownTilePx = $tileMaxPx - $offset;
 
@@ -26,7 +27,7 @@ function getTilePos() {
             }
 
             // Iterate through JSON and place images at offset distances, starting at 0x64
-            var $select = $("#somediv");
+            var $select = $("#ground-layer");
 
             var $xCoord = 0;
             var $yCoord = 300;
@@ -35,8 +36,8 @@ function getTilePos() {
             var $height = $tileMaxPx / Math.ceil($pxHeight / $tileMaxPx);
             var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 
-            //document.getElementById('somediv').style.width=$pxWidth;
-            //document.getElementById('somediv').style.height=$pxHeight;
+            //document.getElementById('ground-layer').style.width=$pxWidth;
+            //document.getElementById('ground-layer').style.height=$pxHeight;
             $.each(responseJson, function (index, value) {
                 $.each(value, function (innerIndex, innerValue) {
                     $("<img>")
