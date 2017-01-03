@@ -494,23 +494,34 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		return sb.toString();
 	}
 	
-	public static String generateGroupAllianceRequest(CachedEntity group)
+	public static String generateGroupAllianceRequest(CachedEntity group, boolean isCreator, boolean inGroup)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-		sb.append("<div class='main-item-container'><div class='main-item'>");
-		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
-		sb.append("</div><div class='main-item-controls'>");
-		sb.append("<a onclick='groupAcceptAllianceRequest(event, "+group.getId()+")'>Accept Alliance</a>");
-		sb.append("<a onclick='groupDeclineAllianceRequest(event, "+group.getId()+")'>Deny Alliance</a>");
-		sb.append("</div></div></div>");
+		
+		if (isCreator && inGroup)
+		{
+			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+			sb.append("<div class='main-item-container'><div class='main-item'>");
+			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+			sb.append("</div><div class='main-item-controls'>");
+			sb.append("<a onclick='groupAcceptAllianceRequest(event, "+group.getId()+")'>Accept Alliance</a>");
+			sb.append("<a onclick='groupDeclineAllianceRequest(event, "+group.getId()+")'>Deny Alliance</a>");
+			sb.append("</div></div></div>");
+		}
+		else
+		{
+			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+			sb.append("<div class='main-item-container'><div class='main-item'>");
+			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+			sb.append("</div></div></div>");
+		}
 		return sb.toString();
 	}
 	
-	public static String generateAlliedGroups(CachedEntity group, boolean isCreator)
+	public static String generateAlliedGroups(CachedEntity group, boolean isCreator, boolean inGroup)
 	{		
 		StringBuilder sb = new StringBuilder();
-		if (isCreator)
+		if (isCreator && inGroup)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 			sb.append("<div class='main-item-container'><div class='main-item'>");
@@ -530,10 +541,10 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		
 	}
 	
-	public static String generateWarDeclarations(CachedEntity group, boolean isCreator)
+	public static String generateWarDeclarations(CachedEntity group, boolean isCreator, boolean inGroup)
 	{	
 		StringBuilder sb = new StringBuilder();
-		if (isCreator)
+		if (isCreator && inGroup)
 		{
 			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
 			sb.append("<div class='main-item-container'><div class='main-item'>");
