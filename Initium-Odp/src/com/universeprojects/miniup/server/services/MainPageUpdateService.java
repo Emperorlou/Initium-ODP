@@ -364,6 +364,31 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
 	}
+
+	/**
+	 * This updates the TestPanel if environment is currently in test
+	 * 
+	 */
+	public String updateTestPanel()
+	{
+		if (db.getRequest().getRequestURL().toString().contains("test")) {
+			return "Width: <input type='text' id='width' value=20 />\n"
+					+ "Height: <input type='text' id='height' value=20 />\n"
+					+ "Offset: <input type='text' id='offset' value=32 />\n"
+					+ "Seed: <input type='text' id='seed' value=123456 />\n"
+					+ "<button id=\"somebutton\">press here</button>\n"
+					+ "\n"
+					+ "<div id=\"somediv\"></div>\n"
+					+ "\n"
+					+ "<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>\n"
+					+ "<script>\n"
+					+ "    $(document).on(\"click\", \"#somebutton\", function() {\n"
+					+ "        getTilePos();\n"
+					+ "    });\n"
+					+ "</script>\n";
+		}
+		return "";
+	}
 	
 	
 	public String updateInBannerOverlayLinks()
