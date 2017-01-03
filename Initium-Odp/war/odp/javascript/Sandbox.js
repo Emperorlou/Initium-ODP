@@ -13,7 +13,7 @@ function getTilePos() {
     var $tileRows = Math.ceil($pxHeight / $shownTilePx);
 
     $.ajax({
-        url: "MyServlet",
+        url: "SandboxServlet",
         data:{width:$tileColumns, height:$tileRows, seed:$("#seed").val()},
         type: 'POST',
         success: function(responseJson) {
