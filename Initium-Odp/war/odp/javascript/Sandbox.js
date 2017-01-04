@@ -32,6 +32,10 @@ function loadMap() {
     var outerLoop=0;
     var reachedDiag = false;
 
+    document.getElementById("viewportcontainer").style.position = "relative";
+    document.getElementById("viewport").style.position = "absolute";
+    document.getElementById("ground-layer").style.position = "absolute";
+
     // Remove all current images
     var images = document.getElementsByClassName('hexagon');
     var l = images.length;
@@ -61,6 +65,7 @@ function loadMap() {
                     $hexBody.append('<div id="hex' + i + 'Top" class="hexTop"/>');
                     $hexBody.append('<div id="hex' + i + 'Bot" class="hexBottom"/>');
 
+                    $hexBody.css("position", "relative");
                     $hexBody.css("width", hexWidth + 'px');
                     $hexBody.css("height", hexSize + 'px');
                     $hexBody.css("margin", hexSize / 2 + 'px');
