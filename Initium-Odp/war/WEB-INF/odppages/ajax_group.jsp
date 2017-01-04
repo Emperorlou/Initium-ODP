@@ -33,10 +33,12 @@
 			<br/><br/>
 			${currentMergeRequest}
 			<br/><br/>
-			<a onclick='declareWar(event)'>Declare War</a>
+			<c:if test="${isCreator}">
+				<a onclick='declareWar(event)'>Declare War</a>
+				<br/><br/>
+				<a onclick='submitGroupAllianceRequest(event)'>Request Alliance</a>
 			<br/><br/>
-			<a onclick='submitGroupAllianceRequest(event)'>Request Alliance</a>
-			<br/><br/>
+			</c:if>
 		</div>
 		<h4>Group Merge Applications</h4>
 		<c:forEach var="groupApp" items="${groupMergeApplications}">
@@ -49,11 +51,7 @@
 		<h4>Group Alliance Applications</h4>
 		<c:forEach var="allyApp" items="${pendingGroupAllies}">
 			${allyApp}
-		</c:forEach>	
-		<h4>Active Wars</h4>
-		<c:forEach var="warGroup" items="${warDecGroupNames}">
-			${warGroup}
-		</c:forEach>			
+		</c:forEach>				
 	</div>
 	<hr>
 	</c:if>

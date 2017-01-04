@@ -364,6 +364,37 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
 	}
+
+	/**
+	 * This updates the TestPanel if environment is currently in test
+	 * 
+	 */
+	public String updateTestPanel()
+	{
+		if (db.getRequest().getRequestURL().toString().contains("test")) {
+			
+			StringBuilder newHtml = new StringBuilder();
+			
+			newHtml.append("Hex Edge: <input type='text' id='hexEdge' value=4 />");
+			newHtml.append("Zoom: <input type='text' id='zoom' value=1 />");
+			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
+			newHtml.append("<button id=\"somebutton\">press here</button>");
+			newHtml.append("<div id=\"viewportcontainer\">");
+			newHtml.append("<div id=\"viewport\">");
+			newHtml.append("<div id=\"ground-layer\"></div>");
+			newHtml.append("</div>");
+			newHtml.append("</div>");
+			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
+			newHtml.append("<script>");
+			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
+			newHtml.append("loadMap();");
+			newHtml.append("});");
+			newHtml.append("</script>");
+			
+			return updateHtmlContents("#test-panel", newHtml.toString());
+		}
+		return "";
+	}
 	
 	
 	public String updateInBannerOverlayLinks()

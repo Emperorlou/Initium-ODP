@@ -141,7 +141,9 @@ public class GroupController extends PageController {
 			if (service.characterHasGroup()) {
 				request.setAttribute("inGroup", true);
 				boolean isAdmin = service.isCharacterGroupAdmin();
+				boolean isCreator = service.isCharacterGroupCreator();
 				request.setAttribute("isAdmin", isAdmin);
+				request.setAttribute("isCreator", isCreator);
 				
 				// Group merge information.
 				boolean allowMergeRequests = service.doesGroupAllowMergeRequests(group);
@@ -227,12 +229,14 @@ public class GroupController extends PageController {
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
 
 			List<CachedEntity> receivedWars = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
+			@SuppressWarnings("unchecked")
 			List<Key> alliedGroups = (List<Key>)group.getProperty("declaredAlliedGroups");
+			@SuppressWarnings("unchecked")
 			List<Key> declaredWars = (List<Key>)group.getProperty("declaredWarGroups");
-			
+			boolean isCreator = service.isCharacterGroupCreator();
+
 			if (declaredWars != null)
 			{
-				boolean isAdmin = service.isCharacterGroupAdmin();
 				List<CachedEntity> declaredWarGroups = db.getEntities(declaredWars);
 				List<String> warGroupNames = new ArrayList<String>();
 				
@@ -240,7 +244,7 @@ public class GroupController extends PageController {
 				{
 					if (war == null)
 						continue;
-					String output = HtmlComponents.generateWarDeclarations(war, isAdmin);
+					String output = HtmlComponents.generateWarDeclarations(war, isCreator, inGroup);
 					warGroupNames.add(output);
 				}
 				request.setAttribute("declaredWars", warGroupNames);
@@ -260,15 +264,15 @@ public class GroupController extends PageController {
 			}
 			if (alliedGroups != null)
 			{
-				boolean isAdmin = service.isCharacterGroupAdmin();
 				List<CachedEntity> declaredAlliedGroups = db.getEntities(alliedGroups);
 				List<String> alliedGroupNames = new ArrayList<String>();
+				boolean isAdmin = service.isCharacterGroupAdmin();
 				
 				for (CachedEntity allies : declaredAlliedGroups)
 				{
 					if (allies == null)
 						continue;
-					String output = HtmlComponents.generateAlliedGroups(allies, isAdmin);
+					String output = HtmlComponents.generateAlliedGroups(allies, isCreator, inGroup);
 					alliedGroupNames.add(output);
 				}
 				request.setAttribute("alliedGroups", alliedGroupNames);
@@ -276,16 +280,18 @@ public class GroupController extends PageController {
 
 			List<CachedEntity> allyRequests = db.getFilteredList("Group", "pendingAllianceGroupKey", group.getKey());
 			List<String> outputAllyRequests = new ArrayList<String>();
-			if (allyRequests != null)
-			{
+			
 				for (CachedEntity allyReq : allyRequests)
 				{
-					String output = HtmlComponents.generateGroupAllianceRequest(allyReq);
+					String output = HtmlComponents.generateGroupAllianceRequest(allyReq, isCreator, inGroup);
 					outputAllyRequests.add(output);
 				}
+				if (outputAllyRequests.isEmpty())
+					outputAllyRequests.add("No group alliance requests at this time.");
+				
 				request.setAttribute("pendingGroupAllies", outputAllyRequests);
 			}
-		}	
+		
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}
 

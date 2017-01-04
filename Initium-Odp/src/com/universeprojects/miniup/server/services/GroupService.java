@@ -152,6 +152,10 @@ public class GroupService extends Service {
 		return false;
 	}
 	
+	public boolean isCharacterGroupCreator()
+	{
+		return GameUtils.equals(this.character.getKey(), this.characterGroup.getProperty("creatorKey"));
+	}
 	/**
 	 * Adds the specified groups Key to character groups pendingMergeGroupKey property, 
 	 * indicating a merge request has been submitted. 
@@ -303,26 +307,53 @@ public class GroupService extends Service {
 		}
 		return null;
 	}
-	@SuppressWarnings("unchecked")
-	public List<CachedEntity> getGroupAlliances(CachedEntity group)
+	
+	public boolean isGroupAtWarWithCharGroup(CachedEntity group) 
 	{
-		List<Key> keys = (List<Key>)group.getProperty("declaredAlliedGroups");
-		
-		if (keys != null)
-			return db.getEntities(keys);
+		List<Key> charGroupWars = getCharGroupWarKeys();
+		List<Key> groupWars = getGroupWarKeys(group);
+		if (charGroupWars != null && charGroupWars.contains(group.getKey()))
+			return true;
+		else if (groupWars != null && groupWars.contains(this.characterGroup.getKey()))
+			return true;
 		else
-			return null;
+			return false;					
 	}
 	
-	public List<CachedEntity> getCharGroupAlliances(CachedEntity character)
+	public boolean isGroupAlliedWithCharGroup(CachedEntity group)
 	{
-		Key charGroupKey = (Key)this.characterGroup.getProperty("groupKey");
-		CachedEntity charGroup = db.getEntity(charGroupKey);
-		return getGroupAlliances(charGroup);
+		List<Key> charGroupAllies = getCharGroupAllianceKeys();
+		if (charGroupAllies != null)
+			return charGroupAllies.contains(group.getKey());
+		else
+			return false;
+	}
+	@SuppressWarnings("unchecked")
+	public List<Key> getGroupAllianceKeys(CachedEntity group)
+	{
+		return (List<Key>)group.getProperty("declaredAlliedGroups");
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean beginWar(CachedDatastoreService ds, CachedEntity warGroup)
+	public List<Key> getCharGroupAllianceKeys()
+	{
+		return (List<Key>)this.characterGroup.getProperty("declaredAlliedGroups");
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Key> getGroupWarKeys(CachedEntity group)
+	{
+		return (List<Key>)group.getProperty("declaredWarGroups");
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Key> getCharGroupWarKeys()
+	{
+		return (List<Key>)this.characterGroup.getProperty("declaredWarGroups");
+	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean beginWar(CachedDatastoreService ds, CachedEntity warGroup) throws UserErrorMessage
 	{
 		//null check
 	if (warGroup == null)
@@ -330,10 +361,18 @@ public class GroupService extends Service {
 	
 	if(this.isAdmin && this.isCharacterInSpecifiedGroup(warGroup) == false)
 	{
-		List<Key> charGroupWars = (List<Key>)this.characterGroup.getProperty("declaredWarGroups");
-		
+		List<Key> charGroupWars = getCharGroupWarKeys();
+		List<Key> warGroupAllies = getGroupWarKeys(warGroup);
 		if (charGroupWars == null)
 		{
+			if (warGroupAllies != null && isGroupAlliedWithCharGroup(warGroup))
+				throw new UserErrorMessage(
+						"Cannot start a war with an allied group.");
+			if (GameUtils.equals(this.characterGroup.getKey(), warGroup.getKey()))
+				throw new UserErrorMessage(
+						"Cannot declare war against yourself.");
+			if (GameUtils.equals(this.characterGroup.getProperty("pendingAllianceGroupKey"), warGroup.getKey()))
+					this.characterGroup.setProperty("pendingAllianceGroupKey", null);
 			List<Key> createCharGroupWars = new ArrayList<Key>();
 			createCharGroupWars.add(warGroup.getKey());
 			this.characterGroup.setProperty("declaredWarGroups", createCharGroupWars);
@@ -342,6 +381,14 @@ public class GroupService extends Service {
 		}
 		else if (charGroupWars != null)
 		{
+			if (warGroupAllies != null && isGroupAlliedWithCharGroup(warGroup))
+				throw new UserErrorMessage(
+						"Cannot start a war with an allied group.");
+			if (GameUtils.equals(this.characterGroup.getKey(), warGroup.getKey()))
+				throw new UserErrorMessage(
+						"Cannot declare war against yourself.");
+			if (GameUtils.equals(this.characterGroup.getProperty("pendingAllianceGroupKey"), warGroup.getKey()))
+				this.characterGroup.setProperty("pendingAllianceGroupKey", null);
 			charGroupWars.add(warGroup.getKey());
 			this.characterGroup.setProperty("declaredWarGroups", charGroupWars);
 			ds.put(this.characterGroup);
@@ -369,10 +416,15 @@ public class GroupService extends Service {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public CachedEntity setAllianceRequest(CachedEntity allyGroup) throws UserErrorMessage
 	{
 		if (allyGroup != null)
 		{
+			List<Key> allyGroupWars = getGroupWarKeys(allyGroup);
+			if (allyGroupWars != null && isGroupAtWarWithCharGroup(allyGroup))
+				throw new UserErrorMessage(
+						"Cannot request an alliance with a group you are at war with.");
 			if (GameUtils.equals(allyGroup.getKey(), this.characterGroup.getKey()))
 				throw new UserErrorMessage(
 						"Group to ally is character's own group.");

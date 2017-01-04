@@ -18,10 +18,9 @@ public class SandboxServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		int width = Integer.parseInt(request.getParameter("width"));
-		int height = Integer.parseInt(request.getParameter("height"));
 		int seed = Integer.parseInt(request.getParameter("seed"));
 
-		String json = new Gson().toJson(RandomTileGenerator.getBuildingCells(seed, height, width));
+		String json = new Gson().toJson(RandomTileGenerator.getBuildingCells(seed, width));
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);
