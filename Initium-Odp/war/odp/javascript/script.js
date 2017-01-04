@@ -508,7 +508,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		text = "";
 	
 	
-	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
+	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
 	content+="</div>";
 
 	$("#banner-base").html(content);
@@ -662,32 +662,32 @@ function transmuteItems(eventObject, containerId)
 //function storeSellItem(itemId)
 //{
 //	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
-//		window.location.href="ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
+//		window.location.href="/ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
 //	});
 //}
 
 //function removeAllStoreItems()
 //{
 //	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
-//		window.location.href='ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
+//		window.location.href='/ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
 //	});
 //}
 
 //function storeDeleteSoldItems()
 //{
-//	location.href = "ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
+//	location.href = "/ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
 //}
 //
 //function storeDeleteItem(saleItemId)
 //{
-//	location.href = "ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
+//	location.href = "/ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
 //}
 
 //function renameStore()
 //{
 //	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
 //		if (name!=null && name!="")
-//			window.location.href='ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
+//			window.location.href='/ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
 //	});
 //}
 
@@ -700,7 +700,7 @@ function createCampsite()
 	promptPopup("New Campsite", "Provide a new name for your campsite:", lastNameUsed, function(name){
 		if (name!=null && name!="")
 		{
-			window.location.href='ServletCharacterControl?type=createCampsite&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
+			window.location.href='/ServletCharacterControl?type=createCampsite&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
 			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
 			localStorage.setItem("campsiteName", name);
 		}
@@ -741,7 +741,7 @@ function collectDogecoinsFromCharacter(characterId, event)
 //	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
 //		if (amount!=null && amount!="")
 //		{
-//			window.location.href='ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
+//			window.location.href='/ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
 //		}
 //	});
 //}
@@ -826,7 +826,7 @@ function ajaxAction(url, eventObject, loadFunction)
 
 	var clickedElement = $(eventObject.currentTarget);
 	var originalText = clickedElement.html();
-	clickedElement.html("<img src='javascript/images/wait.gif' border=0/>");
+	clickedElement.html("<img src='/javascript/images/wait.gif' border=0/>");
 	$.get(url)
 	.done(function(data){
 		clickedElement.html(data);
@@ -953,7 +953,7 @@ function endWar(eventObject, groupId)
 }
 //function cancelLeaveGroup()d
 //{
-//	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
+//	window.location.href = "/ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
 //}
 function groupAcceptAllianceRequest(eventObject, groupId)
 {
@@ -1039,12 +1039,12 @@ function makeGroupCreator(eventObject, characterId)
 
 //function duelConfirmation_Yes()
 //{
-//	window.location.href="ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
+//	window.location.href="/ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
 //}
 //
 //function duelConfirmation_No()
 //{
-//	window.location.href="ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
+//	window.location.href="/ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
 //}
 
 function reloadPopup(element, backUrl, event)
@@ -1097,7 +1097,7 @@ function refreshPopup(url, event)
 //	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
 //		if (sale!=null)
 //		{
-//			window.location.href="ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
+//			window.location.href="/ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
 //		}
 //	});
 //	
@@ -1354,7 +1354,7 @@ function refreshInstanceRespawnWarning()
 //function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
 //{
 //	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
-//		window.location.href = "ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
+//		window.location.href = "/ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
 //	});
 //}
 
@@ -1388,12 +1388,12 @@ function enterDefenceStructureSlot(slot)
 	if (slot=="Defending1" || slot=="Defending2" || slot=="Defending3")
 	{
 		confirmPopup("Defend this structure?", "Are you sure you want to defend this structure? If you do this, other players will be able to attack and kill you.", function(){
-			window.location.href = "ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
+			window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
 		});
 	}
 	else
 	{
-		window.location.href = "ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
+		window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
 	}
 }
 
@@ -1446,7 +1446,7 @@ function pagePopup(url, closeCallback)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	
 	if (closeCallback!=null)
@@ -1467,7 +1467,7 @@ function pagePopupIframe(url)
 	
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><iframe id='"+pagePopupId+"-content' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/></iframe></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><iframe id='"+pagePopupId+"-content' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></iframe></div>");
 }
 
 function closePagePopup(doNotCallback)
@@ -1519,9 +1519,9 @@ function reloadPagePopup(quietly)
 	var url = content.attr("src");
 
 	if (quietly==false)
-		content.html("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
+		content.html("<img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/>");
 	else
-		$(".page-popup-Reload").html("<img src='javascript/images/wait.gif' border=0 style='margin-top:20px;'/>");
+		$(".page-popup-Reload").html("<img src='/javascript/images/wait.gif' border=0 style='margin-top:20px;'/>");
 
 	if (content.is("iframe"))
 	{
@@ -1537,7 +1537,7 @@ function reloadPagePopup(quietly)
 
 function moveItem(event, itemId, newContainerKind, newContainerId)
 {
-	ajaxAction("ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode, event, function(){
+	ajaxAction("/ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode, event, function(){
 		reloadPagePopup(true);
 	});
 }
@@ -1596,7 +1596,7 @@ function deleteAndRecreateCharacter(currentCharName)
 		if (currentCharName==null)
 			currentCharName = "";
 		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
-			window.location.href = "ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+window.verifyCode;
+			window.location.href = "/ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+window.verifyCode;
 		});
 	});
 }
@@ -1711,38 +1711,38 @@ function joinParty(eventObject, partyCode) {
 function leaveParty()
 {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
-		location.href = "ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
+		location.href = "/ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
 	});
 }
 
 function combatAttackWithLeftHand()
 {
-	location.href = "ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode;
 }
 
 function combatAttackWithRightHand()
 {
-	location.href = "ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode;
 }
 
 function combatEscape()
 {
-	location.href = "ServletCharacterControl?type=escape"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=escape"+"&v="+window.verifyCode;
 }
 
 function combatAllowCharacterIn()
 {
-	location.href = "ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode;
 }
 
 function storeDisabled()
 {
-	location.href = "ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode;
 }
 
 function storeEnabled()
 {
-	location.href = "ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
 }
 
 ////////////////////////////////////////////////////////
@@ -1775,17 +1775,17 @@ function toggleHideUserActivity(eventObject)
 
 function campsiteDefend()
 {
-	location.href = "ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
 }
 
 function leaveAndForgetCombatSite(pathId)
 {
-	location.href = "ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode;
 }
 
 function forgetCombatSite(locationId)
 {
-	location.href = "ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
 }
 
 function groupAcceptJoinGroupApplication(eventObject, characterId)
@@ -1805,7 +1805,7 @@ function groupMemberKick(eventObject, characterId)
 
 function groupMemberKickCancel(characterId)
 {
-	location.href = "ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
 }
 
 function groupRequestJoin(eventObject, groupId)
@@ -1853,27 +1853,27 @@ function groupMergeCancelRequest(eventObject)
 
 function tradeRemoveItem(itemId)
 {
-	location.href = "ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
 }
 
 function tradeCancel()
 {
-	location.href = "ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode;
 }
 
 function tradeReady(version)
 {
-	location.href = "ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode;
 }
 
 function tradeAddItem(itemId)
 {
-	location.href = "ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
 }
 
 function partyJoin(characterId)
 {
-	location.href = "ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
 }
 
 function tradeStartTradeNew(eventObject,characterId)
@@ -1949,7 +1949,7 @@ function tradeAddAllItemsNew(eventObject)
 
 function duelRequest(characterId)
 {
-	location.href = "ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
 }
 
 function viewManageStore()
@@ -1977,21 +1977,21 @@ function logout()
 
 function attackStructure()
 {
-	location.href = "ServletCharacterControl?type=attackStructure"+"&v="+verifyCode;
+	location.href = "/ServletCharacterControl?type=attackStructure"+"&v="+verifyCode;
 }
 
 function allowDuelRequests()
 {
 	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
 	return;
-	location.href = "ServletCharacterControl?type=allowDuelRequests"+"&v="+verifyCode;
+	location.href = "/ServletCharacterControl?type=allowDuelRequests"+"&v="+verifyCode;
 }
 
 function disallowDuelRequests()
 {
 	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
 	return;
-	location.href = "ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
+	location.href = "/ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
 }
 
 function viewStore(characterId)
@@ -2001,7 +2001,7 @@ function viewStore(characterId)
 
 function setBlockadeRule(rule)
 {
-	location.href = "ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
+	location.href = "/ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
 }
 
 function doEatBerry(eventObject)
@@ -2166,7 +2166,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 		parameters.v = verifyCode;
 	
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
-	var url = "cmd?cmd="+commandName;
+	var url = "/cmd?cmd="+commandName;
 	
 	var clickedElement = null;
 	var originalText = null;
@@ -2175,7 +2175,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 		clickedElement = $(eventObject.currentTarget);
 		if(clickedElement.find("img.wait").length == 0) {
 			originalText = clickedElement.html();
-			clickedElement.html("<img class='wait' src='javascript/images/wait.gif' border=0/>");
+			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
 		}
 	}
 	
@@ -2312,7 +2312,7 @@ function doTerritorySetDefense(eventObject, line)
 function longOperation_fullPageRefresh(eventObject, operationName, operationDescription, operationBannerUrl, actionUrl, fullPageRefreshSeconds)
 {
 	var originalText = $(eventObject.currentTarget).html();
-	$(eventObject.currentTarget).html("<img src='javascript/images/wait.gif' border=0/>");
+	$(eventObject.currentTarget).html("<img src='/javascript/images/wait.gif' border=0/>");
 	$.get(url)
 	.done(function(data){
 		fullpageRefresh();
@@ -2409,7 +2409,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 
 function showBannerLoadingIcon()
 {
-	$("#banner-base").append("<img id='banner-loading-icon' src='javascript/images/wait.gif' border=0/>");
+	$("#banner-base").append("<img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/>");
 }
 
 function setBannerImage(url)
@@ -2422,7 +2422,7 @@ function setBannerOverlayText(title, text)
 {
 	if (text==null)
 		text = "";
-	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a href='ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
+	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
 	
 	$(".travel-scene-text").remove();
 	$("#banner-base").append(contents);
@@ -2438,7 +2438,7 @@ function doGoto(event, pathId, attack)
 	if (attack == null)
 		attack = false;
 	showBannerLoadingIcon();
-	longOperation(event, "ServletCharacterControl?type=goto_ajax&pathId="+pathId+"&attack="+attack+"&v="+window.verifyCode, 
+	longOperation(event, "/ServletCharacterControl?type=goto_ajax&pathId="+pathId+"&attack="+attack+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2465,7 +2465,7 @@ function doExplore(ignoreCombatSites)
 	if (ignoreCombatSites == null)
 		ignoreCombatSites = false;
 	showBannerLoadingIcon();
-	longOperation(null, "ServletCharacterControl?type=explore_ajax&ignoreCombatSites="+ignoreCombatSites+"&v="+window.verifyCode, 
+	longOperation(null, "/ServletCharacterControl?type=explore_ajax&ignoreCombatSites="+ignoreCombatSites+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2489,7 +2489,7 @@ function doExplore(ignoreCombatSites)
 function doRest()
 {
 	showBannerLoadingIcon();
-	longOperation(null, "ServletCharacterControl?type=rest_ajax"+"&v="+window.verifyCode, 
+	longOperation(null, "/ServletCharacterControl?type=rest_ajax"+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2513,7 +2513,7 @@ function doRest()
 function doCollectCollectable(event, collectableId)
 {
 	showBannerLoadingIcon();
-	longOperation(event, "ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode, 
+	longOperation(event, "/ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2635,7 +2635,7 @@ function completedTradeWindow()
 function updateTerritory()
 {
 	var territoryView = $("#territoryView");
-	territoryView.html("<img src='javascript/images/wait.gif' border=0/>"+territoryView.html());
+	territoryView.html("<img src='/javascript/images/wait.gif' border=0/>"+territoryView.html());
 	territoryView.load("ajax_territoryview.jsp");
 }
 

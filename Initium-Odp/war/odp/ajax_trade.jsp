@@ -12,7 +12,7 @@
 <%@page import="com.universeprojects.miniup.server.ODPDBAccess"%>
 <% 
     response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
-    ODPDBAccess db = new ODPDBAccess(request);
+    ODPDBAccess db = ODPDBAccess.getInstance(request);
     CachedDatastoreService ds = db.getDB(); 
     
     CachedEntity character = db.getCurrentCharacter();
