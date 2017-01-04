@@ -64,8 +64,7 @@ function loadMap() {
 
                     $hexBody.append('<div id="hex' + i + 'Top" class="hexTop"/>');
                     $hexBody.append('<div id="hex' + i + 'Bot" class="hexBottom"/>');
-
-                    $hexBody.css("position", "relative");
+                    
                     $hexBody.css("width", hexWidth + 'px');
                     $hexBody.css("height", hexSize + 'px');
                     $hexBody.css("margin", hexSize / 2 + 'px');
