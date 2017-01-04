@@ -89,7 +89,6 @@ class BuildingCell {
 
     @Override
     public String toString() {
-        
         return "fileName: '" + this.fileName + "', zIndex: '" + this.zIndex + "'";
     }
 }
