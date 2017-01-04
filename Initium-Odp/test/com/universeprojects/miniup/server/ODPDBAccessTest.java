@@ -73,7 +73,7 @@ public class ODPDBAccessTest {
 	@Test
 	public void doCharacterTakePath_noParty_userNotOwner() throws Exception { // Single character not the owner
 		expectedException.expect(UserErrorMessage.class);
-		expectedException.expectMessage("You cannot enter a player owned house unless you are the owner."); // TODO - move these exceptions to properties
+		expectedException.expectMessage("You cannot enter a player owned house unless you already have been given access."); // TODO - move these exceptions to properties
 
 		CachedEntity user = new CachedEntity("User");
 		testObj.getDB().put(user);
@@ -135,9 +135,47 @@ public class ODPDBAccessTest {
 	}
 
 	@Test
+	public void doCharacterTakePath_userOwner_inParty_oneOwner_oneDiscovery() throws Exception { // Two characters of different users, one is owner
+		CachedEntity user1 = new CachedEntity("User");
+		testObj.getDB().put(user1);
+		CachedEntity character1 = new CachedEntity("Character");
+		Key currentLocationKey = KeyFactory.createKey("locationKey", 1);
+		character1.setProperty("locationKey", currentLocationKey);
+		String partyCode = "partyCode";
+		character1.setProperty("partyCode", partyCode);
+		character1.setProperty("userKey", user1.getKey());
+		character1.setProperty("partyLeader", "TRUE");
+		testObj.getDB().put(character1);
+		CachedEntity user2 = new CachedEntity("User");
+		testObj.getDB().put(user2);
+		CachedEntity character2 = new CachedEntity("Character");
+		character2.setProperty("locationKey", currentLocationKey);
+		character2.setProperty("partyCode", partyCode);
+		character2.setProperty("userKey", user2.getKey());
+		testObj.getDB().put(character2);
+		CachedEntity destinationEntity = new CachedEntity("Location");
+		destinationEntity.setProperty("ownerKey", user1.getKey());
+		testObj.getDB().put(destinationEntity);
+		CachedEntity path = new CachedEntity("Path");
+		path.setProperty("location1Key", currentLocationKey);
+		path.setProperty("location2Key", destinationEntity.getKey());
+		path.setProperty("ownerKey", user1.getKey());
+		testObj.getDB().put(path);
+		CachedEntity discovery = new CachedEntity("Discovery");
+		discovery.setProperty("characterKey", character2.getKey());
+		discovery.setProperty("entityKey", path.getKey());
+		discovery.setProperty("kind", path.getKind());
+		discovery.setProperty("location1Key", path.getProperty("location1Key"));
+		discovery.setProperty("location2Key", path.getProperty("location2Key"));
+		testObj.getDB().put(discovery);
+		
+		testObj.doCharacterTakePath(testObj.getDB(), character1, path , false);
+	}
+
+	@Test
 	public void doCharacterTakePath_userOwner_inParty_noOwner_isLeader() throws Exception { // Two characters of different users, one is owner
 		expectedException.expect(UserErrorMessage.class);
-		expectedException.expectMessage("You cannot enter a player owned house unless the owner is a character in your party."); // TODO - move these exceptions to properties
+		expectedException.expectMessage("You cannot enter a player owned house unless every character already has been given access."); // TODO - move these exceptions to properties
 
 		CachedEntity user1 = new CachedEntity("User");
 		testObj.getDB().put(user1);

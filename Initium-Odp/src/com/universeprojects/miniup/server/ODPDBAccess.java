@@ -4852,6 +4852,8 @@ public class ODPDBAccess
 		String partyCode = (String) character.getProperty("partyCode");
 		boolean isInParty = partyCode != null && !"".equals(partyCode);
 
+		MovementService movementService = new MovementService(this);
+
 		Key ownerKey = (Key) destination.getProperty("ownerKey");
 		if (ownerKey != null) {
 			// Check to see if all members of the party have access to enter owned housing.
@@ -4873,30 +4875,21 @@ public class ODPDBAccess
 					throw new UserErrorMessage(String.format("You cannot enter a group owned house unless %s.", partyMembers.size() > 1 ? "all members of your party are members of the group" : "you are a member of the group"));
 				}
 			} else if("User".equals(ownerKey.getKind())) {
-				boolean ownerIsPresent = false;
 				Key pathOwner = (Key) path.getProperty("ownerKey");
 				for (CachedEntity partyMember : partyMembers) {
-					if (GameUtils.equals(pathOwner, partyMember.getProperty("userKey"))) {
-						ownerIsPresent = true;
-						break;
+					boolean isPathOwner = GameUtils.equals(pathOwner, partyMember.getProperty("userKey"));
+					if (!isPathOwner && !movementService.isPathDiscovered(partyMember.getKey(), path.getKey())) {
+						throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", partyMembers.size() > 1 ? "every character already has been given access" : "you already have been given access"));
 					}
-				}
-
-				if (!ownerIsPresent) {
-					throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", partyMembers.size() > 1 ? "the owner is a character in your party" : "you are the owner"));
 				}
 			} else {
 				// TODO - Exception? If we can't determine the owner type; the character will be allowed to take the path. 
 			}
 		}
-		
-		MovementService movementService = new MovementService(this);
 
 		// Check if this property is locked and if so, if we have the key to enter it...
 		movementService.checkForLocks(character, path, destinationKey);
-		
-		
-		
+
 		// Check if we're being blocked by the blockade
 		CachedEntity blockadeStructure = getBlockadeFor(character, destination);
 		
