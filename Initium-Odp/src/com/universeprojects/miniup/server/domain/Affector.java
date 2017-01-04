@@ -2,7 +2,12 @@ package com.universeprojects.miniup.server.domain;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This object defines the influences attributes on other objects have on curve solutions.
+/**
+ * This object defines the influences attributes on other objects have on curve solutions.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Affector extends OdpDomain {
 	public static final String KIND = "Affector";
 
@@ -19,7 +24,11 @@ public class Affector extends OdpDomain {
 		return KIND;
 	}
 
-	// The field name on a result that this affector applies to.
+	/**
+	 * The field name on a result that this affector applies to.
+	 * 
+	 * @param applyField
+	 */
 	public void setApplyField(String applyField) {
 		getCachedEntity().setProperty("applyField", applyField);
 	}
@@ -28,6 +37,10 @@ public class Affector extends OdpDomain {
 		return (String) getCachedEntity().getProperty("applyField");
 	}
 
+	/**
+	 * 
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}

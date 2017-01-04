@@ -2,7 +2,12 @@ package com.universeprojects.miniup.server.domain;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This type of affector allows us to describe how a we (the tool/material..etc) are to affect the field on an item.
+/**
+ * This type of affector allows us to describe how a we (the tool/material..etc) are to affect the field on an item.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class AffectorItemField extends OdpDomain {
 	public static final String KIND = "AffectorItemField";
 
@@ -19,7 +24,11 @@ public class AffectorItemField extends OdpDomain {
 		return KIND;
 	}
 
-	// (Item)
+	/**
+	 * (Item)
+	 * 
+	 * @param destinationFieldName
+	 */
 	public void setDestinationFieldName(String destinationFieldName) {
 		getCachedEntity().setProperty("destinationFieldName", destinationFieldName);
 	}
@@ -28,7 +37,11 @@ public class AffectorItemField extends OdpDomain {
 		return (String) getCachedEntity().getProperty("destinationFieldName");
 	}
 
-	// A multiplier that is applied directly to the destination field. This multiplier is scaled based on the sourceFieldRange. If the source field value is at the sourceFieldRange's max, then maximumMultiplier will be used. If the source field value is somewhere in the middle of the sourceFieldRange, then the multiplier used will be somewhere between maximumMultiplier and minimumMultiplier.
+	/**
+	 * A multiplier that is applied directly to the destination field. This multiplier is scaled based on the sourceFieldRange. If the source field value is at the sourceFieldRange's max, then maximumMultiplier will be used. If the source field value is somewhere in the middle of the sourceFieldRange, then the multiplier used will be somewhere between maximumMultiplier and minimumMultiplier.
+	 * 
+	 * @param maximumMultiplier
+	 */
 	public void setMaximumMultiplier(Double maximumMultiplier) {
 		getCachedEntity().setProperty("maximumMultiplier", maximumMultiplier);
 	}
@@ -37,6 +50,10 @@ public class AffectorItemField extends OdpDomain {
 		return (Double) getCachedEntity().getProperty("maximumMultiplier");
 	}
 
+	/**
+	 * 
+	 * @param minimumMultiplier
+	 */
 	public void setMinimumMultiplier(Double minimumMultiplier) {
 		getCachedEntity().setProperty("minimumMultiplier", minimumMultiplier);
 	}
