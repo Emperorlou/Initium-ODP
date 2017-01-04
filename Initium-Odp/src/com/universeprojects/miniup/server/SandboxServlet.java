@@ -1,13 +1,14 @@
 package com.universeprojects.miniup.server;
 
-import java.io.IOException; 
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 
 public class SandboxServlet extends HttpServlet {
 	private static final long serialVersionUID = 9209182266946047848L;
@@ -20,8 +21,8 @@ public class SandboxServlet extends HttpServlet {
 		
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
-		JSONArray result = new JSONArray();
-		result.add(RandomTileGenerator.getBuildingCells(seed, width));
+		JSONObject result = new JSONObject();
+		result.put("hexTiles", RandomTileGenerator.getBuildingCells(seed, width));
 		response.getWriter().write(result.toJSONString());
 
 	}
