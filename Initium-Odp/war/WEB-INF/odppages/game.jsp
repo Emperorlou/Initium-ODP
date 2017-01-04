@@ -7,6 +7,7 @@
 <head>
 	<jsp:include page="common-head2.jsp"/><jsp:include page="odp/common-head.jsp"/>
 	<title>Main - Initium</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
 <script type='text/javascript'>
 	$(document).ready(function (){
