@@ -86,4 +86,9 @@ class BuildingCell {
         BuildingCell rhs = (BuildingCell) obj;
         return rhs.fileName.equals(this.fileName) && rhs.zIndex == this.zIndex;
     }
+
+    @Override
+    public String toString() {
+        return "{\"fileName\":\"" + this.fileName + "\",\"zIndex\":" + this.zIndex + "}";
+    }
 }
