@@ -939,22 +939,42 @@ function declareWar(eventObject)
 {
 	promptPopup("Declare War", "Enter the name of the group you want to declare on.", "",  function(groupName) {
 		if (groupName != null || groupName != "") {
-			doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName}, function(error)  {
+			doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName, "decision" : "begin"}, function(error)  {
 				if (error) return;
 			})
 		}
 	});
 }
-function endWar(eventObject, groupName) 
+function endWar(eventObject, groupId) 
 {
 	confirmPopup("End War", "Are you sure you want to end this war?", function(){
-		doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName});
+		doCommand(eventObject, "GroupDoSetWar", {"groupId" : groupId, "decision" : "end"});
 	});
 }
 //function cancelLeaveGroup()d
 //{
 //	window.location.href = "ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
 //}
+function groupAcceptAllianceRequest(eventObject, groupId)
+{
+	confirmPopup("Accept Alliance", "Are you sure you want to ally yourself with this group?", function() {
+		doCommand(eventObject, "GroupProcessAllianceReq", {"groupId" : groupId, "decision" : "accept"});
+	})
+}
+
+function groupDeleteAlliance(eventObject, groupId)
+{
+	confirmPopup("End Alliance", "Are you sure you want to end this alliance?", function() {
+		doCommand(eventObject, "GroupDeleteAlliance", {"groupId" : groupId});
+	})
+}
+function groupDeclineAllianceRequest(eventObject, groupId)
+{
+	var decision = "decline";
+	confirmPopup("Decline Alliance", "Are you sure you want to decline this alliance?", function() {
+		doCommand(eventObject, "GroupProcessAllianceReq", {"groupId" : groupId, "decision" : "decline"});
+	})
+}
 
 function setGroupDescription(eventObject, existingDescription)
 {
@@ -971,6 +991,16 @@ function setGroupDescription(eventObject, existingDescription)
 	});
 }
 
+function submitGroupAllianceRequest(eventObject) 
+{
+	promptPopup("Request Alliance", "Enter the name of the group you want to ally with.", "",  function(groupName) {
+		if (groupName != null || groupName != "") {
+			doCommand(eventObject, "GroupAllianceRequest", {"groupName" : groupName}, function(error)  {
+				if (error) return;
+			})
+		}
+	});
+}
 function setGroupMemberRank(eventObject, oldPosition, characterId)
 {
 	if (oldPosition==null || oldPosition=="")
@@ -1667,6 +1697,17 @@ function doAttack(eventObject, charId)
     doCommand(eventObject,"Attack",{"charId":charId});
 }
 
+function leaveParty(eventObject) {
+	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
+		doCommand(eventObject, "LeaveParty");
+	});
+}
+
+function joinParty(eventObject, partyCode) {
+	doCommand(eventObject, "PartyJoin", {"partyCode": partyCode});
+}
+
+//Old leave party function
 function leaveParty()
 {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
@@ -2196,11 +2237,11 @@ function doCommand(eventObject, commandName, parameters, callback)
 	
 }
 
-function doSetLeader(eventObject, charId)
+function doSetLeader(eventObject, charId, charName)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	confirmPopup("Set new leader", "Are you sure you want set someone else to be the leader of your group?", function(){
+	confirmPopup("Set new leader", "Are you sure you want set " + charName + " to be the leader of your group?", function(){
 		doCommand(eventObject,"SetLeader",{"charId":charId});
 	});
 }

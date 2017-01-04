@@ -428,7 +428,6 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 			groupPermissionTag = "(Admin)";
 		if (isCreator)
 			groupPermissionTag = "(Creator)";
-
 		String groupRank = "";
 		if (character.getProperty("groupRank") != null)
 			groupRank = (String) character.getProperty("groupRank");
@@ -486,12 +485,92 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		// This only gets generated within the admin block, so we know the viewing user has access.
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
-		sb.append("<div class='main-item-container'><div class='main-item'>");
+		sb.append("<div class='main-item-container'><div class=''>");
 		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
 		sb.append("</div><div class='main-item-controls'>");
 		sb.append("<a onclick='groupMergeDenyApplication(event, "+group.getId()+")'>Deny Merge</a>");
 		sb.append("<a onclick='groupMergeAcceptApplication(event, "+group.getId()+")'>Accept Merge</a>");
 		sb.append("</div></div></div>");
+		return sb.toString();
+	}
+	
+	public static String generateGroupAllianceRequest(CachedEntity group, boolean isCreator, boolean inGroup)
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		if (isCreator && inGroup)
+		{
+			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+			sb.append("<div class='main-item-container'><div class=''>");
+			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+			sb.append("</div><div class='main-item-controls'>");
+			sb.append("<a onclick='groupAcceptAllianceRequest(event, "+group.getId()+")'>Accept Alliance</a>");
+			sb.append("<a onclick='groupDeclineAllianceRequest(event, "+group.getId()+")'>Deny Alliance</a>");
+			sb.append("</div></div></div>");
+		}
+		else
+		{
+			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+			sb.append("<div class='main-item-container'><div class=''>");
+			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+			sb.append("</div></div></div>");
+		}
+		return sb.toString();
+	}
+	
+	public static String generateAlliedGroups(CachedEntity group, boolean isCreator, boolean inGroup)
+	{		
+		StringBuilder sb = new StringBuilder();
+		if (isCreator && inGroup)
+		{
+			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+			sb.append("<div class='main-item-container'><div class=''>");
+			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+			sb.append("</div><div class='main-item-controls'>");
+			sb.append("<a onclick='groupDeleteAlliance(event, "+group.getId()+")'>End Alliance</a>");
+			sb.append("</div></div></div>");
+		}
+		else
+		{
+		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+		sb.append("<div class='main-item-container'><div class=''>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("</div></div></div>");
+		}
+		return sb.toString();
+		
+	}
+	
+	public static String generateWarDeclarations(CachedEntity group, boolean isCreator, boolean inGroup)
+	{	
+		StringBuilder sb = new StringBuilder();
+		if (isCreator && inGroup)
+		{
+			sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+			sb.append("<div class='main-item-container'><div class=''>");
+			sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+			sb.append("</div><div class='main-item-controls'>");
+			sb.append("<a onclick='endWar(event, "+group.getId()+")'>End War</a>");
+			sb.append("</div></div></div>");
+		}
+		else
+		{
+		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+		sb.append("<div class='main-item-container'><div class=''>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("</div></div></div>");
+		}
+		return sb.toString();
+	}
+	
+	public static String generateWarsReceived(CachedEntity group)
+	{	
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div class='group-container' ref='" + group.getId() + "'>");
+		sb.append("<div class='main-item-container'><div class=''>");
+		sb.append("<a class='link' onclick='viewGroup("+group.getId()+")'>"+group.getProperty("name")+"</a>");
+		sb.append("</div></div></div>");
+
 		return sb.toString();
 	}
 }
