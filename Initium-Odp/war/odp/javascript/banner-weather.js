@@ -96,7 +96,7 @@ function updateDayNightCycle(forceRefresh)
 	if (amount<0) amount = 0;
 	night = amount;
 	
-	var banner = $(".banner-shadowbox");
+	var banner = $(".banner-shadowbox, .banner1");
 	
 	if (Modernizr.backgroundblendmode==false || Modernizr.multiplebgs==false)
 	{
@@ -317,7 +317,7 @@ function updateBannerWeatherSystem()
 			bannerWeatherUpdateTimerId = null;
 		}
 		
-		var banner = $(".banner-shadowbox");
+		var banner = $(".banner-shadowbox, .banner1");
 		banner.css("background", "url('"+bannerUrl+"') no-repeat center center");
 		banner.css("background-blend-mode", "normal");
 		banner.css("background-size", "contain");

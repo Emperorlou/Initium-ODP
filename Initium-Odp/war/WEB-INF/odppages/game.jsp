@@ -207,7 +207,7 @@
 	});
 </script>
 
-<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=5'></script>
+<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=6'></script>
 <script id='ajaxJs' type='text/javascript'>
 ${bannerJs}
 </script>
@@ -215,7 +215,6 @@ ${bannerJs}
 
 
 
-<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=4'></script>
 <script type='text/javascript'>
 	if (isAnimationsEnabled())
 	{
@@ -275,6 +274,24 @@ ${longOperationRecallJs}
 </script>
 <script type="text/javascript" src="./javascript/script.js"></script>
 <link rel="stylesheet" href="./MiniUP.css">
+
+
+<script type="text/javascript">
+	// This ensures the bottom half of the page fills the rest of the page and no more
+	function normalizePage()
+	{
+		var adjust = 5;
+		var viewportHeight = $(window).height();
+		
+		var upperhalf = $(".page-upperhalf");
+		var contents = $(".page-maincontent");
+		var contentsHeight = viewportHeight - upperhalf.height()+adjust;
+		contents.height(contentsHeight);
+		contents.css("top", upperhalf.height()-adjust);
+	}
+	$(document).ready(normalizePage);
+	$(window).resize(normalizePage);
+</script>
 
 </head>
 
