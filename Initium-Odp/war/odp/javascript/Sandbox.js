@@ -115,7 +115,7 @@ function loadMap() {
         data:{width:hexEdge, seed:$("#seed").val()},
         type: 'POST',
         success: function(responseJson) {
-            $.each(responseJson, function (index, value) {
+            $.each(responseJson['hexTiles'], function (index, value) {
                 $.each(value, function (innerIndex, innerValue) {
 
                     var r = index;
