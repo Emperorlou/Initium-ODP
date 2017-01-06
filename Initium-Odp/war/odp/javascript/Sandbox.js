@@ -1,42 +1,33 @@
 var scale = $("#zoom").val();
 var maxZoom = 2.4;
 
+window.onload = function() {
+    document.onmousedown = startDrag;
+    document.onmouseup = stopDrag;
+}
+
 $(document).ready(function () {
     loadMap();
 });
 
-$(window).on("wheel", function(e) {
-
-    focusedEl = document.activeElement;
-    var target = $(e.target);
-    var elId = target.attr('class');
-    if (elId == "hexagon" || "hexBackground") {
-        e.preventDefault();
+$('#viewportcontainer').on({
+    'mousewheel': function (e) {
         var max = maxZoom;
-        var min = .2;
-        if (focusedEl.hasAttribute('max')) {
-            max = focusedEl.getAttribute('max');
-        }
-        if (focusedEl.hasAttribute('min')) {
-            min = focusedEl.getAttribute('min');
-        }
-        var value = parseInt(focusedEl.value, 10);
+        var min = .1;
         if (e.originalEvent.deltaY < 0) {
-            scale += .2;
+            scale += .1;
             if (max !== null && scale > max) {
                 scale = max;
             }
         } else {
-            scale -= .2;
+            scale -= .1;
             if (min !== null && scale < min) {
                 scale = min;
             }
         }
-        zoom();
-        focusedEl.value = value;
+        scaleTiles();
+        $('html, body').stop().animate({}, 500, 'linear');
     }
-    $('html, body').stop().animate({
-    },500, 'linear');
 });
 
 function pressedButton() {
@@ -44,17 +35,22 @@ function pressedButton() {
     loadMap();
 }
 
-function zoom() {
+function scaleTiles() {
 
     var hexEdge = $("#hexEdge").val();
     var hexSize = 32*scale;
     var maxHexSize = 32*maxZoom;
     var hexHeight = hexSize * 2;
+    var maxHexHeight = maxHexSize * 2;
     var hexWidth = Math.sqrt(3) / 2 * hexHeight;
     var hexDiag = hexEdge * 2 - 1;
     var imgSize = 128;
-    var xOffset = (hexDiag*maxHexSize)/2;
-    var offsetY = 100;
+    var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
+    var offsetY = maxHexHeight/2;
+    document.getElementById("ground-layer").style.width = hexDiag*hexWidth;
+    document.getElementById("ground-layer").style.height = (hexEdge*3-1)*hexSize;
+    document.getElementById("ground-layer").style.top = offsetY;
+    document.getElementById("ground-layer").style.left = offsetX;
 
     // Update all tiles
     var hexTiles = document.getElementsByClassName('hexagon');
@@ -66,8 +62,8 @@ function zoom() {
         var r = Number(tileIndexes[0]);
         var q = Number(tileIndexes[1]);
         var i = r + "_" + q;
-        var top = (offsetY + hexSize * 3 / 2 * r);
-        var left = xOffset + (hexSize * Math.sqrt(3) * (q + r / 2));
+        var top = (hexSize * 3 / 2 * r);
+        var left = hexSize * Math.sqrt(3) * (q + r / 2);
 
         hexTiles[index].style.width = hexWidth + "px";
         hexTiles[index].style.height = hexSize + "px";
@@ -89,15 +85,21 @@ function loadMap() {
     var hexSize = 32*scale;
     var maxHexSize = 32*maxZoom;
     var hexHeight = hexSize * 2;
+    var maxHexHeight = maxHexSize * 2;
     var hexWidth = Math.sqrt(3) / 2 * hexHeight;
     var hexDiag = hexEdge * 2 - 1;
     var imgSize = 128;
     var outerLoop=0;
     var reachedDiag = false;
     var htmlString = "";
-    var xOffset = (hexDiag*maxHexSize)/2;
-    var offsetY = 100;
+    var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
+    var offsetY = maxHexHeight/2;
     var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
+
+    document.getElementById("ground-layer").style.width = hexDiag*hexSize;
+    document.getElementById("ground-layer").style.height = hexDiag*hexHeight;
+    document.getElementById("ground-layer").style.top = offsetY;
+    document.getElementById("ground-layer").style.left = offsetX;
 
     document.getElementById("viewportcontainer").style.position = "relative";
     document.getElementById("viewport").style.position = "absolute";
@@ -121,8 +123,8 @@ function loadMap() {
                     var r = index;
                     var q = innerIndex - outerLoop;
                     var i = r + "_" + q;
-                    var top = (offsetY + hexSize * 3 / 2 * r);
-                    var left = (xOffset + hexSize * Math.sqrt(3) * (q + r / 2));
+                    var top = (hexSize * 3 / 2 * r);
+                    var left = (hexSize * Math.sqrt(3) * (q + r / 2));
 
                     $hexBody = "<div";
                     $hexBody += " id=\"hex" + i + "\"";
@@ -158,4 +160,48 @@ function loadMap() {
             $('#ground-layer').append(htmlString);
         }
     });
+}
+
+function startDrag(e) {
+    // determine event object
+    if (!e) {
+        var e = window.event;
+    }
+
+    // IE uses srcElement, others use target
+    var targ = e.target ? e.target : e.srcElement;
+
+    if (targ.className != 'hexBackground' && targ.className != 'ground-layer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
+    // calculate event X, Y coordinates
+    offsetX = e.clientX;
+    offsetY = e.clientY;
+
+    targ = document.getElementById("viewport");
+    //targ = document.getElementsByClassName("groundLayerContainer")
+    // assign default values for top and left properties
+    if(!targ.style.left) { targ.style.left='0px'};
+    if (!targ.style.top) { targ.style.top='0px'};
+
+    // calculate integer values for top and left 
+    // properties
+    coordX = parseInt(targ.style.left);
+    coordY = parseInt(targ.style.top);
+    drag = true;
+
+    // move div element
+    document.onmousemove=dragDiv;
+
+}
+function dragDiv(e) {
+    if (!drag) {return};
+    if (!e) { var e= window.event};
+    var targ=e.target?e.target:e.srcElement;
+    targ = document.getElementById("viewport");
+    // move div element
+    targ.style.left=coordX+e.clientX-offsetX+'px';
+    targ.style.top=coordY+e.clientY-offsetY+'px';
+    return false;
+}
+function stopDrag() {
+    drag=false;
 }
