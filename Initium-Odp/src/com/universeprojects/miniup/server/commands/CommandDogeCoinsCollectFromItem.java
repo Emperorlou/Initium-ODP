@@ -41,6 +41,7 @@ public class CommandDogeCoinsCollectFromItem extends TransactionCommand {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
+		character = ds.refetch(character);
 		
 		long itemId = tryParseId(parameters, "itemId");
 		CachedEntity item = db.getEntity("Item", itemId);

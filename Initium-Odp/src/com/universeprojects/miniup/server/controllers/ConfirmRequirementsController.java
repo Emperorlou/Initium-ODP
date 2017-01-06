@@ -29,7 +29,7 @@ public class ConfirmRequirementsController extends PageController
 	@Override
 	protected String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		ODPDBAccess db = new ODPDBAccess(request);
+		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		CachedDatastoreService ds = db.getDB();
 		CachedEntity character = db.getCurrentCharacter(); 
 		

@@ -165,6 +165,13 @@
 <hr>
 
 <h2>Your Character</h2>
+
+<c:if test="${charName=='Unnamed'}">
+	<p>
+		<br> <br> <a class='big-link' href='#' onclick='renameCharacter(event, "${charName}")' id='btnRenameCharacter'>Rename your character</a>
+	</p>
+</c:if>
+
 <p>
 	<br> <br> <a class='big-link' href='#' onclick='deleteAndRecreateCharacter("${charName}")' id='btnNewCharacter'>Delete your character and recreate</a>
 </p>

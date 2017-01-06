@@ -3,7 +3,6 @@ package com.universeprojects.miniup.server.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -364,6 +363,37 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
 	}
+
+	/**
+	 * This updates the TestPanel if environment is currently in test
+	 * 
+	 */
+	public String updateTestPanel()
+	{
+		if (db.getRequest().getRequestURL().toString().contains("test")) {
+			
+			StringBuilder newHtml = new StringBuilder();
+			
+			newHtml.append("Hex Edge: <input type='text' id='hexEdge' value=4 />");
+			newHtml.append("Zoom: <input type='text' id='zoom' value=1 />");
+			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
+			newHtml.append("<button id=\"somebutton\">press here</button>");
+			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
+			newHtml.append("<div id=\"viewport\" class=\"vp\">");
+			newHtml.append("<div id=\"ground-layer\" class=\"groundLayerContainer\"></div>");
+			newHtml.append("</div>");
+			newHtml.append("</div>");
+			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
+			newHtml.append("<script>");
+			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
+			newHtml.append("pressedButton();");
+			newHtml.append("});");
+			newHtml.append("</script>");
+			
+			return updateHtmlContents("#test-panel", newHtml.toString());
+		}
+		return "";
+	}
 	
 	
 	public String updateInBannerOverlayLinks()
@@ -703,7 +733,7 @@ public class MainPageUpdateService extends Service
 		if (isInParty())
 		{
 			newHtml.append("<div class='boldbox'>");
-			newHtml.append("<a onclick='leaveParty()' style='float:right'>Leave Party</a>");
+			newHtml.append("<a onclick='leaveParty(event)' style='float:right'>Leave Party</a>");
 			newHtml.append("<h4>Your party</h4>");
 			List<CachedEntity> party = getParty();
 			if (party!=null)
@@ -731,7 +761,7 @@ public class MainPageUpdateService extends Service
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
 						if (isThisMemberTheLeader == false && isPartyLeader())
-							newHtml.append("<a onclick='doSetLeader(event, "+character.getKey().getId()+")'>Make Leader</a>");
+							newHtml.append("<a onclick='doSetLeader(event, " + character.getKey().getId() + ", \"" + character.getProperty("name") + "\")'>Make Leader</a>");
 						newHtml.append("</div>");
 					}
 					newHtml.append("</a>");

@@ -1404,10 +1404,8 @@ hr.items-separator {
 /* EQUIPMENT AVATAR STYLES 64PX */
 .avatar-equip-backing-64px
 {
-    background-color: #333333;	
     width: 72px;
     height: 72px;
-    border: 3px solid #EFEFEF;
     top: 0px;
     display: inline-block;
     position: relative;
@@ -1559,7 +1557,11 @@ hr.items-separator {
 
 .avatar-equip-backing
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/avatarbacking1.png"); width:36px; height:36px; top:0px; display:inline-block;position:relative;
+	position:relative;
+	width:36px; 
+	height:36px; 
+	top:0px; 
+	display:inline-block;
 	vertical-align:top;
 	margin-left:5px;
 	margin-right:5px;
@@ -2040,13 +2042,13 @@ hr.items-separator {
 .low-durability:before {
 	content: url('https://initium-resources.appspot.com/images/ui/equipment-warning1.png');
 	position: relative;
-	right: 5%;
+	right: 0.5%;
 	top: -5px;
 }
 .very-low-durability:before {
 	content: url('https://initium-resources.appspot.com/images/ui/equipment-warning2.png');
 	position: relative;
-	right: 5%;
+	right: 0.5%;
 	top: -5px;
 }
 .big-link
@@ -2613,8 +2615,12 @@ body
 
 .banner1
 {
-	background-image:url("https://initium-resources.appspot.com/images/banner---animated-stream-waterfall1.gif");
-	background-position:top center;
+	position:relative;
+	
+	
+	background-image:url("https://initium-resources.appspot.com/images/hdbanners/banner---rocky-moutains-forest1.jpg");
+	background-position-x:center;
+	background-position-y:center;
 	background-repeat:no-repeat;
 	background-size:contain;
 	width:100%;
@@ -2868,6 +2874,33 @@ body
 	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 fill repeat;
 }
 
+.backdrop3d
+{
+	/*background-color: #854c30;*/
+	
+	border-style: solid;
+	border-width: 6px 10px 7px 9px;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 fill repeat;	  
+}
+
+.backdropTooltip1
+{
+	
+	
+	border-style: solid;
+	border-width: 4px 6px 6px 4px;
+	-moz-border-image: url(tooltip1-borderimage.png) 4 6 6 4 repeat;
+	-webkit-border-image: url(tooltip1-borderimage.png) 4 6 6 4 repeat;
+	-o-border-image: url(tooltip1-borderimage.png) 4 6 6 4 repeat;
+	border-image: url(tooltip1-borderimage.png) 4 6 6 4 fill repeat;	
+}
+
+
+
+
 .button1:before
 {
 	content: ' ';
@@ -2979,7 +3012,10 @@ body
 	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-right-hover.png");
 }
 
-
+.characterWidgetContainer
+{
+	position:absolute;
+}
 
 
 
@@ -3158,4 +3194,40 @@ body
 		overflow:visible;
 	}
 
+}
+
+/* Sandbox 2Dim testing */
+
+.hexagon {
+	position: absolute;
+	background-color: transparent;
+	/*border-left: solid 1px #333333;*/
+	/*border-right: solid 1px #333333;*/
+	background-size:100%;
+}
+
+.hexBackground {
+	position: absolute;
+	background-color: transparent;
+	background-size:100%;
+}
+
+.vpcontainer {
+	height: 211px;
+	width: 728px;
+	border: 1px solid black;
+	overflow: hidden;
+}
+
+.vp {
+	height: 100%;
+	width: 100%;
+	top: 0; right: 0; bottom: 0; left: 0;
+	/*border: 1px solid black;*/
+}
+
+.groundLayerContainer {
+	height: 100%;
+	width: 100%;
+	/*border: 1px solid black;*/
 }

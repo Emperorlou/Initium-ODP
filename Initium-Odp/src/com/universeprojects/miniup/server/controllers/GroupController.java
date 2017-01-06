@@ -33,7 +33,7 @@ public class GroupController extends PageController {
 			throws ServletException, IOException {
 		response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
 
-	    ODPDBAccess db = new ODPDBAccess(request);
+		ODPDBAccess db = ODPDBAccess.getInstance(request);
 	    CachedDatastoreService ds = db.getDB();
 	    CachedEntity character = db.getCurrentCharacter(); 
 		GroupService service = new GroupService(db, character);
@@ -141,7 +141,9 @@ public class GroupController extends PageController {
 			if (service.characterHasGroup()) {
 				request.setAttribute("inGroup", true);
 				boolean isAdmin = service.isCharacterGroupAdmin();
+				boolean isCreator = service.isCharacterGroupCreator();
 				request.setAttribute("isAdmin", isAdmin);
+				request.setAttribute("isCreator", isCreator);
 				
 				// Group merge information.
 				boolean allowMergeRequests = service.doesGroupAllowMergeRequests(group);
@@ -225,28 +227,71 @@ public class GroupController extends PageController {
 			// Get the number that were active in the past week
 			int activeUsersPastWeek = db.getActiveGroupPlayers(group, members, 60*24*7).size();
 			request.setAttribute("activeUsersPastWeek", activeUsersPastWeek);
-			
-			@SuppressWarnings("unchecked")
-			List<Key> keyOfDecs = (List<Key>)group.getProperty("declaredWarGroups");
-			List<String> groupNames = new ArrayList<String>();
-			
-			if (keyOfDecs == null)
-			{
-				groupNames.add("No current wars active.");
 
-			}
-			
-			else if (keyOfDecs != null)
+			List<CachedEntity> receivedWars = db.getFilteredList("Group", "declaredWarGroups", group.getKey());
+			@SuppressWarnings("unchecked")
+			List<Key> alliedGroups = (List<Key>)group.getProperty("declaredAlliedGroups");
+			@SuppressWarnings("unchecked")
+			List<Key> declaredWars = (List<Key>)group.getProperty("declaredWarGroups");
+			boolean isCreator = service.isCharacterGroupCreator();
+
+			if (declaredWars != null)
 			{
-				List<CachedEntity> groups = db.getEntities(keyOfDecs);
+				List<CachedEntity> declaredWarGroups = db.getEntities(declaredWars);
+				List<String> warGroupNames = new ArrayList<String>();
 				
-			for (CachedEntity declaredGroup : groups) 
-			{
-				groupNames.add(declaredGroup.getNamespace());
-			}
-			request.setAttribute("warDecGroupNames", groupNames);
+				for (CachedEntity war : declaredWarGroups) 
+				{
+					if (war == null)
+						continue;
+					String output = HtmlComponents.generateWarDeclarations(war, isCreator, inGroup);
+					warGroupNames.add(output);
+				}
+				request.setAttribute("declaredWars", warGroupNames);
 			}	
-		}	
+			if (receivedWars != null)
+			{
+				List<String> warGroupNames = new ArrayList<String>();
+				
+				for (CachedEntity war : receivedWars)
+				{
+					if (war == null)
+						continue;
+					String output = HtmlComponents.generateWarsReceived(war);
+					warGroupNames.add(output);
+				}
+				request.setAttribute("receivedWars", warGroupNames);
+			}
+			if (alliedGroups != null)
+			{
+				List<CachedEntity> declaredAlliedGroups = db.getEntities(alliedGroups);
+				List<String> alliedGroupNames = new ArrayList<String>();
+				boolean isAdmin = service.isCharacterGroupAdmin();
+				
+				for (CachedEntity allies : declaredAlliedGroups)
+				{
+					if (allies == null)
+						continue;
+					String output = HtmlComponents.generateAlliedGroups(allies, isCreator, inGroup);
+					alliedGroupNames.add(output);
+				}
+				request.setAttribute("alliedGroups", alliedGroupNames);
+			}
+
+			List<CachedEntity> allyRequests = db.getFilteredList("Group", "pendingAllianceGroupKey", group.getKey());
+			List<String> outputAllyRequests = new ArrayList<String>();
+			
+				for (CachedEntity allyReq : allyRequests)
+				{
+					String output = HtmlComponents.generateGroupAllianceRequest(allyReq, isCreator, inGroup);
+					outputAllyRequests.add(output);
+				}
+				if (outputAllyRequests.isEmpty())
+					outputAllyRequests.add("No group alliance requests at this time.");
+				
+				request.setAttribute("pendingGroupAllies", outputAllyRequests);
+			}
+		
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}
 
