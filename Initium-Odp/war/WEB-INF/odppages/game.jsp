@@ -23,7 +23,7 @@
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=58"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=60"></script>
 
 <script type="text/javascript" src="/javascript/messager.js?v=18"></script>
 
@@ -35,7 +35,7 @@
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=56">
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=59">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="/javascript/rangeslider/rangeslider.min.js"></script>
@@ -207,7 +207,7 @@
 	});
 </script>
 
-<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=6'></script>
+<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=7'></script>
 <script id='ajaxJs' type='text/javascript'>
 ${bannerJs}
 </script>
@@ -280,17 +280,19 @@ ${longOperationRecallJs}
 	// This ensures the bottom half of the page fills the rest of the page and no more
 	function normalizePage()
 	{
-		var adjust = 5;
+		var adjust = 0;
 		var viewportHeight = $(window).height();
 		
-		var upperhalf = $(".page-upperhalf");
+		var banner = $("#main-banner");
+		var header = $("#main-header");
 		var contents = $(".page-maincontent");
-		var contentsHeight = viewportHeight - upperhalf.height()+adjust;
+		var contentsHeight = viewportHeight - banner.height()+header.height()+adjust;
 		contents.height(contentsHeight);
-		contents.css("top", upperhalf.height()-adjust);
+		contents.css("top", banner.height()+header.height()-adjust);
 	}
 	$(document).ready(normalizePage);
 	$(window).resize(normalizePage);
+	normalizePage();
 </script>
 
 </head>
@@ -308,7 +310,7 @@ on our slack channel!
 <body>
 	<div class='page'>
 		<div class='page-upperhalf'>
-			<div class='header1'>
+			<div id='main-header' class='header1'>
 				<div class='header1-spacer'></div>
 				<div class='header1-display'><span id='locationName'>${locationName}</span></div>
 				<div class='header1-spacer'></div>
@@ -321,7 +323,11 @@ on our slack channel!
 					<div class='header1-spacer'></div>
 				</div>
 			</div>
-			<div class='banner1'>
+			<div id='main-banner' class='banner1'>
+					<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
+						${inBannerCharacterWidget}
+					</div>				
+			
 				<img id='banner-sizer' src='https://initium-resources.appspot.com/images/banner---placeholder2.png' border=0/>
 			</div>
 		</div>
@@ -380,8 +386,8 @@ on our slack channel!
 
 					</div>
 				</div>
-			</div>
-			<div class='location-controls-container'>
+				
+							<div class='location-controls-container'>
 				<div class='header1'></div>
 				<div class='main1'>
 					<div class='location-controls'>
@@ -438,6 +444,9 @@ on our slack channel!
 					</div>
 				</div>
 			</div>
+				
+			</div>
+
 		</div>
 	 </div>
 </body>

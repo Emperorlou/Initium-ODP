@@ -179,7 +179,7 @@ function updateDayNightCycle(forceRefresh)
 			bg+=	"rgba(230, 230, 230, "+lightning+")";
 			banner.css("background", bg);
 			banner.css("background-blend-mode", "screen, color-dodge");
-			banner.css("background-size", "contain");
+			banner.css("background-size", "cover");
 			
 			previousR = null;
 			previousG = null;
@@ -217,7 +217,7 @@ function updateDayNightCycle(forceRefresh)
 			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
 			banner.css("background", bg);
 			banner.css("background-blend-mode", "screen, multiply");
-			banner.css("background-size", "contain");
+			banner.css("background-size", "cover");
 		}
 		else if (rainStrength>0.65 && window.biome=="Snow")
 		{
@@ -227,7 +227,7 @@ function updateDayNightCycle(forceRefresh)
 			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
 			banner.css("background", bg);
 			banner.css("background-blend-mode", "screen, multiply");
-			banner.css("background-size", "contain");
+			banner.css("background-size", "cover");
 		}
 		else if (rainStrength>0.65)
 		{
@@ -237,13 +237,13 @@ function updateDayNightCycle(forceRefresh)
 			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
 			banner.css("background", bg);
 			banner.css("background-blend-mode", "screen, multiply");
-			banner.css("background-size", "contain");
+			banner.css("background-size", "cover");
 		}
 		else
 		{
 			banner.css("background", "url('"+bannerUrl+"') no-repeat center center, rgba("+r+", "+g+", "+b+", "+amount+")");
 			banner.css("background-blend-mode", "multiply, normal");
-			banner.css("background-size", "contain");
+			banner.css("background-size", "cover");
 		}
 	}
 	else
@@ -264,7 +264,7 @@ function updateDayNightCycle(forceRefresh)
 		
 		banner.css("background", "url('"+bannerUrl+"') no-repeat center center, rgba(30, 43, 83, "+amount+")");
 		banner.css("background-blend-mode", "multiply, normal");
-		banner.css("background-size", "contain");
+		banner.css("background-size", "cover");
 	}
 }
 
@@ -320,7 +320,7 @@ function updateBannerWeatherSystem()
 		var banner = $(".banner-shadowbox, .banner1");
 		banner.css("background", "url('"+bannerUrl+"') no-repeat center center");
 		banner.css("background-blend-mode", "normal");
-		banner.css("background-size", "contain");
+		banner.css("background-size", "cover");
 	}
 }
 
