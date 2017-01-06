@@ -378,9 +378,9 @@ public class MainPageUpdateService extends Service
 			newHtml.append("Zoom: <input type='text' id='zoom' value=1 />");
 			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
 			newHtml.append("<button id=\"somebutton\">press here</button>");
-			newHtml.append("<div id=\"viewportcontainer\">");
-			newHtml.append("<div id=\"viewport\">");
-			newHtml.append("<div id=\"ground-layer\"></div>");
+			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
+			newHtml.append("<div id=\"viewport\" class=\"vp\">");
+			newHtml.append("<div id=\"ground-layer\" class=\"groundLayerContainer\"></div>");
 			newHtml.append("</div>");
 			newHtml.append("</div>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
