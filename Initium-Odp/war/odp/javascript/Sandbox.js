@@ -1,46 +1,115 @@
-var hexagons = [
-    new Hexagon(0, 0, "tile-grass1"),
-    new Hexagon(1, 0, "tile-grass2"),
-    new Hexagon(2, 0, "tile-grass3"),
-    new Hexagon(-1, 1, "tile-grass4"),
-    new Hexagon(0, 1, "tile-grass5"),
-    new Hexagon(1, 1, "tile-grass6"),
-    new Hexagon(2, 1, "tile-grass1"),
-    new Hexagon(-1, 2, "tile-grass2"),
-    new Hexagon(0, 2, "tile-grass3"),
-    new Hexagon(1, 2, "tile-grass4"),
-];
+var scale = $("#zoom").val();
+var maxZoom = 2.4;
+
+window.onload = function() {
+    document.onmousedown = startDrag;
+    document.onmouseup = stopDrag;
+}
 
 $(document).ready(function () {
     loadMap();
 });
 
-function loadMap() {
-    var offsetX = 100;
-    var offsetY = 100;
-    var scale = $("#zoom").val();
+$('#viewportcontainer').on({
+    'mousewheel': function (e) {
+        var max = maxZoom;
+        var min = .1;
+        if (e.originalEvent.deltaY < 0) {
+            scale += .1;
+            if (max !== null && scale > max) {
+                scale = max;
+            }
+        } else {
+            scale -= .1;
+            if (min !== null && scale < min) {
+                scale = min;
+            }
+        }
+        scaleTiles();
+        $('html, body').stop().animate({}, 500, 'linear');
+    }
+});
 
-    var hexSize = 32*scale;
-    var hexHeight = hexSize * 2;
-    var hexWidth = Math.sqrt(3) / 2 * hexHeight;
+function pressedButton() {
+    scale = $("#zoom").val();
+    loadMap();
+}
+
+function scaleTiles() {
+
     var hexEdge = $("#hexEdge").val();
+    var hexSize = 32*scale;
+    var maxHexSize = 32*maxZoom;
+    var hexHeight = hexSize * 2;
+    var maxHexHeight = maxHexSize * 2;
+    var hexWidth = Math.sqrt(3) / 2 * hexHeight;
     var hexDiag = hexEdge * 2 - 1;
-    var horizontalDist = hexWidth;
-    var verticalDist = hexHeight * 3 / 4;
     var imgSize = 128;
-    var i=0;
+    var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
+    var offsetY = maxHexHeight/2;
+    document.getElementById("ground-layer").style.width = hexDiag*hexWidth;
+    document.getElementById("ground-layer").style.height = (hexEdge*3-1)*hexSize;
+    document.getElementById("ground-layer").style.top = offsetY;
+    document.getElementById("ground-layer").style.left = offsetX;
+
+    // Update all tiles
+    var hexTiles = document.getElementsByClassName('hexagon');
+    var l = hexTiles.length;
+    for (var index = 0; index < l; index++) {
+
+        var tagIndex = hexTiles[index].id.substr(3, hexTiles[index].id.length);
+        var tileIndexes = tagIndex.split("_");
+        var r = Number(tileIndexes[0]);
+        var q = Number(tileIndexes[1]);
+        var i = r + "_" + q;
+        var top = (hexSize * 3 / 2 * r);
+        var left = hexSize * Math.sqrt(3) * (q + r / 2);
+
+        hexTiles[index].style.width = hexWidth + "px";
+        hexTiles[index].style.height = hexSize + "px";
+        hexTiles[index].style.margin = (hexSize / 2) + "px";
+        hexTiles[index].style.top = top + "px";
+        hexTiles[index].style.left = left + "px";
+
+        var hexBack = hexTiles[index].children[0];
+        hexBack.style.width = imgSize * scale + 'px';
+        hexBack.style.height = imgSize * scale + 'px';
+        hexBack.style.marginLeft = (imgSize / -4) * scale + 'px';
+        hexBack.style.marginTop= (imgSize * -3 / 8) * scale + 'px';
+    }
+}
+
+function loadMap() {
+
+    var hexEdge = $("#hexEdge").val();
+    var hexSize = 32*scale;
+    var maxHexSize = 32*maxZoom;
+    var hexHeight = hexSize * 2;
+    var maxHexHeight = maxHexSize * 2;
+    var hexWidth = Math.sqrt(3) / 2 * hexHeight;
+    var hexDiag = hexEdge * 2 - 1;
+    var imgSize = 128;
     var outerLoop=0;
     var reachedDiag = false;
+    var htmlString = "";
+    var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
+    var offsetY = maxHexHeight/2;
+    var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
+
+    document.getElementById("ground-layer").style.width = hexDiag*hexSize;
+    document.getElementById("ground-layer").style.height = hexDiag*hexHeight;
+    document.getElementById("ground-layer").style.top = offsetY;
+    document.getElementById("ground-layer").style.left = offsetX;
 
     document.getElementById("viewportcontainer").style.position = "relative";
     document.getElementById("viewport").style.position = "absolute";
     document.getElementById("ground-layer").style.position = "absolute";
 
-    // Remove all current images
-    var images = document.getElementsByClassName('hexagon');
-    var l = images.length;
+    // Remove all current tiles
+    var hexTiles = document.getElementsByClassName('hexagon');
+    var l = hexTiles.length;
     for (var i = 0; i < l; i++) {
-        images[0].parentNode.removeChild(images[0]);
+        hexTiles[0].parentNode.removeChild(hexTiles[0]);
     }
 
     $.ajax({
@@ -48,66 +117,91 @@ function loadMap() {
         data:{width:hexEdge, seed:$("#seed").val()},
         type: 'POST',
         success: function(responseJson) {
-            $.each(responseJson, function (index, value) {
+            $.each(responseJson['hexTiles'], function (index, value) {
                 $.each(value, function (innerIndex, innerValue) {
-                    //var r = hexagons[i].r;
-                    //var q = hexagons[i].q;
-                    //var a = hexagons[i].a;
 
                     var r = index;
                     var q = innerIndex - outerLoop;
-                    var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
+                    var i = r + "_" + q;
+                    var top = (hexSize * 3 / 2 * r);
+                    var left = (hexSize * Math.sqrt(3) * (q + r / 2));
 
-                    $('#ground-layer').append('<div id="hex' + i + '" class="hexagon" />')
+                    $hexBody = "<div";
+                    $hexBody += " id=\"hex" + i + "\"";
+                    $hexBody += " class=\"hexagon\"";
+                    $hexBody += " data-pos=\"" + i + "\"";
+                    $hexBody += " style=\"";
+                    $hexBody += "width: " + hexWidth + 'px' + ";";
+                    $hexBody += " height:" + hexSize + 'px' + ";";
+                    $hexBody += " margin:" + (hexSize / 2) + 'px' + ";";
+                    $hexBody += " top:" + top + 'px' + ";";
+                    $hexBody += " left:" +  left + 'px' + ";";
+                    $hexBody += "\">";
 
-                    var $hexBody = $("#hex" + i);
+                    $hexBody += "<div id=\"hex" + i + "Back\" " + "class=\"hexBackground\"";
+                    $hexBody += " style=\"";
+                    $hexBody += "width: " + imgSize * scale + 'px' + ";";
+                    $hexBody += " height:" + imgSize * scale + 'px' + ";";
+                    $hexBody += " margin-left:" + imgSize / -4 * scale + 'px' + ";";
+                    $hexBody += " margin-top:" + imgSize * -3 / 8 * scale + 'px' + ";";
+                    $hexBody += " background-image:url(" + $picUrlPath + innerValue.fileName + ");";
+                    $hexBody += "\">";
+                    $hexBody += "</div>";
+                    $hexBody += "</div>";
 
-                    $hexBody.append('<div id="hex' + i + 'Top" class="hexTop"/>');
-                    $hexBody.append('<div id="hex' + i + 'Bot" class="hexBottom"/>');
-                    
-                    $hexBody.css("width", hexWidth + 'px');
-                    $hexBody.css("height", hexSize + 'px');
-                    $hexBody.css("margin", hexSize / 2 + 'px');
-                    $hexBody.css("top", offsetY + hexSize * 3 / 2 * r + 'px');
-                    $hexBody.css("left", offsetX + hexSize * Math.sqrt(3) * (q + r / 2) + 'px');
-                    $hexBody.append('<style>#hex' + i + ':before{background-image:url(https://initium-resources.appspot.com/images/newCombat/' + innerValue.fileName + ');}</style>');
-                    $hexBody.append('<style>#hex' + i + ':before{width: ' + imgSize * scale + 'px;}</style>'); //width
-                    $hexBody.append('<style>#hex' + i + ':before{height: ' + imgSize * scale + 'px ;}</style>'); //height
-                    $hexBody.append('<style>#hex' + i + ':before{margin-left: ' + imgSize / -4 * scale + 'px ;}</style>'); //margin-left
-                    $hexBody.append('<style>#hex' + i + ':before{margin-top: ' + imgSize * -3 / 8 * scale + 'px ;}</style>'); //margin-top
-                    //$hexBody.append('<style>#hex' + i + ':before{z-index: ' + innerValue.zIndex + ' ;}</style>'); //margin-top
-                    //$hexBody.append('<style>#hex' + i + ':before{  }</style>'); //z-index
-
-
-                    var $hexTop = $("#hex" + i + "Top");
-                    var $hexBot = $("#hex" + i + "Bot");
-                    var hexTBBase = hexWidth / Math.sqrt(2);
-                    var hexLeft = (Math.sqrt(Math.pow(hexTBBase, 2) * 2) - hexTBBase) / 2;
-
-                    $hexTop.css("width", hexTBBase + 'px');
-                    $hexTop.css("height", hexTBBase + 'px');
-                    $hexTop.css("left", hexLeft + 'px');
-                    $hexTop.css("top", hexTBBase / -2 + 'px');
-
-                    $hexBot.css("width", hexTBBase + 'px');
-                    $hexBot.css("height", hexTBBase + 'px');
-                    $hexBot.css("left", hexLeft + 'px');
-                    $hexBot.css("bottom", hexTBBase / -2 + 'px');
-                    i++;
+                    htmlString += $hexBody;
                 });
                 if (outerLoop == (hexEdge-1) || reachedDiag) {
                     reachedDiag = true;
-                    //outerLoop--;
                 } else {
                     outerLoop++;
                 }
             });
+            $('#ground-layer').append(htmlString);
         }
     });
 }
 
-function Hexagon(collumn, row, asset) {
-    this.r = row;
-    this.q = collumn;
-    this.a = asset;
+function startDrag(e) {
+    // determine event object
+    if (!e) {
+        var e = window.event;
+    }
+
+    // IE uses srcElement, others use target
+    var targ = e.target ? e.target : e.srcElement;
+
+    if (targ.className != 'hexBackground' && targ.className != 'ground-layer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
+    // calculate event X, Y coordinates
+    offsetX = e.clientX;
+    offsetY = e.clientY;
+
+    targ = document.getElementById("viewport");
+    //targ = document.getElementsByClassName("groundLayerContainer")
+    // assign default values for top and left properties
+    if(!targ.style.left) { targ.style.left='0px'};
+    if (!targ.style.top) { targ.style.top='0px'};
+
+    // calculate integer values for top and left 
+    // properties
+    coordX = parseInt(targ.style.left);
+    coordY = parseInt(targ.style.top);
+    drag = true;
+
+    // move div element
+    document.onmousemove=dragDiv;
+
+}
+function dragDiv(e) {
+    if (!drag) {return};
+    if (!e) { var e= window.event};
+    var targ=e.target?e.target:e.srcElement;
+    targ = document.getElementById("viewport");
+    // move div element
+    targ.style.left=coordX+e.clientX-offsetX+'px';
+    targ.style.top=coordY+e.clientY-offsetY+'px';
+    return false;
+}
+function stopDrag() {
+    drag=false;
 }

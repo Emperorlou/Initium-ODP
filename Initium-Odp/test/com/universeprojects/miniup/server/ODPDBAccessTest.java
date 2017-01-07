@@ -168,8 +168,6 @@ public class ODPDBAccessTest {
 		discovery.setProperty("location1Key", path.getProperty("location1Key"));
 		discovery.setProperty("location2Key", path.getProperty("location2Key"));
 		testObj.getDB().put(discovery);
-		
-		testObj.doCharacterTakePath(testObj.getDB(), character1, path , false);
 	}
 
 	@Test

@@ -45,6 +45,8 @@ import com.universeprojects.miniup.server.services.MovementService;
 
 public class ODPDBAccess
 {
+	public static ODPDBAccessFactory factory = null;
+	
 	final public static int welcomeMessagesLimiter = 0;
 	
 	final private HttpServletRequest request;
@@ -110,10 +112,18 @@ public class ODPDBAccess
 
 	public Map<Key, List<CachedEntity>> buffsCache = new HashMap<Key, List<CachedEntity>>();
 
-	public ODPDBAccess(HttpServletRequest request)
+	protected ODPDBAccess(HttpServletRequest request)
 	{
 		this.request = request;
 		getDB(); // Initialize the datastore service
+	}
+	
+	public static ODPDBAccess getInstance(HttpServletRequest request)
+	{
+		if (factory==null)
+			return ODPDBAccess.getInstance(request);
+		
+		return factory.getInstance(request);
 	}
 
 	public HttpServletRequest getRequest()
@@ -5492,5 +5502,26 @@ public class ODPDBAccess
 		}
 		
 		return result;
+	}
+
+	
+	/**
+	 * This is a placeholder. The actual implementation is not in the ODP.
+	 * @return
+	 * @throws NotLoggedInException 
+	 */
+	public String getVerifyCode() throws NotLoggedInException
+	{
+		return null;
+	}
+
+	/**
+	 * THis is a placeholder. The actual implementation is not in the ODP.
+	 * @param key
+	 * @return
+	 */
+	public String getChatIdToken(Key key)
+	{
+		return null;
 	}
 }

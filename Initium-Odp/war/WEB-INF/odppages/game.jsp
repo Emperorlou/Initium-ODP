@@ -1,51 +1,220 @@
-
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 
 
 <!DOCTYPE html>
 <html>
 <head>
-	<jsp:include page="common-head2.jsp"/><jsp:include page="odp/common-head.jsp"/>
 	<title>Main - Initium</title>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<meta charset="utf-8">    
+<meta http-equiv="content-type" conftent="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/> 
+<!-- <meta name="viewport" content="minimum-scale=0.3, maximum-scale=1"/> -->
+<meta name="keywords" content="initium, game, web game, video game, free to play, mmorpg, mmo">
+<meta name="referrer" content="no-referrer" />
+
+<script type="text/javascript" src="https://code.createjs.com/preloadjs-0.6.2.min.js"></script>
+<script type="text/javascript" src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
+
+<script type="text/javascript" src="/javascript/modernizr.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
+<script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=60"></script>
+
+<script type="text/javascript" src="/javascript/messager.js?v=18"></script>
+
+<script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
+<script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
+
+
+
+<script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
+
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=59">
+
+<link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
+<script src="/javascript/rangeslider/rangeslider.min.js"></script>
+
+<script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
+<script src='/odp/javascript/map.js?t=2'></script>
+
+<script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-62104245-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+<script type="text/javascript">
+	window.chatIdToken = "${chatIdToken}";
+	window.characterId = ${characterId};
+	window.verifyCode = "${verifyCode}";
+	window.serverTime=<c:out value="${serverTime}"/>;
+	window.clientTime=new Date().getTime();
+	
+
+
+	<c:if test="${userMessage!=null}">
+		$(window).ready(function()
+		{
+			popupMessage("System Message", "${userMessage}");
+		});
+	</c:if>
+	
+	
+	// This will hide any open cluetips on a touch device when touching anywhere on the screen
+	$(document).bind('touchstart', function(event) {
+		 event = event.originalEvent;
+		 var tgt = event.touches[0] && event.touches[0].target,
+		     $tgt = $(tgt);
+
+		 if (tgt.nodeName !== 'A' && !$tgt.closest('div.cluetip').length ) {
+		   $(document).trigger('hideCluetip');
+		 }
+		});
+	
+	$(document).delegate(".clueHover:not(.hasTooltip)", "mouseenter", function (event) {
+
+		
+	    $(this).cluetip(
+	    {
+			cluetipClass: 'newui2',
+			showTitle: false, 
+			height: 'auto', 
+			width: 350,
+	        sticky: true, 
+	        closePosition: 'title',
+	        arrows: true,
+	        ajaxCache: false,
+	        mouseOutClose: false,
+	        cluezIndex: 2000000,
+	        onShow: function(e) 
+	        {
+	        	$("#cluetip-waitimage").css('z-index', 2000000); 
+	        	$("#cluetip").css('z-index', 2000000); 
+	        	return true;
+	        }
+	        
+	    }).addClass("hasTooltip");
+	    event.preventDefault();
+	});
+	
+	
+	$(document).delegate(".clue:not(.hasTooltip)", "mouseenter", function (event) {
+
+		
+	    $(this).cluetip(
+	    {
+			cluetipClass: 'newui2',
+			showTitle: false, 
+			height: 'auto', 
+			width: 350,
+	        sticky: true, 
+	        closePosition: 'title', 
+	        arrows: true,
+	        ajaxCache: false,
+	        mouseOutClose: false,
+	        activation:"click",
+	        cluezIndex: 2000000,
+	        onShow: function() {
+	            // close cluetip when users click outside of it
+	            $(document).click(function(e) {
+	                var isInClueTip = $(e.target).closest('#cluetip');
+	                if (isInClueTip.length === 0) {
+	                	$(document).trigger('hideCluetip');
+	                }
+	            })
+	            
+	            // Make the cluetip on top of everything
+	        	$("#cluetip-waitimage").css('z-index', 2000000); 
+	        	$("#cluetip").css('z-index', 2000000); 
+	        	return true;
+	        }	        
+	    }).addClass("hasTooltip");
+	    event.preventDefault();
+	});
+
+	
+	$(document).delegate(".hint:not(.hasTooltip)", "mouseenter", function (event) {
+
+		
+	    $(this).cluetip(
+	    {
+			cluetipClass: 'newui2',
+			showTitle: false, 
+			height: 'auto', 
+			width: 350,
+	        sticky: true, 
+	        closePosition: 'title',
+	        closeText: ' ',
+	        arrows: true,
+	        ajaxCache: false,
+	        mouseOutClose: false,
+	        activation:"click",
+	        local:true,
+	        cluezIndex: 2000000,
+	        onShow: function() {
+	            // close cluetip when users click outside of it
+	            $(document).click(function(e) {
+	                var isInClueTip = $(e.target).closest('#cluetip');
+	                if (isInClueTip.length === 0) {
+	                	$(document).trigger('hideCluetip');
+	                }
+	            })
+
+	            // Make the cluetip on top of everything
+	        	$("#cluetip-waitimage").css('z-index', 2000000); 
+	        	$("#cluetip").css('z-index', 2000000); 
+	        	return true;
+	        }	        
+	    }).addClass("hasTooltip");
+	    event.preventDefault();
+	});
+
+	
+	
+	$.ajaxSetup ({
+	    // Disable caching of AJAX responses
+	    cache: false
+	});
+	
+	// This is a fix for the older android browsers (below 4.4)
+	var ua = navigator.userAgent;
+	if (ua.indexOf("Android")>0 && ua.indexOf("Chrome")==-1)
+	{
+		$("html").removeClass("backgroundcliptext");
+		$("html").addClass("no-backgroundcliptext");
+	}
+</script>
 
 <script type='text/javascript'>
 	$(document).ready(function (){
-		<c:if test="${combatSite==true}">
-		loadInlineItemsAndCharacters();
-		</c:if>
-		
-		<c:if test="${isCollectionSite==true}">
-		loadInlineCollectables();
-		</c:if>
 		
 		// Request permission to use desktop notifications
 		notifyHandler.requestPermission();		
 	});
 </script>
 
-<script type='text/javascript' src='odp/javascript/banner-weather.js?v=5'></script>
+<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=7'></script>
 <script id='ajaxJs' type='text/javascript'>
 ${bannerJs}
 </script>
 
 
 
-<!-- <script type='text/javascript'>
-	$(document).ready(function (){
-		<c:if test="${combatSite==true}">
-		loadInlineItemsAndCharacters();
-		</c:if>
-		
-		<c:if test="${isCollectionSite==true}">
-		loadInlineCollectables();
-		</c:if>
-		
-		
-	});
-</script> -->
 
-<!-- <script type='text/javascript' src='odp/javascript/banner-weather.js?v=4'></script>
- -->
 <script type='text/javascript'>
 	if (isAnimationsEnabled())
 	{
@@ -76,9 +245,9 @@ ${bannerJs}
 	}
 </script>
 
-<script type='text/javascript' src='odp/javascript/messager-impl.js'></script>
+<script type='text/javascript' src='/odp/javascript/messager-impl.js'></script>
 
-<script type='text/javascript' src='odp/javascript/soundeffects.js?v=1'></script>
+<script type='text/javascript' src='/odp/javascript/soundeffects.js?v=1'></script>
 <script type='text/javascript'>
 	// THIS SECTION IS NEEDED FOR THE SOUND EFFECTS
 	$(document).ready(function(){
@@ -106,6 +275,26 @@ ${longOperationRecallJs}
 <script type="text/javascript" src="./javascript/script.js"></script>
 <link rel="stylesheet" href="./MiniUP.css">
 
+
+<script type="text/javascript">
+	// This ensures the bottom half of the page fills the rest of the page and no more
+	function normalizePage()
+	{
+		var adjust = 0;
+		var viewportHeight = $(window).height();
+		
+		var banner = $("#main-banner");
+		var header = $("#main-header");
+		var contents = $(".page-maincontent");
+		var contentsHeight = viewportHeight - banner.height()+header.height()+adjust;
+		contents.height(contentsHeight-40);
+		contents.css("top", banner.height()+header.height()-adjust);
+	}
+	$(document).ready(normalizePage);
+	$(window).resize(normalizePage);
+	normalizePage();
+</script>
+
 </head>
 
 <!--
@@ -121,7 +310,7 @@ on our slack channel!
 <body>
 	<div class='page'>
 		<div class='page-upperhalf'>
-			<div class='header1'>
+			<div id='main-header' class='header1'>
 				<div class='header1-spacer'></div>
 				<div class='header1-display'><span id='locationName'>${locationName}</span></div>
 				<div class='header1-spacer'></div>
@@ -134,7 +323,11 @@ on our slack channel!
 					<div class='header1-spacer'></div>
 				</div>
 			</div>
-			<div class='banner1'>
+			<div id='main-banner' class='banner1'>
+					<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
+						${inBannerCharacterWidget}
+					</div>				
+			
 				<img id='banner-sizer' src='https://initium-resources.appspot.com/images/banner---placeholder2.png' border=0/>
 			</div>
 		</div>
@@ -193,64 +386,27 @@ on our slack channel!
 
 					</div>
 				</div>
-			</div>
-			<div class='location-controls-container'>
+				
+							<div class='location-controls-container'>
 				<div class='header1'></div>
 				<div class='main1'>
 					<div class='location-controls'>
 					<div class='main1-inset1'>
 						<div class='backdrop1b buttonbar'>
-						<div id='buttonBar'>${buttonBar}</div>
+							<div id='buttonBar'>${buttonBar}</div>
 						</div>
 					</div>
 					
 					
-					<div class='main1-inset1 location-controls-navigation'>
-						<div class='titlebar'>NAVIGATION</div>
-						<div class='backdrop2a navigationbox'>
-							<div class='titlebar'>Paths</div>
-							<div class='button2'>Aera</div>
-							<div class='button2'>Swamplands</div>
-							<div class='button2'>Troll Camp</div>
-						</div>
-						<div class='backdrop2a navigationbox'>
-							<div class='titlebar'>Properties</div>
-							<div class='button2'>Armory</div>
-							<div class='button2'>NIK'S BADASS STUFF</div>
-							<div class='button2'>Group House Alpha</div>
-						</div>
-						<div class='backdrop2a navigationbox'>
-							<div class='titlebar'>Combat Sites</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-						</div>
+					<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+						${mainButtonList}
 					</div>					
 					</div>
 				</div>
 			</div>
+				
+			</div>
+
 		</div>
 	 </div>
 </body>
