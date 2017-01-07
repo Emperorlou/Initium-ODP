@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server.dao;
 
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +16,8 @@ import com.universeprojects.miniup.server.exceptions.DaoException;
 public abstract class OdpDao<T extends OdpDomain> {
 
 	public static final int MAX_QUERY_RESULTS = 1000;
+
+	private static final String WRAP_METHOD = "wrap";
 
 	private final CachedDatastoreService datastore;
 
@@ -46,6 +48,7 @@ public abstract class OdpDao<T extends OdpDomain> {
 		return this.odpDomainClass;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected T buildDomain(CachedEntity cachedEntity, Class<T> domainClass) throws DaoException {
 		if (cachedEntity == null) {
 			getLogger().warning("Null entity found");
@@ -53,11 +56,13 @@ public abstract class OdpDao<T extends OdpDomain> {
 		}
 
 		try {
-			Constructor<T> constructor = domainClass.getConstructor(CachedEntity.class);
-			T odpDomainEntity = constructor.newInstance(cachedEntity);
+			Method declaredMethod = domainClass.getDeclaredMethod(WRAP_METHOD, CachedEntity.class);
+			T odpDomainEntity = (T) declaredMethod.invoke(cachedEntity);
 			return odpDomainEntity;
-		} catch (ReflectiveOperationException e) {
-			throw new DaoException(String.format("%s is set up incorrectly", getClass().getName()), e);
+		} catch (ReflectiveOperationException | IllegalArgumentException e) {
+			throw new DaoException(String.format("%s is set up incorrectly", getOdpDomainClass().getName()), e);
+		} catch (SecurityException e) {
+			throw new DaoException(String.format("Unable to access declared method %s", WRAP_METHOD), e);
 		}
 	}
 
