@@ -16,7 +16,7 @@ window.onload = function() {
     //document.ontouchstart = startDrag;
     document.body.addEventListener('touchend', stopDrag);
     document.body.addEventListener('touchmove', touchMoveDiv);
-    addEventListener('touchstart', function (e) {
+    document.body.addEventListener('touchstart', function (e) {
 
         if (e.touches.length == 1) {
             var targ = e.target ? e.target : e.srcElement;
@@ -27,6 +27,8 @@ window.onload = function() {
             offsetX = e.touches[0].clientX;
             offsetY = e.touches[0].clientY;
 
+            if(!viewport.style.left) { viewport.style.left='0px'};
+            if (!viewport.style.top) { viewport.style.top='0px'};
             coordX = parseInt(viewport.style.left);
             coordY = parseInt(viewport.style.top);
 
@@ -89,7 +91,7 @@ function scaleTiles() {
     var hexWidth = Math.sqrt(3) / 2 * hexHeight;
     var hexDiag = hexEdge * 2 - 1;
     var imgSize = 128;
-    var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
+    var offsetX = viewportContainer.offsetWidth/2-((hexEdge/2)*hexWidth);
     var offsetY = maxHexHeight/2;
     groundLayer.style.width = hexDiag*hexWidth;
     groundLayer.style.height = (hexEdge*3-1)*hexSize;
@@ -135,7 +137,7 @@ function loadMap() {
     var outerLoop=0;
     var reachedDiag = false;
     var htmlString = "";
-    var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
+    var offsetX = viewportContainer.offsetWidth/2-((hexEdge/2)*hexWidth);
     var offsetY = maxHexHeight/2;
 
 
@@ -245,7 +247,6 @@ function touchMoveDiv(e) {
     // move div element
     viewport.style.left=coordX+e.touches[0].clientX-offsetX+'px';
     viewport.style.top=coordY+e.touches[0].clientY-offsetY+'px';
-    $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
 function zoomDiv(e) {
