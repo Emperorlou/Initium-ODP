@@ -71,6 +71,7 @@ public class CombatService extends Service
 	/**
 	 * Removes all items from the specified character for which the strength requirement
 	 * is no longer met (i.e. a buff is applied or expires).
+	 * TODO: THIS IS UNTESTED.
 	 */
 	public void updateEquips(CachedEntity character) {
 		List<Key> itemKeys = new ArrayList<Key>();
