@@ -2886,16 +2886,24 @@ body
 	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 fill repeat;	  
 }
 
-.backdropTooltip1
+.cluetip-newui
 {
-	
-	
 	border-style: solid;
 	border-width: 4px 6px 6px 4px;
-	-moz-border-image: url(tooltip1-borderimage.png) 4 6 6 4 repeat;
-	-webkit-border-image: url(tooltip1-borderimage.png) 4 6 6 4 repeat;
-	-o-border-image: url(tooltip1-borderimage.png) 4 6 6 4 repeat;
-	border-image: url(tooltip1-borderimage.png) 4 6 6 4 fill repeat;	
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 fill repeat;	
+}
+
+.cluetip-newui2
+{
+	border-style: solid;
+	border-width: 8px 12px 12px 8px;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 fill repeat;	
 }
 
 
@@ -3016,6 +3024,20 @@ body
 {
 	position:absolute;
 }
+
+.cluetip-newui2 .mini-window-header
+{
+	background-color:inherit;
+}
+
+
+
+
+
+
+
+
+
 
 
 

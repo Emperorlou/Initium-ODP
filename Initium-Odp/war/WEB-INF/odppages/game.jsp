@@ -9,7 +9,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <meta charset="utf-8">    
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="content-type" conftent="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/> 
 <!-- <meta name="viewport" content="minimum-scale=0.3, maximum-scale=1"/> -->
 <meta name="keywords" content="initium, game, web game, video game, free to play, mmorpg, mmo">
@@ -90,7 +90,7 @@
 		
 	    $(this).cluetip(
 	    {
-			cluetipClass: 'rounded',
+			cluetipClass: 'newui2',
 			showTitle: false, 
 			height: 'auto', 
 			width: 350,
@@ -117,7 +117,7 @@
 		
 	    $(this).cluetip(
 	    {
-			cluetipClass: 'rounded',
+			cluetipClass: 'newui2',
 			showTitle: false, 
 			height: 'auto', 
 			width: 350,
@@ -152,7 +152,7 @@
 		
 	    $(this).cluetip(
 	    {
-			cluetipClass: 'rounded',
+			cluetipClass: 'newui2',
 			showTitle: false, 
 			height: 'auto', 
 			width: 350,
@@ -287,7 +287,7 @@ ${longOperationRecallJs}
 		var header = $("#main-header");
 		var contents = $(".page-maincontent");
 		var contentsHeight = viewportHeight - banner.height()+header.height()+adjust;
-		contents.height(contentsHeight);
+		contents.height(contentsHeight-40);
 		contents.css("top", banner.height()+header.height()-adjust);
 	}
 	$(document).ready(normalizePage);
@@ -393,53 +393,13 @@ on our slack channel!
 					<div class='location-controls'>
 					<div class='main1-inset1'>
 						<div class='backdrop1b buttonbar'>
-						<div id='buttonBar'>${buttonBar}</div>
+							<div id='buttonBar'>${buttonBar}</div>
 						</div>
 					</div>
 					
 					
-					<div class='main1-inset1 location-controls-navigation'>
-						<div class='titlebar'>NAVIGATION</div>
-						<div class='backdrop2a navigationbox'>
-							<div class='titlebar'>Paths</div>
-							<div class='button2'>Aera</div>
-							<div class='button2'>Swamplands</div>
-							<div class='button2'>Troll Camp</div>
-						</div>
-						<div class='backdrop2a navigationbox'>
-							<div class='titlebar'>Properties</div>
-							<div class='button2'>Armory</div>
-							<div class='button2'>NIK'S BADASS STUFF</div>
-							<div class='button2'>Group House Alpha</div>
-						</div>
-						<div class='backdrop2a navigationbox'>
-							<div class='titlebar'>Combat Sites</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Troll</div>
-							<div class='button2'>Shell Troll</div>
-							<div class='button2'>Troll</div>
-						</div>
+					<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+						${mainButtonList}
 					</div>					
 					</div>
 				</div>
