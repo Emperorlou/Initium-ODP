@@ -1,6 +1,13 @@
-var scale = $("#zoom").val();
+var scale = 1;
+var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
+var groundLayer = document.getElementById("ground-layer");
+var hexTiles = document.getElementsByClassName('hexagon');
 var maxZoom = 2.4;
+var minZoom = .05;
+var scaleRate = Number($("#zoom").val());
+var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
+var hexEdge = Number($("#hexEdge").val());
 
 window.onload = function() {
     document.onmousedown = startDrag;
@@ -52,17 +59,15 @@ $(document).ready(function () {
 $('#viewportcontainer').on({
     'mousewheel': function (e) {
         e.preventDefault();
-        var max = maxZoom;
-        var min = .1;
         if (e.originalEvent.deltaY < 0) {
-            scale += .1;
-            if (max !== null && scale > max) {
-                scale = max;
+            scale += scaleRate;
+            if (maxZoom !== null && scale > maxZoom) {
+                scale = maxZoom;
             }
         } else {
-            scale -= .1;
-            if (min !== null && scale < min) {
-                scale = min;
+            scale -= scaleRate;
+            if (minZoom !== null && scale < minZoom) {
+                scale = minZoom;
             }
         }
         scaleTiles();
@@ -71,7 +76,7 @@ $('#viewportcontainer').on({
 });
 
 function pressedButton() {
-    scale = $("#zoom").val();
+    scaleRate = Number($("#zoom").val());
     loadMap();
 }
 
@@ -86,13 +91,13 @@ function scaleTiles() {
     var imgSize = 128;
     var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
     var offsetY = maxHexHeight/2;
-    document.getElementById("ground-layer").style.width = hexDiag*hexWidth;
-    document.getElementById("ground-layer").style.height = (hexEdge*3-1)*hexSize;
-    document.getElementById("ground-layer").style.top = offsetY;
-    document.getElementById("ground-layer").style.left = offsetX;
+    groundLayer.style.width = hexDiag*hexWidth;
+    groundLayer.style.height = (hexEdge*3-1)*hexSize;
+    groundLayer.style.top = offsetY;
+    groundLayer.style.left = offsetX;
 
     // Update all tiles
-    var hexTiles = document.getElementsByClassName('hexagon');
+    //var hexTiles = document.getElementsByClassName('hexagon');
     var l = hexTiles.length;
     for (var index = 0; index < l; index++) {
 
@@ -119,7 +124,7 @@ function scaleTiles() {
 
 function loadMap() {
 
-    var hexEdge = $("#hexEdge").val();
+    var hexEdge = Number($("#hexEdge").val());
     var hexSize = 32*scale;
     var maxHexSize = 32*maxZoom;
     var hexHeight = hexSize * 2;
@@ -132,19 +137,18 @@ function loadMap() {
     var htmlString = "";
     var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
     var offsetY = maxHexHeight/2;
-    var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 
-    document.getElementById("ground-layer").style.width = hexDiag*hexSize;
-    document.getElementById("ground-layer").style.height = hexDiag*hexHeight;
-    document.getElementById("ground-layer").style.top = offsetY;
-    document.getElementById("ground-layer").style.left = offsetX;
 
-    document.getElementById("viewportcontainer").style.position = "relative";
-    document.getElementById("viewport").style.position = "absolute";
-    document.getElementById("ground-layer").style.position = "absolute";
+    groundLayer.style.width = hexDiag*hexSize;
+    groundLayer.style.height = hexDiag*hexHeight;
+    groundLayer.style.top = offsetY;
+    groundLayer.style.left = offsetX;
+
+    viewportContainer.style.position = "relative";
+    viewport.style.position = "absolute";
+    groundLayer.style.position = "absolute";
 
     // Remove all current tiles
-    var hexTiles = document.getElementsByClassName('hexagon');
     var l = hexTiles.length;
     for (var i = 0; i < l; i++) {
         hexTiles[0].parentNode.removeChild(hexTiles[0]);
@@ -196,6 +200,7 @@ function loadMap() {
                 }
             });
             $('#ground-layer').append(htmlString);
+            hexTiles = document.getElementsByClassName('hexagon');
         }
     });
 }
@@ -231,6 +236,7 @@ function dragDiv(e) {
     // move div element
     viewport.style.left=coordX+e.clientX-offsetX+'px';
     viewport.style.top=coordY+e.clientY-offsetY+'px';
+    $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
 function touchMoveDiv(e) {
@@ -239,6 +245,7 @@ function touchMoveDiv(e) {
     // move div element
     viewport.style.left=coordX+e.touches[0].clientX-offsetX+'px';
     viewport.style.top=coordY+e.touches[0].clientY-offsetY+'px';
+    $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
 function zoomDiv(e) {
@@ -253,20 +260,19 @@ function zoomDiv(e) {
 
     d1 = Math.sqrt( Math.pow((offsetX2 - offsetX1),2) + Math.pow((offsetY2 - offsetY1),2));
     d2 = Math.sqrt( Math.pow((coffsetX2 - coffsetX1),2) + Math.pow((coffsetY2 - coffsetY1),2));
-    var max = maxZoom;
-    var min = .1;
-    if (d1 > d2) {
-        scale += .1;
-        if (max !== null && scale > max) {
-            scale = max;
+    if (d1 < d2) {
+        scale += scaleRate;
+        if (maxZoom !== null && scale > maxZoom) {
+            scale = maxZoom;
         }
     } else {
-        scale -= .1;
-        if (min !== null && scale < min) {
-            scale = min;
+        scale -= scaleRate;
+        if (minZoom !== null && scale < minZoom) {
+            scale = minZoom;
         }
     }
     scaleTiles();
+    $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
 function stopDrag() {
