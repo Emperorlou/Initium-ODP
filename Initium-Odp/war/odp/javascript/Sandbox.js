@@ -16,7 +16,7 @@ window.onload = function() {
     //document.ontouchstart = startDrag;
     document.body.addEventListener('touchend', stopDrag);
     document.body.addEventListener('touchmove', touchMoveDiv);
-    addEventListener('touchstart', function (e) {
+    document.body.addEventListener('touchstart', function (e) {
 
         if (e.touches.length == 1) {
             var targ = e.target ? e.target : e.srcElement;
@@ -27,6 +27,8 @@ window.onload = function() {
             offsetX = e.touches[0].clientX;
             offsetY = e.touches[0].clientY;
 
+            if(!viewport.style.left) { viewport.style.left='0px'};
+            if (!viewport.style.top) { viewport.style.top='0px'};
             coordX = parseInt(viewport.style.left);
             coordY = parseInt(viewport.style.top);
 
