@@ -565,7 +565,7 @@ public class MainPageUpdateService extends Service
 
 			
 
-			if ("CombatSite".equals(location.getProperty("type")))
+			if ("CombatSite".equals(location.getProperty("type")) && "CombatSite".equals(destLocation.getProperty("type"))==false)
 			{
 				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 				newHtml.append("<br>");
