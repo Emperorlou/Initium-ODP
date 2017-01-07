@@ -5,7 +5,12 @@ import java.util.Date;
 import com.google.appengine.api.datastore.Text;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//Set a description
+/**
+ * Set a description
+ * 
+ * @author kyle-miller
+ *
+ */
 public class ChangeLog extends OdpDomain {
 	public static final String KIND = "ChangeLog";
 
@@ -22,6 +27,10 @@ public class ChangeLog extends OdpDomain {
 		return KIND;
 	}
 
+	/**
+	 * 
+	 * @param createdDate
+	 */
 	public void setCreatedDate(Date createdDate) {
 		getCachedEntity().setProperty("createdDate", createdDate);
 	}
@@ -30,7 +39,11 @@ public class ChangeLog extends OdpDomain {
 		return (Date) getCachedEntity().getProperty("createdDate");
 	}
 
-	// (0)
+	/**
+	 *  (0)
+	 *  
+	 * @param importance
+	 */
 	public void setImportance(Long importance) {
 		getCachedEntity().setProperty("importance", importance);
 	}
@@ -39,6 +52,10 @@ public class ChangeLog extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("importance");
 	}
 
+	/**
+	 * 
+	 * @param log
+	 */
 	public void setLog(Text log) {
 		getCachedEntity().setProperty("log", log);
 	}

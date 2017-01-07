@@ -3,7 +3,12 @@ package com.universeprojects.miniup.server.domain;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This entity is used to create a friends list for a user with other users.
+/**
+ * This entity is used to create a friends list for a user with other users.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Friend extends OdpDomain {
 	public static final String KIND = "Friend";
 
@@ -20,7 +25,11 @@ public class Friend extends OdpDomain {
 		return KIND;
 	}
 
-	// (Character)
+	/**
+	 *  (Character)
+	 *  
+	 * @param friendUserKey
+	 */
 	public void setFriendUserKey(Key friendUserKey) {
 		getCachedEntity().setProperty("friendUserKey", friendUserKey);
 	}
@@ -29,7 +38,11 @@ public class Friend extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("friendUserKey");
 	}
 
-	// This is not used by the game itself, but when you're creating a new friend, set this to the friendUserKey's current character name. It is simply meant to make it easier to browse friends lists in the editor.
+	/**
+	 *  This is not used by the game itself, but when you're creating a new friend, set this to the friendUserKey's current character name. It is simply meant to make it easier to browse friends lists in the editor.
+	 *  
+	 * @param summary
+	 */
 	public void setSummary(String summary) {
 		getCachedEntity().setProperty("summary", summary);
 	}
@@ -38,7 +51,11 @@ public class Friend extends OdpDomain {
 		return (String) getCachedEntity().getProperty("summary");
 	}
 
-	// (Character)
+	/**
+	 *  (Character)
+	 *  
+	 * @param userKey
+	 */
 	public void setUserKey(Key userKey) {
 		getCachedEntity().setProperty("userKey", userKey);
 	}

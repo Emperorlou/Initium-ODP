@@ -5,7 +5,12 @@ import java.util.List;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This entity defines a group of locations that are controllable by a player.
+/**
+ * This entity defines a group of locations that are controllable by a player.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Territory extends OdpDomain {
 	public static final String KIND = "Territory";
 
@@ -22,7 +27,11 @@ public class Territory extends OdpDomain {
 		return KIND;
 	}
 
-	// (Character)
+	/**
+	 *  (Character)
+	 *  
+	 * @param characterWhitelist
+	 */
 	public void setCharacterWhitelist(List<Character> characterWhitelist) {
 		getCachedEntity().setProperty("characterWhitelist", characterWhitelist);
 	}
@@ -32,7 +41,11 @@ public class Territory extends OdpDomain {
 		return (List<Character>) getCachedEntity().getProperty("characterWhitelist");
 	}
 
-	// (Group)
+	/**
+	 *  (Group)
+	 *  
+	 * @param groupWhitelist
+	 */
 	public void setGroupWhitelist(List<Group> groupWhitelist) {
 		getCachedEntity().setProperty("groupWhitelist", groupWhitelist);
 	}
@@ -42,7 +55,11 @@ public class Territory extends OdpDomain {
 		return (List<Group>) getCachedEntity().getProperty("groupWhitelist");
 	}
 
-	// (Location|territoryKey)
+	/**
+	 *  (Location|territoryKey)
+	 *  
+	 * @param locations
+	 */
 	public void setLocations(List<Location> locations) {
 		getCachedEntity().setProperty("locations", locations);
 	}
@@ -52,7 +69,11 @@ public class Territory extends OdpDomain {
 		return (List<Location>) getCachedEntity().getProperty("locations");
 	}
 
-	// A name given to this territory.
+	/**
+	 *  A name given to this territory.
+	 *  
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}
@@ -61,7 +82,11 @@ public class Territory extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
-	// (Group)
+	/**
+	 *  (Group)
+	 *  
+	 * @param owningGroupKey
+	 */
 	public void setOwningGroupKey(Key owningGroupKey) {
 		getCachedEntity().setProperty("owningGroupKey", owningGroupKey);
 	}
@@ -74,6 +99,10 @@ public class Territory extends OdpDomain {
 		None, OwningGroupOnly,
 	}
 
+	/**
+	 * 
+	 * @param travelRule
+	 */
 	public void setTravelRule(TravelRule travelRule) {
 		getCachedEntity().setProperty("travelRule", travelRule);
 	}

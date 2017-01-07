@@ -2,7 +2,12 @@ package com.universeprojects.miniup.server.domain;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//Things people have said about the game. These quotes could appear on the website (possibly randomly). It's better to have sources to the quotes if possible.
+/**
+ * Things people have said about the game. These quotes could appear on the website (possibly randomly). It's better to have sources to the quotes if possible.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Quotes extends OdpDomain {
 	public static final String KIND = "Quotes";
 
@@ -19,7 +24,11 @@ public class Quotes extends OdpDomain {
 		return KIND;
 	}
 
-	// The name of the person who we are quoting.
+	/**
+	 *  The name of the person who we are quoting.
+	 *  
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}
@@ -28,7 +37,11 @@ public class Quotes extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
-	// What they said.
+	/**
+	 *  What they said.
+	 *  
+	 * @param quote
+	 */
 	public void setQuote(String quote) {
 		getCachedEntity().setProperty("quote", quote);
 	}
@@ -37,7 +50,11 @@ public class Quotes extends OdpDomain {
 		return (String) getCachedEntity().getProperty("quote");
 	}
 
-	// The url that points to the person actually saying it.
+	/**
+	 *  The url that points to the person actually saying it.
+	 *  
+	 * @param sourceUrl
+	 */
 	public void setSourceUrl(String sourceUrl) {
 		getCachedEntity().setProperty("sourceUrl", sourceUrl);
 	}
@@ -46,7 +63,11 @@ public class Quotes extends OdpDomain {
 		return (String) getCachedEntity().getProperty("sourceUrl");
 	}
 
-	// A short name to give this quote for reference.
+	/**
+	 * A short name to give this quote for reference.
+	 * 
+	 * @param summary
+	 */
 	public void setSummary(String summary) {
 		getCachedEntity().setProperty("summary", summary);
 	}

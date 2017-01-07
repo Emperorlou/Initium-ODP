@@ -2,7 +2,12 @@ package com.universeprojects.miniup.server.domain;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//Settings that relate to the database schema itself.
+/**
+ * Settings that relate to the database schema itself.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Schema extends OdpDomain {
 	public static final String KIND = "Schema";
 
@@ -19,7 +24,11 @@ public class Schema extends OdpDomain {
 		return KIND;
 	}
 
-	// The url where we can find the image server.
+	/**
+	 *  The url where we can find the image server.
+	 *  
+	 * @param baseImageUrl
+	 */
 	public void setBaseImageUrl(String baseImageUrl) {
 		getCachedEntity().setProperty("baseImageUrl", baseImageUrl);
 	}

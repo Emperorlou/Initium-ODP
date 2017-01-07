@@ -4,7 +4,12 @@ import java.util.List;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//Tags are categorical concepts that are applied to an item. Items with the same tags are considered to have the same use or conceptual properties in-game. The more tags items have in common, the more similar in form and function the items are.
+/**
+ * Tags are categorical concepts that are applied to an item. Items with the same tags are considered to have the same use or conceptual properties in-game. The more tags items have in common, the more similar in form and function the items are.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Tag extends OdpDomain {
 	public static final String KIND = "Tag";
 
@@ -21,7 +26,11 @@ public class Tag extends OdpDomain {
 		return KIND;
 	}
 
-	// (Affector)
+	/**
+	 *  (Affector)
+	 *  
+	 * @param affectors
+	 */
 	public void setAffectors(List<Object> affectors) { // TODO Objects?
 		getCachedEntity().setProperty("affectors", affectors);
 	}
@@ -31,6 +40,10 @@ public class Tag extends OdpDomain {
 	 return (List<Object>) getCachedEntity().getProperty("affectors");
 	}
 
+	/**
+	 * 
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}

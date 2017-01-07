@@ -4,7 +4,12 @@ import java.util.List;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This is used as a complete definition of a tool "slot". It includes rules for how to identify a valid tool for this slot, and the effect the tool has on the outcome of thing the tool is being used to create.
+/**
+ * This is used as a complete definition of a tool "slot". It includes rules for how to identify a valid tool for this slot, and the effect the tool has on the outcome of thing the tool is being used to create.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class ConstructionToolRequirement extends OdpDomain {
 	public static final String KIND = "ConstructionToolRequirement";
 
@@ -21,7 +26,11 @@ public class ConstructionToolRequirement extends OdpDomain {
 		return KIND;
 	}
 
-	// (EntityRequirement|type==Tool)
+	/**
+	 *  (EntityRequirement|type==Tool)
+	 *  
+	 * @param entityRequirement
+	 */
 	public void setEntityRequirement(EntityRequirement entityRequirement) {
 		getCachedEntity().setProperty("entityRequirement", entityRequirement);
 	}
@@ -30,7 +39,11 @@ public class ConstructionToolRequirement extends OdpDomain {
 		return (EntityRequirement) getCachedEntity().getProperty("entityRequirement");
 	}
 
-	// This name is likely going to be player facing and should probably mirror the name on the EntityRequirement.
+	/**
+	 *  This name is likely going to be player facing and should probably mirror the name on the EntityRequirement.
+	 *  
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}
@@ -39,7 +52,11 @@ public class ConstructionToolRequirement extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
-	// (AffectorProcess)
+	/**
+	 *  (AffectorProcess)
+	 *  
+	 * @param processAffectors
+	 */
 	public void setProcessAffectors(List<AffectorProcess> processAffectors) {
 		getCachedEntity().setProperty("processAffectors", processAffectors);
 	}
@@ -49,7 +66,11 @@ public class ConstructionToolRequirement extends OdpDomain {
 		return (List<AffectorProcess>) getCachedEntity().getProperty("processAffectors");
 	}
 
-	// (AffectorItemField)
+	/**
+	 *  (AffectorItemField)
+	 *  
+	 * @param resultingFieldAffectors
+	 */
 	public void setResultingFieldAffectors(List<AffectorItemField> resultingFieldAffectors) {
 		getCachedEntity().setProperty("resultingFieldAffectors", resultingFieldAffectors);
 	}

@@ -4,7 +4,12 @@ import java.util.List;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//Defines how to generate a new NPC for the character entity type.
+/**
+ * Defines how to generate a new NPC for the character entity type.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class NPCDef extends OdpDomain {
 	public static final String KIND = "NPCDef";
 
@@ -21,7 +26,11 @@ public class NPCDef extends OdpDomain {
 		return KIND;
 	}
 
-	// (images/npc-generic1.jpg)
+	/**
+	 *  (images/npc-generic1.jpg)
+	 *  
+	 * @param bannerUrl
+	 */
 	public void setBannerUrl(String bannerUrl) {
 		getCachedEntity().setProperty("bannerUrl", bannerUrl);
 	}
@@ -38,7 +47,11 @@ public class NPCDef extends OdpDomain {
 		return (Boolean) getCachedEntity().getProperty("cloaked");
 	}
 
-	// The dexterity for this NPC. Dexterity is used to determine the hit/dodge chance in combat. For a standard human, 5 is the average dexterity. Keep in mind that the effect of ALL stats increase exponentially as they go up, so keep this in mind.
+	/**
+	 *  The dexterity for this NPC. Dexterity is used to determine the hit/dodge chance in combat. For a standard human, 5 is the average dexterity. Keep in mind that the effect of ALL stats increase exponentially as they go up, so keep this in mind.
+	 *  
+	 * @param dexterity
+	 */
 	public void setDexterity(String dexterity) {
 		getCachedEntity().setProperty("dexterity", dexterity);
 	}
@@ -47,7 +60,11 @@ public class NPCDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("dexterity");
 	}
 
-	// The number of Dogecoins this NPC will drop. This number will be scaled down depending on the Dogecoin reserves available (but content developers don`t need to worry about that).
+	/**
+	 *  The number of Dogecoins this NPC will drop. This number will be scaled down depending on the Dogecoin reserves available (but content developers don`t need to worry about that).
+	 *  
+	 * @param dogecoins
+	 */
 	public void setDogecoins(String dogecoins) {
 		getCachedEntity().setProperty("dogecoins", dogecoins);
 	}
@@ -56,7 +73,11 @@ public class NPCDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("dogecoins");
 	}
 
-	// Default is 1 for blank entries. Low level monsters should be 1, high level monsters should be at most 5 (5x the experience gain rate). Choose the value that best suits your monster based on it's difficulty to kill for a character with max stats.
+	/**
+	 *  Default is 1 for blank entries. Low level monsters should be 1, high level monsters should be at most 5 (5x the experience gain rate). Choose the value that best suits your monster based on it's difficulty to kill for a character with max stats.
+	 *  
+	 * @param experienceMultiplier
+	 */
 	public void setExperienceMultiplier(Double experienceMultiplier) {
 		getCachedEntity().setProperty("experienceMultiplier", experienceMultiplier);
 	}
@@ -65,7 +86,11 @@ public class NPCDef extends OdpDomain {
 		return (Double) getCachedEntity().getProperty("experienceMultiplier");
 	}
 
-	// The amount of hitpoints this NPC will have. Generally, a standard human should have 15-20 hp.
+	/**
+	 *  The amount of hitpoints this NPC will have. Generally, a standard human should have 15-20 hp.
+	 *  
+	 * @param hitpoints
+	 */
 	public void setHitpoints(String hitpoints) {
 		getCachedEntity().setProperty("hitpoints", hitpoints);
 	}
@@ -74,7 +99,11 @@ public class NPCDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("hitpoints");
 	}
 
-	// The intelligence for this NPC. At the moment intelligence isn`t used, but we may eventually use it to affect critical hit chances in the future. Keep in mind that the effect of ALL stats increase exponentially as they go up, so keep this in mind.
+	/**
+	 *  The intelligence for this NPC. At the moment intelligence isn`t used, but we may eventually use it to affect critical hit chances in the future. Keep in mind that the effect of ALL stats increase exponentially as they go up, so keep this in mind.
+	 *  
+	 * @param intelligence
+	 */
 	public void setIntelligence(String intelligence) {
 		getCachedEntity().setProperty("intelligence", intelligence);
 	}
@@ -83,6 +112,10 @@ public class NPCDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("intelligence");
 	}
 
+	/**
+	 * 
+	 * @param internalName
+	 */
 	public void setInternalName(String internalName) {
 		getCachedEntity().setProperty("internalName", internalName);
 	}
@@ -91,7 +124,11 @@ public class NPCDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("internalName");
 	}
 
-	// (ItemSpawner|npcDefKey)
+	/**
+	 *  (ItemSpawner|npcDefKey)
+	 *  
+	 * @param itemSpawners
+	 */
 	public void setItemSpawners(List<ItemSpawner> itemSpawners) {
 		getCachedEntity().setProperty("itemSpawners", itemSpawners);
 	}
@@ -101,7 +138,11 @@ public class NPCDef extends OdpDomain {
 		return (List<ItemSpawner>) getCachedEntity().getProperty("itemSpawners");
 	}
 
-	// (MonsterSpawner|npcDefKey)
+	/**
+	 *  (MonsterSpawner|npcDefKey)
+	 *  
+	 * @param monsterSpawners
+	 */
 	public void setMonsterSpawners(List<MonsterSpawner> monsterSpawners) {
 		getCachedEntity().setProperty("monsterSpawners", monsterSpawners);
 	}
@@ -111,7 +152,11 @@ public class NPCDef extends OdpDomain {
 		return (List<MonsterSpawner>) getCachedEntity().getProperty("monsterSpawners");
 	}
 
-	// This is the name of the NPC. It is carried forward when the NPC is generated from the NPCDef
+	/**
+	 *  This is the name of the NPC. It is carried forward when the NPC is generated from the NPCDef
+	 *  
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}
@@ -120,7 +165,11 @@ public class NPCDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
-	// These numbers override the usual weather modifiers for spawn rates. Leave them blank if you want the default weather effects. The modifiers are percentage based, so 100 means no change, 50 means half, 200 means double, etc. For example, if you want to make sure that your monster NEVER spawns when it's raining, you would set spawnChanceRainMultiplier to 0. (NOTE: Spawn multiplier effects do not apply when the spawn location is indoors. Weather and time of day can only affect outdoor spawns.)
+	/**
+	 *  These numbers override the usual weather modifiers for spawn rates. Leave them blank if you want the default weather effects. The modifiers are percentage based, so 100 means no change, 50 means half, 200 means double, etc. For example, if you want to make sure that your monster NEVER spawns when it's raining, you would set spawnChanceRainMultiplier to 0. (NOTE: Spawn multiplier effects do not apply when the spawn location is indoors. Weather and time of day can only affect outdoor spawns.)
+	 *  
+	 * @param spawnChanceClearMultiplier
+	 */
 	public void setSpawnChanceClearMultiplier(Long spawnChanceClearMultiplier) {
 		getCachedEntity().setProperty("spawnChanceClearMultiplier", spawnChanceClearMultiplier);
 	}
@@ -129,7 +178,11 @@ public class NPCDef extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("spawnChanceClearMultiplier");
 	}
 
-	// These numbers override the usual weather modifiers for spawn rates. Leave them blank if you want the default weather effects. The modifiers are percentage based, so 100 means no change, 50 means half, 200 means double, etc. For example, if you want to make sure that your monster NEVER spawns when it's raining, you would set spawnChanceRainMultiplier to 0. (NOTE: Spawn multiplier effects do not apply when the spawn location is indoors. Weather and time of day can only affect outdoor spawns.)
+	/**
+	 *  These numbers override the usual weather modifiers for spawn rates. Leave them blank if you want the default weather effects. The modifiers are percentage based, so 100 means no change, 50 means half, 200 means double, etc. For example, if you want to make sure that your monster NEVER spawns when it's raining, you would set spawnChanceRainMultiplier to 0. (NOTE: Spawn multiplier effects do not apply when the spawn location is indoors. Weather and time of day can only affect outdoor spawns.)
+	 *  
+	 * @param spawnChanceDaytimeMultiplier
+	 */
 	public void setSpawnChanceDaytimeMultiplier(Long spawnChanceDaytimeMultiplier) {
 		getCachedEntity().setProperty("spawnChanceDaytimeMultiplier", spawnChanceDaytimeMultiplier);
 	}
@@ -138,7 +191,11 @@ public class NPCDef extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("spawnChanceDaytimeMultiplier");
 	}
 
-	// These numbers override the usual weather modifiers for spawn rates. Leave them blank if you want the default weather effects. The modifiers are percentage based, so 100 means no change, 50 means half, 200 means double, etc. For example, if you want to make sure that your monster NEVER spawns when it's raining, you would set spawnChanceRainMultiplier to 0. (NOTE: Spawn multiplier effects do not apply when the spawn location is indoors. Weather and time of day can only affect outdoor spawns.)
+	/**
+	 *  These numbers override the usual weather modifiers for spawn rates. Leave them blank if you want the default weather effects. The modifiers are percentage based, so 100 means no change, 50 means half, 200 means double, etc. For example, if you want to make sure that your monster NEVER spawns when it's raining, you would set spawnChanceRainMultiplier to 0. (NOTE: Spawn multiplier effects do not apply when the spawn location is indoors. Weather and time of day can only affect outdoor spawns.)
+	 *  
+	 * @param spawnChanceNighttimeMultiplier
+	 */
 	public void setSpawnChanceNighttimeMultiplier(Long spawnChanceNighttimeMultiplier) {
 		getCachedEntity().setProperty("spawnChanceNighttimeMultiplier", spawnChanceNighttimeMultiplier);
 	}
@@ -147,7 +204,11 @@ public class NPCDef extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("spawnChanceNighttimeMultiplier");
 	}
 
-	// These numbers override the usual weather modifiers for spawn rates. Leave them blank if you want the default weather effects. The modifiers are percentage based, so 100 means no change, 50 means half, 200 means double, etc. For example, if you want to make sure that your monster NEVER spawns when it's raining, you would set spawnChanceRainMultiplier to 0. (NOTE: Spawn multiplier effects do not apply when the spawn location is indoors. Weather and time of day can only affect outdoor spawns.)
+	/**
+	 *  These numbers override the usual weather modifiers for spawn rates. Leave them blank if you want the default weather effects. The modifiers are percentage based, so 100 means no change, 50 means half, 200 means double, etc. For example, if you want to make sure that your monster NEVER spawns when it's raining, you would set spawnChanceRainMultiplier to 0. (NOTE: Spawn multiplier effects do not apply when the spawn location is indoors. Weather and time of day can only affect outdoor spawns.)
+	 *  
+	 * @param spawnChanceRainMultiplier
+	 */
 	public void setSpawnChanceRainMultiplier(Long spawnChanceRainMultiplier) {
 		getCachedEntity().setProperty("spawnChanceRainMultiplier", spawnChanceRainMultiplier);
 	}
@@ -156,7 +217,11 @@ public class NPCDef extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("spawnChanceRainMultiplier");
 	}
 
-	// The strength for this NPC. At the moment, Strength isn't used very much (only affects hp on player characters). Eventually, Strength will be used to determine how much a player can carry, hitpoints, how much additional damage is done from a hit, how much damage a shield can block. Keep in mind that the effect of ALL stats increase exponentially as they go up, so keep this in mind.
+	/**
+	 *  The strength for this NPC. At the moment, Strength isn't used very much (only affects hp on player characters). Eventually, Strength will be used to determine how much a player can carry, hitpoints, how much additional damage is done from a hit, how much damage a shield can block. Keep in mind that the effect of ALL stats increase exponentially as they go up, so keep this in mind.
+	 *  
+	 * @param strength
+	 */
 	public void setStrength(String strength) {
 		getCachedEntity().setProperty("strength", strength);
 	}
@@ -165,7 +230,11 @@ public class NPCDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("strength");
 	}
 
-	// This should just always be NPC since NPCDef always creates an NPC.
+	/**
+	 *  This should just always be NPC since NPCDef always creates an NPC.
+	 *  
+	 * @param type
+	 */
 	public void setType(String type) {
 		getCachedEntity().setProperty("type", type);
 	}
@@ -178,6 +247,10 @@ public class NPCDef extends OdpDomain {
 		Rarest, HighestDamage, Random,
 	}
 
+	/**
+	 * 
+	 * @param automaticWeaponChoiceMethod
+	 */
 	public void setAutomaticWeaponChoiceMethod(AutomaticWeaponChoiceMethod automaticWeaponChoiceMethod) {
 		getCachedEntity().setProperty("automaticWeaponChoiceMethod", automaticWeaponChoiceMethod);
 	}
@@ -190,6 +263,10 @@ public class NPCDef extends OdpDomain {
 		Weapon, Armor, Other,
 	}
 
+	/**
+	 * 
+	 * @param itemTypeMinimums
+	 */
 	public void setItemTypeMinimums(ItemTypeMinimums itemTypeMinimums) {
 		getCachedEntity().setProperty("itemTypeMinimums", itemTypeMinimums);
 	}
@@ -202,6 +279,10 @@ public class NPCDef extends OdpDomain {
 		CollectEverything, CollectBetter, CollectNone,
 	}
 
+	/**
+	 * 
+	 * @param lootPreference
+	 */
 	public void setLootPreference(LootPreference lootPreference) {
 		getCachedEntity().setProperty("lootPreference", lootPreference);
 	}
@@ -214,6 +295,10 @@ public class NPCDef extends OdpDomain {
 		Normal, Defending1, Defending2, Defending3, Zombie,
 	}
 
+	/**
+	 * 
+	 * @param status
+	 */
 	public void setStatus(Status status) {
 		getCachedEntity().setProperty("status", status);
 	}

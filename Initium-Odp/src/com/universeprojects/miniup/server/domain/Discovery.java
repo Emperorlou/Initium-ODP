@@ -3,7 +3,12 @@ package com.universeprojects.miniup.server.domain;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This entry tells us whether or not a character can see a given entity. If they cannot see it, they can usually try to search to find it. Discoveries are generally used for finding: Paths, and Items.
+/**
+ * This entry tells us whether or not a character can see a given entity. If they cannot see it, they can usually try to search to find it. Discoveries are generally used for finding: Paths, and Items.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Discovery extends OdpDomain {
 	public static final String KIND = "Discovery";
 
@@ -20,7 +25,11 @@ public class Discovery extends OdpDomain {
 		return KIND;
 	}
 
-	// (Character)
+	/**
+	 *  (Character)
+	 *  
+	 * @param characterKey
+	 */
 	public void setCharacterKey(Key characterKey) {
 		getCachedEntity().setProperty("characterKey", characterKey);
 	}
@@ -29,7 +38,11 @@ public class Discovery extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("characterKey");
 	}
 
-	// The entity that was discovered. Most of the time it is a Path entity, but it can be other things since this entity is meant to be generic.
+	/**
+	 * The entity that was discovered. Most of the time it is a Path entity, but it can be other things since this entity is meant to be generic.
+	 * 
+	 * @param entityKey
+	 */
 	public void setEntityKey(Key entityKey) {
 		getCachedEntity().setProperty("entityKey", entityKey);
 	}
@@ -38,7 +51,11 @@ public class Discovery extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("entityKey");
 	}
 
-	// (Location|type==Permanent)
+	/**
+	 *  (Location|type==Permanent)
+	 *  
+	 * @param location1Key
+	 */
 	public void setLocation1Key(Key location1Key) {
 		getCachedEntity().setProperty("location1Key", location1Key);
 	}
@@ -47,7 +64,11 @@ public class Discovery extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("location1Key");
 	}
 
-	// (Location|type==Permanent)
+	/**
+	 *  (Location|type==Permanent)
+	 *  
+	 * @param location2Key
+	 */
 	public void setLocation2Key(Key location2Key) {
 		getCachedEntity().setProperty("location2Key", location2Key);
 	}
@@ -56,6 +77,10 @@ public class Discovery extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("location2Key");
 	}
 
+	/**
+	 * 
+	 * @param hidden
+	 */
 	public void setHidden(Boolean hidden) {
 		getCachedEntity().setProperty("hidden", hidden);
 	}
@@ -68,6 +93,10 @@ public class Discovery extends OdpDomain {
 		Path,
 	}
 
+	/**
+	 * 
+	 * @param discoveryKind
+	 */
 	public void setDiscoveryKind(DiscoveryKind discoveryKind) {
 		getCachedEntity().setProperty("kind", discoveryKind);
 	}

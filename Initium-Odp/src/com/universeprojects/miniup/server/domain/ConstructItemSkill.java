@@ -2,7 +2,12 @@ package com.universeprojects.miniup.server.domain;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This type of skill defines how to construct an item. A character would have an instance of this.
+/**
+ * This type of skill defines how to construct an item. A character would have an instance of this.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class ConstructItemSkill extends OdpDomain {
 	public static final String KIND = "ConstructItemSkill";
 

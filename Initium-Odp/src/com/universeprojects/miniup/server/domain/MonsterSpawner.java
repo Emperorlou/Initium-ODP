@@ -3,7 +3,12 @@ package com.universeprojects.miniup.server.domain;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//A monster spawner belongs to a location. It defines the odds of a player finding a monster, and links to a NPCDef for creating the monster in the game world.
+/**
+ * A monster spawner belongs to a location. It defines the odds of a player finding a monster, and links to a NPCDef for creating the monster in the game world.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class MonsterSpawner extends OdpDomain {
 	public static final String KIND = "MonsterSpawner";
 
@@ -20,7 +25,11 @@ public class MonsterSpawner extends OdpDomain {
 		return KIND;
 	}
 
-	// The number of monsters that will always spawn during the instance spawning routine.
+	/**
+	 *  The number of monsters that will always spawn during the instance spawning routine.
+	 *  
+	 * @param instanceMonsterCount
+	 */
 	public void setInstanceMonsterCount(Long instanceMonsterCount) {
 		getCachedEntity().setProperty("instanceMonsterCount", instanceMonsterCount);
 	}
@@ -29,7 +38,11 @@ public class MonsterSpawner extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("instanceMonsterCount");
 	}
 
-	// (Location|type==Permanent)
+	/**
+	 *  (Location|type==Permanent)
+	 *  
+	 * @param locationKey
+	 */
 	public void setLocationKey(Key locationKey) {
 		getCachedEntity().setProperty("locationKey", locationKey);
 	}
@@ -38,7 +51,11 @@ public class MonsterSpawner extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("locationKey");
 	}
 
-	// Just some way for the editor to distinguish between spawners. Could just be the npc name.
+	/**
+	 *  Just some way for the editor to distinguish between spawners. Could just be the npc name.
+	 *  
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}
@@ -47,7 +64,11 @@ public class MonsterSpawner extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
-	// If this is set to true, the monster that spawns here will be spawned directly into the location and not in a combat site that branches from the location.
+	/**
+	 *  If this is set to true, the monster that spawns here will be spawned directly into the location and not in a combat site that branches from the location.
+	 *  
+	 * @param noCombatSite
+	 */
 	public void setNoCombatSite(Boolean noCombatSite) {
 		getCachedEntity().setProperty("noCombatSite", noCombatSite);
 	}
@@ -56,7 +77,11 @@ public class MonsterSpawner extends OdpDomain {
 		return (Boolean) getCachedEntity().getProperty("noCombatSite");
 	}
 
-	// (NPCDef)
+	/**
+	 *  (NPCDef)
+	 *  
+	 * @param npcDefKey
+	 */
 	public void setNpcDefKey(Key npcDefKey) {
 		getCachedEntity().setProperty("npcDefKey", npcDefKey);
 	}
@@ -65,7 +90,11 @@ public class MonsterSpawner extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("npcDefKey");
 	}
 
-	// (0.0)
+	/**
+	 *  (0.0)
+	 *  
+	 * @param spawnChance
+	 */
 	public void setSpawnChance(Double spawnChance) {
 		getCachedEntity().setProperty("spawnChance", spawnChance);
 	}
@@ -74,7 +103,11 @@ public class MonsterSpawner extends OdpDomain {
 		return (Double) getCachedEntity().getProperty("spawnChance");
 	}
 
-	// This String defines how many monsters spawn as a result of this MonsterSpawner.
+	/**
+	 *  This String defines how many monsters spawn as a result of this MonsterSpawner.
+	 *  
+	 * @param spawnCount
+	 */
 	public void setSpawnCount(String spawnCount) {
 		getCachedEntity().setProperty("spawnCount", spawnCount);
 	}
@@ -83,6 +116,10 @@ public class MonsterSpawner extends OdpDomain {
 		return (String) getCachedEntity().getProperty("spawnCount");
 	}
 
+	/**
+	 * 
+	 * @param instanceModeEnabled
+	 */
 	public void setInstanceModeEnabled(Boolean instanceModeEnabled) {
 		getCachedEntity().setProperty("instanceModeEnabled", instanceModeEnabled);
 	}
@@ -95,6 +132,10 @@ public class MonsterSpawner extends OdpDomain {
 		Normal, Defending1, Defending2, Defending3,
 	}
 
+	/**
+	 * 
+	 * @param instanceMonsterStatus
+	 */
 	public void setInstanceMonsterStatus(InstanceMonsterStatus instanceMonsterStatus) {
 		getCachedEntity().setProperty("instanceMonsterStatus", instanceMonsterStatus);
 	}

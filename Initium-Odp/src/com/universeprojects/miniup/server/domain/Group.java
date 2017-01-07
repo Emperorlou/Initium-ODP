@@ -5,7 +5,12 @@ import java.util.List;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//A player group.
+/**
+ * A player group.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Group extends OdpDomain {
 	public static final String KIND = "Group";
 
@@ -22,7 +27,11 @@ public class Group extends OdpDomain {
 		return KIND;
 	}
 
-	// If true, this group is allowing other groups to request to merge with them.
+	/**
+	 *  If true, this group is allowing other groups to request to merge with them.
+	 *  
+	 * @param allowMergeRequests
+	 */
 	public void setAllowMergeRequests(Boolean allowMergeRequests) {
 		getCachedEntity().setProperty("allowMergeRequests", allowMergeRequests);
 	}
@@ -31,7 +40,11 @@ public class Group extends OdpDomain {
 		return (Boolean) getCachedEntity().getProperty("allowMergeRequests");
 	}
 
-	// (User)
+	/**
+	 *  (User)
+	 *  
+	 * @param creatorKey
+	 */
 	public void setCreatorKey(Key creatorKey) {
 		getCachedEntity().setProperty("creatorKey", creatorKey);
 	}
@@ -40,7 +53,11 @@ public class Group extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("creatorKey");
 	}
 
-	// (Character|type=PC)
+	/**
+	 *  (Character|type=PC)
+	 *  
+	 * @param declaredAlliedCharacterKeys
+	 */
 	public void setDeclaredAlliedCharacterKeys(List<Key> declaredAlliedCharacterKeys) {
 		getCachedEntity().setProperty("declaredAlliedCharacters", declaredAlliedCharacterKeys);
 	}
@@ -50,7 +67,11 @@ public class Group extends OdpDomain {
 		return (List<Key>) getCachedEntity().getProperty("declaredAlliedCharacters");
 	}
 
-	// (Group)
+	/**
+	 *  (Group)
+	 *  
+	 * @param declaredAlliedGroupKeys
+	 */
 	public void setDeclaredAlliedGroupKeys(List<Key> declaredAlliedGroupKeys) {
 		getCachedEntity().setProperty("declaredAlliedGroups", declaredAlliedGroupKeys);
 	}
@@ -60,7 +81,11 @@ public class Group extends OdpDomain {
 		return (List<Key>) getCachedEntity().getProperty("declaredAlliedGroups");
 	}
 
-	// (Character|type=PC)
+	/**
+	 *  (Character|type=PC)
+	 *  
+	 * @param declaredWarCharacterKeys
+	 */
 	public void setDeclaredWarCharacterKeys(List<Key> declaredWarCharacterKeys) {
 		getCachedEntity().setProperty("declaredWarCharacters", declaredWarCharacterKeys);
 	}
@@ -70,7 +95,11 @@ public class Group extends OdpDomain {
 		return (List<Key>) getCachedEntity().getProperty("declaredWarCharacters");
 	}
 
-	// (Group)
+	/**
+	 *  (Group)
+	 *  
+	 * @param declaredWarGroupKeys
+	 */
 	public void setDeclaredWarGroupKeys(List<Key> declaredWarGroupKeys) {
 		getCachedEntity().setProperty("declaredWarGroups", declaredWarGroupKeys);
 	}
@@ -80,7 +109,11 @@ public class Group extends OdpDomain {
 		return (List<Key>) getCachedEntity().getProperty("declaredWarGroups");
 	}
 
-	// This is a general purpose description for the player group. It is what players see when they inspect your group.
+	/**
+	 *  This is a general purpose description for the player group. It is what players see when they inspect your group.
+	 *  
+	 * @param description
+	 */
 	public void setDescription(String description) {
 		getCachedEntity().setProperty("description", description);
 	}
@@ -89,7 +122,11 @@ public class Group extends OdpDomain {
 		return (String) getCachedEntity().getProperty("description");
 	}
 
-	// (Character|groupKey)
+	/**
+	 *  (Character|groupKey)
+	 *  
+	 * @param memberKeys
+	 */
 	public void setMemberKeys(List<Key> memberKeys) {
 		getCachedEntity().setProperty("members", memberKeys);
 	}
@@ -99,7 +136,11 @@ public class Group extends OdpDomain {
 		return (List<Key>) getCachedEntity().getProperty("members");
 	}
 
-	// The name of this group.
+	/**
+	 *  The name of this group.
+	 *  
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}
@@ -108,7 +149,11 @@ public class Group extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
-	// (Group)
+	/**
+	 *  (Group)
+	 *  
+	 * @param pendingAllianceGroupKey
+	 */
 	public void setPendingAllianceGroupKey(Key pendingAllianceGroupKey) {
 		getCachedEntity().setProperty("pendingAllianceGroupKey", pendingAllianceGroupKey);
 	}
@@ -117,7 +162,11 @@ public class Group extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("pendingAllianceGroupKey");
 	}
 
-	// (Group)
+	/**
+	 *  (Group)
+	 *  
+	 * @param pendingMergeGroupKey
+	 */
 	public void setPendingMergeGroupKey(Key pendingMergeGroupKey) {
 		getCachedEntity().setProperty("pendingMergeGroupKey", pendingMergeGroupKey);
 	}
@@ -140,6 +189,10 @@ public class Group extends OdpDomain {
 		}
 	}
 
+	/**
+	 * 
+	 * @param applicationMode
+	 */
 	public void setApplicationMode(ApplicationMode applicationMode) {
 		getCachedEntity().setProperty("applicationMode", applicationMode);
 	}

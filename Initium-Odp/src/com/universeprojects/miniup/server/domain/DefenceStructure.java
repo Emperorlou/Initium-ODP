@@ -5,7 +5,12 @@ import java.util.List;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This entity is used to describe a defensive structure in the game world. It has hitpoints so it can be destroyed. It is attached to a location and acts as a blockade to keep other players from entering said location.
+/**
+ * This entity is used to describe a defensive structure in the game world. It has hitpoints so it can be destroyed. It is attached to a location and acts as a blockade to keep other players from entering said location.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class DefenceStructure extends OdpDomain {
 	public static final String KIND = "DefenceStructure";
 
@@ -22,7 +27,11 @@ public class DefenceStructure extends OdpDomain {
 		return KIND;
 	}
 
-	// The banner that will be used when a player is not in combat at the defence structure site.
+	/**
+	 *  The banner that will be used when a player is not in combat at the defence structure site.
+	 *  
+	 * @param bannerUrl
+	 */
 	public void setBannerUrl(String bannerUrl) {
 		getCachedEntity().setProperty("bannerUrl", bannerUrl);
 	}
@@ -31,7 +40,11 @@ public class DefenceStructure extends OdpDomain {
 		return (String) getCachedEntity().getProperty("bannerUrl");
 	}
 
-	// How well the structure blocks these kinds of attacks. This is a direct damage reduction.
+	/**
+	 *  How well the structure blocks these kinds of attacks. This is a direct damage reduction.
+	 *  
+	 * @param blockBludgeoningCapability
+	 */
 	public void setBlockBludgeoningCapability(Long blockBludgeoningCapability) {
 		getCachedEntity().setProperty("blockBludgeoningCapability", blockBludgeoningCapability);
 	}
@@ -40,7 +53,11 @@ public class DefenceStructure extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("blockBludgeoningCapability");
 	}
 
-	// How well the structure blocks these kinds of attacks. This is a direct damage reduction.
+	/**
+	 *  How well the structure blocks these kinds of attacks. This is a direct damage reduction.
+	 *  
+	 * @param blockPiercingCapability
+	 */
 	public void setBlockPiercingCapability(Long blockPiercingCapability) {
 		getCachedEntity().setProperty("blockPiercingCapability", blockPiercingCapability);
 	}
@@ -49,7 +66,11 @@ public class DefenceStructure extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("blockPiercingCapability");
 	}
 
-	// How well the structure blocks these kinds of attacks. This is a direct damage reduction.
+	/**
+	 *  How well the structure blocks these kinds of attacks. This is a direct damage reduction.
+	 *  
+	 * @param blockSlashingCapability
+	 */
 	public void setBlockSlashingCapability(Long blockSlashingCapability) {
 		getCachedEntity().setProperty("blockSlashingCapability", blockSlashingCapability);
 	}
@@ -58,7 +79,11 @@ public class DefenceStructure extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("blockSlashingCapability");
 	}
 
-	// The hitpoints remaining on the structure itself.
+	/**
+	 *  The hitpoints remaining on the structure itself.
+	 *  
+	 * @param hitpoints
+	 */
 	public void setHitpoints(Double hitpoints) {
 		getCachedEntity().setProperty("hitpoints", hitpoints);
 	}
@@ -67,7 +92,11 @@ public class DefenceStructure extends OdpDomain {
 		return (Double) getCachedEntity().getProperty("hitpoints");
 	}
 
-	// (Character)
+	/**
+	 *  (Character)
+	 *  
+	 * @param leaderKey
+	 */
 	public void setLeaderKey(Key leaderKey) {
 		getCachedEntity().setProperty("leaderKey", leaderKey);
 	}
@@ -76,7 +105,11 @@ public class DefenceStructure extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("leaderKey");
 	}
 
-	// (Location|type==Permanent)
+	/**
+	 *  (Location|type==Permanent)
+	 *  
+	 * @param locationKey
+	 */
 	public void setLocationKey(Key locationKey) {
 		getCachedEntity().setProperty("locationKey", locationKey);
 	}
@@ -85,7 +118,11 @@ public class DefenceStructure extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("locationKey");
 	}
 
-	// The materials that were used to construct this structure. When the structure is destroyed or dismantled, some of the materials may be recoverable.
+	/**
+	 *  The materials that were used to construct this structure. When the structure is destroyed or dismantled, some of the materials may be recoverable.
+	 *  
+	 * @param materialsUsed
+	 */
 	public void setMaterialsUsed(List<String> materialsUsed) { // TODO - type
 		getCachedEntity().setProperty("materialsUsed", materialsUsed);
 	}
@@ -95,7 +132,11 @@ public class DefenceStructure extends OdpDomain {
 		return (List<String>) getCachedEntity().getProperty("materialsUsed");
 	}
 
-	// The maximum hitpoints the structure can have.
+	/**
+	 *  The maximum hitpoints the structure can have.
+	 *  
+	 * @param maxHitpoints
+	 */
 	public void setMaxHitpoints(Double maxHitpoints) {
 		getCachedEntity().setProperty("maxHitpoints", maxHitpoints);
 	}
@@ -104,7 +145,11 @@ public class DefenceStructure extends OdpDomain {
 		return (Double) getCachedEntity().getProperty("maxHitpoints");
 	}
 
-	// A name given to the structure by the builders.
+	/**
+	 * A name given to the structure by the builders.
+	 * 
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}
@@ -113,7 +158,11 @@ public class DefenceStructure extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
-	// The type of structure this is. For example, a Wooden Tower, or Stone Tower, or Keep, or Wooden Gated Campsite.
+	/**
+	 *  The type of structure this is. For example, a Wooden Tower, or Stone Tower, or Keep, or Wooden Gated Campsite.
+	 *  
+	 * @param typeName
+	 */
 	public void setTypeName(String typeName) {
 		getCachedEntity().setProperty("typeName", typeName);
 	}
@@ -122,7 +171,11 @@ public class DefenceStructure extends OdpDomain {
 		return (String) getCachedEntity().getProperty("typeName");
 	}
 
-	// When a player attacks the structure, this is the weapon range bonus defenders are given when they attack with ranged weapons.
+	/**
+	 *  When a player attacks the structure, this is the weapon range bonus defenders are given when they attack with ranged weapons.
+	 *  
+	 * @param weaponRangeBonus
+	 */
 	public void setWeaponRangeBonus(Long weaponRangeBonus) {
 		getCachedEntity().setProperty("weaponRangeBonus", weaponRangeBonus);
 	}
@@ -145,6 +198,10 @@ public class DefenceStructure extends OdpDomain {
 		}
 	}
 
+	/**
+	 * 
+	 * @param blockadeRule
+	 */
 	public void setBlockadeRule(BlockadeRule blockadeRule) {
 		getCachedEntity().setProperty("blockadeRule", blockadeRule);
 	}
@@ -153,6 +210,10 @@ public class DefenceStructure extends OdpDomain {
 		return (BlockadeRule) getCachedEntity().getProperty("blockadeRule");
 	}
 
+	/**
+	 * 
+	 * @param blockadeRuleChangeable
+	 */
 	public void setBlockadeRuleChangeable(Boolean blockadeRuleChangeable) {
 		getCachedEntity().setProperty("blockadeRuleChangeable", blockadeRuleChangeable);
 	}

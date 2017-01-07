@@ -4,6 +4,12 @@ import java.util.Objects;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
+/**
+ * Generic parent class for all Initium ODP domain classes
+ * 
+ * @author kyle-miller
+ *
+ */
 public abstract class OdpDomain {
 	private final CachedEntity cachedEntity;
 

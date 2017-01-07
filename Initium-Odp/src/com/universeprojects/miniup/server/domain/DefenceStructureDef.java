@@ -2,7 +2,12 @@ package com.universeprojects.miniup.server.domain;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//This is used to describe how to create a DefenceStructure object for the game.
+/**
+ * This is used to describe how to create a DefenceStructure object for the game.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class DefenceStructureDef extends OdpDomain {
 	public static final String KIND = "DefenceStructureDef";
 
@@ -19,6 +24,10 @@ public class DefenceStructureDef extends OdpDomain {
 		return KIND;
 	}
 
+	/**
+	 * 
+	 * @param bannerUrl
+	 */
 	public void setBannerUrl(String bannerUrl) {
 		getCachedEntity().setProperty("bannerUrl", bannerUrl);
 	}
@@ -27,6 +36,10 @@ public class DefenceStructureDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("bannerUrl");
 	}
 
+	/**
+	 * 
+	 * @param blockBludgeoningCapability
+	 */
 	public void setBlockBludgeoningCapability(String blockBludgeoningCapability) {
 		getCachedEntity().setProperty("blockBludgeoningCapability", blockBludgeoningCapability);
 	}
@@ -35,6 +48,10 @@ public class DefenceStructureDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("blockBludgeoningCapability");
 	}
 
+	/**
+	 * 
+	 * @param blockPiercingCapability
+	 */
 	public void setBlockPiercingCapability(String blockPiercingCapability) {
 		getCachedEntity().setProperty("blockPiercingCapability", blockPiercingCapability);
 	}
@@ -43,6 +60,10 @@ public class DefenceStructureDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("blockPiercingCapability");
 	}
 
+	/**
+	 * 
+	 * @param blockSlashingCapability
+	 */
 	public void setBlockSlashingCapability(String blockSlashingCapability) {
 		getCachedEntity().setProperty("blockSlashingCapability", blockSlashingCapability);
 	}
@@ -51,6 +72,10 @@ public class DefenceStructureDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("blockSlashingCapability");
 	}
 
+	/**
+	 * 
+	 * @param hitpoints
+	 */
 	public void setHitpoints(String hitpoints) {
 		getCachedEntity().setProperty("hitpoints", hitpoints);
 	}
@@ -59,6 +84,10 @@ public class DefenceStructureDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("hitpoints");
 	}
 
+	/**
+	 * 
+	 * @param maxHitpoints
+	 */
 	public void setMaxHitpoints(String maxHitpoints) {
 		getCachedEntity().setProperty("maxHitpoints", maxHitpoints);
 	}
@@ -67,6 +96,10 @@ public class DefenceStructureDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("maxHitpoints");
 	}
 
+	/**
+	 * 
+	 * @param typeName
+	 */
 	public void setTypeName(String typeName) {
 		getCachedEntity().setProperty("typeName", typeName);
 	}
@@ -75,6 +108,10 @@ public class DefenceStructureDef extends OdpDomain {
 		return (String) getCachedEntity().getProperty("typeName");
 	}
 
+	/**
+	 * 
+	 * @param weaponRangeBonus
+	 */
 	public void setWeaponRangeBonus(String weaponRangeBonus) {
 		getCachedEntity().setProperty("weaponRangeBonus", weaponRangeBonus);
 	}

@@ -6,7 +6,12 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//These orders are for customizations that players would like to see for various things. This can include item customizations, houses...and more as we add them.
+/**
+ * These orders are for customizations that players would like to see for various things. This can include item customizations, houses...and more as we add them.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class CustomOrder extends OdpDomain {
 	public static final String KIND = "CustomOrder";
 
@@ -23,7 +28,11 @@ public class CustomOrder extends OdpDomain {
 		return KIND;
 	}
 
-	// The date this order was created by the user.
+	/**
+	 *  The date this order was created by the user.
+	 *  
+	 * @param createdDate
+	 */
 	public void setCreatedDate(Date createdDate) {
 		getCachedEntity().setProperty("createdDate", createdDate);
 	}
@@ -32,7 +41,11 @@ public class CustomOrder extends OdpDomain {
 		return (Date) getCachedEntity().getProperty("createdDate");
 	}
 
-	// (CustomOrderType)
+	/**
+	 *  (CustomOrderType)
+	 *  
+	 * @param customOrderTypeKey
+	 */
 	public void setCustomOrderTypeKey(Key customOrderTypeKey) {
 		getCachedEntity().setProperty("customOrderTypeKey", customOrderTypeKey);
 	}
@@ -41,7 +54,11 @@ public class CustomOrder extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("customOrderTypeKey");
 	}
 
-	// A description of the change that the user would like to make. It might be a name change, or a description of the custom icon they'd like to have, or it may even include links to external images for reference.
+	/**
+	 *  A description of the change that the user would like to make. It might be a name change, or a description of the custom icon they'd like to have, or it may even include links to external images for reference.
+	 *  
+	 * @param description
+	 */
 	public void setDescription(Text description) {
 		getCachedEntity().setProperty("description", description);
 	}
@@ -50,7 +67,11 @@ public class CustomOrder extends OdpDomain {
 		return (Text) getCachedEntity().getProperty("description");
 	}
 
-	// The amount of donation credit (in cents) that has been taken from the user for this order.
+	/**
+	 *  The amount of donation credit (in cents) that has been taken from the user for this order.
+	 *  
+	 * @param donationCredit
+	 */
 	public void setDonationCredit(Long donationCredit) {
 		getCachedEntity().setProperty("donationCredit", donationCredit);
 	}
@@ -59,7 +80,11 @@ public class CustomOrder extends OdpDomain {
 		return (Long) getCachedEntity().getProperty("donationCredit");
 	}
 
-	// The thing the user wants to change. This could be an Item, a player house, and maybe other things as we keep adding them.
+	/**
+	 *  The thing the user wants to change. This could be an Item, a player house, and maybe other things as we keep adding them.
+	 *  
+	 * @param entityKey
+	 */
 	public void setEntityKey(Key entityKey) {
 		getCachedEntity().setProperty("entityKey", entityKey);
 	}
@@ -68,7 +93,11 @@ public class CustomOrder extends OdpDomain {
 		return (Key) getCachedEntity().getProperty("entityKey");
 	}
 
-	// The last time this order was worked on or updated by a content developer.
+	/**
+	 * The last time this order was worked on or updated by a content developer.
+	 * 
+	 * @param lastUpdateDate
+	 */
 	public void setLastUpdateDate(Date lastUpdateDate) {
 		getCachedEntity().setProperty("lastUpdateDate", lastUpdateDate);
 	}
@@ -77,7 +106,11 @@ public class CustomOrder extends OdpDomain {
 		return (Date) getCachedEntity().getProperty("lastUpdateDate");
 	}
 
-	// Content developer notes that can help to understand what's going on with an order.
+	/**
+	 *  Content developer notes that can help to understand what's going on with an order.
+	 *  
+	 * @param progressNotes
+	 */
 	public void setProgressNotes(Text progressNotes) {
 		getCachedEntity().setProperty("progressNotes", progressNotes);
 	}
@@ -86,7 +119,11 @@ public class CustomOrder extends OdpDomain {
 		return (Text) getCachedEntity().getProperty("progressNotes");
 	}
 
-	// (User)
+	/**
+	 *  (User)
+	 *  
+	 * @param userKey
+	 */
 	public void setUserKey(Key userKey) {
 		getCachedEntity().setProperty("userKey", userKey);
 	}
@@ -115,6 +152,10 @@ public class CustomOrder extends OdpDomain {
 		}
 	}
 
+	/**
+	 * 
+	 * @param status
+	 */
 	public void setStatus(Status status) {
 		getCachedEntity().setProperty("status", status);
 	}

@@ -3,7 +3,12 @@ package com.universeprojects.miniup.server.domain;
 import com.google.appengine.api.datastore.Text;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
-//Javascript that can be written directly from the editor to perform various actions in-game without requiring a code deployment.
+/**
+ * Javascript that can be written directly from the editor to perform various actions in-game without requiring a code deployment.
+ * 
+ * @author kyle-miller
+ *
+ */
 public class Script extends OdpDomain {
 	public static final String KIND = "Script";
 
@@ -20,7 +25,11 @@ public class Script extends OdpDomain {
 		return KIND;
 	}
 
-	// This text would get displayed to the user. It is the link name the user would click on to activate this script.
+	/**
+	 *  This text would get displayed to the user. It is the link name the user would click on to activate this script.
+	 *  
+	 * @param caption
+	 */
 	public void setCaption(String caption) {
 		getCachedEntity().setProperty("caption", caption);
 	}
@@ -29,7 +38,11 @@ public class Script extends OdpDomain {
 		return (String) getCachedEntity().getProperty("caption");
 	}
 
-	// The description for this script that is displayed to the user. It should describe what this script does within the context of the game (using language that a player would be reading).
+	/**
+	 *  The description for this script that is displayed to the user. It should describe what this script does within the context of the game (using language that a player would be reading).
+	 *  
+	 * @param description
+	 */
 	public void setDescription(Text description) {
 		getCachedEntity().setProperty("description", description);
 	}
@@ -38,7 +51,11 @@ public class Script extends OdpDomain {
 		return (Text) getCachedEntity().getProperty("description");
 	}
 
-	// For internal use only to help categorize things.
+	/**
+	 *  For internal use only to help categorize things.
+	 *  
+	 * @param internalName
+	 */
 	public void setInternalName(String internalName) {
 		getCachedEntity().setProperty("internalName", internalName);
 	}
@@ -47,7 +64,11 @@ public class Script extends OdpDomain {
 		return (String) getCachedEntity().getProperty("internalName");
 	}
 
-	// All scripts need a unique name so we can call them by name (especially for global scripts).
+	/**
+	 *  All scripts need a unique name so we can call them by name (especially for global scripts).
+	 *  
+	 * @param name
+	 */
 	public void setName(String name) {
 		getCachedEntity().setProperty("name", name);
 	}
@@ -56,7 +77,11 @@ public class Script extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
-	// The actual javascript for this script function.
+	/**
+	 *  The actual javascript for this script function.
+	 *  
+	 * @param script
+	 */
 	public void setScript(Text script) {
 		getCachedEntity().setProperty("script", script);
 	}
@@ -69,6 +94,10 @@ public class Script extends OdpDomain {
 		global, directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, onMoveBegin, onMoveEnd, onServerTick, onCombatTick,
 	}
 
+	/**
+	 * 
+	 * @param type
+	 */
 	public void setType(Type type) {
 		getCachedEntity().setProperty("type", type);
 	}

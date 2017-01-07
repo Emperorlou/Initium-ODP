@@ -71,6 +71,10 @@ public class AffectorItemField extends OdpDomain {
 		return (String) getCachedEntity().getProperty("name");
 	}
 
+	/**
+	 * 
+	 * @param sourceFieldMaximumValue
+	 */
 	public void setSourceFieldMaximumValue(Double sourceFieldMaximumValue) {
 		getCachedEntity().setProperty("sourceFieldMaximumValue", sourceFieldMaximumValue);
 	}
@@ -79,6 +83,10 @@ public class AffectorItemField extends OdpDomain {
 		return (Double) getCachedEntity().getProperty("sourceFieldMaximumValue");
 	}
 
+	/**
+	 * 
+	 * @param sourceFieldMinimumValue
+	 */
 	public void setSourceFieldMinimumValue(Double sourceFieldMinimumValue) {
 		getCachedEntity().setProperty("sourceFieldMinimumValue", sourceFieldMinimumValue);
 	}
@@ -87,7 +95,11 @@ public class AffectorItemField extends OdpDomain {
 		return (Double) getCachedEntity().getProperty("sourceFieldMinimumValue");
 	}
 
-	// (Item)
+	/**
+	 * (Item)
+	 * 
+	 * @param sourceFieldName
+	 */
 	public void setSourceFieldName(String sourceFieldName) {
 		getCachedEntity().setProperty("sourceFieldName", sourceFieldName);
 	}
