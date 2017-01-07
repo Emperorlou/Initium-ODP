@@ -89,7 +89,7 @@ function scaleTiles() {
     var hexWidth = Math.sqrt(3) / 2 * hexHeight;
     var hexDiag = hexEdge * 2 - 1;
     var imgSize = 128;
-    var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
+    var offsetX = viewportContainer.offsetWidth/2-((hexEdge/2)*hexWidth);
     var offsetY = maxHexHeight/2;
     groundLayer.style.width = hexDiag*hexWidth;
     groundLayer.style.height = (hexEdge*3-1)*hexSize;
@@ -135,7 +135,7 @@ function loadMap() {
     var outerLoop=0;
     var reachedDiag = false;
     var htmlString = "";
-    var offsetX = (window.innerWidth/2)-((hexEdge/2)*hexWidth);
+    var offsetX = viewportContainer.offsetWidth/2-((hexEdge/2)*hexWidth);
     var offsetY = maxHexHeight/2;
 
 
@@ -245,7 +245,6 @@ function touchMoveDiv(e) {
     // move div element
     viewport.style.left=coordX+e.touches[0].clientX-offsetX+'px';
     viewport.style.top=coordY+e.touches[0].clientY-offsetY+'px';
-    $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
 function zoomDiv(e) {
