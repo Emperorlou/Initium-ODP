@@ -14,6 +14,8 @@ import com.universeprojects.miniup.server.exceptions.DaoException;
 
 public abstract class OdpDao<T extends OdpDomain> {
 
+	public static final int MAX_QUERY_RESULTS = 1000;
+
 	private CachedDatastoreService datastore;
 
 	public OdpDao(CachedDatastoreService datastore) {
@@ -47,7 +49,7 @@ public abstract class OdpDao<T extends OdpDomain> {
 	}
 
 	protected List<CachedEntity> findAllCachedEntities(String kind) {
-		return getDatastore().fetchAsList(kind, null, Integer.MAX_VALUE);
+		return getDatastore().fetchAsList(kind, null, MAX_QUERY_RESULTS);
 	}
 
 	protected List<T> buildList(List<CachedEntity> cachedEntities, Class<T> domainClass) throws DaoException {
