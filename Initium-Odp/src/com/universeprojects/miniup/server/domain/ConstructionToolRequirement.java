@@ -17,8 +17,12 @@ public class ConstructionToolRequirement extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public ConstructionToolRequirement(CachedEntity cachedEntity) {
+	private ConstructionToolRequirement(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final ConstructionToolRequirement wrap(CachedEntity cachedEntity) {
+		return new ConstructionToolRequirement(cachedEntity);
 	}
 
 	@Override

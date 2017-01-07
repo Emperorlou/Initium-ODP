@@ -16,8 +16,12 @@ public class Friend extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Friend(CachedEntity cachedEntity) {
+	private Friend(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Friend wrap(CachedEntity cachedEntity) {
+		return new Friend(cachedEntity);
 	}
 
 	@Override

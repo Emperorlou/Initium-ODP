@@ -16,8 +16,12 @@ public class Discovery extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Discovery(CachedEntity cachedEntity) {
+	private Discovery(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Discovery wrap(CachedEntity cachedEntity) {
+		return new Discovery(cachedEntity);
 	}
 
 	@Override

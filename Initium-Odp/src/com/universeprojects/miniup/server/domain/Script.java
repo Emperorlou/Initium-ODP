@@ -16,8 +16,12 @@ public class Script extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Script(CachedEntity cachedEntity) {
+	private Script(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Script wrap(CachedEntity cachedEntity) {
+		return new Script(cachedEntity);
 	}
 
 	@Override

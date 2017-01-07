@@ -15,8 +15,12 @@ public class Schema extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Schema(CachedEntity cachedEntity) {
+	private Schema(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Schema wrap(CachedEntity cachedEntity) {
+		return new Schema(cachedEntity);
 	}
 
 	@Override

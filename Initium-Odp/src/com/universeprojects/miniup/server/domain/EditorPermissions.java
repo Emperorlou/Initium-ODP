@@ -15,8 +15,12 @@ public class EditorPermissions extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public EditorPermissions(CachedEntity cachedEntity) {
+	private EditorPermissions(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final EditorPermissions wrap(CachedEntity cachedEntity) {
+		return new EditorPermissions(cachedEntity);
 	}
 
 	@Override

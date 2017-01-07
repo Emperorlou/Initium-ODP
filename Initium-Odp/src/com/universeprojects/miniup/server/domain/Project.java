@@ -16,8 +16,12 @@ public class Project extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Project(CachedEntity cachedEntity) {
+	private Project(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Project wrap(CachedEntity cachedEntity) {
+		return new Project(cachedEntity);
 	}
 
 	@Override

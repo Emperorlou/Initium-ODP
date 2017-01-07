@@ -17,8 +17,12 @@ public class NPCDef extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public NPCDef(CachedEntity cachedEntity) {
+	private NPCDef(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final NPCDef wrap(CachedEntity cachedEntity) {
+		return new NPCDef(cachedEntity);
 	}
 
 	@Override

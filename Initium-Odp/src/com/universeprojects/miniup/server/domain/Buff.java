@@ -19,8 +19,12 @@ public class Buff extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Buff(CachedEntity cachedEntity) {
+	private Buff(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Buff wrap(CachedEntity cachedEntity) {
+		return new Buff(cachedEntity);
 	}
 
 	@Override

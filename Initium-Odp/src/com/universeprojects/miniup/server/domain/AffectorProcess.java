@@ -15,8 +15,12 @@ public class AffectorProcess extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public AffectorProcess(CachedEntity cachedEntity) {
+	private AffectorProcess(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final AffectorProcess wrap(CachedEntity cachedEntity) {
+		return new AffectorProcess(cachedEntity);
 	}
 
 	@Override

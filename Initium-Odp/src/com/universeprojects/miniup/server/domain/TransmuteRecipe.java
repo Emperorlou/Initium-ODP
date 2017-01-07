@@ -17,8 +17,12 @@ public class TransmuteRecipe extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public TransmuteRecipe(CachedEntity cachedEntity) {
+	private TransmuteRecipe(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final TransmuteRecipe wrap(CachedEntity cachedEntity) {
+		return new TransmuteRecipe(cachedEntity);
 	}
 
 	@Override

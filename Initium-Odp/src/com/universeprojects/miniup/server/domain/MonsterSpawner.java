@@ -16,8 +16,12 @@ public class MonsterSpawner extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public MonsterSpawner(CachedEntity cachedEntity) {
+	private MonsterSpawner(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final MonsterSpawner wrap(CachedEntity cachedEntity) {
+		return new MonsterSpawner(cachedEntity);
 	}
 
 	@Override

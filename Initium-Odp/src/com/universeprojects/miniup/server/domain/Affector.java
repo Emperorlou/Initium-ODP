@@ -15,8 +15,12 @@ public class Affector extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Affector(CachedEntity cachedEntity) {
+	private Affector(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Affector wrap(CachedEntity cachedEntity) {
+		return new Affector(cachedEntity);
 	}
 
 	@Override

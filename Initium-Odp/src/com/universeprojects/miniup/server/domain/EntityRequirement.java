@@ -18,8 +18,12 @@ public class EntityRequirement extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public EntityRequirement(CachedEntity cachedEntity) {
+	private EntityRequirement(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final EntityRequirement wrap(CachedEntity cachedEntity) {
+		return new EntityRequirement(cachedEntity);
 	}
 
 	@Override

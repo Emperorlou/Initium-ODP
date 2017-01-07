@@ -18,8 +18,12 @@ public class Territory extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Territory(CachedEntity cachedEntity) {
+	private Territory(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Territory wrap(CachedEntity cachedEntity) {
+		return new Territory(cachedEntity);
 	}
 
 	@Override

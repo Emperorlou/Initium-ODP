@@ -17,8 +17,12 @@ public class Tag extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Tag(CachedEntity cachedEntity) {
+	private Tag(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Tag wrap(CachedEntity cachedEntity) {
+		return new Tag(cachedEntity);
 	}
 
 	@Override

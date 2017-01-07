@@ -18,8 +18,12 @@ public class ChangeLog extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public ChangeLog(CachedEntity cachedEntity) {
+	private ChangeLog(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final ChangeLog wrap(CachedEntity cachedEntity) {
+		return new ChangeLog(cachedEntity);
 	}
 
 	@Override

@@ -16,8 +16,12 @@ public class SaleItem extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public SaleItem(CachedEntity cachedEntity) {
+	private SaleItem(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final SaleItem wrap(CachedEntity cachedEntity) {
+		return new SaleItem(cachedEntity);
 	}
 
 	@Override

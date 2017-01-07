@@ -16,8 +16,12 @@ public class AssetAttribution extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public AssetAttribution(CachedEntity cachedEntity) {
+	private AssetAttribution(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final AssetAttribution wrap(CachedEntity cachedEntity) {
+		return new AssetAttribution(cachedEntity);
 	}
 
 	@Override

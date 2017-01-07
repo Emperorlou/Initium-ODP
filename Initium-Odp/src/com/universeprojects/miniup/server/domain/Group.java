@@ -18,8 +18,12 @@ public class Group extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Group(CachedEntity cachedEntity) {
+	private Group(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Group wrap(CachedEntity cachedEntity) {
+		return new Group(cachedEntity);
 	}
 
 	@Override

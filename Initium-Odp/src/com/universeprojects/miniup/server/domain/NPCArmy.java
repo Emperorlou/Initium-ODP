@@ -16,8 +16,12 @@ public class NPCArmy extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public NPCArmy(CachedEntity cachedEntity) {
+	private NPCArmy(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final NPCArmy wrap(CachedEntity cachedEntity) {
+		return new NPCArmy(cachedEntity);
 	}
 
 	@Override

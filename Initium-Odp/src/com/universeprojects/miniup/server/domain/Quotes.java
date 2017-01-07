@@ -15,8 +15,12 @@ public class Quotes extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Quotes(CachedEntity cachedEntity) {
+	private Quotes(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Quotes wrap(CachedEntity cachedEntity) {
+		return new Quotes(cachedEntity);
 	}
 
 	@Override

@@ -19,8 +19,12 @@ public class Location extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Location(CachedEntity cachedEntity) {
+	private Location(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Location wrap(CachedEntity cachedEntity) {
+		return new Location(cachedEntity);
 	}
 
 	@Override

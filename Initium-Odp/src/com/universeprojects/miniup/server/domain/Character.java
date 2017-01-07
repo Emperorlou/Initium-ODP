@@ -19,8 +19,12 @@ public class Character extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Character(CachedEntity cachedEntity) {
+	private Character(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Character wrap(CachedEntity cachedEntity) {
+		return new Character(cachedEntity);
 	}
 
 	@Override

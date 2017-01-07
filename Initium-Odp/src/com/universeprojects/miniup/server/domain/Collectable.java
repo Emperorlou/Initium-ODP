@@ -18,8 +18,12 @@ public class Collectable extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Collectable(CachedEntity cachedEntity) {
+	private Collectable(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Collectable wrap(CachedEntity cachedEntity) {
+		return new Collectable(cachedEntity);
 	}
 
 	@Override

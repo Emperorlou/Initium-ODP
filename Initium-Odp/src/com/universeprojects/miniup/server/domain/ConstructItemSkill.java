@@ -15,8 +15,12 @@ public class ConstructItemSkill extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public ConstructItemSkill(CachedEntity cachedEntity) {
+	private ConstructItemSkill(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final ConstructItemSkill wrap(CachedEntity cachedEntity) {
+		return new ConstructItemSkill(cachedEntity);
 	}
 
 	@Override

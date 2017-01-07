@@ -15,8 +15,12 @@ public class AffectorItemField extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public AffectorItemField(CachedEntity cachedEntity) {
+	private AffectorItemField(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final AffectorItemField wrap(CachedEntity cachedEntity) {
+		return new AffectorItemField(cachedEntity);
 	}
 
 	@Override

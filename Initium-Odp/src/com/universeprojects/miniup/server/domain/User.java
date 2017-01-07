@@ -19,8 +19,12 @@ public class User extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public User(CachedEntity cachedEntity) {
+	private User(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final User wrap(CachedEntity cachedEntity) {
+		return new User(cachedEntity);
 	}
 
 	@Override

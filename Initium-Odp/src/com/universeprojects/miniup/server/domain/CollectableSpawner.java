@@ -16,8 +16,12 @@ public class CollectableSpawner extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public CollectableSpawner(CachedEntity cachedEntity) {
+	private CollectableSpawner(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final CollectableSpawner wrap(CachedEntity cachedEntity) {
+		return new CollectableSpawner(cachedEntity);
 	}
 
 	@Override

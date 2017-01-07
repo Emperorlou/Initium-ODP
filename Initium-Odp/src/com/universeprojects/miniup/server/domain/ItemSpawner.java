@@ -16,8 +16,12 @@ public class ItemSpawner extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public ItemSpawner(CachedEntity cachedEntity) {
+	private ItemSpawner(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final ItemSpawner wrap(CachedEntity cachedEntity) {
+		return new ItemSpawner(cachedEntity);
 	}
 
 	@Override

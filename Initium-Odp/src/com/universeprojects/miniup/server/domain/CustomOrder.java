@@ -19,8 +19,12 @@ public class CustomOrder extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public CustomOrder(CachedEntity cachedEntity) {
+	private CustomOrder(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final CustomOrder wrap(CachedEntity cachedEntity) {
+		return new CustomOrder(cachedEntity);
 	}
 
 	@Override

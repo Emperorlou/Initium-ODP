@@ -20,8 +20,12 @@ public class Item extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Item(CachedEntity cachedEntity) {
+	private Item(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Item wrap(CachedEntity cachedEntity) {
+		return new Item(cachedEntity);
 	}
 
 	@Override

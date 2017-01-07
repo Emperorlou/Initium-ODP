@@ -18,8 +18,12 @@ public class DefenceStructure extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public DefenceStructure(CachedEntity cachedEntity) {
+	private DefenceStructure(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final DefenceStructure wrap(CachedEntity cachedEntity) {
+		return new DefenceStructure(cachedEntity);
 	}
 
 	@Override

@@ -16,8 +16,12 @@ public class Path extends OdpDomain {
 		super(new CachedEntity(KIND));
 	}
 
-	public Path(CachedEntity cachedEntity) {
+	private Path(CachedEntity cachedEntity) {
 		super(cachedEntity);
+	}
+
+	public static final Path wrap(CachedEntity cachedEntity) {
+		return new Path(cachedEntity);
 	}
 
 	@Override
