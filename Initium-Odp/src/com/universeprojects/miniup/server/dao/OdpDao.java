@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.dao;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -16,67 +17,98 @@ public abstract class OdpDao<T extends OdpDomain> {
 
 	public static final int MAX_QUERY_RESULTS = 1000;
 
-	private CachedDatastoreService datastore;
+	private final CachedDatastoreService datastore;
 
-	public OdpDao(CachedDatastoreService datastore) {
+	private final String kind;
+
+	private final Class<T> odpDomainClass;
+
+	public OdpDao(CachedDatastoreService datastore, String kind, Class<T> odpDomainClass) {
 		assert datastore != null : "Datastore service cannot be null";
+		assert kind != null : "Kind cannot be null";
+		assert odpDomainClass != null : "OdpDomainClass cannot be null";
 		this.datastore = datastore;
-	}
-
-	protected CachedDatastoreService getDatastore() {
-		return this.datastore;
-	}
-
-	public boolean save(T o) {
-		assert o != null && o.getCachedEntity() != null : "Cannot save a null entity";
-		getDatastore().put(o.getCachedEntity());
-		return true;
-	}
-
-	protected CachedEntity getCachedEntity(Key key) {
-		try {
-			CachedEntity cachedEntity = getDatastore().get(key);
-			if (cachedEntity == null) {
-				getLogger().warning("Retrieved a CachedEntity key that has a null value");
-			} else if (cachedEntity.getEntity() == null) {
-				cachedEntity = null;
-				getLogger().warning("Retrieved an Entity key that has a null value");
-			}
-			return cachedEntity;
-		} catch (EntityNotFoundException e) {
-			return null;
-		}
-	}
-
-	protected List<CachedEntity> findAllCachedEntities(String kind) {
-		return getDatastore().fetchAsList(kind, null, MAX_QUERY_RESULTS);
-	}
-
-	protected List<T> buildList(List<CachedEntity> cachedEntities, Class<T> domainClass) throws DaoException {
-		try {
-			List<T> all = new ArrayList<>();
-			if (cachedEntities != null) {
-				Constructor<T> constructor = domainClass.getConstructor(CachedEntity.class);
-				for (CachedEntity entity : cachedEntities) {
-					if (entity == null) {
-						getLogger().warning("Null entity received from query");
-						continue;
-					}
-					all.add(constructor.newInstance(entity));
-				}
-			}
-			return all;
-		} catch (ReflectiveOperationException e) {
-			// Each DAO should have tests ensuring this doesn't happen
-			throw new DaoException(String.format("%s is set up incorrectly", getClass().getName()), e);
-		}
+		this.kind = kind;
+		this.odpDomainClass = odpDomainClass;
 	}
 
 	protected abstract Logger getLogger();
 
-	public abstract T get(Key key);
+	protected CachedDatastoreService getDatastore() {
+		return this.datastore;
+	}
+	
+	protected String getKind() {
+		return this.kind;
+	}
+	
+	protected Class<T> getOdpDomainClass() {
+		return this.odpDomainClass;
+	}
 
-	public abstract List<T> get(List<Key> keyList) throws DaoException;
+	protected T buildDomain(CachedEntity cachedEntity, Class<T> domainClass) throws DaoException {
+		if (cachedEntity == null) {
+			getLogger().warning("Null entity found");
+			return null;
+		}
 
-	public abstract List<T> findAll() throws DaoException;
+		try {
+			Constructor<T> constructor = domainClass.getConstructor(CachedEntity.class);
+			T odpDomainEntity = constructor.newInstance(cachedEntity);
+			return odpDomainEntity;
+		} catch (ReflectiveOperationException e) {
+			throw new DaoException(String.format("%s is set up incorrectly", getClass().getName()), e);
+		}
+	}
+
+	protected List<T> buildOdpDomainList(List<CachedEntity> cachedEntities) throws DaoException {
+		if (cachedEntities == null || cachedEntities.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<T> odpDomainEntities = new ArrayList<>();
+		for (CachedEntity entity : cachedEntities) {
+				T domainEntity = buildDomain(entity, odpDomainClass);
+				if (domainEntity != null) {
+					odpDomainEntities.add(domainEntity);
+				}
+		}
+		return odpDomainEntities;
+	}
+
+	public boolean save(T t) {
+		assert t != null && t.getCachedEntity() != null : "Cannot save a null entity";
+		getDatastore().put(t.getCachedEntity());
+		return true;
+	}
+
+	public T get(Key key) throws DaoException  {
+		T odpDomainEntity = null;
+
+		try {
+			CachedEntity cachedEntity = getDatastore().get(key);
+			odpDomainEntity = buildDomain(cachedEntity, odpDomainClass);
+		} catch (EntityNotFoundException e) {
+			getLogger().fine(String.format("Non-existing key requested for %s", key));
+		}
+
+		return odpDomainEntity;
+	}
+
+	public List<T> get(List<Key> keyList) throws DaoException {
+		if (keyList == null || keyList.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<CachedEntity> cachedEntities = getDatastore().get(keyList);
+		List<T> odpDomainEntities = buildOdpDomainList(cachedEntities);
+		return odpDomainEntities;
+	}
+
+	public List<T> findAll() throws DaoException {
+		List<CachedEntity> cachedEntities = getDatastore().fetchAsList(kind, null, MAX_QUERY_RESULTS);
+		List<T> odpDomainEntities = buildOdpDomainList(cachedEntities);
+		return odpDomainEntities;
+	}
+
 }
