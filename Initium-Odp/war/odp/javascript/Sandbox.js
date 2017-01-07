@@ -1,9 +1,48 @@
 var scale = $("#zoom").val();
+var viewport = document.getElementById("viewport");
 var maxZoom = 2.4;
 
 window.onload = function() {
     document.onmousedown = startDrag;
     document.onmouseup = stopDrag;
+    //document.ontouchend = stopDrag;
+    //document.ontouchstart = startDrag;
+    document.body.addEventListener('touchend', stopDrag);
+    document.body.addEventListener('touchmove', touchMoveDiv);
+    addEventListener('touchstart', function (e) {
+
+        if (e.touches.length == 1) {
+            var targ = e.target ? e.target : e.srcElement;
+            if (targ.className != 'hexBackground' && targ.className != 'groundLayerContainer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
+            e.preventDefault();
+
+            // calculate event X, Y coordinates
+            offsetX = e.touches[0].clientX;
+            offsetY = e.touches[0].clientY;
+
+            coordX = parseInt(viewport.style.left);
+            coordY = parseInt(viewport.style.top);
+
+            if(!viewport.style.left) { viewport.style.left='0px'};
+            if (!viewport.style.top) { viewport.style.top='0px'};
+
+            drag = true;
+            document.ontouchmove=dragDiv;
+        } else if (e.touches.length == 2) { // If two fingers are touching
+            var targ = e.target ? e.target : e.srcElement;
+            if (targ.className != 'hexBackground' && targ.className != 'groundLayerContainer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
+            e.preventDefault();
+
+            // calculate event X, Y coordinates
+            offsetX1 = e.touches[0].clientX;
+            offsetY1 = e.touches[0].clientY;
+            offsetX2 = e.touches[1].clientX;
+            offsetY2 = e.touches[1].clientY;
+
+            zoom = true;
+            document.ontouchmove=zoomDiv;
+        }
+    });
 }
 
 $(document).ready(function () {
@@ -12,6 +51,7 @@ $(document).ready(function () {
 
 $('#viewportcontainer').on({
     'mousewheel': function (e) {
+        e.preventDefault();
         var max = maxZoom;
         var min = .1;
         if (e.originalEvent.deltaY < 0) {
@@ -37,7 +77,6 @@ function pressedButton() {
 
 function scaleTiles() {
 
-    var hexEdge = $("#hexEdge").val();
     var hexSize = 32*scale;
     var maxHexSize = 32*maxZoom;
     var hexHeight = hexSize * 2;
@@ -61,7 +100,6 @@ function scaleTiles() {
         var tileIndexes = tagIndex.split("_");
         var r = Number(tileIndexes[0]);
         var q = Number(tileIndexes[1]);
-        var i = r + "_" + q;
         var top = (hexSize * 3 / 2 * r);
         var left = hexSize * Math.sqrt(3) * (q + r / 2);
 
@@ -167,39 +205,68 @@ function startDrag(e) {
     if (!e) {
         var e = window.event;
     }
-
     // IE uses srcElement, others use target
     var targ = e.target ? e.target : e.srcElement;
 
-    if (targ.className != 'hexBackground' && targ.className != 'ground-layer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
+    if (targ.className != 'hexBackground' && targ.className != 'groundLayerContainer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
     // calculate event X, Y coordinates
     offsetX = e.clientX;
     offsetY = e.clientY;
 
-    targ = document.getElementById("viewport");
-    //targ = document.getElementsByClassName("groundLayerContainer")
-    // assign default values for top and left properties
-    if(!targ.style.left) { targ.style.left='0px'};
-    if (!targ.style.top) { targ.style.top='0px'};
+    if(!viewport.style.left) { viewport.style.left='0px'};
+    if (!viewport.style.top) { viewport.style.top='0px'};
 
     // calculate integer values for top and left 
     // properties
-    coordX = parseInt(targ.style.left);
-    coordY = parseInt(targ.style.top);
+    coordX = parseInt(viewport.style.left);
+    coordY = parseInt(viewport.style.top);
     drag = true;
 
     // move div element
     document.onmousemove=dragDiv;
-
 }
 function dragDiv(e) {
     if (!drag) {return};
     if (!e) { var e= window.event};
-    var targ=e.target?e.target:e.srcElement;
-    targ = document.getElementById("viewport");
     // move div element
-    targ.style.left=coordX+e.clientX-offsetX+'px';
-    targ.style.top=coordY+e.clientY-offsetY+'px';
+    viewport.style.left=coordX+e.clientX-offsetX+'px';
+    viewport.style.top=coordY+e.clientY-offsetY+'px';
+    return false;
+}
+function touchMoveDiv(e) {
+    if (!drag) {return};
+    if (!e) { var e= window.event};
+    // move div element
+    viewport.style.left=coordX+e.touches[0].clientX-offsetX+'px';
+    viewport.style.top=coordY+e.touches[0].clientY-offsetY+'px';
+    return false;
+}
+function zoomDiv(e) {
+    if (!zoom) {return};
+    if (!e) { var e= window.event};
+    // find direction
+    // calculate event X, Y coordinates
+    coffsetX1 = e.touches[0].clientX;
+    coffsetY1 = e.touches[0].clientY;
+    coffsetX2 = e.touches[1].clientX;
+    coffsetY2 = e.touches[1].clientY;
+
+    d1 = Math.sqrt( Math.pow((offsetX2 - offsetX1),2) + Math.pow((offsetY2 - offsetY1),2));
+    d2 = Math.sqrt( Math.pow((coffsetX2 - coffsetX1),2) + Math.pow((coffsetY2 - coffsetY1),2));
+    var max = maxZoom;
+    var min = .1;
+    if (d1 > d2) {
+        scale += .1;
+        if (max !== null && scale > max) {
+            scale = max;
+        }
+    } else {
+        scale -= .1;
+        if (min !== null && scale < min) {
+            scale = min;
+        }
+    }
+    scaleTiles();
     return false;
 }
 function stopDrag() {

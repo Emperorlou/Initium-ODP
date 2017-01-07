@@ -3180,6 +3180,7 @@ body
 	height: 211px;
 	width: 728px;
 	border: 1px solid black;
+	margin: 0 auto;
 	overflow: hidden;
 }
 
