@@ -8,6 +8,7 @@ var minZoom = .05;
 var scaleRate = Number($("#zoom").val());
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 var hexEdge = Number($("#hexEdge").val());
+var reachedZoom = false;
 
 window.onload = function() {
     document.onmousedown = startDrag;
@@ -27,13 +28,13 @@ window.onload = function() {
             offsetX = e.touches[0].clientX;
             offsetY = e.touches[0].clientY;
 
-            if(!viewport.style.left) { viewport.style.left='0px'};
-            if (!viewport.style.top) { viewport.style.top='0px'};
-            coordX = parseInt(viewport.style.left);
-            coordY = parseInt(viewport.style.top);
+            if(!groundLayer.style.left) { groundLayer.style.left='0px'};
+            if (!groundLayer.style.top) { groundLayer.style.top='0px'};
+            coordX = parseInt(groundLayer.style.left);
+            coordY = parseInt(groundLayer.style.top);
 
-            if(!viewport.style.left) { viewport.style.left='0px'};
-            if (!viewport.style.top) { viewport.style.top='0px'};
+            if(!groundLayer.style.left) { groundLayer.style.left='0px'};
+            if (!groundLayer.style.top) { groundLayer.style.top='0px'};
 
             drag = true;
             document.ontouchmove=dragDiv;
@@ -84,22 +85,70 @@ function pressedButton() {
 
 function scaleTiles() {
 
-    var hexSize = 32*scale;
-    var maxHexSize = 32*maxZoom;
+    var hexEdge = Number($("#hexEdge").val());
+    var hexSize = 32 * scale;
+    var maxHexSize = 32 * maxZoom;
     var hexHeight = hexSize * 2;
     var maxHexHeight = maxHexSize * 2;
     var hexWidth = Math.sqrt(3) / 2 * hexHeight;
     var hexDiag = hexEdge * 2 - 1;
     var imgSize = 128;
-    var offsetX = viewportContainer.offsetWidth/2-((hexEdge/2)*hexWidth);
-    var offsetY = maxHexHeight/2;
-    groundLayer.style.width = hexDiag*hexWidth;
-    groundLayer.style.height = (hexEdge*3-1)*hexSize;
-    groundLayer.style.top = offsetY;
-    groundLayer.style.left = offsetX;
+
+    prevGridWidth = groundLayer.offsetWidth;
+    prevGridHeight = groundLayer.offsetHeight;
+    currGridWidth = hexDiag * hexWidth;
+    currGridHeight = (hexEdge * 3 - 1) * hexSize;
+    diffGridWidth = currGridWidth - prevGridWidth;
+    diffGridHeight = currGridHeight - prevGridHeight;
+    groundLayer.style.height = currGridHeight;
+    groundLayer.style.width = currGridWidth;
+
+    originX = groundLayer.offsetLeft + viewport.offsetLeft;
+    originY = groundLayer.offsetTop + viewport.offsetTop;
+    dx = Math.abs(event.clientX - originX);
+    dy = Math.abs(event.clientY - originY);
+    widthRatio = currGridWidth / prevGridWidth;
+    heightRatio = currGridHeight / prevGridHeight;
+
+    newDx = dx * widthRatio;
+    newDy = dy * heightRatio;
+    diffX = Math.abs(newDx - dx);
+    diffY = Math.abs(newDy - dy);
+
+    if (event.clientY < originY && diffGridWidth < 0 || event.clientY > originY && diffGridWidth > 0) {
+        diffY = diffY * -1;
+    }
+    if (event.clientX < originX && diffGridWidth < 0 || event.clientX > originX && diffGridWidth > 0) {
+        diffX = diffX * -1;
+    }
+
+    if (reachedZoom) {
+        if (scale > minZoom && scale < maxZoom) {
+            reachedZoom = false;
+        } else {
+            diffX = 0;
+            diffY = 0;
+        }
+    }
+    else if (scale == minZoom || scale == maxZoom) {
+        reachedZoom = true;
+    }
+
+    newX = groundLayer.offsetLeft + diffX;
+    newY = groundLayer.offsetTop + diffY;
+
+    groundLayer.style.top = newY;
+    groundLayer.style.left = newX;
+
+    // For debugging zoom
+    //var c = document.getElementById("myCanvas");
+    //var ctx = c.getContext("2d");
+    //ctx.beginPath();
+    //ctx.moveTo(originX, originY);
+    //ctx.lineTo(newX, newY);
+    //ctx.stroke();
 
     // Update all tiles
-    //var hexTiles = document.getElementsByClassName('hexagon');
     var l = hexTiles.length;
     for (var index = 0; index < l; index++) {
 
@@ -108,7 +157,9 @@ function scaleTiles() {
         var r = Number(tileIndexes[0]);
         var q = Number(tileIndexes[1]);
         var top = (hexSize * 3 / 2 * r);
-        var left = hexSize * Math.sqrt(3) * (q + r / 2);
+        var left = (hexSize * Math.sqrt(3) * (q + r / 2)) + (hexWidth);
+        //var top = r * gridHeight;
+        //var left = q * gridWidth;
 
         hexTiles[index].style.width = hexWidth + "px";
         hexTiles[index].style.height = hexSize + "px";
@@ -140,15 +191,17 @@ function loadMap() {
     var offsetX = viewportContainer.offsetWidth/2-((hexEdge/2)*hexWidth);
     var offsetY = maxHexHeight/2;
 
-
-    groundLayer.style.width = hexDiag*hexSize;
-    groundLayer.style.height = hexDiag*hexHeight;
+    currGridWidth = hexDiag*hexWidth;
+    currGridHeight = (hexEdge*3-1)*hexSize;
+    groundLayer.style.height = currGridHeight;
+    groundLayer.style.width = currGridWidth;
     groundLayer.style.top = offsetY;
     groundLayer.style.left = offsetX;
 
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
     groundLayer.style.position = "absolute";
+
 
     // Remove all current tiles
     var l = hexTiles.length;
@@ -168,7 +221,7 @@ function loadMap() {
                     var q = innerIndex - outerLoop;
                     var i = r + "_" + q;
                     var top = (hexSize * 3 / 2 * r);
-                    var left = (hexSize * Math.sqrt(3) * (q + r / 2));
+                    var left = (hexSize * Math.sqrt(3) * (q + r / 2)) + (hexWidth);
 
                     $hexBody = "<div";
                     $hexBody += " id=\"hex" + i + "\"";
@@ -200,9 +253,9 @@ function loadMap() {
                 } else {
                     outerLoop++;
                 }
+                //outerLoop++;
             });
             $('#ground-layer').append(htmlString);
-            hexTiles = document.getElementsByClassName('hexagon');
         }
     });
 }
@@ -220,13 +273,13 @@ function startDrag(e) {
     offsetX = e.clientX;
     offsetY = e.clientY;
 
-    if(!viewport.style.left) { viewport.style.left='0px'};
-    if (!viewport.style.top) { viewport.style.top='0px'};
+    if(!groundLayer.style.left) { groundLayer.style.left='0px'};
+    if (!groundLayer.style.top) { groundLayer.style.top='0px'};
 
     // calculate integer values for top and left 
     // properties
-    coordX = parseInt(viewport.style.left);
-    coordY = parseInt(viewport.style.top);
+    coordX = parseInt(groundLayer.style.left);
+    coordY = parseInt(groundLayer.style.top);
     drag = true;
 
     // move div element
@@ -236,8 +289,8 @@ function dragDiv(e) {
     if (!drag) {return};
     if (!e) { var e= window.event};
     // move div element
-    viewport.style.left=coordX+e.clientX-offsetX+'px';
-    viewport.style.top=coordY+e.clientY-offsetY+'px';
+    groundLayer.style.left=coordX+e.clientX-offsetX+'px';
+    groundLayer.style.top=coordY+e.clientY-offsetY+'px';
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
@@ -245,8 +298,8 @@ function touchMoveDiv(e) {
     if (!drag) {return};
     if (!e) { var e= window.event};
     // move div element
-    viewport.style.left=coordX+e.touches[0].clientX-offsetX+'px';
-    viewport.style.top=coordY+e.touches[0].clientY-offsetY+'px';
+    groundLayer.style.left=coordX+e.touches[0].clientX-offsetX+'px';
+    groundLayer.style.top=coordY+e.touches[0].clientY-offsetY+'px';
     return false;
 }
 function zoomDiv(e) {
