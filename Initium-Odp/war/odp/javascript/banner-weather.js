@@ -174,7 +174,7 @@ function updateDayNightCycle(forceRefresh)
 		
 		if (lightning>0)
 		{
-			var bg=	"url('https://initium-resources.appspot.com/images/effects/light-rain1.gif') no-repeat center center, ";
+			var bg=	"url('https://initium-resources.appspot.com/images/effects/hd-light-rain1.gif') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 			bg+=	"rgba(230, 230, 230, "+lightning+")";
 			banner.css("background", bg);
@@ -232,7 +232,7 @@ function updateDayNightCycle(forceRefresh)
 		else if (rainStrength>0.65)
 		{
 			var bg=	"";
-			bg+="url('https://initium-resources.appspot.com/images/effects/light-rain1.gif') no-repeat center center, ";
+			bg+="url('https://initium-resources.appspot.com/images/effects/hd-light-rain1.gif') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
 			banner.css("background", bg);

@@ -61,7 +61,7 @@ public class MainPageUpdateService extends Service
 
 
 	private boolean isGroupLoaded = false;
-	private CachedEntity getGroup()
+	protected CachedEntity getGroup()
 	{
 		if (isGroupLoaded==false)
 		{
