@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.domain;
 
 import java.util.Objects;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
 /**
@@ -23,6 +24,10 @@ public abstract class OdpDomain {
 
 	public CachedEntity getCachedEntity() {
 		return this.cachedEntity;
+	}
+
+	public Key getKey() {
+		return this.getCachedEntity().getKey();
 	}
 
 	public boolean equals(Object o) {

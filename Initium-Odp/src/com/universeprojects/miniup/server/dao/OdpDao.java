@@ -101,7 +101,7 @@ public abstract class OdpDao<T extends OdpDomain> {
 
 		try {
 			Method declaredMethod = getOdpDomainClass().getDeclaredMethod(WRAP_METHOD, CachedEntity.class);
-			T odpDomainEntity = (T) declaredMethod.invoke(cachedEntity);
+			T odpDomainEntity = (T) declaredMethod.invoke(getOdpDomainClass(), cachedEntity);
 			return odpDomainEntity;
 		} catch (ReflectiveOperationException | IllegalArgumentException e) {
 			throw new DaoException(String.format("%s is set up incorrectly", getOdpDomainClass().getName()), e);
