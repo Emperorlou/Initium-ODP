@@ -100,8 +100,8 @@ function scaleTiles() {
     currGridHeight = (hexEdge * 3 - 1) * hexSize;
     diffGridWidth = currGridWidth - prevGridWidth;
     diffGridHeight = currGridHeight - prevGridHeight;
-    groundLayer.style.height = currGridHeight;
-    groundLayer.style.width = currGridWidth;
+    groundLayer.style.height = currGridHeight + "px";
+    groundLayer.style.width = currGridWidth + "px";
 
     originX = groundLayer.offsetLeft + viewport.offsetLeft;
     originY = groundLayer.offsetTop + viewport.offsetTop;
@@ -193,8 +193,8 @@ function loadMap() {
 
     currGridWidth = hexDiag*hexWidth;
     currGridHeight = (hexEdge*3-1)*hexSize;
-    groundLayer.style.height = currGridHeight;
-    groundLayer.style.width = currGridWidth;
+    groundLayer.style.height = currGridHeight + "px";
+    groundLayer.style.width = currGridWidth + "px";
     groundLayer.style.top = offsetY;
     groundLayer.style.left = offsetX;
 
