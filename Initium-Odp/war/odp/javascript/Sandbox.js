@@ -3,6 +3,7 @@ var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
 var groundLayer = document.getElementById("ground-layer");
 var hexTiles = document.getElementsByClassName('hexagon');
+var testPanel = document.getElementById("test-panel");
 var maxZoom = 2.4;
 var minZoom = .05;
 var scaleRate = Number($("#zoom").val());
@@ -103,8 +104,8 @@ function scaleTiles() {
     groundLayer.style.height = currGridHeight + "px";
     groundLayer.style.width = currGridWidth + "px";
 
-    originX = groundLayer.offsetLeft + viewport.offsetLeft;
-    originY = groundLayer.offsetTop + viewport.offsetTop;
+    originX = groundLayer.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
+    originY = groundLayer.offsetTop + viewport.offsetTop + viewportContainer.offsetTop - testPanel.offsetTop;
     dx = Math.abs(event.clientX - originX);
     dy = Math.abs(event.clientY - originY);
     widthRatio = currGridWidth / prevGridWidth;
