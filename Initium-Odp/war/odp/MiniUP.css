@@ -3020,6 +3020,19 @@ body
 	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-right-hover.png");
 }
 
+.button2 img
+{
+	position:absolute;
+	z-index:1;
+	
+	max-height:15px;
+	margin-left:4px;
+	margin-right:6px;
+	vertical-align:top;
+	
+}
+
+
 .characterWidgetContainer
 {
 	position:absolute;
@@ -3087,6 +3100,11 @@ body
 
 @media (max-width:900px)
 {
+	.chatMessage-main
+	{
+		font-size:14px;
+	}
+
 	.banner1
 	{
 		background-size:cover;
@@ -3238,18 +3256,16 @@ body
 	height: 211px;
 	width: 728px;
 	border: 1px solid black;
+	margin: 0 auto;
 	overflow: hidden;
 }
 
 .vp {
-	height: 100%;
-	width: 100%;
 	top: 0; right: 0; bottom: 0; left: 0;
 	/*border: 1px solid black;*/
 }
 
 .groundLayerContainer {
-	height: 100%;
-	width: 100%;
+	margin: 0 auto;
 	/*border: 1px solid black;*/
 }

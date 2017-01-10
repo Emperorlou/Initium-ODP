@@ -1157,7 +1157,7 @@ function acceptCharacterTransfer()
 	promptPopup("Accept Character Transfer", "What is the name of the character you are going to transfer to this account? \n\nPlease note that the name is case sensitive!", "", function(charName){
 		if (charName!=null)
 		{
-			window.location.href = "ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode;
+			window.location.href = "/ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode;
 		}
 	});
 }
@@ -1167,7 +1167,7 @@ function transferCharacter(currentCharName)
 	promptPopup("Transfer Character To..", "Please type the email address of the account you wish to transfer this character to.\n\nPlease note that you are currently using: "+currentCharName, "", function(email){
 		if (email!=null)
 		{
-			window.location.href = "ServletUserControl?type=transferCharacter&email="+email+"&v="+window.verifyCode;
+			window.location.href = "/ServletUserControl?type=transferCharacter&email="+email+"&v="+window.verifyCode;
 		}
 	});
 }
@@ -1362,9 +1362,9 @@ function giftPremium()
 {
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
 		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
-			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
+			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
 		}, function(){
-			location.href = "ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
+			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
 		});
 	});
 }
@@ -1372,14 +1372,14 @@ function giftPremium()
 function newPremiumToken()
 {
 	confirmPopup("Create new premium token?", "Are you sure you want to create a premium token and put it in your inventory?\n\nBe aware that this token can be traded AND looted if you die.", function(){
-		window.location.href = "ServletUserControl?type=newPremiumToken"+"&v="+window.verifyCode;
+		window.location.href = "/ServletUserControl?type=newPremiumToken"+"&v="+window.verifyCode;
 	});
 }
 
 function newCharacterFromUnconscious()
 {
 	confirmPopup("Create a new character?", "If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
-		window.location.href = "ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode;
+		window.location.href = "/ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode;
 	});
 }
 
@@ -1639,7 +1639,7 @@ function doShowHiddenSites(eventObject)
 function resendVerificationEmail()
 {
 	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
-		location.href = "ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode;
+		location.href = "/ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode;
 	});
 	
 }
@@ -1647,7 +1647,7 @@ function resendVerificationEmail()
 function changeEmailAddress(oldEmail)
 {
 	promptPopup("Change email", "What email address would you like to use for your account?", oldEmail, function(value){
-		location.href = "ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value)+"&v="+window.verifyCode;
+		location.href = "/ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value)+"&v="+window.verifyCode;
 	});
 }
 
@@ -1666,7 +1666,7 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 {
 	confirmPopup("Are you sure?", "This will send an email to a content developer notifying them that you'd like to customize an item.<br>You will be asked to provide some details in the next popup.", function(){
 		promptPopup("Customization Details", requiredDetails, "", function(value){
-			location.href="ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+window.verifyCode+"&requiredDetails="+encodeURIComponent(value);
+			location.href="/ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+window.verifyCode+"&requiredDetails="+encodeURIComponent(value);
 		});
 	});
 }
@@ -1962,17 +1962,17 @@ function viewManageStore()
 
 function newCharacterFromDead()
 {
-	location.href = "ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
+	location.href = "/ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
 }
 
 function switchCharacter(characterId)
 {
-	location.href = "ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
+	location.href = "/ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
 }
 
 function logout()
 {
-	location.href = "ServletUserControl?type=logout"+"&v="+verifyCode;
+	location.href = "/ServletUserControl?type=logout"+"&v="+verifyCode;
 }
 
 function attackStructure()
