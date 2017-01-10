@@ -137,8 +137,8 @@ function scaleTiles() {
     newX = groundLayer.offsetLeft + diffX;
     newY = groundLayer.offsetTop + diffY;
 
-    groundLayer.style.top = newY;
-    groundLayer.style.left = newX;
+    groundLayer.style.top = newY + "px";
+    groundLayer.style.left = newX + "px";
 
     // For debugging zoom
     //var c = document.getElementById("myCanvas");
@@ -195,8 +195,8 @@ function loadMap() {
     currGridHeight = (hexEdge*3-1)*hexSize;
     groundLayer.style.height = currGridHeight + "px";
     groundLayer.style.width = currGridWidth + "px";
-    groundLayer.style.top = offsetY;
-    groundLayer.style.left = offsetX;
+    groundLayer.style.top = offsetY + "px";
+    groundLayer.style.left = offsetX + "px";
 
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
