@@ -105,7 +105,7 @@ function scaleTiles() {
     groundLayer.style.width = currGridWidth + "px";
 
     originX = groundLayer.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
-    originY = groundLayer.offsetTop + viewport.offsetTop + viewportContainer.offsetTop - testPanel.offsetTop;
+    originY = groundLayer.offsetTop + viewport.offsetTop + viewportContainer.offsetTop - $(window).scrollTop();
     dx = Math.abs(event.clientX - originX);
     dy = Math.abs(event.clientY - originY);
     widthRatio = currGridWidth / prevGridWidth;
