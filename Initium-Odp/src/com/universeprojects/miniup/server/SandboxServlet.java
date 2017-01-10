@@ -16,11 +16,12 @@ public class SandboxServlet extends HttpServlet {
 
 		int width = Integer.parseInt(request.getParameter("width"));
 		int seed = Integer.parseInt(request.getParameter("seed"));
+		int forestry = Integer.parseInt(request.getParameter("forestry"));
 		
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		JSONObject result = new JSONObject();
-		result.put("hexTiles", RandomTileGenerator.getBuildingCells(seed, width));
+		result.putAll(RandomTileGenerator.getBuildingCells(seed, width, forestry));
 		response.getWriter().write(result.toJSONString());
 
 	}

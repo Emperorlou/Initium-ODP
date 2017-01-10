@@ -378,6 +378,7 @@ public class MainPageUpdateService extends Service
 			newHtml.append("Hex Edge: <input type='text' id='hexEdge' value=20 />");
 			newHtml.append("Zoom Rate: <input type='text' id='zoom' value=.075 />");
 			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
+			newHtml.append("Forestry (0-10): <input type='text' id='forestry' value=2 />");
 			newHtml.append("<button id=\"somebutton\">press here</button>");
 			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
 			newHtml.append("<div id=\"viewport\" class=\"vp\">");

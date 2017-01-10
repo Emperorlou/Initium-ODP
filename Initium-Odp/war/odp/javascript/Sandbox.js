@@ -3,13 +3,16 @@ var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
 var groundLayer = document.getElementById("ground-layer");
 var hexTiles = document.getElementsByClassName('hexagon');
-var testPanel = document.getElementById("test-panel");
+var objects = document.getElementsByClassName('gridObject');
 var maxZoom = 2.4;
 var minZoom = .05;
 var scaleRate = Number($("#zoom").val());
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 var hexEdge = Number($("#hexEdge").val());
 var reachedZoom = false;
+var imgSize = 128;
+var treeWidth = 192;
+var treeHeight = 256;
 
 window.onload = function() {
     document.onmousedown = startDrag;
@@ -93,7 +96,7 @@ function scaleTiles() {
     var maxHexHeight = maxHexSize * 2;
     var hexWidth = Math.sqrt(3) / 2 * hexHeight;
     var hexDiag = hexEdge * 2 - 1;
-    var imgSize = 128;
+
 
     prevGridWidth = groundLayer.offsetWidth;
     prevGridHeight = groundLayer.offsetHeight;
@@ -101,8 +104,8 @@ function scaleTiles() {
     currGridHeight = (hexEdge * 3 - 1) * hexSize;
     diffGridWidth = currGridWidth - prevGridWidth;
     diffGridHeight = currGridHeight - prevGridHeight;
-    groundLayer.style.height = currGridHeight + "px";
-    groundLayer.style.width = currGridWidth + "px";
+    groundLayer.style.height = currGridHeight;
+    groundLayer.style.width = currGridWidth;
 
     originX = groundLayer.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
     originY = groundLayer.offsetTop + viewport.offsetTop + viewportContainer.offsetTop - $(window).scrollTop();
@@ -138,8 +141,8 @@ function scaleTiles() {
     newX = groundLayer.offsetLeft + diffX;
     newY = groundLayer.offsetTop + diffY;
 
-    groundLayer.style.top = newY + "px";
-    groundLayer.style.left = newX + "px";
+    groundLayer.style.top = newY;
+    groundLayer.style.left = newX;
 
     // For debugging zoom
     //var c = document.getElementById("myCanvas");
@@ -168,17 +171,38 @@ function scaleTiles() {
         hexTiles[index].style.top = top + "px";
         hexTiles[index].style.left = left + "px";
 
-        var hexBack = hexTiles[index].children[0];
-        hexBack.style.width = imgSize * scale + 'px';
-        hexBack.style.height = imgSize * scale + 'px';
-        hexBack.style.marginLeft = (imgSize / -4) * scale + 'px';
-        hexBack.style.marginTop= (imgSize * -3 / 8) * scale + 'px';
+        //var child = hexTiles[index].children[0];
+        for (var i = 0, len = hexTiles[index].children.length; i < len; i++) {
+            scaleChildTiles(hexTiles[index].children[i]);
+        }
     }
+    var l = objects.length;
+    for (var index = 0; index < l; index++) {
+
+        var top = (hexSize * 3 / 2 * Number(objects[index].dataset.ycoord));
+        var left = (hexSize * Math.sqrt(3) * (Number(objects[index].dataset.xcoord) + Number(objects[index].dataset.ycoord) / 2)) + (hexWidth);
+        //var top = r * gridHeight;
+        //var left = q * gridWidth;
+
+        objects[index].style.width = treeWidth * scale + "px";
+        objects[index].style.height = treeHeight * scale + "px";
+        objects[index].style.margin = (hexSize / 2) + "px";
+        objects[index].style.top = top + "px";
+        objects[index].style.left = left + "px";
+    }
+}
+
+function scaleChildTiles(child) {
+    child.style.width = imgSize * scale + 'px';
+    child.style.height = imgSize * scale + 'px';
+    child.style.marginLeft = (imgSize / -4) * scale + 'px';
+    child.style.marginTop = (imgSize * -3 / 8) * scale + 'px';
 }
 
 function loadMap() {
 
     var hexEdge = Number($("#hexEdge").val());
+    var forestry = Number($("#forestry").val());
     var hexSize = 32*scale;
     var maxHexSize = 32*maxZoom;
     var hexHeight = hexSize * 2;
@@ -194,14 +218,14 @@ function loadMap() {
 
     currGridWidth = hexDiag*hexWidth;
     currGridHeight = (hexEdge*3-1)*hexSize;
-    groundLayer.style.height = currGridHeight + "px";
-    groundLayer.style.width = currGridWidth + "px";
-    groundLayer.style.top = offsetY + "px";
-    groundLayer.style.left = offsetX + "px";
+    groundLayer.style.height = currGridHeight;
+    groundLayer.style.width = currGridWidth;
+    groundLayer.style.top = offsetY;
+    groundLayer.style.left = offsetX;
 
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
-    groundLayer.style.position = "absolute";
+    groundLayer.style.position = "relative";
 
 
     // Remove all current tiles
@@ -212,10 +236,10 @@ function loadMap() {
 
     $.ajax({
         url: "SandboxServlet",
-        data:{width:hexEdge, seed:$("#seed").val()},
+        data:{width:hexEdge, seed:$("#seed").val(), forestry:forestry},
         type: 'POST',
         success: function(responseJson) {
-            $.each(responseJson['hexTiles'], function (index, value) {
+            $.each(responseJson['backgroundTiles'], function (index, value) {
                 $.each(value, function (innerIndex, innerValue) {
 
                     var r = index;
@@ -242,7 +266,8 @@ function loadMap() {
                     $hexBody += " height:" + imgSize * scale + 'px' + ";";
                     $hexBody += " margin-left:" + imgSize / -4 * scale + 'px' + ";";
                     $hexBody += " margin-top:" + imgSize * -3 / 8 * scale + 'px' + ";";
-                    $hexBody += " background-image:url(" + $picUrlPath + innerValue.fileName + ");";
+                    $hexBody += " z-index:" + innerValue.zIndex + ";";
+                    $hexBody += " background-image:url(" + $picUrlPath + innerValue.backgroundFile + ");";
                     $hexBody += "\">";
                     $hexBody += "</div>";
                     $hexBody += "</div>";
@@ -256,7 +281,35 @@ function loadMap() {
                 }
                 //outerLoop++;
             });
+
             $('#ground-layer').append(htmlString);
+
+            htmlString = "";
+            $.each(responseJson['objectMap'], function (objectKey, gridObject) {
+
+                var top = (hexSize * 3 / 2 * gridObject.yCoord);
+                var left = (hexSize * Math.sqrt(3) * (gridObject.xCoord + gridObject.yCoord / 2)) + (hexWidth);
+
+                $hexBody = "<div id=\"object" + i + "_" + "\" " + "class=\"gridObject\"";
+                //$hexBody += "src=\"" + $picUrlPath + gridObject.fileName + "\";";
+                $hexBody += " data-xCoord=\"" + gridObject.xCoord + "\"";
+                $hexBody += " data-yCoord=\"" + gridObject.yCoord + "\"";
+                $hexBody += " style=\"";
+                $hexBody += " top:" + top + 'px' + ";";
+                $hexBody += " left:" +  left + 'px' + ";";
+                $hexBody += "width: " + '100%' + ";";
+                $hexBody += " height:" + '100%' + ";";
+                //$hexBody += " margin-left:" + imgSize / -4 * scale + 'px' + ";";
+                //$hexBody += " margin-top:" + imgSize * -3 / 8 * scale + 'px' + ";";
+                $hexBody += " z-index:" + 10 + ";";
+                $hexBody += " background-image:url(" + $picUrlPath + gridObject.fileName + ");";
+                $hexBody += "\">";
+                $hexBody += "</div>";
+                htmlString += $hexBody;
+            });
+
+            $('#ground-layer').append(htmlString);
+            scaleTiles();
         }
     });
 }
@@ -269,7 +322,7 @@ function startDrag(e) {
     // IE uses srcElement, others use target
     var targ = e.target ? e.target : e.srcElement;
 
-    if (targ.className != 'hexBackground' && targ.className != 'groundLayerContainer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
+    if (targ.className != 'hexBackground' && targ.className != 'groundLayerContainer' && targ.className != 'vp' && targ.className !=  'vpcontainer' && targ.className != 'gridObject') {return};
     // calculate event X, Y coordinates
     offsetX = e.clientX;
     offsetY = e.clientY;
