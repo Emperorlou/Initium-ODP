@@ -1,3 +1,11 @@
+function encode_utf8( s ) {
+  return unescape( encodeURIComponent( s ) );
+}
+
+function decode_utf8( s ) {
+  return decodeURIComponent( escape( s ) );
+}
+
 var messageCodes = [
              "GameMessages",
              "GlobalChat",
@@ -50,8 +58,9 @@ messager.onNotificationMessage = function(message)
 messager.onChatMessage = function(chatMessage)
 {
 	if (!isCharNotMuted(chatMessage.characterId))
-	return; //We quit the function if message is muted
+		return; //We quit the function if message is muted
 
+	chatMessage.message = decode_utf8(chatMessage.message);
 
 	var html = "<div class='chatMessage-main'>";
 	if (chatMessage.createdDate!=null)
