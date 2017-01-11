@@ -1,8 +1,9 @@
 var scale = 1;
 var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
-var groundLayer = document.getElementById("ground-layer");
-var hexTiles = document.getElementsByClassName('hexagon');
+//var groundLayer = document.getElementById("ground-layer");
+var grid = document.getElementById("grid");
+var hexTiles = document.getElementsByClassName('gridCell');
 var objects = document.getElementsByClassName('gridObject');
 var maxZoom = 2.4;
 var minZoom = .05;
@@ -25,26 +26,26 @@ window.onload = function() {
 
         if (e.touches.length == 1) {
             var targ = e.target ? e.target : e.srcElement;
-            if (targ.className != 'hexBackground' && targ.className != 'groundLayerContainer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
+            if (targ.className != 'gridBackground' && targ.className != 'grid' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
             e.preventDefault();
 
             // calculate event X, Y coordinates
             offsetX = e.touches[0].clientX;
             offsetY = e.touches[0].clientY;
 
-            if(!groundLayer.style.left) { groundLayer.style.left='0px'};
-            if (!groundLayer.style.top) { groundLayer.style.top='0px'};
-            coordX = parseInt(groundLayer.style.left);
-            coordY = parseInt(groundLayer.style.top);
+            if(!grid.style.left) { grid.style.left='0px'};
+            if (!grid.style.top) { grid.style.top='0px'};
+            coordX = parseInt(grid.style.left);
+            coordY = parseInt(grid.style.top);
 
-            if(!groundLayer.style.left) { groundLayer.style.left='0px'};
-            if (!groundLayer.style.top) { groundLayer.style.top='0px'};
+            if(!grid.style.left) { grid.style.left='0px'};
+            if (!grid.style.top) { grid.style.top='0px'};
 
             drag = true;
             document.ontouchmove=dragDiv;
         } else if (e.touches.length == 2) { // If two fingers are touching
             var targ = e.target ? e.target : e.srcElement;
-            if (targ.className != 'hexBackground' && targ.className != 'groundLayerContainer' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
+            if (targ.className != 'gridBackground' && targ.className != 'grid' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
             e.preventDefault();
 
             // calculate event X, Y coordinates
@@ -89,26 +90,23 @@ function pressedButton() {
 
 function scaleTiles() {
 
-    var hexEdge = Number($("#hexEdge").val());
-    var hexSize = 32 * scale;
-    var maxHexSize = 32 * maxZoom;
-    var hexHeight = hexSize * 2;
-    var maxHexHeight = maxHexSize * 2;
-    var hexWidth = Math.sqrt(3) / 2 * hexHeight;
-    var hexDiag = hexEdge * 2 - 1;
+    var gridTileWidth = Number($("#hexEdge").val());
+    var forestry = Number($("#forestry").val());
+    var gridCellWidth = 64 * scale;
+    var totalGridWidth = gridTileWidth * gridCellWidth;
 
 
-    prevGridWidth = groundLayer.offsetWidth;
-    prevGridHeight = groundLayer.offsetHeight;
-    currGridWidth = hexDiag * hexWidth;
-    currGridHeight = (hexEdge * 3 - 1) * hexSize;
-    diffGridWidth = currGridWidth - prevGridWidth;
-    diffGridHeight = currGridHeight - prevGridHeight;
-    groundLayer.style.height = currGridHeight + "px";
-    groundLayer.style.width = currGridWidth + "px";
+    prevGridWidth = grid.offsetWidth;
+    prevGridHeight = grid.offsetHeight;
+    currGridWidth = totalGridWidth;
+    currGridHeight = totalGridWidth;
+    diffGridWidth = totalGridWidth - prevGridWidth;
+    diffGridHeight = totalGridWidth - prevGridHeight;
+    grid.style.height = currGridHeight + "px";
+    grid.style.width = currGridWidth + "px";
 
-    originX = groundLayer.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
-    originY = groundLayer.offsetTop + viewport.offsetTop + viewportContainer.offsetTop - $(window).scrollTop();
+    originX = grid.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
+    originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop - $(window).scrollTop();
     dx = Math.abs(event.clientX - originX);
     dy = Math.abs(event.clientY - originY);
     widthRatio = currGridWidth / prevGridWidth;
@@ -138,13 +136,13 @@ function scaleTiles() {
         reachedZoom = true;
     }
 
-    newX = groundLayer.offsetLeft + diffX;
-    newY = groundLayer.offsetTop + diffY;
+    newX = grid.offsetLeft + diffX;
+    newY = grid.offsetTop + diffY;
 
-    groundLayer.style.top = newY + "px";
-    groundLayer.style.left = newX + "px";
+    grid.style.top = newY + "px";
+    grid.style.left = newX + "px";
 
-    // For debugging zoom
+    // Please leave for debugging zoom
     //var c = document.getElementById("myCanvas");
     //var ctx = c.getContext("2d");
     //ctx.beginPath();
@@ -156,18 +154,12 @@ function scaleTiles() {
     var l = hexTiles.length;
     for (var index = 0; index < l; index++) {
 
-        var tagIndex = hexTiles[index].id.substr(3, hexTiles[index].id.length);
-        var tileIndexes = tagIndex.split("_");
-        var r = Number(tileIndexes[0]);
-        var q = Number(tileIndexes[1]);
-        var top = (hexSize * 3 / 2 * r);
-        var left = (hexSize * Math.sqrt(3) * (q + r / 2)) + (hexWidth);
-        //var top = r * gridHeight;
-        //var left = q * gridWidth;
+        var top = hexTiles[index].dataset.ycoord * gridCellWidth;
+        var left = hexTiles[index].dataset.xcoord * gridCellWidth;
 
-        hexTiles[index].style.width = hexWidth + "px";
-        hexTiles[index].style.height = hexSize + "px";
-        hexTiles[index].style.margin = (hexSize / 2) + "px";
+        hexTiles[index].style.width = gridCellWidth + "px";
+        hexTiles[index].style.height = gridCellWidth + "px";
+        hexTiles[index].style.margin = (gridCellWidth / 2) + "px";
         hexTiles[index].style.top = top + "px";
         hexTiles[index].style.left = left + "px";
 
@@ -176,57 +168,50 @@ function scaleTiles() {
             scaleChildTiles(hexTiles[index].children[i]);
         }
     }
+
+    // Update all objects
     var l = objects.length;
     for (var index = 0; index < l; index++) {
 
-        var top = (hexSize * 3 / 2 * Number(objects[index].dataset.ycoord));
-        var left = (hexSize * Math.sqrt(3) * (Number(objects[index].dataset.xcoord) + Number(objects[index].dataset.ycoord) / 2)) + (hexWidth);
-        //var top = r * gridHeight;
-        //var left = q * gridWidth;
+        var top = objects[index].dataset.ycoord * gridCellWidth - (objects[index].dataset.yattach * scale);
+        var left = objects[index].dataset.xcoord * gridCellWidth - (objects[index].dataset.xattach * scale);
 
         objects[index].style.width = treeWidth * scale + "px";
         objects[index].style.height = treeHeight * scale + "px";
-        objects[index].style.margin = (hexSize / 2) + "px";
+        objects[index].style.margin = (gridCellWidth / 2) + "px";
         objects[index].style.top = top + "px";
         objects[index].style.left = left + "px";
     }
 }
 
 function scaleChildTiles(child) {
-    child.style.width = imgSize * scale + 'px';
-    child.style.height = imgSize * scale + 'px';
-    child.style.marginLeft = (imgSize / -4) * scale + 'px';
-    child.style.marginTop = (imgSize * -3 / 8) * scale + 'px';
+    var scaledImgSize = imgSize * scale;
+    child.style.width = scaledImgSize + 'px';
+    child.style.height = scaledImgSize + 'px';
+    child.style.top = scaledImgSize / -2 + 'px';
+    child.style.left = scaledImgSize / -2 + 'px';
 }
 
 function loadMap() {
 
-    var hexEdge = Number($("#hexEdge").val());
+    var gridTileWidth = Number($("#hexEdge").val());
     var forestry = Number($("#forestry").val());
-    var hexSize = 32*scale;
-    var maxHexSize = 32*maxZoom;
-    var hexHeight = hexSize * 2;
-    var maxHexHeight = maxHexSize * 2;
-    var hexWidth = Math.sqrt(3) / 2 * hexHeight;
-    var hexDiag = hexEdge * 2 - 1;
-    var imgSize = 128;
-    var outerLoop=0;
-    var reachedDiag = false;
+    var imgSize = 128 * scale;
+    var gridCellWidth = 64 * scale;
+    var totalGridWidth = gridTileWidth * gridCellWidth;
+    var offsetX = viewportContainer.offsetWidth/2-(totalGridWidth/2);
+    var offsetY = totalGridWidth/2;
     var htmlString = "";
-    var offsetX = viewportContainer.offsetWidth/2-((hexEdge/2)*hexWidth);
-    var offsetY = maxHexHeight/2;
+    var zOffset = 10;
 
-    currGridWidth = hexDiag*hexWidth;
-    currGridHeight = (hexEdge*3-1)*hexSize;
-    groundLayer.style.height = currGridHeight + "px";
-    groundLayer.style.width = currGridWidth + "px";
-    groundLayer.style.top = offsetY + "px";
-    groundLayer.style.left = offsetX + "px";
+    grid.style.height = totalGridWidth + "px";
+    grid.style.width = totalGridWidth + "px";
+    grid.style.top = offsetY + "px";
+    grid.style.left = offsetX + "px";
 
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
-    groundLayer.style.position = "relative";
-
+    grid.style.position = "relative";
 
     // Remove all current tiles
     var l = hexTiles.length;
@@ -246,30 +231,27 @@ function loadMap() {
             $.each(responseJson['backgroundTiles'], function (index, value) {
                 $.each(value, function (innerIndex, innerValue) {
 
-                    var r = index;
-                    var q = innerIndex - outerLoop;
-                    var i = r + "_" + q;
-                    var top = (hexSize * 3 / 2 * r);
-                    var left = (hexSize * Math.sqrt(3) * (q + r / 2)) + (hexWidth);
+                    var top = (gridCellWidth * index);
+                    var left = (gridCellWidth * innerIndex);
 
                     $hexBody = "<div";
-                    $hexBody += " id=\"hex" + i + "\"";
-                    $hexBody += " class=\"hexagon\"";
-                    $hexBody += " data-pos=\"" + i + "\"";
+                    $hexBody += " id=\"hex" + index + "_" + innerIndex + "\"";
+                    $hexBody += " class=\"gridCell\"";
+                    $hexBody += " data-xcoord=\"" + innerIndex + "\"";
+                    $hexBody += " data-ycoord=\"" + index + "\"";
                     $hexBody += " style=\"";
-                    $hexBody += "width: " + hexWidth + 'px' + ";";
-                    $hexBody += " height:" + hexSize + 'px' + ";";
-                    $hexBody += " margin:" + (hexSize / 2) + 'px' + ";";
+                    $hexBody += "width: " + gridCellWidth + 'px' + ";";
+                    $hexBody += " height:" + gridCellWidth + 'px' + ";";
                     $hexBody += " top:" + top + 'px' + ";";
                     $hexBody += " left:" +  left + 'px' + ";";
                     $hexBody += "\">";
 
-                    $hexBody += "<div id=\"hex" + i + "Back\" " + "class=\"hexBackground\"";
+                    $hexBody += "<div id=\"hex" + i + "Back\" " + "class=\"gridBackground\"";
                     $hexBody += " style=\"";
-                    $hexBody += "width: " + imgSize * scale + 'px' + ";";
-                    $hexBody += " height:" + imgSize * scale + 'px' + ";";
-                    $hexBody += " margin-left:" + imgSize / -4 * scale + 'px' + ";";
-                    $hexBody += " margin-top:" + imgSize * -3 / 8 * scale + 'px' + ";";
+                    $hexBody += "width: " + imgSize + 'px' + ";";
+                    $hexBody += " height:" + imgSize + 'px' + ";";
+                    $hexBody += " top:" + imgSize/ -2 + 'px' + ";";
+                    $hexBody += " left:" +  imgSize / -2 + 'px' + ";";
                     $hexBody += " z-index:" + innerValue.zIndex + ";";
                     $hexBody += " background-image:url(" + $picUrlPath + innerValue.backgroundFile + ");";
                     $hexBody += "\">";
@@ -278,12 +260,6 @@ function loadMap() {
 
                     htmlString += $hexBody;
                 });
-                if (outerLoop == (hexEdge-1) || reachedDiag) {
-                    reachedDiag = true;
-                } else {
-                    outerLoop++;
-                }
-                //outerLoop++;
             });
 
             $('#ground-layer').append(htmlString);
@@ -291,28 +267,25 @@ function loadMap() {
             htmlString = "";
             $.each(responseJson['objectMap'], function (objectKey, gridObject) {
 
-                var top = (hexSize * 3 / 2 * gridObject.yCoord);
-                var left = (hexSize * Math.sqrt(3) * (gridObject.xCoord + gridObject.yCoord / 2)) + (hexWidth);
+                var top = (gridCellWidth * gridObject.xCoord);
+                var left = (gridCellWidth * gridObject.yCoord);
 
                 $hexBody = "<div id=\"object" + i + "_" + "\" " + "class=\"gridObject\"";
-                //$hexBody += "src=\"" + $picUrlPath + gridObject.fileName + "\";";
-                $hexBody += " data-xCoord=\"" + gridObject.xCoord + "\"";
-                $hexBody += " data-yCoord=\"" + gridObject.yCoord + "\"";
+                $hexBody += " data-xcoord=\"" + gridObject.xCoord + "\"";
+                $hexBody += " data-ycoord=\"" + gridObject.yCoord + "\"";
+                $hexBody += " data-xattach=\"" + gridObject.xAttach + "\"";
+                $hexBody += " data-yattach=\"" + gridObject.yAttach + "\"";
                 $hexBody += " style=\"";
-                $hexBody += " top:" + top + 'px' + ";";
-                $hexBody += " left:" +  left + 'px' + ";";
-                $hexBody += "width: " + '100%' + ";";
-                $hexBody += " height:" + '100%' + ";";
-                //$hexBody += " margin-left:" + imgSize / -4 * scale + 'px' + ";";
-                //$hexBody += " margin-top:" + imgSize * -3 / 8 * scale + 'px' + ";";
-                $hexBody += " z-index:" + 10 + ";";
+                $hexBody += " top:" + top - gridObject.xAttach + 'px' + ";";
+                $hexBody += " left:" +  left + gridObject.xAttach + 'px' + ";";
+                $hexBody += " z-index:" + zOffset + gridObject.yCoord + ";";
                 $hexBody += " background-image:url(" + $picUrlPath + gridObject.fileName + ");";
                 $hexBody += "\">";
                 $hexBody += "</div>";
                 htmlString += $hexBody;
             });
 
-            $('#ground-layer').append(htmlString);
+            $('#object-layer').append(htmlString);
             scaleTiles();
         }
     });
@@ -326,18 +299,24 @@ function startDrag(e) {
     // IE uses srcElement, others use target
     var targ = e.target ? e.target : e.srcElement;
 
-    if (targ.className != 'hexBackground' && targ.className != 'groundLayerContainer' && targ.className != 'vp' && targ.className !=  'vpcontainer' && targ.className != 'gridObject') {return};
+    if (targ.className != 'gridBackground' &&
+        targ.className != 'grid' &&
+        targ.className != 'vp' &&
+        targ.className != 'vpcontainer' &&
+        targ.className != 'gridObject' &&
+        targ.className != 'gridLayer' &&
+        targ.className != 'objectLayer') {return};
     // calculate event X, Y coordinates
     offsetX = e.clientX;
     offsetY = e.clientY;
 
-    if(!groundLayer.style.left) { groundLayer.style.left='0px'};
-    if (!groundLayer.style.top) { groundLayer.style.top='0px'};
+    if(!grid.style.left) { grid.style.left='0px'};
+    if (!grid.style.top) { grid.style.top='0px'};
 
     // calculate integer values for top and left 
     // properties
-    coordX = parseInt(groundLayer.style.left);
-    coordY = parseInt(groundLayer.style.top);
+    coordX = parseInt(grid.style.left);
+    coordY = parseInt(grid.style.top);
     drag = true;
 
     // move div element
@@ -347,8 +326,8 @@ function dragDiv(e) {
     if (!drag) {return};
     if (!e) { var e= window.event};
     // move div element
-    groundLayer.style.left=coordX+e.clientX-offsetX+'px';
-    groundLayer.style.top=coordY+e.clientY-offsetY+'px';
+    grid.style.left=coordX+e.clientX-offsetX+'px';
+    grid.style.top=coordY+e.clientY-offsetY+'px';
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
@@ -356,8 +335,8 @@ function touchMoveDiv(e) {
     if (!drag) {return};
     if (!e) { var e= window.event};
     // move div element
-    groundLayer.style.left=coordX+e.touches[0].clientX-offsetX+'px';
-    groundLayer.style.top=coordY+e.touches[0].clientY-offsetY+'px';
+    grid.style.left=coordX+e.touches[0].clientX-offsetX+'px';
+    grid.style.top=coordY+e.touches[0].clientY-offsetY+'px';
     return false;
 }
 function zoomDiv(e) {
