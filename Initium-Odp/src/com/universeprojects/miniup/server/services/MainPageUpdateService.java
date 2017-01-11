@@ -3,7 +3,6 @@ package com.universeprojects.miniup.server.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -16,19 +15,19 @@ import com.universeprojects.miniup.server.WebUtils;
 
 public class MainPageUpdateService extends Service
 {
-	final private CachedEntity user;
-	final private CachedEntity character;
-	final private CachedEntity location;
-	final private OperationBase operation;
+	final protected CachedEntity user;
+	final protected CachedEntity character;
+	final protected CachedEntity location;
+	final protected OperationBase operation;
 
-	private CachedEntity group = null;
+	protected CachedEntity group = null;
 	
 	// Path related caches
 	boolean hasHiddenPaths = false;
-	private List<CachedEntity> discoveries = null;  // All the discoveries we have for this character and location.
-	private List<CachedEntity> paths = null;  // All the paths that we can currently see that are connected to the path we're location in.
-	private List<CachedEntity> destLocations = null;  // The location entities at the other end of the paths; on the side we're not on currently.
-	private List<Integer> pathEnds = null;  // 1 or 2. Since each path is 2 sided, this number indicates which side we are NOT on currently.
+	protected List<CachedEntity> discoveries = null;  // All the discoveries we have for this character and location.
+	protected List<CachedEntity> paths = null;  // All the paths that we can currently see that are connected to the path we're location in.
+	protected List<CachedEntity> destLocations = null;  // The location entities at the other end of the paths; on the side we're not on currently.
+	protected List<Integer> pathEnds = null;  // 1 or 2. Since each path is 2 sided, this number indicates which side we are NOT on currently.
 	
 	/**
 	 * 
@@ -44,7 +43,7 @@ public class MainPageUpdateService extends Service
 		this.location = location;
 	}
 
-	private String updateHtmlContents(String selector, String newHtml)
+	protected String updateHtmlContents(String selector, String newHtml)
 	{
 		if (operation!=null)
 			operation.updateHtmlContents(selector, newHtml);
@@ -62,7 +61,7 @@ public class MainPageUpdateService extends Service
 
 
 	private boolean isGroupLoaded = false;
-	private CachedEntity getGroup()
+	protected CachedEntity getGroup()
 	{
 		if (isGroupLoaded==false)
 		{
@@ -465,7 +464,7 @@ public class MainPageUpdateService extends Service
 		return updateButtonList(cs, false);
 	}
 	
-	private String updateButtonList_NormalMode()
+	protected String updateButtonList_NormalMode()
 	{
 		StringBuilder newHtml = new StringBuilder();
 
@@ -567,7 +566,7 @@ public class MainPageUpdateService extends Service
 
 			
 
-			if ("CombatSite".equals(location.getProperty("type")))
+			if ("CombatSite".equals(location.getProperty("type")) && "CombatSite".equals(destLocation.getProperty("type"))==false)
 			{
 				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 				newHtml.append("<br>");
@@ -619,7 +618,7 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#main-button-list", newHtml.toString());
 	}
 	
-	private String updateButtonList_CombatMode()
+	protected String updateButtonList_CombatMode()
 	{
 		StringBuilder newHtml = new StringBuilder();
 		

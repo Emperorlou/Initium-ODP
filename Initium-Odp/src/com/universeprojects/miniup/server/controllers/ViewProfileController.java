@@ -42,7 +42,7 @@ public class ViewProfileController extends PageController {
 	protected String processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		ODPDBAccess db = new ODPDBAccess(request);
+		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity user = db.getCurrentUser();
 		if(character == null)
