@@ -3269,3 +3269,9 @@ body
 	margin: 0 auto;
 	/*border: 1px solid black;*/
 }
+
+.gridObject {
+	position: absolute;
+	background-color: transparent;
+	background-size:100%;
+}
