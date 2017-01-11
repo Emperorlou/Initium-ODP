@@ -61,9 +61,9 @@ public class GridObject {
 	public String toString() {
 		return "{\"fileName\":\"" + this.fileName +
 				"\",\"xOffset\":" + this.xOffset +
-				"\",\"yOffset\":" + this.yOffset +
-				"\",\"xCoord\":" + this.xCoord +
-				"\",\"yCoord\":" + this.yCoord +
+				",\"yOffset\":" + this.yOffset +
+				",\"xCoord\":" + this.xCoord +
+				",\"yCoord\":" + this.yCoord +
 				"}";
 	}
 }
