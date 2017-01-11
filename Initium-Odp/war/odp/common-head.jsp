@@ -11,7 +11,7 @@
 	request.setAttribute("serverTime", serverTime);
 %>
     
-<meta charset="utf-8">    
+<meta charset="UTF-8">    
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/> 
 <!-- <meta name="viewport" content="minimum-scale=0.3, maximum-scale=1"/> -->
