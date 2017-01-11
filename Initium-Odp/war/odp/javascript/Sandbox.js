@@ -104,8 +104,8 @@ function scaleTiles() {
     currGridHeight = (hexEdge * 3 - 1) * hexSize;
     diffGridWidth = currGridWidth - prevGridWidth;
     diffGridHeight = currGridHeight - prevGridHeight;
-    groundLayer.style.height = currGridHeight;
-    groundLayer.style.width = currGridWidth;
+    groundLayer.style.height = currGridHeight + "px";
+    groundLayer.style.width = currGridWidth + "px";
 
     originX = groundLayer.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
     originY = groundLayer.offsetTop + viewport.offsetTop + viewportContainer.offsetTop - $(window).scrollTop();
@@ -141,8 +141,8 @@ function scaleTiles() {
     newX = groundLayer.offsetLeft + diffX;
     newY = groundLayer.offsetTop + diffY;
 
-    groundLayer.style.top = newY;
-    groundLayer.style.left = newX;
+    groundLayer.style.top = newY + "px";
+    groundLayer.style.left = newX + "px";
 
     // For debugging zoom
     //var c = document.getElementById("myCanvas");
@@ -218,10 +218,10 @@ function loadMap() {
 
     currGridWidth = hexDiag*hexWidth;
     currGridHeight = (hexEdge*3-1)*hexSize;
-    groundLayer.style.height = currGridHeight;
-    groundLayer.style.width = currGridWidth;
-    groundLayer.style.top = offsetY;
-    groundLayer.style.left = offsetX;
+    groundLayer.style.height = currGridHeight + "px";
+    groundLayer.style.width = currGridWidth + "px";
+    groundLayer.style.top = offsetY + "px";
+    groundLayer.style.left = offsetX + "px";
 
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
@@ -232,6 +232,10 @@ function loadMap() {
     var l = hexTiles.length;
     for (var i = 0; i < l; i++) {
         hexTiles[0].parentNode.removeChild(hexTiles[0]);
+    }
+    var l = objects.length;
+    for (var i = 0; i < l; i++) {
+        objects[0].parentNode.removeChild(objects[0]);
     }
 
     $.ajax({
