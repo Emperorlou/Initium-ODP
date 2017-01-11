@@ -233,6 +233,10 @@ function loadMap() {
     for (var i = 0; i < l; i++) {
         hexTiles[0].parentNode.removeChild(hexTiles[0]);
     }
+    var l = objects.length;
+    for (var i = 0; i < l; i++) {
+        objects[0].parentNode.removeChild(objects[0]);
+    }
 
     $.ajax({
         url: "SandboxServlet",
