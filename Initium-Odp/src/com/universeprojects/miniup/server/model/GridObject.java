@@ -1,20 +1,23 @@
 package com.universeprojects.miniup.server.model;
 
-
 public class GridObject {
-	
+
 	private String fileName;
 	private int xOffset;
 	private int yOffset;
 	private int xCoord;
 	private int yCoord;
+	private int xAttach;
+	private int yAttach;
 
-	public GridObject(String fileName, int xOffset, int yOffset, int xCoord, int yCoord) {
+	public GridObject(String fileName, int xOffset, int yOffset, int xCoord, int yCoord, int xAttach, int yAttach) {
 		this.fileName = fileName;
 		this.xOffset = xOffset;
 		this.yOffset = yOffset;
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
+		this.xAttach = xAttach;
+		this.yAttach = yAttach;
 	}
 
 	public String getFileName() {
@@ -56,7 +59,23 @@ public class GridObject {
 	public void setyCoord(int yCoord) {
 		this.yCoord = yCoord;
 	}
-	
+
+	public int getxAttach() {
+		return xAttach;
+	}
+
+	public void setxAttach(int xAttach) {
+		this.xAttach = xAttach;
+	}
+
+	public int getyAttach() {
+		return yAttach;
+	}
+
+	public void setyAttach(int yAttach) {
+		this.yAttach = yAttach;
+	}
+
 	@Override
 	public String toString() {
 		return "{\"fileName\":\"" + this.fileName +
@@ -64,6 +83,8 @@ public class GridObject {
 				",\"yOffset\":" + this.yOffset +
 				",\"xCoord\":" + this.xCoord +
 				",\"yCoord\":" + this.yCoord +
+				",\"xAttach\":" + this.xAttach +
+				",\"yAttach\":" + this.yAttach +
 				"}";
 	}
 }

@@ -3237,8 +3237,7 @@ body
 }
 
 /* Sandbox 2Dim testing */
-
-.hexagon {
+.gridCell {
 	position: absolute;
 	background-color: transparent;
 	/*border-left: solid 1px #333333;*/
@@ -3246,7 +3245,7 @@ body
 	background-size:100%;
 }
 
-.hexBackground {
+.gridBackground {
 	position: absolute;
 	background-color: transparent;
 	background-size:100%;
@@ -3265,9 +3264,18 @@ body
 	/*border: 1px solid black;*/
 }
 
-.groundLayerContainer {
-	margin: 0 auto;
-	/*border: 1px solid black;*/
+..groundLayer {
+	/*height: 100%;*/
+	/*width: 100%;*/
+	border: 1px solid black;
+	/*margin: 0 auto;*/
+}
+
+.objectLayer{
+	/*height: 100%;*/
+	/*width: 100%;*/
+	border: 1px solid black;
+	/*margin: 0 auto;*/
 }
 
 .gridObject {

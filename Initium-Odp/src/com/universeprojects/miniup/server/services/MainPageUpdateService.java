@@ -381,7 +381,10 @@ public class MainPageUpdateService extends Service
 			newHtml.append("<button id=\"somebutton\">press here</button>");
 			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
 			newHtml.append("<div id=\"viewport\" class=\"vp\">");
-			newHtml.append("<div id=\"ground-layer\" class=\"groundLayerContainer\"></div>");
+			newHtml.append("<div id=\"grid\" class=\"grid\">");
+			newHtml.append("<div id=\"ground-layer\" class=\"groundLayer\"></div>");
+			newHtml.append("<div id=\"object-layer\" class=\"objectLayer\"></div>");
+			newHtml.append("</div>");
 			newHtml.append("</div>");
 			newHtml.append("</div>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
