@@ -75,6 +75,12 @@ var previousA = null;
 
 function updateDayNightCycle(forceRefresh)
 {
+	// Determine if we're on a small screenc
+	var smallScreen = false;
+	var windowWidth = $(window).width();
+	if (windowWidth<=1024)
+		smallScreen = true;
+	
 	if (forceRefresh==true)
 	{
 		previousR = null;
@@ -174,7 +180,9 @@ function updateDayNightCycle(forceRefresh)
 		
 		if (lightning>0)
 		{
-			var bg=	"url('https://initium-resources.appspot.com/images/effects/hd-light-rain1.gif') no-repeat center center, ";
+			var rainGif = "hd-light-rain1.gif";
+			if (smallScreen) rainGif = "light-rain1.gif";
+			var bg=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 			bg+=	"rgba(230, 230, 230, "+lightning+")";
 			banner.css("background", bg);
@@ -231,8 +239,10 @@ function updateDayNightCycle(forceRefresh)
 		}
 		else if (rainStrength>0.65)
 		{
-			var bg=	"";
-			bg+="url('https://initium-resources.appspot.com/images/effects/hd-light-rain1.gif') no-repeat center center, ";
+			var rainGif = "hd-light-rain1.gif";
+			if (smallScreen) rainGif = "light-rain1.gif";
+
+			var bg=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
 			banner.css("background", bg);

@@ -273,7 +273,7 @@ ${longOperationRecallJs}
 	window.isPremium = ${isPremium};
 </script>
 <script type="text/javascript" src="./javascript/script.js"></script>
-<link rel="stylesheet" href="./MiniUP.css">
+<link rel="stylesheet" href="./MiniUP.css?v=1">
 
 
 <script type="text/javascript">

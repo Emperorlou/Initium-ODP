@@ -23,7 +23,7 @@ public class ConfirmRequirementsController extends PageController
 
 	public ConfirmRequirementsController()
 	{
-		super("ajax_confirmrequirements");
+		super("confirmrequirements");
 	}
 
 	@Override
@@ -47,6 +47,7 @@ public class ConfirmRequirementsController extends PageController
 		List<CachedEntity> entityRequirementOwners = new ArrayList<CachedEntity>();
 		List<List<CachedEntity>> candidatesForRequirement = new ArrayList<List<CachedEntity>>();
 		
+		@SuppressWarnings("unchecked")
 		List<CachedEntity> batchEntities = ds.get(entityRequirementKeys, entityRequirementOwnerKeys);
 		for(int i = 0; i<entityRequirementKeys.size(); i++)
 			entityRequirements.add(batchEntities.get(i));
@@ -64,6 +65,8 @@ public class ConfirmRequirementsController extends PageController
 				itemsAlreadyAdded.add(candidatesFor.get(0));
 		}
 	    
+		
+		
 		
 	    return "/WEB-INF/odppages/ajax_confirmrequirements.jsp";
 	}
