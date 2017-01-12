@@ -119,6 +119,8 @@ public class CommandTransmuteItems extends Command {
 						// put the item(s) in character's transmute box
 						resultItem.setProperty("containerKey", containerKey);
 						resultItem.setProperty("movedDate", new Date());
+						if(resultItem.getProperty("durability") != null)
+							resultItem.setProperty("maxDurability", resultItem.getProperty("durability"));
 						
 						ds.put(resultItem);
 						}
