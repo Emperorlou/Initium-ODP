@@ -110,7 +110,7 @@ public class GridObject {
 	@Override
 	public String toString() {
 		return "{\"key\":\"" + this.key +
-				"\",\"fileName\":" + this.fileName +
+				"\",\"fileName\":\"" + this.fileName +
 				"\",\"xGridCoord\":" + this.xGridCoord +
 				",\"yGridCoord\":" + this.yGridCoord +
 				",\"xGridCellOffset\":" + this.xGridCellOffset +
