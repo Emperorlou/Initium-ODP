@@ -1,18 +1,16 @@
 var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
 var grid = document.getElementById("grid");
+var gridCellLayer = document.getElementById("cell-layer");
 var objects = document.getElementsByClassName('gridObject');
 var scaleRate = Number($("#zoom").val());
-var hexEdge = Number($("#hexEdge").val());
 var scale = 1;
 var maxZoom = 2.4;
-var minZoom = .005;
+var minZoom = .05;
 var imgSize = 128;
 var treeWidth = 192;
 var treeHeight = 256;
 var reachedZoom = false;
-var gridWidth = Number($("#hexEdge").val());
-var gridHeight = gridWidth;
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 
 /**
@@ -112,23 +110,24 @@ function pressedButton() {
 
 function scaleTiles() {
 
-    var gridTileWidth = Number($("#hexEdge").val());
+    var gridTileWidth = Number($("#gridWidth").val());
+    var gridTileHeight = Number($("#gridHeight").val());
     var forestry = Number($("#forestry").val());
     var gridCellWidth = 64 * scale;
     var totalGridWidth = gridTileWidth * gridCellWidth;
-
+    var totalGridHeight = gridTileHeight * gridCellWidth;
 
     prevGridWidth = grid.offsetWidth;
     prevGridHeight = grid.offsetHeight;
     currGridWidth = totalGridWidth;
-    currGridHeight = totalGridWidth;
+    currGridHeight = totalGridHeight;
     diffGridWidth = totalGridWidth - prevGridWidth;
     diffGridHeight = totalGridWidth - prevGridHeight;
     grid.style.height = currGridHeight + "px";
     grid.style.width = currGridWidth + "px";
 
     originX = grid.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
-    originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop - $(window).scrollTop();
+    originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop + gridCellLayer.offsetTop - $(window).scrollTop();
     dx = Math.abs(event.clientX - originX);
     dy = Math.abs(event.clientY - originY);
     widthRatio = currGridWidth / prevGridWidth;
@@ -173,8 +172,8 @@ function scaleTiles() {
     //ctx.stroke();
 
     // Update all tiles
-    for (var y = 0; y < gridWidth; y++) {
-        for (var x = 0; x < gridHeight; x++) {
+    for (var x = 0; x < gridTileWidth; x++) {
+        for (var y = 0; y < gridTileHeight; y++) {
 
             // Update all grid cells, and background images
             var scaledImgSize = imgSize * scale;
@@ -196,8 +195,8 @@ function scaleTiles() {
             if (gridCells[x][y].objectKeys.length > 0) {
                 for (var keyIndex = 0; keyIndex < gridCells[x][y].objectKeys.length; keyIndex++) {
                     var currKey = gridCells[x][y].objectKeys[keyIndex];
-                    var top = gridObjects[currKey].yCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].yAttach * scale) - (gridObjects[currKey].yOffset * scale);
-                    var left = gridObjects[currKey].xCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].xAttach * scale) - (gridObjects[currKey].xOffset * scale);
+                    var top = gridObjects[currKey].yGridCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].yImageOrigin * scale) - (gridObjects[currKey].yGridCellOffset * scale);
+                    var left = gridObjects[currKey].xGridCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].xImageOrigin * scale) - (gridObjects[currKey].xGridCellOffset * scale);
 
                     gridObjects[currKey].div.style.width = treeWidth * scale + "px";
                     gridObjects[currKey].div.style.height = treeHeight * scale + "px";
@@ -213,11 +212,12 @@ function scaleTiles() {
 function loadMap() {
 
     var displayGridLines = document.getElementById('displayGridLines').checked;
-    var gridTileWidth = Number($("#hexEdge").val());
+    var gridTileWidth = Number($("#gridWidth").val());
+    var gridTileHeight = Number($("#gridHeight").val());
     var forestry = Number($("#forestry").val());
     var imgSize = 128 * scale;
     var gridCellWidth = 64 * scale;
-    var totalGridWidth = gridTileWidth * gridCellWidth;
+    var totalGridWidth = gridTileWidth * gridTileHeight;
     var offsetX = viewportContainer.offsetWidth/2-(totalGridWidth/2);
     var offsetY = viewportContainer.offsetHeight/2-(totalGridWidth/2);
     var groundHtml = "";
@@ -226,8 +226,8 @@ function loadMap() {
 
     grid.style.height = totalGridWidth + "px";
     grid.style.width = totalGridWidth + "px";
-    grid.style.top = offsetY + "px";
-    grid.style.left = offsetX + "px";
+    //grid.style.top = offsetY + "px";
+    //grid.style.left = offsetX + "px";
 
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
@@ -240,7 +240,7 @@ function loadMap() {
 
     $.ajax({
         url: "SandboxServlet",
-        data:{width:hexEdge, seed:$("#seed").val(), forestry:forestry},
+        data:{width:gridTileWidth, height:gridTileHeight, seed:$("#seed").val(), forestry:forestry},
         type: 'POST',
         success: function(responseJson) {
             $.each(responseJson['backgroundTiles'], function (index, value) {
@@ -250,8 +250,6 @@ function loadMap() {
                         "",
                         "",
                         backgroundObject.zIndex,
-                        innerIndex,
-                        index,
                         []
                     );
 
@@ -303,25 +301,25 @@ function loadMap() {
             htmlString = "";
             $.each(responseJson['objectMap'], function (objectKey, gridObject) {
 
-                var top = (gridObject.yCoord+1) * treeHeight - (gridObject.yAttach) - (gridObject.yOffset);
-                var left = (gridObject.xCoord+1) * gridCellWidth - (gridObject.xAttach * scale) - (gridObject.xOffset * scale);
+                var top = (gridObject.yGridCoord+1) * treeHeight - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset);
+                var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
 
                 var cgridObject = new GridObject(
                     "",
-                    gridObject.xOffset,
-                    gridObject.yOffset,
-                    gridObject.xCoord,
-                    gridObject.yCoord,
-                    gridObject.xAttach,
-                    gridObject.yAttach,
+                    gridObject.xGridCellOffset,
+                    gridObject.yGridCellOffset,
+                    gridObject.xGridCoord,
+                    gridObject.yGridCoord,
+                    gridObject.xImageOrigin,
+                    gridObject.yImageOrigin,
                     gridObject.width,
                     gridObject.height);
-                var key = gridObject.xCoord + "-" + gridObject.yCoord;
+                var key = gridObject.xGridCoord + "-" + gridObject.yGridCoord;
                 gridObjects[key] = cgridObject;
-                var gridCell = gridCells[gridObject.xCoord][gridObject.yCoord];
+                var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
                 gridCell.objectKeys[gridCell.objectKeys.length] = key;
 
-                $hexBody = "<div id=\"object" + gridObject.xCoord + "_" + gridObject.yCoord + "\" " + "class=\"gridObject\"";
+                $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
                 $hexBody += " data-key=\"" + key + "\"";
                 $hexBody += " style=\"";
                 $hexBody += " z-index:" + zOffset + (Number(top)) + ";";
@@ -426,14 +424,14 @@ function GridCell(backgroundDiv, cellDiv, zindex, objectKeys) {
     this.objectKeys = objectKeys;
 }
 
-function GridObject(div, xOffset, yOffset, xCoord, yCoord, xAttach, yAttach, width, height) {
+function GridObject(div, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
     this.div = div;
-    this.xOffset = xOffset;
-    this.yOffset = yOffset;
-    this.xCoord = xCoord;
-    this.yCoord = yCoord;
-    this.xAttach = xAttach;
-    this.yAttach = yAttach;
+    this.xGridCellOffset = xGridCellOffset;
+    this.yGridCellOffset = yGridCellOffset;
+    this.xGridCoord = xGridCoord;
+    this.yGridCoord = yGridCoord;
+    this.xImageOrigin = xImageOrigin;
+    this.yImageOrigin = yImageOrigin;
     this.width = width;
     this.height = height;
 };

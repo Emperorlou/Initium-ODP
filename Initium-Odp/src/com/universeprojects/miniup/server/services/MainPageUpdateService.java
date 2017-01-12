@@ -374,7 +374,8 @@ public class MainPageUpdateService extends Service
 			
 			StringBuilder newHtml = new StringBuilder();
 			
-			newHtml.append("Hex Edge: <input type='text' id='hexEdge' value=20 />");
+			newHtml.append("Width: <input type='text' id='gridWidth' value=20 />");
+			newHtml.append("Height: <input type='text' id='gridHeight' value=20 />");
 			newHtml.append("Zoom Rate: <input type='text' id='zoom' value=.075 />");
 			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
 			newHtml.append("Forestry (0-10): <input type='text' id='forestry' value=2 />");
