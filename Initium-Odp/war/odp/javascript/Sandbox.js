@@ -178,8 +178,8 @@ function scaleTiles() {
 
             // Update all grid cells, and background images
             var scaledImgSize = imgSize * scale;
-            var top = gridCells[x][y].yCoord * gridCellWidth;
-            var left = gridCells[x][y].xCoord * gridCellWidth;
+            var top = y * gridCellWidth;
+            var left = x * gridCellWidth;
 
             gridCells[x][y].cellDiv.style.width = gridCellWidth + "px";
             gridCells[x][y].cellDiv.style.height = gridCellWidth + "px";
@@ -419,12 +419,10 @@ function stopDrag() {
     drag=false;
 }
 
-function GridCell(backgroundDiv, cellDiv, zindex, xCoord, yCoord, objectKeys) {
+function GridCell(backgroundDiv, cellDiv, zindex, objectKeys) {
     this.backgroundDiv = backgroundDiv;
     this.cellDiv = cellDiv;
     this.zIndex = zindex;
-    this.xCoord = xCoord;
-    this.yCoord = yCoord;
     this.objectKeys = objectKeys;
 }
 
