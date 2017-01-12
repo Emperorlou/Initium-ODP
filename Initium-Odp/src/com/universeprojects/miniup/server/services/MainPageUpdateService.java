@@ -376,7 +376,7 @@ public class MainPageUpdateService extends Service
 			
 			newHtml.append("Width: <input type='text' id='gridWidth' value=20 />");
 			newHtml.append("Height: <input type='text' id='gridHeight' value=20 />");
-			newHtml.append("Zoom Rate: <input type='text' id='zoom' value=.075 />");
+			newHtml.append("Zoom Rate: <input type='text' id='zoom' value=.3 />");
 			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
 			newHtml.append("Forestry (0-10): <input type='text' id='forestry' value=2 />");
 			newHtml.append("Grid Lines: <input type=\"checkbox\" id=\"displayGridLines\">");

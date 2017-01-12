@@ -26,52 +26,6 @@ var gridObjects = {};
  */
 var gridCells = [];
 
-
-window.onload = function() {
-    document.onmousedown = startDrag;
-    document.onmouseup = stopDrag;
-    //document.ontouchend = stopDrag;
-    //document.ontouchstart = startDrag;
-    document.body.addEventListener('touchend', stopDrag);
-    document.body.addEventListener('touchmove', touchMoveDiv);
-    document.body.addEventListener('touchstart', function (e) {
-
-        if (e.touches.length == 1) {
-            var targ = e.target ? e.target : e.srcElement;
-            if (targ.className != 'gridBackground' && targ.className != 'grid' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
-            e.preventDefault();
-
-            // calculate event X, Y coordinates
-            offsetX = e.touches[0].clientX;
-            offsetY = e.touches[0].clientY;
-
-            if(!grid.style.left) { grid.style.left='0px'};
-            if (!grid.style.top) { grid.style.top='0px'};
-            coordX = parseInt(grid.style.left);
-            coordY = parseInt(grid.style.top);
-
-            if(!grid.style.left) { grid.style.left='0px'};
-            if (!grid.style.top) { grid.style.top='0px'};
-
-            drag = true;
-            document.ontouchmove=dragDiv;
-        } else if (e.touches.length == 2) { // If two fingers are touching
-            var targ = e.target ? e.target : e.srcElement;
-            if (targ.className != 'gridBackground' && targ.className != 'grid' && targ.className != 'vp' && targ.className !=  'vpcontainer') {return};
-            e.preventDefault();
-
-            // calculate event X, Y coordinates
-            offsetX1 = e.touches[0].clientX;
-            offsetY1 = e.touches[0].clientY;
-            offsetX2 = e.touches[1].clientX;
-            offsetY2 = e.touches[1].clientY;
-
-            zoom = true;
-            document.ontouchmove=zoomDiv;
-        }
-    });
-}
-
 $(document).ready(function () {
     loadMap();
 });
@@ -339,6 +293,65 @@ function loadMap() {
             }
             // Update scale/zoom of all elements
             scaleTiles();
+        }
+    });
+}
+
+window.onload = function() {
+    document.onmousedown = startDrag;
+    document.onmouseup = stopDrag;
+    //document.ontouchend = stopDrag;
+    //document.ontouchstart = startDrag;
+    document.body.addEventListener('touchend', stopDrag);
+    document.body.addEventListener('touchmove', touchMoveDiv);
+    document.body.addEventListener('touchstart', function (e) {
+
+        if (e.touches.length == 1) {
+            var targ = e.target ? e.target : e.srcElement;
+            if (targ.className != 'gridBackground' &&
+                targ.className != 'grid' &&
+                targ.className != 'gridCell' &&
+                targ.className != 'vp' &&
+                targ.className != 'vpcontainer' &&
+                targ.className != 'gridObject' &&
+                targ.className != 'gridLayer' &&
+                targ.className != 'objectLayer') {return};
+            e.preventDefault();
+
+            // calculate event X, Y coordinates
+            offsetX = e.touches[0].clientX;
+            offsetY = e.touches[0].clientY;
+
+            if(!grid.style.left) { grid.style.left='0px'};
+            if (!grid.style.top) { grid.style.top='0px'};
+            coordX = parseInt(grid.style.left);
+            coordY = parseInt(grid.style.top);
+
+            if(!grid.style.left) { grid.style.left='0px'};
+            if (!grid.style.top) { grid.style.top='0px'};
+
+            drag = true;
+            document.ontouchmove=touchMoveDiv;
+        } else if (e.touches.length == 2) { // If two fingers are touching
+            var targ = e.target ? e.target : e.srcElement;
+            if (targ.className != 'gridBackground' &&
+                targ.className != 'grid' &&
+                targ.className != 'gridCell' &&
+                targ.className != 'vp' &&
+                targ.className != 'vpcontainer' &&
+                targ.className != 'gridObject' &&
+                targ.className != 'gridLayer' &&
+                targ.className != 'objectLayer') {return};
+            e.preventDefault();
+
+            // calculate event X, Y coordinates
+            offsetX1 = e.touches[0].clientX;
+            offsetY1 = e.touches[0].clientY;
+            offsetX2 = e.touches[1].clientX;
+            offsetY2 = e.touches[1].clientY;
+
+            zoom = true;
+            document.ontouchmove=zoomDiv;
         }
     });
 }
