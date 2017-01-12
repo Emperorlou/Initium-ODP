@@ -1,19 +1,33 @@
-var scale = 1;
 var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
-//var groundLayer = document.getElementById("ground-layer");
 var grid = document.getElementById("grid");
-var hexTiles = document.getElementsByClassName('gridCell');
 var objects = document.getElementsByClassName('gridObject');
-var maxZoom = 2.4;
-var minZoom = .05;
 var scaleRate = Number($("#zoom").val());
-var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 var hexEdge = Number($("#hexEdge").val());
-var reachedZoom = false;
+var scale = 1;
+var maxZoom = 2.4;
+var minZoom = .005;
 var imgSize = 128;
 var treeWidth = 192;
 var treeHeight = 256;
+var reachedZoom = false;
+var gridWidth = Number($("#hexEdge").val());
+var gridHeight = gridWidth;
+var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
+
+/**
+ * Grid Objects is a HashMap of all objects in the grid
+ * key
+ * value: GridObject
+ * @type {{}}
+ */
+var gridObjects = {};
+/**
+ * gridCells is a 2D array of GridCells corresponding to the grid
+ * @type {Array}
+ */
+var gridCells = [];
+
 
 window.onload = function() {
     document.onmousedown = startDrag;
@@ -68,20 +82,28 @@ $('#viewportcontainer').on({
     'mousewheel': function (e) {
         e.preventDefault();
         if (e.originalEvent.deltaY < 0) {
-            scale += scaleRate;
-            if (maxZoom !== null && scale > maxZoom) {
-                scale = maxZoom;
-            }
+            zoomOut();
         } else {
-            scale -= scaleRate;
-            if (minZoom !== null && scale < minZoom) {
-                scale = minZoom;
-            }
+            zoomIn();
         }
         scaleTiles();
         $('html, body').stop().animate({}, 500, 'linear');
     }
 });
+
+function zoomOut() {
+    scale += scaleRate*scale;
+    if (maxZoom !== null && scale > maxZoom) {
+        scale = maxZoom;
+    }
+}
+
+function zoomIn() {
+    scale -= scaleRate*scale;
+    if (minZoom !== null && scale < minZoom) {
+        scale = minZoom;
+    }
+}
 
 function pressedButton() {
     scaleRate = Number($("#zoom").val());
@@ -151,57 +173,55 @@ function scaleTiles() {
     //ctx.stroke();
 
     // Update all tiles
-    var l = hexTiles.length;
-    for (var index = 0; index < l; index++) {
+    for (var y = 0; y < gridWidth; y++) {
+        for (var x = 0; x < gridHeight; x++) {
 
-        var top = hexTiles[index].dataset.ycoord * gridCellWidth;
-        var left = hexTiles[index].dataset.xcoord * gridCellWidth;
+            // Update all grid cells, and background images
+            var scaledImgSize = imgSize * scale;
+            var top = gridCells[x][y].yCoord * gridCellWidth;
+            var left = gridCells[x][y].xCoord * gridCellWidth;
 
-        hexTiles[index].style.width = gridCellWidth + "px";
-        hexTiles[index].style.height = gridCellWidth + "px";
-        hexTiles[index].style.margin = (gridCellWidth / 2) + "px";
-        hexTiles[index].style.top = top + "px";
-        hexTiles[index].style.left = left + "px";
+            gridCells[x][y].cellDiv.style.width = gridCellWidth + "px";
+            gridCells[x][y].cellDiv.style.height = gridCellWidth + "px";
+            gridCells[x][y].cellDiv.style.margin = (gridCellWidth / 2) + "px";
+            gridCells[x][y].cellDiv.style.top = top + "px";
+            gridCells[x][y].cellDiv.style.left = left + "px";
 
-        //var child = hexTiles[index].children[0];
-        for (var i = 0, len = hexTiles[index].children.length; i < len; i++) {
-            scaleChildTiles(hexTiles[index].children[i]);
+            gridCells[x][y].backgroundDiv.style.width = scaledImgSize + "px";
+            gridCells[x][y].backgroundDiv.style.height = scaledImgSize + "px";
+            gridCells[x][y].backgroundDiv.style.top = top + "px";
+            gridCells[x][y].backgroundDiv.style.left = left + "px";
+
+            // Update all objects
+            if (gridCells[x][y].objectKeys.length > 0) {
+                for (var keyIndex = 0; keyIndex < gridCells[x][y].objectKeys.length; keyIndex++) {
+                    var currKey = gridCells[x][y].objectKeys[keyIndex];
+                    var top = gridObjects[currKey].yCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].yAttach * scale) - (gridObjects[currKey].yOffset * scale);
+                    var left = gridObjects[currKey].xCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].xAttach * scale) - (gridObjects[currKey].xOffset * scale);
+
+                    gridObjects[currKey].div.style.width = treeWidth * scale + "px";
+                    gridObjects[currKey].div.style.height = treeHeight * scale + "px";
+                    gridObjects[currKey].div.style.margin = (gridCellWidth / 2) + "px";
+                    gridObjects[currKey].div.style.top = top + "px";
+                    gridObjects[currKey].div.style.left = left + "px";
+                }
+            }
         }
     }
-
-    // Update all objects
-    var l = objects.length;
-    for (var index = 0; index < l; index++) {
-
-        var top = objects[index].dataset.ycoord * gridCellWidth - (objects[index].dataset.yattach * scale);
-        var left = objects[index].dataset.xcoord * gridCellWidth - (objects[index].dataset.xattach * scale);
-
-        objects[index].style.width = treeWidth * scale + "px";
-        objects[index].style.height = treeHeight * scale + "px";
-        objects[index].style.margin = (gridCellWidth / 2) + "px";
-        objects[index].style.top = top + "px";
-        objects[index].style.left = left + "px";
-    }
-}
-
-function scaleChildTiles(child) {
-    var scaledImgSize = imgSize * scale;
-    child.style.width = scaledImgSize + 'px';
-    child.style.height = scaledImgSize + 'px';
-    child.style.top = scaledImgSize / -2 + 'px';
-    child.style.left = scaledImgSize / -2 + 'px';
 }
 
 function loadMap() {
 
+    var displayGridLines = document.getElementById('displayGridLines').checked;
     var gridTileWidth = Number($("#hexEdge").val());
     var forestry = Number($("#forestry").val());
     var imgSize = 128 * scale;
     var gridCellWidth = 64 * scale;
     var totalGridWidth = gridTileWidth * gridCellWidth;
     var offsetX = viewportContainer.offsetWidth/2-(totalGridWidth/2);
-    var offsetY = totalGridWidth/2;
-    var htmlString = "";
+    var offsetY = viewportContainer.offsetHeight/2-(totalGridWidth/2);
+    var groundHtml = "";
+    var cellHtml = "";
     var zOffset = 10;
 
     grid.style.height = totalGridWidth + "px";
@@ -213,15 +233,10 @@ function loadMap() {
     viewport.style.position = "absolute";
     grid.style.position = "relative";
 
-    // Remove all current tiles
-    var l = hexTiles.length;
-    for (var i = 0; i < l; i++) {
-        hexTiles[0].parentNode.removeChild(hexTiles[0]);
-    }
-    var l = objects.length;
-    for (var i = 0; i < l; i++) {
-        objects[0].parentNode.removeChild(objects[0]);
-    }
+    // Remove all current grid tiles
+    jQuery('#cell-layer').html('');
+    jQuery('#ground-layer').html('');
+    jQuery('#object-layer').html('');
 
     $.ajax({
         url: "SandboxServlet",
@@ -229,63 +244,102 @@ function loadMap() {
         type: 'POST',
         success: function(responseJson) {
             $.each(responseJson['backgroundTiles'], function (index, value) {
-                $.each(value, function (innerIndex, innerValue) {
+                $.each(value, function (innerIndex, backgroundObject) {
 
-                    var top = (gridCellWidth * index);
-                    var left = (gridCellWidth * innerIndex);
+                    var gridCell = new GridCell(
+                        "",
+                        "",
+                        backgroundObject.zIndex,
+                        innerIndex,
+                        index,
+                        []
+                    );
+
+                    var key = index + "-" + innerIndex;
+                    if (innerIndex == 0) {
+                        gridCells[index] = [];
+                    }
+                    gridCells[index][innerIndex] = gridCell;
+
+                    $hexBody = "<div id=\"hex" + key + "Back\"";
+                    $hexBody += " class=\"gridBackground\"";
+                    $hexBody += " data-xCoord=\"" + index + "\"";
+                    $hexBody += " data-yCoord=\"" + innerIndex + "\"";
+                    $hexBody += " style=\"";
+                    $hexBody += " z-index:" + backgroundObject.zIndex + ";";
+                    $hexBody += " background-image:url(" + $picUrlPath + backgroundObject.backgroundFile + ");";
+                    $hexBody += "\">";
+                    $hexBody += "</div>";
+                    cellHtml += $hexBody;
 
                     $hexBody = "<div";
-                    $hexBody += " id=\"hex" + index + "_" + innerIndex + "\"";
+                    $hexBody += " id=\"hex" + key + "\"";
                     $hexBody += " class=\"gridCell\"";
-                    $hexBody += " data-xcoord=\"" + innerIndex + "\"";
-                    $hexBody += " data-ycoord=\"" + index + "\"";
+                    $hexBody += " data-key=\"" + key + "\"";
                     $hexBody += " style=\"";
-                    $hexBody += "width: " + gridCellWidth + 'px' + ";";
-                    $hexBody += " height:" + gridCellWidth + 'px' + ";";
-                    $hexBody += " top:" + top + 'px' + ";";
-                    $hexBody += " left:" +  left + 'px' + ";";
-                    $hexBody += "\">";
-
-                    $hexBody += "<div id=\"hex" + i + "Back\" " + "class=\"gridBackground\"";
-                    $hexBody += " style=\"";
-                    $hexBody += "width: " + imgSize + 'px' + ";";
-                    $hexBody += " height:" + imgSize + 'px' + ";";
-                    $hexBody += " top:" + imgSize/ -2 + 'px' + ";";
-                    $hexBody += " left:" +  imgSize / -2 + 'px' + ";";
-                    $hexBody += " z-index:" + innerValue.zIndex + ";";
-                    $hexBody += " background-image:url(" + $picUrlPath + innerValue.backgroundFile + ");";
+                    if (displayGridLines) {
+                        $hexBody += " border: 1px solid black;";
+                    }
+                    $hexBody += " z-index: 11;";
                     $hexBody += "\">";
                     $hexBody += "</div>";
-                    $hexBody += "</div>";
 
-                    htmlString += $hexBody;
+                    groundHtml += $hexBody;
                 });
             });
 
-            $('#ground-layer').append(htmlString);
+            // Append HTML
+            $('#ground-layer').append(groundHtml);
+            $('#cell-layer').append(cellHtml);
+            // Gather DOM elements
+            var gridCellElements = document.getElementsByClassName('gridCell');
+            var gridBackgroundElements = document.getElementsByClassName('gridBackground');
+            // Attach elements to gridBackground structure
+            for (var i = 0; i < gridBackgroundElements.length; i++) {
+                gridCells[gridBackgroundElements[i].dataset.xcoord][gridBackgroundElements[i].dataset.ycoord].backgroundDiv = gridBackgroundElements[i];
+                gridCells[gridBackgroundElements[i].dataset.xcoord][gridBackgroundElements[i].dataset.ycoord].cellDiv = gridCellElements[i];
+            }
 
             htmlString = "";
             $.each(responseJson['objectMap'], function (objectKey, gridObject) {
 
-                var top = (gridCellWidth * gridObject.xCoord);
-                var left = (gridCellWidth * gridObject.yCoord);
+                var top = (gridObject.yCoord+1) * treeHeight - (gridObject.yAttach) - (gridObject.yOffset);
+                var left = (gridObject.xCoord+1) * gridCellWidth - (gridObject.xAttach * scale) - (gridObject.xOffset * scale);
 
-                $hexBody = "<div id=\"object" + i + "_" + "\" " + "class=\"gridObject\"";
-                $hexBody += " data-xcoord=\"" + gridObject.xCoord + "\"";
-                $hexBody += " data-ycoord=\"" + gridObject.yCoord + "\"";
-                $hexBody += " data-xattach=\"" + gridObject.xAttach + "\"";
-                $hexBody += " data-yattach=\"" + gridObject.yAttach + "\"";
+                var cgridObject = new GridObject(
+                    "",
+                    gridObject.xOffset,
+                    gridObject.yOffset,
+                    gridObject.xCoord,
+                    gridObject.yCoord,
+                    gridObject.xAttach,
+                    gridObject.yAttach,
+                    gridObject.width,
+                    gridObject.height);
+                var key = gridObject.xCoord + "-" + gridObject.yCoord;
+                gridObjects[key] = cgridObject;
+                var gridCell = gridCells[gridObject.xCoord][gridObject.yCoord];
+                gridCell.objectKeys[gridCell.objectKeys.length] = key;
+
+                $hexBody = "<div id=\"object" + gridObject.xCoord + "_" + gridObject.yCoord + "\" " + "class=\"gridObject\"";
+                $hexBody += " data-key=\"" + key + "\"";
                 $hexBody += " style=\"";
-                $hexBody += " top:" + top - gridObject.xAttach + 'px' + ";";
-                $hexBody += " left:" +  left + gridObject.xAttach + 'px' + ";";
-                $hexBody += " z-index:" + zOffset + gridObject.yCoord + ";";
+                $hexBody += " z-index:" + zOffset + (Number(top)) + ";";
                 $hexBody += " background-image:url(" + $picUrlPath + gridObject.fileName + ");";
                 $hexBody += "\">";
                 $hexBody += "</div>";
                 htmlString += $hexBody;
             });
 
+            // Append HTML
             $('#object-layer').append(htmlString);
+            // Gather DOM elements
+            var gridObjectElements = document.getElementsByClassName('gridObject');
+            // Attach elements to gridObject structure
+            for (var i = 0; i < gridObjectElements.length; i++) {
+                gridObjects[objects[i].dataset.key].div = gridObjectElements[i];
+            }
+            // Update scale/zoom of all elements
             scaleTiles();
         }
     });
@@ -301,6 +355,7 @@ function startDrag(e) {
 
     if (targ.className != 'gridBackground' &&
         targ.className != 'grid' &&
+        targ.className != 'gridCell' &&
         targ.className != 'vp' &&
         targ.className != 'vpcontainer' &&
         targ.className != 'gridObject' &&
@@ -352,15 +407,9 @@ function zoomDiv(e) {
     d1 = Math.sqrt( Math.pow((offsetX2 - offsetX1),2) + Math.pow((offsetY2 - offsetY1),2));
     d2 = Math.sqrt( Math.pow((coffsetX2 - coffsetX1),2) + Math.pow((coffsetY2 - coffsetY1),2));
     if (d1 < d2) {
-        scale += scaleRate;
-        if (maxZoom !== null && scale > maxZoom) {
-            scale = maxZoom;
-        }
+        zoomIn();
     } else {
-        scale -= scaleRate;
-        if (minZoom !== null && scale < minZoom) {
-            scale = minZoom;
-        }
+        zoomOut();
     }
     scaleTiles();
     $('html, body').stop().animate({}, 500, 'linear');
@@ -369,3 +418,24 @@ function zoomDiv(e) {
 function stopDrag() {
     drag=false;
 }
+
+function GridCell(backgroundDiv, cellDiv, zindex, xCoord, yCoord, objectKeys) {
+    this.backgroundDiv = backgroundDiv;
+    this.cellDiv = cellDiv;
+    this.zIndex = zindex;
+    this.xCoord = xCoord;
+    this.yCoord = yCoord;
+    this.objectKeys = objectKeys;
+}
+
+function GridObject(div, xOffset, yOffset, xCoord, yCoord, xAttach, yAttach, width, height) {
+    this.div = div;
+    this.xOffset = xOffset;
+    this.yOffset = yOffset;
+    this.xCoord = xCoord;
+    this.yCoord = yCoord;
+    this.xAttach = xAttach;
+    this.yAttach = yAttach;
+    this.width = width;
+    this.height = height;
+};

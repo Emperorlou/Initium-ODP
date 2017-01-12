@@ -9,8 +9,10 @@ public class GridObject {
 	private int yCoord;
 	private int xAttach;
 	private int yAttach;
+	private int width;
+	private int height;
 
-	public GridObject(String fileName, int xOffset, int yOffset, int xCoord, int yCoord, int xAttach, int yAttach) {
+	public GridObject(String fileName, int xOffset, int yOffset, int xCoord, int yCoord, int xAttach, int yAttach, int width, int height) {
 		this.fileName = fileName;
 		this.xOffset = xOffset;
 		this.yOffset = yOffset;
@@ -18,6 +20,8 @@ public class GridObject {
 		this.yCoord = yCoord;
 		this.xAttach = xAttach;
 		this.yAttach = yAttach;
+		this.width = width;
+		this.height = height;
 	}
 
 	public String getFileName() {
@@ -76,6 +80,22 @@ public class GridObject {
 		this.yAttach = yAttach;
 	}
 
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
 	@Override
 	public String toString() {
 		return "{\"fileName\":\"" + this.fileName +
@@ -85,6 +105,9 @@ public class GridObject {
 				",\"yCoord\":" + this.yCoord +
 				",\"xAttach\":" + this.xAttach +
 				",\"yAttach\":" + this.yAttach +
+				",\"width\":" + this.width +
+				",\"height\":" + this.height +
 				"}";
 	}
 }
+

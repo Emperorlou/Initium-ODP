@@ -378,10 +378,12 @@ public class MainPageUpdateService extends Service
 			newHtml.append("Zoom Rate: <input type='text' id='zoom' value=.075 />");
 			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
 			newHtml.append("Forestry (0-10): <input type='text' id='forestry' value=2 />");
-			newHtml.append("<button id=\"somebutton\">press here</button>");
+			newHtml.append("Grid Lines: <input type=\"checkbox\" id=\"displayGridLines\">");
+			newHtml.append("<button id=\"somebutton\">Update</button>");
 			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
 			newHtml.append("<div id=\"viewport\" class=\"vp\">");
 			newHtml.append("<div id=\"grid\" class=\"grid\">");
+			newHtml.append("<div id=\"cell-layer\" class=\"cellLayer\"></div>");
 			newHtml.append("<div id=\"ground-layer\" class=\"groundLayer\"></div>");
 			newHtml.append("<div id=\"object-layer\" class=\"objectLayer\"></div>");
 			newHtml.append("</div>");

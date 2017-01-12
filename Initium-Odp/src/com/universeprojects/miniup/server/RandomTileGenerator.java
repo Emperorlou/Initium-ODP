@@ -36,9 +36,9 @@ public class RandomTileGenerator {
                 if (noiseResult < ((forestry/5.0) - 1)) {
                     objectMap.put("tempKey:" + i + "-" + j, new GridObject(
                             "tree1.png",
-                            new Random(seed * (i*j+ i*11 + j)).nextInt(60)*2 - 1,
-                            new Random(seed * (i*j+ i*10 + j)).nextInt(60)*2 - 1,
-                            j, i, 192/2, ((256)-20)));
+                            new Random(seed * (i*j+ i*11 + j)).nextInt(20),
+                            new Random(seed * (i*j+ i*10 + j)).nextInt(20),
+                            j, i, 192/2, ((256)-20), 192, 256));
                 }
                 row.add(new GridBackground("tile-grass" + (new Random(seed * (i*j+ i*10 + j)).nextInt(7)) + ".png",
                         (new Random(seed * (i*10 + j)).nextInt(10)))
