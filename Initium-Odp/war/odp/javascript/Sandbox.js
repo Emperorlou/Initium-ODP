@@ -83,19 +83,21 @@ function scaleTiles() {
     originX = grid.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
     originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop + gridCellLayer.offsetTop - $(window).scrollTop();
 
-    var userLocX;
-    var userLocY;
-    if (event.clientX) {
-        userLocX = event.clientX;
-        userLocY = event.clientY;
-    } else {
-        offsetX1 = e.touches[0].clientX;
-        offsetY1 = e.touches[0].clientY;
-        offsetX2 = e.touches[1].clientX;
-        offsetY2 = e.touches[1].clientY;
+    var userLocX = 0;
+    var userLocY = 0;
+    if (event) {
+        if (event.clientX) {
+            userLocX = event.clientX;
+            userLocY = event.clientY;
+        } else if (event.touches) {
+            offsetX1 = e.touches[0].clientX;
+            offsetY1 = e.touches[0].clientY;
+            offsetX2 = e.touches[1].clientX;
+            offsetY2 = e.touches[1].clientY;
 
-        userLocX = (offsetX2 + offsetX1)/2;
-        userLocY = (offsetY2 + offsetY1)/2;
+            userLocX = (offsetX2 + offsetX1) / 2;
+            userLocY = (offsetY2 + offsetY1) / 2;
+        }
     }
 
     dx = Math.abs(userLocX - originX);
