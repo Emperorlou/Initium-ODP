@@ -14,13 +14,11 @@ import java.util.Random;
  *
  */
 public class RandomTileGenerator {
-
-    private static String picURL = "https://initium-resources.appspot.com/images/newCombat/";
     
     private RandomTileGenerator() {
     }
 
-    public static Map<String, Object> getBuildingCells(int seed, int rowLength, int forestry) {
+    public static Map<String, Object> getBuildingCells(int seed, int rowLength, int columnLength, int forestry) {
 
         Map<String, Object> data = new HashMap<>();
         List<List<GridBackground>> grid = new ArrayList<>();
@@ -31,14 +29,16 @@ public class RandomTileGenerator {
         // Loop over left sides of hexagon
         for(int i = 0;i < rowLength; i++) {
             List<GridBackground> row = new ArrayList<>();
-            for (int j = 0; j < rowLength; j++) {
+            for (int j = 0; j < columnLength; j++) {
                 double noiseResult = ssn.eval(j,i);
                 if (noiseResult < ((forestry/5.0) - 1)) {
                     objectMap.put("tempKey:" + i + "-" + j, new GridObject(
+                            "tempKey:" + i + "-" + j,
                             "tree1.png",
-                            new Random(seed * (i*j+ i*11 + j)).nextInt(60)*2 - 1,
-                            new Random(seed * (i*j+ i*10 + j)).nextInt(60)*2 - 1,
-                            j, i, 192/2, ((256)-20)));
+                            i, j,
+                            new Random(seed * (i*j+ i*11 + j)).nextInt(20),
+                            new Random(seed * (i*j+ i*10 + j)).nextInt(20),
+                            192/2, ((256)-20), 192, 256));
                 }
                 row.add(new GridBackground("tile-grass" + (new Random(seed * (i*j+ i*10 + j)).nextInt(7)) + ".png",
                         (new Random(seed * (i*10 + j)).nextInt(10)))

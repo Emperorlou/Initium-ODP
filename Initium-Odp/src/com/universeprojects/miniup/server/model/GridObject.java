@@ -2,22 +2,37 @@ package com.universeprojects.miniup.server.model;
 
 public class GridObject {
 
+	private String key;
 	private String fileName;
-	private int xOffset;
-	private int yOffset;
-	private int xCoord;
-	private int yCoord;
-	private int xAttach;
-	private int yAttach;
+	private int xGridCoord;
+	private int yGridCoord;
+	private int xGridCellOffset;
+	private int yGridCellOffset;
+	private int xImageOrigin;
+	private int yImageOrigin;
+	private int width;
+	private int height;
 
-	public GridObject(String fileName, int xOffset, int yOffset, int xCoord, int yCoord, int xAttach, int yAttach) {
+	public GridObject(String key, String fileName, int xGridCoord, int yGridCoord, int xGridCellOffset, int yGridCellOffset, int xImageOrigin, int yImageOrigin,
+			int width, int height) {
+		this.key = key;
 		this.fileName = fileName;
-		this.xOffset = xOffset;
-		this.yOffset = yOffset;
-		this.xCoord = xCoord;
-		this.yCoord = yCoord;
-		this.xAttach = xAttach;
-		this.yAttach = yAttach;
+		this.xGridCoord = xGridCoord;
+		this.yGridCoord = yGridCoord;
+		this.xGridCellOffset = xGridCellOffset;
+		this.yGridCellOffset = yGridCellOffset;
+		this.xImageOrigin = xImageOrigin;
+		this.yImageOrigin = yImageOrigin;
+		this.width = width;
+		this.height = height;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	public String getFileName() {
@@ -28,63 +43,83 @@ public class GridObject {
 		this.fileName = fileName;
 	}
 
-	public int getxOffset() {
-		return xOffset;
+	public int getxGridCoord() {
+		return xGridCoord;
 	}
 
-	public void setxOffset(int xOffset) {
-		this.xOffset = xOffset;
+	public void setxGridCoord(int xGridCoord) {
+		this.xGridCoord = xGridCoord;
 	}
 
-	public int getyOffset() {
-		return yOffset;
+	public int getyGridCoord() {
+		return yGridCoord;
 	}
 
-	public void setyOffset(int yOffset) {
-		this.yOffset = yOffset;
+	public void setyGridCoord(int yGridCoord) {
+		this.yGridCoord = yGridCoord;
 	}
 
-	public int getxCoord() {
-		return xCoord;
+	public int getxGridCellOffset() {
+		return xGridCellOffset;
 	}
 
-	public void setxCoord(int xCoord) {
-		this.xCoord = xCoord;
+	public void setxGridCellOffset(int xGridCellOffset) {
+		this.xGridCellOffset = xGridCellOffset;
 	}
 
-	public int getyCoord() {
-		return yCoord;
+	public int getyGridCellOffset() {
+		return yGridCellOffset;
 	}
 
-	public void setyCoord(int yCoord) {
-		this.yCoord = yCoord;
+	public void setyGridCellOffset(int yGridCellOffset) {
+		this.yGridCellOffset = yGridCellOffset;
 	}
 
-	public int getxAttach() {
-		return xAttach;
+	public int getxImageOrigin() {
+		return xImageOrigin;
 	}
 
-	public void setxAttach(int xAttach) {
-		this.xAttach = xAttach;
+	public void setxImageOrigin(int xImageOrigin) {
+		this.xImageOrigin = xImageOrigin;
 	}
 
-	public int getyAttach() {
-		return yAttach;
+	public int getyImageOrigin() {
+		return yImageOrigin;
 	}
 
-	public void setyAttach(int yAttach) {
-		this.yAttach = yAttach;
+	public void setyImageOrigin(int yImageOrigin) {
+		this.yImageOrigin = yImageOrigin;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 
 	@Override
 	public String toString() {
-		return "{\"fileName\":\"" + this.fileName +
-				"\",\"xOffset\":" + this.xOffset +
-				",\"yOffset\":" + this.yOffset +
-				",\"xCoord\":" + this.xCoord +
-				",\"yCoord\":" + this.yCoord +
-				",\"xAttach\":" + this.xAttach +
-				",\"yAttach\":" + this.yAttach +
+		return "{\"key\":\"" + this.key +
+				"\",\"fileName\":" + this.fileName +
+				"\",\"xGridCoord\":" + this.xGridCoord +
+				",\"yGridCoord\":" + this.yGridCoord +
+				",\"xGridCellOffset\":" + this.xGridCellOffset +
+				",\"yGridCellOffset\":" + this.yGridCellOffset +
+				",\"xImageOrigin\":" + this.xImageOrigin +
+				",\"yImageOrigin\":" + this.yImageOrigin +
+				",\"width\":" + this.width +
+				",\"height\":" + this.height +
 				"}";
 	}
 }
+
