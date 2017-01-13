@@ -8,10 +8,14 @@ var scale = 1;
 var maxZoom = 2.4;
 var minZoom = .05;
 var imgSize = 128;
-var treeWidth = 192;
-var treeHeight = 256;
+var gridCellWidth = 64;
+var gridCellHeight = 64;
+var drugged = false;
 var reachedZoom = false;
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
+var selectedRow;
+var selectedColumn;
+var selectedIndex = 0;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -174,8 +178,8 @@ function scaleTiles() {
                     var top = gridObjects[currKey].yGridCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].yImageOrigin * scale) - (gridObjects[currKey].yGridCellOffset * scale);
                     var left = gridObjects[currKey].xGridCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].xImageOrigin * scale) - (gridObjects[currKey].xGridCellOffset * scale);
 
-                    gridObjects[currKey].div.style.width = treeWidth * scale + "px";
-                    gridObjects[currKey].div.style.height = treeHeight * scale + "px";
+                    gridObjects[currKey].div.style.width = gridObjects[currKey].width * scale + "px";
+                    gridObjects[currKey].div.style.height = gridObjects[currKey].height * scale + "px";
                     gridObjects[currKey].div.style.margin = (gridCellWidth / 2) + "px";
                     gridObjects[currKey].div.style.top = top + "px";
                     gridObjects[currKey].div.style.left = left + "px";
@@ -277,11 +281,12 @@ function loadMap() {
             htmlString = "";
             $.each(responseJson['objectMap'], function (objectKey, gridObject) {
 
-                var top = (gridObject.yGridCoord+1) * treeHeight - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset);
+                var top = (gridObject.yGridCoord+1) * gridObject.height - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset);
                 var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
 
                 var cgridObject = new GridObject(
                     "",
+                    gridObject.name,
                     gridObject.xGridCellOffset,
                     gridObject.yGridCellOffset,
                     gridObject.xGridCoord,
@@ -290,9 +295,9 @@ function loadMap() {
                     gridObject.yImageOrigin,
                     gridObject.width,
                     gridObject.height);
-                var key = gridObject.xGridCoord + "-" + gridObject.yGridCoord;
+                var key = gridObject.fileName + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
                 gridObjects[key] = cgridObject;
-                var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
+                var gridCell = gridCells[gridObject.yGridCoord][gridObject.xGridCoord];
                 gridCell.objectKeys[gridCell.objectKeys.length] = key;
 
                 $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
@@ -320,62 +325,15 @@ function loadMap() {
 }
 
 window.onload = function() {
+
+    // Listen for mouse input
     document.onmousedown = startDrag;
     document.onmouseup = stopDrag;
-    //document.ontouchend = stopDrag;
-    //document.ontouchstart = startDrag;
+
+    // Listen for touch inputs
     document.body.addEventListener('touchend', stopDrag);
     document.body.addEventListener('touchmove', dragDiv);
-    document.body.addEventListener('touchstart', function (e) {
-
-        if (e.touches.length == 1) {
-            var targ = e.target ? e.target : e.srcElement;
-            if (targ.className != 'gridBackground' &&
-                targ.className != 'grid' &&
-                targ.className != 'gridCell' &&
-                targ.className != 'vp' &&
-                targ.className != 'vpcontainer' &&
-                targ.className != 'gridObject' &&
-                targ.className != 'gridLayer' &&
-                targ.className != 'objectLayer') {return};
-            e.preventDefault();
-
-            // calculate event X, Y coordinates
-            offsetX = e.touches[0].clientX;
-            offsetY = e.touches[0].clientY;
-
-            if(!grid.style.left) { grid.style.left='0px'};
-            if (!grid.style.top) { grid.style.top='0px'};
-            coordX = parseInt(grid.style.left);
-            coordY = parseInt(grid.style.top);
-
-            if(!grid.style.left) { grid.style.left='0px'};
-            if (!grid.style.top) { grid.style.top='0px'};
-
-            drag = true;
-            document.ontouchmove=dragDiv;
-        } else if (e.touches.length == 2) { // If two fingers are touching
-            var targ = e.target ? e.target : e.srcElement;
-            if (targ.className != 'gridBackground' &&
-                targ.className != 'grid' &&
-                targ.className != 'gridCell' &&
-                targ.className != 'vp' &&
-                targ.className != 'vpcontainer' &&
-                targ.className != 'gridObject' &&
-                targ.className != 'gridLayer' &&
-                targ.className != 'objectLayer') {return};
-            e.preventDefault();
-
-            // calculate event X, Y coordinates
-            offsetX1 = e.touches[0].clientX;
-            offsetY1 = e.touches[0].clientY;
-            offsetX2 = e.touches[1].clientX;
-            offsetY2 = e.touches[1].clientY;
-
-            zoom = true;
-            document.ontouchmove=zoomDiv;
-        }
-    });
+    document.body.addEventListener('touchstart', startDrag);
 }
 
 function startDrag(e) {
@@ -394,10 +352,70 @@ function startDrag(e) {
         targ.className != 'gridObject' &&
         targ.className != 'gridLayer' &&
         targ.className != 'objectLayer') {return};
-    // calculate event X, Y coordinates
-    offsetX = e.clientX;
-    offsetY = e.clientY;
 
+    // Prevent normal panning
+    e.preventDefault();
+    drugged = false;
+    // calculate event X, Y coordinates
+    if (e) {
+        // For mouse clicks
+        if (e.clientX) {
+            offsetX = e.clientX;
+            offsetY = e.clientY;
+            updateGrid();
+            // For touch input
+        } else if (event.touches) {
+            if (event.touches.length == 1) {
+                offsetX = e.touches[0].clientX;
+                offsetY = e.touches[0].clientY;
+                updateGrid();
+            } else {
+                offsetX1 = e.touches[0].clientX;
+                offsetY1 = e.touches[0].clientY;
+                offsetX2 = e.touches[1].clientX;
+                offsetY2 = e.touches[1].clientY;
+                zoom = true;
+                document.ontouchmove=zoomDiv;
+            }
+        }
+    }
+}
+function clickMap() {
+    var scaledGridCellWidth = 64 * scale;
+    var scaledGridCellHeight = 64 * scale;
+    // For mouse clicks
+    if (event.clientX) {
+        offsetX = event.clientX;
+        offsetY = event.clientY;
+        // For touch input
+    } else if (event.touches) {
+        offsetX = event.touches[0].clientX;
+        offsetY = event.touches[0].clientY;
+    }
+    var gridRelx = offsetX - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft - (scaledGridCellWidth / 2);
+    var gridRely = offsetY - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop - $(window).scrollTop() - (scaledGridCellHeight / 2);
+    var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
+    var gridRow = Math.floor(gridRely / scaledGridCellHeight);
+    // If user had previously selected this coordinate, increase the selectedIndex into this coord
+    if (selectedRow == gridRow && selectedColumn == gridColumn) {
+        selectedIndex++;
+    } else {
+        selectedRow = gridRow;
+        selectedColumn = gridColumn;
+    }
+    // If we have a new object for the user select it
+    if (gridCells[selectedRow][selectedColumn].objectKeys.length > selectedIndex) {
+        gridObject = gridObjects[gridCells[selectedRow][selectedColumn].objectKeys[selectedIndex]];
+        $("#slectedObject").text(gridObject.name);
+    } else {
+        $("#slectedObject").text('No more objects');
+        // reset selected index
+        selectedIndex = 0;
+        selectedRow = 0;
+        selectedColumn = 0;
+    }
+};
+function updateGrid() {
     if(!grid.style.left) { grid.style.left='0px'};
     if (!grid.style.top) { grid.style.top='0px'};
 
@@ -432,10 +450,14 @@ function dragDiv(e) {
         grid.style.top = coordY + userLocY - offsetY + 'px';
     }
     $('html, body').stop().animate({}, 500, 'linear');
+    drugged = true;
     return false;
 }
-
 function stopDrag() {
+    if (!drugged) {
+        // User clicked on map without dragging
+        clickMap();
+    }
     drag=false;
 }
 function zoomDiv(e) {
@@ -467,8 +489,9 @@ function GridCell(backgroundDiv, cellDiv, zindex, objectKeys) {
     this.objectKeys = objectKeys;
 }
 
-function GridObject(div, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
+function GridObject(div, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
     this.div = div;
+    this.name = name;
     this.xGridCellOffset = xGridCellOffset;
     this.yGridCellOffset = yGridCellOffset;
     this.xGridCoord = xGridCoord;
