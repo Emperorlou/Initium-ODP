@@ -143,12 +143,12 @@ function scaleTiles() {
     //ctx.lineTo(newX, newY);
     //ctx.stroke();
 
+    var scaledImgSize = imgSize * scale;
     // Update all tiles
     for (var x = 0; x < gridTileWidth; x++) {
         for (var y = 0; y < gridTileHeight; y++) {
 
             // Update all grid cells, and background images
-            var scaledImgSize = imgSize * scale;
             var top = y * gridCellWidth;
             var left = x * gridCellWidth;
 
@@ -187,19 +187,19 @@ function loadMap() {
     var gridTileWidth = Number($("#gridWidth").val());
     var gridTileHeight = Number($("#gridHeight").val());
     var forestry = Number($("#forestry").val());
-    var imgSize = 128 * scale;
     var gridCellWidth = 64 * scale;
-    var totalGridWidth = gridTileWidth * gridTileHeight;
-    var offsetX = viewportContainer.offsetWidth/2-(totalGridWidth/2);
-    var offsetY = viewportContainer.offsetHeight/2-(totalGridWidth/2);
     var groundHtml = "";
     var cellHtml = "";
     var zOffset = 10;
 
+    var totalGridWidth = gridTileWidth * gridCellWidth;
+    var totalGridHeight = gridTileHeight * gridCellWidth;
+    var offsetX = viewportContainer.offsetWidth/2-(totalGridWidth/2);
+    var offsetY = viewportContainer.offsetHeight/2-(totalGridWidth/2);
     grid.style.height = totalGridWidth + "px";
-    grid.style.width = totalGridWidth + "px";
-    //grid.style.top = offsetY + "px";
-    //grid.style.left = offsetX + "px";
+    grid.style.width = totalGridHeight + "px";
+    grid.style.top = offsetY + "px";
+    grid.style.left = offsetX + "px";
 
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
@@ -321,7 +321,7 @@ window.onload = function() {
     //document.ontouchend = stopDrag;
     //document.ontouchstart = startDrag;
     document.body.addEventListener('touchend', stopDrag);
-    document.body.addEventListener('touchmove', touchMoveDiv);
+    document.body.addEventListener('touchmove', dragDiv);
     document.body.addEventListener('touchstart', function (e) {
 
         if (e.touches.length == 1) {
@@ -349,7 +349,7 @@ window.onload = function() {
             if (!grid.style.top) { grid.style.top='0px'};
 
             drag = true;
-            document.ontouchmove=touchMoveDiv;
+            document.ontouchmove=dragDiv;
         } else if (e.touches.length == 2) { // If two fingers are touching
             var targ = e.target ? e.target : e.srcElement;
             if (targ.className != 'gridBackground' &&
@@ -410,17 +410,18 @@ function dragDiv(e) {
     if (!drag) {return};
     if (!e) { var e= window.event};
     // move div element
-    grid.style.left=coordX+e.clientX-offsetX+'px';
-    grid.style.top=coordY+e.clientY-offsetY+'px';
+    if (e) {
+        if (e.clientX) {
+            userLocX = e.clientX;
+            userLocY = e.clientY;
+        } else if (event.touches) {
+            userLocX = e.touches[0].clientX;
+            userLocY = e.touches[0].clientY;
+        }
+    }
+    grid.style.left=coordX+userLocX-offsetX+'px';
+    grid.style.top=coordY+userLocY-offsetY+'px';
     $('html, body').stop().animate({}, 500, 'linear');
-    return false;
-}
-function touchMoveDiv(e) {
-    if (!drag) {return};
-    if (!e) { var e= window.event};
-    // move div element
-    grid.style.left=coordX+e.touches[0].clientX-offsetX+'px';
-    grid.style.top=coordY+e.touches[0].clientY-offsetY+'px';
     return false;
 }
 function zoomDiv(e) {
