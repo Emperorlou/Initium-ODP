@@ -132,8 +132,12 @@ function scaleTiles() {
     newX = grid.offsetLeft + diffX;
     newY = grid.offsetTop + diffY;
 
-    grid.style.top = newY + "px";
-    grid.style.left = newX + "px";
+    if (newY < (viewport.offsetHeight*1.5) && newY > (-1.5 * grid.offsetHeight)) {
+        grid.style.top = newY + "px";
+    }
+    if (newX < (viewport.offsetWidth*1.5) && newX > (-1.5 * grid.offsetWidth)) {
+        grid.style.left = newX + "px";
+    }
 
     // Please leave for debugging zoom
     //var c = document.getElementById("myCanvas");
@@ -419,10 +423,20 @@ function dragDiv(e) {
             userLocY = e.touches[0].clientY;
         }
     }
-    grid.style.left=coordX+userLocX-offsetX+'px';
-    grid.style.top=coordY+userLocY-offsetY+'px';
+    updatedX = coordX+userLocX-offsetX;
+    updatedY = coordY+userLocY-offsetY;
+    if (updatedX < viewport.offsetWidth && ((updatedX > coordX) || updatedX > (-1 * grid.offsetWidth))) {
+        grid.style.left = coordX + userLocX - offsetX + 'px';
+    }
+    if (updatedY < viewport.offsetHeight && ((updatedY > coordY) || (updatedY > (-1 * grid.offsetHeight)))) {
+        grid.style.top = coordY + userLocY - offsetY + 'px';
+    }
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
+}
+
+function stopDrag() {
+    drag=false;
 }
 function zoomDiv(e) {
     if (!zoom) {return};
@@ -444,9 +458,6 @@ function zoomDiv(e) {
     scaleTiles();
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
-}
-function stopDrag() {
-    drag=false;
 }
 
 function GridCell(backgroundDiv, cellDiv, zindex, objectKeys) {
