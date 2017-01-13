@@ -434,6 +434,7 @@ function dragDiv(e) {
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
+
 function stopDrag() {
     drag=false;
 }
