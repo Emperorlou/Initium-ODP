@@ -36,7 +36,7 @@ public class RandomTileGenerator {
                 double shrubNoiseResult = shrubSsn.eval(j,i);
                 // Determine if object is generated at coordinate
                 if (treeNoiseResult < ((forestry/5.0) - 1)) {
-                    objectMap.put("tempKey:" + i + "-" + j, new GridObject(
+                    objectMap.put("tree1.png" + "tempKey:" + i + "-" + j, new GridObject(
                             "tempKey:" + i + "-" + j,
                             "tree1.png",
                             "A maple tree, maybe?",
@@ -46,7 +46,7 @@ public class RandomTileGenerator {
                             192/2, ((256)-20), 192, 256));
                 }
                 if (shrubNoiseResult < ((forestry/5.0) - 1)) {
-                    objectMap.put("tempKey:" + i + "-" + j, new GridObject(
+                    objectMap.put("shrub1.png" + "tempKey:" + i + "-" + j, new GridObject(
                             "tempKey:" + i + "-" + j,
                             "shrub1.png",
                             "A shrubbery!",

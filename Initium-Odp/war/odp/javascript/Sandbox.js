@@ -287,7 +287,8 @@ function loadMap() {
             htmlString = "";
             $.each(responseJson['objectMap'], function (objectKey, gridObject) {
 
-                var top = (gridObject.yGridCoord+1) * gridObject.height - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset);
+                //var top = (gridObject.yGridCoord+1) * gridCellHeight - (gridObject.yGridCellOffset);
+                var top = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
                 var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
 
                 var cgridObject = new GridObject(
@@ -309,7 +310,7 @@ function loadMap() {
                 $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
                 $hexBody += " data-key=\"" + key + "\"";
                 $hexBody += " style=\"";
-                $hexBody += " z-index:" + zOffset + (Number(top)) + ";";
+                $hexBody += " z-index:" + (Number(zOffset) + Number(top)) + ";";
                 $hexBody += " background-image:url(" + $picUrlPath + gridObject.fileName + ");";
                 $hexBody += "\">";
                 $hexBody += "</div>";
