@@ -16,6 +16,7 @@ var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 var selectedRow;
 var selectedColumn;
 var selectedIndex = 0;
+var firstLoad = true;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -62,6 +63,7 @@ function zoomIn() {
 }
 
 function pressedButton() {
+    firstLoad = true;
     scaleRate = Number($("#zoom").val());
     loadMap();
 }
@@ -136,11 +138,15 @@ function scaleTiles() {
     newX = grid.offsetLeft + diffX;
     newY = grid.offsetTop + diffY;
 
-    if (newY < (viewport.offsetHeight*1.5) && newY > (-1.5 * grid.offsetHeight)) {
-        grid.style.top = newY + "px";
-    }
-    if (newX < (viewport.offsetWidth*1.5) && newX > (-1.5 * grid.offsetWidth)) {
-        grid.style.left = newX + "px";
+    if (!firstLoad) {
+        if (newY < (viewport.offsetHeight * 1.5) && newY > (-1.5 * grid.offsetHeight)) {
+            grid.style.top = newY + "px";
+        }
+        if (newX < (viewport.offsetWidth * 1.5) && newX > (-1.5 * grid.offsetWidth)) {
+            grid.style.left = newX + "px";
+        }
+    } else {
+        firstLoad = false;
     }
 
     // Please leave for debugging zoom
@@ -203,7 +209,7 @@ function loadMap() {
     var totalGridWidth = gridTileWidth * gridCellWidth;
     var totalGridHeight = gridTileHeight * gridCellWidth;
     var offsetX = viewportContainer.offsetWidth/2-(totalGridWidth/2);
-    var offsetY = viewportContainer.offsetHeight/2-(totalGridWidth/2);
+    var offsetY = viewportContainer.offsetHeight/2-(totalGridHeight/2);
     grid.style.height = totalGridWidth + "px";
     grid.style.width = totalGridHeight + "px";
     grid.style.top = offsetY + "px";
@@ -297,7 +303,7 @@ function loadMap() {
                     gridObject.height);
                 var key = gridObject.fileName + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
                 gridObjects[key] = cgridObject;
-                var gridCell = gridCells[gridObject.yGridCoord][gridObject.xGridCoord];
+                var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
                 gridCell.objectKeys[gridCell.objectKeys.length] = key;
 
                 $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
@@ -341,17 +347,10 @@ function startDrag(e) {
     if (!e) {
         var e = window.event;
     }
-    // IE uses srcElement, others use target
-    var targ = e.target ? e.target : e.srcElement;
 
-    if (targ.className != 'gridBackground' &&
-        targ.className != 'grid' &&
-        targ.className != 'gridCell' &&
-        targ.className != 'vp' &&
-        targ.className != 'vpcontainer' &&
-        targ.className != 'gridObject' &&
-        targ.className != 'gridLayer' &&
-        targ.className != 'objectLayer') {return};
+    if (!checkIfHoveringOverViewport()) {
+        return;
+    }
 
     // Prevent normal panning
     e.preventDefault();
@@ -404,8 +403,8 @@ function clickMap() {
         selectedColumn = gridColumn;
     }
     // If we have a new object for the user select it
-    if (gridCells[selectedRow][selectedColumn].objectKeys.length > selectedIndex) {
-        gridObject = gridObjects[gridCells[selectedRow][selectedColumn].objectKeys[selectedIndex]];
+    if (gridCells[selectedColumn][selectedRow].objectKeys.length > selectedIndex) {
+        gridObject = gridObjects[gridCells[selectedColumn][selectedRow].objectKeys[selectedIndex]];
         $("#slectedObject").text(gridObject.name);
     } else {
         $("#slectedObject").text('No more objects');
@@ -453,8 +452,30 @@ function dragDiv(e) {
     drugged = true;
     return false;
 }
+function checkIfHoveringOverViewport() {
+    var targ = event.target ? event.target : event.srcElement;
+    if (targ.className != 'gridBackground' &&
+        targ.className != 'grid' &&
+        targ.className != 'gridCell' &&
+        targ.className != 'vp' &&
+        targ.className != 'vpcontainer' &&
+        targ.className != 'gridObject' &&
+        targ.className != 'gridLayer' &&
+        targ.className != 'objectLayer') {return false};
+    return true;
+}
+function checkIfHoveringOverGrid() {
+    var targ = event.target ? event.target : event.srcElement;
+    if (targ.className != 'gridBackground' &&
+        targ.className != 'grid' &&
+        targ.className != 'gridCell' &&
+        targ.className != 'gridObject' &&
+        targ.className != 'gridLayer' &&
+        targ.className != 'objectLayer') {return false};
+    return true;
+}
 function stopDrag() {
-    if (!drugged) {
+    if (!drugged && checkIfHoveringOverGrid()) {
         // User clicked on map without dragging
         clickMap();
     }

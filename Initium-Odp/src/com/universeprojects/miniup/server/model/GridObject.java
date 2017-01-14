@@ -33,7 +33,7 @@ public class GridObject {
 	public String toString() {
 		return "{\"key\":\"" + this.key +
 				"\",\"fileName\":\"" + this.fileName +
-				"\",\"name\":" + this.fileName +
+				"\",\"name\":\"" + this.fileName +
 				"\",\"xGridCoord\":" + this.xGridCoord +
 				",\"yGridCoord\":" + this.yGridCoord +
 				",\"xGridCellOffset\":" + this.xGridCellOffset +
