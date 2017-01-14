@@ -460,6 +460,7 @@ function stopDrag() {
     }
     drag=false;
 }
+
 function zoomDiv(e) {
     if (!zoom) {return};
     if (!e) { var e= window.event};
