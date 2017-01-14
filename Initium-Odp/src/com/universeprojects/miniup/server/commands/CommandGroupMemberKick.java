@@ -78,6 +78,13 @@ public class CommandGroupMemberKick extends Command
 			throw new UserErrorMessage("The creator cannot be kicked you fool.");
 		}
 
+		if ("Admin".equals(admin.getProperty("groupStatus")) == true 
+                && "Admin".equals(kickCharacter.getProperty("groupStatus")) == true)
+        {
+            throw new UserErrorMessage(
+                    "You can not kick a fellow admin.");
+        }
+		
 		db.doLeaveGroup(ds, kickCharacter);
 
 		setPopupMessage(kickCharacter.getProperty("name")
