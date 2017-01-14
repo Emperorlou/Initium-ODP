@@ -258,7 +258,10 @@
 								+ ")'>Demote from admin</a>");
 					}
 				}
-				if (groupStatus.equals("Kicked") == false)
+				if (groupStatus.equals("Kicked") == false 
+						&& groupStatus.equals("Admin") == false 
+						|| (Key) group.getProperty("creatorKey")).getId() == 
+						common.getCharacter().getKey().getId())
 					out.println("<a onclick='groupMemberKick(event, "
 							+ character.getKey().getId() + ")'>Kick</a>");
 				else

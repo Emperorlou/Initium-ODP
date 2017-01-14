@@ -468,10 +468,10 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 				}
 			}
 			
-			if (groupStatus.equals("Kicked") == false)
-				sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ")'>Kick</a>");
-			else
-				sb.append("<a onclick='groupMemberKickCancel(" + character.getKey().getId() + ")'>Cancel Kick</a>");
+			if(groupStatus.equals("Kicked") == false && isAdmin == false || viewCreator)
+                		sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ")'>Kick</a>");
+            		else if (groupStatus.equals("Kicked") == true && isAdmin == false || viewCreator)
+                		sb.append("<a onclick='groupMemberKickCancel(" + character.getKey().getId() + ")'>Cancel Kick</a>");
 			
 			if (viewCreator && canDeleteGroup)
 				sb.append("<a onclick='deleteGroup(event)'>Delete group</a>");
