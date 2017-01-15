@@ -393,7 +393,7 @@ function clickMap() {
         offsetY = event.touches[0].clientY;
     }
     var gridRelx = offsetX - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft - (scaledGridCellWidth / 2);
-    var gridRely = offsetY - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop - $(window).scrollTop() - (scaledGridCellHeight / 2);
+    var gridRely = offsetY - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() - (scaledGridCellHeight / 2);
     var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
     // If user had previously selected this coordinate, increase the selectedIndex into this coord
