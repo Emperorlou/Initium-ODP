@@ -13,10 +13,8 @@ var gridCellHeight = 64;
 var drugged = false;
 var reachedZoom = false;
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
-var selectedRow;
-var selectedColumn;
-var selectedIndex = 0;
 var firstLoad = true;
+var previouslySelectedDivs = [];
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -396,19 +394,34 @@ function clickMap() {
     var gridRely = offsetY - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() - (scaledGridCellHeight / 2);
     var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
-    // If user had previously selected this coordinate, increase the selectedIndex into this coord
-    if (selectedRow == gridRow && selectedColumn == gridColumn) {
-        selectedIndex++;
-    } else {
-        selectedRow = gridRow;
-        selectedColumn = gridColumn;
+    // Remove highlights from previously selected divs
+    for (i=0; i<previouslySelectedDivs.length; i++) {
+        previouslySelectedDivs[i].style.backgroundColor = "";
+        previouslySelectedDivs[i].style.mixBlendMode = "";
+
     }
-    // If we have a new object for the user select it
-    if (gridCells[selectedColumn][selectedRow].objectKeys.length > selectedIndex) {
-        gridObject = gridObjects[gridCells[selectedColumn][selectedRow].objectKeys[selectedIndex]];
-        $("#slectedObject").text(gridObject.name);
+    // Highlight the background div
+    gridCells[gridColumn][gridRow].backgroundDiv.style.backgroundColor = "white";
+    gridCells[gridColumn][gridRow].backgroundDiv.style.mixBlendMode = "overlay";
+    previouslySelectedDivs = [];
+    previouslySelectedDivs[0] = gridCells[gridColumn][gridRow].backgroundDiv;
+    // If we have an object for the user select it
+    if (gridCells[gridColumn][gridRow].objectKeys.length > 0) {
+        tmpString = "";
+        objectKeys = gridCells[gridColumn][gridRow].objectKeys;
+        for (selectedIndex=0; selectedIndex<objectKeys.length; selectedIndex++){
+            object = gridObjects[objectKeys[selectedIndex]];
+            // Update the selected object list
+            tmpString += "<br>" + object.name + "<br/>";
+            // Highlight the objects in the viewport
+            object.div.style.backgroundColor = "white";
+            object.div.style.mixBlendMode = "overlay";
+            // Add div to previouslySelected to remove highlight on later click
+            previouslySelectedDivs[selectedIndex+1] = object.div;
+        }
+        $("#slectedObjects").html(tmpString);
     } else {
-        $("#slectedObject").text('No more objects');
+        $("#slectedObjects").html('<br> No objects at this coordinate. </br>');
         // reset selected index
         selectedIndex = 0;
         selectedRow = 0;
