@@ -10,12 +10,15 @@ var minZoom = .05;
 var imgSize = 128;
 var gridCellWidth = 64;
 var gridCellHeight = 64;
+var cursorWidth = 164;
+var cursorHeight = 166;
 var drugged = false;
 var reachedZoom = false;
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 var firstLoad = true;
 var previouslySelectedBackground;
 var previouslySelectedObjects = [];
+var cursorObject;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -155,6 +158,13 @@ function scaleTiles() {
     //ctx.moveTo(originX, originY);
     //ctx.lineTo(newX, newY);
     //ctx.stroke();
+
+    if (cursorObject != null) {
+        cursorObject.div.style.width = cursorWidth * scale * .2 + "px";
+        cursorObject.div.style.height = cursorHeight * scale * .2 + "px";
+        cursorObject.div.style.top = cursorObject.yGridCoord * gridCellHeight + "px";
+        cursorObject.div.style.left = cursorObject.xGridCoord * gridCellWidth + "px";
+    }
 
     var scaledImgSize = imgSize * scale;
     // Update all tiles
@@ -395,23 +405,43 @@ function clickMap() {
         offsetX = event.touches[0].clientX;
         offsetY = event.touches[0].clientY;
     }
+    // Determine where the click took place in the grid
     var gridRelx = offsetX - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft - (scaledGridCellWidth / 2);
     var gridRely = offsetY - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() - (scaledGridCellHeight / 2);
     var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
+
+    // Place the cursor object in the grid
+    htmlString = "<div id=\"cursor\"" + " class=\"cursorObject\"";
+    htmlString += " style=\"";
+    htmlString += " z-index:" + 1000000 + ";";
+    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " top:" + (gridColumn * gridCellHeight) + "px;";
+    htmlString += " left:" + (gridRow * gridCellWidth) + "px;";
+    htmlString += " background-size:100%;";
+    htmlString += "\">";
+    htmlString += "</div>";
+    $('#ui-layer').append(htmlString);
+    if (cursorObject == null) {
+        cursorObject = new CursorObject(document.getElementById('cursor'), (gridRow * gridCellWidth), (gridColumn * gridCellHeight));
+    }
+
     // Remove highlights from previously selected divs
     if (previouslySelectedBackground != null) {
         previouslySelectedBackground.backgroundDiv.style.background = "url(" + $picUrlPath + previouslySelectedBackground.filename + ") center center / 100%";
+        previouslySelectedBackground.backgroundDiv.className = previouslySelectedBackground.backgroundDiv.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
     }
     for (i=0; i<previouslySelectedObjects.length; i++) {
         previouslySelectedObjects[i].div.style.background = "url(" + $picUrlPath + previouslySelectedObjects[i].filename + ")";
         previouslySelectedObjects[i].div.style.backgroundSize = "100%";
         previouslySelectedObjects[i].div.style.backgroundBlendMode = "";
+        previouslySelectedObjects[i].div.className = previouslySelectedObjects[i].div.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
 
     }
     // Highlight the background div
     gridCells[gridColumn][gridRow].backgroundDiv.style.background = gridCells[gridColumn][gridRow].backgroundDiv.style.background + ", #FFFFFF";
-    gridCells[gridColumn][gridRow].backgroundDiv.style.backgroundBlendMode = "normal, overlay";
+    //gridCells[gridColumn][gridRow].backgroundDiv.style.backgroundBlendMode = "normal, overlay";
+    gridCells[gridColumn][gridRow].backgroundDiv.className += " highlighted";
     previouslySelectedBackground  = gridCells[gridColumn][gridRow];
     // If we have an object for the user highlight it
     if (gridCells[gridColumn][gridRow].objectKeys.length > 0) {
@@ -423,7 +453,8 @@ function clickMap() {
             tmpString += "<br>" + object.name + "<br/>";
             // Highlight the objects in the viewport
             object.div.style.background += ", #FFFFFF";
-            object.div.style.backgroundBlendMode = "normal, overlay";
+            object.div.className += " highlighted";
+            //object.div.style.backgroundBlendMode = "normal, overlay";
             // Add div to previouslySelected to remove highlight on later click
             previouslySelectedObjects[selectedIndex] = object;
         }
@@ -521,6 +552,12 @@ function zoomDiv(e) {
     scaleTiles();
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
+}
+
+function CursorObject(div, xGridCoord, yGridCoord) {
+    this.div = div;
+    this.xGridCoord = xGridCoord;
+    this.yGridCoord = yGridCoord;
 }
 
 function GridCell(backgroundDiv, cellDiv, filename, zindex, objectKeys) {

@@ -3350,6 +3350,17 @@ body
 	background-size:100%;
 }
 
+.cursorObject {
+	position: absolute;
+	background-color: transparent;
+	background-size:100%;
+}
+
+.highlighted {
+	background-blend-mode: normal, overlay;
+	filter: brightness(2);
+}
+
 .selectedObjectList {
 	border: 3px solid blue;
 	display: inline-block;
