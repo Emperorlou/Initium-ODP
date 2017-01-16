@@ -75,9 +75,10 @@ function scaleTiles() {
     var gridTileWidth = Number($("#gridWidth").val());
     var gridTileHeight = Number($("#gridHeight").val());
     var forestry = Number($("#forestry").val());
-    var gridCellWidth = 64 * scale;
-    var totalGridWidth = gridTileWidth * gridCellWidth;
-    var totalGridHeight = gridTileHeight * gridCellWidth;
+    var scaledGridCellWidth = 64 * scale;
+    var scaledGridCellHeight = 64 * scale;
+    var totalGridWidth = gridTileWidth * scaledGridCellWidth;
+    var totalGridHeight = gridTileHeight * scaledGridCellHeight;
 
     prevGridWidth = grid.offsetWidth;
     prevGridHeight = grid.offsetHeight;
@@ -160,10 +161,21 @@ function scaleTiles() {
     //ctx.stroke();
 
     if (cursorObject != "") {
-        cursorObject.div.style.width = cursorWidth * scale * .2 + "px";
-        cursorObject.div.style.height = cursorHeight * scale * .2 + "px";
-        cursorObject.div.style.top = cursorObject.yGridCoord * gridCellHeight + "px";
-        cursorObject.div.style.left = cursorObject.xGridCoord * gridCellWidth + "px";
+        var cursorTop = scaledGridCellHeight/2 + (cursorObject.yGridCoord * scaledGridCellHeight);
+        var cursorLeft = scaledGridCellWidth/2 + (cursorObject.xGridCoord * scaledGridCellWidth);
+        cursorObject.div.style.width = cursorWidth * scale * .4 + "px";
+        cursorObject.div.style.height = cursorHeight * scale * .4 + "px";
+        cursorObject.div.style.top = cursorTop + "px";
+        cursorObject.div.style.left = cursorLeft + "px";
+        cursorSubObjects = cursorObject.div.children;
+        for (i=0; i<cursorSubObjects.length; i++) {
+            if (cursorSubObjects[i].style.top != "") {
+                cursorSubObjects[i].style.top = scaledGridCellHeight/2;
+            }
+            if (cursorSubObjects[i].style.left != "") {
+                cursorSubObjects[i].style.left = scaledGridCellWidth/2;
+            }
+        }
     }
 
     var scaledImgSize = imgSize * scale;
@@ -172,12 +184,12 @@ function scaleTiles() {
         for (var y = 0; y < gridTileHeight; y++) {
 
             // Update all grid cells, and background images
-            var top = y * gridCellWidth;
-            var left = x * gridCellWidth;
+            var top = y * scaledGridCellWidth;
+            var left = x * scaledGridCellWidth;
 
-            gridCells[x][y].cellDiv.style.width = gridCellWidth + "px";
-            gridCells[x][y].cellDiv.style.height = gridCellWidth + "px";
-            gridCells[x][y].cellDiv.style.margin = (gridCellWidth / 2) + "px";
+            gridCells[x][y].cellDiv.style.width = scaledGridCellWidth + "px";
+            gridCells[x][y].cellDiv.style.height = scaledGridCellWidth + "px";
+            gridCells[x][y].cellDiv.style.margin = (scaledGridCellWidth / 2) + "px";
             gridCells[x][y].cellDiv.style.top = top + "px";
             gridCells[x][y].cellDiv.style.left = left + "px";
 
@@ -190,12 +202,12 @@ function scaleTiles() {
             if (gridCells[x][y].objectKeys.length > 0) {
                 for (var keyIndex = 0; keyIndex < gridCells[x][y].objectKeys.length; keyIndex++) {
                     var currKey = gridCells[x][y].objectKeys[keyIndex];
-                    var top = gridObjects[currKey].yGridCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].yImageOrigin * scale) - (gridObjects[currKey].yGridCellOffset * scale);
-                    var left = gridObjects[currKey].xGridCoord * gridCellWidth + gridCellWidth / 2 - (gridObjects[currKey].xImageOrigin * scale) - (gridObjects[currKey].xGridCellOffset * scale);
+                    var top = gridObjects[currKey].yGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObjects[currKey].yImageOrigin * scale) - (gridObjects[currKey].yGridCellOffset * scale);
+                    var left = gridObjects[currKey].xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObjects[currKey].xImageOrigin * scale) - (gridObjects[currKey].xGridCellOffset * scale);
 
                     gridObjects[currKey].div.style.width = gridObjects[currKey].width * scale + "px";
                     gridObjects[currKey].div.style.height = gridObjects[currKey].height * scale + "px";
-                    gridObjects[currKey].div.style.margin = (gridCellWidth / 2) + "px";
+                    gridObjects[currKey].div.style.margin = (scaledGridCellWidth / 2) + "px";
                     gridObjects[currKey].div.style.top = top + "px";
                     gridObjects[currKey].div.style.left = left + "px";
                 }
@@ -411,22 +423,75 @@ function clickMap() {
     var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
 
+    if (gridRow < 0 || gridColumn < 0) {return}
+    var cursorTop = scaledGridCellHeight/2 + (gridRow * scaledGridCellHeight);
+    var cursorLeft = scaledGridCellWidth/2 + (gridColumn * scaledGridCellWidth);
     if (cursorObject == "") {
-        // Build out new div
-        htmlString = "<div id=\"cursor\"" + " class=\"cursorObject\"";
+        // First select, build out cursor object
+        htmlString = "<div id=\"cursorObject\"" + " class=\"cursorObject\"";
+        htmlString += " style=\"";
+        htmlString += " top:" + cursorTop + "px;";
+        htmlString += " left:" + cursorLeft + "px;";
+        htmlString += " width:" + cursorWidth * scale * .4 + "px;";
+        htmlString += " height:" + cursorHeight * scale * .4 + "px;";
+        htmlString += "\">";
+        htmlString += "<div id=\"topLeftCursor\"" + " class=\"cursorSubObject\"";
         htmlString += " style=\"";
         htmlString += " z-index:" + 1000000 + ";";
         htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-        htmlString += " top:" + (gridColumn * gridCellHeight) + "px;";
-        htmlString += " left:" + (gridRow * gridCellWidth) + "px;";
+        htmlString += " width:50%;";
+        htmlString += " height:50%;";
         htmlString += " background-size:100%;";
+        htmlString += " transform:scaleX(-1);";
+        htmlString += " filter:drop-shadow(0px 0px 3px #000000);";
         htmlString += "\">";
         htmlString += "</div>";
+        htmlString += "<div id=\"topRightCursor\"" + " class=\"cursorSubObject\"";
+        htmlString += " style=\"";
+        htmlString += " z-index:" + 1000000 + ";";
+        htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+        htmlString += " left:" + scaledGridCellWidth/2 + "px;";
+        htmlString += " width:50%;";
+        htmlString += " height:50%;";
+        htmlString += " background-size:100%;";
+        htmlString += " filter:drop-shadow(0px 0px 3px #000000);";
+        htmlString += "\">";
+        htmlString += "</div>";
+        htmlString += "<div id=\"bottomRightCursor\"" + " class=\"cursorSubObject\"";
+        htmlString += " style=\"";
+        htmlString += " z-index:" + 1000000 + ";";
+        htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+        htmlString += " top:" + scaledGridCellHeight/2 + "px;";
+        htmlString += " left:" + scaledGridCellWidth/2 + "px;";
+        htmlString += " width:50%;";
+        htmlString += " height:50%;";
+        htmlString += " background-size:100%;";
+        htmlString += " transform:scaleX(-1);";
+        htmlString += " transform:scaleY(-1);";
+        htmlString += " filter:drop-shadow(0px 0px 3px #000000);";
+        htmlString += "\">";
+        htmlString += "</div>";
+        htmlString += "<div id=\"bottomLeftCursor\"" + " class=\"cursorSubObject\"";
+        htmlString += " style=\"";
+        htmlString += " z-index:" + 1000000 + ";";
+        htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+        htmlString += " top:" + scaledGridCellHeight/2 + "px;";
+        htmlString += " width:50%;";
+        htmlString += " height:50%;";
+        htmlString += " background-size:100%;";
+        htmlString += " transform:scale(-1, -1);";
+        htmlString += " filter:drop-shadow(0px 0px 3px #000000);";
+        htmlString += "\">";
+        htmlString += "</div>";
+        htmlString += "</div>";
         $('#ui-layer').append(htmlString);
-        cursorObject = new CursorObject(document.getElementById('cursor'), (gridRow * gridCellWidth), (gridColumn * gridCellHeight));
+        cursorObject = new CursorObject(document.getElementById('cursorObject'), gridColumn, gridRow);
     } else {
-        cursorObject.div.style.top = (gridColumn * gridCellHeight) + "px";
-        cursorObject.div.style.left = (gridRow * gridCellWidth) + "px";
+        // Only need to update cursor object
+        cursorObject.div.style.top = cursorTop + "px";
+        cursorObject.div.style.left = cursorLeft + "px";
+        cursorObject.xGridCoord = gridColumn;
+        cursorObject.yGridCoord = gridRow;
     }
 
     // Remove highlights from previously selected divs

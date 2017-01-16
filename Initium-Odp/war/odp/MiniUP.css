@@ -3351,9 +3351,20 @@ body
 }
 
 .cursorObject {
+	position: relative;
+	/*background-size:100%;*/
+}
+
+.cursorSubObject {
 	position: absolute;
 	background-color: transparent;
-	background-size:100%;
+	filter:drop-shadow(0px 0px 3px #000000 );
+	/*background-size:100%;*/
+}
+
+.gridBackground.highlighted
+{
+	z-index:10 !important;
 }
 
 .highlighted {
