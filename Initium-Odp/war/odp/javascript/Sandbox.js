@@ -170,10 +170,10 @@ function scaleTiles() {
         cursorSubObjects = cursorObject.div.children;
         for (i=0; i<cursorSubObjects.length; i++) {
             if (cursorSubObjects[i].style.top != "") {
-                cursorSubObjects[i].style.top = scaledGridCellHeight/2;
+                cursorSubObjects[i].style.top = scaledGridCellHeight/2 + "px";
             }
             if (cursorSubObjects[i].style.left != "") {
-                cursorSubObjects[i].style.left = scaledGridCellWidth/2;
+                cursorSubObjects[i].style.left = scaledGridCellWidth/2 + "px";
             }
         }
     }
