@@ -32,8 +32,7 @@ function closeMap()
 
 function createLocalMapViewer(id)
 {
-	var quality = localStorage.getItem("checkboxUseLowResolutionMap") || "false";
-	quality = quality === "true" ? "low" : "high";
+	var quality = getMapQuality();
     viewer = OpenSeadragon({
         id: id,
         prefixUrl: "https://s3.amazonaws.com/imappy/openseadragon/images/",

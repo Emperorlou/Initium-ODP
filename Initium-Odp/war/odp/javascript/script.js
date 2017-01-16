@@ -3018,6 +3018,13 @@ function getMusicVolume()
 	return parseInt(setting);
 }
 
+function getMapQuality()
+{
+	var setting = localStorage.getItem("checkboxUseLowResolutionMap") || "false";
+	if(setting === "true") return "low";
+	return "high";
+}
+
 function toggleEnvironmentSoundEffects(newState)
 {
 	var enabled = isSoundEffectsEnabled();
