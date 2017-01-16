@@ -588,6 +588,8 @@ function checkIfHoveringOverGrid() {
         targ.className != 'gridCell' &&
         targ.className != 'gridObject' &&
         targ.className != 'gridLayer' &&
+        targ.className != 'highlighted' &&
+        targ.className != 'gridObject highlighted' &&
         targ.className != 'objectLayer') {return false};
     return true;
 }
