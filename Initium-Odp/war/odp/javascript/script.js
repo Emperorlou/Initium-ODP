@@ -2048,6 +2048,21 @@ function doDeleteCharacter(eventObject,characterId,characterName)
 	});
 }
 
+function doCombatEscape(event)
+{
+	doCommand(event, "CombatEscape");
+}
+
+function doCombatAttackLeftHand(event)
+{
+	doCommand(event, "CombatAttack", {"hand":"LeftHand"});
+}
+
+function doCombatAttackRightHand(event)
+{
+	doCommand(event, "CombatAttack", {"hand":"RightHand"});
+}
+
 function viewExchange()
 {
 	pagePopup("/odp/ajax_exchange");

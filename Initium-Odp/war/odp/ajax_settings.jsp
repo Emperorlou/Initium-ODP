@@ -68,6 +68,7 @@ input[type='checkbox']
 		<h2>Performance</h2>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableWeather'> Disable weather effects</div>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableTravelAnimations'> Disable travel animations</div>
+		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxUseLowResolutionMap'> Use low resolution map</div>
 	</div>
 	
 	<center><p><a onclick='fullpageRefresh()' style='font-size:24px'>Apply Changes</a></p></center>
@@ -79,7 +80,8 @@ input[type='checkbox']
 		                   "checkboxDisableOnlyAnimatedBanners", 
 		                   "checkboxDisableWeather", 
 		                   "checkboxDisableTravelAnimations",
-		                   "checkboxDisableAds"];
+		                   "checkboxDisableAds",
+		                   "checkboxUseLowResolutionMap"];
 		for(var i = 0; i<checkboxIds.length; i++)
 		{
 			var checkboxId = checkboxIds[i];
