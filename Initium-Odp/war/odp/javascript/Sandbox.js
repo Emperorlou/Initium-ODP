@@ -14,7 +14,8 @@ var drugged = false;
 var reachedZoom = false;
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 var firstLoad = true;
-var previouslySelectedDivs = [];
+var previouslySelectedBackground;
+var previouslySelectedObjects = [];
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -233,6 +234,7 @@ function loadMap() {
                     var gridCell = new GridCell(
                         "",
                         "",
+                        backgroundObject.backgroundFile,
                         backgroundObject.zIndex,
                         []
                     );
@@ -249,10 +251,11 @@ function loadMap() {
                     $hexBody += " data-yCoord=\"" + innerIndex + "\"";
                     $hexBody += " style=\"";
                     $hexBody += " z-index:" + backgroundObject.zIndex + ";";
-                    $hexBody += " background-image:url(" + $picUrlPath + backgroundObject.backgroundFile + ");";
+                    $hexBody += " background:url(" + $picUrlPath + backgroundObject.backgroundFile + ") center center;";
+                    $hexBody += " background-size:100%;";
                     $hexBody += "\">";
                     $hexBody += "</div>";
-                    cellHtml += $hexBody;
+                    groundHtml += $hexBody;
 
                     $hexBody = "<div";
                     $hexBody += " id=\"hex" + key + "\"";
@@ -266,7 +269,7 @@ function loadMap() {
                     $hexBody += "\">";
                     $hexBody += "</div>";
 
-                    groundHtml += $hexBody;
+                    cellHtml += $hexBody;
                 });
             });
 
@@ -291,6 +294,7 @@ function loadMap() {
 
                 var cgridObject = new GridObject(
                     "",
+                    gridObject.fileName,
                     gridObject.name,
                     gridObject.xGridCellOffset,
                     gridObject.yGridCellOffset,
@@ -309,7 +313,8 @@ function loadMap() {
                 $hexBody += " data-key=\"" + key + "\"";
                 $hexBody += " style=\"";
                 $hexBody += " z-index:" + (Number(zOffset) + Number(top)) + ";";
-                $hexBody += " background-image:url(" + $picUrlPath + gridObject.fileName + ");";
+                $hexBody += " background:url(" + $picUrlPath + gridObject.fileName + ");";
+                $hexBody += " background-size:100%;";
                 $hexBody += "\">";
                 $hexBody += "</div>";
                 htmlString += $hexBody;
@@ -395,17 +400,20 @@ function clickMap() {
     var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
     // Remove highlights from previously selected divs
-    for (i=0; i<previouslySelectedDivs.length; i++) {
-        previouslySelectedDivs[i].style.backgroundColor = "";
-        previouslySelectedDivs[i].style.mixBlendMode = "";
+    if (previouslySelectedBackground != null) {
+        previouslySelectedBackground.backgroundDiv.style.background = "url(" + $picUrlPath + previouslySelectedBackground.filename + ") center center / 100%";
+    }
+    for (i=0; i<previouslySelectedObjects.length; i++) {
+        previouslySelectedObjects[i].div.style.background = "url(" + $picUrlPath + previouslySelectedObjects[i].filename + ")";
+        previouslySelectedObjects[i].div.style.backgroundSize = "100%";
+        previouslySelectedObjects[i].div.style.backgroundBlendMode = "";
 
     }
     // Highlight the background div
-    gridCells[gridColumn][gridRow].backgroundDiv.style.backgroundColor = "white";
-    gridCells[gridColumn][gridRow].backgroundDiv.style.mixBlendMode = "overlay";
-    previouslySelectedDivs = [];
-    previouslySelectedDivs[0] = gridCells[gridColumn][gridRow].backgroundDiv;
-    // If we have an object for the user select it
+    gridCells[gridColumn][gridRow].backgroundDiv.style.background = gridCells[gridColumn][gridRow].backgroundDiv.style.background + ", #FFFFFF";
+    gridCells[gridColumn][gridRow].backgroundDiv.style.backgroundBlendMode = "normal, overlay";
+    previouslySelectedBackground  = gridCells[gridColumn][gridRow];
+    // If we have an object for the user highlight it
     if (gridCells[gridColumn][gridRow].objectKeys.length > 0) {
         tmpString = "";
         objectKeys = gridCells[gridColumn][gridRow].objectKeys;
@@ -414,18 +422,15 @@ function clickMap() {
             // Update the selected object list
             tmpString += "<br>" + object.name + "<br/>";
             // Highlight the objects in the viewport
-            object.div.style.backgroundColor = "white";
-            object.div.style.mixBlendMode = "overlay";
+            object.div.style.background += ", #FFFFFF";
+            object.div.style.backgroundBlendMode = "normal, overlay";
             // Add div to previouslySelected to remove highlight on later click
-            previouslySelectedDivs[selectedIndex+1] = object.div;
+            previouslySelectedObjects[selectedIndex] = object;
         }
-        $("#slectedObjects").html(tmpString);
+        // Update object list
+        $("#selectedObjects").html(tmpString);
     } else {
-        $("#slectedObjects").html('<br> No objects at this coordinate. </br>');
-        // reset selected index
-        selectedIndex = 0;
-        selectedRow = 0;
-        selectedColumn = 0;
+        $("#selectedObjects").html('<br> No objects at this coordinate. </br>');
     }
 };
 function updateGrid() {
@@ -518,15 +523,17 @@ function zoomDiv(e) {
     return false;
 }
 
-function GridCell(backgroundDiv, cellDiv, zindex, objectKeys) {
+function GridCell(backgroundDiv, cellDiv, filename, zindex, objectKeys) {
     this.backgroundDiv = backgroundDiv;
     this.cellDiv = cellDiv;
+    this.filename = filename;
     this.zIndex = zindex;
     this.objectKeys = objectKeys;
 }
 
-function GridObject(div, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
+function GridObject(div, filename, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
     this.div = div;
+    this.filename = filename;
     this.name = name;
     this.xGridCellOffset = xGridCellOffset;
     this.yGridCellOffset = yGridCellOffset;
