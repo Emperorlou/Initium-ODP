@@ -390,7 +390,7 @@ public class MainPageUpdateService extends Service
 			newHtml.append("</div>");
 			newHtml.append("</div>");
 			newHtml.append("</div>");
-			newHtml.append("<p id=\"slectedObject\"></p>");
+			newHtml.append("<p id=\"slectedObjects\" class=\"selectedObjectList\"></p>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
 			newHtml.append("<script>");
 			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
