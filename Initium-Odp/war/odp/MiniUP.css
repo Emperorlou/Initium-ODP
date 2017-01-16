@@ -3257,6 +3257,11 @@ body
 	background-size:100%;
 }
 
+.selectedObjectList {
+	border: 3px solid blue;
+	display: inline-block;
+}
+
 .vpcontainer {
 	height: 500px;
 	width: 728px;
