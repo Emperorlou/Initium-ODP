@@ -763,7 +763,7 @@ function loadLocationItems()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("ajax_moveitems.jsp?preset=location");
+	pagePopup("/ajax_moveitems.jsp?preset=location");
 //	$("#main-itemlist").load("locationitemlist.jsp");
 //	$("#main-itemlist").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby items</h4></div>");
@@ -775,7 +775,7 @@ function loadLocationCharacters()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("locationcharacterlist.jsp");
+	pagePopup("/locationcharacterlist.jsp");
 //	$("#main-characterlist").click(function(){
 //		$("#main-characterlist").html("<div class='boldbox' onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby characters</h4></div>");
 //	});
@@ -786,7 +786,7 @@ function loadLocationMerchants()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("locationmerchantlist.jsp");
+	pagePopup("/locationmerchantlist.jsp");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
 //	$("#main-merchantlist").click(function(){
 //		$("#main-merchantlist").html("<div class='boldbox' onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby merchants</h4></div>");
@@ -900,7 +900,7 @@ function shareItem(itemId)
 function viewGroup(groupId)
 {
 	closeAllTooltips();
-	pagePopup("odp/ajax_group?groupId=" + groupId);
+	pagePopup("/odp/ajax_group?groupId=" + groupId);
 }
 
 
@@ -1405,7 +1405,7 @@ function incrementStackIndex()
 	currentPopupStackIndex++;
     if (currentPopupStackIndex==1)
     {
-		$("#page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
+		$(".main-page #page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
 	    $(document).bind("keydown", popupKeydownHandler);
     }
     else
@@ -1562,7 +1562,7 @@ function inventory()
 function viewChangelog()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_changelog.jsp");
+	pagePopup("/ajax_changelog.jsp");
 }
 
 function viewSettings()
@@ -1574,7 +1574,7 @@ function viewSettings()
 function viewProfile()
 {
     closeAllPopupsTooltips();
-	pagePopup("odp/view_profile");
+	pagePopup("/odp/view_profile");
 }
 
 function viewMap()
@@ -1653,13 +1653,13 @@ function changeEmailAddress(oldEmail)
 
 function viewReferrals()
 {
-	pagePopup("ajax_referrals.jsp");
+	pagePopup("/ajax_referrals.jsp");
 }
 
 function customizeItemOrderPage(itemId)
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_customizeitem.jsp?itemId="+itemId);
+	pagePopup("/ajax_customizeitem.jsp?itemId="+itemId);
 }
 
 function orderItemCustomization(itemId, orderTypeId, requiredDetails)
@@ -1957,7 +1957,7 @@ function viewManageStore()
     closeAllPagePopups();
     closeAllPopups();
     closeAllTooltips();
-    pagePopup("odp/ajax_managestore.jsp");
+    pagePopup("/odp/ajax_managestore.jsp");
 }
 
 function newCharacterFromDead()
@@ -2609,7 +2609,7 @@ function fullpageRefresh()
 function _viewTrade()
 {
     closeAllPopupsTooltips(true);
-	pagePopup("odp/ajax_trade.jsp",function(){
+	pagePopup("/odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
 //		popupMessage("Trade Cancelled","This trade has been cancelled.")
 	});	

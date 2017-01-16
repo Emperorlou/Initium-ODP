@@ -276,6 +276,38 @@ ${longOperationRecallJs}
 <link rel="stylesheet" href="./MiniUP.css?v=1">
 
 
+<!-- Overrides of script.js for the new UI -->
+<script type="text/javascript">
+
+$("#page-popup-root").html("");	// Clean out the page popup root, we no longer put the close/refresh buttons there
+function pagePopup(url, closeCallback)
+{
+	if (url.indexOf("?")>0)
+		url+="&ajax=true";
+	else
+		url+="?ajax=true";
+	
+	exitFullscreenChat();
+	
+	var stackIndex = incrementStackIndex();
+	var pagePopupId = "page-popup"+stackIndex;
+	
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'>"+
+			"<div style='display:table'><div class='header1' style='display:table-row'>"+
+			"<div class='header1-button' style='display:table-cell' onclick='reloadPagePopup()'>&#8635;</div>"+
+			"<div  style='display:table-cell; width:100%;'></div>"+
+			"<div class='header1-button'  style='display:table-cell' onclick='closePagePopup()'>X</div></div></div>"+
+			"<div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
+	$("#"+pagePopupId+"-content").load(url);
+	
+	if (closeCallback!=null)
+		popupStackCloseCallbackHandlers.push(closeCallback);
+	else
+		popupStackCloseCallbackHandlers.push(null);
+}
+
+</script>
+
 <script type="text/javascript">
 	// This ensures the bottom half of the page fills the rest of the page and no more
 	function normalizePage()
@@ -325,11 +357,12 @@ on our slack channel!
 				</div>
 			</div>
 			<div id='main-banner' class='banner1'>
-					<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
-						${inBannerCharacterWidget}
-					</div>				
-			
 				<img id='banner-sizer' src='https://initium-resources.appspot.com/images/banner---placeholder2.png' border=0/>
+				<div id='banner-base'></div>			
+				<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
+					${inBannerCharacterWidget}
+				</div>				
+			
 			</div>
 		</div>
 		<div class='page-maincontent'>
@@ -385,26 +418,50 @@ on our slack channel!
 			<script type="text/javascript">updateMinimizeBox("#chat_box_minimize_button", ".chat_box")</script>
 		</div>
 
+		<div class='newui-popup' id='page-popup-root'></div> 
+
 					</div>
 				</div>
 				
-							<div class='location-controls-container'>
-				<div class='header1'></div>
-				<div class='main1'>
-					<div class='location-controls'>
-					<div class='main1-inset1'>
-						<div class='backdrop1b buttonbar'>
-							<div id='buttonBar'>${buttonBar}</div>
+				<div class='location-controls-container'>
+					<div class='location-controls-page'>
+						<div class='header1'>
+							<div style="display:table">
+								<div class="header1" style="display:table-row">
+									<div class="header1-button" style="display:table-cell" onclick="reloadPagePopup()">↻</div>
+									<div style="display:table-cell; width:100%;">
+										<div id='buttonbar'>${buttonBar}</div>
+									</div>
+									<div class="header1-button" style="display:table-cell" onclick="closePagePopup()">X</div>
+								</div>
+							</div>
+						</div>
+						<div class='main1 location-controls-page-internal'>
+							<div class='location-controls'>
+							
+							
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							</div>
 						</div>
 					</div>
-					
-					
-					<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-						${mainButtonList}
-					</div>					
-					</div>
 				</div>
-			</div>
 				
 			</div>
 

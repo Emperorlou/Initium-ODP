@@ -126,8 +126,8 @@ messager.onChatMessage = function(chatMessage)
 			chatMessage.message = chatMessage.message.substring(4);
 		}
 		else
-			html+=": ";
-		html+=chatMessage.message;
+			html+="<span class='chatMessage-separator'>: </span>";
+		html+="<span class='chatMessage-message'>"+chatMessage.message+"</span>";
 		html+="</div>";
 	}
 	else if (chatMessage.mode=="admin")

@@ -382,7 +382,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("<span>" + generateToggleDuel(character) + "</span>");
 		sb.append("<span>" + generateToggleCloak(character) + "</span>");
 		// Help text
-		sb.append("<div class='hiddenTooltip' id='buttonbar'><h5>The Button Bar</h5>");
+		sb.append("<div class='hiddenTooltip' id='buttonbar-help'><h5>The Button Bar</h5>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/manageStore.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This button will take you to your storefront management page. This page allows you to setup your storefront by specifying which items you would like to sell to other players and for how much. More help can be found in the storefront page itself.</p>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/storefrontEnabled.png' border='0' style='float:left;padding:4px;'>");
@@ -397,7 +397,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("<p>This button will not allow other players to see your character stats, referral stats, or equipment. It can be an important tool in PvP to hide your equipment so other players are less prepared to attack you since they do not know what you're weak to. However if you're not planning on doing PvP any time soon, keeping this option off makes it easier for people to see what you have and to help you - or just to show off your great gear.</p>");
 		sb.append("</div>");
 		// Help button
-		sb.append("<span class='hint' rel='#buttonbar' style='float:right'><img src='https://initium-resources.appspot.com/images/ui/help.png' border='0'></span>");
+		sb.append("<span class='hint' rel='#buttonbar-help' ><img src='https://initium-resources.appspot.com/images/ui/help.png' border='0'></span>");
 		sb.append("</div>");
 		return sb.toString();
 	}

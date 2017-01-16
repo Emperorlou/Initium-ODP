@@ -128,7 +128,7 @@ hr:after {
 .travel-scene-container
 {
 	width:100%;
-	height:211px;
+	height:100%;
 	background-image:url('https://initium-resources.appspot.com/images/environment/background.png');
 }
 .travel-scene
@@ -1173,7 +1173,7 @@ hr.items-separator {
 .walkingman-prop
 {
 	position: absolute;
-	z-index:15000;
+	z-index:1500000;
 }
 
 
@@ -1346,6 +1346,11 @@ hr.items-separator {
 }
 
 /* EQUIPMENT AVATAR STYLES 32PX */
+.avatar-equip-silhouette
+{
+	position:absolute; top:0px; left:0px; width:100%; height:100%; background-size:contain; background-position:center; background-repeat:no-repeat;
+}
+
 .avatar-equip-cloak
 {
 	position:absolute; top:0px; left:0px; width:100%; height:100%; background-size:contain; background-position:center; background-repeat:no-repeat;
@@ -2403,8 +2408,8 @@ body
 
 ::-webkit-scrollbar
 {
-	width:14px;
-	height:14px;
+	width:7px;
+	height:7px;
 }
 ::-webkit-scrollbar-track
 {
@@ -2564,7 +2569,8 @@ body
 	padding-top:5px;
 	padding-left:9px;
 	padding-right:7px;
-	
+	vertical-align:top;
+
 	text-shadow: 1px 1px 0px rgba(0, 0, 0, 1);
 }
 .header1-button:after
@@ -2618,7 +2624,6 @@ body
 	position:relative;
 	
 	
-	background-image:url("https://initium-resources.appspot.com/images/hdbanners/banner---rocky-moutains-forest1.jpg");
 	background-position-x:center;
 	background-position-y:center;
 	background-repeat:no-repeat;
@@ -2647,6 +2652,18 @@ body
 	max-width:100%;
 }
 
+.banner1 #banner-base
+{
+	position:absolute;
+	top:0px;
+	width:100%;
+	height:100%;
+}
+
+.banner1 #banner-base .travel-scene-container
+{
+	height:100%;
+}
 
 
 .main1
@@ -2698,10 +2715,19 @@ body
 	
 }
 
-.buttonbar img
+#buttonbar img
 {
   -webkit-filter: drop-shadow(5px 5px 5px #222222);
-  filter: drop-shadow(5px 5px 5px #222222);	
+  filter: drop-shadow(5px 5px 5px #222222);
+  max-height:24px;
+  margin-left:5px;
+  margin-right:5px;
+  vertical-align:bottom;
+  	
+}
+#buttonbar
+{
+	text-align: center;
 }
 
 
@@ -2778,13 +2804,26 @@ body
 	vertical-align:top;
 	height:100%;
 	max-height:100%;
+	background-color: #757161;
 
+}
+.location-controls-page
+{
+	max-height:100%;
+	height:100%;
+	position:relative;
+}
+.location-controls-page-internal
+{
+	overflow-y:auto;
+	max-height:100%;
+	margin-top:27px;
+	top:0px;
+	position:absolute;
+	border-bottom-width:42px;
 }
 .location-controls-container .main1
 {
-	height:100%;
-	max-height:100%;
-	padding-bottom:40px;
 }
 .location-controls-navigation
 {
@@ -2794,8 +2833,6 @@ body
 
 .location-controls
 {
-	height:100%;
-	overflow-y:auto;
 }
 
 
@@ -2853,11 +2890,11 @@ body
 	background-color: #1d1d1d;
 	
 	border-style: solid;
-	border-width: 8px 20px 8px 18px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 20 8 18 fill round repeat;
+	border-width: 8px 10px 8px 9px;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 fill round repeat;
 	
 	margin:8px;
 }
@@ -3036,6 +3073,7 @@ body
 .characterWidgetContainer
 {
 	position:absolute;
+	top:0px;
 }
 
 .cluetip-newui2 .mini-window-header
@@ -3043,58 +3081,79 @@ body
 	background-color:inherit;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* For REALLY small screens, save as much space as possible
-*/
-@media (max-width:400px)
+.newui-popup#page-popup-root
 {
-	.header1-spacer
-	{
-		display:none;
-	}
-	
-	.chat_messages
-	{
-		font-size:12px;
-	}
+	max-width:none;
 }
 
-@media (max-width:750px)
+.newui-popup .page-popup
 {
-	.section
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+	
+	background-color: #757161;
+
+	width:100%;	
+	max-width:none;
+
+	border-style: solid;
+	border-width: 0px 7px;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 fill round repeat;
+	
+	padding:1px;
+	
+	position:relative;
+}
+
+.newui-popup .page-popup:before
+{
+	display:none;
+}
+
+.newui-popup .page-popup-glass
+{
+	display:none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (min-width:1456px)
+{
+	.banner1
 	{
-		display:block;
-		width:100%;
+		background-position: center center; 
+		background-size:cover;
 	}
 }
 
@@ -3117,14 +3176,6 @@ body
 		height:30%;
 		min-height:100px;
 	}
-	.buttonbar
-	{
-	
-	}
-	.buttonbar img
-	{
-		height:25px;
-	}
 	.chat-container .main1
 	{
 		padding-bottom:30px;
@@ -3142,14 +3193,16 @@ body
 		height:66%;
 	}
 		
-	.location-controls-container .header1
-	{
-		display:none;
-	}
 	
 	.location-controls-container .main1
 	{
 		margin-bottom: 40px;
+	}
+	
+	.location-controls-page-internal
+	{
+		max-height:70%;
+		border-bottom-width:69px;
 	}
 	
 	.header1-button
@@ -3168,13 +3221,53 @@ body
 	}
 }
 
-@media (min-width:1456px)
+
+/* For REALLY small screens, save as much space as possible
+*/
+@media (max-width:750px)
 {
-	.banner1
+	.section
 	{
-		background-position: center center; 
-		background-size:cover;
+		display:block;
+		width:100%;
 	}
+	.main1
+	{
+		border-left:none;
+		border-right:none;
+		margin-left:0px;
+		margin-right:0px;
+	}
+
+
+	.chat-text-container
+	{
+		margin:2px;
+	}
+	.chat-container .main1
+	{
+		padding-bottom:21px;
+	}
+	
+	.chatMessage-time
+	{
+		font-family: sans-serif;
+		font-size:10px;
+	}
+}
+
+@media (max-width:400px)
+{
+	.header1-spacer
+	{
+		display:none;
+	}
+	
+	.chat_messages
+	{
+		font-size:12px;
+	}
+
 }
 
 /* When the screen is a square or less */
@@ -3208,7 +3301,7 @@ body
 	}
 }
 
-@media screen and (max-height:500px)
+@media screen and (max-height:550px)
 {
 	.page
 	{
