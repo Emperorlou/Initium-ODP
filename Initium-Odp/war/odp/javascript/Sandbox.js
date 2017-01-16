@@ -18,7 +18,7 @@ var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 var firstLoad = true;
 var previouslySelectedBackground;
 var previouslySelectedObjects = [];
-var cursorObject;
+var cursorObject = "";
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -159,7 +159,7 @@ function scaleTiles() {
     //ctx.lineTo(newX, newY);
     //ctx.stroke();
 
-    if (cursorObject != null) {
+    if (cursorObject != "") {
         cursorObject.div.style.width = cursorWidth * scale * .2 + "px";
         cursorObject.div.style.height = cursorHeight * scale * .2 + "px";
         cursorObject.div.style.top = cursorObject.yGridCoord * gridCellHeight + "px";
@@ -411,19 +411,22 @@ function clickMap() {
     var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
 
-    // Place the cursor object in the grid
-    htmlString = "<div id=\"cursor\"" + " class=\"cursorObject\"";
-    htmlString += " style=\"";
-    htmlString += " z-index:" + 1000000 + ";";
-    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-    htmlString += " top:" + (gridColumn * gridCellHeight) + "px;";
-    htmlString += " left:" + (gridRow * gridCellWidth) + "px;";
-    htmlString += " background-size:100%;";
-    htmlString += "\">";
-    htmlString += "</div>";
-    $('#ui-layer').append(htmlString);
-    if (cursorObject == null) {
+    if (cursorObject == "") {
+        // Build out new div
+        htmlString = "<div id=\"cursor\"" + " class=\"cursorObject\"";
+        htmlString += " style=\"";
+        htmlString += " z-index:" + 1000000 + ";";
+        htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+        htmlString += " top:" + (gridColumn * gridCellHeight) + "px;";
+        htmlString += " left:" + (gridRow * gridCellWidth) + "px;";
+        htmlString += " background-size:100%;";
+        htmlString += "\">";
+        htmlString += "</div>";
+        $('#ui-layer').append(htmlString);
         cursorObject = new CursorObject(document.getElementById('cursor'), (gridRow * gridCellWidth), (gridColumn * gridCellHeight));
+    } else {
+        cursorObject.div.style.top = (gridColumn * gridCellHeight) + "px";
+        cursorObject.div.style.left = (gridRow * gridCellWidth) + "px";
     }
 
     // Remove highlights from previously selected divs
@@ -439,7 +442,7 @@ function clickMap() {
 
     }
     // Highlight the background div
-    gridCells[gridColumn][gridRow].backgroundDiv.style.background = gridCells[gridColumn][gridRow].backgroundDiv.style.background + ", #FFFFFF";
+    gridCells[gridColumn][gridRow].backgroundDiv.style.background = gridCells[gridColumn][gridRow].backgroundDiv.style.background;
     //gridCells[gridColumn][gridRow].backgroundDiv.style.backgroundBlendMode = "normal, overlay";
     gridCells[gridColumn][gridRow].backgroundDiv.className += " highlighted";
     previouslySelectedBackground  = gridCells[gridColumn][gridRow];
@@ -452,7 +455,6 @@ function clickMap() {
             // Update the selected object list
             tmpString += "<br>" + object.name + "<br/>";
             // Highlight the objects in the viewport
-            object.div.style.background += ", #FFFFFF";
             object.div.className += " highlighted";
             //object.div.style.backgroundBlendMode = "normal, overlay";
             // Add div to previouslySelected to remove highlight on later click
