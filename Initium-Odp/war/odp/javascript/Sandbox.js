@@ -96,7 +96,7 @@ function scaleTiles() {
     grid.style.width = currGridWidth + "px";
 
     originX = grid.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
-    originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop + gridCellLayer.offsetTop - $(window).scrollTop();
+    originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop + - $(window).scrollTop();
 
     var userLocX = 0;
     var userLocY = 0;
@@ -613,6 +613,8 @@ function checkIfHoveringOverViewport() {
         targ.className != 'vpcontainer' &&
         targ.className != 'gridObject' &&
         targ.className != 'gridLayer' &&
+        targ.className != 'highlighted' &&
+        targ.className != 'gridObject highlighted' &&
         targ.className != 'objectLayer') {return false};
     return true;
 }
