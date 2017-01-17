@@ -15,6 +15,7 @@ var cursorHeight = 166;
 var drugged = false;
 var reachedZoom = false;
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
+var $domain = "https://initium-resources.appspot.com/";
 var firstLoad = true;
 var previouslySelectedBackground;
 var previouslySelectedObjects = [];
@@ -315,6 +316,7 @@ function loadMap() {
                 var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
 
                 var cgridObject = new GridObject(
+                    gridObject.key,
                     "",
                     gridObject.fileName,
                     gridObject.name,
@@ -335,7 +337,11 @@ function loadMap() {
                 $hexBody += " data-key=\"" + key + "\"";
                 $hexBody += " style=\"";
                 $hexBody += " z-index:" + (Number(zOffset) + Number(top)) + ";";
-                $hexBody += " background:url(" + $picUrlPath + gridObject.fileName + ");";
+                if (gridObject.key == "o1") {
+                    $hexBody += " background:url(" + $domain + gridObject.fileName + ");";
+                } else {
+                    $hexBody += " background:url(" + $picUrlPath + gridObject.fileName + ");";
+                }
                 $hexBody += " background-size:100%;";
                 $hexBody += "\">";
                 $hexBody += "</div>";
@@ -500,7 +506,11 @@ function clickMap() {
         previouslySelectedBackground.backgroundDiv.className = previouslySelectedBackground.backgroundDiv.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
     }
     for (i=0; i<previouslySelectedObjects.length; i++) {
-        previouslySelectedObjects[i].div.style.background = "url(" + $picUrlPath + previouslySelectedObjects[i].filename + ")";
+        if (previouslySelectedObjects[i].key == "o1") {
+            previouslySelectedObjects[i].div.style.background = "url(" + $domain + previouslySelectedObjects[i].filename + ")";
+        } else {
+            previouslySelectedObjects[i].div.style.background = "url(" + $picUrlPath + previouslySelectedObjects[i].filename + ")";
+        }
         previouslySelectedObjects[i].div.style.backgroundSize = "100%";
         previouslySelectedObjects[i].div.style.backgroundBlendMode = "";
         previouslySelectedObjects[i].div.className = previouslySelectedObjects[i].div.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
@@ -508,10 +518,9 @@ function clickMap() {
     }
     // Highlight the background div
     gridCells[gridColumn][gridRow].backgroundDiv.style.background = gridCells[gridColumn][gridRow].backgroundDiv.style.background;
-    //gridCells[gridColumn][gridRow].backgroundDiv.style.backgroundBlendMode = "normal, overlay";
     gridCells[gridColumn][gridRow].backgroundDiv.className += " highlighted";
     previouslySelectedBackground  = gridCells[gridColumn][gridRow];
-    // If we have an object for the user highlight it
+    // If we have an object for the user, highlight it
     if (gridCells[gridColumn][gridRow].objectKeys.length > 0) {
         tmpString = "";
         objectKeys = gridCells[gridColumn][gridRow].objectKeys;
@@ -637,7 +646,8 @@ function GridCell(backgroundDiv, cellDiv, filename, zindex, objectKeys) {
     this.objectKeys = objectKeys;
 }
 
-function GridObject(div, filename, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
+function GridObject(key, div, filename, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
+    this.key = key;
     this.div = div;
     this.filename = filename;
     this.name = name;
