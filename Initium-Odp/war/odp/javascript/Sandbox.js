@@ -429,7 +429,7 @@ function startDrag(e) {
 }
 
 function checkDoubleClick() {
-    if (timeBetweenLeftClick > 20) {
+    if (timeBetweenLeftClick > 17) {
         timeBetweenLeftClick = 0;
         window.clearInterval(clickTimer);
         return false;
