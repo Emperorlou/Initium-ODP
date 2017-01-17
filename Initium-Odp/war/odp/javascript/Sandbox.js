@@ -442,7 +442,12 @@ function checkDoubleClick() {
     }
 }
 function timerIncrement() {
-    timeBetweenLeftClick += 1;
+    if (timeBetweenLeftClick > 17) {
+        timeBetweenLeftClick = 0;
+        window.clearInterval(clickTimer);
+    } else {
+        timeBetweenLeftClick += 1;
+    }
 }
 
 function clickMap() {
