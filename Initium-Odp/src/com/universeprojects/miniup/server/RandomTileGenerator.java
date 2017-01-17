@@ -62,6 +62,49 @@ public class RandomTileGenerator {
             }
             grid.add(row);
         }
+
+        int dumpX = 8;
+        int dumpY = 12;
+        int attachX = -15;
+        int attachY = -15;
+        int width = 30;
+        int height = 30;
+        int offsetX = 30;
+        int offsetY = 30;
+        objectMap.put("images/small2/Pixel_Art-Armor-Chest-elvenhunter.png" + "tempKey:o1",
+                new GridObject("o1", "images/small2/Pixel_Art-Armor-Chest-elvenhunter.png",
+                        "Norwood Cloak", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small2/Pixel_Art-Armor-Hardenedleatherboots_Old.png" + "tempKey:o1",
+                new GridObject("o1", "images/small2/Pixel_Art-Armor-Hardenedleatherboots_Old.png",
+                        "Leather Shin Protectors", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small/Pixel_Art-Tools-Shovel1.png" + "tempKey:o1",
+                new GridObject("o1", "images/small/Pixel_Art-Tools-Shovel1.png",
+                        "Ogre-Sized Shovel", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small2/Pixel_Art-Gems-Topaz_Perfect.png" + "tempKey:o1",
+                new GridObject("o1", "images/small2/Pixel_Art-Gems-Topaz_Perfect.png",
+                        "Perfect Topaz", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small2/Pixel_Art-Weapon-Energy-Blade.png" + "tempKey:o1",
+                new GridObject("o1", "images/small2/Pixel_Art-Weapon-Energy-Blade.png",
+                        "Energy Blade", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small/Pixel_Art-Weapons-Chain-W_Mace005.png" + "tempKey:o1",
+                new GridObject("o1", "images/small/Pixel_Art-Weapons-Chain-W_Mace005.png",
+                        "Flail of the Desert Prince", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small2/Pixel-Art-Armor-Gladiator-gauntlets.png" + "tempKey:o1",
+                new GridObject("o1", "images/small2/Pixel-Art-Armor-Gladiator-gauntlets.png",
+                        "Gladiator's Gauntlets", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small2/Pixel_Art-Gems-Sapphire_Flawed.png" + "tempKey:o1",
+                new GridObject("o1", "images/small2/Pixel_Art-Gems-Sapphire_Flawed.png",
+                        "Flawed Sapphire", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small/Pixel_Art-Tools-Pick1.png" + "tempKey:o1",
+                new GridObject("o1", "images/small/Pixel_Art-Tools-Pick1.png",
+                        "Orcish Pick", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small2/Pixel_Art-Weapon-Chieftains-Axe.png" + "tempKey:o1",
+                new GridObject("o1", "images/small2/Pixel_Art-Weapon-Chieftains-Axe.png",
+                        "Ogre Chieftain's Axe", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        objectMap.put("images/small2/Pixel_Art-Armor-Head-Santa-Hat.png" + "tempKey:o1",
+                new GridObject("o1", "images/small2/Pixel_Art-Armor-Head-Santa-Hat.png",
+                        "Fake Santa Hat", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+        
         data.put("backgroundTiles", grid);
         data.put("objectMap", objectMap);
         return data;
