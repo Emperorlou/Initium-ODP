@@ -45,24 +45,24 @@ $('#viewportcontainer').on({
     'mousewheel': function (e) {
         e.preventDefault();
         if (e.originalEvent.deltaY < 0) {
-            zoomIn();
+            zoomIn(1);
         } else {
-            zoomOut();
+            zoomOut(1);
         }
         $('html, body').stop().animate({}, 500, 'linear');
     }
 });
 
-function zoomIn() {
-    scale += scaleRate*scale;
+function zoomIn(additionalScale) {
+    scale += scaleRate*scale*additionalScale;
     if (maxZoom !== null && scale > maxZoom) {
         scale = maxZoom;
     }
     scaleTiles();
 }
 
-function zoomOut() {
-    scale -= scaleRate*scale;
+function zoomOut(additionalScale) {
+    scale -= scaleRate*scale*additionalScale;
     if (minZoom !== null && scale < minZoom) {
         scale = minZoom;
     }
@@ -449,9 +449,9 @@ function clickMap() {
     event.preventDefault();
     if (checkDoubleClick()) {
         if (event.which == 3) {
-            zoomOut();
+            zoomOut(2);
         } else {
-            zoomIn();
+            zoomIn(2);
         }
     }
     var scaledGridCellWidth = 64 * scale;
@@ -687,9 +687,9 @@ function zoomDiv(e) {
     d1 = Math.sqrt( Math.pow((offsetX2 - offsetX1),2) + Math.pow((offsetY2 - offsetY1),2));
     d2 = Math.sqrt( Math.pow((coffsetX2 - coffsetX1),2) + Math.pow((coffsetY2 - coffsetY1),2));
     if (d1 < d2) {
-        zoomIn();
+        zoomIn(1);
     } else {
-        zoomOut();
+        zoomOut(1);
     }
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
