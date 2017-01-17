@@ -21,6 +21,8 @@ var firstLoad = true;
 var previouslySelectedBackground;
 var previouslySelectedObjects = [];
 var cursorObject = "";
+var clickTimer;
+var timeBetweenLeftClick = 0;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -43,27 +45,28 @@ $('#viewportcontainer').on({
     'mousewheel': function (e) {
         e.preventDefault();
         if (e.originalEvent.deltaY < 0) {
-            zoomOut();
-        } else {
             zoomIn();
+        } else {
+            zoomOut();
         }
-        scaleTiles();
         $('html, body').stop().animate({}, 500, 'linear');
     }
 });
 
-function zoomOut() {
+function zoomIn() {
     scale += scaleRate*scale;
     if (maxZoom !== null && scale > maxZoom) {
         scale = maxZoom;
     }
+    scaleTiles();
 }
 
-function zoomIn() {
+function zoomOut() {
     scale -= scaleRate*scale;
     if (minZoom !== null && scale < minZoom) {
         scale = minZoom;
     }
+    scaleTiles();
 }
 
 function pressedButton() {
@@ -383,6 +386,10 @@ window.onload = function() {
     document.body.addEventListener('touchstart', startDrag);
 }
 
+$('#viewport').on('contextmenu', function(){
+    return false;
+});
+
 function startDrag(e) {
     // determine event object
     if (!e) {
@@ -420,7 +427,52 @@ function startDrag(e) {
         }
     }
 }
+
+function single_double_click(single_click_callback, double_click_callback, timeout) {
+    return this.each(function(){
+        var clicks = 0, self = this;
+        jQuery(this).click(function(event){
+            clicks++;
+            if (clicks == 1) {
+                setTimeout(function(){
+                    if(clicks == 1) {
+                        single_click_callback.call(self, event);
+                    } else {
+                        double_click_callback.call(self, event);
+                    }
+                    clicks = 0;
+                }, timeout || 300);
+            }
+        });
+    });
+}
+
+function checkDoubleClick() {
+    if (timeBetweenLeftClick > 5) {
+        timeBetweenLeftClick = 0;
+        window.clearInterval(clickTimer);
+        return false;
+    } else if (timeBetweenLeftClick > 0) {
+        timeBetweenLeftClick = 0;
+        window.clearInterval(clickTimer);
+        return true;
+    } else {
+        clickTimer = window.setInterval(timerIncrement, 100);
+    }
+}
+function timerIncrement() {
+    timeBetweenLeftClick += 1;
+}
+
 function clickMap() {
+    event.preventDefault();
+    if (checkDoubleClick()) {
+        if (event.which == 3) {
+            zoomOut();
+        } else {
+            zoomIn();
+        }
+    }
     var scaledGridCellWidth = 64 * scale;
     var scaledGridCellHeight = 64 * scale;
     // For mouse clicks
@@ -445,63 +497,7 @@ function clickMap() {
     var scaledCursorWidth = cursorWidth * scale * .4;
     if (cursorObject == "") {
         // First select, build out cursor object
-        htmlString = "<div id=\"cursorObject\"" + " class=\"cursorObject\"";
-        htmlString += " style=\"";
-        htmlString += " top:" + cursorTop + "px;";
-        htmlString += " left:" + cursorLeft + "px;";
-        htmlString += " width:" + cursorWidth * scale * .4 + "px;";
-        htmlString += " height:" + cursorHeight * scale * .4 + "px;";
-        htmlString += "\">";
-        htmlString += "<div id=\"topLeftCursor\"" + " class=\"cursorSubObject\"";
-        htmlString += " style=\"";
-        htmlString += " z-index:" + 1000000 + ";";
-        htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-        htmlString += " width:50%;";
-        htmlString += " height:50%;";
-        htmlString += " background-size:100%;";
-        htmlString += " transform:scaleX(-1);";
-        htmlString += " filter:drop-shadow(0px 0px 3px #000000);";
-        htmlString += "\">";
-        htmlString += "</div>";
-        htmlString += "<div id=\"topRightCursor\"" + " class=\"cursorSubObject\"";
-        htmlString += " style=\"";
-        htmlString += " z-index:" + 1000000 + ";";
-        htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-        htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
-        htmlString += " width:50%;";
-        htmlString += " height:50%;";
-        htmlString += " background-size:100%;";
-        htmlString += " filter:drop-shadow(0px 0px 3px #000000);";
-        htmlString += "\">";
-        htmlString += "</div>";
-        htmlString += "<div id=\"bottomRightCursor\"" + " class=\"cursorSubObject\"";
-        htmlString += " style=\"";
-        htmlString += " z-index:" + 1000000 + ";";
-        htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-        htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
-        htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
-        htmlString += " width:50%;";
-        htmlString += " height:50%;";
-        htmlString += " background-size:100%;";
-        htmlString += " transform:scaleX(-1);";
-        htmlString += " transform:scaleY(-1);";
-        htmlString += " filter:drop-shadow(0px 0px 3px #000000);";
-        htmlString += "\">";
-        htmlString += "</div>";
-        htmlString += "<div id=\"bottomLeftCursor\"" + " class=\"cursorSubObject\"";
-        htmlString += " style=\"";
-        htmlString += " z-index:" + 1000000 + ";";
-        htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-        htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
-        htmlString += " width:50%;";
-        htmlString += " height:50%;";
-        htmlString += " background-size:100%;";
-        htmlString += " transform:scale(-1, -1);";
-        htmlString += " filter:drop-shadow(0px 0px 3px #000000);";
-        htmlString += "\">";
-        htmlString += "</div>";
-        htmlString += "</div>";
-        $('#ui-layer').append(htmlString);
+        $('#ui-layer').append(buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursorWidth, scaledGridCellHeight, scaledGridCellWidth));
         cursorObject = new CursorObject(document.getElementById('cursorObject'), gridColumn, gridRow);
     } else {
         // Only need to update cursor object
@@ -538,10 +534,9 @@ function clickMap() {
 
     }
     // Highlight the background div
-    gridCells[gridColumn][gridRow].backgroundDiv.style.background = gridCells[gridColumn][gridRow].backgroundDiv.style.background;
     gridCells[gridColumn][gridRow].backgroundDiv.className += " highlighted";
     previouslySelectedBackground  = gridCells[gridColumn][gridRow];
-    // If we have an object for the user, highlight it
+    // If we have an objects at this coord, highlight them and display their names
     if (gridCells[gridColumn][gridRow].objectKeys.length > 0) {
         tmpString = "";
         objectKeys = gridCells[gridColumn][gridRow].objectKeys;
@@ -561,6 +556,61 @@ function clickMap() {
         $("#selectedObjects").html('<br> No objects at this coordinate. </br>');
     }
 };
+function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursorWidth, scaledGridCellHeight, scaledGridCellWidth) {
+    htmlString = "<div id=\"cursorObject\"" + " class=\"cursorObject\"";
+    htmlString += " style=\"";
+    htmlString += " top:" + cursorTop + "px;";
+    htmlString += " left:" + cursorLeft + "px;";
+    htmlString += " width:" + cursorWidth * scale * .4 + "px;";
+    htmlString += " height:" + cursorHeight * scale * .4 + "px;";
+    htmlString += "\">";
+    htmlString += "<div id=\"topLeftCursor\"" + " class=\"cursorSubObject\"";
+    htmlString += " style=\"";
+    htmlString += " z-index:" + 1000000 + ";";
+    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " width:50%;";
+    htmlString += " height:50%;";
+    htmlString += " background-size:100%;";
+    htmlString += " transform:scaleX(-1);";
+    htmlString += "\">";
+    htmlString += "</div>";
+    htmlString += "<div id=\"topRightCursor\"" + " class=\"cursorSubObject\"";
+    htmlString += " style=\"";
+    htmlString += " z-index:" + 1000000 + ";";
+    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
+    htmlString += " width:50%;";
+    htmlString += " height:50%;";
+    htmlString += " background-size:100%;";
+    htmlString += "\">";
+    htmlString += "</div>";
+    htmlString += "<div id=\"bottomRightCursor\"" + " class=\"cursorSubObject\"";
+    htmlString += " style=\"";
+    htmlString += " z-index:" + 1000000 + ";";
+    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
+    htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
+    htmlString += " width:50%;";
+    htmlString += " height:50%;";
+    htmlString += " background-size:100%;";
+    htmlString += " transform:scaleX(-1);";
+    htmlString += " transform:scaleY(-1);";
+    htmlString += "\">";
+    htmlString += "</div>";
+    htmlString += "<div id=\"bottomLeftCursor\"" + " class=\"cursorSubObject\"";
+    htmlString += " style=\"";
+    htmlString += " z-index:" + 1000000 + ";";
+    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
+    htmlString += " width:50%;";
+    htmlString += " height:50%;";
+    htmlString += " background-size:100%;";
+    htmlString += " transform:scale(-1, -1);";
+    htmlString += "\">";
+    htmlString += "</div>";
+    htmlString += "</div>";
+    return htmlString;
+}
 function updateGrid() {
     if(!grid.style.left) { grid.style.left='0px'};
     if (!grid.style.top) { grid.style.top='0px'};
@@ -604,6 +654,7 @@ function dragDiv(e) {
     }
     return false;
 }
+
 function checkIfHoveringOverViewport() {
     var targ = event.target ? event.target : event.srcElement;
     if (targ.className != 'gridBackground' &&
@@ -615,6 +666,8 @@ function checkIfHoveringOverViewport() {
         targ.className != 'gridLayer' &&
         targ.className != 'highlighted' &&
         targ.className != 'gridObject highlighted' &&
+        targ.className != 'cursorObject' &&
+        targ.className != 'cursorSubObject' &&
         targ.className != 'objectLayer') {return false};
     return true;
 }
@@ -627,6 +680,8 @@ function checkIfHoveringOverGrid() {
         targ.className != 'gridLayer' &&
         targ.className != 'highlighted' &&
         targ.className != 'gridObject highlighted' &&
+        targ.className != 'cursorObject' &&
+        targ.className != 'cursorSubObject' &&
         targ.className != 'objectLayer') {return false};
     return true;
 }
@@ -651,11 +706,10 @@ function zoomDiv(e) {
     d1 = Math.sqrt( Math.pow((offsetX2 - offsetX1),2) + Math.pow((offsetY2 - offsetY1),2));
     d2 = Math.sqrt( Math.pow((coffsetX2 - coffsetX1),2) + Math.pow((coffsetY2 - coffsetY1),2));
     if (d1 < d2) {
-        zoomOut();
-    } else {
         zoomIn();
+    } else {
+        zoomOut();
     }
-    scaleTiles();
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
 }
