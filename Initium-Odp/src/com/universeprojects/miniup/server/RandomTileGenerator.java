@@ -71,39 +71,41 @@ public class RandomTileGenerator {
         int height = 30;
         int offsetX = 30;
         int offsetY = 30;
+        Random gausRx = new Random(seed);
+        Random gausRy = new Random(seed);
         objectMap.put("images/small2/Pixel_Art-Armor-Chest-elvenhunter.png" + "tempKey:o1",
                 new GridObject("o1", "images/small2/Pixel_Art-Armor-Chest-elvenhunter.png",
-                        "Norwood Cloak", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Norwood Cloak", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small2/Pixel_Art-Armor-Hardenedleatherboots_Old.png" + "tempKey:o1",
                 new GridObject("o1", "images/small2/Pixel_Art-Armor-Hardenedleatherboots_Old.png",
-                        "Leather Shin Protectors", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Leather Shin Protectors", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small/Pixel_Art-Tools-Shovel1.png" + "tempKey:o1",
                 new GridObject("o1", "images/small/Pixel_Art-Tools-Shovel1.png",
-                        "Ogre-Sized Shovel", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Ogre-Sized Shovel", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small2/Pixel_Art-Gems-Topaz_Perfect.png" + "tempKey:o1",
                 new GridObject("o1", "images/small2/Pixel_Art-Gems-Topaz_Perfect.png",
-                        "Perfect Topaz", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Perfect Topaz", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small2/Pixel_Art-Weapon-Energy-Blade.png" + "tempKey:o1",
                 new GridObject("o1", "images/small2/Pixel_Art-Weapon-Energy-Blade.png",
-                        "Energy Blade", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Energy Blade", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small/Pixel_Art-Weapons-Chain-W_Mace005.png" + "tempKey:o1",
                 new GridObject("o1", "images/small/Pixel_Art-Weapons-Chain-W_Mace005.png",
-                        "Flail of the Desert Prince", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Flail of the Desert Prince", dumpY, dumpX, offsetX, (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small2/Pixel-Art-Armor-Gladiator-gauntlets.png" + "tempKey:o1",
                 new GridObject("o1", "images/small2/Pixel-Art-Armor-Gladiator-gauntlets.png",
-                        "Gladiator's Gauntlets", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Gladiator's Gauntlets", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small2/Pixel_Art-Gems-Sapphire_Flawed.png" + "tempKey:o1",
                 new GridObject("o1", "images/small2/Pixel_Art-Gems-Sapphire_Flawed.png",
-                        "Flawed Sapphire", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Flawed Sapphire", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small/Pixel_Art-Tools-Pick1.png" + "tempKey:o1",
                 new GridObject("o1", "images/small/Pixel_Art-Tools-Pick1.png",
-                        "Orcish Pick", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Orcish Pick", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small2/Pixel_Art-Weapon-Chieftains-Axe.png" + "tempKey:o1",
                 new GridObject("o1", "images/small2/Pixel_Art-Weapon-Chieftains-Axe.png",
-                        "Ogre Chieftain's Axe", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Ogre Chieftain's Axe", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         objectMap.put("images/small2/Pixel_Art-Armor-Head-Santa-Hat.png" + "tempKey:o1",
                 new GridObject("o1", "images/small2/Pixel_Art-Armor-Head-Santa-Hat.png",
-                        "Fake Santa Hat", dumpY, dumpX, offsetX, offsetY, attachY, attachX, width, height));
+                        "Fake Santa Hat", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian()*10+30), (int) Math.round(gausRy.nextGaussian()*10+30), attachY, attachX, width, height));
         
         data.put("backgroundTiles", grid);
         data.put("objectMap", objectMap);

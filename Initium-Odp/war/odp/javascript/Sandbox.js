@@ -3,6 +3,7 @@ var viewport = document.getElementById("viewport");
 var grid = document.getElementById("grid");
 var gridCellLayer = document.getElementById("cell-layer");
 var objects = document.getElementsByClassName('gridObject');
+var dragDelta = $("#dragDelta").val();
 var scaleRate = Number($("#zoom").val());
 var scale = 1;
 var maxZoom = 2.4;
@@ -67,6 +68,10 @@ function zoomIn() {
 
 function pressedButton() {
     firstLoad = true;
+    if (cursorObject != "") {
+        cursorObject.div.remove();
+        cursorObject = "";
+    }
     scaleRate = Number($("#zoom").val());
     loadMap();
 }
@@ -161,9 +166,12 @@ function scaleTiles() {
     //ctx.lineTo(newX, newY);
     //ctx.stroke();
 
+
     if (cursorObject != "") {
-        var cursorTop = scaledGridCellHeight/2 + (cursorObject.yGridCoord * scaledGridCellHeight);
-        var cursorLeft = scaledGridCellWidth/2 + (cursorObject.xGridCoord * scaledGridCellWidth);
+        var cursorTop = (cursorObject.yGridCoord * scaledGridCellHeight);
+        var cursorLeft = (cursorObject.xGridCoord * scaledGridCellWidth);
+        var scaledCursorHeight = cursorHeight * scale * .4;
+        var scaledCursorWidth = cursorWidth * scale * .4;
         cursorObject.div.style.width = cursorWidth * scale * .4 + "px";
         cursorObject.div.style.height = cursorHeight * scale * .4 + "px";
         cursorObject.div.style.top = cursorTop + "px";
@@ -171,10 +179,10 @@ function scaleTiles() {
         cursorSubObjects = cursorObject.div.children;
         for (i=0; i<cursorSubObjects.length; i++) {
             if (cursorSubObjects[i].style.top != "") {
-                cursorSubObjects[i].style.top = scaledGridCellHeight/2 + "px";
+                cursorSubObjects[i].style.top = (scaledGridCellHeight + scaledCursorHeight/2) + "px";
             }
             if (cursorSubObjects[i].style.left != "") {
-                cursorSubObjects[i].style.left = scaledGridCellWidth/2 + "px";
+                cursorSubObjects[i].style.left = (scaledGridCellWidth + scaledCursorWidth/2) + "px";
             }
         }
     }
@@ -219,6 +227,7 @@ function scaleTiles() {
 
 function loadMap() {
 
+    var dragDelta = $("#dragDelta").val();
     var displayGridLines = document.getElementById('displayGridLines').checked;
     var gridTileWidth = Number($("#gridWidth").val());
     var gridTileHeight = Number($("#gridHeight").val());
@@ -430,8 +439,10 @@ function clickMap() {
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
 
     if (gridRow < 0 || gridColumn < 0) {return}
-    var cursorTop = scaledGridCellHeight/2 + (gridRow * scaledGridCellHeight);
-    var cursorLeft = scaledGridCellWidth/2 + (gridColumn * scaledGridCellWidth);
+    var cursorTop = (gridRow * scaledGridCellHeight);
+    var cursorLeft = (gridColumn * scaledGridCellWidth);
+    var scaledCursorHeight = cursorHeight * scale * .4;
+    var scaledCursorWidth = cursorWidth * scale * .4;
     if (cursorObject == "") {
         // First select, build out cursor object
         htmlString = "<div id=\"cursorObject\"" + " class=\"cursorObject\"";
@@ -456,7 +467,7 @@ function clickMap() {
         htmlString += " style=\"";
         htmlString += " z-index:" + 1000000 + ";";
         htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-        htmlString += " left:" + scaledGridCellWidth/2 + "px;";
+        htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
         htmlString += " width:50%;";
         htmlString += " height:50%;";
         htmlString += " background-size:100%;";
@@ -467,8 +478,8 @@ function clickMap() {
         htmlString += " style=\"";
         htmlString += " z-index:" + 1000000 + ";";
         htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-        htmlString += " top:" + scaledGridCellHeight/2 + "px;";
-        htmlString += " left:" + scaledGridCellWidth/2 + "px;";
+        htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
+        htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
         htmlString += " width:50%;";
         htmlString += " height:50%;";
         htmlString += " background-size:100%;";
@@ -481,7 +492,7 @@ function clickMap() {
         htmlString += " style=\"";
         htmlString += " z-index:" + 1000000 + ";";
         htmlString += " background:url(" + $picUrlPath + "selector1.png);";
-        htmlString += " top:" + scaledGridCellHeight/2 + "px;";
+        htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
         htmlString += " width:50%;";
         htmlString += " height:50%;";
         htmlString += " background-size:100%;";
@@ -498,6 +509,16 @@ function clickMap() {
         cursorObject.div.style.left = cursorLeft + "px";
         cursorObject.xGridCoord = gridColumn;
         cursorObject.yGridCoord = gridRow;
+
+        cursorSubObjects = cursorObject.div.children;
+        for (i=0; i<cursorSubObjects.length; i++) {
+            if (cursorSubObjects[i].style.top != "") {
+                cursorSubObjects[i].style.top = (scaledGridCellHeight + scaledCursorHeight/2) + "px";
+            }
+            if (cursorSubObjects[i].style.left != "") {
+                cursorSubObjects[i].style.left = (scaledGridCellWidth + scaledCursorWidth/2) + "px";
+            }
+        }
     }
 
     // Remove highlights from previously selected divs
@@ -566,16 +587,21 @@ function dragDiv(e) {
             userLocY = e.touches[0].clientY;
         }
     }
-    updatedX = coordX+userLocX-offsetX;
-    updatedY = coordY+userLocY-offsetY;
-    if (updatedX < viewport.offsetWidth && ((updatedX > coordX) || updatedX > (-1 * grid.offsetWidth))) {
-        grid.style.left = coordX + userLocX - offsetX + 'px';
+    var dragDelta = $("#dragDelta").val();
+    deltaX = userLocX - offsetX;
+    deltaY = userLocY - offsetY;
+    updatedX = coordX+deltaX;
+    updatedY = coordY+deltaY;
+    if (Math.abs(deltaX) > dragDelta || Math.abs(deltaY) > dragDelta) {
+        if (updatedX < viewport.offsetWidth && ((updatedX > coordX) || updatedX > (-1 * grid.offsetWidth))) {
+            grid.style.left = coordX + userLocX - offsetX + 'px';
+        }
+        if (updatedY < viewport.offsetHeight && ((updatedY > coordY) || (updatedY > (-1 * grid.offsetHeight)))) {
+            grid.style.top = coordY + userLocY - offsetY + 'px';
+        }
+        $('html, body').stop().animate({}, 500, 'linear');
+        drugged = true;
     }
-    if (updatedY < viewport.offsetHeight && ((updatedY > coordY) || (updatedY > (-1 * grid.offsetHeight)))) {
-        grid.style.top = coordY + userLocY - offsetY + 'px';
-    }
-    $('html, body').stop().animate({}, 500, 'linear');
-    drugged = true;
     return false;
 }
 function checkIfHoveringOverViewport() {
