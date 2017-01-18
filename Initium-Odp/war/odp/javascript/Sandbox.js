@@ -412,26 +412,93 @@ function currentCoord() {
     }
     return new CoordObject(xCoord, yCoord);
 }
+function panGrid(xOffset, yOffset) {
+    grid.style.left = grid.offsetLeft + xOffset + 'px';
+    grid.style.top = grid.offsetTop + yOffset + 'px';
+}
+function moveCellOnScreen(xCoord, yCoord) {
+    scaledGridCellWidth = gridCellWidth * scale;
+    scaledGridCellHeight = gridCellHeight * scale;
+    xDist = xCoord * scaledGridCellWidth;
+    yDist = yCoord * scaledGridCellHeight;
+    if (grid.offsetLeft + xDist < 0) {
+        panGrid(gridCellWidth, 0);
+    } else if (grid.offsetLeft + xDist + scaledGridCellWidth > viewportContainer.offsetWidth) {
+        panGrid(-gridCellWidth, 0);
+    }
+    else if (grid.offsetTop + yDist < 0) {
+        panGrid(0, gridCellHeight);
+    } else if (grid.offsetTop + yDist + scaledGridCellHeight > viewportContainer.offsetHeight) {
+        panGrid(0, -gridCellHeight);
+    }
+
+}
 function keyPress() {
     if (!e) {
         var e = window.event;
     }
     var currCoord = currentCoord();
+    var isShift;
+    if (window.event) {
+        key = window.event.keyCode;
+        isShift = !!window.event.shiftKey;
+    } else {
+        key = ev.which;
+        isShift = !!ev.shiftKey;
+    }
+    panOffset = 100;
     switch(e.which) {
         case 13: // enter
-            updateCursor(currCoord.yGridCoord, currCoord.xGridCoord);
-            updateHighlights(previouslySelectedBackground, previouslySelectedObjects, (currCoord.xGridCoord), (currCoord.yGridCoord), true);
+            if (isShift) {
+                //panGrid();
+            } else {
+                updateCursor(currCoord.yGridCoord, currCoord.xGridCoord);
+                updateHighlights(previouslySelectedBackground, previouslySelectedObjects, (currCoord.xGridCoord), (currCoord.yGridCoord), true);
+            }
+            break;
         case 37: // left
-            updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, (currCoord.xGridCoord-1), (currCoord.yGridCoord), false);
+            if (isShift) {
+                panGrid(-panOffset, 0);
+            } else {
+                newXCoord = (currCoord.xGridCoord - 1);
+                newYCoord = (currCoord.yGridCoord);
+                if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
+                updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
+                moveCellOnScreen(newXCoord, newYCoord);
+            }
             break;
         case 38: // up
-            updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, (currCoord.xGridCoord), (currCoord.yGridCoord-1), false);
+            if (isShift) {
+                panGrid(0, -panOffset);
+            } else {
+                newXCoord = (currCoord.xGridCoord);
+                newYCoord = (currCoord.yGridCoord - 1);
+                if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
+                updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
+                moveCellOnScreen(newXCoord, newYCoord);
+            }
             break;
         case 39: // right
-            updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, (currCoord.xGridCoord+1), (currCoord.yGridCoord), false);
+            if (isShift) {
+                panGrid(panOffset, 0);
+            } else {
+                newXCoord = (currCoord.xGridCoord + 1);
+                newYCoord = (currCoord.yGridCoord);
+                if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
+                updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
+                moveCellOnScreen(newXCoord, newYCoord);
+            }
             break;
         case 40: // down
-            updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, (currCoord.xGridCoord), (currCoord.yGridCoord+1), false);
+            if (isShift) {
+                panGrid(0, panOffset);
+            } else {
+                newXCoord = (currCoord.xGridCoord);
+                newYCoord = (currCoord.yGridCoord + 1);
+                if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
+                updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
+                moveCellOnScreen(newXCoord, newYCoord);
+            }
             break;
 
         default: return; // exit this handler for other keys

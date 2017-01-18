@@ -3265,8 +3265,13 @@ body
 .cursorSubObject {
 	position: absolute;
 	background-color: transparent;
-	filter:drop-shadow(0px 0px 3px #000000 );
+	filter:drop-shadow(0px 0px 3px #000000);
 	/*background-size:100%;*/
+}
+
+.gridBackground.selected
+{
+	z-index:11 !important;
 }
 
 .gridBackground.highlighted
@@ -3275,6 +3280,11 @@ body
 }
 
 .highlighted {
+	background-blend-mode: normal, overlay;
+	filter: brightness(1.2);
+}
+
+.selected {
 	background-blend-mode: normal, overlay;
 	filter: brightness(2);
 }
