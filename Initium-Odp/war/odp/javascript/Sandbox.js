@@ -452,8 +452,8 @@ function centerCellOnScreen(xCoord, yCoord) {
     yView = grid.offsetTop + yGrid;
     xGridOrigin = xView - viewportContainer.offsetWidth/2;
     yGridOrigin = yView - viewportContainer.offsetHeight/2;
-    grid.style.left = grid.offsetLeft - xGridOrigin;
-    grid.style.top = grid.offsetTop - yGridOrigin;
+    grid.style.left = (grid.offsetLeft - xGridOrigin) + "px" ;
+    grid.style.top = (grid.offsetTop - yGridOrigin) + "px";
 }
 function centerGridOnScreen() {
     actualGridWidth = (gridCellWidth + (gridCellWidth * gridTileWidth));
@@ -468,8 +468,8 @@ function centerGridOnScreen() {
     scaleTiles(true);
     scaledGridWidth = (gridCellWidth * scale  + (gridCellWidth * scale * gridTileWidth));
     scaledGridHeight = (gridCellHeight * scale + (gridCellHeight * scale * gridTileHeight));
-    grid.style.left = (viewport.offsetWidth - scaledGridWidth)/2;
-    grid.style.top = (viewport.offsetHeight - scaledGridHeight)/2;
+    grid.style.left = ((viewport.offsetWidth - scaledGridWidth)/2) + "px";
+    grid.style.top = ((viewport.offsetHeight - scaledGridHeight)/2) + "px";
 }
 function keyUnpress() {
     if (!e) {
