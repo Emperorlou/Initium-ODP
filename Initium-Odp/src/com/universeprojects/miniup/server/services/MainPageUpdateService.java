@@ -3,7 +3,6 @@ package com.universeprojects.miniup.server.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -16,19 +15,19 @@ import com.universeprojects.miniup.server.WebUtils;
 
 public class MainPageUpdateService extends Service
 {
-	final private CachedEntity user;
-	final private CachedEntity character;
-	final private CachedEntity location;
-	final private OperationBase operation;
+	final protected CachedEntity user;
+	final protected CachedEntity character;
+	final protected CachedEntity location;
+	final protected OperationBase operation;
 
-	private CachedEntity group = null;
+	protected CachedEntity group = null;
 	
 	// Path related caches
 	boolean hasHiddenPaths = false;
-	private List<CachedEntity> discoveries = null;  // All the discoveries we have for this character and location.
-	private List<CachedEntity> paths = null;  // All the paths that we can currently see that are connected to the path we're location in.
-	private List<CachedEntity> destLocations = null;  // The location entities at the other end of the paths; on the side we're not on currently.
-	private List<Integer> pathEnds = null;  // 1 or 2. Since each path is 2 sided, this number indicates which side we are NOT on currently.
+	protected List<CachedEntity> discoveries = null;  // All the discoveries we have for this character and location.
+	protected List<CachedEntity> paths = null;  // All the paths that we can currently see that are connected to the path we're location in.
+	protected List<CachedEntity> destLocations = null;  // The location entities at the other end of the paths; on the side we're not on currently.
+	protected List<Integer> pathEnds = null;  // 1 or 2. Since each path is 2 sided, this number indicates which side we are NOT on currently.
 	
 	/**
 	 * 
@@ -44,7 +43,7 @@ public class MainPageUpdateService extends Service
 		this.location = location;
 	}
 
-	private String updateHtmlContents(String selector, String newHtml)
+	protected String updateHtmlContents(String selector, String newHtml)
 	{
 		if (operation!=null)
 			operation.updateHtmlContents(selector, newHtml);
@@ -62,7 +61,7 @@ public class MainPageUpdateService extends Service
 
 
 	private boolean isGroupLoaded = false;
-	private CachedEntity getGroup()
+	protected CachedEntity getGroup()
 	{
 		if (isGroupLoaded==false)
 		{
@@ -364,6 +363,47 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
 	}
+
+	/**
+	 * This updates the TestPanel if environment is currently in test
+	 * 
+	 */
+	public String updateTestPanel()
+	{
+		if (db.getRequest().getRequestURL().toString().contains("test")) {
+			
+			StringBuilder newHtml = new StringBuilder();
+			
+			newHtml.append("Width: <input type='text' id='gridWidth' value=20 />");
+			newHtml.append("Height: <input type='text' id='gridHeight' value=20 />");
+			newHtml.append("Zoom Rate: <input type='text' id='zoom' value=.3 />");
+			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
+			newHtml.append("Forestry (0-10): <input type='text' id='forestry' value=2 />");
+			newHtml.append("Drag Delta: <input type='text' id='dragDelta' value=5 />");
+			newHtml.append("Grid Lines: <input type=\"checkbox\" id=\"displayGridLines\">");
+			newHtml.append("<button id=\"somebutton\">Update</button>");
+			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
+			newHtml.append("<div id=\"viewport\" class=\"vp\">");
+			newHtml.append("<div id=\"grid\" class=\"grid\">");
+			newHtml.append("<div id=\"ui-layer\" class=\"uiLayer\"></div>");
+			newHtml.append("<div id=\"cell-layer\" class=\"cellLayer\"></div>");
+			newHtml.append("<div id=\"ground-layer\" class=\"groundLayer\"></div>");
+			newHtml.append("<div id=\"object-layer\" class=\"objectLayer\"></div>");
+			newHtml.append("</div>");
+			newHtml.append("</div>");
+			newHtml.append("</div>");
+			newHtml.append("<p id=\"selectedObjects\" class=\"selectedObjectList\"></p>");
+			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
+			newHtml.append("<script>");
+			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
+			newHtml.append("pressedButton();");
+			newHtml.append("});");
+			newHtml.append("</script>");
+			
+			return updateHtmlContents("#test-panel", newHtml.toString());
+		}
+		return "";
+	}
 	
 	
 	public String updateInBannerOverlayLinks()
@@ -433,7 +473,7 @@ public class MainPageUpdateService extends Service
 		return updateButtonList(cs, false);
 	}
 	
-	private String updateButtonList_NormalMode()
+	protected String updateButtonList_NormalMode()
 	{
 		StringBuilder newHtml = new StringBuilder();
 
@@ -536,7 +576,7 @@ public class MainPageUpdateService extends Service
 
 			
 
-			if ("CombatSite".equals(location.getProperty("type")))
+			if ("CombatSite".equals(location.getProperty("type")) && "CombatSite".equals(destLocation.getProperty("type"))==false)
 			{
 				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 				newHtml.append("<br>");
@@ -588,7 +628,7 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#main-button-list", newHtml.toString());
 	}
 	
-	private String updateButtonList_CombatMode()
+	protected String updateButtonList_CombatMode()
 	{
 		StringBuilder newHtml = new StringBuilder();
 		
@@ -704,7 +744,7 @@ public class MainPageUpdateService extends Service
 		if (isInParty())
 		{
 			newHtml.append("<div class='boldbox'>");
-			newHtml.append("<a onclick='leaveParty()' style='float:right'>Leave Party</a>");
+			newHtml.append("<a onclick='leaveParty(event)' style='float:right'>Leave Party</a>");
 			newHtml.append("<h4>Your party</h4>");
 			List<CachedEntity> party = getParty();
 			if (party!=null)
@@ -732,7 +772,7 @@ public class MainPageUpdateService extends Service
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
 						if (isThisMemberTheLeader == false && isPartyLeader())
-							newHtml.append("<a onclick='doSetLeader(event, "+character.getKey().getId()+")'>Make Leader</a>");
+							newHtml.append("<a onclick='doSetLeader(event, " + character.getKey().getId() + ", \"" + character.getProperty("name") + "\")'>Make Leader</a>");
 						newHtml.append("</div>");
 					}
 					newHtml.append("</a>");

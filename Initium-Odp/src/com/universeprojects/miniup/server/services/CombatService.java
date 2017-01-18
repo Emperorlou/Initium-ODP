@@ -1,5 +1,8 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.ArrayList;
+import java.util.List;
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
@@ -63,5 +66,32 @@ public class CombatService extends Service
 			return true;
 		else
 			return false;
+	}
+	
+	/**
+	 * Removes all items from the specified character for which the strength requirement
+	 * is no longer met (i.e. a buff is applied or expires).
+	 * TODO: THIS IS UNTESTED.
+	 */
+	public void updateEquips(CachedEntity character) {
+		List<Key> itemKeys = new ArrayList<Key>();
+		CachedDatastoreService ds = db.getDB();
+		for (String slot : ODPDBAccess.EQUIPMENT_SLOTS) {
+			Key itemKey = (Key) character.getProperty("equipment" + slot);
+			if (itemKey != null) {
+				itemKeys.add(itemKey);
+			}
+		}
+		List<CachedEntity> itemEntities = db.getEntities(itemKeys);
+		Double characterStrength = db.getCharacterStrength(character);
+		Double strengthRequirement;
+		for (CachedEntity item : itemEntities){
+			if (item != null) {
+				strengthRequirement = (Double) item.getProperty("strengthRequirement");
+				if (strengthRequirement!=null && characterStrength<strengthRequirement){
+					db.doCharacterUnequipEntity(ds, character, item);
+				}
+			}
+		}
 	}
 }

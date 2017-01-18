@@ -55,13 +55,15 @@ public class CommandGroupDelete extends Command
 		}
 		String groupName = (String) group.getProperty("name");
 		List<CachedEntity> members = db.getGroupMembers(null, group);
-
+		List<Key> alliances = (List<Key>)group.getProperty("declaredAlliedGroups");
+		List<Key> wars = (List<Key>)group.getProperty("declaredWarGroups");
+		
 		if (members.size() > 1)
 		{
 			throw new UserErrorMessage(
 					"The group must have no members before it can be deleted.");
 		}
-
+		
 		if (GameUtils.equals((Key) group.getProperty("creatorKey"),
 				(Key) character.getKey()) == false)
 		{

@@ -917,9 +917,9 @@ public class GameUtils
 		}
 		
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)
@@ -933,9 +933,9 @@ public class GameUtils
     		return "";
     	
     	if (popupEmbedded)
-    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
     	else
-    		return "<a rel='viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
     }
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)
@@ -965,7 +965,7 @@ public class GameUtils
     		nameClass = "chatMessage-text";
     	
     	if (includePopupLink)
-    		return "<a class='clue "+nameClass+"' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+name+"</a>";
+    		return "<a class='clue "+nameClass+"' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+name+"</a>";
     	else
     		return "<span class='"+nameClass+"'>"+name+"</span>";
     }
@@ -980,7 +980,7 @@ public class GameUtils
     {
     	boolean isSelf = false;
     	String lowDurabilityClass = "";
-    	if (selfUser!=null)
+    	if (GameUtils.equals(db.getCurrentCharacterKey(), character.getKey()))
     		isSelf = true;
     	
     	boolean isCloaked = false;
@@ -1165,7 +1165,7 @@ public class GameUtils
 		
 		
 		if (isSelf)
-			sb.append("<a class='clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
+			sb.append("<a class='clue' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
 		
 		String sizePrepend = "";
 		if (largeSize)
@@ -1173,8 +1173,10 @@ public class GameUtils
 				
 		if (isCloaked==false)
 		{
-			sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+"'>");
+			sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+" backdrop3d' style='background-color:none;'>");
 
+			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/ui/newui/avatar-silhouette-male1.png\")'></div>");
+			
 			if (equipmentBootsUrl!=null)
 				sb.append("<div class='avatar-equip-boots"+sizePrepend+"' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
 			if (equipmentLegsUrl!=null)
@@ -1205,7 +1207,7 @@ public class GameUtils
 		}
 		else
 		{
-			sb.append("<div class='avatar-equip-backing"+sizePrepend+"'>");
+			sb.append("<div class='avatar-equip-backing"+sizePrepend+" backdrop3d' style='background-color:none;'>");
 
 			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
 			
@@ -1214,7 +1216,7 @@ public class GameUtils
 		if (isSelf)
 			sb.append("</a>");
 		
-		if (isSelf)
+		if (isSelf && selfUser!=null)
 		{
 			ShardedCounterService cs = ShardedCounterService.getInstance(db.getDB());
 			Long referralViews = cs.readCounter(selfUser.getKey(), "referralViews");
