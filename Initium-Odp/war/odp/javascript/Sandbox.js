@@ -446,12 +446,14 @@ function centerCellOnScreen(xCoord, yCoord) {
     // Move grid to center the currently selected cell
     scaledGridCellWidth = gridCellWidth * scale;
     scaledGridCellHeight = gridCellHeight * scale;
-    xDist = xCoord * scaledGridCellWidth + scaledGridCellWidth;
-    yDist = yCoord * scaledGridCellHeight + scaledGridCellHeight;
-    xGridOrigin = -xDist + viewportContainer.offsetWidth/2;
-    yGridOrigin = -yDist + viewportContainer.offsetHeight/2;
-    grid.style.left = xGridOrigin;
-    grid.style.top = yGridOrigin;
+    xGrid = xCoord * scaledGridCellWidth + scaledGridCellWidth/2;
+    yGrid = yCoord * scaledGridCellHeight + scaledGridCellHeight/2;
+    xView = grid.offsetLeft + xGrid;
+    yView = grid.offsetTop + yGrid;
+    xGridOrigin = xView - viewportContainer.offsetWidth/2;
+    yGridOrigin = yView - viewportContainer.offsetHeight/2;
+    grid.style.left = grid.offsetLeft - xGridOrigin;
+    grid.style.top = grid.offsetTop - yGridOrigin;
 }
 function centerGridOnScreen() {
     actualGridWidth = (gridCellWidth + (gridCellWidth * gridTileWidth));
