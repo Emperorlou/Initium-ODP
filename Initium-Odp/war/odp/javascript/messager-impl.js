@@ -166,9 +166,11 @@ function changeChatTab(code)
 	for(var i = 0; i<messageCodes.length; i++)
 	{
 		$("#"+messageCodes[i]+"_tab").removeClass("chat_tab_selected");
+		$("#"+messageCodes[i]+"_tab_newui").removeClass("selected");
 	}	
 	
-	$("#"+code+"_tab").addClass("chat_tab_selected");
+	$("#"+code+"_tab").addClass("selected");
+	$("#"+code+"_tab_newui").addClass("selected");
 	
 	if (code === "GameMessages")
 		$("#chat_form_wrapper").hide();

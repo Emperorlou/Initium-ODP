@@ -1424,6 +1424,7 @@ function decrementStackIndex()
 	if (currentPopupStackIndex==0)
 	{
 		$("#page-popup-root").empty();
+		$(".page-popup-newui").remove();
 		$(document).unbind("keydown", popupKeydownHandler);
 	}
 	else
@@ -1445,7 +1446,7 @@ function pagePopup(url, closeCallback)
 	
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
-	
+	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	
@@ -1521,7 +1522,10 @@ function reloadPagePopup(quietly)
 	if (quietly==false)
 		content.html("<img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/>");
 	else
+	{
 		$(".page-popup-Reload").html("<img src='/javascript/images/wait.gif' border=0 style='margin-top:20px;'/>");
+		$("#page-popup-reloadbutton").html("<img src='/javascript/images/wait.gif' border=0/>");	// new ui variant
+	}
 
 	if (content.is("iframe"))
 	{
@@ -1531,6 +1535,7 @@ function reloadPagePopup(quietly)
 	{
 		content.load(url, null, function(){
 			$(".page-popup-Reload").html("&#8635;");
+			$("#page-popup-reloadbutton").html("&#8635;");	// new ui variant
 		});
 	}
 }

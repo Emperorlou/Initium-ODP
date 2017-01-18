@@ -328,6 +328,32 @@ function pagePopup(url, closeCallback)
 	normalizePage();
 </script>
 
+<script type="text/javascript">
+function pagePopup(url, closeCallback, popupTitle)
+{
+	if (url.indexOf("?")>0)
+		url+="&ajax=true";
+	else
+		url+="?ajax=true";
+	
+	exitFullscreenChat();
+	
+	var stackIndex = incrementStackIndex();
+	var pagePopupId = "page-popup"+stackIndex;
+	
+	if (popupTitle==null)
+		popupTitle = "";
+	$(".location-controls-container").append("<div id='"+pagePopupId+"' class='page-popup-newui location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div id='page-popup-reloadbutton' class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div class='header1-display' id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>");
+	$("#"+pagePopupId+"-content").load(url);
+	
+	if (closeCallback!=null)
+		popupStackCloseCallbackHandlers.push(closeCallback);
+	else
+		popupStackCloseCallbackHandlers.push(null);
+}
+
+</script>
+
 </head>
 
 <!--
@@ -337,6 +363,8 @@ Did you know you can help code Initium?
 Check out our github and get yourself setup,
 then talk to the lead dev so you can get yourself
 on our slack channel!
+
+https://github.com/Emperorlou/Initium-ODP
 
                                            -->
 
@@ -369,17 +397,17 @@ on our slack channel!
 			<div class='chat-container'>
 				<div class='header1'>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>!</div>
+					<div class='header1-button chat-button' id='GameMessages_tab_newui' onclick='changeChatTab("GameMessages")'><div id='GameMessages-chat-indicator' class='chat-button-indicator'></div>!</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>GLOBAL</div>
+					<div class='header1-button chat-button' id='GlobalChat_tab_newui' onclick='changeChatTab("GlobalChat")'><div id='GlobalChat-chat-indicator' class='chat-button-indicator'></div>GLOBAL</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>LOCATION</div>
+					<div class='header1-button chat-button' id='LocationChat_tab_newui' onclick='changeChatTab("LocationChat")'><div id='LocationChat-chat-indicator' class='chat-button-indicator'></div>LOCATION</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>GROUP</div>
+					<div class='header1-button chat-button' id='GroupChat_tab_newui' onclick='changeChatTab("GroupChat")'><div id='GroupChat-chat-indicator' class='chat-button-indicator'></div>GROUP</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>PARTY</div>
+					<div class='header1-button chat-button' id='PartyChat_tab_newui' onclick='changeChatTab("PartyChat")'><div id='PartyChat-chat-indicator' class='chat-button-indicator'></div>PARTY</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator' style='visibility:visible'>12</div>PRIVATE</div>
+					<div class='header1-button chat-button' id='PrivateChat_tab_newui' onclick='changeChatTab("PrivateChat")'><div id='PrivateChat-chat-indicator' class='chat-button-indicator' ></div>PRIVATE</div>
 					<div class='header1-spacer'></div>
 				</div>
 				<div class='main1'>
@@ -426,13 +454,11 @@ on our slack channel!
 				<div class='location-controls-container'>
 					<div class='location-controls-page'>
 						<div class='header1'>
-							<div style="display:table">
-								<div class="header1" style="display:table-row">
-									<div class="header1-button" style="display:table-cell" onclick="reloadPagePopup()">↻</div>
-									<div style="display:table-cell; width:100%;">
+							<div class='header1-buttonbar'>
+								<div class='header1-buttonbar-inner'>
+									<div class='header1-buttonbar-middle'>
 										<div id='buttonbar'>${buttonBar}</div>
 									</div>
-									<div class="header1-button" style="display:table-cell" onclick="closePagePopup()">X</div>
 								</div>
 							</div>
 						</div>
