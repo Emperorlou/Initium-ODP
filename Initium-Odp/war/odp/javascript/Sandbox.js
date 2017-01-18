@@ -125,8 +125,8 @@ function scaleTiles(onCenter) {
             }
         }
     } else {
-        userLocX = viewport.offsetWidth/2;
-        userLocY = viewport.offsetHeight/2;
+        userLocX = viewport.offsetWidth/2 + viewport.offsetLeft + viewportContainer.offsetLeft;
+        userLocY = viewport.offsetHeight/2 + viewport.offsetTop + viewportContainer.offsetTop + -$(window).scrollTop();
     }
 
     dx = Math.abs(userLocX - originX);
@@ -446,8 +446,8 @@ function centerCellOnScreen(xCoord, yCoord) {
     // Move grid to center the currently selected cell
     scaledGridCellWidth = gridCellWidth * scale;
     scaledGridCellHeight = gridCellHeight * scale;
-    xGrid = xCoord * scaledGridCellWidth + scaledGridCellWidth/2;
-    yGrid = yCoord * scaledGridCellHeight + scaledGridCellHeight/2;
+    xGrid = xCoord * scaledGridCellWidth + scaledGridCellWidth;
+    yGrid = yCoord * scaledGridCellHeight + scaledGridCellHeight;
     xView = grid.offsetLeft + xGrid;
     yView = grid.offsetTop + yGrid;
     xGridOrigin = xView - viewportContainer.offsetWidth/2;
