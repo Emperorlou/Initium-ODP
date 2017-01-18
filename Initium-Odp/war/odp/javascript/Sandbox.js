@@ -29,6 +29,8 @@ var clickTimer;
 var timeBetweenLeftClick = 0;
 var dragging = false;
 var spacePressed = false;
+var prevScale;
+var prevCoord;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -441,8 +443,6 @@ function moveCellOnScreen(xCoord, yCoord) {
 
 }
 function centerCellOnScreen(xCoord, yCoord) {
-    // Remove previously highlighted cell
-    removeHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, false);
     // Move grid to center the currently selected cell
     scaledGridCellWidth = gridCellWidth * scale;
     scaledGridCellHeight = gridCellHeight * scale;
@@ -515,7 +515,7 @@ function keyPress() {
                 newYCoord = (currCoord.yGridCoord);
                 if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
                 updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
-                moveCellOnScreen(newXCoord, newYCoord);
+                centerCellOnScreen(newXCoord, newYCoord);
             }
             break;
         case 38: // up
@@ -528,12 +528,14 @@ function keyPress() {
                 newYCoord = (currCoord.yGridCoord - 1);
                 if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
                 updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
-                moveCellOnScreen(newXCoord, newYCoord);
+                centerCellOnScreen(newXCoord, newYCoord);
             }
             break;
         case 39: // right
             if (isShift) {
                 if (previouslySelectedBackground != null) {
+                    // Remove previously highlighted cell
+                    removeHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, false);
                     centerCellOnScreen(previouslySelectedBackground.xGridCoord, previouslySelectedBackground.yGridCoord);
                 }
             } else if (spacePressed) {
@@ -543,7 +545,7 @@ function keyPress() {
                 newYCoord = (currCoord.yGridCoord);
                 if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
                 updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
-                moveCellOnScreen(newXCoord, newYCoord);
+                centerCellOnScreen(newXCoord, newYCoord);
             }
             break;
         case 40: // down
@@ -556,7 +558,7 @@ function keyPress() {
                 newYCoord = (currCoord.yGridCoord + 1);
                 if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
                 updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
-                moveCellOnScreen(newXCoord, newYCoord);
+                centerCellOnScreen(newXCoord, newYCoord);
             }
             break;
 
