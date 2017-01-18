@@ -5,6 +5,8 @@ var gridCellLayer = document.getElementById("cell-layer");
 var objects = document.getElementsByClassName('gridObject');
 var dragDelta = $("#dragDelta").val();
 var scaleRate = Number($("#zoom").val());
+var gridTileWidth = Number($("#gridWidth").val());
+var gridTileHeight = Number($("#gridHeight").val());
 var scale = 1;
 var maxZoom = 2.4;
 var minZoom = .05;
@@ -20,9 +22,12 @@ var $domain = "https://initium-resources.appspot.com/";
 var firstLoad = true;
 var previouslySelectedBackground;
 var previouslySelectedObjects = [];
+var previouslyHighlightedBackground;
+var previouslyHighlightedObjects = [];
 var cursorObject = "";
 var clickTimer;
 var timeBetweenLeftClick = 0;
+var dragging = false;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -81,8 +86,8 @@ function pressedButton() {
 
 function scaleTiles() {
 
-    var gridTileWidth = Number($("#gridWidth").val());
-    var gridTileHeight = Number($("#gridHeight").val());
+    gridTileWidth = Number($("#gridWidth").val());
+    gridTileHeight = Number($("#gridHeight").val());
     var forestry = Number($("#forestry").val());
     var scaledGridCellWidth = 64 * scale;
     var scaledGridCellHeight = 64 * scale;
@@ -271,7 +276,9 @@ function loadMap() {
                         "",
                         backgroundObject.backgroundFile,
                         backgroundObject.zIndex,
-                        []
+                        [],
+                        index,
+                        innerIndex
                     );
 
                     var key = index + "-" + innerIndex;
@@ -380,17 +387,78 @@ window.onload = function() {
     document.onmousedown = startDrag;
     document.onmouseup = stopDrag;
 
+    //document.onmouseover = startHover;
+    document.onmousemove=startHover;
+    document.onkeydown = keyPress;
+
     // Listen for touch inputs
     document.body.addEventListener('touchend', stopDrag);
     document.body.addEventListener('touchmove', dragDiv);
     document.body.addEventListener('touchstart', startDrag);
 }
 
+function currentCoord() {
+    // Get currently highlighted or selected coordinates
+    var xCoord;
+    var yCoord;
+    if (previouslyHighlightedBackground != null) {
+        xCoord = previouslyHighlightedBackground.xGridCoord;
+        yCoord = previouslyHighlightedBackground.yGridCoord;
+    } else if (previouslySelectedBackground != null) {
+        xCoord = previouslySelectedBackground.xGridCoord;
+        yCoord = previouslySelectedBackground.yGridCoord;
+    } else {
+        return;
+    }
+    return new CoordObject(xCoord, yCoord);
+}
+function keyPress() {
+    if (!e) {
+        var e = window.event;
+    }
+    var currCoord = currentCoord();
+    switch(e.which) {
+        case 13: // enter
+            updateCursor(currCoord.yGridCoord, currCoord.xGridCoord);
+            updateHighlights(previouslySelectedBackground, previouslySelectedObjects, (currCoord.xGridCoord), (currCoord.yGridCoord), true);
+        case 37: // left
+            updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, (currCoord.xGridCoord-1), (currCoord.yGridCoord), false);
+            break;
+        case 38: // up
+            updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, (currCoord.xGridCoord), (currCoord.yGridCoord-1), false);
+            break;
+        case 39: // right
+            updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, (currCoord.xGridCoord+1), (currCoord.yGridCoord), false);
+            break;
+        case 40: // down
+            updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, (currCoord.xGridCoord), (currCoord.yGridCoord+1), false);
+            break;
+
+        default: return; // exit this handler for other keys
+    }
+    e.preventDefault();
+}
+
 $('#viewport').on('contextmenu', function(){
     return false;
 });
 
+function startHover(e) {
+    if (dragging) {return}
+    // determine event object
+    if (!e) {
+        var e = window.event;
+    }
+    if (!checkIfHoveringOverGrid()) {
+        return;
+    }
+    var currCoord = getCoordOfMouse();
+    if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
+    updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, currCoord.xGridCoord, currCoord.yGridCoord, false);
+}
+
 function startDrag(e) {
+    dragging = true;
     // determine event object
     if (!e) {
         var e = window.event;
@@ -450,15 +518,7 @@ function timerIncrement() {
     }
 }
 
-function clickMap() {
-    event.preventDefault();
-    if (checkDoubleClick()) {
-        if (event.which == 3) {
-            zoomOut(2);
-        } else {
-            zoomIn(2);
-        }
-    }
+function getCoordOfMouse() {
     var scaledGridCellWidth = 64 * scale;
     var scaledGridCellHeight = 64 * scale;
     // For mouse clicks
@@ -475,8 +535,11 @@ function clickMap() {
     var gridRely = offsetY - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() - (scaledGridCellHeight / 2);
     var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
-
-    if (gridRow < 0 || gridColumn < 0) {return}
+    return new CoordObject(gridColumn, gridRow);
+}
+function updateCursor(gridRow, gridColumn) {
+    var scaledGridCellWidth = 64 * scale;
+    var scaledGridCellHeight = 64 * scale;
     var cursorTop = (gridRow * scaledGridCellHeight);
     var cursorLeft = (gridColumn * scaledGridCellWidth);
     var scaledCursorHeight = cursorHeight * scale * .4;
@@ -502,26 +565,55 @@ function clickMap() {
             }
         }
     }
+}
 
-    // Remove highlights from previously selected divs
-    if (previouslySelectedBackground != null) {
-        previouslySelectedBackground.backgroundDiv.style.background = "url(" + $picUrlPath + previouslySelectedBackground.filename + ") center center / 100%";
-        previouslySelectedBackground.backgroundDiv.className = previouslySelectedBackground.backgroundDiv.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
-    }
-    for (i=0; i<previouslySelectedObjects.length; i++) {
-        if (previouslySelectedObjects[i].key == "o1") {
-            previouslySelectedObjects[i].div.style.background = "url(" + $domain + previouslySelectedObjects[i].filename + ")";
+function clickMap() {
+    event.preventDefault();
+    if (checkDoubleClick()) {
+        if (event.which == 3) {
+            zoomOut(2);
         } else {
-            previouslySelectedObjects[i].div.style.background = "url(" + $picUrlPath + previouslySelectedObjects[i].filename + ")";
+            zoomIn(2);
         }
-        previouslySelectedObjects[i].div.style.backgroundSize = "100%";
-        previouslySelectedObjects[i].div.style.backgroundBlendMode = "";
-        previouslySelectedObjects[i].div.className = previouslySelectedObjects[i].div.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
+    }
+    var currCoord = getCoordOfMouse();
+    if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
+    updateCursor(currCoord.yGridCoord, currCoord.xGridCoord);
+    updateHighlights(previouslySelectedBackground, previouslySelectedObjects, currCoord.xGridCoord, currCoord.yGridCoord, true);
+};
 
+function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection) {
+    if (selection) {
+        className = "selected";
+    } else {
+        className = "highlighted";
+    }
+    // Remove highlights from previously selected divs
+    if (previouslyUpdatedBackground != null) {
+        previouslyUpdatedBackground.backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground.filename + ") center center / 100%";
+        if (selection) {
+            previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)selected(?!\S)/g, '');
+        } else {
+            previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)highlighted(?!\S)/g, '');
+        }
+    }
+    for (i=0; i<previouslyUpdatedObjects.length; i++) {
+        if (previouslyUpdatedObjects[i].key == "o1") {
+            previouslyUpdatedObjects[i].div.style.background = "url(" + $domain + previouslyUpdatedObjects[i].filename + ")";
+        } else {
+            previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ")";
+        }
+        previouslyUpdatedObjects[i].div.style.backgroundSize = "100%";
+        previouslyUpdatedObjects[i].div.style.backgroundBlendMode = "";
+        if (selection) {
+            previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)selected(?!\S)/g , '' );
+        } else {
+            previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
+        }
     }
     // Highlight the background div
-    gridCells[gridColumn][gridRow].backgroundDiv.className += " highlighted";
-    previouslySelectedBackground  = gridCells[gridColumn][gridRow];
+    gridCells[gridColumn][gridRow].backgroundDiv.className += " " + className;
+    previouslyUpdatedBackground  = gridCells[gridColumn][gridRow];
     // If we have an objects at this coord, highlight them and display their names
     if (gridCells[gridColumn][gridRow].objectKeys.length > 0) {
         tmpString = "";
@@ -531,17 +623,28 @@ function clickMap() {
             // Update the selected object list
             tmpString += "<br>" + object.name + "<br/>";
             // Highlight the objects in the viewport
-            object.div.className += " highlighted";
+            object.div.className += " " + className;
             //object.div.style.backgroundBlendMode = "normal, overlay";
             // Add div to previouslySelected to remove highlight on later click
-            previouslySelectedObjects[selectedIndex] = object;
+            previouslyUpdatedObjects[selectedIndex] = object;
         }
         // Update object list
-        $("#selectedObjects").html(tmpString);
+        if (selection) {
+            $("#selectedObjects").html(tmpString);
+        }
     } else {
-        $("#selectedObjects").html('<br> No objects at this coordinate. </br>');
+        if (selection) {
+            $("#selectedObjects").html('<br> No objects at this coordinate. </br>');
+        }
     }
-};
+
+    if (selection) {
+        previouslySelectedBackground = previouslyUpdatedBackground;
+    } else {
+        previouslyHighlightedBackground = previouslyUpdatedBackground;
+    }
+}
+
 function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursorWidth, scaledGridCellHeight, scaledGridCellWidth) {
     htmlString = "<div id=\"cursorObject\"" + " class=\"cursorObject\"";
     htmlString += " style=\"";
@@ -672,6 +775,8 @@ function checkIfHoveringOverGrid() {
     return true;
 }
 function stopDrag() {
+    dragging = false;
+    document.onmousemove=startHover;
     if (!drugged && checkIfHoveringOverGrid()) {
         // User clicked on map without dragging
         clickMap();
@@ -706,12 +811,14 @@ function CursorObject(div, xGridCoord, yGridCoord) {
     this.yGridCoord = yGridCoord;
 }
 
-function GridCell(backgroundDiv, cellDiv, filename, zindex, objectKeys) {
+function GridCell(backgroundDiv, cellDiv, filename, zindex, objectKeys, xGridCoord, yGridCoord) {
     this.backgroundDiv = backgroundDiv;
     this.cellDiv = cellDiv;
     this.filename = filename;
     this.zIndex = zindex;
     this.objectKeys = objectKeys;
+    this.xGridCoord = xGridCoord;
+    this.yGridCoord = yGridCoord;
 }
 
 function GridObject(key, div, filename, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
@@ -728,3 +835,8 @@ function GridObject(key, div, filename, name, xGridCellOffset, yGridCellOffset, 
     this.width = width;
     this.height = height;
 };
+
+function CoordObject(xGridCoord, yGridCoord) {
+    this.xGridCoord = xGridCoord;
+    this.yGridCoord = yGridCoord;
+}
