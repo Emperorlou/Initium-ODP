@@ -560,6 +560,22 @@ function deletePlayerHouse(eventObject, pathId)
 	});
 }
 
+function createHouseKey(eventObject)
+
+{
+
+    confirmPopUp("Create House Key", "Do you want this key to be reuseable?", 
+    		function()
+    			{
+    				doCommand(eventObject, "CommandCreatePlayerHouseKey", {"reusable":"true"})
+    			}, 
+    		function()
+    			{
+    				doCommand(eventObject, "CommandCreatePlayerHouseKey", {"reusable":"false"}) 
+    			}
+    		);
+}
+
 function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, characterId)
 {
 	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
@@ -3070,3 +3086,5 @@ function swapContainers(event, selector)
 
 	doCommand(event,"ItemsSwapStorageContainers",{"itemIds":itemIds});
 }
+
+

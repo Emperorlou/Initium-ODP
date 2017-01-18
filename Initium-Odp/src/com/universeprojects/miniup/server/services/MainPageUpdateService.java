@@ -482,6 +482,7 @@ public class MainPageUpdateService extends Service
 		if (user!=null && GameUtils.equals(location.getProperty("ownerKey"), user.getKey()))
 		{
 			newHtml.append("<a onclick='renamePlayerHouse(event)' class='main-button'>Rename this house</a>");
+			newHtml.append("<a onclick='createHouseKey(event)' class='main-button'>Create House Key</a>");
 		}
 		
 
