@@ -28,6 +28,7 @@ var cursorObject = "";
 var clickTimer;
 var timeBetweenLeftClick = 0;
 var dragging = false;
+var spacePressed = false;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -58,20 +59,20 @@ $('#viewportcontainer').on({
     }
 });
 
-function zoomIn(additionalScale) {
+function zoomIn(additionalScale, onCenter) {
     scale += scaleRate*scale*additionalScale;
     if (maxZoom !== null && scale > maxZoom) {
         scale = maxZoom;
     }
-    scaleTiles();
+    scaleTiles(onCenter);
 }
 
-function zoomOut(additionalScale) {
+function zoomOut(additionalScale, onCenter) {
     scale -= scaleRate*scale*additionalScale;
     if (minZoom !== null && scale < minZoom) {
         scale = minZoom;
     }
-    scaleTiles();
+    scaleTiles(onCenter);
 }
 
 function pressedButton() {
@@ -84,7 +85,7 @@ function pressedButton() {
     loadMap();
 }
 
-function scaleTiles() {
+function scaleTiles(onCenter) {
 
     gridTileWidth = Number($("#gridWidth").val());
     gridTileHeight = Number($("#gridHeight").val());
@@ -104,23 +105,28 @@ function scaleTiles() {
     grid.style.width = currGridWidth + "px";
 
     originX = grid.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
-    originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop + - $(window).scrollTop();
+    originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop + -$(window).scrollTop();
 
-    var userLocX = 0;
-    var userLocY = 0;
-    if (event) {
-        if (event.clientX) {
-            userLocX = event.clientX;
-            userLocY = event.clientY;
-        } else if (event.touches) {
-            offsetX1 = e.touches[0].clientX;
-            offsetY1 = e.touches[0].clientY;
-            offsetX2 = e.touches[1].clientX;
-            offsetY2 = e.touches[1].clientY;
+    if (!onCenter) {
+        var userLocX = 0;
+        var userLocY = 0;
+        if (event) {
+            if (event.clientX) {
+                userLocX = event.clientX;
+                userLocY = event.clientY;
+            } else if (event.touches) {
+                offsetX1 = e.touches[0].clientX;
+                offsetY1 = e.touches[0].clientY;
+                offsetX2 = e.touches[1].clientX;
+                offsetY2 = e.touches[1].clientY;
 
-            userLocX = (offsetX2 + offsetX1) / 2;
-            userLocY = (offsetY2 + offsetY1) / 2;
+                userLocX = (offsetX2 + offsetX1) / 2;
+                userLocY = (offsetY2 + offsetY1) / 2;
+            }
         }
+    } else {
+        userLocX = viewport.offsetWidth/2;
+        userLocY = viewport.offsetHeight/2;
     }
 
     dx = Math.abs(userLocX - originX);
@@ -375,8 +381,8 @@ function loadMap() {
             for (var i = 0; i < gridObjectElements.length; i++) {
                 gridObjects[objects[i].dataset.key].div = gridObjectElements[i];
             }
-            // Update scale/zoom of all elements
-            scaleTiles();
+            // Move grid to center, scale, and update all tiles
+            centerGridOnScreen();
         }
     });
 }
@@ -390,6 +396,7 @@ window.onload = function() {
     //document.onmouseover = startHover;
     document.onmousemove=startHover;
     document.onkeydown = keyPress;
+    document.onkeyup = keyUnpress;
 
     // Listen for touch inputs
     document.body.addEventListener('touchend', stopDrag);
@@ -433,6 +440,45 @@ function moveCellOnScreen(xCoord, yCoord) {
     }
 
 }
+function centerCellOnScreen(xCoord, yCoord) {
+    // Remove previously highlighted cell
+    removeHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, false);
+    // Move grid to center the currently selected cell
+    scaledGridCellWidth = gridCellWidth * scale;
+    scaledGridCellHeight = gridCellHeight * scale;
+    xGrid = xCoord * scaledGridCellWidth + scaledGridCellWidth/2;
+    yGrid = yCoord * scaledGridCellHeight + scaledGridCellHeight/2;
+    xView = grid.offsetLeft + xGrid;
+    yView = grid.offsetTop + yGrid;
+    xGridOrigin = xView - viewportContainer.offsetWidth/2;
+    yGridOrigin = yView - viewportContainer.offsetHeight/2;
+    grid.style.left = grid.offsetLeft - xGridOrigin;
+    grid.style.top = grid.offsetTop - yGridOrigin;
+}
+function centerGridOnScreen() {
+    actualGridWidth = (gridCellWidth + (gridCellWidth * gridTileWidth));
+    actualGridHeight = (gridCellHeight + (gridCellHeight * gridTileHeight));
+    widthScale = viewport.offsetWidth / actualGridWidth;
+    heightScale = viewport.offsetHeight / actualGridHeight;
+    if (widthScale < heightScale) {
+        scale = widthScale;
+    } else {
+        scale = heightScale;
+    }
+    scaleTiles(true);
+    scaledGridWidth = (gridCellWidth * scale  + (gridCellWidth * scale * gridTileWidth));
+    scaledGridHeight = (gridCellHeight * scale + (gridCellHeight * scale * gridTileHeight));
+    grid.style.left = (viewport.offsetWidth - scaledGridWidth)/2;
+    grid.style.top = (viewport.offsetHeight - scaledGridHeight)/2;
+}
+function keyUnpress() {
+    if (!e) {
+        var e = window.event;
+    }
+    if (e.keyCode == 32) {
+        spacePressed = false;
+    }
+}
 function keyPress() {
     if (!e) {
         var e = window.event;
@@ -446,8 +492,11 @@ function keyPress() {
         key = ev.which;
         isShift = !!ev.shiftKey;
     }
-    panOffset = 100;
+    panOffset = 20;
     switch(e.which) {
+        case 32:
+            spacePressed = true;
+            break;
         case 13: // enter
             if (isShift) {
                 //panGrid();
@@ -458,6 +507,8 @@ function keyPress() {
             break;
         case 37: // left
             if (isShift) {
+                centerGridOnScreen();
+            } else if (spacePressed) {
                 panGrid(-panOffset, 0);
             } else {
                 newXCoord = (currCoord.xGridCoord - 1);
@@ -469,6 +520,8 @@ function keyPress() {
             break;
         case 38: // up
             if (isShift) {
+                zoomIn(2, true);
+            } else if (spacePressed) {
                 panGrid(0, -panOffset);
             } else {
                 newXCoord = (currCoord.xGridCoord);
@@ -480,6 +533,10 @@ function keyPress() {
             break;
         case 39: // right
             if (isShift) {
+                if (previouslySelectedBackground != null) {
+                    centerCellOnScreen(previouslySelectedBackground.xGridCoord, previouslySelectedBackground.yGridCoord);
+                }
+            } else if (spacePressed) {
                 panGrid(panOffset, 0);
             } else {
                 newXCoord = (currCoord.xGridCoord + 1);
@@ -491,6 +548,8 @@ function keyPress() {
             break;
         case 40: // down
             if (isShift) {
+                zoomOut(2, true);
+            } else if (spacePressed) {
                 panGrid(0, panOffset);
             } else {
                 newXCoord = (currCoord.xGridCoord);
@@ -505,6 +564,7 @@ function keyPress() {
     }
     e.preventDefault();
 }
+
 
 $('#viewport').on('contextmenu', function(){
     return false;
@@ -638,9 +698,9 @@ function clickMap() {
     event.preventDefault();
     if (checkDoubleClick()) {
         if (event.which == 3) {
-            zoomOut(2);
+            zoomOut(2, false);
         } else {
-            zoomIn(2);
+            zoomIn(2, false);
         }
     }
     var currCoord = getCoordOfMouse();
@@ -649,7 +709,7 @@ function clickMap() {
     updateHighlights(previouslySelectedBackground, previouslySelectedObjects, currCoord.xGridCoord, currCoord.yGridCoord, true);
 };
 
-function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection) {
+function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, selection) {
     if (selection) {
         className = "selected";
     } else {
@@ -678,6 +738,17 @@ function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
             previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
         }
     }
+    if (selection) {
+        previouslySelectedBackground = null;
+    } else {
+        previouslyHighlightedBackground = null;
+    }
+    previouslyUpdatedObjects = [];
+}
+
+function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection) {
+    // Remove previous highlights
+    removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, selection);
     // Highlight the background div
     gridCells[gridColumn][gridRow].backgroundDiv.className += " " + className;
     previouslyUpdatedBackground  = gridCells[gridColumn][gridRow];
@@ -864,9 +935,9 @@ function zoomDiv(e) {
     d1 = Math.sqrt( Math.pow((offsetX2 - offsetX1),2) + Math.pow((offsetY2 - offsetY1),2));
     d2 = Math.sqrt( Math.pow((coffsetX2 - coffsetX1),2) + Math.pow((coffsetY2 - coffsetY1),2));
     if (d1 < d2) {
-        zoomIn(1);
+        zoomIn(1, false);
     } else {
-        zoomOut(1);
+        zoomOut(1, false);
     }
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
