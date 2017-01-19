@@ -3418,7 +3418,7 @@ body
 	/*background-size:100%;*/
 }
 
-.gridBackground.selected
+.gridBackground.gridSelected
 {
 	z-index:11 !important;
 }
@@ -3433,7 +3433,7 @@ body
 	filter: brightness(1.6);
 }
 
-.selected {
+.gridSelected {
 	background-blend-mode: normal, overlay;
 	filter: brightness(2.25);
 }
@@ -3445,7 +3445,7 @@ body
 
 .menuContainer {
 	position: absolute;
-	background:rgba(255,255,255,0.5);
+	background:rgba(255,255,255,0.25);
 	z-index: 10000000000000;
 }
 

@@ -318,9 +318,9 @@ function buildMenu() {
 
 
         jQuery('#menu').html(htmlString);
-        document.getElementById('menu').style.width = viewport.offsetWidth * (2 / 3);
-        document.getElementById('menu').style.left = viewport.offsetWidth * (1 / 6);
-        document.getElementById('menu').style.top = viewport.offsetHeight / 2 - menu.offsetHeight / 2;
+        document.getElementById('menu').style.width = viewport.offsetWidth * (2 / 3) + "px";
+        document.getElementById('menu').style.left = viewport.offsetWidth * (1 / 6) + "px";
+        document.getElementById('menu').style.top = viewport.offsetHeight / 2 - menu.offsetHeight / 2 + "px";
         menuBuilt = true;3
     }
 }
@@ -803,7 +803,7 @@ function clickMap() {
 
 function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, selection) {
     if (selection) {
-        className = "selected";
+        className = "gridSelected";
     } else {
         className = "highlighted";
     }
@@ -811,7 +811,7 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
     if (previouslyUpdatedBackground != null) {
         previouslyUpdatedBackground.backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground.filename + ") center center / 100%";
         if (selection) {
-            previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)selected(?!\S)/g, '');
+            previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)gridSelected(?!\S)/g, '');
         } else {
             previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)highlighted(?!\S)/g, '');
         }
@@ -825,7 +825,7 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
         previouslyUpdatedObjects[i].div.style.backgroundSize = "100%";
         previouslyUpdatedObjects[i].div.style.backgroundBlendMode = "";
         if (selection) {
-            previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)selected(?!\S)/g , '' );
+            previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)gridSelected(?!\S)/g , '' );
         } else {
             previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
         }
