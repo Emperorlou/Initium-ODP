@@ -29,8 +29,7 @@ var clickTimer;
 var timeBetweenLeftClick = 0;
 var dragging = false;
 var spacePressed = false;
-var prevScale;
-var prevCoord;
+var usingKeys = false;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -479,11 +478,22 @@ function keyUnpress() {
         spacePressed = false;
     }
 }
+function getCenterCell() {
+    scaledGridCellWidth = gridCellWidth * scale;
+    scaledGridCellHeight = gridCellHeight * scale;
+    xMid = Math.round((viewportContainer.offsetWidth/2 - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft + (scaledGridCellWidth)) / scaledGridCellWidth);
+    yMid = Math.round((viewportContainer.offsetHeight/2 - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() + (scaledGridCellHeight))/ scaledGridCellHeight);
+    return new CoordObject(xMid, yMid);
+}
 function keyPress() {
     if (!e) {
         var e = window.event;
     }
-    var currCoord = currentCoord();
+    if (usingKeys) {
+        currCoord = currentCoord();
+    } else {
+        currCoord = getCenterCell();
+    }
     var isShift;
     if (window.event) {
         key = window.event.keyCode;
@@ -565,6 +575,7 @@ function keyPress() {
         default: return; // exit this handler for other keys
     }
     e.preventDefault();
+    usingKeys = true;
 }
 
 
@@ -573,6 +584,7 @@ $('#viewport').on('contextmenu', function(){
 });
 
 function startHover(e) {
+    usingKeys = false;
     if (dragging) {return}
     // determine event object
     if (!e) {
