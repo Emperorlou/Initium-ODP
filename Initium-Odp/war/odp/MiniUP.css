@@ -3430,12 +3430,12 @@ body
 
 .highlighted {
 	background-blend-mode: normal, overlay;
-	filter: brightness(1.6);
+	filter: brightness(1.5);
 }
 
 .selected {
 	background-blend-mode: normal, overlay;
-	filter: brightness(2.25);
+	filter: brightness(2);
 }
 
 .selectedObjectList {
