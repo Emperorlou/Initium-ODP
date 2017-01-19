@@ -3430,17 +3430,23 @@ body
 
 .highlighted {
 	background-blend-mode: normal, overlay;
-	filter: brightness(1.5);
+	filter: brightness(1.6);
 }
 
 .selected {
 	background-blend-mode: normal, overlay;
-	filter: brightness(2);
+	filter: brightness(2.25);
 }
 
 .selectedObjectList {
 	border: 3px solid blue;
 	display: inline-block;
+}
+
+.menuContainer {
+	position: absolute;
+	background:rgba(255,255,255,0.5);
+	z-index: 10000000000000;
 }
 
 .vpcontainer {
