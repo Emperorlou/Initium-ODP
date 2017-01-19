@@ -483,6 +483,10 @@ function getCenterCell() {
     scaledGridCellHeight = gridCellHeight * scale;
     xMid = Math.round((viewportContainer.offsetWidth/2 - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft + (scaledGridCellWidth)) / scaledGridCellWidth);
     yMid = Math.round((viewportContainer.offsetHeight/2 - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() + (scaledGridCellHeight))/ scaledGridCellHeight);
+    if (xMid > gridTileWidth) {xMid = gridTileWidth}
+    if (yMid > gridTileWidth) {yMid = gridTileHeight}
+    if (xMid < 0) {xMid = 0}
+    if (yMid < 0) {yMid = 0}
     return new CoordObject(xMid, yMid);
 }
 function keyPress() {
@@ -575,7 +579,11 @@ function keyPress() {
         default: return; // exit this handler for other keys
     }
     e.preventDefault();
-    usingKeys = true;
+    if (isShift || spacePressed) {
+        usingKeys = false;
+    } else {
+        usingKeys = true;
+    }
 }
 
 
