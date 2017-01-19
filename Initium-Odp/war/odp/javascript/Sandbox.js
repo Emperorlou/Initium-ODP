@@ -1,12 +1,10 @@
 var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
+var menu = document.getElementById("menu");
 var grid = document.getElementById("grid");
 var gridCellLayer = document.getElementById("cell-layer");
 var objects = document.getElementsByClassName('gridObject');
-var dragDelta = $("#dragDelta").val();
-var scaleRate = Number($("#zoom").val());
-var gridTileWidth = Number($("#gridWidth").val());
-var gridTileHeight = Number($("#gridHeight").val());
+var dragDelta = 10;
 var scale = 1;
 var maxZoom = 2.4;
 var minZoom = .05;
@@ -30,6 +28,10 @@ var timeBetweenLeftClick = 0;
 var dragging = false;
 var spacePressed = false;
 var usingKeys = false;
+var isMenuVisible = false;
+var menuBuilt = false;
+var displayGridLines = false;
+var keepSelectedCenter = true;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -82,14 +84,15 @@ function pressedButton() {
         cursorObject.div.remove();
         cursorObject = "";
     }
-    scaleRate = Number($("#zoom").val());
+    scaleRate = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
     loadMap();
+    openMenu();
 }
 
 function scaleTiles(onCenter) {
 
-    gridTileWidth = Number($("#gridWidth").val());
-    gridTileHeight = Number($("#gridHeight").val());
+    gridTileWidth = isNaN(Number($("#gridWidth").val())) ? 20 : Number($("#gridWidth").val());
+    gridTileHeight = isNaN(Number($("#gridHeight").val())) ? 20 : Number($("#gridHeight").val());
     var forestry = Number($("#forestry").val());
     var scaledGridCellWidth = 64 * scale;
     var scaledGridCellHeight = 64 * scale;
@@ -242,15 +245,15 @@ function scaleTiles(onCenter) {
 
 function loadMap() {
 
-    var dragDelta = $("#dragDelta").val();
-    var displayGridLines = document.getElementById('displayGridLines').checked;
-    var gridTileWidth = Number($("#gridWidth").val());
-    var gridTileHeight = Number($("#gridHeight").val());
-    var forestry = Number($("#forestry").val());
+    scaleRate = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
+    dragDelta = ($("#dragDelta").val() == undefined) ? 10 : $("#dragDelta").val();
+    gridTileWidth = isNaN(Number($("#gridWidth").val())) ? 20 : Number($("#gridWidth").val());
+    gridTileHeight = isNaN(Number($("#gridHeight").val())) ? 20 : Number($("#gridHeight").val());
+    var seed = isNaN(Number($("#seed").val())) ? 123456 : Number($("#seed").val());
+    var forestry = isNaN(Number($("#forestry").val())) ? 2 : Number($("#forestry").val());
+    scale = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
+
     var gridCellWidth = 64 * scale;
-    var groundHtml = "";
-    var cellHtml = "";
-    var zOffset = 10;
 
     var totalGridWidth = gridTileWidth * gridCellWidth;
     var totalGridHeight = gridTileHeight * gridCellWidth;
@@ -272,120 +275,171 @@ function loadMap() {
 
     $.ajax({
         url: "SandboxServlet",
-        data:{width:gridTileWidth, height:gridTileHeight, seed:$("#seed").val(), forestry:forestry},
+        data:{width:gridTileWidth, height:gridTileHeight, seed:seed, forestry:forestry},
         type: 'POST',
         success: function(responseJson) {
-            $.each(responseJson['backgroundTiles'], function (index, value) {
-                $.each(value, function (innerIndex, backgroundObject) {
-
-                    var gridCell = new GridCell(
-                        "",
-                        "",
-                        backgroundObject.backgroundFile,
-                        backgroundObject.zIndex,
-                        [],
-                        index,
-                        innerIndex
-                    );
-
-                    var key = index + "-" + innerIndex;
-                    if (innerIndex == 0) {
-                        gridCells[index] = [];
-                    }
-                    gridCells[index][innerIndex] = gridCell;
-
-                    $hexBody = "<div id=\"hex" + key + "Back\"";
-                    $hexBody += " class=\"gridBackground\"";
-                    $hexBody += " data-xCoord=\"" + index + "\"";
-                    $hexBody += " data-yCoord=\"" + innerIndex + "\"";
-                    $hexBody += " style=\"";
-                    $hexBody += " z-index:" + backgroundObject.zIndex + ";";
-                    $hexBody += " background:url(" + $picUrlPath + backgroundObject.backgroundFile + ") center center;";
-                    $hexBody += " background-size:100%;";
-                    $hexBody += "\">";
-                    $hexBody += "</div>";
-                    groundHtml += $hexBody;
-
-                    $hexBody = "<div";
-                    $hexBody += " id=\"hex" + key + "\"";
-                    $hexBody += " class=\"gridCell\"";
-                    $hexBody += " data-key=\"" + key + "\"";
-                    $hexBody += " style=\"";
-                    if (displayGridLines) {
-                        $hexBody += " border: 1px solid black;";
-                    }
-                    $hexBody += " z-index: 11;";
-                    $hexBody += "\">";
-                    $hexBody += "</div>";
-
-                    cellHtml += $hexBody;
-                });
-            });
-
-            // Append HTML
-            $('#ground-layer').append(groundHtml);
-            $('#cell-layer').append(cellHtml);
-            // Gather DOM elements
-            var gridCellElements = document.getElementsByClassName('gridCell');
-            var gridBackgroundElements = document.getElementsByClassName('gridBackground');
-            // Attach elements to gridBackground structure
-            for (var i = 0; i < gridBackgroundElements.length; i++) {
-                gridCells[gridBackgroundElements[i].dataset.xcoord][gridBackgroundElements[i].dataset.ycoord].backgroundDiv = gridBackgroundElements[i];
-                gridCells[gridBackgroundElements[i].dataset.xcoord][gridBackgroundElements[i].dataset.ycoord].cellDiv = gridCellElements[i];
-            }
-
-            htmlString = "";
-            $.each(responseJson['objectMap'], function (objectKey, gridObject) {
-
-                //var top = (gridObject.yGridCoord+1) * gridCellHeight - (gridObject.yGridCellOffset);
-                var top = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
-                var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
-
-                var cgridObject = new GridObject(
-                    gridObject.key,
-                    "",
-                    gridObject.fileName,
-                    gridObject.name,
-                    gridObject.xGridCellOffset,
-                    gridObject.yGridCellOffset,
-                    gridObject.xGridCoord,
-                    gridObject.yGridCoord,
-                    gridObject.xImageOrigin,
-                    gridObject.yImageOrigin,
-                    gridObject.width,
-                    gridObject.height);
-                var key = gridObject.fileName + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
-                gridObjects[key] = cgridObject;
-                var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
-                gridCell.objectKeys[gridCell.objectKeys.length] = key;
-
-                $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
-                $hexBody += " data-key=\"" + key + "\"";
-                $hexBody += " style=\"";
-                $hexBody += " z-index:" + (Number(zOffset) + Number(top)) + ";";
-                if (gridObject.key == "o1") {
-                    $hexBody += " background:url(" + $domain + gridObject.fileName + ");";
-                } else {
-                    $hexBody += " background:url(" + $picUrlPath + gridObject.fileName + ");";
-                }
-                $hexBody += " background-size:100%;";
-                $hexBody += "\">";
-                $hexBody += "</div>";
-                htmlString += $hexBody;
-            });
-
-            // Append HTML
-            $('#object-layer').append(htmlString);
-            // Gather DOM elements
-            var gridObjectElements = document.getElementsByClassName('gridObject');
-            // Attach elements to gridObject structure
-            for (var i = 0; i < gridObjectElements.length; i++) {
-                gridObjects[objects[i].dataset.key].div = gridObjectElements[i];
-            }
-            // Move grid to center, scale, and update all tiles
-            centerGridOnScreen();
+            buildMap(responseJson);
         }
     });
+    buildMenu();
+}
+
+
+function openMenu() {
+    if (isMenuVisible) {
+        isMenuVisible = false;
+        document.getElementById('menu').style.visibility = 'hidden';
+    } else {
+        isMenuVisible = true;
+        document.getElementById('menu').style.display = 'inline';
+        document.getElementById('menu').style.visibility = 'visible';
+    }
+}
+
+function buildMenu() {
+    if (!menuBuilt) {
+        htmlString =
+            "<table> <tr>" +
+            "<td>" + "Width: " + "</td><td>" + "<input type=\'text\' id=\'gridWidth\' value=20 /> " + "</td>" +
+            "<td>" + "Height: " + "</td><td>" + "<input type='text' id='gridHeight' value=20 /> " + "</td>" +
+            "</tr> <tr>" +
+            "<td>" + "Zoom Rate: " + "</td><td>" + "<input type='text' id='zoom' value=.3 /> " + "</td>" +
+            "<td>" + "Forestry (0-10): " + "</td><td>" + "<input type='text' id='forestry' value=2 /> " + "</td>" +
+            "</tr> <tr>" +
+            "<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
+            "<td>" + "Seed: " + "</td><td>" + "<input type='text' id='seed' value=123456 /> " + "</td>" +
+            "</tr> <tr>" +
+            "<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
+            "<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
+            "</tr> <tr>" +
+            "</tr> </table>" +
+            "<center>" + "<button id='somebutton'>Update</button>" + "</center>" +
+            "<br>";
+
+
+        jQuery('#menu').html(htmlString);
+        document.getElementById('menu').style.width = viewport.offsetWidth * (2 / 3);
+        document.getElementById('menu').style.left = viewport.offsetWidth * (1 / 6);
+        document.getElementById('menu').style.top = viewport.offsetHeight / 2 - menu.offsetHeight / 2;
+        menuBuilt = true;3
+    }
+}
+
+function buildMap(responseJson) {
+    displayGridLines = (document.getElementById('displayGridLines') == null) ? false : document.getElementById('displayGridLines').checked;
+    keepSelectedCenter = (document.getElementById('keepSelectedCenter') == null) ? true : document.getElementById('keepSelectedCenter').checked;
+    var groundHtml = "";
+    var cellHtml = "";
+    var zOffset = 10;
+    $.each(responseJson['backgroundTiles'], function (index, value) {
+        $.each(value, function (innerIndex, backgroundObject) {
+
+            var gridCell = new GridCell(
+                "",
+                "",
+                backgroundObject.backgroundFile,
+                backgroundObject.zIndex,
+                [],
+                index,
+                innerIndex
+            );
+
+            var key = index + "-" + innerIndex;
+            if (innerIndex == 0) {
+                gridCells[index] = [];
+            }
+            gridCells[index][innerIndex] = gridCell;
+
+            $hexBody = "<div id=\"hex" + key + "Back\"";
+            $hexBody += " class=\"gridBackground\"";
+            $hexBody += " data-xCoord=\"" + index + "\"";
+            $hexBody += " data-yCoord=\"" + innerIndex + "\"";
+            $hexBody += " style=\"";
+            $hexBody += " z-index:" + backgroundObject.zIndex + ";";
+            $hexBody += " background:url(" + $picUrlPath + backgroundObject.backgroundFile + ") center center;";
+            $hexBody += " background-size:100%;";
+            $hexBody += "\">";
+            $hexBody += "</div>";
+            groundHtml += $hexBody;
+
+            $hexBody = "<div";
+            $hexBody += " id=\"hex" + key + "\"";
+            $hexBody += " class=\"gridCell\"";
+            $hexBody += " data-key=\"" + key + "\"";
+            $hexBody += " style=\"";
+            if (displayGridLines) {
+                $hexBody += " border: 1px solid black;";
+            }
+            $hexBody += " z-index: 11;";
+            $hexBody += "\">";
+            $hexBody += "</div>";
+
+            cellHtml += $hexBody;
+        });
+    });
+
+    // Append HTML
+    $('#ground-layer').append(groundHtml);
+    $('#cell-layer').append(cellHtml);
+    // Gather DOM elements
+    var gridCellElements = document.getElementsByClassName('gridCell');
+    var gridBackgroundElements = document.getElementsByClassName('gridBackground');
+    // Attach elements to gridBackground structure
+    for (var i = 0; i < gridBackgroundElements.length; i++) {
+        gridCells[gridBackgroundElements[i].dataset.xcoord][gridBackgroundElements[i].dataset.ycoord].backgroundDiv = gridBackgroundElements[i];
+        gridCells[gridBackgroundElements[i].dataset.xcoord][gridBackgroundElements[i].dataset.ycoord].cellDiv = gridCellElements[i];
+    }
+
+    htmlString = "";
+    $.each(responseJson['objectMap'], function (objectKey, gridObject) {
+
+        //var top = (gridObject.yGridCoord+1) * gridCellHeight - (gridObject.yGridCellOffset);
+        var top = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
+        var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
+
+        var cgridObject = new GridObject(
+            gridObject.key,
+            "",
+            gridObject.fileName,
+            gridObject.name,
+            gridObject.xGridCellOffset,
+            gridObject.yGridCellOffset,
+            gridObject.xGridCoord,
+            gridObject.yGridCoord,
+            gridObject.xImageOrigin,
+            gridObject.yImageOrigin,
+            gridObject.width,
+            gridObject.height);
+        var key = gridObject.fileName + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
+        gridObjects[key] = cgridObject;
+        var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
+        gridCell.objectKeys[gridCell.objectKeys.length] = key;
+
+        $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
+        $hexBody += " data-key=\"" + key + "\"";
+        $hexBody += " style=\"";
+        $hexBody += " z-index:" + (Number(zOffset) + Number(top)) + ";";
+        if (gridObject.key == "o1") {
+            $hexBody += " background:url(" + $domain + gridObject.fileName + ");";
+        } else {
+            $hexBody += " background:url(" + $picUrlPath + gridObject.fileName + ");";
+        }
+        $hexBody += " background-size:100%;";
+        $hexBody += "\">";
+        $hexBody += "</div>";
+        htmlString += $hexBody;
+    });
+
+    // Append HTML
+    $('#object-layer').append(htmlString);
+    // Gather DOM elements
+    var gridObjectElements = document.getElementsByClassName('gridObject');
+    // Attach elements to gridObject structure
+    for (var i = 0; i < gridObjectElements.length; i++) {
+        gridObjects[objects[i].dataset.key].div = gridObjectElements[i];
+    }
+    // Move grid to center, scale, and update all tiles
+    centerGridOnScreen();
 }
 
 window.onload = function() {
@@ -493,7 +547,7 @@ function keyPress() {
     if (!e) {
         var e = window.event;
     }
-    if (usingKeys) {
+    if (usingKeys || !keepSelectedCenter) {
         currCoord = currentCoord();
     } else {
         currCoord = getCenterCell();
@@ -529,7 +583,11 @@ function keyPress() {
                 newYCoord = (currCoord.yGridCoord);
                 if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
                 updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
-                centerCellOnScreen(newXCoord, newYCoord);
+                if (keepSelectedCenter) {
+                    centerCellOnScreen(newXCoord, newYCoord);
+                } else {
+                    moveCellOnScreen(newXCoord, newYCoord);
+                }
             }
             break;
         case 38: // up
@@ -542,7 +600,11 @@ function keyPress() {
                 newYCoord = (currCoord.yGridCoord - 1);
                 if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
                 updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
-                centerCellOnScreen(newXCoord, newYCoord);
+                if (keepSelectedCenter) {
+                    centerCellOnScreen(newXCoord, newYCoord);
+                } else {
+                    moveCellOnScreen(newXCoord, newYCoord);
+                }
             }
             break;
         case 39: // right
@@ -559,7 +621,11 @@ function keyPress() {
                 newYCoord = (currCoord.yGridCoord);
                 if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
                 updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
-                centerCellOnScreen(newXCoord, newYCoord);
+                if (keepSelectedCenter) {
+                    centerCellOnScreen(newXCoord, newYCoord);
+                } else {
+                    moveCellOnScreen(newXCoord, newYCoord);
+                }
             }
             break;
         case 40: // down
@@ -572,11 +638,15 @@ function keyPress() {
                 newYCoord = (currCoord.yGridCoord + 1);
                 if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
                 updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
-                centerCellOnScreen(newXCoord, newYCoord);
+                if (keepSelectedCenter) {
+                    centerCellOnScreen(newXCoord, newYCoord);
+                } else {
+                    moveCellOnScreen(newXCoord, newYCoord);
+                }
             }
             break;
 
-        default: return; // exit this handler for other keys
+        default: return;
     }
     e.preventDefault();
     if (isShift || spacePressed) {
@@ -886,7 +956,7 @@ function dragDiv(e) {
             userLocY = e.touches[0].clientY;
         }
     }
-    var dragDelta = $("#dragDelta").val();
+    //dragDelta = isNaN($("#dragDelta").val()) ? 10 : $("#dragDelta").val();$("#dragDelta").val();
     deltaX = userLocX - offsetX;
     deltaY = userLocY - offsetY;
     updatedX = coordX+deltaX;
@@ -999,4 +1069,15 @@ function GridObject(key, div, filename, name, xGridCellOffset, yGridCellOffset, 
 function CoordObject(xGridCoord, yGridCoord) {
     this.xGridCoord = xGridCoord;
     this.yGridCoord = yGridCoord;
+}
+
+function mapPlow(coord) {
+    $.ajax({
+        url: "SandboxServlet",
+        data: {width: gridTileWidth, height: gridTileHeight, seed: $("#seed").val(), forestry: forestry, command: "mapPlow", coord: currentCoord()},
+        type: 'POST',
+        success: function (responseJson) {
+            buildMap(responseJson);
+        }
+    });
 }

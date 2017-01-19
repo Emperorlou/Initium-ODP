@@ -383,6 +383,7 @@ public class MainPageUpdateService extends Service
 			newHtml.append("Grid Lines: <input type=\"checkbox\" id=\"displayGridLines\">");
 			newHtml.append("<button id=\"somebutton\">Update</button>");
 			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
+			newHtml.append("<div id=\"menu\" class=\"menuContainer\" style=\"visibility: hidden;\"></div>");
 			newHtml.append("<div id=\"viewport\" class=\"vp\">");
 			newHtml.append("<div id=\"grid\" class=\"grid\">");
 			newHtml.append("<div id=\"ui-layer\" class=\"uiLayer\"></div>");
@@ -392,6 +393,7 @@ public class MainPageUpdateService extends Service
 			newHtml.append("</div>");
 			newHtml.append("</div>");
 			newHtml.append("</div>");
+			newHtml.append("<button type=\"button\" onclick=\"openMenu()\">Menu</button>");
 			newHtml.append("<p id=\"selectedObjects\" class=\"selectedObjectList\"></p>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
 			newHtml.append("<script>");
