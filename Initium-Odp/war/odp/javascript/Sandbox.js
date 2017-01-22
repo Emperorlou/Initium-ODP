@@ -119,10 +119,10 @@ function scaleTiles(onCenter) {
                 userLocX = event.clientX;
                 userLocY = event.clientY;
             } else if (event.touches) {
-                offsetX1 = e.touches[0].clientX;
-                offsetY1 = e.touches[0].clientY;
-                offsetX2 = e.touches[1].clientX;
-                offsetY2 = e.touches[1].clientY;
+                offsetX1 = event.touches[0].clientX;
+                offsetY1 = event.touches[0].clientY;
+                offsetX2 = event.touches[1].clientX;
+                offsetY2 = event.touches[1].clientY;
 
                 userLocX = (offsetX2 + offsetX1) / 2;
                 userLocY = (offsetY2 + offsetY1) / 2;
