@@ -3296,7 +3296,7 @@ body
 
 .menuContainer {
 	position: absolute;
-	background:rgba(255,255,255,0.25);
+	background:rgba(0,0,0,0.50);
 	z-index: 10000000000000;
 }
 
