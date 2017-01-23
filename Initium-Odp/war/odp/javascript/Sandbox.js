@@ -746,8 +746,8 @@ function getCoordOfMouse() {
         offsetY = event.clientY;
         // For touch input
     } else if (event.touches) {
-        offsetX = event.touches[0].clientX;
-        offsetY = event.touches[0].clientY;
+        offsetX = event.changedTouches[0].pageX;
+        offsetY = event.changedTouches[0].pageX;
     }
     // Determine where the click took place in the grid
     var gridRelx = offsetX - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft - (scaledGridCellWidth / 2);
