@@ -454,8 +454,8 @@ window.onload = function() {
     document.onkeyup = keyUnpress;
 
     // Listen for touch inputs
-    document.body.addEventListener('touchend', stopDrag);
-    document.body.addEventListener('touchmove', dragDiv);
+    document.body.addEventListener('touchend', stopDrag, {passive: true});
+    document.body.addEventListener('touchmove', dragDiv, {passive: true});
     document.body.addEventListener('touchstart', startDrag);
 }
 
@@ -702,6 +702,7 @@ function startDrag(e) {
             if (event.touches.length == 1) {
                 offsetX = e.touches[0].clientX;
                 offsetY = e.touches[0].clientY;
+                document.ontouchmove=dragDiv;
                 updateGrid();
             } else {
                 offsetX1 = e.touches[0].clientX;
