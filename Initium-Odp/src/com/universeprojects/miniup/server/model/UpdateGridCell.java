@@ -3,9 +3,9 @@ package com.universeprojects.miniup.server.model;
 public class UpdateGridCell {
 	private int xGridCoord;
 	private int yGridCoord;
-	private Object payload;
+	private String payload;
 
-	public UpdateGridCell(int xGridCoord, int yGridCoord, Object payload) {
+	public UpdateGridCell(int xGridCoord, int yGridCoord, String payload) {
 		this.xGridCoord = xGridCoord;
 		this.yGridCoord = yGridCoord;
 		this.payload = payload;
@@ -27,11 +27,11 @@ public class UpdateGridCell {
 		this.yGridCoord = yGridCoord;
 	}
 
-	public Object getPayLoad() {
+	public String getPayLoad() {
 		return payload;
 	}
 
-	public void setPayLoad(Object payload) {
+	public void setPayLoad(String payload) {
 		this.payload = payload;
 	}
 
@@ -39,6 +39,6 @@ public class UpdateGridCell {
 	public String toString() {
 		return "{\"xGridCoord\":" + this.xGridCoord +
 				",\"yGridCoord\":" + this.yGridCoord +
-				",\"payload\":\"" + this.payload.toString() + "\"}";
+				",\"payload\":\"" + this.payload + "\"}";
 	}
 }

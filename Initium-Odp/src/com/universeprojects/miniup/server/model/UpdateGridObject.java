@@ -3,9 +3,9 @@ package com.universeprojects.miniup.server.model;
 public class UpdateGridObject {
 	
 	private String key;
-	private Object payload;
+	private String payload;
 
-	public UpdateGridObject(String key, Object payload) {
+	public UpdateGridObject(String key, String payload) {
 		this.key = key;
 		this.payload = payload;
 	}
@@ -22,13 +22,13 @@ public class UpdateGridObject {
 		return payload;
 	}
 
-	public void setPayload(Object payload) {
+	public void setPayload(String payload) {
 		this.payload = payload;
 	}
 
 	@Override
 	public String toString() {
 		return "{\"key\":\"" + this.key +
-				"\",\"payLoad\":\"" + this.payload.toString() + "\"}";
+				"\",\"payLoad\":\"" + this.payload + "\"}";
 	}
 }
