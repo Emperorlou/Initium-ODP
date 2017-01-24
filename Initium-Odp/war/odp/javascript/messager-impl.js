@@ -169,7 +169,7 @@ function changeChatTab(code)
 		$("#"+messageCodes[i]+"_tab_newui").removeClass("selected");
 	}	
 	
-	$("#"+code+"_tab").addClass("selected");
+	$("#"+code+"_tab").addClass("chat_tab_selected");
 	$("#"+code+"_tab_newui").addClass("selected");
 	
 	if (code === "GameMessages")

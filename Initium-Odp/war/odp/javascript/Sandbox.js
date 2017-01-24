@@ -648,7 +648,7 @@ function keyPress() {
 
         default: return;
     }
-    e.preventDefault();
+    //e.preventDefault();
     if (isShift || spacePressed) {
         usingKeys = false;
     } else {

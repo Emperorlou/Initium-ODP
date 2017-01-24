@@ -1561,7 +1561,7 @@ function loadInlineCollectables()
 function inventory()
 {
     closeAllPopupsTooltips();
-	pagePopup("/odp/ajax_inventory.jsp");
+	pagePopup("/odp/ajax_inventory.jsp", null, "Your Inventory");
 }
 
 function viewChangelog()
@@ -1579,7 +1579,7 @@ function viewSettings()
 function viewProfile()
 {
     closeAllPopupsTooltips();
-	pagePopup("/odp/view_profile");
+	pagePopup("/odp/view_profile", "Your Profile");
 }
 
 function viewMap()
@@ -1962,7 +1962,7 @@ function viewManageStore()
     closeAllPagePopups();
     closeAllPopups();
     closeAllTooltips();
-    pagePopup("/odp/ajax_managestore.jsp");
+    pagePopup("/odp/ajax_managestore.jsp", null, "Your Store");
 }
 
 function newCharacterFromDead()

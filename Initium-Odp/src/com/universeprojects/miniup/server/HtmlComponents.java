@@ -440,7 +440,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("<div class='main-item-controls' style='top:0px; display:block; margin-bottom:25px;'>");
 		sb.append("<span>" + groupPermissionTag + "</span> ");
 		
-		if (groupStatus.equals("Kicked") == false) {
+		if ("Kicked".equals(groupStatus) == false) {
 			sb.append("Position: " + groupRank + "<br>");
 			if (character.getProperty("groupLeaveDate") != null)
 				sb.append("(This member is leaving the group. They will be out of the group in: "

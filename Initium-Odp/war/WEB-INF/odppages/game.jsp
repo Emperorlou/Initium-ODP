@@ -376,9 +376,9 @@ https://github.com/Emperorlou/Initium-ODP
 				<div class='header1-display'><span id='locationName'>${locationName}</span></div>
 				<div class='header1-spacer'></div>
 				<div class='header1-rightchunk'>
-					<div class='header1-button'>MAP</div>
+					<div class='header1-button' onclick='viewMap()'>MAP</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button'>EQUIP</div>
+					<div class='header1-button' onclick='inventory()'>EQUIP</div>
 					<div class='header1-spacer'></div>
 					<div class='header1-display'><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' border=0/><span id='mainGoldIndicator'>${mainGoldIndicator}</span></div>
 					<div class='header1-spacer'></div>
