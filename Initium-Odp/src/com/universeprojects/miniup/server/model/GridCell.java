@@ -21,10 +21,10 @@ public class GridCell {
 
 	public GridCell(String backgroundFile, Integer xGridCoord, Integer yGridCoord, Integer zIndex) {
 		jsonObject = new JSONObject();
-		jsonObject.put(this.backgroundFile, backgroundFile);
-		jsonObject.put(this.xGridCoord, xGridCoord);
-		jsonObject.put(this.yGridCoord, yGridCoord);
-		jsonObject.put(this.zIndex, zIndex);
+		setBackgroundFile(backgroundFile);
+		setxGridCoord(xGridCoord);
+		setyGridCoord(yGridCoord);
+		setzIndex(zIndex);
 	}
 
 	public String getBackgroundFile() {

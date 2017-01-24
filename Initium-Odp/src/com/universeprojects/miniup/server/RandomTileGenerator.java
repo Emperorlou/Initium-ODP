@@ -17,10 +17,8 @@ public class RandomTileGenerator {
 	}
 
 	public static GridMap buildNewGrid(int seed, int rowLength, int columnLength, int forestry) {
-
-		Map<String, Object> data = new HashMap<>();
+		
 		GridCell[][] grid = new GridCell[rowLength][columnLength];
-
 		SeededSimplexNoise treeSsn = new SeededSimplexNoise(seed);
 		SeededSimplexNoise shrubSsn = new SeededSimplexNoise(seed + 1);
 		Map<String, GridObject> objectMap = new HashMap<>();
