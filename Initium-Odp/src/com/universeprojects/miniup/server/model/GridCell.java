@@ -13,7 +13,13 @@ public class GridCell {
 		jsonObject = new JSONObject();
 	}
 
-	public GridCell(String backgroundFile, int xGridCoord, int yGridCoord, int zIndex) {
+	public GridCell(Integer xGridCoord, Integer yGridCoord) {
+		jsonObject = new JSONObject();
+		setxGridCoord(xGridCoord);
+		setyGridCoord(yGridCoord);
+	}
+
+	public GridCell(String backgroundFile, Integer xGridCoord, Integer yGridCoord, Integer zIndex) {
 		jsonObject = new JSONObject();
 		jsonObject.put(this.backgroundFile, backgroundFile);
 		jsonObject.put(this.xGridCoord, xGridCoord);
@@ -26,31 +32,30 @@ public class GridCell {
 	}
 
 	public void setBackgroundFile(String backgroundFile) {
-		this.backgroundFile = backgroundFile;
 		this.jsonObject.put(this.backgroundFile, backgroundFile);
 	}
 
-	public int getxGridCoord() {
-		return (int) this.jsonObject.get(this.xGridCoord);
+	public Integer getxGridCoord() {
+		return (Integer) this.jsonObject.get(this.xGridCoord);
 	}
 
-	public void setxGridCoord(int xGridCoord) {
+	public void setxGridCoord(Integer xGridCoord) {
 		this.jsonObject.put("xGridCoord", xGridCoord);
 	}
 
-	public int getyGridCoord() {
-		return (int) this.jsonObject.get(this.yGridCoord);
+	public Integer getyGridCoord() {
+		return (Integer) this.jsonObject.get(this.yGridCoord);
 	}
 
-	public void setyGridCoord(int yGridCoord) {
+	public void setyGridCoord(Integer yGridCoord) {
 		this.jsonObject.put("yGridCoord", yGridCoord);
 	}
 
-	public int getzIndex() {
-		return (int) this.jsonObject.get(this.zIndex);
+	public Integer getzIndex() {
+		return (Integer) this.jsonObject.get(this.zIndex);
 	}
 
-	public void setzIndex(int zIndex) {
+	public void setzIndex(Integer zIndex) {
 		this.jsonObject.put("zIndex", zIndex);
 	}
 
