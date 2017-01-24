@@ -374,22 +374,19 @@ public class MainPageUpdateService extends Service
 			
 			StringBuilder newHtml = new StringBuilder();
 			
-			newHtml.append("Width: <input type='text' id='gridWidth' value=20 />");
-			newHtml.append("Height: <input type='text' id='gridHeight' value=20 />");
-			newHtml.append("Zoom Rate: <input type='text' id='zoom' value=.3 />");
-			newHtml.append("Seed: <input type='text' id='seed' value=123456 />");
-			newHtml.append("Forestry (0-10): <input type='text' id='forestry' value=2 />");
-			newHtml.append("Grid Lines: <input type=\"checkbox\" id=\"displayGridLines\">");
-			newHtml.append("<button id=\"somebutton\">Update</button>");
 			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
+			newHtml.append("<div id=\"menu\" class=\"menuContainer\" style=\"visibility: hidden;\"></div>");
 			newHtml.append("<div id=\"viewport\" class=\"vp\">");
 			newHtml.append("<div id=\"grid\" class=\"grid\">");
+			newHtml.append("<div id=\"ui-layer\" class=\"uiLayer\"></div>");
 			newHtml.append("<div id=\"cell-layer\" class=\"cellLayer\"></div>");
 			newHtml.append("<div id=\"ground-layer\" class=\"groundLayer\"></div>");
 			newHtml.append("<div id=\"object-layer\" class=\"objectLayer\"></div>");
 			newHtml.append("</div>");
 			newHtml.append("</div>");
 			newHtml.append("</div>");
+			newHtml.append("<button type=\"button\" onclick=\"openMenu()\">Menu</button>");
+			newHtml.append("<center><p id=\"selectedObjects\" class=\"selectedObjectList\"></p></center>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
 			newHtml.append("<script>");
 			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");

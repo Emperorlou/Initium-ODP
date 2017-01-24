@@ -154,6 +154,8 @@ public class GroupService extends Service {
 	
 	public boolean isCharacterGroupCreator()
 	{
+		if (characterGroup==null)
+			return false;
 		return GameUtils.equals(this.character.getKey(), this.characterGroup.getProperty("creatorKey"));
 	}
 	/**

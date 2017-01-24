@@ -26,7 +26,7 @@
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=60"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=61"></script>
 
 <script type="text/javascript" src="javascript/messager.js?v=18"></script>
 
@@ -38,13 +38,13 @@
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=57">
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=58">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="javascript/rangeslider/rangeslider.min.js"></script>
 
 <script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
-<script src='/odp/javascript/map.js?v=3'></script>
+<script src='/odp/javascript/map.js?t=4'></script>
 
 <script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit"></script>
 

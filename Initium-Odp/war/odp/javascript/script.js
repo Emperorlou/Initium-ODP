@@ -763,7 +763,7 @@ function loadLocationItems()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("ajax_moveitems.jsp?preset=location");
+	pagePopup("/ajax_moveitems.jsp?preset=location");
 //	$("#main-itemlist").load("locationitemlist.jsp");
 //	$("#main-itemlist").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby items</h4></div>");
@@ -775,7 +775,7 @@ function loadLocationCharacters()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("locationcharacterlist.jsp");
+	pagePopup("/locationcharacterlist.jsp");
 //	$("#main-characterlist").click(function(){
 //		$("#main-characterlist").html("<div class='boldbox' onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby characters</h4></div>");
 //	});
@@ -786,7 +786,7 @@ function loadLocationMerchants()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("locationmerchantlist.jsp");
+	pagePopup("/locationmerchantlist.jsp");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
 //	$("#main-merchantlist").click(function(){
 //		$("#main-merchantlist").html("<div class='boldbox' onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby merchants</h4></div>");
@@ -900,7 +900,7 @@ function shareItem(itemId)
 function viewGroup(groupId)
 {
 	closeAllTooltips();
-	pagePopup("odp/ajax_group?groupId=" + groupId);
+	pagePopup("/odp/ajax_group?groupId=" + groupId);
 }
 
 
@@ -1405,7 +1405,7 @@ function incrementStackIndex()
 	currentPopupStackIndex++;
     if (currentPopupStackIndex==1)
     {
-		$("#page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
+		$(".main-page #page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
 	    $(document).bind("keydown", popupKeydownHandler);
     }
     else
@@ -1424,6 +1424,7 @@ function decrementStackIndex()
 	if (currentPopupStackIndex==0)
 	{
 		$("#page-popup-root").empty();
+		$(".page-popup-newui").remove();
 		$(document).unbind("keydown", popupKeydownHandler);
 	}
 	else
@@ -1445,7 +1446,7 @@ function pagePopup(url, closeCallback)
 	
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
-	
+	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	
@@ -1521,7 +1522,10 @@ function reloadPagePopup(quietly)
 	if (quietly==false)
 		content.html("<img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/>");
 	else
+	{
 		$(".page-popup-Reload").html("<img src='/javascript/images/wait.gif' border=0 style='margin-top:20px;'/>");
+		$("#page-popup-reloadbutton").html("<img src='/javascript/images/wait.gif' border=0/>");	// new ui variant
+	}
 
 	if (content.is("iframe"))
 	{
@@ -1531,6 +1535,7 @@ function reloadPagePopup(quietly)
 	{
 		content.load(url, null, function(){
 			$(".page-popup-Reload").html("&#8635;");
+			$("#page-popup-reloadbutton").html("&#8635;");	// new ui variant
 		});
 	}
 }
@@ -1556,13 +1561,13 @@ function loadInlineCollectables()
 function inventory()
 {
     closeAllPopupsTooltips();
-	pagePopup("/odp/ajax_inventory.jsp");
+	pagePopup("/odp/ajax_inventory.jsp", null, "Your Inventory");
 }
 
 function viewChangelog()
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_changelog.jsp");
+	pagePopup("/ajax_changelog.jsp");
 }
 
 function viewSettings()
@@ -1574,7 +1579,7 @@ function viewSettings()
 function viewProfile()
 {
     closeAllPopupsTooltips();
-	pagePopup("odp/view_profile");
+	pagePopup("/odp/view_profile", "Your Profile");
 }
 
 function viewMap()
@@ -1653,13 +1658,13 @@ function changeEmailAddress(oldEmail)
 
 function viewReferrals()
 {
-	pagePopup("ajax_referrals.jsp");
+	pagePopup("/ajax_referrals.jsp");
 }
 
 function customizeItemOrderPage(itemId)
 {
     closeAllPopupsTooltips();
-	pagePopup("ajax_customizeitem.jsp?itemId="+itemId);
+	pagePopup("/ajax_customizeitem.jsp?itemId="+itemId);
 }
 
 function orderItemCustomization(itemId, orderTypeId, requiredDetails)
@@ -1957,7 +1962,7 @@ function viewManageStore()
     closeAllPagePopups();
     closeAllPopups();
     closeAllTooltips();
-    pagePopup("odp/ajax_managestore.jsp");
+    pagePopup("/odp/ajax_managestore.jsp", null, "Your Store");
 }
 
 function newCharacterFromDead()
@@ -2624,7 +2629,7 @@ function fullpageRefresh()
 function _viewTrade()
 {
     closeAllPopupsTooltips(true);
-	pagePopup("odp/ajax_trade.jsp",function(){
+	pagePopup("/odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
 //		popupMessage("Trade Cancelled","This trade has been cancelled.")
 	});	

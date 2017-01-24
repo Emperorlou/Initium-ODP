@@ -276,6 +276,38 @@ ${longOperationRecallJs}
 <link rel="stylesheet" href="./MiniUP.css?v=1">
 
 
+<!-- Overrides of script.js for the new UI -->
+<script type="text/javascript">
+
+$("#page-popup-root").html("");	// Clean out the page popup root, we no longer put the close/refresh buttons there
+function pagePopup(url, closeCallback)
+{
+	if (url.indexOf("?")>0)
+		url+="&ajax=true";
+	else
+		url+="?ajax=true";
+	
+	exitFullscreenChat();
+	
+	var stackIndex = incrementStackIndex();
+	var pagePopupId = "page-popup"+stackIndex;
+	
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'>"+
+			"<div style='display:table'><div class='header1' style='display:table-row'>"+
+			"<div class='header1-button' style='display:table-cell' onclick='reloadPagePopup()'>&#8635;</div>"+
+			"<div  style='display:table-cell; width:100%;'></div>"+
+			"<div class='header1-button'  style='display:table-cell' onclick='closePagePopup()'>X</div></div></div>"+
+			"<div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
+	$("#"+pagePopupId+"-content").load(url);
+	
+	if (closeCallback!=null)
+		popupStackCloseCallbackHandlers.push(closeCallback);
+	else
+		popupStackCloseCallbackHandlers.push(null);
+}
+
+</script>
+
 <script type="text/javascript">
 	// This ensures the bottom half of the page fills the rest of the page and no more
 	function normalizePage()
@@ -296,6 +328,32 @@ ${longOperationRecallJs}
 	normalizePage();
 </script>
 
+<script type="text/javascript">
+function pagePopup(url, closeCallback, popupTitle)
+{
+	if (url.indexOf("?")>0)
+		url+="&ajax=true";
+	else
+		url+="?ajax=true";
+	
+	exitFullscreenChat();
+	
+	var stackIndex = incrementStackIndex();
+	var pagePopupId = "page-popup"+stackIndex;
+	
+	if (popupTitle==null)
+		popupTitle = "";
+	$(".location-controls-container").append("<div id='"+pagePopupId+"' class='page-popup-newui location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div id='page-popup-reloadbutton' class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div class='header1-display' id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>");
+	$("#"+pagePopupId+"-content").load(url);
+	
+	if (closeCallback!=null)
+		popupStackCloseCallbackHandlers.push(closeCallback);
+	else
+		popupStackCloseCallbackHandlers.push(null);
+}
+
+</script>
+
 </head>
 
 <!--
@@ -305,6 +363,8 @@ Did you know you can help code Initium?
 Check out our github and get yourself setup,
 then talk to the lead dev so you can get yourself
 on our slack channel!
+
+https://github.com/Emperorlou/Initium-ODP
 
                                            -->
 
@@ -316,37 +376,38 @@ on our slack channel!
 				<div class='header1-display'><span id='locationName'>${locationName}</span></div>
 				<div class='header1-spacer'></div>
 				<div class='header1-rightchunk'>
-					<div class='header1-button'>MAP</div>
+					<div class='header1-button' onclick='viewMap()'>MAP</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button'>EQUIP</div>
+					<div class='header1-button' onclick='inventory()'>EQUIP</div>
 					<div class='header1-spacer'></div>
 					<div class='header1-display'><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' border=0/><span id='mainGoldIndicator'>${mainGoldIndicator}</span></div>
 					<div class='header1-spacer'></div>
 				</div>
 			</div>
 			<div id='main-banner' class='banner1'>
-					<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
-						${inBannerCharacterWidget}
-					</div>				
-			
 				<img id='banner-sizer' src='https://initium-resources.appspot.com/images/banner---placeholder2.png' border=0/>
+				<div id='banner-base'></div>			
+				<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
+					${inBannerCharacterWidget}
+				</div>				
+			
 			</div>
 		</div>
 		<div class='page-maincontent'>
 			<div class='chat-container'>
 				<div class='header1'>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>!</div>
+					<div class='header1-button chat-button' id='GameMessages_tab_newui' onclick='changeChatTab("GameMessages")'><div id='GameMessages-chat-indicator' class='chat-button-indicator'></div>!</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>GLOBAL</div>
+					<div class='header1-button chat-button' id='GlobalChat_tab_newui' onclick='changeChatTab("GlobalChat")'><div id='GlobalChat-chat-indicator' class='chat-button-indicator'></div>GLOBAL</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>LOCATION</div>
+					<div class='header1-button chat-button' id='LocationChat_tab_newui' onclick='changeChatTab("LocationChat")'><div id='LocationChat-chat-indicator' class='chat-button-indicator'></div>LOCATION</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>GROUP</div>
+					<div class='header1-button chat-button' id='GroupChat_tab_newui' onclick='changeChatTab("GroupChat")'><div id='GroupChat-chat-indicator' class='chat-button-indicator'></div>GROUP</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator'></div>PARTY</div>
+					<div class='header1-button chat-button' id='PartyChat_tab_newui' onclick='changeChatTab("PartyChat")'><div id='PartyChat-chat-indicator' class='chat-button-indicator'></div>PARTY</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-button chat-button'><div class='chat-button-indicator' style='visibility:visible'>12</div>PRIVATE</div>
+					<div class='header1-button chat-button' id='PrivateChat_tab_newui' onclick='changeChatTab("PrivateChat")'><div id='PrivateChat-chat-indicator' class='chat-button-indicator' ></div>PRIVATE</div>
 					<div class='header1-spacer'></div>
 				</div>
 				<div class='main1'>
@@ -385,26 +446,48 @@ on our slack channel!
 			<script type="text/javascript">updateMinimizeBox("#chat_box_minimize_button", ".chat_box")</script>
 		</div>
 
+		<div class='newui-popup' id='page-popup-root'></div> 
+
 					</div>
 				</div>
 				
-							<div class='location-controls-container'>
-				<div class='header1'></div>
-				<div class='main1'>
-					<div class='location-controls'>
-					<div class='main1-inset1'>
-						<div class='backdrop1b buttonbar'>
-							<div id='buttonBar'>${buttonBar}</div>
+				<div class='location-controls-container'>
+					<div class='location-controls-page'>
+						<div class='header1'>
+							<div class='header1-buttonbar'>
+								<div class='header1-buttonbar-inner'>
+									<div class='header1-buttonbar-middle'>
+										<div id='buttonbar'>${buttonBar}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class='main1 location-controls-page-internal'>
+							<div class='location-controls'>
+							
+							
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+								${mainButtonList}
+							</div>					
+							</div>
 						</div>
 					</div>
-					
-					
-					<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-						${mainButtonList}
-					</div>					
-					</div>
 				</div>
-			</div>
 				
 			</div>
 
