@@ -3,10 +3,10 @@ package com.universeprojects.miniup.server.model;
 import org.json.simple.JSONObject;
 
 public class GridCell {
-	private String backgroundFile;
-	private int xGridCoord;
-	private int yGridCoord;
-	private int zIndex;
+	private static String backgroundFile = "backgroundFile";
+	private static String xGridCoord = "xGridCoord";
+	private static String yGridCoord = "yGridCoord";
+	private static String zIndex = "zIndex";
 	private JSONObject jsonObject;
 	
 	public GridCell() {
@@ -14,51 +14,43 @@ public class GridCell {
 	}
 
 	public GridCell(String backgroundFile, int xGridCoord, int yGridCoord, int zIndex) {
-		this.backgroundFile = backgroundFile;
-		this.xGridCoord = xGridCoord;
-		this.yGridCoord = yGridCoord;
-		this.zIndex = zIndex;
-		
 		jsonObject = new JSONObject();
-		jsonObject.put("backgroundFile", backgroundFile);
-		jsonObject.put("xGridCoord", xGridCoord);
-		jsonObject.put("yGridCoord", yGridCoord);
-		jsonObject.put("zIndex", zIndex);
+		jsonObject.put(this.backgroundFile, backgroundFile);
+		jsonObject.put(this.xGridCoord, xGridCoord);
+		jsonObject.put(this.yGridCoord, yGridCoord);
+		jsonObject.put(this.zIndex, zIndex);
 	}
 
 	public String getBackgroundFile() {
-		return backgroundFile;
+		return (String) this.jsonObject.get(this.backgroundFile);
 	}
 
 	public void setBackgroundFile(String backgroundFile) {
 		this.backgroundFile = backgroundFile;
-		this.jsonObject.put("backgroundFile", backgroundFile);
+		this.jsonObject.put(this.backgroundFile, backgroundFile);
 	}
 
 	public int getxGridCoord() {
-		return xGridCoord;
+		return (int) this.jsonObject.get(this.xGridCoord);
 	}
 
 	public void setxGridCoord(int xGridCoord) {
-		this.xGridCoord = xGridCoord;
 		this.jsonObject.put("xGridCoord", xGridCoord);
 	}
 
 	public int getyGridCoord() {
-		return yGridCoord;
+		return (int) this.jsonObject.get(this.yGridCoord);
 	}
 
 	public void setyGridCoord(int yGridCoord) {
-		this.yGridCoord = yGridCoord;
 		this.jsonObject.put("yGridCoord", yGridCoord);
 	}
 
 	public int getzIndex() {
-		return zIndex;
+		return (int) this.jsonObject.get(this.zIndex);
 	}
 
 	public void setzIndex(int zIndex) {
-		this.zIndex = zIndex;
 		this.jsonObject.put("zIndex", zIndex);
 	}
 
