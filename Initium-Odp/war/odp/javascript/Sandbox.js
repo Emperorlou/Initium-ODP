@@ -118,7 +118,7 @@ function scaleTiles(onCenter) {
             if (event.clientX) {
                 userLocX = event.clientX;
                 userLocY = event.clientY;
-            } else if (event.touches) {
+            } else if (event.touches && event.touches[0] && event.touches[0].clientX && event.touches[1] && event.touches[1].clientX) {
                 offsetX1 = event.touches[0].clientX;
                 offsetY1 = event.touches[0].clientY;
                 offsetX2 = event.touches[1].clientX;
@@ -454,7 +454,7 @@ window.onload = function() {
     document.onkeyup = keyUnpress;
 
     // Listen for touch inputs
-    document.body.addEventListener('touchend', stopDrag, {passive: true});
+    document.body.addEventListener('touchend', stopDrag);
     document.body.addEventListener('touchmove', dragDiv, {passive: true});
     document.body.addEventListener('touchstart', startDrag);
 }
@@ -994,12 +994,15 @@ function checkIfHoveringOverViewport() {
 function checkIfHoveringOverGrid() {
     var targ = event.target ? event.target : event.srcElement;
     if (targ.className != 'gridBackground' &&
+        targ.className != 'gridBackground gridSelected' &&
+        targ.className != 'gridBackground highlighted' &&
         targ.className != 'grid' &&
         targ.className != 'gridCell' &&
-        targ.className != 'gridObject' &&
         targ.className != 'gridLayer' &&
         targ.className != 'highlighted' &&
+        targ.className != 'gridObject' &&
         targ.className != 'gridObject highlighted' &&
+        targ.className != 'gridObject gridSelected' &&
         targ.className != 'cursorObject' &&
         targ.className != 'cursorSubObject' &&
         targ.className != 'objectLayer') {return false};
