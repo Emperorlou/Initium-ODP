@@ -1,14 +1,21 @@
 package com.universeprojects.miniup.server.model;
 
+import org.json.simple.JSONObject;
+
 public class UpdateGridCell {
 	private int xGridCoord;
 	private int yGridCoord;
 	private String payload;
+	private JSONObject jsonObject;
 
 	public UpdateGridCell(int xGridCoord, int yGridCoord, String payload) {
 		this.xGridCoord = xGridCoord;
 		this.yGridCoord = yGridCoord;
 		this.payload = payload;
+		jsonObject = new JSONObject();
+		jsonObject.put("xGridCoord", xGridCoord);
+		jsonObject.put("yGridCoord", xGridCoord);
+		jsonObject.put("xGridCoord", xGridCoord);
 	}
 
 	public int getxGridCoord() {
