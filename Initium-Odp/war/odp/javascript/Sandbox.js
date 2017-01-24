@@ -1045,19 +1045,19 @@ function zoomDiv(e) {
     if (!e) { var e= window.event};
     // find direction
     // calculate event X, Y coordinates
-    offsetX1 = offsetY1 = offsetX2 = offsetY2 = -1;
+    coffsetX1 = coffsetY1 = coffsetX2 = coffsetY2 = -1;
     if (event.touches && event.touches[0] && event.touches[0].clientX && event.touches[1] && event.touches[1].clientX) {
         // Check for touch posiions for zooming on mobile
-        offsetX1 = event.touches[0].clientX;
-        offsetY1 = event.touches[0].clientY;
-        offsetX2 = event.touches[1].clientX;
-        offsetY2 = event.touches[1].clientY;
+        coffsetX1 = event.touches[0].clientX;
+        coffsetY1 = event.touches[0].clientY;
+        coffsetX2 = event.touches[1].clientX;
+        coffsetY2 = event.touches[1].clientY;
     } else if (event.changedTouches && event.changedTouches.length > 1) {
         // Check for recent touch posiions for zooming on mobile
-        offsetX1 = event.changedTouches[0].clientX;
-        offsetY1 = event.changedTouches[0].clientY;
-        offsetX2 = event.changedTouches[1].clientX;
-        offsetY2 = event.changedTouches[1].clientY;
+        coffsetX1 = event.changedTouches[0].clientX;
+        coffsetY1 = event.changedTouches[0].clientY;
+        coffsetX2 = event.changedTouches[1].clientX;
+        coffsetY2 = event.changedTouches[1].clientY;
     }
     if (offsetX1 != -1) {
         zoomDelta = isNaN($("#zoomDelta").val()) ? .25 : $("#zoomDelta").val();
