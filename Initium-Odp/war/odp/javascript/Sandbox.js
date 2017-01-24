@@ -324,10 +324,12 @@ function buildMenu() {
             "<td>" + "Height: " + "</td><td>" + "<input type='text' id='gridHeight' value=20 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Zoom Rate: " + "</td><td>" + "<input type='text' id='zoom' value=.3 /> " + "</td>" +
-            "<td>" + "Forestry (0-10): " + "</td><td>" + "<input type='text' id='forestry' value=2 /> " + "</td>" +
+            "<td>" + "Zoom Delta: " + "</td><td>" + "<input type='text' id='zoomDelta' value=.25 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
             "<td>" + "Seed: " + "</td><td>" + "<input type='text' id='seed' value=123456 /> " + "</td>" +
+            "</tr> <tr>" +
+            "<td>" + "Forestry (0-10): " + "</td><td>" + "<input type='text' id='forestry' value=2 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
             "<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
@@ -1043,17 +1045,31 @@ function zoomDiv(e) {
     if (!e) { var e= window.event};
     // find direction
     // calculate event X, Y coordinates
-    coffsetX1 = e.touches[0].clientX;
-    coffsetY1 = e.touches[0].clientY;
-    coffsetX2 = e.touches[1].clientX;
-    coffsetY2 = e.touches[1].clientY;
+    offsetX1 = offsetY1 = offsetX2 = offsetY2 = -1;
+    if (event.touches && event.touches[0] && event.touches[0].clientX && event.touches[1] && event.touches[1].clientX) {
+        // Check for touch posiions for zooming on mobile
+        offsetX1 = event.touches[0].clientX;
+        offsetY1 = event.touches[0].clientY;
+        offsetX2 = event.touches[1].clientX;
+        offsetY2 = event.touches[1].clientY;
+    } else if (event.changedTouches && event.changedTouches.length > 1) {
+        // Check for recent touch posiions for zooming on mobile
+        offsetX1 = event.changedTouches[0].clientX;
+        offsetY1 = event.changedTouches[0].clientY;
+        offsetX2 = event.changedTouches[1].clientX;
+        offsetY2 = event.changedTouches[1].clientY;
+    }
+    if (offsetX1 != -1) {
+        zoomDelta = isNaN($("#zoomDelta").val()) ? .25 : $("#zoomDelta").val();
 
-    d1 = Math.sqrt( Math.pow((offsetX2 - offsetX1),2) + Math.pow((offsetY2 - offsetY1),2));
-    d2 = Math.sqrt( Math.pow((coffsetX2 - coffsetX1),2) + Math.pow((coffsetY2 - coffsetY1),2));
-    if (d1 < d2) {
-        zoomIn(1, false);
-    } else {
-        zoomOut(1, false);
+        d1 = Math.sqrt(Math.pow((offsetX2 - offsetX1), 2) + Math.pow((offsetY2 - offsetY1), 2));
+        d2 = Math.sqrt(Math.pow((coffsetX2 - coffsetX1), 2) + Math.pow((coffsetY2 - coffsetY1), 2));
+        delta = Math.abs(d1 - d2);
+        if (d1 < d2 && delta > zoomDelta) {
+            zoomIn(1, false);
+        } else {
+            zoomOut(1, false);
+        }
     }
     $('html, body').stop().animate({}, 500, 'linear');
     return false;
