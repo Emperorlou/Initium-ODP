@@ -24,7 +24,7 @@ public class SandboxServlet extends HttpServlet
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		JSONObject result = new JSONObject();
-		result.putAll(RandomTileGenerator.getBuildingCells(seed, width, height, forestry));
+		result.putAll("gridMap", RandomTileGenerator.buildNewGrid(seed, width, height, forestry));
 
 		response.getWriter().write(result.toJSONString());
 	}
