@@ -3451,9 +3451,9 @@ body
 
 .vpcontainer {
 	height: 500px;
-	width: 728px;
+	width: 95%;
 	border: 1px solid black;
-	margin: 0 auto;
+	margin-left:auto;margin-right:auto;
 	overflow: hidden;
 }
 
