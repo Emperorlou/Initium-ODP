@@ -121,7 +121,7 @@ public class ODPDBAccess
 	public static ODPDBAccess getInstance(HttpServletRequest request)
 	{
 		if (factory==null)
-			return ODPDBAccess.getInstance(request);
+			return new ODPDBAccess(request);
 		
 		return factory.getInstance(request);
 	}

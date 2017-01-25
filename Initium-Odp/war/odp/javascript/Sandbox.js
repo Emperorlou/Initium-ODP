@@ -116,9 +116,15 @@ function scaleTiles(onCenter) {
         var userLocY = 0;
         if (event) {
             if (event.clientX) {
+                // Check for a mouse position
                 userLocX = event.clientX;
                 userLocY = event.clientY;
-            } else if (event.touches) {
+            } else if (event.changedTouches && event.changedTouches.length == 1) {
+                // Check for double click on mobile
+                userLocX = event.changedTouches[0].clientX;
+                userLocY = event.changedTouches[0].clientY;
+            } else if (event.touches && event.touches[0] && event.touches[0].clientX && event.touches[1] && event.touches[1].clientX) {
+                // Check for zooming on mobile, find midpoint of pinch gesture
                 offsetX1 = event.touches[0].clientX;
                 offsetY1 = event.touches[0].clientY;
                 offsetX2 = event.touches[1].clientX;
@@ -126,11 +132,25 @@ function scaleTiles(onCenter) {
 
                 userLocX = (offsetX2 + offsetX1) / 2;
                 userLocY = (offsetY2 + offsetY1) / 2;
+            } else if (event.changedTouches && event.changedTouches.length > 1) {
+                // Check for zooming on mobile, find midpoint of pinch gesture
+                offsetX1 = event.changedTouches[0].clientX;
+                offsetY1 = event.changedTouches[0].clientY;
+                offsetX2 = event.changedTouches[1].clientX;
+                offsetY2 = event.changedTouches[1].clientY;
+
+                userLocX = (offsetX2 + offsetX1) / 2;
+                userLocY = (offsetY2 + offsetY1) / 2;
+            } else {
+                // Couldn't find mouse/finger position(s), last resort zoom to center of viewport
+                userLocX = viewport.offsetWidth/2 + viewport.offsetLeft + viewportContainer.offsetLeft;
+                userLocY = viewport.offsetHeight/2 + viewport.offsetTop + viewportContainer.offsetTop + - $(window).scrollTop();
             }
         }
     } else {
+        // Zoom to center of viewport
         userLocX = viewport.offsetWidth/2 + viewport.offsetLeft + viewportContainer.offsetLeft;
-        userLocY = viewport.offsetHeight/2 + viewport.offsetTop + viewportContainer.offsetTop + -$(window).scrollTop();
+        userLocY = viewport.offsetHeight/2 + viewport.offsetTop + viewportContainer.offsetTop + - $(window).scrollTop();
     }
 
     dx = Math.abs(userLocX - originX);
@@ -304,10 +324,12 @@ function buildMenu() {
             "<td>" + "Height: " + "</td><td>" + "<input type='text' id='gridHeight' value=20 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Zoom Rate: " + "</td><td>" + "<input type='text' id='zoom' value=.3 /> " + "</td>" +
-            "<td>" + "Forestry (0-10): " + "</td><td>" + "<input type='text' id='forestry' value=2 /> " + "</td>" +
+            "<td>" + "Zoom Delta: " + "</td><td>" + "<input type='text' id='zoomDelta' value=.25 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
             "<td>" + "Seed: " + "</td><td>" + "<input type='text' id='seed' value=123456 /> " + "</td>" +
+            "</tr> <tr>" +
+            "<td>" + "Forestry (0-10): " + "</td><td>" + "<input type='text' id='forestry' value=2 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
             "<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
@@ -454,7 +476,7 @@ window.onload = function() {
     document.onkeyup = keyUnpress;
 
     // Listen for touch inputs
-    document.body.addEventListener('touchend', stopDrag, {passive: true});
+    document.body.addEventListener('touchend', stopDrag);
     document.body.addEventListener('touchmove', dragDiv, {passive: true});
     document.body.addEventListener('touchstart', startDrag);
 }
@@ -648,7 +670,7 @@ function keyPress() {
 
         default: return;
     }
-    e.preventDefault();
+    //e.preventDefault();
     if (isShift || spacePressed) {
         usingKeys = false;
     } else {
@@ -746,9 +768,9 @@ function getCoordOfMouse() {
         offsetX = event.clientX;
         offsetY = event.clientY;
         // For touch input
-    } else if (event.touches) {
-        offsetX = event.changedTouches[0].pageX;
-        offsetY = event.changedTouches[0].pageY;
+    } else if (event.changedTouches && event.changedTouches[0].clientX) {
+        offsetX = event.changedTouches[0].clientX;
+        offsetY = event.changedTouches[0].clientY;
     }
     // Determine where the click took place in the grid
     var gridRelx = offsetX - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft - (scaledGridCellWidth / 2);
@@ -994,12 +1016,15 @@ function checkIfHoveringOverViewport() {
 function checkIfHoveringOverGrid() {
     var targ = event.target ? event.target : event.srcElement;
     if (targ.className != 'gridBackground' &&
+        targ.className != 'gridBackground gridSelected' &&
+        targ.className != 'gridBackground highlighted' &&
         targ.className != 'grid' &&
         targ.className != 'gridCell' &&
-        targ.className != 'gridObject' &&
         targ.className != 'gridLayer' &&
         targ.className != 'highlighted' &&
+        targ.className != 'gridObject' &&
         targ.className != 'gridObject highlighted' &&
+        targ.className != 'gridObject gridSelected' &&
         targ.className != 'cursorObject' &&
         targ.className != 'cursorSubObject' &&
         targ.className != 'objectLayer') {return false};
@@ -1020,17 +1045,31 @@ function zoomDiv(e) {
     if (!e) { var e= window.event};
     // find direction
     // calculate event X, Y coordinates
-    coffsetX1 = e.touches[0].clientX;
-    coffsetY1 = e.touches[0].clientY;
-    coffsetX2 = e.touches[1].clientX;
-    coffsetY2 = e.touches[1].clientY;
+    coffsetX1 = coffsetY1 = coffsetX2 = coffsetY2 = -1;
+    if (event.touches && event.touches[0] && event.touches[0].clientX && event.touches[1] && event.touches[1].clientX) {
+        // Check for touch posiions for zooming on mobile
+        coffsetX1 = event.touches[0].clientX;
+        coffsetY1 = event.touches[0].clientY;
+        coffsetX2 = event.touches[1].clientX;
+        coffsetY2 = event.touches[1].clientY;
+    } else if (event.changedTouches && event.changedTouches.length > 1) {
+        // Check for recent touch posiions for zooming on mobile
+        coffsetX1 = event.changedTouches[0].clientX;
+        coffsetY1 = event.changedTouches[0].clientY;
+        coffsetX2 = event.changedTouches[1].clientX;
+        coffsetY2 = event.changedTouches[1].clientY;
+    }
+    if (offsetX1 != -1) {
+        zoomDelta = isNaN($("#zoomDelta").val()) ? .25 : $("#zoomDelta").val();
 
-    d1 = Math.sqrt( Math.pow((offsetX2 - offsetX1),2) + Math.pow((offsetY2 - offsetY1),2));
-    d2 = Math.sqrt( Math.pow((coffsetX2 - coffsetX1),2) + Math.pow((coffsetY2 - coffsetY1),2));
-    if (d1 < d2) {
-        zoomIn(1, false);
-    } else {
-        zoomOut(1, false);
+        d1 = Math.sqrt(Math.pow((offsetX2 - offsetX1), 2) + Math.pow((offsetY2 - offsetY1), 2));
+        d2 = Math.sqrt(Math.pow((coffsetX2 - coffsetX1), 2) + Math.pow((coffsetY2 - coffsetY1), 2));
+        delta = Math.abs(d1 - d2);
+        if (d1 < d2 && delta > zoomDelta) {
+            zoomIn(1, false);
+        } else {
+            zoomOut(1, false);
+        }
     }
     $('html, body').stop().animate({}, 500, 'linear');
     return false;

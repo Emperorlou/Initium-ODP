@@ -980,7 +980,7 @@ public class GameUtils
     {
     	boolean isSelf = false;
     	String lowDurabilityClass = "";
-    	if (selfUser!=null)
+    	if (GameUtils.equals(db.getCurrentCharacterKey(), character.getKey()))
     		isSelf = true;
     	
     	boolean isCloaked = false;
@@ -1175,6 +1175,8 @@ public class GameUtils
 		{
 			sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+" backdrop3d' style='background-color:none;'>");
 
+			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/ui/newui/avatar-silhouette-male1.png\")'></div>");
+			
 			if (equipmentBootsUrl!=null)
 				sb.append("<div class='avatar-equip-boots"+sizePrepend+"' style='background-image:url(\""+equipmentBootsUrl+"\")'></div>");
 			if (equipmentLegsUrl!=null)
@@ -1214,7 +1216,7 @@ public class GameUtils
 		if (isSelf)
 			sb.append("</a>");
 		
-		if (isSelf)
+		if (isSelf && selfUser!=null)
 		{
 			ShardedCounterService cs = ShardedCounterService.getInstance(db.getDB());
 			Long referralViews = cs.readCounter(selfUser.getKey(), "referralViews");

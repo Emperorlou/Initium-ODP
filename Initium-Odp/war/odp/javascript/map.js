@@ -13,11 +13,11 @@ function openMap()
 	var pagePopupId = "page-popup"+stackIndex;
 	var mapId = pagePopupId+"-map";
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+mapId+"' class='page-popup-map'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><center><h3>Player-Made Game Map</h3><br/><span>Last updated: January 13, 2017</span></center><div id='"+mapId+"' class='page-popup-map'></div></div>");
 	createLocalMapViewer(mapId);
 }
 
-// Disposes of the viewer objecz
+// Disposes of the viewer object
 function closeMap()
 {
 	try
@@ -32,12 +32,13 @@ function closeMap()
 
 function createLocalMapViewer(id)
 {
+	var quality = getMapQuality();
     viewer = OpenSeadragon({
         id: id,
         prefixUrl: "https://s3.amazonaws.com/imappy/openseadragon/images/",
         springStiffness: 5,
         animationTime: 0.2,
-        tileSources: "odp/javascript/images/map/map.xml"
+        tileSources: "/odp/javascript/images/map/" + quality + ".xml"
     });
 }
 
