@@ -38,7 +38,7 @@ function createLocalMapViewer(id)
         prefixUrl: "https://s3.amazonaws.com/imappy/openseadragon/images/",
         springStiffness: 5,
         animationTime: 0.2,
-        tileSources: "odp/javascript/images/map/" + quality + ".xml"
+        tileSources: "/odp/javascript/images/map/" + quality + ".xml"
     });
 }
 
