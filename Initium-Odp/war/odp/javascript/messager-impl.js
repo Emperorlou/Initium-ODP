@@ -112,6 +112,9 @@ messager.onChatMessage = function(chatMessage)
 			chatMessage.message = "/me is a spammer. Kill him with fire!";
 		var meMode = chatMessage.message.toLowerCase().startsWith("/me ");
 		html+="<span class='chatMessage-text'>";
+		if(chatMessage.message.toLowerCase() == "/help") {
+			chatMessage.message = "<a href=\"#\" onclick=\"pagePopup('/odp/chatHelp.html')\">[Click here to view chat help]</a>"; 
+		}
 		if (chatMessage.characterId!=null && meMode==false)
 			html+=chatMessage.nicknameStyled;
 		else if (chatMessage.characterId!=null && meMode==true)
