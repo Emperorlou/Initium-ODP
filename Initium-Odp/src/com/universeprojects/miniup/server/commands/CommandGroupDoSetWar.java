@@ -12,6 +12,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
+import com.universeprojects.miniup.server.services.GroupService;
 
 /** 
  * 
@@ -34,55 +35,26 @@ public class CommandGroupDoSetWar extends Command {
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		String groupName = parameters.get("groupName");
-		CachedEntity admin = db.getCurrentCharacter();		
-		Key groupKey = (Key) admin.getProperty("groupKey");
-		CachedEntity warDeclarer = db.getEntity(groupKey);
-		CachedEntity warReceiver = db.getGroupByName(groupName);	
+		CachedEntity character = db.getCurrentCharacter();		
+		String decision = parameters.get("decision");
 		
-		if (warDeclarer == null)
-		{
-			throw new UserErrorMessage("You are not currently in a group.");
-		}
-		
-		if (("Admin".equals(admin.getProperty("groupStatus"))) == false)
-		{
-			throw new UserErrorMessage(
-					"You are not an admin of your group and cannot perform this action.");
-		}
-		
-		if (warReceiver == null)
-		{
-			throw new UserErrorMessage(
-					"Cannot declare war on a group that does not exist.");
-		}
+		GroupService service = new GroupService(db, character);
 				
-		List<Key> declarerCurrent = (List<Key>)warDeclarer.getProperty("declaredWarGroups");
-		if (declarerCurrent == null)
+		if (decision.equals("begin"))
 		{
-			List<Key> newWarDecs = new ArrayList<Key>();
-			newWarDecs.add(warReceiver.getKey());
-			setPopupMessage("War has been declared!");
-			warDeclarer.setProperty("declaredWarGroups", newWarDecs);
-			ds.put(warDeclarer);
+			String groupName = parameters.get("groupName");
+			CachedEntity group = db.getGroupByName(groupName);
+			if (service.beginWar(ds, group))
+				setPopupMessage("War has been declared!");	
 		}
-		
-		else 
+		else if (decision.equals("end"))
 		{
-			if (!declarerCurrent.contains(warReceiver.getKey()))
-			{
-				declarerCurrent.add(warReceiver.getKey());
-				setPopupMessage("War has been declared!");
-			}
-			
-			else if (declarerCurrent.contains(warReceiver.getKey()))
-			{
-				declarerCurrent.remove(warReceiver.getKey());
+			Long groupID = parameters.containsKey("groupId") ? tryParseId(parameters, "groupId") : null;
+			if(groupID == null) throw new RuntimeException("Command missing parameter groupId");	
+			CachedEntity group = db.getEntity("Group", groupID);
+			if (service.endWar(ds, group))
 				setPopupMessage("War has ended.");
-			}	
-			
-		ds.put(warDeclarer);	
-		}		
+		}						
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }

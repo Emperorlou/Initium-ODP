@@ -21,8 +21,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.datanucleus.util.StringUtils;
-
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
@@ -47,6 +45,8 @@ import com.universeprojects.miniup.server.services.MovementService;
 
 public class ODPDBAccess
 {
+	public static ODPDBAccessFactory factory = null;
+	
 	final public static int welcomeMessagesLimiter = 0;
 	
 	final private HttpServletRequest request;
@@ -112,10 +112,18 @@ public class ODPDBAccess
 
 	public Map<Key, List<CachedEntity>> buffsCache = new HashMap<Key, List<CachedEntity>>();
 
-	public ODPDBAccess(HttpServletRequest request)
+	protected ODPDBAccess(HttpServletRequest request)
 	{
 		this.request = request;
 		getDB(); // Initialize the datastore service
+	}
+	
+	public static ODPDBAccess getInstance(HttpServletRequest request)
+	{
+		if (factory==null)
+			return new ODPDBAccess(request);
+		
+		return factory.getInstance(request);
 	}
 
 	public HttpServletRequest getRequest()
@@ -4850,8 +4858,11 @@ public class ODPDBAccess
 			throw new UserErrorMessage("You cannot take this path.");
 		if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
 			throw new UserErrorMessage("You cannot take this path.");
-			
-		boolean isInParty = StringUtils.notEmpty((String) character.getProperty("partyCode"));
+
+		String partyCode = (String) character.getProperty("partyCode");
+		boolean isInParty = partyCode != null && !"".equals(partyCode);
+
+		MovementService movementService = new MovementService(this);
 
 		Key ownerKey = (Key) destination.getProperty("ownerKey");
 		if (ownerKey != null) {
@@ -4874,30 +4885,21 @@ public class ODPDBAccess
 					throw new UserErrorMessage(String.format("You cannot enter a group owned house unless %s.", partyMembers.size() > 1 ? "all members of your party are members of the group" : "you are a member of the group"));
 				}
 			} else if("User".equals(ownerKey.getKind())) {
-				boolean ownerIsPresent = false;
 				Key pathOwner = (Key) path.getProperty("ownerKey");
 				for (CachedEntity partyMember : partyMembers) {
-					if (GameUtils.equals(pathOwner, partyMember.getProperty("ownerKey"))) {
-						ownerIsPresent = true;
-						break;
+					boolean isPathOwner = GameUtils.equals(pathOwner, partyMember.getProperty("userKey"));
+					if (!isPathOwner && !movementService.isPathDiscovered(partyMember.getKey(), path.getKey())) {
+						throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", partyMembers.size() > 1 ? "every character already has been given access" : "you already have been given access"));
 					}
-				}
-
-				if (!ownerIsPresent) {
-					throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", partyMembers.size() > 1 ? "the owner is a character in your party" : "you are the owner"));
 				}
 			} else {
 				// TODO - Exception? If we can't determine the owner type; the character will be allowed to take the path. 
 			}
 		}
-		
-		MovementService movementService = new MovementService(this);
 
 		// Check if this property is locked and if so, if we have the key to enter it...
 		movementService.checkForLocks(character, path, destinationKey);
-		
-		
-		
+
 		// Check if we're being blocked by the blockade
 		CachedEntity blockadeStructure = getBlockadeFor(character, destination);
 		
@@ -5500,5 +5502,26 @@ public class ODPDBAccess
 		}
 		
 		return result;
+	}
+
+	
+	/**
+	 * This is a placeholder. The actual implementation is not in the ODP.
+	 * @return
+	 * @throws NotLoggedInException 
+	 */
+	public String getVerifyCode() throws NotLoggedInException
+	{
+		return null;
+	}
+
+	/**
+	 * THis is a placeholder. The actual implementation is not in the ODP.
+	 * @param key
+	 * @return
+	 */
+	public String getChatIdToken(Key key)
+	{
+		return null;
 	}
 }

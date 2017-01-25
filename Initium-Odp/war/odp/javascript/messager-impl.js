@@ -1,3 +1,11 @@
+function encode_utf8( s ) {
+  return unescape( encodeURIComponent( s ) );
+}
+
+function decode_utf8( s ) {
+  return decodeURIComponent( escape( s ) );
+}
+
 var messageCodes = [
              "GameMessages",
              "GlobalChat",
@@ -50,8 +58,9 @@ messager.onNotificationMessage = function(message)
 messager.onChatMessage = function(chatMessage)
 {
 	if (!isCharNotMuted(chatMessage.characterId))
-	return; //We quit the function if message is muted
+		return; //We quit the function if message is muted
 
+	chatMessage.message = decode_utf8(chatMessage.message);
 
 	var html = "<div class='chatMessage-main'>";
 	if (chatMessage.createdDate!=null)
@@ -117,8 +126,8 @@ messager.onChatMessage = function(chatMessage)
 			chatMessage.message = chatMessage.message.substring(4);
 		}
 		else
-			html+=": ";
-		html+=chatMessage.message;
+			html+="<span class='chatMessage-separator'>: </span>";
+		html+="<span class='chatMessage-message'>"+chatMessage.message+"</span>";
 		html+="</div>";
 	}
 	else if (chatMessage.mode=="admin")
@@ -157,9 +166,11 @@ function changeChatTab(code)
 	for(var i = 0; i<messageCodes.length; i++)
 	{
 		$("#"+messageCodes[i]+"_tab").removeClass("chat_tab_selected");
+		$("#"+messageCodes[i]+"_tab_newui").removeClass("selected");
 	}	
 	
 	$("#"+code+"_tab").addClass("chat_tab_selected");
+	$("#"+code+"_tab_newui").addClass("selected");
 	
 	if (code === "GameMessages")
 		$("#chat_form_wrapper").hide();
