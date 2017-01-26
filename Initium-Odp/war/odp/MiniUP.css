@@ -149,7 +149,8 @@ hr:after {
 	z-index:2000000;
 	width:100%;
 	position:absolute;
-	text-align:center;	
+	text-align:center;
+	top:20%;	
 }
 
 .clue
@@ -328,7 +329,7 @@ hr:after {
 	-webkit-backface-visibility: hidden;
 	-webkit-transform:translate3d(0,0,0);
 	
-	image-rendering: pixelated;	
+	/*image-rendering: pixelated;*/	
 
 }
 
@@ -1284,17 +1285,45 @@ hr.items-separator {
 
 .fullscreenChat
 {
+	position:fixed !important;
+	top:0px;
+	left:0px;
+	bottom:0px;
+	right:0px;
+	border:none;
+	z-index:2000002 !important;
+	width: 100% !important;
+    height: 100% !important;	
+}
+
+.fullscreenChat .main1
+{
+	padding:0px !important;
+	padding-bottom:49px !important;
+}
+
+.fullscreenChat .chat_tab_container, .fullscreenChat #chat_tab
+{
+	background-color: #0e0b06;
+}
+
+.fullscreenChat-old
+{
 	position:absolute !important;
 	top:0px;
 	left:0px;
 	bottom:0px;
 	right:0px;
 	border:none;
-	/*z-index:30000;*/
 }
 
+.fullscreenChat-old .main1
+{
+	padding:0px !important;
+	padding-bottom:49px !important;
+}
 
-.fullscreenChat .chat_tab_container, .fullscreenChat #chat_tab
+.fullscreenChat-old .chat_tab_container, .fullscreenChat-old #chat_tab
 {
 	background-color: #0e0b06;
 }
@@ -1305,12 +1334,13 @@ hr.items-separator {
 	display:table-cell;
 	cursor:pointer;
 }
-.fullscreenChat #chat_tab .chat_messages
+.fullscreenChat #chat_tab .chat_messages, .fullscreenChat-old #chat_tab .chat_messages
 {
 	height:inherit;
 	max-height:inherit;
 	overflow:hidden;
 }
+
 
 .chat-embedded-item
 {
@@ -1590,6 +1620,7 @@ hr.items-separator {
 {
 	display: inline-block;
 	margin: 4px 2px;
+	z-index:2000001;
 }
 
 #inBannerCombatantWidget
@@ -2218,11 +2249,11 @@ hr.items-separator {
 			width:100%;
 		}
 		
-		.fullscreenChat .chat_messages
+		.fullscreenChat .chat_messages, .fullscreenChat-old .chat_messages
 		{
 			font-size:18px;
 		}
-		
+
 /*
 		.banner-shadowbox
 		{
@@ -2674,7 +2705,7 @@ body
 
 	margin-bottom:-5px;
 	
-	image-rendering: pixelated;	
+	/*image-rendering: pixelated;*/	
 
 /*	height:300px;
 	max-height:300px;*/
@@ -3252,7 +3283,7 @@ body
 	
 	.location-controls-container .main1
 	{
-		margin-bottom: 40px;
+		/*margin-bottom: 40px;*/
 	}
 	
 	.location-controls-page-internal
@@ -3357,7 +3388,7 @@ body
 	}
 }
 
-@media screen and (max-height:550px)
+@media screen and (max-width:900px)
 {
 	.page
 	{
@@ -3381,6 +3412,15 @@ body
 	{
 		height:auto;
 		overflow:visible;
+	}
+	.chat-container
+	{
+		z-index:1;
+		height:30%;
+	}
+	.chat-container.is_stuck .main1
+	{
+		padding-bottom:18px;
 	}
 
 }

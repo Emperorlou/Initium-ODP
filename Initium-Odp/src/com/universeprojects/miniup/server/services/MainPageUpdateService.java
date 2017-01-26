@@ -86,7 +86,7 @@ public class MainPageUpdateService extends Service
 	 * this particular session.
 	 * @return
 	 */
-	private void loadPathCache() {
+	protected void loadPathCache() {
 		loadPathCache(false);
 	}
 	
@@ -97,7 +97,7 @@ public class MainPageUpdateService extends Service
 	 * @param showHidden  A boolean value that determines whether we should load the hidden paths.
 	 * @return
 	 */
-	private void loadPathCache(boolean showHidden)
+	protected void loadPathCache(boolean showHidden)
 	{
 		if (paths==null)
 		{

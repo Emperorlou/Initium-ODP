@@ -20,6 +20,9 @@
 
 <script type="text/javascript" src="/javascript/modernizr.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://cdn.rawgit.com/leafo/sticky-kit/v1.1.2/jquery.sticky-kit.min.js"></script>
+
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
@@ -35,7 +38,7 @@
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=59">
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=60">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="/javascript/rangeslider/rangeslider.min.js"></script>
@@ -272,8 +275,6 @@ ${longOperationRecallJs}
 	/*Other javascript variables*/
 	window.isPremium = ${isPremium};
 </script>
-<script type="text/javascript" src="./javascript/script.js"></script>
-<link rel="stylesheet" href="./MiniUP.css?v=1">
 
 
 <!-- Overrides of script.js for the new UI -->
@@ -352,6 +353,9 @@ function pagePopup(url, closeCallback, popupTitle)
 		popupStackCloseCallbackHandlers.push(null);
 }
 
+$(function(){
+	$(".chat-container").stick_in_parent({bottoming:false});	
+});
 </script>
 
 </head>
@@ -395,7 +399,7 @@ https://github.com/Emperorlou/Initium-ODP
 		</div>
 		<div class='page-maincontent'>
 			<div class='chat-container'>
-				<div class='header1'>
+				<div class='header1 chat-header'>
 					<div class='header1-spacer'></div>
 					<div class='header1-button chat-button' id='GameMessages_tab_newui' onclick='changeChatTab("GameMessages")'><div id='GameMessages-chat-indicator' class='chat-button-indicator'></div>!</div>
 					<div class='header1-spacer'></div>
@@ -417,7 +421,7 @@ https://github.com/Emperorlou/Initium-ODP
 					<form id="chat_form">
 						<span class='fullscreenChatButton' onclick='toggleFullscreenChat()'>[&nbsp;]</span><input type='hidden' id='chatroomId' value='L${locationId}' />
 						<div class='chat_form_input'>
-							<input id="chat_input" type="text" autocomplete="off" placeholder='Chat with anyone else in this location' maxlength='2000'/>
+							<input id="chat_input" type="text" autocorrect="on" spellcheck="true" autocapitalize="on" autocomplete="off" placeholder='Chat with anyone else in this location' maxlength='2000'/>
 						</div>
 						<div class='chat_form_submit'>
 							<input id="chat_submit" type="submit" value='Submit'/>
@@ -446,10 +450,10 @@ https://github.com/Emperorlou/Initium-ODP
 			<script type="text/javascript">updateMinimizeBox("#chat_box_minimize_button", ".chat_box")</script>
 		</div>
 
-		<div class='newui-popup' id='page-popup-root'></div> 
 
 					</div>
 				</div>
+		<div class='newui-popup' id='page-popup-root'></div> 
 				
 				<div class='location-controls-container'>
 					<div class='location-controls-page'>
@@ -466,24 +470,24 @@ https://github.com/Emperorlou/Initium-ODP
 							<div class='location-controls'>
 							
 							
-							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-								${mainButtonList}
-							</div>					
-							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-								${mainButtonList}
-							</div>					
-							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-								${mainButtonList}
-							</div>					
-							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-								${mainButtonList}
-							</div>					
-							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-								${mainButtonList}
-							</div>					
-							<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-								${mainButtonList}
-							</div>					
+								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+									${mainButtonList}
+								</div>					
+								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+									${mainButtonList}
+								</div>					
+								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+									${mainButtonList}
+								</div>					
+								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+									${mainButtonList}
+								</div>					
+								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+									${mainButtonList}
+								</div>					
+								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
+									${mainButtonList}
+								</div>					
 							</div>
 						</div>
 					</div>

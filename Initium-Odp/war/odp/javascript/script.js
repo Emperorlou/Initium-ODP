@@ -749,12 +749,14 @@ function collectDogecoinsFromCharacter(characterId, event)
 
 function toggleFullscreenChat()
 {
-	$(".chat_box").toggleClass("fullscreenChat");
+	$(".chat_box").toggleClass("fullscreenChat-old");
+	$(".chat-container").toggleClass("fullscreenChat");
 }
 
 function exitFullscreenChat()
 {
-	$(".chat_box").removeClass("fullscreenChat");
+	$(".chat_box").removeClass("fullscreenChat-old");
+	$(".chat-container").removeClass("fullscreenChat");
 }
 
 
