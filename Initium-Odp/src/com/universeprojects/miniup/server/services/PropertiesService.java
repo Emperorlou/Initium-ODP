@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
@@ -86,5 +87,23 @@ public class PropertiesService extends Service {
 		List<CachedEntity> userCharacters = db.getFilteredList("Character", "userKey", user.getKey());
 		for(CachedEntity character:userCharacters)
 			db.discoverAllPropertiesFor(null, user, character);
+	}
+	
+	public boolean doesCharacterOwnHouse(CachedEntity location, CachedEntity character)
+	{
+		return doesUserOwnHouse(location, character, false);
+	}
+	
+	public boolean doesUserOwnHouse(CachedEntity location, CachedEntity character, boolean checkUser)
+	{
+		Key ownerKey = (Key)location.getProperty("ownerKey");
+		if(ownerKey == null) return false;
+		if(GameUtils.equals(character.getKey(), ownerKey)) return true;
+		if(checkUser)
+		{
+			CachedEntity ownerEntity = db.getEntity(ownerKey);
+			return GameUtils.equals(ownerEntity.getProperty("userKey"), character.getProperty("userKey"));
+		}
+		return false;
 	}
 }

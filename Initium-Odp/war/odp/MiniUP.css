@@ -1050,18 +1050,8 @@ hr.items-separator {
 	cursor:pointer;
 }
 
-.popup_confirm_yes
+.popup_confirm_option
 {
-	float:left;
-	margin:20px;
-	color: #DAA520;
-	font-size:36px;
-	cursor:pointer;
-}
-
-.popup_confirm_no
-{
-	float:right;
 	margin:20px;
 	color: #DAA520;
 	font-size:36px;
@@ -1140,12 +1130,18 @@ hr.items-separator {
     height: 46px;
     margin-top: -20px;
     padding-top: 24px;
+    display: table;
+    text-align: center;
     /*background-image: url('../images/info-category-footer-bar.png');
     background-repeat: no-repeat;*/
     /*background-color:#777777;*/
 
     }
+.popup_footer > a {
+    display: table-cell;
+    width: 33%;
 
+	}
 
 
 
