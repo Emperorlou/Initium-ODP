@@ -543,6 +543,24 @@ function buyHouse(eventObject)
 	});
 }
 
+function playerReadMap(eventObject, itemId, pathId, hasDura)
+{
+	var readMap = function() { doCommand(eventObject, "PlayerReadMap", {"itemId":itemId,"pathId":pathId}); }; 
+	if(hasDura)
+	{
+		confirmPopup("Confirm Read Map", "This map looks to be worn. Read anyway?", doReadMap);
+	}
+	else
+		doReadMap();
+}
+
+function createMapToHouse(eventObject)
+{
+	confirmPopup("Create Permanent Map", "Do you want to create a permanent map? Be warned that anyone will be able to learn the path to your house if they get access to it.", 
+			function() { doCommand(eventObject, "PlayerCreateHouseMap", {"reusable":"true"}); },
+			function() { doCommand(eventObject, "PlayerCreateHouseMap", {"reusable":"false"}); });
+}
+
 function renamePlayerHouse(eventObject)
 {
 	promptPopup("Rename Player House", "Enter a new name for your house:", "", function(newName) {
