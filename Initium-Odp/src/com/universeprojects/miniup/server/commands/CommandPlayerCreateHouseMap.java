@@ -33,7 +33,7 @@ public class CommandPlayerCreateHouseMap extends Command{
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity user = db.getCurrentUser();
-		CachedEntity location = db.getEntity((Key)character.getProperty("location"));
+		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		
 		// Validation
 		if(location == null) throw new RuntimeException("Character location is null");
