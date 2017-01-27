@@ -92,12 +92,12 @@ public class PropertiesService extends Service {
 	public boolean doesCharacterOwnHouse(CachedEntity location, CachedEntity character)
 	{
 		Key ownerKey = (Key)location.getProperty("ownerKey");
-		return GameUtils.equals(character.getProperty("userKey"), ownerKey));
+		return GameUtils.equals(character.getProperty("userKey"), ownerKey);
 	}
 	
 	public boolean doesUserOwnHouse(CachedEntity location, CachedEntity user)
 	{
 		Key ownerKey = (Key)location.getProperty("ownerKey");
-		return GameUtils.equals(user.getKey(), ownerKey));
+		return GameUtils.equals(user.getKey(), ownerKey);
 	}
 }
