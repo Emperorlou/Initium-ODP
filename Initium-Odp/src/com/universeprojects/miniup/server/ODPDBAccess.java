@@ -922,6 +922,14 @@ public class ODPDBAccess
 		Query q = new Query("Path").setFilter(f).setKeysOnly();
 		return getDB().fetchAsList(q, 1000);
 	}
+	
+	public List<CachedEntity> getPathsBetweenLocations(Key location1Key, Key location2Key)
+	{
+		QueryHelper qh = new QueryHelper(getDB());
+		List<CachedEntity> foundPaths = qh.getFilteredList("Path", "location1Key", location1Key, "location2Key", location2Key);
+		foundPaths.addAll(qh.getFilteredList("Path", "location1Key", location2Key, "location2Key", location1Key));
+		return foundPaths;
+	}
 
 	public List<CachedEntity> getMonsterSpawnersForLocation(Key locationKey)
 	{
