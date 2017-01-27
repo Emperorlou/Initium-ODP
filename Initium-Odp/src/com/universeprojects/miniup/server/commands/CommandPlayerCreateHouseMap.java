@@ -79,8 +79,8 @@ public class CommandPlayerCreateHouseMap extends Command{
 		if (reusable == false)
 		{
 			//here is giving one time use map to player
-			houseMap.setProperty("durability", 1);
-			houseMap.setProperty("maxDurability", 1);
+			houseMap.setProperty("durability", 1L);
+			houseMap.setProperty("maxDurability", 1L);
 		}
 		ds.put(houseMap);
 		
