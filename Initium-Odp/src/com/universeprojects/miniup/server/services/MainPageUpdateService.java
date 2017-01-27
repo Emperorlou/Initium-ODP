@@ -334,8 +334,7 @@ public class MainPageUpdateService extends Service
 	
 	/**
 	 * This updates the gold amount in the header bar.
-	 * 
-	 * @param character
+	 *
 	 * @return Returns the new html just in case we want to use this method directly
 	 */
 	public String updateMoney()
@@ -353,9 +352,7 @@ public class MainPageUpdateService extends Service
 	
 	/**
 	 * This updates the html in the character widget that is in the top left corner of the banner.
-	 * 
-	 * @param userOfViewer
-	 * @param groupOfCharacter
+	 *
 	 */
 	public String updateInBannerCharacterWidget()
 	{
@@ -372,8 +369,7 @@ public class MainPageUpdateService extends Service
 	{
 		if (db.getRequest().getRequestURL().toString().contains("test")) {
 			StringBuilder newHtml = new StringBuilder();
-
-			newHtml.append("<script>var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2) + "';</script");
+			
 			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
 			newHtml.append("<div id=\"menu\" class=\"menuContainer\" style=\"visibility: hidden;\"></div>");
 			newHtml.append("<div id=\"viewport\" class=\"vp\">");
@@ -389,6 +385,7 @@ public class MainPageUpdateService extends Service
 			newHtml.append("<center><p id=\"selectedObjects\" class=\"selectedObjectList\"></p></center>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
 			newHtml.append("<script>");
+			newHtml.append("var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2).toString() + "';");
 			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
 			newHtml.append("pressedButton();");
 			newHtml.append("});");
