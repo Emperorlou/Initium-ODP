@@ -368,7 +368,7 @@ public class MainPageUpdateService extends Service
 	 * This updates the TestPanel if environment is currently in test
 	 * 
 	 */
-	public String updateTestPanel(String allMapDataJson)
+	public String updateTestPanel()
 	{
 		if (db.getRequest().getRequestURL().toString().contains("test")) {
 			StringBuilder newHtml = new StringBuilder();
