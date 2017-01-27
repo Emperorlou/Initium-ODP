@@ -120,14 +120,29 @@ public class InventionService extends Service
 			Double val = null;
 			if (sourceValue instanceof Long)
 				val = ((Long)sourceValue).doubleValue();
+			if (sourceFieldMinimumValue<=sourceFieldMaximumValue)
+			{
+				if (val<sourceFieldMinimumValue) val = sourceFieldMinimumValue;
+				if (val>sourceFieldMaximumValue) val = sourceFieldMaximumValue;
+			}
+			else
+			{
+				if (val>sourceFieldMinimumValue) val = sourceFieldMinimumValue;
+				if (val<sourceFieldMaximumValue) val = sourceFieldMaximumValue;
+			}
+			
 			double range = sourceFieldMaximumValue-sourceFieldMinimumValue;
 			multiplier = (val-sourceFieldMinimumValue)/range;
-				
+			
 			// Now scale the multiplier to fit inside the destination multiplier range
 			double destinationRange = maximumMultiplier-minimumMultiplier;
-			double destinationMultiplier = (multiplier-minimumMultiplier)/destinationRange;
+			double destinationMultiplier = (multiplier*destinationRange)+minimumMultiplier;
 			
 			
+			
+			result = new GenericAffectorResult();
+			result.resultMultiplier = destinationMultiplier;
+			result.resultField = destinationFieldName;
 		}
 		else
 		{
