@@ -38,7 +38,7 @@ public class CommandPlayerCreateHouseMap extends Command{
 		// Validation
 		if(location == null) throw new RuntimeException("Character location is null");
 		PropertiesService ps = new PropertiesService(db);
-		if(ps.doesUserOwnHouse(location, character, true) == false) throw new UserErrorMessage("It's not nice to share a house location that doesn't belong to you.");
+		if(ps.doesUserOwnHouse(location, user) == false) throw new UserErrorMessage("It's not nice to share a house location that doesn't belong to you.");
 		if(location.getProperty("parentLocationKey") == null) throw new RuntimeException("Parent location null for player owned house");
 		
 		// Get town location and house owner to put in player owned HTML.
