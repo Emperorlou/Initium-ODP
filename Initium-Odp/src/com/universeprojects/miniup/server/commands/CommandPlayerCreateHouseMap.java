@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +67,14 @@ public class CommandPlayerCreateHouseMap extends Command{
 		// Allow user to destroy the script.
 		List<CachedEntity> destroyScripts = db.getFilteredList("Script", "name", "DestroyPlayerMap");
 		if(destroyScripts.isEmpty() == false)
-			houseMap.setProperty("scripts", destroyScripts);
+		{
+			List<Key> scriptKeys = new ArrayList<Key>();
+			for(CachedEntity script:destroyScripts)
+			{
+				if(script != null) scriptKeys.add(script.getKey());
+			}
+			houseMap.setProperty("scripts", scriptKeys);
+		}
 		//setting durability
 		if (reusable == false)
 		{
