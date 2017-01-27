@@ -43,7 +43,7 @@ public class CommandPlayerReadMap extends Command {
 		if(path == null) throw new UserErrorMessage("This path does not exist");
 		if(location == null) throw new RuntimeException("Character location is null");
 		
-		if("Map to Location".equals(item.getProperty("name"))==false) throw new UserErrorMessage("The specified item is not a map.");
+		if("Map".equals(item.getProperty("itemClass"))==false) throw new UserErrorMessage("The specified item is not a map.");
 		if(GameUtils.equals(item.getProperty("containerKey"), character.getKey()) == false)
 			throw new UserErrorMessage("You are not currently in possession of this map!");
 		
