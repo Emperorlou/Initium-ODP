@@ -545,10 +545,11 @@ function buyHouse(eventObject)
 
 function playerReadMap(eventObject, itemId, pathId, hasDura)
 {
+	closeAllTooltips();
 	var readMap = function() { doCommand(eventObject, "PlayerReadMap", {"itemId":itemId,"pathId":pathId}); }; 
 	if(hasDura)
 	{
-		confirmPopup("Confirm Read Map", "This map looks to be worn. Read anyway?", doReadMap);
+		confirmPopup("Confirm Read Map", "This map looks to be worn. Read anyway?", readMap);
 	}
 	else
 		readMap();
