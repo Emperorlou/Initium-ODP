@@ -371,7 +371,6 @@ public class MainPageUpdateService extends Service
 	public String updateTestPanel(String allMapDataJson)
 	{
 		if (db.getRequest().getRequestURL().toString().contains("test")) {
-			
 			StringBuilder newHtml = new StringBuilder();
 
 			newHtml.append("<script>var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2) + "';</script");
