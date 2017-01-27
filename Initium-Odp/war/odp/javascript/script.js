@@ -551,7 +551,7 @@ function playerReadMap(eventObject, itemId, pathId, hasDura)
 		confirmPopup("Confirm Read Map", "This map looks to be worn. Read anyway?", doReadMap);
 	}
 	else
-		doReadMap();
+		readMap();
 }
 
 function createMapToHouse(eventObject)

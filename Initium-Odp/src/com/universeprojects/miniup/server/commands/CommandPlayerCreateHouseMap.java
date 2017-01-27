@@ -45,7 +45,6 @@ public class CommandPlayerCreateHouseMap extends Command{
 		// Get town location and house owner to put in player owned HTML.
 		CachedEntity townLocation = db.getEntity((Key)location.getProperty("parentLocationKey"));
 		if(townLocation == null) throw new RuntimeException("Parent location refers to null entity");
-		CachedEntity houseOwner = db.getEntity((Key)location.getProperty("ownerKey"));
 
 		// Get the path from this location to the town.
 		List<CachedEntity> pathList = db.getPathsByLocationAndType(location.getKey(), "PlayerHouse");
@@ -58,11 +57,12 @@ public class CommandPlayerCreateHouseMap extends Command{
 		CachedEntity houseMap = new CachedEntity("Item", itemId);
 		houseMap.setProperty("containerKey", character.getKey());
 		houseMap.setProperty("icon", "images/small/Pixel_Art-Writing-I_Map.png");
-		houseMap.setProperty("description", "This is a map showing the location of a player's house.");
-		houseMap.setProperty("name", "Map to Location");
+		houseMap.setProperty("description", "Map showing the location of a player's house.");
+		houseMap.setProperty("itemClass", "Map");
+		houseMap.setProperty("name", "Map to player house: " + location.getProperty("name"));
 		houseMap.setProperty("ownerOnlyHtml", 
-				"<p>This map shows the path from " + townLocation.getProperty("name") + " to " + houseOwner.getProperty("name") + "'s property " + location.getProperty("name") + ". </p>" + 
-				"<p><a onclick='playerReadMap(event, " +itemId + ", " + housePath.getId() + "," + reusable + ")'>Read map to " + location.getProperty("name") + "</a></p>");
+				"<p>This map shows the path from " + townLocation.getProperty("name") + " to " + character.getProperty("name") + "'s property " + location.getProperty("name") + ". </p>" + 
+				"<p><a onclick='playerReadMap(event, " +itemId + ", " + housePath.getId() + "," + !reusable + ")'>Read map to " + location.getProperty("name") + "</a></p>");
 		houseMap.setProperty("keyCode", housePath.getId());
 		// Allow user to destroy the script.
 		List<CachedEntity> destroyScripts = db.getFilteredList("Script", "name", "DestroyPlayerMap");
