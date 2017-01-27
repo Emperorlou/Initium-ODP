@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.universeprojects.miniup.server.model.GridMap;
 import org.json.simple.JSONObject;
 
 
@@ -24,7 +25,9 @@ public class SandboxServlet extends HttpServlet
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		JSONObject result = new JSONObject();
-		result.putAll(RandomTileGenerator.getBuildingCells(seed, width, height, forestry));
+		GridMap gridMap = RandomTileGenerator.buildNewGrid(seed, width, height, forestry);
+		result.put("backgroundTiles", gridMap.getMap());
+		result.put("objectMap", gridMap.getGridObjects());
 
 		response.getWriter().write(result.toJSONString());
 	}
