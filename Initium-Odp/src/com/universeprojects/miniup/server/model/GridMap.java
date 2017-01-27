@@ -43,6 +43,6 @@ public class GridMap {
 		}
 		jsonObject.put("backgroundTiles", jsonGrid);
 		jsonObject.put("objectMap", gridObjects);
-		return jsonObject.toJSONString().replaceAll("'", "\\'");
+		return jsonObject.toJSONString().replaceAll("'", "\\\\'");
 	}
 }
