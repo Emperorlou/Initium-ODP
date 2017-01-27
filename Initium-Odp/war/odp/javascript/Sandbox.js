@@ -1113,6 +1113,12 @@ function CoordObject(xGridCoord, yGridCoord) {
     this.yGridCoord = yGridCoord;
 }
 
-function mapPlow(coord) {
-    
+function mapPlow() {
+    if (cursorObject != "") {
+        doCommand(event, "MapPlow", {"xGridCoord": cursorObject.xGridCoord, "yGridCoord": cursorObject.yGridCoord}, function (data, error) {
+            if (error) return;
+            gridCells[data.mapPlow.xGridCoord][data.mapPlow.yGridCoord].backgroundDiv.style.backgroundImage =
+                $picUrlPath + data.mapPlow.backgroundFile + ")";
+        });
+    }
 }
