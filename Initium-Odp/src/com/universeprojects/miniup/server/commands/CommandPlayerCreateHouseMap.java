@@ -47,8 +47,8 @@ public class CommandPlayerCreateHouseMap extends Command{
 		CachedEntity houseOwner = db.getEntity((Key)location.getProperty("ownerKey"));
 
 		// Get the path from this location to the town.
-		List<CachedEntity> pathList = db.getPathsBetweenLocations(townLocation.getKey(), location.getKey());
-		if(pathList.isEmpty() || pathList.size() > 1) throw new RuntimeException("Should only be 1 town path from current location!");
+		List<CachedEntity> pathList = db.getPathsByLocationAndType(location.getKey(), "PlayerHouse");
+		if(pathList.isEmpty()) throw new RuntimeException("No town path exists from current location!");
 		CachedEntity housePath = pathList.get(0);
 		
 		// Create the item, set all properties.
