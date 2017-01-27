@@ -38,7 +38,7 @@ public class GridObject {
 		setKey(key);
 		setfilename(filename);
 		setName(name);
-		setxGridCellOffset(xGridCoord);
+		setxGridCoord(xGridCoord);
 		setyGridCoord(yGridCoord);
 		setxGridCellOffset(xGridCellOffset);
 		setyGridCellOffset(yGridCellOffset);

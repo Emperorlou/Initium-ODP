@@ -436,7 +436,7 @@ function buildMap(responseJson) {
         var cgridObject = new GridObject(
             gridObject.key,
             "",
-            gridObject.fileName,
+            gridObject.filename,
             gridObject.name,
             gridObject.xGridCellOffset,
             gridObject.yGridCellOffset,
@@ -446,7 +446,7 @@ function buildMap(responseJson) {
             gridObject.yImageOrigin,
             gridObject.width,
             gridObject.height);
-        var key = gridObject.fileName + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
+        var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
         gridObjects[key] = cgridObject;
         var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
         gridCell.objectKeys[gridCell.objectKeys.length] = key;
@@ -456,9 +456,9 @@ function buildMap(responseJson) {
         $hexBody += " style=\"";
         $hexBody += " z-index:" + (Number(zOffset) + Number(top)) + ";";
         if (gridObject.key == "o1") {
-            $hexBody += " background:url(" + $domain + gridObject.fileName + ");";
+            $hexBody += " background:url(" + $domain + gridObject.filename + ");";
         } else {
-            $hexBody += " background:url(" + $picUrlPath + gridObject.fileName + ");";
+            $hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
         }
         $hexBody += " background-size:100%;";
         $hexBody += "\">";
