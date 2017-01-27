@@ -293,14 +293,16 @@ function loadMap() {
     jQuery('#ground-layer').html('');
     jQuery('#object-layer').html('');
 
-    $.ajax({
-        url: "SandboxServlet",
-        data:{width:gridTileWidth, height:gridTileHeight, seed:seed, forestry:forestry},
-        type: 'POST',
-        success: function(responseJson) {
-            buildMap(responseJson);
-        }
-    });
+    buildMap(JSON.parse(mapData));
+
+    //$.ajax({
+    //    url: "SandboxServlet",
+    //    data:{width:gridTileWidth, height:gridTileHeight, seed:seed, forestry:forestry},
+    //    type: 'POST',
+    //    success: function(responseJson) {
+    //        buildMap(responseJson);
+    //    }
+    //});
     buildMenu();
 }
 
@@ -1112,12 +1114,5 @@ function CoordObject(xGridCoord, yGridCoord) {
 }
 
 function mapPlow(coord) {
-    $.ajax({
-        url: "SandboxServlet",
-        data: {width: gridTileWidth, height: gridTileHeight, seed: $("#seed").val(), forestry: forestry, command: "mapPlow", coord: currentCoord()},
-        type: 'POST',
-        success: function (responseJson) {
-            buildMap(responseJson);
-        }
-    });
+    
 }
