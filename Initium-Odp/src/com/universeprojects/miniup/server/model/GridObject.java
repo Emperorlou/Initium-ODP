@@ -20,6 +20,11 @@ public class GridObject {
 	public GridObject() {
 		jsonObject = new JSONObject();
 	}
+
+	public GridObject(String key) {
+		jsonObject = new JSONObject();
+		setKey(key);
+	}
 	
 	public GridObject(Integer xGridCoord, Integer yGridCoord) {
 		jsonObject = new JSONObject();
