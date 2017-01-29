@@ -57,7 +57,7 @@ messager.onNotificationMessage = function(message)
 
 messager.onChatMessage = function(chatMessage)
 {
-	if (chatMessage.message.toLowerCase().startsWith("/")) {
+	if (chatMessage.message.startsWith("/")) {
 		if(tryChatCommands(chatMessage)) {
 			return;
 		}
@@ -153,7 +153,7 @@ messager.onChatMessage = function(chatMessage)
 
 function tryChatCommands(chatMessage)
 {
-	if (chatMessage.message == "/help") {
+	if (chatMessage.message.toLowerCase() == "/help") {
 		pagePopup('/odp/chatHelp.html');
 		return true;
 	}

@@ -1803,9 +1803,11 @@ function groupDenyJoinGroupApplication(eventObject, characterId)
 	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId});
 }
 
-function groupMemberKick(eventObject, characterId)
+function groupMemberKick(eventObject, characterId, characterName)
 {
-	doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId});
+	confirmPopup("Kick Group Member", "Are you sure you want to kick this group member ("+characterName+")?", function(){
+		doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId});
+	});
 }
 
 function groupMemberKickCancel(characterId)
@@ -1891,7 +1893,7 @@ function tradeStartTradeNew(eventObject,characterId)
 	})
 }
 
-function tradeStartTradeNewCharacter(eventObject,characterName)
+function tradeStartTradeNewCharacterName(eventObject,characterName)
 {
 	closeAllTooltips();
 	doCommand(eventObject,"TradeStartTrade",{"inputType":"characterName","characterName":characterName},function(data,error){
