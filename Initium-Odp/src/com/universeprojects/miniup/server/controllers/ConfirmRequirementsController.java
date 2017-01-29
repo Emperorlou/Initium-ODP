@@ -15,7 +15,6 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.services.InventionService;
 import com.universeprojects.web.PageController;
 
 public class ConfirmRequirementsController extends PageController
@@ -33,7 +32,7 @@ public class ConfirmRequirementsController extends PageController
 		CachedDatastoreService ds = db.getDB();
 		CachedEntity character = db.getCurrentCharacter(); 
 		
-		InventionService invention = new InventionService(db, character);
+//		InventionService invention = new InventionService(db, character);
 
 		// Get the list of EntityRequirements we were given and work from those
 		// (Maybe include the entity that owns the EntityRequirement for backreference [like the ConstructionToolRequirement])
@@ -60,9 +59,9 @@ public class ConfirmRequirementsController extends PageController
 		// candidates that are available to the character for the thing in question
 		for(CachedEntity entityRequirement:entityRequirements)
 		{
-			List<CachedEntity> candidatesFor = invention.getItemCandidatesFor(entityRequirement, itemsAlreadyAdded);
-			if (candidatesFor.size()>0)
-				itemsAlreadyAdded.add(candidatesFor.get(0));
+//			List<CachedEntity> candidatesFor = invention.getItemCandidatesFor(entityRequirement, itemsAlreadyAdded);
+//			if (candidatesFor.size()>0)
+//				itemsAlreadyAdded.add(candidatesFor.get(0));
 		}
 	    
 		
