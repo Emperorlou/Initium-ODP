@@ -1884,7 +1884,17 @@ function partyJoin(characterId)
 function tradeStartTradeNew(eventObject,characterId)
 {
 	closeAllTooltips();
-	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
+	doCommand(eventObject,"TradeStartTrade",{"inputType":"characterId","characterId":characterId},function(data,error){
+		if (error) return;
+		_viewTrade();
+		popupMessage("Trade Started", data.tradePrompt);	
+	})
+}
+
+function tradeStartTradeNewCharacter(eventObject,characterName)
+{
+	closeAllTooltips();
+	doCommand(eventObject,"TradeStartTrade",{"inputType":"characterName","characterName":characterName},function(data,error){
 		if (error) return;
 		_viewTrade();
 		popupMessage("Trade Started", data.tradePrompt);	
