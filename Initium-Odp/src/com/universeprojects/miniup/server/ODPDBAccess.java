@@ -5218,6 +5218,128 @@ public class ODPDBAccess
 		}
 	}
 	
+	/**
+	 * Instead of deleting the combat site and everything in it, it will move any characters or items to the combat site's parent location
+	 * and only delete the combat site's paths and the combat site location itself, once that's done.
+	 * @param ds
+	 * @param playerCharacter
+	 * @param location
+	 * @param forceDelete
+	 */
+	public void doCollapseCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, CachedEntity location, boolean forceDelete)
+	{
+		if (ds==null)
+			ds = getDB();
+
+		Key locationKey = location.getKey();
+		
+		if ("CombatSite".equals(location.getProperty("type"))==false)
+			return;
+		
+		// Check that the location is older than a number of days before allowing this
+		Date createdDate = (Date)location.getProperty("createdDate");
+		
+		if (createdDate==null)
+			return;
+
+		// If it has been less than the amount of time we want to wait before collapsing, lets get out of here
+		if (GameUtils.elapsed(createdDate, Calendar.HOUR)<24)
+			return;
+		
+		CachedEntity parentLocation = getParentLocation(ds, location);
+		
+		if (parentLocation==null)
+			return;
+		
+		QueryHelper q = new QueryHelper(ds);
+		List<CachedEntity> characters = q.getFilteredList("Character", "locationKey", locationKey);
+		List<CachedEntity> paths = getPathsByLocation_KeysOnly(locationKey);
+		List<CachedEntity> discoveries = new ArrayList<CachedEntity>();
+		if (playerCharacter!=null)
+			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey);
+		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
+		
+
+		boolean hasLiveNpc = false;
+		boolean hideOnly = false;
+		for(CachedEntity character:characters)
+		{
+			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
+				hideOnly = true;
+			else if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d)
+				hasLiveNpc=true;
+		}
+		
+		
+		// Having the paths size>1 cancels the deletion of the combat site. This is very important so that people don't get
+		// stranded in rare cases where there are other sites branching from this one. The outer branches must be deleted first, 
+		// but we can do that lazily.
+		if ((hideOnly && forceDelete==false) || 
+				(paths.size()>1 && forceDelete==false) || 
+				(hasLiveNpc && forceDelete==false) /*Now we don't delete the site if the NPC is alive*/)
+		{
+			// Delete the discoveries of the paths to this location
+			for(CachedEntity discovery:discoveries)
+			{
+				for(CachedEntity path:paths)
+				{
+					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
+					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
+					{
+						discovery.setProperty("hidden", "TRUE");
+						ds.put(discovery);
+					}
+				}
+				
+				// Right now discoveries are only used for paths. More may need to be handled later on.
+			}
+			
+			return;
+		}
+		else
+		{
+			
+			
+			// Move all characters standing in this place (should only be NPCs)
+			for(CachedEntity character:characters)
+			{
+				character.setProperty("locationKey", parentLocation.getKey());
+				ds.put(character);
+			}
+			
+			// Move all items on the ground
+			for(CachedEntity item:items)
+			{
+				item.setProperty("containerKey", parentLocation.getKey());
+				ds.put(item);
+			}
+			
+			// Delete all paths to this location
+			for(CachedEntity path:paths)
+				ds.delete(path.getKey());
+			
+			// Delete the discoveries of the paths to this location
+			for(CachedEntity discovery:discoveries)
+			{
+				if (discovery==null)
+					continue;
+				for(CachedEntity path:paths)
+				{
+					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
+					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
+						ds.delete(discovery.getKey());
+				}
+				
+				// Right now discoveries are only used for paths. More may need to be handled later on.
+			}
+			
+			// Finally delete the location itself
+			ds.delete(locationKey);
+			
+			
+		}
+	}
+	
 	
 
 	/**
