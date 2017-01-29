@@ -28,8 +28,19 @@ public class CommandTradeStartTrade extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
-		Long characterId = tryParseId(parameters,"characterId");
-        CachedEntity otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
+		CachedEntity otherCharacter = null;
+		
+		if(parameters.get("inputType").equals("characterId")) {
+			Long characterId = tryParseId(parameters,"characterId");
+			otherCharacter = db.getEntity(KeyFactory.createKey("Character", characterId));
+		} else if (parameters.get("inputType").equals("characterName")) {
+			String characterName = parameters.get("characterName");
+			otherCharacter = db.getCharacterByName(characterName);
+			if(otherCharacter == null) {
+				throw new UserErrorMessage("Character with name of "+characterName+" does not exist!");
+			}
+		}
+        
         
         if (GameUtils.equals(((Key)character.getProperty("locationKey")),((Key)otherCharacter.getProperty("locationKey")))==false)
 			throw new UserErrorMessage("You cannot start a trade with a character that is not in your location.");

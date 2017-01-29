@@ -57,6 +57,12 @@ messager.onNotificationMessage = function(message)
 
 messager.onChatMessage = function(chatMessage)
 {
+	if (chatMessage.message.toLowerCase().startsWith("/")) {
+		if(tryChatCommands(chatMessage)) {
+			return;
+		}
+	}
+
 	if (!isCharNotMuted(chatMessage.characterId))
 		return; //We quit the function if message is muted
 
@@ -145,6 +151,18 @@ messager.onChatMessage = function(chatMessage)
 	notifyNewMessage(chatMessage.code);
 };
 
+function tryChatCommands(chatMessage)
+{
+	if (chatMessage.message == "/help") {
+		pagePopup('/odp/chatHelp.html');
+		return true;
+	}
+	if (chatMessage.message.toLowerCase().startsWith("/trade")) {
+		var characterName = chatMessage.message.slice(6);
+		doTradeStartTradeNewCharacterName(null, characterName);
+		return true;
+	}
+}
 
 function changeChatTab(code)
 {
