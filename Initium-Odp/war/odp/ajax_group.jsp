@@ -260,7 +260,7 @@
 				}
 				if (groupStatus.equals("Kicked") == false)
 					out.println("<a onclick='groupMemberKick(event, "
-							+ character.getKey().getId() + ")'>Kick</a>");
+							+ character.getKey().getId() + ", "+character.getProperty("name")+")'>Kick</a>");
 				else
 					out.println("<a onclick='groupMemberKickCancel("
 							+ character.getKey().getId()

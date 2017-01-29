@@ -56,6 +56,11 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 
 	this.sendMessage = function(message)
 	{
+		if(this.checkClientSideChatCommands!=null){}
+			if(checkClientSideChatCommands(message))
+				return;
+		}
+
 		message = encode_utf8(message);
 		
 		var a = $.post(this.chatServer + "/messager",
@@ -187,6 +192,7 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
     
     this.onChatMessage = null;
     this.onNotificationMessage = null;
+    this.checkClientSideChatCommands = null;
     /**
      * Args: xhr, textStatus, error
      */
