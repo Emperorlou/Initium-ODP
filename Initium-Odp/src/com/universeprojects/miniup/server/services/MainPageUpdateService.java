@@ -86,7 +86,7 @@ public class MainPageUpdateService extends Service
 	 * this particular session.
 	 * @return
 	 */
-	private void loadPathCache() {
+	protected void loadPathCache() {
 		loadPathCache(false);
 	}
 	
@@ -97,7 +97,7 @@ public class MainPageUpdateService extends Service
 	 * @param showHidden  A boolean value that determines whether we should load the hidden paths.
 	 * @return
 	 */
-	private void loadPathCache(boolean showHidden)
+	protected void loadPathCache(boolean showHidden)
 	{
 		if (paths==null)
 		{
@@ -334,8 +334,7 @@ public class MainPageUpdateService extends Service
 	
 	/**
 	 * This updates the gold amount in the header bar.
-	 * 
-	 * @param character
+	 *
 	 * @return Returns the new html just in case we want to use this method directly
 	 */
 	public String updateMoney()
@@ -353,9 +352,7 @@ public class MainPageUpdateService extends Service
 	
 	/**
 	 * This updates the html in the character widget that is in the top left corner of the banner.
-	 * 
-	 * @param userOfViewer
-	 * @param groupOfCharacter
+	 *
 	 */
 	public String updateInBannerCharacterWidget()
 	{
@@ -371,7 +368,6 @@ public class MainPageUpdateService extends Service
 	public String updateTestPanel()
 	{
 		if (db.getRequest().getRequestURL().toString().contains("test")) {
-			
 			StringBuilder newHtml = new StringBuilder();
 			
 			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
@@ -389,6 +385,7 @@ public class MainPageUpdateService extends Service
 			newHtml.append("<center><p id=\"selectedObjects\" class=\"selectedObjectList\"></p></center>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
 			newHtml.append("<script>");
+			newHtml.append("var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2).toString() + "';");
 			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
 			newHtml.append("pressedButton();");
 			newHtml.append("});");
@@ -515,6 +512,7 @@ public class MainPageUpdateService extends Service
 		
 		if (user!=null && GameUtils.equals(location.getProperty("ownerKey"), user.getKey()))
 		{
+			newHtml.append("<a onclick='createMapToHouse(event)' class='main-button'>Create map to this house</a><br/>");
 			newHtml.append("<a onclick='renamePlayerHouse(event)' class='main-button'>Rename this house</a>");
 		}
 		

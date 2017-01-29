@@ -25,6 +25,7 @@ public class GamePageUpdateService extends MainPageUpdateService {
 		newHtml.append("<div class='titlebar'>ACTIONS</div>");
 		newHtml.append("<div class='backdrop2a navigationbox'>");
 		newHtml.append("	<div class='titlebar'>This location</div>");
+		newHtml.append("	<a href='/main.jsp' class='button2' title='This will take you back to the old UI.'>Old UI</a>");
 		newHtml.append("	<a href='#' class='button2' shortcut='69' onclick='doExplore(false)' title='Explore this location for new paths or monsters.'><span class='shortcut-key'>(E)</span>Explore</a>");
 		newHtml.append("	<a href='#' class='button2' shortcut='87' onclick='doExplore(true)' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.'><span class='shortcut-key'>(W)</span>Explore <img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' border=0/></a>");
 		if ("CampSite".equals(location.getProperty("type")))
@@ -244,8 +245,16 @@ public class GamePageUpdateService extends MainPageUpdateService {
 	@Override
 	protected String updateButtonList_CombatMode()
 	{
-		// TODO Auto-generated method stub
-		return super.updateButtonList_CombatMode();
+		StringBuilder newHtml = new StringBuilder();
+		
+		newHtml.append("<div class='titlebar'>COMBAT ACTIONS</div>");
+		newHtml.append("<div class='backdrop2a navigationbox'>");
+		newHtml.append("	<div class='titlebar'>Combat</div>");
+		newHtml.append("	<a href='/main.jsp' class='button2' title='This will take you back to the old UI.'>Old UI</a>");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		
+		return updateHtmlContents("#mainButtonList", newHtml.toString());
 	}
 
 	

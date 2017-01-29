@@ -24,6 +24,9 @@ var previouslyHighlightedBackground;
 var previouslyHighlightedObjects = [];
 var cursorObject = "";
 var clickTimer;
+var zoomTouchX;
+var zoomTouchY;
+var zoomTouch = false;
 var timeBetweenLeftClick = 0;
 var dragging = false;
 var spacePressed = false;
@@ -119,8 +122,11 @@ function scaleTiles(onCenter) {
                 // Check for a mouse position
                 userLocX = event.clientX;
                 userLocY = event.clientY;
+            } else if (zoomTouch) {
+                userLocX = zoomTouchX;
+                userLocY = zoomTouchY;
             } else if (event.changedTouches && event.changedTouches.length == 1) {
-                // Check for double click on mobile
+                // Check for double tap on mobile
                 userLocX = event.changedTouches[0].clientX;
                 userLocY = event.changedTouches[0].clientY;
             } else if (event.touches && event.touches[0] && event.touches[0].clientX && event.touches[1] && event.touches[1].clientX) {
@@ -132,6 +138,9 @@ function scaleTiles(onCenter) {
 
                 userLocX = (offsetX2 + offsetX1) / 2;
                 userLocY = (offsetY2 + offsetY1) / 2;
+                zoomTouchX = userLocX;
+                zoomTouchY = userLocY;
+                zoomTouch = true;
             } else if (event.changedTouches && event.changedTouches.length > 1) {
                 // Check for zooming on mobile, find midpoint of pinch gesture
                 offsetX1 = event.changedTouches[0].clientX;
@@ -141,6 +150,9 @@ function scaleTiles(onCenter) {
 
                 userLocX = (offsetX2 + offsetX1) / 2;
                 userLocY = (offsetY2 + offsetY1) / 2;
+                zoomTouchX = userLocX;
+                zoomTouchY = userLocY;
+                zoomTouch = true;
             } else {
                 // Couldn't find mouse/finger position(s), last resort zoom to center of viewport
                 userLocX = viewport.offsetWidth/2 + viewport.offsetLeft + viewportContainer.offsetLeft;
@@ -293,14 +305,16 @@ function loadMap() {
     jQuery('#ground-layer').html('');
     jQuery('#object-layer').html('');
 
-    $.ajax({
-        url: "SandboxServlet",
-        data:{width:gridTileWidth, height:gridTileHeight, seed:seed, forestry:forestry},
-        type: 'POST',
-        success: function(responseJson) {
-            buildMap(responseJson);
-        }
-    });
+    buildMap(JSON.parse(mapData));
+
+    //$.ajax({
+    //    url: "SandboxServlet",
+    //    data:{width:gridTileWidth, height:gridTileHeight, seed:seed, forestry:forestry},
+    //    type: 'POST',
+    //    success: function(responseJson) {
+    //        buildMap(responseJson);
+    //    }
+    //});
     buildMenu();
 }
 
@@ -422,7 +436,7 @@ function buildMap(responseJson) {
         var cgridObject = new GridObject(
             gridObject.key,
             "",
-            gridObject.fileName,
+            gridObject.filename,
             gridObject.name,
             gridObject.xGridCellOffset,
             gridObject.yGridCellOffset,
@@ -432,7 +446,7 @@ function buildMap(responseJson) {
             gridObject.yImageOrigin,
             gridObject.width,
             gridObject.height);
-        var key = gridObject.fileName + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
+        var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
         gridObjects[key] = cgridObject;
         var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
         gridCell.objectKeys[gridCell.objectKeys.length] = key;
@@ -442,9 +456,9 @@ function buildMap(responseJson) {
         $hexBody += " style=\"";
         $hexBody += " z-index:" + (Number(zOffset) + Number(top)) + ";";
         if (gridObject.key == "o1") {
-            $hexBody += " background:url(" + $domain + gridObject.fileName + ");";
+            $hexBody += " background:url(" + $domain + gridObject.filename + ");";
         } else {
-            $hexBody += " background:url(" + $picUrlPath + gridObject.fileName + ");";
+            $hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
         }
         $hexBody += " background-size:100%;";
         $hexBody += "\">";
@@ -670,7 +684,6 @@ function keyPress() {
 
         default: return;
     }
-    //e.preventDefault();
     if (isShift || spacePressed) {
         usingKeys = false;
     } else {
@@ -1038,6 +1051,9 @@ function stopDrag() {
         clickMap();
     }
     drag=false;
+    if (!event.touches || event.touches.length < 2) {
+        zoomTouch = false;
+    }
 }
 
 function zoomDiv(e) {
@@ -1065,10 +1081,12 @@ function zoomDiv(e) {
         d1 = Math.sqrt(Math.pow((offsetX2 - offsetX1), 2) + Math.pow((offsetY2 - offsetY1), 2));
         d2 = Math.sqrt(Math.pow((coffsetX2 - coffsetX1), 2) + Math.pow((coffsetY2 - coffsetY1), 2));
         delta = Math.abs(d1 - d2);
-        if (d1 < d2 && delta > zoomDelta) {
-            zoomIn(1, false);
-        } else {
-            zoomOut(1, false);
+        if (delta > zoomDelta) {
+            if (d1 < d2) {
+                zoomIn(1, false);
+            } else {
+                zoomOut(1, false);
+            }
         }
     }
     $('html, body').stop().animate({}, 500, 'linear');
@@ -1112,12 +1130,5 @@ function CoordObject(xGridCoord, yGridCoord) {
 }
 
 function mapPlow(coord) {
-    $.ajax({
-        url: "SandboxServlet",
-        data: {width: gridTileWidth, height: gridTileHeight, seed: $("#seed").val(), forestry: forestry, command: "mapPlow", coord: currentCoord()},
-        type: 'POST',
-        success: function (responseJson) {
-            buildMap(responseJson);
-        }
-    });
+    
 }
