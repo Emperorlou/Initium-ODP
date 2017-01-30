@@ -2264,7 +2264,8 @@ function doCommand(eventObject, commandName, parameters, callback)
 		if (data.message!=null && data.message.length>0)
 			popupMessage("System Message", data.message);
 		
-		if (data._2dViewportUpdates!=null && data._2dViewportUpdates.length>0) {
+		// Update the map with response data
+		if (data._2dViewportUpdates!=null) {
 			updateGridFromServer(data._2dViewportUpdates);
 		}
 
