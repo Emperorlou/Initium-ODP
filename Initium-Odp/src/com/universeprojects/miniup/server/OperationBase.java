@@ -145,9 +145,8 @@ public abstract class OperationBase
 	public JSONObject getMapUpdateJSON() {
 		JSONObject jsonObject = new JSONObject();
 		JSONArray jsonArray = new JSONArray();
-		jsonArray.addAll(this.gridCellUpdates);
-		
 		JSONArray jsonObjects = new JSONArray();
+		jsonArray.addAll(this.gridCellUpdates);
 		jsonObjects.addAll(this.gridObjectUpdates);
 		jsonObject.put("GridCells", jsonArray);
 		jsonObject.put("GridObject", jsonObjects);
