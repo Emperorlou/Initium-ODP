@@ -1251,4 +1251,5 @@ function addGridObjectToMap(gridObject) {
 	$hexBody += "\">";
 	$hexBody += "</div>";
 	return $hexBody;
+	
 }
