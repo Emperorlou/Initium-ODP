@@ -143,13 +143,13 @@ public abstract class OperationBase
 	}
 	
 	public JSONObject getMapUpdateJSON() {
-		JSONObject jsonObject = new JSONObject();
-		JSONArray jsonArray = new JSONArray();
-		JSONArray jsonObjects = new JSONArray();
-		jsonArray.addAll(this.gridCellUpdates);
-		jsonObjects.addAll(this.gridObjectUpdates);
-		jsonObject.put("GridCells", jsonArray);
-		jsonObject.put("GridObject", jsonObjects);
-		return jsonObject;
+		JSONObject finalJson = new JSONObject();
+		JSONArray gridCellJson = new JSONArray();
+		JSONArray gridObjectJson = new JSONArray();
+		gridCellJson.addAll(this.gridCellUpdates);
+		gridObjectJson.addAll(this.gridObjectUpdates);
+		finalJson.put("GridCells", gridCellJson);
+		finalJson.put("GridObject", gridObjectJson);
+		return finalJson;
 	}
 }
