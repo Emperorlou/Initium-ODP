@@ -382,13 +382,12 @@ public class MainPageUpdateService extends Service
 			newHtml.append("</div>");
 			newHtml.append("</div>");
 			newHtml.append("<button type=\"button\" onclick=\"openMenu()\">Menu</button>");
+			newHtml.append("<button type=\"button\" onclick=\"mapPlow()\">Plow</button>");
 			newHtml.append("<center><p id=\"selectedObjects\" class=\"selectedObjectList\"></p></center>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
 			newHtml.append("<script>");
 			newHtml.append("var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2).toString() + "';");
-			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() {");
-			newHtml.append("pressedButton();");
-			newHtml.append("});");
+			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() { pressedButton(); });");
 			newHtml.append("</script>");
 			
 			return updateHtmlContents("#test-panel", newHtml.toString());

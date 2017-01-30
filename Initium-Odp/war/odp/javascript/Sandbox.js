@@ -13,6 +13,7 @@ var gridCellWidth = 64;
 var gridCellHeight = 64;
 var cursorWidth = 164;
 var cursorHeight = 166;
+var objectZOffset = 10;
 var drugged = false;
 var reachedZoom = false;
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
@@ -428,42 +429,7 @@ function buildMap(responseJson) {
 
     htmlString = "";
     $.each(responseJson['objectMap'], function (objectKey, gridObject) {
-
-        //var top = (gridObject.yGridCoord+1) * gridCellHeight - (gridObject.yGridCellOffset);
-        var top = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
-        var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
-
-        var cgridObject = new GridObject(
-            gridObject.key,
-            "",
-            gridObject.filename,
-            gridObject.name,
-            gridObject.xGridCellOffset,
-            gridObject.yGridCellOffset,
-            gridObject.xGridCoord,
-            gridObject.yGridCoord,
-            gridObject.xImageOrigin,
-            gridObject.yImageOrigin,
-            gridObject.width,
-            gridObject.height);
-        var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
-        gridObjects[key] = cgridObject;
-        var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
-        gridCell.objectKeys[gridCell.objectKeys.length] = key;
-
-        $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
-        $hexBody += " data-key=\"" + key + "\"";
-        $hexBody += " style=\"";
-        $hexBody += " z-index:" + (Number(zOffset) + Number(top)) + ";";
-        if (gridObject.key == "o1") {
-            $hexBody += " background:url(" + $domain + gridObject.filename + ");";
-        } else {
-            $hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
-        }
-        $hexBody += " background-size:100%;";
-        $hexBody += "\">";
-        $hexBody += "</div>";
-        htmlString += $hexBody;
+        htmlString += addGridObjectToMap(gridObject);
     });
 
     // Append HTML
@@ -731,14 +697,14 @@ function startDrag(e) {
         if (e.clientX) {
             offsetX = e.clientX;
             offsetY = e.clientY;
-            updateGrid();
+            updateGridOnUI();
             // For touch input
         } else if (event.touches) {
             if (event.touches.length == 1) {
                 offsetX = e.touches[0].clientX;
                 offsetY = e.touches[0].clientY;
                 document.ontouchmove=dragDiv;
-                updateGrid();
+                updateGridOnUI();
             } else {
                 offsetX1 = e.touches[0].clientX;
                 offsetY1 = e.touches[0].clientY;
@@ -966,7 +932,7 @@ function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursor
     htmlString += "</div>";
     return htmlString;
 }
-function updateGrid() {
+function updateGridOnUI() {
     if(!grid.style.left) { grid.style.left='0px'};
     if (!grid.style.top) { grid.style.top='0px'};
 
@@ -1083,9 +1049,9 @@ function zoomDiv(e) {
         delta = Math.abs(d1 - d2);
         if (delta > zoomDelta) {
             if (d1 < d2) {
-                zoomIn(1, false);
+                zoomIn(.25, true);
             } else {
-                zoomOut(1, false);
+                zoomOut(.25, true);
             }
         }
     }
@@ -1129,6 +1095,160 @@ function CoordObject(xGridCoord, yGridCoord) {
     this.yGridCoord = yGridCoord;
 }
 
-function mapPlow(coord) {
-    
+function mapPlow() {
+    if (cursorObject != "") {
+        doCommand(event, "MapPlow", {"xGridCoord": cursorObject.xGridCoord, "yGridCoord": cursorObject.yGridCoord}, function (data, error) {
+            if (error) return;
+            updateGridFromServer(data);
+        });
+    }
+}
+
+/**
+ * Server response can optionally have:
+ *      GridCells (A list of gridCell objects for updating the gridMap)
+ *      GridObject (A map of gridObject objects for updating the objects on the gridMap)
+ * @param returnJson
+ */
+function updateGridFromServer(returnJson) {
+    // Check if we have any gridCells for updating
+    if (returnJson.GridCells) {
+        // Update all passed gridCells
+        for (index=0; index < returnJson.GridCells.length; index++) {
+            updateGridCell(returnJson.GridCells[index]);
+        }
+    }
+    // Check if we have anyt gridObjects for updating
+    if (returnJson.GridObjects) {
+        // Update all passed gridObjects
+        for (index=0; index < returnJson.GridObjects.length; index++) {
+            updateGridObject(returnJson.GridObjects[index]);
+        }
+    }
+}
+
+/**
+ * Updates a current gridCell of the map, depending on the populated fields of the passed back gridCell
+ * @param gridCell
+ */
+function updateGridCell(gridCell) {
+    // For all updates we need to have a coord
+    if (gridCell.xGridCoord && gridCell.yGridCoord) {
+        currentCell = gridCells[gridCell.xGridCoord][gridCell.yGridCoord];
+        if (gridCell.backgroundFile) {
+            currentCell.style.backgroundImage = $picUrlPath + gridCell.backgroundFile + ")";
+        }
+    }
+}
+
+function updateGridObject(gridObject) {
+    // For all updates we need to have a key
+    if (gridObject.key) {
+        currentObject = gridObjects[gridObject.key];
+        // Update the new object
+        if (gridObject.filename) {
+            currentObject.div.style.backgroundImage = $picUrlPath + gridObject.filename + ")";
+        }
+        if (gridObject.xGridCoord) {
+            currentObject.xGridCoord = gridObject.xGridCoord;
+        }
+        if (gridObject.yGridCoord) {
+            currentObject.yGridCoord = gridObject.yGridCoord;
+        }
+        if (gridObject.xGridCellOffset) {
+            currentObject.xGridCellOffset = gridObject.xGridCellOffset;
+        }
+        if (gridObject.yGridCellOffset) {
+            currentObject.yGridCellOffset = gridObject.yGridCellOffset;
+        }
+        if (gridObject.xImageOrigin) {
+            currentObject.xImageOrigin = gridObject.xImageOrigin;
+        }
+        if (gridObject.yImageOrigin) {
+            currentObject.yImageOrigin = gridObject.yImageOrigin;
+        }
+        if (gridObject.width) {
+            currentObject.width = gridObject.width;
+        }
+        if (gridObject.height) {
+            currentObject.height = gridObject.height;
+        }
+
+        // Update necessary grid meta-data
+        // If this object is marked for deletion, remove it's key from the gridCells and delete from the hashMap
+        if (gridObject.markForDeletion) {
+            delete gridObjects[gridObject.key];
+            gridCells[gridObject.xGridCoord][gridObject.yGridCoord].objectKeys.remove(gridObject.key);
+        }
+        // If this object is marked for removal, remove it's key from the gridCells
+        else if (gridObject.markForRemoval) {
+            gridCells[gridObject.xGridCoord][gridObject.yGridCoord].objectKeys.remove(gridObject.key);
+        }
+        // Simple update or addition of gridObject
+        else {
+            // If we have updated coords, use them. Otherwise use the object's old coords
+            xCoord = currentObject.xGridCoord;
+            yCoord = currentObject.yGridCoord;
+            if (gridObject.xGridCoord) xCoord = gridObject.xGridCoord;
+            if (gridObject.yGridCoord) yCoord = gridObject.yGridCoord;
+
+            // If this object is not marked for removal, see if it exists at the coord, if not add it
+            if (!gridCells[xCoord][yCoord].objectKeys.contains(gridObject.key)) {
+                gridCells[xCoord][yCoord].objectKeys.add(gridObject.key);
+            }
+            // If this object is not marked for removal, see if it exists in the object hash, if not add it
+            if (!gridObjects[gridObject.key]) {
+                // If we add the object to the map, we should have all image related fields defined
+                if (gridObject.filename && gridObject.name && gridObject.xGridCellOffset && gridObject.yGridCellOffset &&
+                    gridObject.xGridCoord && gridObject.yGridCoord && gridObject.xImageOrigin && gridObject.yImageOrigin &&
+                    gridObject.width && gridObject.height) {
+                    addGridObjectToMap(gridObject);
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Adds gridObject to the map
+ * Builds HTML for gridObject according to the gridObject's attributes
+ * Adds object to the gridCell structure
+ * @param gridObject
+ * Returns HTML string for adding to DOM
+ */
+function addGridObjectToMap(gridObject) {
+    var top = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
+    var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
+
+    var cgridObject = new GridObject(
+        gridObject.key,
+        "",
+        gridObject.filename,
+        gridObject.name,
+        gridObject.xGridCellOffset,
+        gridObject.yGridCellOffset,
+        gridObject.xGridCoord,
+        gridObject.yGridCoord,
+        gridObject.xImageOrigin,
+        gridObject.yImageOrigin,
+        gridObject.width,
+        gridObject.height);
+    var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
+    gridObjects[key] = cgridObject;
+    var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
+    gridCell.objectKeys[gridCell.objectKeys.length] = key;
+
+    $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
+    $hexBody += " data-key=\"" + key + "\"";
+    $hexBody += " style=\"";
+    $hexBody += " z-index:" + (Number(objectZOffset) + Number(top)) + ";";
+    if (gridObject.key == "o1") {
+        $hexBody += " background:url(" + $domain + gridObject.filename + ");";
+    } else {
+        $hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
+    }
+    $hexBody += " background-size:100%;";
+    $hexBody += "\">";
+    $hexBody += "</div>";
+    return $hexBody;
 }

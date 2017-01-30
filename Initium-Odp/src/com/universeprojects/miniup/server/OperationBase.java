@@ -1,5 +1,8 @@
 package com.universeprojects.miniup.server;
 
+import com.universeprojects.miniup.server.model.GridCell;
+import com.universeprojects.miniup.server.model.GridObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +12,8 @@ public abstract class OperationBase
 {
 
 	private List<Map<String, String>> htmlUpdates = new ArrayList<Map<String, String>>();
+	private List<GridCell> gridCellUpdates = new ArrayList<>();
+	private List<GridObject> gridObjectUpdates = new ArrayList<>();
 	
 	/**
 	 * When the command returns to the browser, the page will then find the elements that match
@@ -57,9 +62,7 @@ public abstract class OperationBase
 	 * will be deleted and the then a new script tag will be added to the page with the given javascript.
 	 * The new javascript <script> tag will also have the same id as the one deleted.
 	 * 
-	 * 
-	 * @param jquerySelector
-	 * @param newHtml
+	 *
 	 */
 	public void updateJavascript(String elementId, String newJavascript)
 	{
@@ -112,5 +115,28 @@ public abstract class OperationBase
 	{
 		return htmlUpdates;
 	}
+
+	public List<GridCell> getGridCellUpdates() {
+		return gridCellUpdates;
+	}
+
+	public void setGridCellUpdates(List<GridCell> gridCellUpdates) {
+		this.gridCellUpdates = gridCellUpdates;
+	}
+
+	public List<GridObject> getGridObjectUpdates() {
+		return gridObjectUpdates;
+	}
+
+	public void setGridObjectUpdates(List<GridObject> gridObjectUpdates) {
+		this.gridObjectUpdates = gridObjectUpdates;
+	}
 	
+	public void addGridCellUpdate(GridCell gridCell) {
+		this.gridCellUpdates.add(gridCell);
+	}
+	
+	public void addGridObjectUpdate(GridObject gridObject) {
+		this.gridObjectUpdates.add(gridObject);
+	}
 }
