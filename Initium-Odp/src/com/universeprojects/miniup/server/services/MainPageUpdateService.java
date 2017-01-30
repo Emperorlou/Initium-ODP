@@ -86,7 +86,7 @@ public class MainPageUpdateService extends Service
 	 * this particular session.
 	 * @return
 	 */
-	private void loadPathCache() {
+	protected void loadPathCache() {
 		loadPathCache(false);
 	}
 	
@@ -97,7 +97,7 @@ public class MainPageUpdateService extends Service
 	 * @param showHidden  A boolean value that determines whether we should load the hidden paths.
 	 * @return
 	 */
-	private void loadPathCache(boolean showHidden)
+	protected void loadPathCache(boolean showHidden)
 	{
 		if (paths==null)
 		{
@@ -511,6 +511,7 @@ public class MainPageUpdateService extends Service
 		
 		if (user!=null && GameUtils.equals(location.getProperty("ownerKey"), user.getKey()))
 		{
+			newHtml.append("<a onclick='createMapToHouse(event)' class='main-button'>Create map to this house</a><br/>");
 			newHtml.append("<a onclick='renamePlayerHouse(event)' class='main-button'>Rename this house</a>");
 		}
 		

@@ -469,7 +469,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 			}
 			
 			if (groupStatus.equals("Kicked") == false)
-				sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ")'>Kick</a>");
+				sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ", \""+character.getProperty("name")+"\")'>Kick</a>");
 			else
 				sb.append("<a onclick='groupMemberKickCancel(" + character.getKey().getId() + ")'>Cancel Kick</a>");
 			

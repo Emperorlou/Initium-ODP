@@ -28,7 +28,7 @@
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
 <script type="text/javascript" src="/odp/javascript/script.js?v=61"></script>
 
-<script type="text/javascript" src="javascript/messager.js?v=18"></script>
+<script type="text/javascript" src="/odp/javascript/messager.js?v=18"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
 <script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
