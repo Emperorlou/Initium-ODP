@@ -148,14 +148,14 @@ messager.onChatMessage = function(chatMessage)
 
 messager.checkClientSideChatCommands = function(chatMessage)
 {
-	if(chatMessage.message.startsWith("/")){
-		if (chatMessage.message.toLowerCase() == "/help") {
+	if(chatMessage.startsWith("/")){
+		if (chatMessage.toLowerCase() == "/help") {
 			pagePopup('/odp/chatHelp.html');
 			return true;
 		}
-		if (chatMessage.message.toLowerCase().startsWith("/trade")) {
-			var characterName = chatMessage.message.slice(6);
-			doTradeStartTradeNewCharacterName(null, characterName);
+		if (chatMessage.toLowerCase().startsWith("/trade")) {
+			var characterName = chatMessage.slice(7);
+			tradeStartTradeNewCharacterName(null, characterName);
 			return true;
 		}
 	}
