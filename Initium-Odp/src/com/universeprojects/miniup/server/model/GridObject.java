@@ -15,6 +15,8 @@ public class GridObject {
 	private static String yImageOrigin = "yImageOrigin";
 	private static String width = "width";
 	private static String height = "height";
+	private static String markForRemoval = "markForRemoval";
+	private static String markForDeletion = "markForDeletion";
 	private JSONObject jsonObject;
 
 	public GridObject() {
@@ -33,7 +35,7 @@ public class GridObject {
 	}
 
 	public GridObject(String key, String filename, String name, Integer xGridCoord, Integer yGridCoord, Integer xGridCellOffset, Integer yGridCellOffset, Integer xImageOrigin,
-			Integer yImageOrigin, Integer width, Integer height) {
+			Integer yImageOrigin, Integer width, Integer height, boolean markForRemoval, boolean markForDeletion) {
 		jsonObject = new JSONObject();
 		setKey(key);
 		setfilename(filename);
@@ -46,7 +48,17 @@ public class GridObject {
 		setyImageOrigin(yImageOrigin);
 		setWidth(width);
 		setHeight(height);
+		setMarkForRemoval(markForRemoval);
+		setMarkForDeletion(markForDeletion);
 	}
+
+	public boolean getMarkForDeletion() { return (boolean) jsonObject.get(this.markForDeletion);}
+
+	public void setMarkForDeletion(boolean markForDeletion) { jsonObject.put(this.markForDeletion, markForDeletion);}
+	
+	public boolean getMarkForRemoval() { return (boolean) jsonObject.get(this.markForRemoval);}
+	
+	public void setMarkForRemoval(boolean markForRemoval) { jsonObject.put(this.markForRemoval, markForRemoval);}
 
 	public String getKey() {
 		return (String) jsonObject.get(this.key);

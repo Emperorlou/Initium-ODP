@@ -1,3147 +1,1254 @@
-window.popupsNum = 0;
-window.popupsOpen = 0;
-window.popupsArray = new Array();
+var viewportContainer = document.getElementById("viewportcontainer");
+var viewport = document.getElementById("viewport");
+var menu = document.getElementById("menu");
+var grid = document.getElementById("grid");
+var gridCellLayer = document.getElementById("cell-layer");
+var objects = document.getElementsByClassName('gridObject');
+var dragDelta = 10;
+var scale = 1;
+var maxZoom = 2.4;
+var minZoom = .05;
+var imgSize = 128;
+var gridCellWidth = 64;
+var gridCellHeight = 64;
+var cursorWidth = 164;
+var cursorHeight = 166;
+var objectZOffset = 10;
+var drugged = false;
+var reachedZoom = false;
+var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
+var $domain = "https://initium-resources.appspot.com/";
+var firstLoad = true;
+var previouslySelectedBackground;
+var previouslySelectedObjects = [];
+var previouslyHighlightedBackground;
+var previouslyHighlightedObjects = [];
+var cursorObject = "";
+var clickTimer;
+var zoomTouchX;
+var zoomTouchY;
+var zoomTouch = false;
+var timeBetweenLeftClick = 0;
+var dragging = false;
+var spacePressed = false;
+var usingKeys = false;
+var isMenuVisible = false;
+var menuBuilt = false;
+var displayGridLines = false;
+var keepSelectedCenter = true;
 
-window.singlePostFormSubmitted = false;
+/**
+ * Grid Objects is a HashMap of all objects in the grid
+ * key
+ * value: GridObject
+ * @type {{}}
+ */
+var gridObjects = {};
+/**
+ * gridCells is a 2D array of GridCells corresponding to the grid
+ * @type {Array}
+ */
+var gridCells = [];
 
-var notifyHandler = null;
-// Case insensitive Contains selector.
-jQuery.expr[':'].ContainsI = function(a, i, m) { return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0; };
-
-$(window).ready(function(e){
-	$(".single-post-form").submit(function(e){
-		if (window.singlePostFormSubmitted)
-			e.preventDefault();
-		else
-			window.singlePostFormSubmitted = true;
-	});
-	
-	$(window).resize(function() {
-		expandpopupMessage();
-	});
-
-	
-	$(".boldBoxCollapsed > h4").click(function(){
-		$(this).parent().toggleClass("boldBoxCollapsed");
-	});
-	
-	// For all inputs under the body: If a text box is selected, don't allow shortcut keys to process (prevent default)
-	$("body").on("keyup", "input", function(event){
-		event.stopPropagation();
-	});
-	
-	// Any inputs with the main-item-filter-input class should be named (ID) according to 
-	// which div class they will be filtering on.
-	$("#page-popup-root").on("input propertychange paste", "input.main-item-filter-input", function(event)
-	{
-		// If it's the propertychange event, make sure it's the value that changed.
-	    if (window.event && event.type == "propertychange" && event.propertyName != "value")
-	        return;
-
-	    // Clear any previously set timer before setting a fresh one
-	    window.clearTimeout($(this).data("timeout"));
-	    $(this).data("timeout", setTimeout(function () {
-	    	var selector = "div."+event.currentTarget.id.substring("filter_".length);
-			var searchString = $(event.currentTarget).val();
-
-			var conditionSelector = "a.clue:ContainsI('" + searchString + "')";
-			var filterItems = $(selector);
-			var showItems = filterItems.has(conditionSelector);
-			var hideItems = filterItems.not(showItems);
-			
-			showItems.show().next("br").show();
-			hideItems.hide().next("br").hide();
-			setSelectionCheckboxes(event, null);
-	    }, 500));
-	});
-	
-	// Unfortunately, we have to use event delegation for checkboxes, since it's in popup content.
-	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-all", function(event)
-	{
-		var cb = $(event.currentTarget);
-		var selectRoot = cb.parents(".selection-root");
-		selectRoot.find("input:checkbox.check-group:not(:disabled)").prop( {checked:cb.prop("checked"), indeterminate:false});
-		var selectItems = selectRoot.find(".selection-list .main-item:visible");
-		selectItems.find("input:checkbox").prop("checked", cb.prop("checked"));
-		selectItems.toggleClass("main-item-selected", cb.prop("checked"));
-	});
-	
-	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-group", function(event)
-	{
-		var cb = $(event.currentTarget);
-		var groupId = cb.attr("ref");
-		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item:visible");
-		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
-		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
-		
-		setSelectionCheckboxes(event, groupId);
-	});
-	
-	$("#page-popup-root").on("click", ".selection-list input:checkbox", function(event)
-	{
-		var cb = $(event.currentTarget);
-		cb.parent(".main-item").toggleClass("main-item-selected", cb.prop("checked"));
-		
-		setSelectionCheckboxes(event);
-	});
-	
-	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
-	{
-		$(event.currentTarget).parent().find("input:checkbox").click();
-	});
-	
-	$(".main-expandable .main-expandable-title").click(function(){
-		$(this).parent().find(".main-expandable-content").show();
-		$(this).hide();
-	});
-	
-	// Set the correct image for the header mute button
-	if (isSoundEffectsEnabled())
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
-	else
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
-		
-
-	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
-	$(window).focus(function(){
-		flagReadMessages();
-	});
-	
+$(document).ready(function () {
+	loadMap();
 });
 
-/**
- * This removes the * from the title, (and by extension the 'unread messages' symbol on chrome browsers).
- *  
- * You can safely call this as often as you want.
- */
-function flagReadMessages()
-{
-	if (document.hasFocus())
-	{
-		if (document.title.indexOf("* ")==0)
-		{
-			document.title = document.title.substring(2);
+$('#viewportcontainer').on({
+	'mousewheel': function (e) {
+		e.preventDefault();
+		if (e.originalEvent.deltaY < 0) {
+			zoomIn(1);
+		} else {
+			zoomOut(1);
 		}
-	}
-}
-
-/**
- * This adds a * to the title of the page (and by extension adds an 'unread messages' symbol on chrome browsers). 
- * 
- * You can safely call this as often as you want.
- */
-function flagUnreadMessages()
-{
-	if (document.hasFocus()==false)
-	{
-		if (document.title.indexOf("*")<0)
-		{
-			document.title = "* "+document.title;
-		}
-	}
-}
-
-//Pop up Message
-function popupPermanentOverlay(title, content, popupClassOverride) 
-{
-	if (popupClassOverride==null)
-		popupClassOverride = "popup";
-	closeAllPopups();
-    window.popupsNum++;
-    window.popupsOpen++;
-    window.popupsArray[popupsNum-1] = "yes";
-    $("#popups").show();
-    currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text">' + content + '</div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"></div></div></div></div>');
-    expandpopupMessage();
-}
-
-function popupMessage(title, content, noBackground) 
-{
-	noBackgroundHtml = "";
-	if (noBackground==true)
-		noBackgroundHtml = 'style="background:none"';
-    window.popupsNum++;
-    window.popupsOpen++;
-    window.popupsArray[popupsNum-1] = "yes";
-    $("#popups").show();
-    currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
-    expandpopupMessage();
-    enterPopupClose();
-   }
-
-$(document).bind("keydown",function(e) 
-{
-    if (popupsOpen >= 1) 
-    {
-        if ((e.keyCode == 13) || (e.keyCode == 27)) 
-        {
-            closepopupMessage(currentPopup());
-        }
-    }
-});
-
-function enterPopupClose() 
-{
-}
-
-function currentPopup() {
-    popupLast = $(".popupWrapperBackground").last();
-    popupLastID = popupLast.attr("id");
-    popupLastIDNum = popupLastID.split("_");
-    return popupLastIDNum[1];
-}
-function closeAllPopups()
-{
-    $(".popupWrapperBackground").remove();
-    $("#popups").hide();
-    window.popupsOpen = 0;
-    window.documentBindEnter = false;
-}
-
-function closeAllTooltips()
-{
-	$(".cluetip").hide();
-}
-
-function closepopupMessage(popupID) {
-    $("#popupWrapperBackground_" + popupID).remove();
-	window.popupsOpen = window.popupsOpen-1;
-    window.popupsArray[popupID-1] = "no";
-    window.documentBindEnter = false;
-    if (window.popupsOpen<=0)
-		$("#popups").hide();
-    else
-    	enterPopupClose();
-}
-function expandpopupMessage() 
-{
-	var win = $(window);
-	var viewportHeight = win.height();
-	var viewportWidth = win.width();
-	
-	$(".popup").each(function(index)
-	{
-		var popup = $(this);
-		var width = popup.width();
-		var height = popup.height();
-		
-		popup.css("left", viewportWidth/2-(width/2)+"px");
-		popup.css("top", viewportHeight/2-(height/2)+"px");
-	});
-	
-//    var winHeight = window.innerHeight;
-//    var popupWrapperH = winHeight-125;
-//    var popupWrapperM = -popupWrapperH/2;
-//    var popupTextH = popupWrapperH-100;
-//    $(".popupWrapper").css("height", popupWrapperH + "px");
-//    $(".popupWrapper").css("margin-top", popupWrapperM + "px");
-//    $(".popup_text").css("max-height", popupTextH + "px");
-//    var popupM = (-popupWrapperM - ($("#popup_text_" + currentPopup()).height())); console.log(popupM + '\n' + $("#popup_text_" + currentPopup()).height());
-//    if ($("#popup_" + currentPopup()).height() < popupTextH) $("#popup_" + currentPopup()).css("margin-top", popupM + "px");
-//    
-//    $("#popups").find("img").each(function(index,element)
-//	{
-//		element.src = element.src+"";
-//	});
-}
-
-
-
-// SPECIAL GAME FUNCTIONS
-
-function random(start, end)
-{
-	return Math.floor(Math.random()*(end-start+1))+start;
-}
-
-function popupPermanentOverlay_Searching(locationName)
-{
-	popupPermanentOverlay_WalkingBase("Exploring "+locationName, "You are wandering around, looking for anything of interest...");
-}
-
-function popupPermanentOverlay_Walking(locationName)
-{
-	popupPermanentOverlay_WalkingBase("Walking to "+locationName);
-}
-
-function popupPermanentOverlay_WalkingBase(title, text) {
-	var biome = window.biome;
-	if (biome==null) biome = "Temperate";
-	var windowWidth = $(".main-banner").width();
-	var width = windowWidth+20;
-	var yOffset = 180;
-
-	var content = "";
-	
-	if (isAnimationsEnabled())
-	{
-	
-		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
-	
-		if (biome=="Dungeon")
-		{
-			// This version uses the new torch walking man
-			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
-			
-			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
-			var grassTiles = 40;
-			// The ground first
-			for(var i = 0; i<grassTiles; i++)
-			{
-				var filename = "ground";
-				
-				filename+=random(1,4);
-					
-				
-				var y = random(-40, 10);
-				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
-			}
-			
-			// Add the dungeon wall
-			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
-		
-			var torches = random(1,5);
-			var torchXOffset = random(0,100);
-			for(var i = 0; i<torches; i++)
-			{
-				
-				var x = torchXOffset;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
-			}
-			
-	//		var plants = random(0,10);
-	//		// Trees and shrubs next
-	//		for(var i = 0; i<plants; i++)
-	//		{
-	//			var filename = "baretree";
-	////			var type=random(0,5);
-	////			if (type==0)
-	////				filename = "tree";
-	////			else if (type==1)
-	////				filename = "tree";
-	////			else if (type==2)
-	////				filename = "shrub";
-	////			else if (type==3)
-	////				filename = "shrub";
-	////			else if (type==4)
-	////				filename = "shrub";
-	////			else if (type==5)
-	////				filename = "baretree";
-	//			
-	////			if (filename == "tree")
-	////				filename+=random(1,6);
-	////			else if (filename == "shrub")
-	////				filename+=random(1,3);
-	////			else if (filename == "baretree")
-	//			filename+=random(1,7);
-	//	
-	//			var y = random(-60, 60);
-	//			var x = random(width/2*-1,width/2)-100;
-	//			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
-	//		}		
-		}
-		else if (biome=="Snow")
-		{
-			var grassTiles = 80;
-			// The ground first
-			for(var i = 0; i<grassTiles; i++)
-			{
-				var filename = "snow";
-				
-				if (random(1,2)==1)
-					filename+=random(1,6);
-				else
-					filename+=random(1,4);
-					
-		
-				var y = random(-100, 100);
-				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
-			}
-			
-			
-			var plants = random(0,10);
-			// Trees and shrubs next
-			for(var i = 0; i<plants; i++)
-			{
-				var filename = "baretree";
-	//			var type=random(0,5);
-	//			if (type==0)
-	//				filename = "tree";
-	//			else if (type==1)
-	//				filename = "tree";
-	//			else if (type==2)
-	//				filename = "shrub";
-	//			else if (type==3)
-	//				filename = "shrub";
-	//			else if (type==4)
-	//				filename = "shrub";
-	//			else if (type==5)
-	//				filename = "baretree";
-				
-	//			if (filename == "tree")
-	//				filename+=random(1,6);
-	//			else if (filename == "shrub")
-	//				filename+=random(1,3);
-	//			else if (filename == "baretree")
-				filename+=random(1,7);
-		
-				var y = random(-60, 60);
-				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
-			}
-		}
-		else if (biome=="Desert")
-		{
-			var grassTiles = 80;
-			// The ground first
-			for(var i = 0; i<grassTiles; i++)
-			{
-				var filename = "sand";
-				
-				if (random(1,2)==1)
-					filename+=random(1,6);
-				else
-					filename+=random(1,4);
-					
-		
-				var y = random(-100, 100);
-				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
-			}
-			
-			
-			var plants = random(-5,20);
-			// Trees and shrubs next
-			for(var i = 0; i<plants; i++)
-			{
-				var filename = "baretree";
-	//			var type=random(0,5);
-	//			if (type==0)
-	//				filename = "tree";
-	//			else if (type==1)
-	//				filename = "tree";
-	//			else if (type==2)
-	//				filename = "shrub";
-	//			else if (type==3)
-	//				filename = "shrub";
-	//			else if (type==4)
-	//				filename = "shrub";
-	//			else if (type==5)
-	//				filename = "baretree";
-				
-	//			if (filename == "tree")
-	//				filename+=random(1,6);
-	//			else if (filename == "shrub")
-	//				filename+=random(1,3);
-	//			else if (filename == "baretree")
-				filename+=random(1,7);
-		
-				var y = random(-60, 60);
-				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
-			}
-		}
-		else // Temperate by default
-		{
-			var grassTiles = 80;
-			// The ground first
-			for(var i = 0; i<grassTiles; i++)
-			{
-				var filename = "grass";
-				
-				if (random(1,2)==1)
-					filename+=random(1,6);
-				else
-					filename+=random(3,6);
-					
-		
-				var y = random(-100, 100);
-				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
-			}
-			
-			
-			var plants = 40;
-			// Trees and shrubs next
-			for(var i = 0; i<plants; i++)
-			{
-				var filename = "";
-				var type = random(0, 5);
-
-				switch(type)
-				{
-				    case 0:
-				        filename = "tree" + random(1,6);
-				        break;
-				    case 1:
-				        filename = "tree" + random(1,6);
-				        break;
-				    case 2:
-				        filename = "shrub" + random(1,3);
-				        break;
-				    case 3:
-				        filename = "shrub" + random(1,3);
-				        break;
-				    case 4:
-				        filename = "shrub" + random(1,3);
-				        break;
-				    case 5:
-				        filename = "baretree" + random(1,7);
-				        break;
-				}
-		
-				var y = random(-60, 60);
-				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
-			}
-		}
-		content+="</div>";
-		content+="</div>";
-	}
-	if (text!=null)
-		text = "<p class='text-shadow'>"+text+"</p>";
-	else
-		text = "";
-	
-	
-	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
-	content+="</div>";
-
-	$("#banner-base").html(content);
-	$(".walkingman").animate({left: "+="+(windowWidth+40)+"px"}, (windowWidth/0.023), "linear");
-}
-
-//function popupPermanentOverlay_Searching(locationName) {
-//	var title = "Exploring "+locationName;
-//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
-//	popupPermanentOverlay(title, content);
-//	$(".walkingman").animate({left: "+=60px"}, 800, "linear", function()
-//			{
-//				var img = $(this);
-//				img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Ducking_by_pfunked.gif");
-//				img.animate({left: "+=0px"}, 1250, "linear", function(){
-//					var img = $(this);
-//					img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif");
-//					img.animate({left: "+=600px"}, 10000, "linear");
-//				});
-//			});
-//}
-
-function rediscoverHouses(event)
-{
-	doCommand(event, "UserRediscoverHouses");
-}
-
-function buyHouse(eventObject)
-{
-	promptPopup("Buy House", "Are you sure you want to buy a house from the city? It will cost 2000 gold.\n\nIf you would like to proceed, please give your new home a name:", "My House", function(name){
-		doCommand(eventObject, "BuyHouse", {"houseName":name});
-	});
-}
-
-function renamePlayerHouse(eventObject)
-{
-	promptPopup("Rename Player House", "Enter a new name for your house:", "", function(newName) {
-		if (newName != null && newName != "")
-		{
-			doCommand(eventObject, "RenamePlayerHouse", {"newName" : newName});
-		}
-	});
-}
-
-function deletePlayerHouse(eventObject, pathId)
-{
-	confirmPopup("Delete Player House", "Deleting this house will cause THIS character to forget how to get back to this house, however the house itself will still be accessible by other characters who know about it's existence. <br>Are you absolutely sure you want to delete this house?", function() {
-		doCommand(eventObject, "DeletePlayerHouse", {"pathId" : pathId});
-	});
-}
-
-function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, characterId)
-{
-	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
-		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId},function(data,error){
-			if (error) return;
-			$(".saleItem[ref='"+saleItemId+"']").html(data.createStoreItem);
-		});
-	});
-}
-
-function storeSellItemNew(eventObject,itemId)
-{
-	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(amount){
-		if (amount!=null && amount!="")
-		{
-		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
-			if (error) return;
-			$(".invItem[ref='"+itemId+"']").remove();
-			var container = $("#saleItems");
-			container.html(data.createSellItem+container.html());
-			});
-		}
-	});
-}
-
-function storeDeleteAllItemsNew(eventObject,characterKey)
-{
-	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
-		{
-		doCommand(eventObject,"StoreDeleteAllItems");
-		}
-	});
-}
-
-function storeDeleteSoldItemsNew(eventObject)
-{
-	confirmPopup("Remove All Sold Items","Are you sure you want to remove ALL sold items from your store?", function(){
-		{
-		doCommand(eventObject,"StoreDeleteSoldItems");
-		}
-	});
-}
-
-function storeDeleteItemNew(eventObject,saleItemId,itemId)
-{
-	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":saleItemId,"itemId":itemId},function(data,error){
-		if (error) return;
-		
-		$(".saleItem[ref='"+saleItemId+"']").remove();
-		var container = $("#invItems");
-		container.html(data.createInvItem+container.html());
-		});
-		
-}
-
-function storeRenameNew(eventObject)
-{
-	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
-		if (name!=null && name!="")
-		{
-			doCommand(eventObject,"StoreRename",{"name":name});
-		}
-	});	
-}
-
-function storeDisabledNew(eventObject)
-{
-	var clickedElement = $(eventObject.currentTarget);
-	doCommand(eventObject, "StoreDisable", null, function(data, error){
-		if (error) return;
-		clickedElement.replaceWith(data.html);
-	});
-}
-
-function storeEnabledNew(eventObject)
-{
-	var clickedElement = $(eventObject.currentTarget);
-	doCommand(eventObject, "StoreEnable", null, function(data, error){
-		if (error) return;
-		clickedElement.replaceWith(data.html);
-	});
-}
-
-function storeSetSaleNew(eventObject)
-{
-	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
-		if (sale!=null)
-		{
-			doCommand(eventObject,"StoreSetSale",{"sale":sale});
-		}
-	});
-	
-}
-
-function transmuteItems(eventObject, containerId) 
-{
-	doCommand(eventObject, "TransmuteItems", {"containerId":containerId});
-}
-
-//function storeSellItem(itemId)
-//{
-//	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
-//		window.location.href="/ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
-//	});
-//}
-
-//function removeAllStoreItems()
-//{
-//	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
-//		window.location.href='/ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
-//	});
-//}
-
-//function storeDeleteSoldItems()
-//{
-//	location.href = "/ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
-//}
-//
-//function storeDeleteItem(saleItemId)
-//{
-//	location.href = "/ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
-//}
-
-//function renameStore()
-//{
-//	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
-//		if (name!=null && name!="")
-//			window.location.href='/ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
-//	});
-//}
-
-function createCampsite()
-{
-	var lastNameUsed = localStorage.getItem("campsiteName");
-	if (lastNameUsed==null)
-		lastNameUsed = "";
-	
-	promptPopup("New Campsite", "Provide a new name for your campsite:", lastNameUsed, function(name){
-		if (name!=null && name!="")
-		{
-			window.location.href='/ServletCharacterControl?type=createCampsite&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
-			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
-			localStorage.setItem("campsiteName", name);
-		}
-	});
-}
-
-function depositDogecoinsToItem(itemId, event)
-{
-	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", $("#mainGoldIndicator").text().replace(/,/g,""), function(amount){
-		if (amount!=null && amount!="")
-		{
-			doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
-				if(error) return;
-				reloadPagePopup();
-			});
-		}
-	});
-}
-
-function collectDogecoinsFromItem(itemId, event)
-{
-	// Command updates the gold indicator as needed, but not the inventory gold span. 
-	// Just reload popup (if one is open, that is).
-	doCommand(event, "DogeCoinsCollectFromItem", {"itemId" : itemId}, function(data, error){
-		if(error) return;
-		reloadPagePopup();
-	});
-}
-
-function collectDogecoinsFromCharacter(characterId, event)
-{
-	// Command updates the gold indicator as needed.
-	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId});
-}
-
-//function tradeSetDogecoin(currentDogecoin)
-//{
-//	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
-//		if (amount!=null && amount!="")
-//		{
-//			window.location.href='/ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
-//		}
-//	});
-//}
-
-
-function toggleFullscreenChat()
-{
-	$(".chat_box").toggleClass("fullscreenChat");
-}
-
-function exitFullscreenChat()
-{
-	$(".chat_box").removeClass("fullscreenChat");
-}
-
-
-function loadLocationItems()
-{
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
-	pagePopup("/ajax_moveitems.jsp?preset=location");
-//	$("#main-itemlist").load("locationitemlist.jsp");
-//	$("#main-itemlist").click(function(){
-//		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby items</h4></div>");
-//	});
-}
-
-function loadLocationCharacters()
-{
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
-	pagePopup("/locationcharacterlist.jsp");
-//	$("#main-characterlist").click(function(){
-//		$("#main-characterlist").html("<div class='boldbox' onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby characters</h4></div>");
-//	});
-}
-
-function loadLocationMerchants()
-{
-	closeAllPagePopups();
-	closeAllPopups();
-	closeAllTooltips();
-	pagePopup("/locationmerchantlist.jsp");
-//	$("#main-merchantlist").load("locationmerchantlist.jsp");
-//	$("#main-merchantlist").click(function(){
-//		$("#main-merchantlist").html("<div class='boldbox' onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby merchants</h4></div>");
-//	});
-}
-
-function loadInventoryAndEquipment()
-{
-	loadInventory();
-	loadEquipment();
-}
-
-function loadInventory()
-{
-	$("#inventory").load("/odp/inventorylist.jsp?ajax=true");
-//	$("#inventory").click(function(){
-//		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
-//	});
-}
-
-function loadEquipment()
-{
-	$("#equipment").load("/odp/equipmentlist.jsp?ajax=true");
-//	$("#inventory").click(function(){
-//		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
-//	});
-}
-
-function ajaxAction(url, eventObject, loadFunction)
-{
-	if (url.indexOf("?")>0)
-		url+="&ajax=true";
-	else
-		url+="?ajax=true";
-	
-	url += "&v="+window.verifyCode;
-
-	var clickedElement = $(eventObject.currentTarget);
-	var originalText = clickedElement.html();
-	clickedElement.html("<img src='/javascript/images/wait.gif' border=0/>");
-	$.get(url)
-	.done(function(data){
-		clickedElement.html(data);
-		loadFunction();
-	})
-	.fail(function(data){
-		loadFunction();
-		popupMessage("ERROR", "There was a server error when trying to perform the action. Feel free to report this on /r/initium. A log has been generated.");
-		clickedElement.html(originalText);
-	});
-	
-	eventObject.stopPropagation();
-}
-
-
-/**
- * Displays a popup that shows various chat commands available.
- */
-function helpPopup()
-{
-	/*popupMessage("Help", "The following chat commands exist:" +
-			"<ul>" +
-			"<li>/changelog - This displays the latest changes to the game. <a onclick='viewChangelog()'>View change log.</a></li>" +
-			"<li>/me - This allows you to say something in 3rd person</li>" +
-			"<li>/map - This shows a link to the community-created map which <a href='https://docs.google.com/drawings/d/1ZGBwTTrY5ATlJOWrPnwH2qWkee7kgdRTnTDPVHYZ3Ak/edit?usp=sharing'>you can also find here.</a>" +
-			"<li>/customize - This allows you to share a link to the iten customization page. <a onclick='customizeItemOrderPage()'>You can also find it here</a>" +
-			"<li>/merchant - This allows you to share the link to your store with everyone in the location. Make sure to turn your store on first though! <a onclick='viewManageStore()'>You can do that here</a>" +
-			"<li>/quickstart - A quick start guide for new players who want to play efficiently as quick as possible! <a href='quickstart.jsp'>Open quick start page.</a></li>" +
-			"<li>/about - Easily share the link to the official 'about' page on this site. <a href='about.jsp'>Open about page.</a></li>" +
-			"<li>/mechanics - Easily share the link to the official 'mechanics' page on this site. It goes into more detail about how the game works. <a href='mechanics.jsp'>Open mechanics page.</a></li>" +
-			"<li>/premium - Easily share a link to where people can learn about premium accounts.</li>" + 
-			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" + 
-			"<li>/app - This shows all the links to the mobile apps we have available.</li>" +
-			"<li>/competition - This puts up a link to the official competition page. This page allows you to donate to prize pools and is usually used to organize competitions between the content developers for creating new content.</li>" +
-			"<li>/faq - This puts up a link to a player made Frequently Asked Questions document which <a href='http://initium.wikia.com/wiki/Staub%27s_FAQ_Guide' target='_blank'>you can also find here.</a></li>" +
-			"<li>/guide - This puts up a link to a player made Starter Guide which <a href='http://initium.wikia.com/wiki/Starter_Guide' target='_blank'>you can also find here.</a></li>" +
-			"<li>/group - This puts up a link to the group that you belong to if you belong to one.</li>" +
-			"<li>/groups - This puts up a link to a player made list of groups in Initium which <a href='http://initium.wikia.com/wiki/Category:Player_Groups' target='_blank'>you can also find here.</a></li>" +
-			"<li>/wiki - This puts up a link to a player made wiki for Initium which <a href='http://initium.wikia.com/wiki/Initium_Wiki' target='_blank'>you can also find here.</a></li>" +
-			"</ul>", false);*/
-	pagePopup("/odp/chatHelp.html");
-}
-
-
-function shareItem(itemId)
-{
-	var message = "Item("+itemId+")";
-	if (messager.channel == "PrivateChat" && currentPrivateChatCharacterId!=null)
-	{
-		message = "#"+currentPrivateChatCharacterId + ": "+message;
-	}
-	else if (messager.channel == "PrivateChat" && currentPrivateChatCharacterName!=null)
-	{
-		message = currentPrivateChatCharacterName + ": "+message;
-	}
-
-	if (messager.channel == "PrivateChat" && currentPrivateChatCharacterName==null)
-	{
-		alert("You cannot chat privately until you select a person to chat privately with. Click on their name and then click on Private Chat.");
-		return;
-	}
-
-	
-	messager.sendMessage(message);
-	//popupMessage("Item shared", "Everyone who is in your location can now see the item you just shared.");
-	
-	closeAllTooltips();
-}
-
-
-function viewGroup(groupId)
-{
-	closeAllTooltips();
-	pagePopup("/odp/ajax_group?groupId=" + groupId);
-}
-
-
-function createNewGroup(eventObject)
-{
-	promptPopup("New Group","What name will you be using for your group.\n\nPlease use ONLY letters, commas, and apostrophes and a maximum of 30 characters.\n\nThis name cannot be changed later, so choose wisely!","", function(groupName) {
-				if (groupName != null && groupName != "") {
-					doCommand(eventObject, "GroupCreate", {"groupName" : groupName}, function(data, error) {
-						if (error) return;
-						viewGroup(data.groupId);
-					})
-				}
-			});
-}
-
-
-function deleteGroup(eventObject)
-{
-	confirmPopup("Confirmation", "Are you sure you want to delete your group?\n\nThis cannot be undone.", function() {
-		doCommand(eventObject, "GroupDelete", {}, function(data, error) {
-			if (error) return;
-			closePagePopup();
-		});
-	});
-}
-
-
-function leaveGroup(eventObject)
-{
-	confirmPopup("Leave group", "Are you sure you want to leave your group?", function(){
-		doCommand(eventObject, "GroupLeave");
-	});
-}
-
-function declareWar(eventObject)
-{
-	promptPopup("Declare War", "Enter the name of the group you want to declare on.", "",  function(groupName) {
-		if (groupName != null || groupName != "") {
-			doCommand(eventObject, "GroupDoSetWar", {"groupName" : groupName, "decision" : "begin"}, function(error)  {
-				if (error) return;
-			})
-		}
-	});
-}
-function endWar(eventObject, groupId) 
-{
-	confirmPopup("End War", "Are you sure you want to end this war?", function(){
-		doCommand(eventObject, "GroupDoSetWar", {"groupId" : groupId, "decision" : "end"});
-	});
-}
-//function cancelLeaveGroup()d
-//{
-//	window.location.href = "/ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
-//}
-function groupAcceptAllianceRequest(eventObject, groupId)
-{
-	confirmPopup("Accept Alliance", "Are you sure you want to ally yourself with this group?", function() {
-		doCommand(eventObject, "GroupProcessAllianceReq", {"groupId" : groupId, "decision" : "accept"});
-	})
-}
-
-function groupDeleteAlliance(eventObject, groupId)
-{
-	confirmPopup("End Alliance", "Are you sure you want to end this alliance?", function() {
-		doCommand(eventObject, "GroupDeleteAlliance", {"groupId" : groupId});
-	})
-}
-function groupDeclineAllianceRequest(eventObject, groupId)
-{
-	var decision = "decline";
-	confirmPopup("Decline Alliance", "Are you sure you want to decline this alliance?", function() {
-		doCommand(eventObject, "GroupProcessAllianceReq", {"groupId" : groupId, "decision" : "decline"});
-	})
-}
-
-function setGroupDescription(eventObject, existingDescription)
-{
-	if (existingDescription==null || existingDescription=="")
-	{
-		existingDescription="No description";
-	}
-	promptPopup("Group Description", "Set your group's description here, but please be careful to only use letters, numbers, commas, and apostrophies:", existingDescription, function(description){
-		if (description!=null && description!="")
-		{
-			doCommand(eventObject, "GroupChangeDescription", {"description" : description});
-		}
-		
-	});
-}
-
-function submitGroupAllianceRequest(eventObject) 
-{
-	promptPopup("Request Alliance", "Enter the name of the group you want to ally with.", "",  function(groupName) {
-		if (groupName != null || groupName != "") {
-			doCommand(eventObject, "GroupAllianceRequest", {"groupName" : groupName}, function(error)  {
-				if (error) return;
-			})
-		}
-	});
-}
-function setGroupMemberRank(eventObject, oldPosition, characterId)
-{
-	if (oldPosition==null || oldPosition=="")
-	{
-		oldPosition="No position";
-	}
-	promptPopup("Member Rank", "Give a new rank for this member:", oldPosition, function(newPosition){
-		if (newPosition!=null && newPosition!="")
-		{
-			doCommand(eventObject, "GroupMemberChangeRank", {"rank" : newPosition, "characterId" : characterId});
-		}
-	});
-}
-
-function promoteToAdmin(eventObject, characterId)
-{
-	confirmPopup("Promote to Admin", "Are you sure you want to promote this member to admin?", function(){
-		doCommand(eventObject, "GroupMemberPromoteToAdmin", {"characterId" : characterId});
-	});
-}
-
-function demoteFromAdmin(eventObject, characterId)
-{
-	confirmPopup("Demote from Admin", "Are you sure you want to demote this member from admin?", function(){
-		doCommand(eventObject, "GroupMemberDemoteFromAdmin", {"characterId" : characterId});
-	});
-}
-
-function makeGroupCreator(eventObject, characterId)
-{
-	confirmPopup("New Group Creator", "Are you sure you want to make this member the group creator?\n\nThis action cannot be reversed unless this member (as the new group creator) chooses to reverse it manually!", function(){
-		doCommand(eventObject, "GroupMemberMakeGroupCreator", {"characterId" : characterId});
-	});
-}
-
-
-//function duelConfirmation_Yes()
-//{
-//	window.location.href="/ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
-//}
-//
-//function duelConfirmation_No()
-//{
-//	window.location.href="/ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
-//}
-
-function reloadPopup(element, backUrl, event)
-{
-	var reloadDiv = $("#reload-div");
-	var reloadDivReturn = $("#reload-div-return");
-	
-	var url = $(element).attr("rel");
-	
-	if (url==null)
-		return;
-	reloadDiv.load(url);
-	
-	if (backUrl==null)
-		reloadDivReturn.html("");
-	else
-		reloadDivReturn.html("<a onclick='reloadPopup(this, null, event)' rel='"+backUrl+"'>&lt;&lt; Back</a>");
-	
-	if (event!=null)
-		event.stopPropagation();
-}
-
-/**
- * This will refresh the current popup contents, assuming the popup
- * was created via an ajax call.
- * THIS IS A WORK IN PROGRESS, UNFINISHED
- */
-function refreshPopup(url, event)
-{
-	var reloadDiv = $("#reload-div");
-	var reloadDivReturn = $("#reload-div-return");
-	
-	var url = $(element).attr("rel");
-	
-	if (url==null)
-		return;
-	reloadDiv.load(url);
-	
-	if (backUrl==null)
-		reloadDivReturn.html("");
-	else
-		reloadDivReturn.html("<a onclick='reloadPopup(this, null, event)' rel='"+backUrl+"'>&lt;&lt; Back</a>");
-	
-	if (event!=null)
-		event.stopPropagation();
-}
-
-//function changeStoreSale()
-//{
-//	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
-//		if (sale!=null)
-//		{
-//			window.location.href="/ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
-//		}
-//	});
-//	
-//}
-
-
-function destroyThrowaway()
-{
-	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
-		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
-	});
-}
-
-function popupPremiumReminder()
-{
-	if (window.isPremium==false)
-	{
-		$("body").append("<p id='premiumReminder' class='highlightbox-green' style='position:fixed; bottom:0px;z-index:19999999; left:0px;right:0px; background-color:#000000;'>" +
-				"When you donate at least 5 dollars, you get a premium account for life!<br>" +
-				"Premium member's characters always remember their house when they die, and " +
-				"their names show up as red in chat.<br>" +
-				"There are a lot more benefits coming for premium members <a onclick='viewProfile()'>" +
-				"so check out more details here!</a>" +
-				"</p>");
-	}
-}
-
-function popupCharacterTransferService(currentCharacterId, currentCharacterName, characterNameToAccept)
-{
-	if (characterNameToAccept==null || characterNameToAccept=="")
-		characterNameToAccept = "[No character specified]";
-		
-	var content = "This service allows you to transfer characters between user accounts. In order to transfer a character " +
-			"you have to first click on the `Accept Character by Name` link and type the name of the character that you will " +
-			"accept. Then log into the account with the character you want to transfer and click the `Transfer Character to Another Account` " +
-			"link. You will then specify the email address of the account you wish to transfer your character to. The transfer " +
-			"will be made instantly at that point." +
-			"<br>" +
-			"<strong>Please note that character names are case sensitive and email addresses must be all lower case!</strong>" +
-			"<br>" +
-			"<br>" +
-			"<h5>You are currently waiting to accept: <span class='main-item-subnote'>"+characterNameToAccept+"</span></h5>" +
-			""+
-			"<p><a onclick='acceptCharacterTransfer()'>Accept Character by Name</a></p>" +
-			"<p><a onclick='transferCharacter("+currentCharacterId+",\""+currentCharacterName+"\")'>Transfer Character to Another Account</a></p>" +
-			"";
-//	<p><a onclick='acceptCharacterTransfer()'>Accept Character by Name</a></p>
-//	<p><a onclick='transferCharacter("${characterName}")'>Transfer Character to Another Account</a></p>
-	
-	$(".cluetip").hide();
-	
-	popupMessage("Character Transfer Service", content, false);
-}
-
-function acceptCharacterTransfer()
-{
-	promptPopup("Accept Character Transfer", "What is the name of the character you are going to transfer to this account? \n\nPlease note that the name is case sensitive!", "", function(charName){
-		if (charName!=null)
-		{
-			window.location.href = "/ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode;
-		}
-	});
-}
-
-function transferCharacter(currentCharName)
-{
-	promptPopup("Transfer Character To..", "Please type the email address of the account you wish to transfer this character to.\n\nPlease note that you are currently using: "+currentCharName, "", function(email){
-		if (email!=null)
-		{
-			window.location.href = "/ServletUserControl?type=transferCharacter&email="+email+"&v="+window.verifyCode;
-		}
-	});
-}
-
-function dropAllInventory(event)
-{
-	confirmPopup("Drop ALL Inventory", "Are you sure you want to drop EVERYTHING in your inventory on the ground?\n\nPlease note that items for sale in your store and equipped items will be excluded.", function(){
-		doCommand(event, "CharacterDropAll");
-	});
-}
-
-////////////////////////////////////////////////////////
-//Batch item functions
-/**
- * @param fromSelector - should select the item divs themselves, not the parent (selection-list)
- * @param toSelector - this is the encompassing div we'll be adding to
- * @param delimitedIds - The list of ID's we'll be removing from the original list (fromSelector)
- * @param newHtml - Raw HTML to add to the new list (toSelector)
- */
-function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
-{
-	var itemsList = "[ref="+(delimitedIds || "").split(",").join("],[ref=")+"]";
-	
-	var selectedItems = $(fromSelector).filter(itemsList);
-	// Get rid of following line breaks first.
-	selectedItems.next("br").remove();
-	selectedItems.remove();
-	
-	var container = $(toSelector);
-	container.html(newHtml+container.html());
-}
-
-/**
- * This call is used to set the checkboxes in the inventory headers. Required to be called
- * using an event, so we can get the root and work from there (on popups with multiple
- * roots, such as inventory/equipment, this keeps us in the correct context).
- * @param event - Event object fired from the user action. Used to get context list.
- * @param groupId - Specified when clicking on a select group checkbox, bypassing checkbox state for groups entirely
- */
-function setSelectionCheckboxes(event, groupId)
-{
-	// On link clicks, currentTarget should be null since it's not assigned from a shared parent
-	// The link itself has the onclick, so coalesce to event.target
-	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
-	var allItems = selectRoot.find(".main-item:visible");
-	var checkedItems = allItems.has("input:checkbox:checked");
-	
-	// Check-all first
-	selectRoot.find("input:checkbox.check-all")
-		.prop({
-			checked: allItems.length > 0 && checkedItems.length == allItems.length,
-			indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
-		});
-	
-	// If we pass in a groupId, that means we've clicked a group checkbox already.
-	// There won't be any overlapping groups (yet), so don't bother doing anything else with groups.
-	if(groupId == null || groupId == "")
-	{
-		// Check if this event belongs to a group. We can limit our selection that way.
-		var belongsToGroup = $(event.currentTarget || event.target).parents(".selection-group").prop("id");
-		
-		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]" 
-		selectRoot.find("input:checkbox.check-group" + groupFilter).each(function(idx, grp) {
-			var groupCB = $(grp);
-			var groupItems = allItems.filter("#" + groupCB.attr("ref") + " .main-item");
-			var groupChecked = checkedItems.filter(groupItems);
-			groupCB
-				.prop({
-					checked:groupItems.length > 0 && groupChecked.length == groupItems.length,
-					indeterminate: groupChecked.length > 0 && groupChecked.length != groupItems.length
-				});
-			// Set the checkbox enabled state in case there are new elements
-			// in the group.
-			groupCB.get(0).disabled = groupItems.length == 0;
-		});
-	}
-}
-
-function selectedItemsDrop(event, selector)
-{
-	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;
-	
-	confirmPopup("Drop Selected Inventory", "Are you sure you want to drop " + batchItems.length + " selected items on the ground?\n\nPlease note that items for sale in your store will be excluded.", function(){
-		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-
-		// This command causes the popup to reload, so no need for a callback.
-		doCommand(event,"ItemsDrop",{"itemIds":itemIds});
-	});
-}
-
-function selectedItemsRemoveFromStore(event, selector)
-{
-	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;
-	
-	confirmPopup("Remove Items from Store", "Are you sure you want to remove " + batchItems.length + " selected items from your store?", function(){
-		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-
-		doCommand(event,"ItemsStoreDelete",{"itemIds":itemIds}, function(data, error){
-			if (error) return;
-			moveSelectedElements(selector, "#invItems", data.processedItems || "", data.createInvItem);
-			setSelectionCheckboxes(event);
-		});
-	});
-}
-
-function selectedItemsSell(event, selector)
-{
-	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;
-	promptPopup("Sell Multiple Items", "How much do you want to sell these " + batchItems.length + " selected items for?", "0", function(amount){
-		if (amount!=null && amount!="")
-		{
-			var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-	
-			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
-				if (error) return;
-				moveSelectedElements(selector, "#saleItems", data.processedItems || "", data.createSellItem);
-				setSelectionCheckboxes(event);
-			});
-		}
-	});
-}
-
-function selectedItemsTrade(event, selector)
-{
-	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;
-	
-	confirmPopup("Trade Items", "Are you sure you want to trade " + batchItems.length + " selected items?", function(){
-		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-
-		doCommand(event,"ItemsTrade",{"itemIds":itemIds}, function(data, error){
-			if (error) return;
-			moveSelectedElements(selector, "#yourTrade", data.processedItems || "", data.createTradeItem);
-			tradeVersion = data.tradeVersion;
-			setSelectionCheckboxes(event);
-		});
-	});
-}
-
-function characterEquipSet(event, containerId){
-	doCommand(event, "CharacterEquipSet", {"containerId":containerId}, loadInventoryAndEquipment);
-}
-
-function characterUnequipItem(event, itemId)
-{
-	doCommand(event, "CharacterUnequipItem", {"itemId":itemId}, loadInventoryAndEquipment);
-}
-
-function characterUnequipAll(event)
-{
-	doCommand(event, "CharacterUnequipAll", null, loadInventoryAndEquipment);
-}
-
-function giveHouseToGroup(eventObject)
-{
-	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
-		doCommand(eventObject,"GivePlayerHouseToGroup")});
-}
-
-function refreshInstanceRespawnWarning()
-{
-	if (window.instanceRespawnMs!=null)
-	{
-		var now = new Date().getTime();
-		var seconds = (window.instanceRespawnMs - now)/1000;
-		var warning = $("#instanceRespawnWarning");
-		if (seconds<=0)
-			warning.text("Reinforcements will arrive at any moment! If you do not vacate the premises before they arrive, you will be forced out!");
-		else
-			warning.text("Reinforcements will arrive in "+secondsElapsed(seconds)+". If you do not vacate the premises before they arrive, you will be forced out!");
-		warning.show();
-	}
-	else
-	{
-		var warning = $("#instanceRespawnWarning");
-		warning.text("");
-		warning.hide();
-	}
-}
-
-//function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
-//{
-//	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
-//		window.location.href = "/ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
-//	});
-//}
-
-function giftPremium()
-{
-	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
-		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
-			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
-		}, function(){
-			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
-		});
-	});
-}
-
-function newPremiumToken()
-{
-	confirmPopup("Create new premium token?", "Are you sure you want to create a premium token and put it in your inventory?\n\nBe aware that this token can be traded AND looted if you die.", function(){
-		window.location.href = "/ServletUserControl?type=newPremiumToken"+"&v="+window.verifyCode;
-	});
-}
-
-function newCharacterFromUnconscious()
-{
-	confirmPopup("Create a new character?", "If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
-		window.location.href = "/ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode;
-	});
-}
-
-function enterDefenceStructureSlot(slot)
-{
-	if (slot=="Defending1" || slot=="Defending2" || slot=="Defending3")
-	{
-		confirmPopup("Defend this structure?", "Are you sure you want to defend this structure? If you do this, other players will be able to attack and kill you.", function(){
-			window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
-		});
-	}
-	else
-	{
-		window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
-	}
-}
-
-var popupStackCloseCallbackHandlers = [];
-var currentPopupStackIndex = 0;
-var popupKeydownHandler = function(e){if (e.keyCode == 27) closePagePopup();}
-function incrementStackIndex()
-{
-	currentPopupStackIndex++;
-    if (currentPopupStackIndex==1)
-    {
-		$(".main-page #page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
-	    $(document).bind("keydown", popupKeydownHandler);
-    }
-    else
-   	{
-    	$("#page-popup"+(currentPopupStackIndex-1)).hide();
-   	}
-    return currentPopupStackIndex;
-}
-
-function decrementStackIndex()
-{
-	if (currentPopupStackIndex==0)
-		return 0;
-	
-	currentPopupStackIndex--;
-	if (currentPopupStackIndex==0)
-	{
-		$("#page-popup-root").empty();
-		$(".page-popup-newui").remove();
-		$(document).unbind("keydown", popupKeydownHandler);
-	}
-	else
-	{
-		$("#page-popup"+currentPopupStackIndex).show();
-		$("#page-popup"+(currentPopupStackIndex+1)).remove();
-	}
-	return currentPopupStackIndex;
-}
-
-function pagePopup(url, closeCallback)
-{
-	if (url.indexOf("?")>0)
-		url+="&ajax=true";
-	else
-		url+="?ajax=true";
-	
-	exitFullscreenChat();
-	
-	var stackIndex = incrementStackIndex();
-	var pagePopupId = "page-popup"+stackIndex;
-	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
-	$("#"+pagePopupId+"-content").load(url);
-	
-	if (closeCallback!=null)
-		popupStackCloseCallbackHandlers.push(closeCallback);
-	else
-		popupStackCloseCallbackHandlers.push(null);
-}
-
-function pagePopupIframe(url)
-{
-	
-	if (url.indexOf("?")>0)
-		url+="&ajax=true";
-	else
-		url+="?ajax=true";
-	
-	exitFullscreenChat();
-	
-	var stackIndex = incrementStackIndex();
-	var pagePopupId = "page-popup"+stackIndex;
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><iframe id='"+pagePopupId+"-content' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></iframe></div>");
-}
-
-function closePagePopup(doNotCallback)
-{
-	var pagePopupId = "page-popup"+currentPopupStackIndex;
-	if ($("#"+pagePopupId+"-map").length>0)
-	{
-		closeMap();
-	}
-	
-	decrementStackIndex();
-	
-	if (doNotCallback!=true)
-	{
-		var func = popupStackCloseCallbackHandlers.pop();
-		if (func!=null)
-			func();
-	}
-}
-
-function closeAllPagePopups(doNotCallback)
-{
-	while (currentPopupStackIndex>0)
-	{		
-		closePagePopup(doNotCallback);
-	}
-}
-
-function closeAllPopupsTooltips(doNotCallback)
-{
-    closeAllPagePopups(doNotCallback);
-    closeAllPopups();
-    closeAllTooltips();
-}
-
-
-function reloadPagePopup(quietly)
-{
-	if (currentPopupStackIndex==0)
-		return;
-
-	var pagePopupId = "page-popup"+currentPopupStackIndex;
-
-	// Map can't be refreshed, but map popup will return empty content as well
-	var content = $("#"+pagePopupId+"-content");
-	if (content.length==0)
-		return;
-	
-	var url = content.attr("src");
-
-	if (quietly==false)
-		content.html("<img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/>");
-	else
-	{
-		$(".page-popup-Reload").html("<img src='/javascript/images/wait.gif' border=0 style='margin-top:20px;'/>");
-		$("#page-popup-reloadbutton").html("<img src='/javascript/images/wait.gif' border=0/>");	// new ui variant
-	}
-
-	if (content.is("iframe"))
-	{
-		content.attr('src', url);
-	}
-	else 
-	{
-		content.load(url, null, function(){
-			$(".page-popup-Reload").html("&#8635;");
-			$("#page-popup-reloadbutton").html("&#8635;");	// new ui variant
-		});
-	}
-}
-
-function moveItem(event, itemId, newContainerKind, newContainerId)
-{
-	ajaxAction("/ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode, event, function(){
-		reloadPagePopup(true);
-	});
-}
-
-function loadInlineItemsAndCharacters()
-{
-	$("#inline-items").load("locationitemlist.jsp?ajax=true");	
-	$("#inline-characters").load("locationcharacterlist.jsp?ajax=true");	
-}
-
-function loadInlineCollectables()
-{
-	$("#collectables-area").load("ajax_collectables.jsp?ajax=true");	
-}
-
-function inventory()
-{
-    closeAllPopupsTooltips();
-	pagePopup("/odp/ajax_inventory.jsp", null, "Your Inventory");
-}
-
-function viewChangelog()
-{
-    closeAllPopupsTooltips();
-	pagePopup("/ajax_changelog.jsp");
-}
-
-function viewSettings()
-{
-    closeAllPopupsTooltips();
-	pagePopup("/odp/ajax_settings.jsp");
-}
-
-function viewProfile()
-{
-    closeAllPopupsTooltips();
-	pagePopup("/odp/view_profile", "Your Profile");
-}
-
-function viewMap()
-{
-    closeAllPopupsTooltips();
-	openMap();
-}
-
-function renameCharacter(eventObject, currentCharName)
-{
-	promptPopup("Rename Character", "Ok, what will you call your character?", currentCharName, function(name){
-		doCommand(eventObject, "RenameUnnamedPlayer", {"newName":name});
-	});
-}
-
-function deleteAndRecreateCharacter(currentCharName)
-{
-	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
-		if (currentCharName==null)
-			currentCharName = "";
-		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
-			window.location.href = "/ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+window.verifyCode;
-		});
-	});
-}
-
-function doDrinkBeer(eventObject)
-{
-	doCommand(eventObject,"DrinkBeer");
-}
-
-/**
- * Calls the command to forget the combat site
- * @param eventObject
- * @param locationId   This is the locationId of the combat site you want to forget.
- */
-function doForgetCombatSite(eventObject, locationId)
-{
-	doCommand(eventObject, "ForgetCombatSite", {"locationId" : locationId});
-}
-
-/**
- * Calls the command to forget all combat sites/destroyed camps
- * @param eventObject
- * @param forgettableCombatSiteArray
- */
-function doForgetAllCombatSites(eventObject, forgettableCombatSiteArray)
-{
-	confirmPopup("System Message","Are you sure you want to forget all combat sites in this location?", 
-			function(){doCommand(eventObject, "ForgetAllCombatSites", {"forgettableCombatSiteArray" : forgettableCombatSiteArray})});
-}
-
-/**
- * Calls the command to show all hidden sites.
- * @param eventObject
- */
-function doShowHiddenSites(eventObject)
-{
-	doCommand(eventObject, "ShowHiddenSites");
-}
-
-function resendVerificationEmail()
-{
-	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
-		location.href = "/ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode;
-	});
-	
-}
-
-function changeEmailAddress(oldEmail)
-{
-	promptPopup("Change email", "What email address would you like to use for your account?", oldEmail, function(value){
-		location.href = "/ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value)+"&v="+window.verifyCode;
-	});
-}
-
-function viewReferrals()
-{
-	pagePopup("/ajax_referrals.jsp");
-}
-
-function customizeItemOrderPage(itemId)
-{
-    closeAllPopupsTooltips();
-	pagePopup("/ajax_customizeitem.jsp?itemId="+itemId);
-}
-
-function orderItemCustomization(itemId, orderTypeId, requiredDetails)
-{
-	confirmPopup("Are you sure?", "This will send an email to a content developer notifying them that you'd like to customize an item.<br>You will be asked to provide some details in the next popup.", function(){
-		promptPopup("Customization Details", requiredDetails, "", function(value){
-			location.href="/ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+window.verifyCode+"&requiredDetails="+encodeURIComponent(value);
-		});
-	});
-}
-
-function doTriggerLocation(event, effectId, locationId)
-{
-	doTriggerEffect(event, "Link", effectId, "location", locationId);
-}
-
-function doTriggerItem(event, effectId, itemId)
-{
-	doTriggerEffect(event, "Link", effectId, "item", itemId);
-}
-
-function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
-{
-	closeAllTooltips();
-	
-	var params = {"scriptId": effectId };
-	params[sourceType + "Id"] = sourceId;
-	doCommand(event, "Script"+effectType, params);
-}
-
-function doAttack(eventObject, charId)
-{
-    closeAllPopups();
-    closeAllTooltips();
-    doCommand(eventObject,"Attack",{"charId":charId});
-}
-
-function leaveParty(eventObject) {
-	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
-		doCommand(eventObject, "LeaveParty");
-	});
-}
-
-function joinParty(eventObject, partyCode) {
-	doCommand(eventObject, "PartyJoin", {"partyCode": partyCode});
-}
-
-//Old leave party function
-function leaveParty()
-{
-	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
-		location.href = "/ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
-	});
-}
-
-function combatAttackWithLeftHand()
-{
-	location.href = "/ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode;
-}
-
-function combatAttackWithRightHand()
-{
-	location.href = "/ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode;
-}
-
-function combatEscape()
-{
-	location.href = "/ServletCharacterControl?type=escape"+"&v="+window.verifyCode;
-}
-
-function combatAllowCharacterIn()
-{
-	location.href = "/ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode;
-}
-
-function storeDisabled()
-{
-	location.href = "/ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode;
-}
-
-function storeEnabled()
-{
-	location.href = "/ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
-}
-
-////////////////////////////////////////////////////////
-// BUTTON BAR TOGGLES
-function toggleStorefront(eventObject)
-{
-	doCommand(eventObject, "ToggleStorefront", {"buttonId" : eventObject.currentTarget.id});
-}
-
-function togglePartyJoins(eventObject)
-{
-	doCommand(eventObject, "TogglePartyJoins", {"buttonId" : eventObject.currentTarget.id});
-}
-
-function toggleDuelRequests(eventObject)
-{
-	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
-	//doCommand(eventObject, "ToggleDuelRequests", {"buttonId" : eventObject.currentTarget.id});
-}
-
-function toggleCloaked(eventObject)
-{	
-	doCommand(eventObject, "ToggleCloak", {"buttonId" : eventObject.currentTarget.id});
-}
-
-function toggleHideUserActivity(eventObject)
-{
-	doCommand(eventObject, "ToggleHideUserActivity");
-}
-
-function campsiteDefend()
-{
-	location.href = "/ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
-}
-
-function leaveAndForgetCombatSite(pathId)
-{
-	location.href = "/ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode;
-}
-
-function forgetCombatSite(locationId)
-{
-	location.href = "/ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
-}
-
-function groupAcceptJoinGroupApplication(eventObject, characterId)
-{
-	doCommand(eventObject, "GroupAcceptJoinApplication", {"characterId" : characterId});
-}
-
-function groupDenyJoinGroupApplication(eventObject, characterId)
-{
-	doCommand(eventObject, "GroupDenyJoinApplication", {"characterId" : characterId});
-}
-
-function groupMemberKick(eventObject, characterId)
-{
-	doCommand(eventObject, "GroupMemberKick", {"characterId" : characterId});
-}
-
-function groupMemberKickCancel(characterId)
-{
-	location.href = "/ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
-}
-
-function groupRequestJoin(eventObject, groupId)
-{
-	doCommand(eventObject, "GroupRequestJoin", {"groupId" : groupId});
-}
-
-function groupMergeRequestsAllow(eventObject)
-{
-	doCommand(eventObject, "GroupMergeAllowRequests");
-}
-
-function groupMergeRequestsDisallow(eventObject)
-{
-	doCommand(eventObject, "GroupMergeDisallowRequests");
-}
-
-function groupMergeDenyApplication(eventObject, groupId)
-{
-	confirmPopup("Deny Merge Request", "Are you sure you want to deny this merge request?", function(){
-		doCommand(eventObject, "GroupMergeDenyApplication", {"groupId" : groupId});
-	});
-}
-
-function groupMergeAcceptApplication(eventObject, groupId)
-{
-	confirmPopup("Accept Merge Request", "Are you sure you want to accept this merge request? All group members and group houses will transfer to this group.", function(){
-		doCommand(eventObject, "GroupMergeAcceptApplication", {"groupId" : groupId});
-	});
-}
-
-function groupMergeSubmitRequest(eventObject, groupId)
-{
-	confirmPopup("Submit Merge Request", "Are you sure you want to submit this merge request? All group members and group houses will transfer to the group.<br/>Note that you can only have 1 active merge request at a time.", function(){
-		doCommand(eventObject, "GroupMergeSubmitRequest", {"groupId" : groupId});
-	});
-}
-
-function groupMergeCancelRequest(eventObject)
-{
-	confirmPopup("Cancel Merge Request", "Are you sure you want to cancel this merge request?", function(){
-		doCommand(eventObject, "GroupMergeCancelRequest");
-	});
-}
-
-function tradeRemoveItem(itemId)
-{
-	location.href = "/ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
-}
-
-function tradeCancel()
-{
-	location.href = "/ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode;
-}
-
-function tradeReady(version)
-{
-	location.href = "/ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode;
-}
-
-function tradeAddItem(itemId)
-{
-	location.href = "/ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
-}
-
-function partyJoin(characterId)
-{
-	location.href = "/ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
-}
-
-function tradeStartTradeNew(eventObject,characterId)
-{
-	closeAllTooltips();
-	doCommand(eventObject,"TradeStartTrade",{"characterId":characterId},function(data,error){
-		if (error) return;
-		_viewTrade();
-		popupMessage("Trade Started", data.tradePrompt);	
-	})
-}
-
-function tradeRemoveItemNew(eventObject,itemId)
-{
-	doCommand(eventObject,"TradeRemoveItem",{"itemId":itemId},function(data,error){
-		if (error) return;
-		$(".tradeItem[ref='"+itemId+"']").remove();
-		var container = $("#invItems");
-		container.html(data.createTradeInvItem+container.html());
-		tradeVersion = data.tradeVersion;
-	})
-}
-
-function tradeCancelNew(eventObject)
-{
-	doCommand(eventObject,"TradeCancel")
-}
-
-function tradeReadyNew(eventObject)
-{
-	doCommand(eventObject,"TradeReady",{"tradeVersion":tradeVersion},function(data,error){
-		if (error) return;
-		if (data.tradeComplete == "complete")
-			{
-				popupMessage("Trade Complete","Trade is complete.")
-				closePagePopup(true);
-			}
-	});
-}
-
-function tradeAddItemNew(eventObject,itemId)
-{
-	doCommand(eventObject,"TradeAddItem",{"itemId":itemId},function(data,error){
-		if (error) return;
-		$(".invItem[ref='"+itemId+"']").remove();
-		var container = $("#yourTrade");
-		container.html(data.createTradeItem+container.html());
-		tradeVersion = data.tradeVersion;
-	})
-}
-
-function tradeSetGoldNew(eventObject,currentDogecoin,curAvailDogecoin)
-{
-	promptPopup("Trade Gold", "How much gold do you want to add to the trade (out of "+ curAvailDogecoin +"):", currentDogecoin+"", function(amount){
-		if (amount!=null && amount!="")
-		{
-			doCommand(eventObject,"TradeSetGold",{"amount":amount},function(data,error){
-				if (error) return;
-				$("#myTradeGoldAmount").text(data.newTradeGoldAmount);
-				tradeVersion = data.tradeVersion;
-			})
-			
-		}
-	});
-}
-
-function tradeAddAllItemsNew(eventObject)
-{
-	doCommand(eventObject,"TradeAddAllItems");
-	reloadPagePopup();
-}
-	
-
-function duelRequest(characterId)
-{
-	location.href = "/ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
-}
-
-function viewManageStore()
-{
-    closeAllPagePopups();
-    closeAllPopups();
-    closeAllTooltips();
-    pagePopup("/odp/ajax_managestore.jsp", null, "Your Store");
-}
-
-function newCharacterFromDead()
-{
-	location.href = "/ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
-}
-
-function switchCharacter(characterId)
-{
-	location.href = "/ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
-}
-
-function logout()
-{
-	location.href = "/ServletUserControl?type=logout"+"&v="+verifyCode;
-}
-
-function attackStructure()
-{
-	location.href = "/ServletCharacterControl?type=attackStructure"+"&v="+verifyCode;
-}
-
-function allowDuelRequests()
-{
-	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
-	return;
-	location.href = "/ServletCharacterControl?type=allowDuelRequests"+"&v="+verifyCode;
-}
-
-function disallowDuelRequests()
-{
-	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
-	return;
-	location.href = "/ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
-}
-
-function viewStore(characterId)
-{
-	pagePopup("/odp/ajax_viewstore.jsp?characterId="+characterId+"");
-}
-
-function setBlockadeRule(rule)
-{
-	location.href = "/ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
-}
-
-function doEatBerry(eventObject)
-{	
-	var itemId = $("#popupItemId").val();
-	if (itemId == null) return;
-	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
-		if (error) return;
-		reloadPagePopup();
-		popupMessage("System Message", "That was a tasty berry! Makes you feel kinda weird though, like your insides are trying to become outsides. WOW OK, now you don't feel too good. But you understand why. You feel like you understand a lot of things.");
-	});
-}
-
-function doEatCandy(eventObject)
-{	
-	var itemId = $("#popupItemId").val();
-	if (itemId == null) return;
-	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
-		if (error) return;
-		reloadPagePopup();
-		popupMessage("System Message", "You eat the ancient candy bar and your insides gurgle back at you. You probably shouldn't eat too much of this. Who knows what could happen?");
-	});
-}
-
-function doDrinkElixir(eventObject)
-{	
-	var itemId = $("#popupItemId").val();
-	if (itemId == null) return;
-	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
-		if (error) return;
-		reloadPagePopup();
-		popupMessage("System Message", "As you sip down the liquid you feel a rush of energy that pulsates through your body. Your mind becomes hazy and you can only focus on defeating your enemies.");
-	});
-}
-function doDeleteCharacter(eventObject,characterId,characterName)
-{
-	confirmPopup("Delete Character","Are you sure you want to delete " + characterName + "?",function(){
-		confirmPopup("Delete Character","I mean, are you REALLY sure you want to delete " + characterName + "? You can't take it back!",function(){
-			doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
-				if(error) return;
-				$("a[onclick='switchCharacter(" + characterId +")']").parent("li").remove();
-			});
-		});
-	});
-}
-
-function doCombatEscape(event)
-{
-	doCommand(event, "CombatEscape");
-}
-
-function doCombatAttackLeftHand(event)
-{
-	doCommand(event, "CombatAttack", {"hand":"LeftHand"});
-}
-
-function doCombatAttackRightHand(event)
-{
-	doCommand(event, "CombatAttack", {"hand":"RightHand"});
-}
-
-function viewExchange()
-{
-	pagePopup("/odp/ajax_exchange");
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-////////////////////////////////////////////////////////
-// COMMANDS
-
-function ajaxUpdatePage(ajaxResponseData)
-{
-	// Here we update the screen with fresh html that came along with the response
-	if (ajaxResponseData.responseHtml!=null && ajaxResponseData.responseHtml.length>0)
-	{
-		for(var i = 0; i<ajaxResponseData.responseHtml.length; i++)
-		{
-			var htmlData = ajaxResponseData.responseHtml[i];
-			if (htmlData.type==0)
-			{
-				$(htmlData.selector).html(htmlData.html);
-			}
-			else if (htmlData.type==1)
-			{
-				$(htmlData.selector).replaceWith(htmlData.html);
-			}
-			else if (htmlData.type==2)
-			{
-				$(htmlData.selector).first().before(htmlData.html);
-			}
-			else if (htmlData.type==3)
-			{
-				$(htmlData.selector).last().after(htmlData.html);
-			}
-			else if (htmlData.type==4)
-			{
-				$("#"+htmlData.id).remove();
-				$("body").append("<script id='"+htmlData.id+"' type='text/javascript'>"+htmlData.js+"</script>");
-			}
-		}
-	}
-}
-
-
-function doCommand(eventObject, commandName, parameters, callback)
-{
-	// Changing to a post now, so no need to generate the URL parameter string anymore.
-	if (parameters==null)
-		parameters = {"v":verifyCode};
-	else
-		parameters.v = verifyCode;
-	
-	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
-	var url = "/cmd?cmd="+commandName;
-	
-	var clickedElement = null;
-	var originalText = null;
-	if (eventObject!=null)
-	{
-		clickedElement = $(eventObject.currentTarget);
-		if(clickedElement.find("img.wait").length == 0) {
-			originalText = clickedElement.html();
-			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
-		}
-	}
-	
-	// We need to post, as larger batch operations failed due to URL string being too long
-	$.post(url, parameters)
-	.done(function(data)
-	{
-		// Return clicked element back to original state first.
-		// Ajax updates get overwritten if they're not simple updates
-		// on the original element.
-		if (eventObject!=null && originalText)
-			clickedElement.html(originalText);
-		
-		if (data.antiBotQuestionActive == true)
-		{
-			antiBotQuestionPopup();
-			return;
-		}
-		
-		// Refresh the full page or the pagePopup if applicable
-		if (data.javascriptResponse == "FullPageRefresh")
-		{
-			fullpageRefresh();
-			return;		// No need to go any further, we're refreshing the page anyway
-		}
-		else if (data.javascriptResponse == "ReloadPagePopup")
-			reloadPagePopup();
-
-		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
-		ajaxUpdatePage(data);
-
-		// Here we display the system message if there was a system message
-		if (data.message!=null && data.message.length>0)
-			popupMessage("System Message", data.message);
-
-		// Here we display an error message popup if there was an error
-		var error = false;
-		if (data.errorMessage!=null && data.errorMessage.length>0)
-		{
-			error = true;
-			popupMessage("System Message", data.errorMessage);
-		}
-
-		if (callback!=null && data!=null)
-			callback(data.callbackData, error);
-		else if (callback!=null && data==null)
-			callback(null, error);
-	
-	})
-	.fail(function(data)
-	{
-		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
-		if (eventObject!=null)
-			clickedElement.html(originalText);
-	});
-	
-	if (eventObject!=null)
-		eventObject.stopPropagation();
-	
-}
-
-function doSetLeader(eventObject, charId, charName)
-{
-	closeAllPopups();
-	closeAllTooltips();
-	confirmPopup("Set new leader", "Are you sure you want set " + charName + " to be the leader of your group?", function(){
-		doCommand(eventObject,"SetLeader",{"charId":charId});
-	});
-}
-
-function doSetLabel(eventObject, itemId)
-{
-	closeAllPopups();
-	closeAllTooltips();
-	promptPopup("Relabel storage item", "Enter the new label for your item.<br>(Or leave blank to reset to the original name.)", null, function(label){
-		doCommand(eventObject,"SetLabel",{"itemId":itemId,"label":label});
-	});
-}
-
-function doTerritoryClaim(eventObject)
-{
-	closeAllPopups();
-	closeAllTooltips();
-	confirmPopup("Territory", "You are trying to claim a territory. If you continue, the defenders of this territory might attack you.<br><br>Are you sure you want to continue?", function(){
-		doCommand(eventObject,"TerritoryClaim");
-	});
-}
-
-function doTerritoryVacate(eventObject)
-{
-	closeAllPopups();
-	closeAllTooltips();
-	confirmPopup("Territory", "By vacating, you are giving up the control of this territory.<br><br>Are you sure you want to continue?", function(){
-		doCommand(eventObject,"TerritoryVacate");
-	});
-}
-
-function doTerritoryRetreat(eventObject)
-{
-	closeAllPopups();
-	closeAllTooltips();
-	confirmPopup("Territory", "By retreating, you are leaving the territory.<br><br>Are you sure you want to continue?", function(){
-		doCommand(eventObject,"TerritoryRetreat");
-	});
-}
-
-function doTerritorySetRule(eventObject, rule)
-{
-	closeAllPopups();
-	closeAllTooltips();
-	doCommand(eventObject,"TerritorySetRule",{"rule":rule});
-}
-
-function doTerritorySetDefense(eventObject, line)
-{
-	closeAllPopups();
-	closeAllTooltips();
-	doCommand(eventObject,"TerritorySetDefense",{"line":line});
-}
-
-
-
-
-
-////////////////////////////////////////////////////////
-// LONG OPERATIONS
-
-
-
-
-
-
-
-function longOperation_fullPageRefresh(eventObject, operationName, operationDescription, operationBannerUrl, actionUrl, fullPageRefreshSeconds)
-{
-	var originalText = $(eventObject.currentTarget).html();
-	$(eventObject.currentTarget).html("<img src='/javascript/images/wait.gif' border=0/>");
-	$.get(url)
-	.done(function(data){
-		fullpageRefresh();
-		$(eventObject.currentTarget).html(data);
-	})
-	.fail(function(data){
-		fullpageRefresh();
-		popupMessage("ERROR", "There was a server error when trying to perform the "+operationName+" action. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
-		$(eventObject.currentTarget).html(originalText);
-	});
-	
-	eventObject.stopPropagation();
-	
-}
-
-
-var lastLongOperationEventObject = null;
-/**
- * 
- * @param eventObject
- * @param actionUrl
- * @param responseFunction This is the handler that is called when the operation returns. The data that is passed into the handler includes: data.isComplete (boolean), data.error (boolean), data.timeLeft (seconds remaining to wait)
- * @param recallFunction This function should call the original javascript call that includes the call to longOperation. This handler is invoked when the time on the long operation runs out.
- */
-function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
-{
-	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
-
-	if (actionUrl.indexOf("?")>0)
-		actionUrl+="&ajax=true";
-	else
-		actionUrl+="?ajax=true";
-	
-	$.get(actionUrl)
-	.done(function(data)
-	{
-		if (data.captcha==true)
-		{
-			antiBotQuestionPopup();
-			return;
-		}
-		
-		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
-		ajaxUpdatePage(data);
-		
-		if (data.error!=undefined)
-		{
-			hideBannerLoadingIcon();
-			popupMessage("System Message", data.error, false);
-			if (data.refresh==true)
-				fullpageRefresh();
-			return;
-		}
-		if (data.refresh==true)
-		{
-			fullpageRefresh();
-			return;
-		}
-		if (data.userMessage!=null)
-		{
-			popupMessage("System Message", data.userMessage, false);
-		}
-		if (responseFunction!=null)
-			responseFunction(data);
-		
-		if (data.isComplete==false)
-		{
-			if (data.timeLeft>=0)
-			{
-				setTimeout(recallFunction, (data.timeLeft+1)*1000);
-				if (data.timeLeft>=5)
-					popupPremiumReminder();
-			}
-		}
-		else
-		{
-			if (data.description!=null)
-				$("#long-operation-complete-text").html(data.description);
-		}
-		lastLongOperationEventObject = null;
-	})
-	.fail(function(xhr, textStatus, errorThrown){
-		if (errorThrown=="Internal Server Error")
-			popupMessage(errorThrown, "There was an error when trying to perform the action. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
-		else
-			popupMessage(errorThrown, "There was an error when trying to perform the action.");
-
-		lastLongOperationEventObject = null;
-	});
-	
-	if (eventObject!=null)
-		eventObject.stopPropagation();
-}
-
-function showBannerLoadingIcon()
-{
-	$("#banner-base").append("<img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/>");
-}
-
-function setBannerImage(url)
-{
-	bannerUrl = url;
-	updateDayNightCycle(true);
-}
-
-function setBannerOverlayText(title, text)
-{
-	if (text==null)
-		text = "";
-	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
-	
-	$(".travel-scene-text").remove();
-	$("#banner-base").append(contents);
-}
-
-function hideBannerLoadingIcon()
-{
-	$('#banner-loading-icon').remove();
-}
-
-function doGoto(event, pathId, attack)
-{
-	if (attack == null)
-		attack = false;
-	showBannerLoadingIcon();
-	longOperation(event, "/ServletCharacterControl?type=goto_ajax&pathId="+pathId+"&attack="+attack+"&v="+window.verifyCode, 
-			function(action) // responseFunction
-			{
-				if (action.isComplete)
-				{
-					//fullpageRefresh();
-				}
-				else
-				{
-					var locationName = action.locationName;
-					popupPermanentOverlay_Walking(locationName, window.biome);
-
-				}
-			},
-			function()	// recallFunction
-			{
-				doGoto(null, pathId, true, window.biome);
-			});
-}
-
-
-
-function doExplore(ignoreCombatSites)
-{
-	if (ignoreCombatSites == null)
-		ignoreCombatSites = false;
-	showBannerLoadingIcon();
-	longOperation(null, "/ServletCharacterControl?type=explore_ajax&ignoreCombatSites="+ignoreCombatSites+"&v="+window.verifyCode, 
-			function(action) // responseFunction
-			{
-				if (action.isComplete)
-				{
-					fullpageRefresh();
-				}
-				else
-				{
-					var locationName = action.locationName;
-					popupPermanentOverlay_Searching(locationName, window.biome);
-
-				}
-			},
-			function()	// recallFunction
-			{
-				doExplore(ignoreCombatSites, window.biome);
-			});
-}
-
-
-function doRest()
-{
-	showBannerLoadingIcon();
-	longOperation(null, "/ServletCharacterControl?type=rest_ajax"+"&v="+window.verifyCode, 
-			function(action) // responseFunction
-			{
-				if (action.isComplete)
-				{
-					fullpageRefresh();
-				}
-				else
-				{
-					hideBannerLoadingIcon();
-					setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
-					setBannerOverlayText("Resting..", action.description);
-				}
-			},
-			function()	// recallFunction
-			{
-				doRest();
-			});
-}
-
-
-function doCollectCollectable(event, collectableId)
-{
-	showBannerLoadingIcon();
-	longOperation(event, "/ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode, 
-			function(action) // responseFunction
-			{
-				if (action.isComplete)
-				{
-					fullpageRefresh();
-				}
-				else
-				{
-					setBannerImage(action.bannerUrl);
-					setBannerOverlayText("Collecting", "This process will take "+action.secondsToWait+" seconds..");
-					hideBannerLoadingIcon();
-				}
-			},
-			function()	// recallFunction
-			{
-				doCollectCollectable(null, collectableId);
-			});
-}
-
-
-
-
-/*
- * 1. Regular method doGoto() is called which calls longOperation, passes in the doGoto_ajaxResponse() function
- * 2. longOperation() ajax calls the server to setup OR continue the operation
- * 3. Ajax call returns an object with the current state (waitTime, variousArgs) and calls the doGoto_ajaxResponse()
- * 4. For certain return states (like messages/errors) the longOperation will handle it? (maybe)
- * 5. doGoto_ajaxResponse() knows how to handle a completed state and an unfinished state
- * 
- * If the page is refreshed, main.jsp will look for an ongoing longOperation before rendering, if it finds one
- * it will include a call to doGoto() with all the same parameters in some script tags.
- */
-
-function toggleMinimizeChat()
-{
-	$("#chat_tab").toggle();
-}
-
-function toggleMinimizeSoldItems()
-{
-	$("#soldItems").toggle();
-}
-
-function updateMinimizeBox(buttonElement, selector)
-{
-	$(window).load(function(){
-		var minimized = localStorage.getItem("minimizeBox"+selector);
-		if (minimized == "true")
-			minimizeBox({target:$(buttonElement)}, selector);
-		else
-			maximizeBox({target:$(buttonElement)}, selector);
-	});
-}
-
-function toggleMinimizeBox(event, selector)
-{
-	if (isBoxMinimized(selector) == "true")
-		maximizeBox(event, selector);
-	else
-		minimizeBox(event, selector);
-}
-
-function minimizeBox(event, selector)
-{
-	var height = $(event.target).height();
-	$(selector).height(height+6);
-	$(selector).css("overflow", "hidden");
-	localStorage.setItem("minimizeBox"+selector, "true");
-}
-
-function maximizeBox(event, selector)
-{
-	$(selector).height("auto");
-	$(selector).css("overflow", "");
-	localStorage.setItem("minimizeBox"+selector, "false");
-}
-
-function isBoxMinimized(selector)
-{
-	var minimized = localStorage.getItem("minimizeBox"+selector);
-	if (minimized==null) minimized = "false";
-	return minimized;
-}
-
-///////////////////////////////////////////
-// These are notification type handlers
-
-function fullpageRefresh()
-{
-	location.reload();
-}
-
-function _viewTrade()
-{
-    closeAllPopupsTooltips(true);
-	pagePopup("/odp/ajax_trade.jsp",function(){
-		doCommand(null,"TradeCancel");
-//		popupMessage("Trade Cancelled","This trade has been cancelled.")
-	});	
-}
-
-function updateTradeWindow()
-{
-	reloadPagePopup();
-}
-
-function cancelledTradeWindow()
-{
-	closeAllPagePopups(true);
-	popupMessage("Trade Cancelled","This trade has been cancelled.");
-}
-
-function completedTradeWindow()
-{
-	closeAllPagePopups(true);
-	popupMessage("Trade Completed","The trade completed successfully.");
-}
-
-function updateTerritory()
-{
-	var territoryView = $("#territoryView");
-	territoryView.html("<img src='/javascript/images/wait.gif' border=0/>"+territoryView.html());
-	territoryView.load("ajax_territoryview.jsp");
-}
-
-
-/////////////////////////////////////////
-// Shortcut key bindings
-
-
-$(document).keyup(function(event){
-	var buttonToPress = $('[shortcut="'+event.which+'"]');
-	if (buttonToPress.length>0)
-	{
-		buttonToPress[0].click();
-	}
-	else if (event.which==73) // I
-	{
-		inventory();
-	}
-	else if (event.which==77) // M
-	{
-		viewMap();
-	}
-	else if (event.which==79) // O
-	{
-		viewSettings();
-	}
-	else if (event.which==80) // P
-	{
-		viewProfile();
-	}
-	else if (event.which==76) // Changed to L since B is now for Nearby Characters list
-	{
-		window.location.href='main.jsp';
+		$('html, body').stop().animate({}, 500, 'linear');
 	}
 });
 
-
-
-
-
-
-
-
-
-
-
-function secondsElapsed(secondsToConvert)
-{
-    if (secondsToConvert<0)
-        secondsToConvert=secondsToConvert*-1;
-    if (secondsToConvert==0)
-        return "now";
-
-    var dSeconds = secondsToConvert;
-    var dDays = Math.floor(dSeconds/86400);
-    dSeconds = dSeconds-(dDays*86400);
-    var dHours = Math.floor(dSeconds/3600);
-    dSeconds = dSeconds-(dHours*3600);
-    var dMinutes = Math.floor(dSeconds/60);
-    dSeconds = Math.floor(dSeconds-(dMinutes*60));
-
-    if (dDays==1)
-        return dDays+" day";
-    else if (dDays>1)
-        return dDays+" days";
-
-    if (dHours==1)
-        return dHours+" hour";
-    else if (dHours>1)
-        return dHours+" hours";
-
-    if (dMinutes==1)
-        return dMinutes+" minute";
-    else if (dMinutes>1)
-        return dMinutes+" minutes";
-
-    if (dSeconds==1)
-        return dSeconds+" second";
-    else if (dSeconds>1)
-        return dSeconds+" seconds";
-
-    return "less than 1 second";
-}
-
-
-function xorShift32(seed) 
-{
-    seed ^= (seed << 11);
-    seed ^= (seed >>> 25);
-    seed ^= (seed << 8);
-    var out = seed % 127521;     
-    return (out < 0) ? -out : out;
-}
-
-function rnd(seed, min, max)
-{
-	var rand = xorShift32(seed);
-	var dbl = (rand/127521);
- 
-    return (dbl*(max-min))+min;
-}
-
-function stopEventPropagation(evt) {
-    if (typeof evt.stopPropagation != "undefined") {
-        evt.stopPropagation();
-    } else {
-        evt.cancelBubble = true;
-    }
-}
-
-//function slideLoaded(img){
-//    var $img = $(img),
-//        $slideWrapper = $img.parent(),
-//         total = $slideWrapper.find('img').length,
-//       percentLoaded = null;
-//
-//    $img.addClass('loaded');
-//
-//    var loaded = $slideWrapper.find('.loaded').length;
-//
-//    if(loaded == total){
-//        percentLoaded = 100;
-//        // INSTANTIATE PLUGIN
-//        $slideWrapper.easyFader();
-//    } else {
-//        // TRACK PROGRESS
-//        percentLoaded = loaded/total * 100;
-//   };
-//};
-
-
-
-
-////////////////////////////////////////////////////
-// Page popups
-
-
-function confirmPopup(title, content, yesFunction, noFunction)
-{
-	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
-	var popupClassOverride = null;
-	if (popupClassOverride==null)
-		popupClassOverride = "popup";
-	closeAllPopups();
-    window.popupsNum++;
-    window.popupsOpen++;
-    window.popupsArray[popupsNum-1] = "yes";
-    $("#popups").show();
-    currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div tabindex="0" id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p><br></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_yes">Yes</a><a id="'+unique+'-no"  class="popup_confirm_no">No</a></div></div></div></div>');
-    expandpopupMessage();
-    
-    var popupRoot = $('#popupWrapperBackground_' + popupsNum).focus();
-
-    popupRoot.css("outline", "0px solid tranparent");
-    popupRoot.focus();
-    
-    popupRoot.keyup(function(e){
-    	stopEventPropagation(e);
-    });
-    popupRoot.keydown(function(e){
-    	stopEventPropagation(e);
-        if (e.keyCode == 13) 
-        {
-        	closepopupMessage(currentPopup());
-        	if (yesFunction)
-        	{
-        		yesFunction();
-        	}
-        }
-        if (e.keyCode == 27)
-        {
-        	closepopupMessage(currentPopup());
-        	if (noFunction)
-        	{
-        		noFunction();
-        	}
-        }
-    });
-    
-    
-    
-    $("#"+unique+"-yes").click(function(){
-    	closepopupMessage(currentPopup());
-    	if (yesFunction)
-    	{
-    		yesFunction();
-    	}
-    });
-    $("#"+unique+"-no").click(function(){
-    	closepopupMessage(currentPopup());
-    	if (noFunction)
-    	{
-    		noFunction();
-    	}
-    });
-    
-    
-}
-
-function promptPopup(title, content, defaultText, yesFunction, noFunction)
-{
-	if (content!=null)
-		content = content.replace("\n", "<br>");
-	
-	if (defaultText==null)
-		defaultText = "";
-	
-	defaultText = defaultText+"";
-	
-	defaultText = defaultText.replace("\"", "`").replace("'", "`")
-	
-	
-	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
-	var popupClassOverride = null;
-	if (popupClassOverride==null)
-		popupClassOverride = "popup";
-	closeAllPopups();
-    window.popupsNum++;
-    window.popupsOpen++;
-    window.popupsArray[popupsNum-1] = "yes";
-    $("#popups").show();
-    currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p style="margin:0px">' + content + '</p><br><div style="text-align:center"><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/></div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div></div></div></div>');
-    //$("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="page-popup"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><p>' + content + '</p><br><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div>');
-    expandpopupMessage();
-    
-    var inputText = $('#popup_prompt_input_'+unique);
-    
-    inputText.focus();
-    inputText.select();
-
-    inputText.keyup(function(e){
-    	stopEventPropagation(e);
-    });
-    inputText.keydown(function(e){
-    	stopEventPropagation(e);
-        if (e.keyCode == 13) 
-        {
-        	var value = null;
-        	if (yesFunction)
-            	value = $('#popup_prompt_input_'+unique).val();
-        	
-        	closepopupMessage(currentPopup());
-        	
-        	if (yesFunction)
-        		yesFunction(value);
-        }
-        if (e.keyCode == 27)
-        {
-        	closepopupMessage(currentPopup());
-        	if (noFunction)
-        	{
-        		noFunction();
-        	}
-        }
-        
-        e.stopPropagation();
-    });
-    
-    
-    
-    $("#"+unique+"-yes").click(function(){
-    	var value = null;
-    	if (yesFunction)
-        	value = $('#popup_prompt_input_'+unique).val();
-    	
-    	closepopupMessage(currentPopup());
-    	
-    	if (yesFunction)
-    		yesFunction(value);
-    });
-    $("#"+unique+"-no").click(function(){
-    	closepopupMessage(currentPopup());
-    	if (noFunction)
-    	{
-    		noFunction();
-    	}
-    });
-    
-    
-}
-
-
-
-
-////////////////////////////////////////////////////////
-// Game Settings
-
-
-function isMusicEnabled()
-{
-	var setting = localStorage.getItem("checkboxDisableMusic");
-	if (setting==false)
-		return true;
-	else
-		return false;
-}
-
-function isSoundEffectsEnabled()
-{
-	var setting = localStorage.getItem("checkboxDisableEnvironmentSoundEffects");
-	if (setting!="true")
-		return true;
-	else
-		return false;
-}
-
-function isBannersEnabled()
-{
-	var setting = localStorage.getItem("checkboxDisableBanners");
-	if (setting!="true")
-		return true;
-	else
-		return false;
-}
-
-function isAnimatedBannersEnabled()
-{
-	var setting = localStorage.getItem("checkboxDisableOnlyAnimatedBanners");
-	if (setting!="true")
-		return true;
-	else
-		return false;
-}
-
-function isWeatherEnabled()
-{
-	var setting = localStorage.getItem("checkboxDisableWeather");
-	if (setting!="true")
-		return true;
-	else
-		return false;
-}
-
-function isAnimationsEnabled()
-{
-	var setting = localStorage.getItem("checkboxDisableTravelAnimations");
-	if (setting!="true")
-		return true;
-	else
-		return false;
-}
-
-function isAdsEnabled()
-{
-	var setting = localStorage.getItem("checkboxDisableAds");
-	if (setting!="true")
-		return true;
-	else
-		return false;
-}
-
-function getSoundEffectsVolume()
-{
-	var setting = localStorage.getItem("sliderSoundEffectsVolume");
-	if (setting==null) return 100;
-	return parseInt(setting);
-}
-
-function getMusicVolume()
-{
-	var setting = localStorage.getItem("sliderMusicVolume");
-	if (setting==null) return 100;
-	return parseInt(setting);
-}
-
-function getMapQuality()
-{
-	var setting = localStorage.getItem("checkboxUseLowResolutionMap") || "false";
-	if(setting === "true") return "low";
-	return "high";
-}
-
-function toggleEnvironmentSoundEffects(newState)
-{
-	var enabled = isSoundEffectsEnabled();
-	if (enabled==null)
-		enabled = true;
-	if (newState !== undefined) {
-		enabled = newState;
+function zoomIn(additionalScale, onCenter) {
+	scale += scaleRate*scale*additionalScale;
+	if (maxZoom !== null && scale > maxZoom) {
+		scale = maxZoom;
 	}
-	
-	createjs.Sound.muted = enabled;
-	localStorage.setItem("checkboxDisableEnvironmentSoundEffects", enabled+"");
+	scaleTiles(onCenter);
+}
 
-	if (requestedAudioDescriptor !== null)
-	{
-		setAudioDescriptor(requestedAudioDescriptor[0], requestedAudioDescriptor[1], requestedAudioDescriptor[2]);
-		requestedAudioDescriptor = null;
+function zoomOut(additionalScale, onCenter) {
+	scale -= scaleRate*scale*additionalScale;
+	if (minZoom !== null && scale < minZoom) {
+		scale = minZoom;
 	}
-	
-	// Set the correct image for the header mute button
-	if (enabled)
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
-	else
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
-	
+	scaleTiles(onCenter);
 }
 
-function updateEnvironmentSoundEffectsVolume()
-{
-	var vol = getSoundEffectsVolume();
-	vol = parseFloat(vol)/100;
-	createjs.Sound.volume = vol;
+function pressedButton() {
+	firstLoad = true;
+	if (cursorObject != "") {
+		cursorObject.div.remove();
+		cursorObject = "";
+	}
+	scaleRate = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
+	loadMap();
+	openMenu();
 }
 
-////////////////////////////////////////////////////////
-//Notifications
-function doPopupNotification(iconUrl, title, text, category, options, onclick, onerror)
-{
-	if(notifyHandler == null || notifyHandler.popupNotify === "undefined") return;
-	return notifyHandler.popupNotify(iconUrl, title, text, category, options, onclick, onerror);
-}
+function scaleTiles(onCenter) {
 
+	gridTileWidth = isNaN(Number($("#gridWidth").val())) ? 20 : Number($("#gridWidth").val());
+	gridTileHeight = isNaN(Number($("#gridHeight").val())) ? 20 : Number($("#gridHeight").val());
+	var forestry = Number($("#forestry").val());
+	var scaledGridCellWidth = 64 * scale;
+	var scaledGridCellHeight = 64 * scale;
+	var totalGridWidth = gridTileWidth * scaledGridCellWidth;
+	var totalGridHeight = gridTileHeight * scaledGridCellHeight;
 
+	prevGridWidth = grid.offsetWidth;
+	prevGridHeight = grid.offsetHeight;
+	currGridWidth = totalGridWidth;
+	currGridHeight = totalGridHeight;
+	diffGridWidth = totalGridWidth - prevGridWidth;
+	diffGridHeight = totalGridWidth - prevGridHeight;
+	grid.style.height = currGridHeight + "px";
+	grid.style.width = currGridWidth + "px";
 
-////////////////////////////////////////////////////////////
-// Anti-bot question stuff
+	originX = grid.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
+	originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop + -$(window).scrollTop();
 
-function antiBotAnswer(response)
-{
-	doCommand(null, "AntiBotAnswer", {response:response}, function(data,error){
-		if (error)
-		{
-			closeAllPopups();
-			antiBotQuestionPopup();
+	if (!onCenter) {
+		var userLocX = 0;
+		var userLocY = 0;
+		if (event) {
+			if (event.clientX) {
+				// Check for a mouse position
+				userLocX = event.clientX;
+				userLocY = event.clientY;
+			} else if (zoomTouch) {
+				userLocX = zoomTouchX;
+				userLocY = zoomTouchY;
+			} else if (event.changedTouches && event.changedTouches.length == 1) {
+				// Check for double tap on mobile
+				userLocX = event.changedTouches[0].clientX;
+				userLocY = event.changedTouches[0].clientY;
+			} else if (event.touches && event.touches[0] && event.touches[0].clientX && event.touches[1] && event.touches[1].clientX) {
+				// Check for zooming on mobile, find midpoint of pinch gesture
+				offsetX1 = event.touches[0].clientX;
+				offsetY1 = event.touches[0].clientY;
+				offsetX2 = event.touches[1].clientX;
+				offsetY2 = event.touches[1].clientY;
+
+				userLocX = (offsetX2 + offsetX1) / 2;
+				userLocY = (offsetY2 + offsetY1) / 2;
+				zoomTouchX = userLocX;
+				zoomTouchY = userLocY;
+				zoomTouch = true;
+			} else if (event.changedTouches && event.changedTouches.length > 1) {
+				// Check for zooming on mobile, find midpoint of pinch gesture
+				offsetX1 = event.changedTouches[0].clientX;
+				offsetY1 = event.changedTouches[0].clientY;
+				offsetX2 = event.changedTouches[1].clientX;
+				offsetY2 = event.changedTouches[1].clientY;
+
+				userLocX = (offsetX2 + offsetX1) / 2;
+				userLocY = (offsetY2 + offsetY1) / 2;
+				zoomTouchX = userLocX;
+				zoomTouchY = userLocY;
+				zoomTouch = true;
+			} else {
+				// Couldn't find mouse/finger position(s), last resort zoom to center of viewport
+				userLocX = viewport.offsetWidth/2 + viewport.offsetLeft + viewportContainer.offsetLeft;
+				userLocY = viewport.offsetHeight/2 + viewport.offsetTop + viewportContainer.offsetTop + - $(window).scrollTop();
+			}
 		}
-		else
-		{
-			closeAllPopups();
+	} else {
+		// Zoom to center of viewport
+		userLocX = viewport.offsetWidth/2 + viewport.offsetLeft + viewportContainer.offsetLeft;
+		userLocY = viewport.offsetHeight/2 + viewport.offsetTop + viewportContainer.offsetTop + - $(window).scrollTop();
+	}
+
+	dx = Math.abs(userLocX - originX);
+	dy = Math.abs(userLocY - originY);
+	widthRatio = currGridWidth / prevGridWidth;
+	heightRatio = currGridHeight / prevGridHeight;
+
+	newDx = dx * widthRatio;
+	newDy = dy * heightRatio;
+	diffX = Math.abs(newDx - dx);
+	diffY = Math.abs(newDy - dy);
+
+	if (userLocY < originY && diffGridWidth < 0 || userLocY > originY && diffGridWidth > 0) {
+		diffY = diffY * -1;
+	}
+	if (userLocX < originX && diffGridWidth < 0 || userLocX > originX && diffGridWidth > 0) {
+		diffX = diffX * -1;
+	}
+
+	if (reachedZoom) {
+		if (scale > minZoom && scale < maxZoom) {
+			reachedZoom = false;
+		} else {
+			diffX = 0;
+			diffY = 0;
 		}
-	});
+	}
+	else if (scale == minZoom || scale == maxZoom) {
+		reachedZoom = true;
+	}
+
+	newX = grid.offsetLeft + diffX;
+	newY = grid.offsetTop + diffY;
+
+	if (!firstLoad) {
+		if (newY < (viewport.offsetHeight * 1.5) && newY > (-1.5 * grid.offsetHeight)) {
+			grid.style.top = newY + "px";
+		}
+		if (newX < (viewport.offsetWidth * 1.5) && newX > (-1.5 * grid.offsetWidth)) {
+			grid.style.left = newX + "px";
+		}
+	} else {
+		firstLoad = false;
+	}
+
+	// Please leave for debugging zoom
+	//var c = document.getElementById("myCanvas");
+	//var ctx = c.getContext("2d");
+	//ctx.beginPath();
+	//ctx.moveTo(originX, originY);
+	//ctx.lineTo(newX, newY);
+	//ctx.stroke();
+
+
+	if (cursorObject != "") {
+		var cursorTop = (cursorObject.yGridCoord * scaledGridCellHeight);
+		var cursorLeft = (cursorObject.xGridCoord * scaledGridCellWidth);
+		var scaledCursorHeight = cursorHeight * scale * .4;
+		var scaledCursorWidth = cursorWidth * scale * .4;
+		cursorObject.div.style.width = cursorWidth * scale * .4 + "px";
+		cursorObject.div.style.height = cursorHeight * scale * .4 + "px";
+		cursorObject.div.style.top = cursorTop + "px";
+		cursorObject.div.style.left = cursorLeft + "px";
+		cursorSubObjects = cursorObject.div.children;
+		for (i=0; i<cursorSubObjects.length; i++) {
+			if (cursorSubObjects[i].style.top != "") {
+				cursorSubObjects[i].style.top = (scaledGridCellHeight + scaledCursorHeight/2) + "px";
+			}
+			if (cursorSubObjects[i].style.left != "") {
+				cursorSubObjects[i].style.left = (scaledGridCellWidth + scaledCursorWidth/2) + "px";
+			}
+		}
+	}
+
+	var scaledImgSize = imgSize * scale;
+	// Update all tiles
+	for (var x = 0; x < gridTileWidth; x++) {
+		for (var y = 0; y < gridTileHeight; y++) {
+
+			// Update all grid cells, and background images
+			var top = y * scaledGridCellWidth;
+			var left = x * scaledGridCellWidth;
+
+			gridCells[x][y].cellDiv.style.width = scaledGridCellWidth + "px";
+			gridCells[x][y].cellDiv.style.height = scaledGridCellWidth + "px";
+			gridCells[x][y].cellDiv.style.margin = (scaledGridCellWidth / 2) + "px";
+			gridCells[x][y].cellDiv.style.top = top + "px";
+			gridCells[x][y].cellDiv.style.left = left + "px";
+
+			gridCells[x][y].backgroundDiv.style.width = scaledImgSize + "px";
+			gridCells[x][y].backgroundDiv.style.height = scaledImgSize + "px";
+			gridCells[x][y].backgroundDiv.style.top = top + "px";
+			gridCells[x][y].backgroundDiv.style.left = left + "px";
+
+			// Update all objects
+			if (gridCells[x][y].objectKeys.length > 0) {
+				for (var keyIndex = 0; keyIndex < gridCells[x][y].objectKeys.length; keyIndex++) {
+					var currKey = gridCells[x][y].objectKeys[keyIndex];
+					var top = gridObjects[currKey].yGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObjects[currKey].yImageOrigin * scale) - (gridObjects[currKey].yGridCellOffset * scale);
+					var left = gridObjects[currKey].xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObjects[currKey].xImageOrigin * scale) - (gridObjects[currKey].xGridCellOffset * scale);
+
+					gridObjects[currKey].div.style.width = gridObjects[currKey].width * scale + "px";
+					gridObjects[currKey].div.style.height = gridObjects[currKey].height * scale + "px";
+					gridObjects[currKey].div.style.margin = (scaledGridCellWidth / 2) + "px";
+					gridObjects[currKey].div.style.top = top + "px";
+					gridObjects[currKey].div.style.left = left + "px";
+				}
+			}
+		}
+	}
 }
 
-function antiBotQuestionPopup()
-{
-	popupMessage("Anti Bot Check", "<div id='myCaptcha' style='float:left;margin-right:10px;'></div><p>We have to check from time to time to make sure you're a human playing. This is to prevent people from " +
-			"playing the game automatically using bots.</p>");
-	
-	grecaptcha.render( 'myCaptcha', {
-		  'sitekey' : '6Ldx9wcUAAAAAG78kIIiv-pnhHBaAaTrpcX5ZDwT',  // required
-		  'theme' : 'light',  // optional
-		  'callback': antiBotAnswer  // optional
+function loadMap() {
+
+	scaleRate = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
+	dragDelta = ($("#dragDelta").val() == undefined) ? 10 : $("#dragDelta").val();
+	gridTileWidth = isNaN(Number($("#gridWidth").val())) ? 20 : Number($("#gridWidth").val());
+	gridTileHeight = isNaN(Number($("#gridHeight").val())) ? 20 : Number($("#gridHeight").val());
+	var seed = isNaN(Number($("#seed").val())) ? 123456 : Number($("#seed").val());
+	var forestry = isNaN(Number($("#forestry").val())) ? 2 : Number($("#forestry").val());
+	scale = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
+
+	var gridCellWidth = 64 * scale;
+
+	var totalGridWidth = gridTileWidth * gridCellWidth;
+	var totalGridHeight = gridTileHeight * gridCellWidth;
+	var offsetX = viewportContainer.offsetWidth/2-(totalGridWidth/2);
+	var offsetY = viewportContainer.offsetHeight/2-(totalGridHeight/2);
+	grid.style.height = totalGridWidth + "px";
+	grid.style.width = totalGridHeight + "px";
+	grid.style.top = offsetY + "px";
+	grid.style.left = offsetX + "px";
+
+	viewportContainer.style.position = "relative";
+	viewport.style.position = "absolute";
+	grid.style.position = "relative";
+
+	// Remove all current grid tiles
+	jQuery('#cell-layer').html('');
+	jQuery('#ground-layer').html('');
+	jQuery('#object-layer').html('');
+
+	buildMap(JSON.parse(mapData));
+
+	//$.ajax({
+	//    url: "SandboxServlet",
+	//    data:{width:gridTileWidth, height:gridTileHeight, seed:seed, forestry:forestry},
+	//    type: 'POST',
+	//    success: function(responseJson) {
+	//        buildMap(responseJson);
+	//    }
+	//});
+	buildMenu();
+}
+
+
+function openMenu() {
+	if (isMenuVisible) {
+		isMenuVisible = false;
+		document.getElementById('menu').style.visibility = 'hidden';
+	} else {
+		isMenuVisible = true;
+		document.getElementById('menu').style.display = 'inline';
+		document.getElementById('menu').style.visibility = 'visible';
+	}
+}
+
+function buildMenu() {
+	if (!menuBuilt) {
+		htmlString =
+			"<table> <tr>" +
+			"<td>" + "Width: " + "</td><td>" + "<input type=\'text\' id=\'gridWidth\' value=20 /> " + "</td>" +
+			"<td>" + "Height: " + "</td><td>" + "<input type='text' id='gridHeight' value=20 /> " + "</td>" +
+			"</tr> <tr>" +
+			"<td>" + "Zoom Rate: " + "</td><td>" + "<input type='text' id='zoom' value=.3 /> " + "</td>" +
+			"<td>" + "Zoom Delta: " + "</td><td>" + "<input type='text' id='zoomDelta' value=.25 /> " + "</td>" +
+			"</tr> <tr>" +
+			"<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
+			"<td>" + "Seed: " + "</td><td>" + "<input type='text' id='seed' value=123456 /> " + "</td>" +
+			"</tr> <tr>" +
+			"<td>" + "Forestry (0-10): " + "</td><td>" + "<input type='text' id='forestry' value=2 /> " + "</td>" +
+			"</tr> <tr>" +
+			"<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
+			"<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
+			"</tr> <tr>" +
+			"</tr> </table>" +
+			"<center>" + "<button id='somebutton'>Update</button>" + "</center>" +
+			"<br>";
+
+
+		jQuery('#menu').html(htmlString);
+		document.getElementById('menu').style.width = viewport.offsetWidth * (2 / 3) + "px";
+		document.getElementById('menu').style.left = viewport.offsetWidth * (1 / 6) + "px";
+		document.getElementById('menu').style.top = viewport.offsetHeight / 2 - menu.offsetHeight / 2 + "px";
+		menuBuilt = true;3
+	}
+}
+
+function buildMap(responseJson) {
+	displayGridLines = (document.getElementById('displayGridLines') == null) ? false : document.getElementById('displayGridLines').checked;
+	keepSelectedCenter = (document.getElementById('keepSelectedCenter') == null) ? true : document.getElementById('keepSelectedCenter').checked;
+	var groundHtml = "";
+	var cellHtml = "";
+	var zOffset = 10;
+	$.each(responseJson['backgroundTiles'], function (index, value) {
+		$.each(value, function (innerIndex, backgroundObject) {
+
+			var gridCell = new GridCell(
+				"",
+				"",
+				backgroundObject.backgroundFile,
+				backgroundObject.zIndex,
+				[],
+				index,
+				innerIndex
+			);
+
+			var key = index + "-" + innerIndex;
+			if (innerIndex == 0) {
+				gridCells[index] = [];
+			}
+			gridCells[index][innerIndex] = gridCell;
+
+			$hexBody = "<div id=\"hex" + key + "Back\"";
+			$hexBody += " class=\"gridBackground\"";
+			$hexBody += " data-xCoord=\"" + index + "\"";
+			$hexBody += " data-yCoord=\"" + innerIndex + "\"";
+			$hexBody += " style=\"";
+			$hexBody += " z-index:" + backgroundObject.zIndex + ";";
+			$hexBody += " background:url(" + $picUrlPath + backgroundObject.backgroundFile + ") center center;";
+			$hexBody += " background-size:100%;";
+			$hexBody += "\">";
+			$hexBody += "</div>";
+			groundHtml += $hexBody;
+
+			$hexBody = "<div";
+			$hexBody += " id=\"hex" + key + "\"";
+			$hexBody += " class=\"gridCell\"";
+			$hexBody += " data-key=\"" + key + "\"";
+			$hexBody += " style=\"";
+			if (displayGridLines) {
+				$hexBody += " border: 1px solid black;";
+			}
+			$hexBody += " z-index: 11;";
+			$hexBody += "\">";
+			$hexBody += "</div>";
+
+			cellHtml += $hexBody;
 		});
-}
-
-// ///////////////////////////////////////////////////////////
-// Stack maintenance
-
-function mergeItemStacks(eventObject, selector)
-{
-	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;
-	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-	doCommand(eventObject, "ItemsStackMerge",{"itemIds":itemIds});
-}
-
-function splitItemStack(eventObject, selector)
-{
-	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;
-	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-	promptPopup("Stack Split","Enter a stack size to create:","1",function(stackSize){
-		if (stackSize!=null&&stackSize!=""){
-			doCommand(eventObject, "ItemsStackSplit",{"itemIds":itemIds, "stackSize":stackSize});
-		}
 	});
-}
 
-function renameUnnamedPlayer(eventObject)
-{
-	promptPopup("Rename Player", "Enter a new name for your character:", "", function(newName) {
-		if (newName != null && newName != "")
-		{
-			doCommand(eventObject, "RenameUnnamedPlayer", {"newName" : newName});
-		}
+	// Append HTML
+	$('#ground-layer').append(groundHtml);
+	$('#cell-layer').append(cellHtml);
+	// Gather DOM elements
+	var gridCellElements = document.getElementsByClassName('gridCell');
+	var gridBackgroundElements = document.getElementsByClassName('gridBackground');
+	// Attach elements to gridBackground structure
+	for (var i = 0; i < gridBackgroundElements.length; i++) {
+		gridCells[gridBackgroundElements[i].dataset.xcoord][gridBackgroundElements[i].dataset.ycoord].backgroundDiv = gridBackgroundElements[i];
+		gridCells[gridBackgroundElements[i].dataset.xcoord][gridBackgroundElements[i].dataset.ycoord].cellDiv = gridCellElements[i];
+	}
+
+	htmlString = "";
+	$.each(responseJson['objectMap'], function (objectKey, gridObject) {
+		htmlString += addGridObjectToMap(gridObject);
 	});
+
+	// Append HTML
+	$('#object-layer').append(htmlString);
+	// Gather DOM elements
+	var gridObjectElements = document.getElementsByClassName('gridObject');
+	// Attach elements to gridObject structure
+	for (var i = 0; i < gridObjectElements.length; i++) {
+		gridObjects[objects[i].dataset.key].div = gridObjectElements[i];
+	}
+	// Move grid to center, scale, and update all tiles
+	centerGridOnScreen();
 }
 
-function swapContainers(event, selector)
-{
-	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;	
-	
-	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+window.onload = function() {
 
-	doCommand(event,"ItemsSwapStorageContainers",{"itemIds":itemIds});
+	// Listen for mouse input
+	document.onmousedown = startDrag;
+	document.onmouseup = stopDrag;
+
+	//document.onmouseover = startHover;
+	document.onmousemove=startHover;
+	document.onkeydown = keyPress;
+	document.onkeyup = keyUnpress;
+
+	// Listen for touch inputs
+	document.body.addEventListener('touchend', stopDrag);
+	document.body.addEventListener('touchmove', dragDiv, {passive: true});
+	document.body.addEventListener('touchstart', startDrag);
+}
+
+function currentCoord() {
+	// Get currently highlighted or selected coordinates
+	var xCoord;
+	var yCoord;
+	if (previouslyHighlightedBackground != null) {
+		xCoord = previouslyHighlightedBackground.xGridCoord;
+		yCoord = previouslyHighlightedBackground.yGridCoord;
+	} else if (previouslySelectedBackground != null) {
+		xCoord = previouslySelectedBackground.xGridCoord;
+		yCoord = previouslySelectedBackground.yGridCoord;
+	} else {
+		return;
+	}
+	return new CoordObject(xCoord, yCoord);
+}
+function panGrid(xOffset, yOffset) {
+	grid.style.left = grid.offsetLeft + xOffset + 'px';
+	grid.style.top = grid.offsetTop + yOffset + 'px';
+}
+function moveCellOnScreen(xCoord, yCoord) {
+	scaledGridCellWidth = gridCellWidth * scale;
+	scaledGridCellHeight = gridCellHeight * scale;
+	xDist = xCoord * scaledGridCellWidth;
+	yDist = yCoord * scaledGridCellHeight;
+	if (grid.offsetLeft + xDist < 0) {
+		panGrid(gridCellWidth, 0);
+	} else if (grid.offsetLeft + xDist + scaledGridCellWidth > viewportContainer.offsetWidth) {
+		panGrid(-gridCellWidth, 0);
+	}
+	else if (grid.offsetTop + yDist < 0) {
+		panGrid(0, gridCellHeight);
+	} else if (grid.offsetTop + yDist + scaledGridCellHeight > viewportContainer.offsetHeight) {
+		panGrid(0, -gridCellHeight);
+	}
+
+}
+function centerCellOnScreen(xCoord, yCoord) {
+	// Move grid to center the currently selected cell
+	scaledGridCellWidth = gridCellWidth * scale;
+	scaledGridCellHeight = gridCellHeight * scale;
+	xGrid = xCoord * scaledGridCellWidth + scaledGridCellWidth;
+	yGrid = yCoord * scaledGridCellHeight + scaledGridCellHeight;
+	xView = grid.offsetLeft + xGrid;
+	yView = grid.offsetTop + yGrid;
+	xGridOrigin = xView - viewportContainer.offsetWidth/2;
+	yGridOrigin = yView - viewportContainer.offsetHeight/2;
+	grid.style.left = (grid.offsetLeft - xGridOrigin) + "px" ;
+	grid.style.top = (grid.offsetTop - yGridOrigin) + "px";
+}
+function centerGridOnScreen() {
+	actualGridWidth = (gridCellWidth + (gridCellWidth * gridTileWidth));
+	actualGridHeight = (gridCellHeight + (gridCellHeight * gridTileHeight));
+	widthScale = viewport.offsetWidth / actualGridWidth;
+	heightScale = viewport.offsetHeight / actualGridHeight;
+	if (widthScale < heightScale) {
+		scale = widthScale;
+	} else {
+		scale = heightScale;
+	}
+	scaleTiles(true);
+	scaledGridWidth = (gridCellWidth * scale  + (gridCellWidth * scale * gridTileWidth));
+	scaledGridHeight = (gridCellHeight * scale + (gridCellHeight * scale * gridTileHeight));
+	grid.style.left = ((viewport.offsetWidth - scaledGridWidth)/2) + "px";
+	grid.style.top = ((viewport.offsetHeight - scaledGridHeight)/2) + "px";
+}
+function keyUnpress() {
+	if (!e) {
+		var e = window.event;
+	}
+	if (e.keyCode == 32) {
+		spacePressed = false;
+	}
+}
+function getCenterCell() {
+	scaledGridCellWidth = gridCellWidth * scale;
+	scaledGridCellHeight = gridCellHeight * scale;
+	xMid = Math.round((viewportContainer.offsetWidth/2 - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft - (scaledGridCellWidth/2)) / scaledGridCellWidth);
+	yMid = Math.round((viewportContainer.offsetHeight/2 - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() - (scaledGridCellHeight/2))/ scaledGridCellHeight);
+	if (xMid > gridTileWidth) {xMid = gridTileWidth}
+	if (yMid > gridTileWidth) {yMid = gridTileHeight}
+	if (xMid < 0) {xMid = 0}
+	if (yMid < 0) {yMid = 0}
+	return new CoordObject(xMid, yMid);
+}
+function keyPress() {
+	if (!e) {
+		var e = window.event;
+	}
+	if (usingKeys || !keepSelectedCenter) {
+		currCoord = currentCoord();
+	} else {
+		currCoord = getCenterCell();
+	}
+	var isShift;
+	if (window.event) {
+		key = window.event.keyCode;
+		isShift = !!window.event.shiftKey;
+	} else {
+		key = ev.which;
+		isShift = !!ev.shiftKey;
+	}
+	panOffset = 20;
+	switch(e.which) {
+		case 32:
+			spacePressed = true;
+			break;
+		case 13: // enter
+			if (isShift) {
+				//panGrid();
+			} else {
+				updateCursor(currCoord.yGridCoord, currCoord.xGridCoord);
+				updateHighlights(previouslySelectedBackground, previouslySelectedObjects, (currCoord.xGridCoord), (currCoord.yGridCoord), true);
+			}
+			break;
+		case 37: // left
+			if (isShift) {
+				centerGridOnScreen();
+			} else if (spacePressed) {
+				panGrid(-panOffset, 0);
+			} else {
+				newXCoord = (currCoord.xGridCoord - 1);
+				newYCoord = (currCoord.yGridCoord);
+				if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
+				updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
+				if (keepSelectedCenter) {
+					centerCellOnScreen(newXCoord, newYCoord);
+				} else {
+					moveCellOnScreen(newXCoord, newYCoord);
+				}
+			}
+			break;
+		case 38: // up
+			if (isShift) {
+				zoomIn(2, true);
+			} else if (spacePressed) {
+				panGrid(0, -panOffset);
+			} else {
+				newXCoord = (currCoord.xGridCoord);
+				newYCoord = (currCoord.yGridCoord - 1);
+				if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
+				updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
+				if (keepSelectedCenter) {
+					centerCellOnScreen(newXCoord, newYCoord);
+				} else {
+					moveCellOnScreen(newXCoord, newYCoord);
+				}
+			}
+			break;
+		case 39: // right
+			if (isShift) {
+				if (previouslySelectedBackground != null) {
+					// Remove previously highlighted cell
+					removeHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, false);
+					centerCellOnScreen(previouslySelectedBackground.xGridCoord, previouslySelectedBackground.yGridCoord);
+				}
+			} else if (spacePressed) {
+				panGrid(panOffset, 0);
+			} else {
+				newXCoord = (currCoord.xGridCoord + 1);
+				newYCoord = (currCoord.yGridCoord);
+				if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
+				updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
+				if (keepSelectedCenter) {
+					centerCellOnScreen(newXCoord, newYCoord);
+				} else {
+					moveCellOnScreen(newXCoord, newYCoord);
+				}
+			}
+			break;
+		case 40: // down
+			if (isShift) {
+				zoomOut(2, true);
+			} else if (spacePressed) {
+				panGrid(0, panOffset);
+			} else {
+				newXCoord = (currCoord.xGridCoord);
+				newYCoord = (currCoord.yGridCoord + 1);
+				if (newYCoord < 0 || newXCoord < 0 || newYCoord > (gridTileHeight-1) || newXCoord > (gridTileWidth-1)) {return}
+				updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, newXCoord, newYCoord, false);
+				if (keepSelectedCenter) {
+					centerCellOnScreen(newXCoord, newYCoord);
+				} else {
+					moveCellOnScreen(newXCoord, newYCoord);
+				}
+			}
+			break;
+
+		default: return;
+	}
+	if (isShift || spacePressed) {
+		usingKeys = false;
+	} else {
+		usingKeys = true;
+	}
+}
+
+
+$('#viewport').on('contextmenu', function(){
+	return false;
+});
+
+function startHover(e) {
+	usingKeys = false;
+	if (dragging) {return}
+	// determine event object
+	if (!e) {
+		var e = window.event;
+	}
+	if (!checkIfHoveringOverGrid()) {
+		return;
+	}
+	var currCoord = getCoordOfMouse();
+	if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
+	updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, currCoord.xGridCoord, currCoord.yGridCoord, false);
+}
+
+function startDrag(e) {
+	dragging = true;
+	// determine event object
+	if (!e) {
+		var e = window.event;
+	}
+
+	if (!checkIfHoveringOverViewport()) {
+		return;
+	}
+
+	// Prevent normal panning
+	e.preventDefault();
+	drugged = false;
+	// calculate event X, Y coordinates
+	if (e) {
+		// For mouse clicks
+		if (e.clientX) {
+			offsetX = e.clientX;
+			offsetY = e.clientY;
+			updateGridOnUI();
+			// For touch input
+		} else if (event.touches) {
+			if (event.touches.length == 1) {
+				offsetX = e.touches[0].clientX;
+				offsetY = e.touches[0].clientY;
+				document.ontouchmove=dragDiv;
+				updateGridOnUI();
+			} else {
+				offsetX1 = e.touches[0].clientX;
+				offsetY1 = e.touches[0].clientY;
+				offsetX2 = e.touches[1].clientX;
+				offsetY2 = e.touches[1].clientY;
+				zoom = true;
+				document.ontouchmove=zoomDiv;
+			}
+		}
+	}
+}
+
+function checkDoubleClick() {
+	if (timeBetweenLeftClick > 17) {
+		timeBetweenLeftClick = 0;
+		window.clearInterval(clickTimer);
+		return false;
+	} else if (timeBetweenLeftClick > 0) {
+		timeBetweenLeftClick = 0;
+		window.clearInterval(clickTimer);
+		return true;
+	} else {
+		clickTimer = window.setInterval(timerIncrement, 25);
+	}
+}
+function timerIncrement() {
+	if (timeBetweenLeftClick > 17) {
+		timeBetweenLeftClick = 0;
+		window.clearInterval(clickTimer);
+	} else {
+		timeBetweenLeftClick += 1;
+	}
+}
+
+function getCoordOfMouse() {
+	var scaledGridCellWidth = 64 * scale;
+	var scaledGridCellHeight = 64 * scale;
+	// For mouse clicks
+	if (event.clientX) {
+		offsetX = event.clientX;
+		offsetY = event.clientY;
+		// For touch input
+	} else if (event.changedTouches && event.changedTouches[0].clientX) {
+		offsetX = event.changedTouches[0].clientX;
+		offsetY = event.changedTouches[0].clientY;
+	}
+	// Determine where the click took place in the grid
+	var gridRelx = offsetX - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft - (scaledGridCellWidth / 2);
+	var gridRely = offsetY - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() - (scaledGridCellHeight / 2);
+	var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
+	var gridRow = Math.floor(gridRely / scaledGridCellHeight);
+	return new CoordObject(gridColumn, gridRow);
+}
+function updateCursor(gridRow, gridColumn) {
+	var scaledGridCellWidth = 64 * scale;
+	var scaledGridCellHeight = 64 * scale;
+	var cursorTop = (gridRow * scaledGridCellHeight);
+	var cursorLeft = (gridColumn * scaledGridCellWidth);
+	var scaledCursorHeight = cursorHeight * scale * .4;
+	var scaledCursorWidth = cursorWidth * scale * .4;
+	if (cursorObject == "") {
+		// First select, build out cursor object
+		$('#ui-layer').append(buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursorWidth, scaledGridCellHeight, scaledGridCellWidth));
+		cursorObject = new CursorObject(document.getElementById('cursorObject'), gridColumn, gridRow);
+	} else {
+		// Only need to update cursor object
+		cursorObject.div.style.top = cursorTop + "px";
+		cursorObject.div.style.left = cursorLeft + "px";
+		cursorObject.xGridCoord = gridColumn;
+		cursorObject.yGridCoord = gridRow;
+
+		cursorSubObjects = cursorObject.div.children;
+		for (i=0; i<cursorSubObjects.length; i++) {
+			if (cursorSubObjects[i].style.top != "") {
+				cursorSubObjects[i].style.top = (scaledGridCellHeight + scaledCursorHeight/2) + "px";
+			}
+			if (cursorSubObjects[i].style.left != "") {
+				cursorSubObjects[i].style.left = (scaledGridCellWidth + scaledCursorWidth/2) + "px";
+			}
+		}
+	}
+}
+
+function clickMap() {
+	event.preventDefault();
+	if (checkDoubleClick()) {
+		if (event.which == 3) {
+			zoomOut(2, false);
+		} else {
+			zoomIn(2, false);
+		}
+	}
+	var currCoord = getCoordOfMouse();
+	if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
+	updateCursor(currCoord.yGridCoord, currCoord.xGridCoord);
+	updateHighlights(previouslySelectedBackground, previouslySelectedObjects, currCoord.xGridCoord, currCoord.yGridCoord, true);
+};
+
+function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, selection) {
+	if (selection) {
+		className = "gridSelected";
+	} else {
+		className = "highlighted";
+	}
+	// Remove highlights from previously selected divs
+	if (previouslyUpdatedBackground != null) {
+		previouslyUpdatedBackground.backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground.filename + ") center center / 100%";
+		if (selection) {
+			previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)gridSelected(?!\S)/g, '');
+		} else {
+			previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)highlighted(?!\S)/g, '');
+		}
+	}
+	for (i=0; i<previouslyUpdatedObjects.length; i++) {
+		if (previouslyUpdatedObjects[i].key == "o1") {
+			previouslyUpdatedObjects[i].div.style.background = "url(" + $domain + previouslyUpdatedObjects[i].filename + ")";
+		} else {
+			previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ")";
+		}
+		previouslyUpdatedObjects[i].div.style.backgroundSize = "100%";
+		previouslyUpdatedObjects[i].div.style.backgroundBlendMode = "";
+		if (selection) {
+			previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)gridSelected(?!\S)/g , '' );
+		} else {
+			previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)highlighted(?!\S)/g , '' );
+		}
+	}
+	if (selection) {
+		previouslySelectedBackground = null;
+	} else {
+		previouslyHighlightedBackground = null;
+	}
+	previouslyUpdatedObjects = [];
+}
+
+function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection) {
+	// Remove previous highlights
+	removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, selection);
+	// Highlight the background div
+	gridCells[gridColumn][gridRow].backgroundDiv.className += " " + className;
+	previouslyUpdatedBackground  = gridCells[gridColumn][gridRow];
+	// If we have an objects at this coord, highlight them and display their names
+	if (gridCells[gridColumn][gridRow].objectKeys.length > 0) {
+		tmpString = "";
+		objectKeys = gridCells[gridColumn][gridRow].objectKeys;
+		for (selectedIndex=0; selectedIndex<objectKeys.length; selectedIndex++){
+			object = gridObjects[objectKeys[selectedIndex]];
+			// Update the selected object list
+			tmpString += "<br>" + object.name + "<br/>";
+			// Highlight the objects in the viewport
+			object.div.className += " " + className;
+			//object.div.style.backgroundBlendMode = "normal, overlay";
+			// Add div to previouslySelected to remove highlight on later click
+			previouslyUpdatedObjects[selectedIndex] = object;
+		}
+		// Update object list
+		if (selection) {
+			$("#selectedObjects").html(tmpString);
+		}
+	} else {
+		if (selection) {
+			$("#selectedObjects").html('<br> No objects at this coordinate. </br>');
+		}
+	}
+
+	if (selection) {
+		previouslySelectedBackground = previouslyUpdatedBackground;
+	} else {
+		previouslyHighlightedBackground = previouslyUpdatedBackground;
+	}
+}
+
+function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursorWidth, scaledGridCellHeight, scaledGridCellWidth) {
+	htmlString = "<div id=\"cursorObject\"" + " class=\"cursorObject\"";
+	htmlString += " style=\"";
+	htmlString += " top:" + cursorTop + "px;";
+	htmlString += " left:" + cursorLeft + "px;";
+	htmlString += " width:" + cursorWidth * scale * .4 + "px;";
+	htmlString += " height:" + cursorHeight * scale * .4 + "px;";
+	htmlString += "\">";
+	htmlString += "<div id=\"topLeftCursor\"" + " class=\"cursorSubObject\"";
+	htmlString += " style=\"";
+	htmlString += " z-index:" + 1000000 + ";";
+	htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+	htmlString += " width:50%;";
+	htmlString += " height:50%;";
+	htmlString += " background-size:100%;";
+	htmlString += " transform:scaleX(-1);";
+	htmlString += "\">";
+	htmlString += "</div>";
+	htmlString += "<div id=\"topRightCursor\"" + " class=\"cursorSubObject\"";
+	htmlString += " style=\"";
+	htmlString += " z-index:" + 1000000 + ";";
+	htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+	htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
+	htmlString += " width:50%;";
+	htmlString += " height:50%;";
+	htmlString += " background-size:100%;";
+	htmlString += "\">";
+	htmlString += "</div>";
+	htmlString += "<div id=\"bottomRightCursor\"" + " class=\"cursorSubObject\"";
+	htmlString += " style=\"";
+	htmlString += " z-index:" + 1000000 + ";";
+	htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+	htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
+	htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
+	htmlString += " width:50%;";
+	htmlString += " height:50%;";
+	htmlString += " background-size:100%;";
+	htmlString += " transform:scaleX(-1);";
+	htmlString += " transform:scaleY(-1);";
+	htmlString += "\">";
+	htmlString += "</div>";
+	htmlString += "<div id=\"bottomLeftCursor\"" + " class=\"cursorSubObject\"";
+	htmlString += " style=\"";
+	htmlString += " z-index:" + 1000000 + ";";
+	htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+	htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
+	htmlString += " width:50%;";
+	htmlString += " height:50%;";
+	htmlString += " background-size:100%;";
+	htmlString += " transform:scale(-1, -1);";
+	htmlString += "\">";
+	htmlString += "</div>";
+	htmlString += "</div>";
+	return htmlString;
+}
+function updateGridOnUI() {
+	if(!grid.style.left) { grid.style.left='0px'};
+	if (!grid.style.top) { grid.style.top='0px'};
+
+	// calculate integer values for top and left 
+	// properties
+	coordX = parseInt(grid.style.left);
+	coordY = parseInt(grid.style.top);
+	drag = true;
+
+	// move div element
+	document.onmousemove=dragDiv;
+}
+function dragDiv(e) {
+	if (!drag) {return};
+	if (!e) { var e= window.event};
+	// move div element
+	if (e) {
+		if (e.clientX) {
+			userLocX = e.clientX;
+			userLocY = e.clientY;
+		} else if (event.touches) {
+			userLocX = e.touches[0].clientX;
+			userLocY = e.touches[0].clientY;
+		}
+	}
+	//dragDelta = isNaN($("#dragDelta").val()) ? 10 : $("#dragDelta").val();$("#dragDelta").val();
+	deltaX = userLocX - offsetX;
+	deltaY = userLocY - offsetY;
+	updatedX = coordX+deltaX;
+	updatedY = coordY+deltaY;
+	if (Math.abs(deltaX) > dragDelta || Math.abs(deltaY) > dragDelta) {
+		if (updatedX < viewport.offsetWidth && ((updatedX > coordX) || updatedX > (-1 * grid.offsetWidth))) {
+			grid.style.left = coordX + userLocX - offsetX + 'px';
+		}
+		if (updatedY < viewport.offsetHeight && ((updatedY > coordY) || (updatedY > (-1 * grid.offsetHeight)))) {
+			grid.style.top = coordY + userLocY - offsetY + 'px';
+		}
+		$('html, body').stop().animate({}, 500, 'linear');
+		drugged = true;
+	}
+	return false;
+}
+
+function checkIfHoveringOverViewport() {
+	var targ = event.target ? event.target : event.srcElement;
+	if (targ.className != 'gridBackground' &&
+		targ.className != 'grid' &&
+		targ.className != 'gridCell' &&
+		targ.className != 'vp' &&
+		targ.className != 'vpcontainer' &&
+		targ.className != 'gridObject' &&
+		targ.className != 'gridLayer' &&
+		targ.className != 'highlighted' &&
+		targ.className != 'gridObject highlighted' &&
+		targ.className != 'cursorObject' &&
+		targ.className != 'cursorSubObject' &&
+		targ.className != 'objectLayer') {return false};
+	return true;
+}
+function checkIfHoveringOverGrid() {
+	var targ = event.target ? event.target : event.srcElement;
+	if (targ.className != 'gridBackground' &&
+		targ.className != 'gridBackground gridSelected' &&
+		targ.className != 'gridBackground highlighted' &&
+		targ.className != 'grid' &&
+		targ.className != 'gridCell' &&
+		targ.className != 'gridLayer' &&
+		targ.className != 'highlighted' &&
+		targ.className != 'gridObject' &&
+		targ.className != 'gridObject highlighted' &&
+		targ.className != 'gridObject gridSelected' &&
+		targ.className != 'cursorObject' &&
+		targ.className != 'cursorSubObject' &&
+		targ.className != 'objectLayer') {return false};
+	return true;
+}
+function stopDrag() {
+	dragging = false;
+	document.onmousemove=startHover;
+	if (!drugged && checkIfHoveringOverGrid()) {
+		// User clicked on map without dragging
+		clickMap();
+	}
+	drag=false;
+	if (!event.touches || event.touches.length < 2) {
+		zoomTouch = false;
+	}
+}
+
+function zoomDiv(e) {
+	if (!zoom) {return};
+	if (!e) { var e= window.event};
+	// find direction
+	// calculate event X, Y coordinates
+	coffsetX1 = coffsetY1 = coffsetX2 = coffsetY2 = -1;
+	if (event.touches && event.touches[0] && event.touches[0].clientX && event.touches[1] && event.touches[1].clientX) {
+		// Check for touch posiions for zooming on mobile
+		coffsetX1 = event.touches[0].clientX;
+		coffsetY1 = event.touches[0].clientY;
+		coffsetX2 = event.touches[1].clientX;
+		coffsetY2 = event.touches[1].clientY;
+	} else if (event.changedTouches && event.changedTouches.length > 1) {
+		// Check for recent touch posiions for zooming on mobile
+		coffsetX1 = event.changedTouches[0].clientX;
+		coffsetY1 = event.changedTouches[0].clientY;
+		coffsetX2 = event.changedTouches[1].clientX;
+		coffsetY2 = event.changedTouches[1].clientY;
+	}
+	if (offsetX1 != -1) {
+		zoomDelta = isNaN($("#zoomDelta").val()) ? .25 : $("#zoomDelta").val();
+
+		d1 = Math.sqrt(Math.pow((offsetX2 - offsetX1), 2) + Math.pow((offsetY2 - offsetY1), 2));
+		d2 = Math.sqrt(Math.pow((coffsetX2 - coffsetX1), 2) + Math.pow((coffsetY2 - coffsetY1), 2));
+		delta = Math.abs(d1 - d2);
+		if (delta > zoomDelta) {
+			if (d1 < d2) {
+				zoomIn(.25, true);
+			} else {
+				zoomOut(.25, true);
+			}
+		}
+	}
+	$('html, body').stop().animate({}, 500, 'linear');
+	return false;
+}
+
+function CursorObject(div, xGridCoord, yGridCoord) {
+	this.div = div;
+	this.xGridCoord = xGridCoord;
+	this.yGridCoord = yGridCoord;
+}
+
+function GridCell(backgroundDiv, cellDiv, filename, zindex, objectKeys, xGridCoord, yGridCoord) {
+	this.backgroundDiv = backgroundDiv;
+	this.cellDiv = cellDiv;
+	this.filename = filename;
+	this.zIndex = zindex;
+	this.objectKeys = objectKeys;
+	this.xGridCoord = xGridCoord;
+	this.yGridCoord = yGridCoord;
+}
+
+function GridObject(key, div, filename, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xImageOrigin, yImageOrigin, width, height) {
+	this.key = key;
+	this.div = div;
+	this.filename = filename;
+	this.name = name;
+	this.xGridCellOffset = xGridCellOffset;
+	this.yGridCellOffset = yGridCellOffset;
+	this.xGridCoord = xGridCoord;
+	this.yGridCoord = yGridCoord;
+	this.xImageOrigin = xImageOrigin;
+	this.yImageOrigin = yImageOrigin;
+	this.width = width;
+	this.height = height;
+};
+
+function CoordObject(xGridCoord, yGridCoord) {
+	this.xGridCoord = xGridCoord;
+	this.yGridCoord = yGridCoord;
+}
+
+function mapPlow() {
+	if (cursorObject != "") {
+		doCommand(event, "MapPlow", {"xGridCoord": cursorObject.xGridCoord, "yGridCoord": cursorObject.yGridCoord}, function (data, error) {
+			if (error) return;
+			updateGridFromServer(data);
+		});
+	}
+}
+
+/**
+ * Server response can optionally have:
+ *      GridCells (A list of gridCell objects for updating the gridMap)
+ *      GridObject (A map of gridObject objects for updating the objects on the gridMap)
+ * @param returnJson
+ */
+function updateGridFromServer(returnJson) {
+	// Check if we have any gridCells for updating
+	if (returnJson.GridCells) {
+		// Update all passed gridCells
+		for (index=0; index < returnJson.GridCells.length; index++) {
+			updateGridCell(returnJson.GridCells[index]);
+		}
+	}
+	// Check if we have anyt gridObjects for updating
+	if (returnJson.GridObjects) {
+		// Update all passed gridObjects
+		for (index=0; index < returnJson.GridObjects.length; index++) {
+			updateGridObject(returnJson.GridObjects[index]);
+		}
+	}
+}
+
+/**
+ * Updates a current gridCell of the map, depending on the populated fields of the passed back gridCell
+ * @param gridCell
+ */
+function updateGridCell(gridCell) {
+	// For all updates we need to have a coord
+	if (gridCell.xGridCoord && gridCell.yGridCoord) {
+		currentCell = gridCells[gridCell.xGridCoord][gridCell.yGridCoord];
+		if (gridCell.backgroundFile) {
+			currentCell.style.backgroundImage = $picUrlPath + gridCell.backgroundFile + ")";
+		}
+	}
+}
+
+function updateGridObject(gridObject) {
+	// For all updates we need to have a key
+	if (gridObject.key) {
+		currentObject = gridObjects[gridObject.key];
+		// Update the new object
+		if (gridObject.filename) {
+			currentObject.div.style.backgroundImage = $picUrlPath + gridObject.filename + ")";
+		}
+		if (gridObject.xGridCoord) {
+			currentObject.xGridCoord = gridObject.xGridCoord;
+		}
+		if (gridObject.yGridCoord) {
+			currentObject.yGridCoord = gridObject.yGridCoord;
+		}
+		if (gridObject.xGridCellOffset) {
+			currentObject.xGridCellOffset = gridObject.xGridCellOffset;
+		}
+		if (gridObject.yGridCellOffset) {
+			currentObject.yGridCellOffset = gridObject.yGridCellOffset;
+		}
+		if (gridObject.xImageOrigin) {
+			currentObject.xImageOrigin = gridObject.xImageOrigin;
+		}
+		if (gridObject.yImageOrigin) {
+			currentObject.yImageOrigin = gridObject.yImageOrigin;
+		}
+		if (gridObject.width) {
+			currentObject.width = gridObject.width;
+		}
+		if (gridObject.height) {
+			currentObject.height = gridObject.height;
+		}
+
+		// Update necessary grid meta-data
+		// If this object is marked for deletion, remove it's key from the gridCells and delete from the hashMap
+		if (gridObject.markForDeletion) {
+			delete gridObjects[gridObject.key];
+			gridCells[gridObject.xGridCoord][gridObject.yGridCoord].objectKeys.remove(gridObject.key);
+		}
+		// If this object is marked for removal, remove it's key from the gridCells
+		else if (gridObject.markForRemoval) {
+			gridCells[gridObject.xGridCoord][gridObject.yGridCoord].objectKeys.remove(gridObject.key);
+		}
+		// Simple update or addition of gridObject
+		else {
+			// If we have updated coords, use them. Otherwise use the object's old coords
+			xCoord = currentObject.xGridCoord;
+			yCoord = currentObject.yGridCoord;
+			if (gridObject.xGridCoord) xCoord = gridObject.xGridCoord;
+			if (gridObject.yGridCoord) yCoord = gridObject.yGridCoord;
+
+			// If this object is not marked for removal, see if it exists at the coord, if not add it
+			if (!gridCells[xCoord][yCoord].objectKeys.contains(gridObject.key)) {
+				gridCells[xCoord][yCoord].objectKeys.add(gridObject.key);
+			}
+			// If this object is not marked for removal, see if it exists in the object hash, if not add it
+			if (!gridObjects[gridObject.key]) {
+				// If we add the object to the map, we should have all image related fields defined
+				if (gridObject.filename && gridObject.name && gridObject.xGridCellOffset && gridObject.yGridCellOffset &&
+					gridObject.xGridCoord && gridObject.yGridCoord && gridObject.xImageOrigin && gridObject.yImageOrigin &&
+					gridObject.width && gridObject.height) {
+					addGridObjectToMap(gridObject);
+				}
+			}
+		}
+	}
+}
+
+/**
+ * Adds gridObject to the map
+ * Builds HTML for gridObject according to the gridObject's attributes
+ * Adds object to the gridCell structure
+ * @param gridObject
+ * Returns HTML string for adding to DOM
+ */
+function addGridObjectToMap(gridObject) {
+	var top = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
+	var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
+
+	var cgridObject = new GridObject(
+		gridObject.key,
+		"",
+		gridObject.filename,
+		gridObject.name,
+		gridObject.xGridCellOffset,
+		gridObject.yGridCellOffset,
+		gridObject.xGridCoord,
+		gridObject.yGridCoord,
+		gridObject.xImageOrigin,
+		gridObject.yImageOrigin,
+		gridObject.width,
+		gridObject.height);
+	var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
+	gridObjects[key] = cgridObject;
+	var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
+	gridCell.objectKeys[gridCell.objectKeys.length] = key;
+
+	$hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
+	$hexBody += " data-key=\"" + key + "\"";
+	$hexBody += " style=\"";
+	$hexBody += " z-index:" + (Number(objectZOffset) + Number(top)) + ";";
+	if (gridObject.key == "o1") {
+		$hexBody += " background:url(" + $domain + gridObject.filename + ");";
+	} else {
+		$hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
+	}
+	$hexBody += " background-size:100%;";
+	$hexBody += "\">";
+	$hexBody += "</div>";
+	return $hexBody;
 }

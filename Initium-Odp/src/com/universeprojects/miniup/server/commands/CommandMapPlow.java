@@ -23,7 +23,7 @@ public class CommandMapPlow extends Command {
 			int yGridCoord = Integer.parseInt(parameters.get("yGridCoord").trim());
 			GridCell updatedGridCell = new GridCell(xGridCoord, yGridCoord);
 			updatedGridCell.setBackgroundFile("boulder1.png");
-			addCallbackData("mapPlow", updatedGridCell.toString());
+			addGridCellUpdate(updatedGridCell);
 		} catch (Exception e) {
 			throw new UserErrorMessage("Invalid coordinate.");
 		}
