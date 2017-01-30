@@ -155,4 +155,9 @@ public class GridObject {
 	public void setJsonObject(JSONObject jsonObject) {
 		this.jsonObject = jsonObject;
 	}
+
+	@Override
+	public String toString() {
+		return jsonObject.toString();
+	}
 }
