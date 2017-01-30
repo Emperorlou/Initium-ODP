@@ -14,8 +14,8 @@ public abstract class OperationBase
 {
 
 	private List<Map<String, String>> htmlUpdates = new ArrayList<Map<String, String>>();
-	private List<GridCell> gridCellUpdates = new ArrayList<>();
-	private List<GridObject> gridObjectUpdates = new ArrayList<>();
+	private List<JSONObject> gridCellUpdates = new ArrayList<>();
+	private List<JSONObject> gridObjectUpdates = new ArrayList<>();
 	
 	/**
 	 * When the command returns to the browser, the page will then find the elements that match
@@ -118,28 +118,28 @@ public abstract class OperationBase
 		return htmlUpdates;
 	}
 
-	public List<GridCell> getGridCellUpdates() {
+	public List<JSONObject> getGridCellUpdates() {
 		return gridCellUpdates;
 	}
 
-	public void setGridCellUpdates(List<GridCell> gridCellUpdates) {
+	public void setGridCellUpdates(List<JSONObject> gridCellUpdates) {
 		this.gridCellUpdates = gridCellUpdates;
 	}
 
-	public List<GridObject> getGridObjectUpdates() {
+	public List<JSONObject> getGridObjectUpdates() {
 		return gridObjectUpdates;
 	}
 
-	public void setGridObjectUpdates(List<GridObject> gridObjectUpdates) {
+	public void setGridObjectUpdates(List<JSONObject> gridObjectUpdates) {
 		this.gridObjectUpdates = gridObjectUpdates;
 	}
 	
 	public void addGridCellUpdate(GridCell gridCell) {
-		this.gridCellUpdates.add(gridCell);
+		this.gridCellUpdates.add(gridCell.getJsonObject());
 	}
 	
 	public void addGridObjectUpdate(GridObject gridObject) {
-		this.gridObjectUpdates.add(gridObject);
+		this.gridObjectUpdates.add(gridObject.getJsonObject());
 	}
 	
 	public JSONObject getMapUpdateJSON() {
