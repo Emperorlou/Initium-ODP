@@ -57,7 +57,7 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 	this.sendMessage = function(message)
 	{
 		if(this.checkClientSideChatCommands!=null){
-			if(checkClientSideChatCommands(message))
+			if(this.checkClientSideChatCommands(message))
 				return;
 		}
 
