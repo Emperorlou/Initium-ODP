@@ -1133,44 +1133,44 @@ function updateGridFromServer(returnJson) {
  */
 function updateGridCell(gridCell) {
     // For all updates we need to have a coord
-    if (gridCell.xGridCoord && gridCell.yGridCoord) {
+    if (gridCell.xGridCoord != undefined && gridCell.yGridCoord != undefined) {
         currentCell = gridCells[gridCell.xGridCoord][gridCell.yGridCoord];
         if (gridCell.backgroundFile) {
-            currentCell.backgroundDiv.style.backgroundImage = $picUrlPath + gridCell.backgroundFile + ")";
+            currentCell.backgroundDiv.style.background = $picUrlPath + gridCell.backgroundFile + ")";
         }
     }
 }
 
 function updateGridObject(gridObject) {
     // For all updates we need to have a key
-    if (gridObject.key) {
+    if (gridObject.key != undefined) {
         currentObject = gridObjects[gridObject.key];
         // Update the new object
-        if (gridObject.filename) {
+        if (gridObject.filename != undefined) {
             currentObject.div.style.backgroundImage = $picUrlPath + gridObject.filename + ")";
         }
-        if (gridObject.xGridCoord) {
+        if (gridObject.xGridCoord != undefined) {
             currentObject.xGridCoord = gridObject.xGridCoord;
         }
-        if (gridObject.yGridCoord) {
+        if (gridObject.yGridCoord != undefined) {
             currentObject.yGridCoord = gridObject.yGridCoord;
         }
-        if (gridObject.xGridCellOffset) {
+        if (gridObject.xGridCellOffset != undefined) {
             currentObject.xGridCellOffset = gridObject.xGridCellOffset;
         }
-        if (gridObject.yGridCellOffset) {
+        if (gridObject.yGridCellOffset != undefined) {
             currentObject.yGridCellOffset = gridObject.yGridCellOffset;
         }
-        if (gridObject.xImageOrigin) {
+        if (gridObject.xImageOrigin != undefined) {
             currentObject.xImageOrigin = gridObject.xImageOrigin;
         }
-        if (gridObject.yImageOrigin) {
+        if (gridObject.yImageOrigin != undefined) {
             currentObject.yImageOrigin = gridObject.yImageOrigin;
         }
-        if (gridObject.width) {
+        if (gridObject.width != undefined) {
             currentObject.width = gridObject.width;
         }
-        if (gridObject.height) {
+        if (gridObject.height != undefined) {
             currentObject.height = gridObject.height;
         }
 
@@ -1189,15 +1189,15 @@ function updateGridObject(gridObject) {
             // If we have updated coords, use them. Otherwise use the object's old coords
             xCoord = currentObject.xGridCoord;
             yCoord = currentObject.yGridCoord;
-            if (gridObject.xGridCoord) xCoord = gridObject.xGridCoord;
-            if (gridObject.yGridCoord) yCoord = gridObject.yGridCoord;
+            if (gridObject.xGridCoord != undefined) xCoord = gridObject.xGridCoord;
+            if (gridObject.yGridCoord != undefined) yCoord = gridObject.yGridCoord;
 
             // If this object is not marked for removal, see if it exists at the coord, if not add it
             if (!gridCells[xCoord][yCoord].objectKeys.contains(gridObject.key)) {
                 gridCells[xCoord][yCoord].objectKeys.add(gridObject.key);
             }
             // If this object is not marked for removal, see if it exists in the object hash, if not add it
-            if (!gridObjects[gridObject.key]) {
+            if (gridObjects[gridObject.key] != undefined) {
                 // If we add the object to the map, we should have all image related fields defined
                 if (gridObject.filename && gridObject.name && gridObject.xGridCellOffset && gridObject.yGridCellOffset &&
                     gridObject.xGridCoord && gridObject.yGridCoord && gridObject.xImageOrigin && gridObject.yImageOrigin &&
