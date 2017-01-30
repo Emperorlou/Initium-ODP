@@ -1136,7 +1136,7 @@ function updateGridCell(gridCell) {
     if (gridCell.xGridCoord && gridCell.yGridCoord) {
         currentCell = gridCells[gridCell.xGridCoord][gridCell.yGridCoord];
         if (gridCell.backgroundFile) {
-            currentCell.style.backgroundImage = $picUrlPath + gridCell.backgroundFile + ")";
+            currentCell.backgroundDiv.style.backgroundImage = $picUrlPath + gridCell.backgroundFile + ")";
         }
     }
 }
