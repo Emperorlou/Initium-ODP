@@ -2,6 +2,8 @@ package com.universeprojects.miniup.server;
 
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,5 +140,17 @@ public abstract class OperationBase
 	
 	public void addGridObjectUpdate(GridObject gridObject) {
 		this.gridObjectUpdates.add(gridObject);
+	}
+	
+	public JSONObject getMapUpdateJSON() {
+		JSONObject jsonObject = new JSONObject();
+		JSONArray jsonArray = new JSONArray();
+		jsonArray.addAll(this.gridCellUpdates);
+		
+		JSONArray jsonObjects = new JSONArray();
+		jsonObjects.addAll(this.gridObjectUpdates);
+		jsonObject.put("GridCells", jsonArray);
+		jsonObject.put("GridObject", jsonObjects);
+		return jsonObject;
 	}
 }
