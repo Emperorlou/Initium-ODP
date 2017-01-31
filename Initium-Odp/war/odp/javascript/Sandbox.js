@@ -298,7 +298,7 @@ function loadMap() {
     grid.style.left = offsetX + "px";
 
     document.getElementById("main-viewport-container").appendChild(viewportContainer);
-    viewportContainer.style.position = "relative";
+    viewportContainer.style.position = "absolute";
     viewport.style.position = "absolute";
     grid.style.position = "relative";
 
@@ -752,8 +752,8 @@ function getCoordOfMouse() {
         offsetY = event.changedTouches[0].clientY;
     }
     // Determine where the click took place in the grid
-    var gridRelx = offsetX - viewportContainer.offsetLeft - viewport.offsetLeft - grid.offsetLeft - (scaledGridCellWidth / 2);
-    var gridRely = offsetY - viewportContainer.offsetTop - viewport.offsetTop - grid.offsetTop + $(window).scrollTop() - (scaledGridCellHeight / 2);
+    var gridRelx = offsetX - grid.getBoundingClientRect().left - (scaledGridCellWidth / 2);
+    var gridRely = offsetY - grid.getBoundingClientRect().top + $(window).scrollTop() - (scaledGridCellHeight / 2);
     var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
     var gridRow = Math.floor(gridRely / scaledGridCellHeight);
     return new CoordObject(gridColumn, gridRow);
