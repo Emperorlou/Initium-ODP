@@ -453,6 +453,7 @@ https://github.com/Emperorlou/Initium-ODP
 
 					</div>
 				</div>
+		<div id='toggle-2d-grid' onclick='toggle2DGrid()'>Toggle 2D Map</div>
 		<div class='newui-popup' id='page-popup-root'></div> 
 				
 				<div class='location-controls-container'>
