@@ -297,6 +297,7 @@ function loadMap() {
     grid.style.top = offsetY + "px";
     grid.style.left = offsetX + "px";
 
+    document.getElementById("banner-base").appendChild(viewportContainer);
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
     grid.style.position = "relative";
@@ -367,7 +368,6 @@ function buildMap(responseJson) {
     keepSelectedCenter = (document.getElementById('keepSelectedCenter') == null) ? true : document.getElementById('keepSelectedCenter').checked;
     var groundHtml = "";
     var cellHtml = "";
-    var zOffset = 10;
     $.each(responseJson['backgroundTiles'], function (index, value) {
         $.each(value, function (innerIndex, backgroundObject) {
 

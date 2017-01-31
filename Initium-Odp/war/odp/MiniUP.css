@@ -3486,8 +3486,8 @@ body
 }
 
 .vpcontainer {
-	height: 500px;
-	width: 95%;
+	height: 215px;
+	width: 100%;
 	border: 1px solid black;
 	margin-left:auto;margin-right:auto;
 	overflow: hidden;
