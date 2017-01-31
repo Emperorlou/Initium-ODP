@@ -3191,3 +3191,12 @@ function swapContainers(event, selector)
 
 	doCommand(event,"ItemsSwapStorageContainers",{"itemIds":itemIds});
 }
+
+function toggle2DGrid() {
+	vpc = document.getElementById("viewportcontainer").style.display;
+	if (vpc.style.display == "none") {
+		vpc.style.display = "block";
+	} else {
+		vpc.style.display = "none";
+	}
+}
