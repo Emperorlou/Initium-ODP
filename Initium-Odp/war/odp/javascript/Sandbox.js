@@ -297,7 +297,7 @@ function loadMap() {
     grid.style.top = offsetY + "px";
     grid.style.left = offsetX + "px";
 
-    document.getElementById("banner-base").appendChild(viewportContainer);
+    document.getElementById("main-viewport-container").appendChild(viewportContainer);
     viewportContainer.style.position = "relative";
     viewport.style.position = "absolute";
     grid.style.position = "relative";
