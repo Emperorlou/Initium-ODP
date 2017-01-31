@@ -557,7 +557,7 @@ function playerReadMap(eventObject, itemId, pathId, hasDura)
 
 function createMapToHouse(eventObject)
 {
-	confirmCancelPopup("Create Permanent Map", "Do you want to create a permanent map? Be warned that anyone will be able to learn the path to your house if they get access to it.", true,
+	confirmCancelPopup("Create Permanent Map", "Do you want to create a permanent map? Be warned that anyone will be able to learn the path to your house if they get access to it. It will cost 500g.", true,
 			function() { doCommand(eventObject, "PlayerCreateHouseMap", {"reusable":"true"}); },
 			function() { doCommand(eventObject, "PlayerCreateHouseMap", {"reusable":"false"}); });
 }

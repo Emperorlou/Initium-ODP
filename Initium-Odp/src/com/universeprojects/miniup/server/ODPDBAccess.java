@@ -5226,7 +5226,7 @@ public class ODPDBAccess
 	 * @param location
 	 * @param forceDelete
 	 */
-	public void doCollapseCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, CachedEntity location, boolean forceDelete)
+	public void doCollapseCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, CachedEntity location)
 	{
 		if (ds==null)
 			ds = getDB();
@@ -5260,40 +5260,23 @@ public class ODPDBAccess
 		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
 		
 
-		boolean hasLiveNpc = false;
-		boolean hideOnly = false;
-		for(CachedEntity character:characters)
-		{
-			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
-				hideOnly = true;
-			else if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d)
-				hasLiveNpc=true;
-		}
+//		boolean hasLiveNpc = false;
+//		boolean hideOnly = false;
+//		for(CachedEntity character:characters)
+//		{
+//			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
+//				hideOnly = true;
+//			else if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d)
+//				hasLiveNpc=true;
+//		}
 		
 		
-		// Having the paths size>1 cancels the deletion of the combat site. This is very important so that people don't get
+		// Having the paths size>1 cancels the collapse of the combat site. This is very important so that people don't get
 		// stranded in rare cases where there are other sites branching from this one. The outer branches must be deleted first, 
 		// but we can do that lazily.
-		if ((hideOnly && forceDelete==false) || 
-				(paths.size()>1 && forceDelete==false) || 
-				(hasLiveNpc && forceDelete==false) /*Now we don't delete the site if the NPC is alive*/)
+		if (paths.size()>1) 
 		{
-			// Delete the discoveries of the paths to this location
-			for(CachedEntity discovery:discoveries)
-			{
-				for(CachedEntity path:paths)
-				{
-					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
-					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
-					{
-						discovery.setProperty("hidden", "TRUE");
-						ds.put(discovery);
-					}
-				}
-				
-				// Right now discoveries are only used for paths. More may need to be handled later on.
-			}
-			
+			// We'll just leave this one for now
 			return;
 		}
 		else

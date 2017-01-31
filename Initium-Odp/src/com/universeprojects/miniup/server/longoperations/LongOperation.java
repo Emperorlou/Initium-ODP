@@ -185,6 +185,8 @@ public abstract class LongOperation extends OperationBase
 		result.put("timeLeft", timeLeft);
 		result.put("isComplete", isComplete());
 		result.put("responseHtml", getHtmlUpdates());
+		result.put("_2dViewportUpdates", getMapUpdateJSON());
+		
 		
 		result.put("refresh", fullRefresh);
 		
