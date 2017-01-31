@@ -5243,7 +5243,7 @@ public class ODPDBAccess
 			return;
 
 		// If it has been less than the amount of time we want to wait before collapsing, lets get out of here
-		if (GameUtils.elapsed(createdDate, Calendar.HOUR)<24)
+		if (GameUtils.elapsed(createdDate, Calendar.HOUR)<3)
 			return;
 		
 		CachedEntity parentLocation = getParentLocation(ds, location);

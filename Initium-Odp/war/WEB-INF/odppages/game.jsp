@@ -390,7 +390,8 @@ https://github.com/Emperorlou/Initium-ODP
 			</div>
 			<div id='main-banner' class='banner1'>
 				<img id='banner-sizer' src='https://initium-resources.appspot.com/images/banner---placeholder2.png' border=0/>
-				<div id='banner-base'></div>			
+				<div id='banner-base'></div>
+				<div id='main-viewport-container'></div>							
 				<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
 					${inBannerCharacterWidget}
 				</div>				
