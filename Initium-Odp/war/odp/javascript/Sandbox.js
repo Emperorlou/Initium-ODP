@@ -111,9 +111,8 @@ function scaleTiles(onCenter) {
     diffGridHeight = totalGridWidth - prevGridHeight;
     grid.style.height = currGridHeight + "px";
     grid.style.width = currGridWidth + "px";
-
-    originX = grid.offsetLeft + viewport.offsetLeft + viewportContainer.offsetLeft;
-    originY = grid.offsetTop + viewport.offsetTop + viewportContainer.offsetTop + -$(window).scrollTop();
+    originX = grid.getBoundingClientRect().left;
+    originY = grid.getBoundingClientRect().top + -$(window).scrollTop();
 
     if (!onCenter) {
         var userLocX = 0;
@@ -156,14 +155,14 @@ function scaleTiles(onCenter) {
                 zoomTouch = true;
             } else {
                 // Couldn't find mouse/finger position(s), last resort zoom to center of viewport
-                userLocX = viewport.offsetWidth/2 + viewport.offsetLeft + viewportContainer.offsetLeft;
-                userLocY = viewport.offsetHeight/2 + viewport.offsetTop + viewportContainer.offsetTop + - $(window).scrollTop();
+                userLocX = viewport.offsetWidth/2 + viewport.getBoundingClientRect().left;
+                userLocY = viewport.offsetHeight/2 + viewport.getBoundingClientRect().top + - $(window).scrollTop();
             }
         }
     } else {
         // Zoom to center of viewport
-        userLocX = viewport.offsetWidth/2 + viewport.offsetLeft + viewportContainer.offsetLeft;
-        userLocY = viewport.offsetHeight/2 + viewport.offsetTop + viewportContainer.offsetTop + - $(window).scrollTop();
+        userLocX = viewport.offsetWidth/2 + viewport.getBoundingClientRect().left;
+        userLocY = viewport.offsetHeight/2 + viewport.getBoundingClientRect().top + - $(window).scrollTop();
     }
 
     dx = Math.abs(userLocX - originX);
