@@ -2266,7 +2266,10 @@ function doCommand(eventObject, commandName, parameters, callback)
 		
 		// Update the map with response data
 		if (data._2dViewportUpdates!=null) {
-			updateGridFromServer(data._2dViewportUpdates);
+			// For testing purposes, we might not have method in scope
+			if (typeof updateGridFromServer === "function") {
+				updateGridFromServer(data._2dViewportUpdates);
+			}
 		}
 
 		// Here we display an error message popup if there was an error
