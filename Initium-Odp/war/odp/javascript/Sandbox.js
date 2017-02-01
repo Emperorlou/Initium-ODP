@@ -977,18 +977,9 @@ function dragDiv(e) {
 
 function checkIfHoveringOverViewport() {
     var targ = event.target ? event.target : event.srcElement;
-    if (targ.className != 'gridBackground' &&
-        targ.className != 'grid' &&
-        targ.className != 'gridCell' &&
-        targ.className != 'vp' &&
-        targ.className != 'vpcontainer' &&
-        targ.className != 'gridObject' &&
-        targ.className != 'gridLayer' &&
-        targ.className != 'highlighted' &&
-        targ.className != 'gridObject highlighted' &&
-        targ.className != 'cursorObject' &&
-        targ.className != 'cursorSubObject' &&
-        targ.className != 'objectLayer') {return false};
+    if (checkIfHoveringOverGrid()) {return true;}
+    else if (targ.className != 'vp' &&
+        targ.className != 'vpcontainer') {return false};
     return true;
 }
 function checkIfHoveringOverGrid() {
@@ -996,6 +987,8 @@ function checkIfHoveringOverGrid() {
     if (targ.className != 'gridBackground' &&
         targ.className != 'gridBackground gridSelected' &&
         targ.className != 'gridBackground highlighted' &&
+        targ.className != 'gridBackground highlighted gridSelected' &&
+        targ.className != 'gridBackground gridSelected highlighted' &&
         targ.className != 'grid' &&
         targ.className != 'gridCell' &&
         targ.className != 'gridLayer' &&
@@ -1003,6 +996,8 @@ function checkIfHoveringOverGrid() {
         targ.className != 'gridObject' &&
         targ.className != 'gridObject highlighted' &&
         targ.className != 'gridObject gridSelected' &&
+        targ.className != 'gridObject gridSelected highlighted' &&
+        targ.className != 'gridObject highlighted gridSelected' &&
         targ.className != 'cursorObject' &&
         targ.className != 'cursorSubObject' &&
         targ.className != 'objectLayer') {return false};
