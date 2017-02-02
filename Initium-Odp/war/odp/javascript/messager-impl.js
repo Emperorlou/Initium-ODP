@@ -158,6 +158,11 @@ messager.checkClientSideChatCommands = function(chatMessage)
 			tradeStartTradeNewCharacterName(null, characterName);
 			return true;
 		}
+		if (chatMessage.toLowerCase().startsWith("/party")) {
+			var characterName = chatMessage.slice(7);
+			joinPartyCharacterName(null, characterName);
+			return true;
+		}
 	}
 	return false;
 }
