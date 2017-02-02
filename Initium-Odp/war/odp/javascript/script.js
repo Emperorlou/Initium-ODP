@@ -5,7 +5,7 @@ window.popupsArray = new Array();
 window.singlePostFormSubmitted = false;
 
 var notifyHandler = null;
-// Case insensitive Contains selector.
+// Case insensitive Contains selector.f
 jQuery.expr[':'].ContainsI = function(a, i, m) { return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0; };
 
 $(window).ready(function(e){
@@ -784,7 +784,7 @@ function loadLocationItems()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("/ajax_moveitems.jsp?preset=location");
+	pagePopup("/ajax_moveitems.jsp?preset=location", null, "Nearby Items");
 //	$("#main-itemlist").load("locationitemlist.jsp");
 //	$("#main-itemlist").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby items</h4></div>");
@@ -796,7 +796,7 @@ function loadLocationCharacters()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("/locationcharacterlist.jsp");
+	pagePopup("/locationcharacterlist.jsp", null, "Nearby Characters");
 //	$("#main-characterlist").click(function(){
 //		$("#main-characterlist").html("<div class='boldbox' onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby characters</h4></div>");
 //	});
@@ -807,7 +807,7 @@ function loadLocationMerchants()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("/locationmerchantlist.jsp");
+	pagePopup("/locationmerchantlist.jsp", null, "Nearby Merchants");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
 //	$("#main-merchantlist").click(function(){
 //		$("#main-merchantlist").html("<div class='boldbox' onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby merchants</h4></div>");
@@ -888,7 +888,7 @@ function helpPopup()
 			"<li>/groups - This puts up a link to a player made list of groups in Initium which <a href='http://initium.wikia.com/wiki/Category:Player_Groups' target='_blank'>you can also find here.</a></li>" +
 			"<li>/wiki - This puts up a link to a player made wiki for Initium which <a href='http://initium.wikia.com/wiki/Initium_Wiki' target='_blank'>you can also find here.</a></li>" +
 			"</ul>", false);*/
-	pagePopup("/odp/chatHelp.html");
+	pagePopup("/odp/chatHelp.html", null, "Chat Help");
 }
 
 
@@ -921,7 +921,7 @@ function shareItem(itemId)
 function viewGroup(groupId)
 {
 	closeAllTooltips();
-	pagePopup("/odp/ajax_group?groupId=" + groupId);
+	pagePopup("/odp/ajax_group?groupId=" + groupId, null, "Group Page");
 }
 
 
@@ -1588,19 +1588,19 @@ function inventory()
 function viewChangelog()
 {
     closeAllPopupsTooltips();
-	pagePopup("/ajax_changelog.jsp");
+	pagePopup("/ajax_changelog.jsp", null, "Change Log");
 }
 
 function viewSettings()
 {
     closeAllPopupsTooltips();
-	pagePopup("/odp/ajax_settings.jsp");
+	pagePopup("/odp/ajax_settings.jsp", null, "Game Settings");
 }
 
 function viewProfile()
 {
     closeAllPopupsTooltips();
-	pagePopup("/odp/view_profile", "Your Profile");
+	pagePopup("/odp/view_profile", null, "Your Profile");
 }
 
 function viewMap()
@@ -1679,13 +1679,13 @@ function changeEmailAddress(oldEmail)
 
 function viewReferrals()
 {
-	pagePopup("/ajax_referrals.jsp");
+	pagePopup("/ajax_referrals.jsp", null, "Latest Referral Visits");
 }
 
 function customizeItemOrderPage(itemId)
 {
     closeAllPopupsTooltips();
-	pagePopup("/ajax_customizeitem.jsp?itemId="+itemId);
+	pagePopup("/ajax_customizeitem.jsp?itemId="+itemId, null, "Customization Order");
 }
 
 function orderItemCustomization(itemId, orderTypeId, requiredDetails)
@@ -2034,7 +2034,7 @@ function disallowDuelRequests()
 
 function viewStore(characterId)
 {
-	pagePopup("/odp/ajax_viewstore.jsp?characterId="+characterId+"");
+	pagePopup("/odp/ajax_viewstore.jsp?characterId="+characterId+"", null, "Merchant Store");
 }
 
 function setBlockadeRule(rule)
@@ -2103,7 +2103,12 @@ function doCombatAttackRightHand(event)
 
 function viewExchange()
 {
-	pagePopup("/odp/ajax_exchange");
+	pagePopup("/odp/ajax_exchange", null, "Exchange");
+}
+
+function viewInvention()
+{
+	pagePopup("/odp/invention", null, "Invention");
 }
 
 
@@ -2673,7 +2678,7 @@ function _viewTrade()
 	pagePopup("/odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
 //		popupMessage("Trade Cancelled","This trade has been cancelled.")
-	});	
+	}, "Trade");	
 }
 
 function updateTradeWindow()

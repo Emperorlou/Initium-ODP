@@ -371,11 +371,17 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		}
 	}
 	
+	public static String generateInventionButton()
+	{
+		return generateButtonBarItem("inventionButton", "Clicking will open the invention page.", "viewInvention(event)", "https://initium-resources.appspot.com/images/ui/invention1.png");
+	}
+	
 	public static String generateButtonBar(CachedEntity character)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id='buttonbar-main'>");
 		// Buttons
+		sb.append("<span>" + generateInventionButton() + "</span>");
 		sb.append("<span>" + generateManageStoreButton() + "</span>");
 		sb.append("<span>" + generateToggleStorefront(character) + "</span>");
 		sb.append("<span>" + generateTogglePartyJoin(character) + "</span>");
@@ -383,6 +389,8 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		sb.append("<span>" + generateToggleCloak(character) + "</span>");
 		// Help text
 		sb.append("<div class='hiddenTooltip' id='buttonbar-help'><h5>The Button Bar</h5>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/invention1.png' border='0' style='float:left; padding:4px;'>");
+		sb.append("<p>This opens the invention page. This page is where you initiate experiments, manage and implement your character's ideas, and construct items and buildings.</p>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/manageStore.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This button will take you to your storefront management page. This page allows you to setup your storefront by specifying which items you would like to sell to other players and for how much. More help can be found in the storefront page itself.</p>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/storefrontEnabled.png' border='0' style='float:left;padding:4px;'>");

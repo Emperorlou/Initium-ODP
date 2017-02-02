@@ -42,6 +42,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MovementService;
+import com.universeprojects.miniup.server.services.ODPInventionService;
 
 public class ODPDBAccess
 {
@@ -5226,7 +5227,7 @@ public class ODPDBAccess
 	 * @param location
 	 * @param forceDelete
 	 */
-	public void doCollapseCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, CachedEntity location)
+	public void doCollapseCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, CachedEntity location, CachedEntity backupParentLocation)
 	{
 		if (ds==null)
 			ds = getDB();
@@ -5243,13 +5244,13 @@ public class ODPDBAccess
 			return;
 
 		// If it has been less than the amount of time we want to wait before collapsing, lets get out of here
-		if (GameUtils.elapsed(createdDate, Calendar.HOUR)<3)
+		if (GameUtils.elapsed(createdDate, Calendar.HOUR)<24)
 			return;
 		
 		CachedEntity parentLocation = getParentLocation(ds, location);
 		
 		if (parentLocation==null)
-			return;
+			parentLocation = backupParentLocation;
 		
 		QueryHelper q = new QueryHelper(ds);
 		List<CachedEntity> characters = q.getFilteredList("Character", "locationKey", locationKey);
@@ -5287,6 +5288,7 @@ public class ODPDBAccess
 			for(CachedEntity character:characters)
 			{
 				character.setProperty("locationKey", parentLocation.getKey());
+				character.setProperty("locationEntryDatetime", new Date());
 				ds.put(character);
 			}
 			
@@ -5294,6 +5296,7 @@ public class ODPDBAccess
 			for(CachedEntity item:items)
 			{
 				item.setProperty("containerKey", parentLocation.getKey());
+				item.setProperty("movedTimestamp", new Date());
 				ds.put(item);
 			}
 			
@@ -5634,6 +5637,11 @@ public class ODPDBAccess
 	 * @return
 	 */
 	public String getChatIdToken(Key key)
+	{
+		return null;
+	}
+	
+	public ODPInventionService getInventionService()
 	{
 		return null;
 	}
