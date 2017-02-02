@@ -1730,7 +1730,11 @@ function leaveParty(eventObject) {
 }
 
 function joinParty(eventObject, partyCode) {
-	doCommand(eventObject, "PartyJoin", {"partyCode": partyCode});
+	doCommand(eventObject, "PartyJoin", {"inputType":"partyCode","partyCode": partyCode});
+}
+
+function joinPartyCharacterName(eventObject, characterName) {
+	doCommand(eventObject, "PartyJoin", {"inputType":"characterName","characterName":characterName});
 }
 
 //Old leave party function

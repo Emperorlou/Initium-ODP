@@ -32,7 +32,19 @@ public class CommandPartyJoin extends Command {
 		CachedDatastoreService ds = getDS();
 
 		CachedEntity character = db.getCurrentCharacter();
-		String toJoin = parameters.get("partyCode");
+		String toJoin = "";
+		
+		if(parameters.get("inputType").equals("partyCode")) {
+			toJoin = parameters.get("partyCode");
+		} else if (parameters.get("inputType").equals("characterName")) {
+			String characterName = parameters.get("characterName");
+			CachedEntity otherCharacter = db.getCharacterByName(characterName);
+			if(otherCharacter == null) {
+				throw new UserErrorMessage("Character with name of "+characterName+" does not exist!");
+			}
+			toJoin = (String) otherCharacter.getProperty("partyCode");
+		}
+		
 		String currentParty = (String) character.getProperty("partyCode");
 		
 		if (toJoin.equals(currentParty)) {
