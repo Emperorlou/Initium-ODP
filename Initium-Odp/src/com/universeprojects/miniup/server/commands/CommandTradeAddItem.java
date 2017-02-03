@@ -34,14 +34,15 @@ public class CommandTradeAddItem extends Command {
         
         if (item==null)
 			throw new UserErrorMessage("Item doesn't exist.");
-		
+        if(db.checkCharacterHasItemEquipped(character, item.getKey()))
+			throw new UserErrorMessage("You cannot trade equipped items");
+        
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
 		if (tradeObject==null || tradeObject.isCancelled())
 			throw new UserErrorMessage("Trade has been cancelled.");
 		if (tradeObject.isComplete())
 			throw new UserErrorMessage("Trade is already complete.");
-        
-        
+		
         db.addTradeItem(ds, tradeObject, character, item);
         db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
