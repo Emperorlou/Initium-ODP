@@ -1,7 +1,9 @@
 package com.universeprojects.miniup.server.services;
 
 import java.util.List;
+import java.util.Map;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 
@@ -31,6 +33,11 @@ public class ODPInventionService extends Service
 	}
 
 	public List<CachedEntity> getAllItemConstructionIdeas()
+	{
+		return null;
+	}
+	
+	public Map<Key, CachedEntity> getAllItemDefsForItemConstructionIdeas()
 	{
 		return null;
 	}
