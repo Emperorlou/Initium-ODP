@@ -34,12 +34,12 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheService.IdentifiableValue;
 import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
+import com.sun.org.apache.bcel.internal.classfile.CodeException;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.exceptions.CodeException;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MovementService;
@@ -4504,7 +4504,7 @@ public class ODPDBAccess
 					leader = e;
 			
 			if (leader==null)
-				throw new CodeException("Party had no leader. This shouldn't be possible.");
+				throw new RuntimeException("Party had no leader. This shouldn't be possible.");
 			
 			if ("TRUE".equals(leader.getProperty("partyJoinsAllowed"))==false)
 				throw new UserErrorMessage("This party is not accepting new members at the moment. The party leader is "+leader.getProperty("name")+".");
@@ -5731,7 +5731,7 @@ public class ODPDBAccess
 	 * 
 	 * @return
 	 */
-	public ODPInventionService getInventionService()
+	public ODPInventionService getInventionService(ODPKnowledgeService knowledgeService)
 	{
 		return null;
 	}

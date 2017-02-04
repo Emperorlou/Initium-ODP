@@ -16,6 +16,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.ODPInventionService;
+import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
@@ -30,7 +31,8 @@ public class InventionController extends PageController {
 	protected final String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
-		ODPInventionService invention = db.getInventionService();
+		ODPKnowledgeService knowledge = db.getKnowledgeService(db.getCurrentCharacter().getKey());
+		ODPInventionService invention = db.getInventionService(knowledge);
 	
 		populateKnowledgePageData(request, db, invention);
 		populateExperimentPageData(request, db, invention);
@@ -43,7 +45,7 @@ public class InventionController extends PageController {
 	@SuppressWarnings("unchecked")
 	private void populateKnowledgePageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
 	{
-		List<CachedEntity> allKnowledgeEntities = invention.getAllKnowledgeTree();
+		List<CachedEntity> allKnowledgeEntities = invention.getKnowledgeService().getAllKnowledgeTree();
 		Map<String, Object> knowledgeTree = processKnowledgeTreeRecursive(null, allKnowledgeEntities);
 		request.setAttribute("knowledgeTree", knowledgeTree);
 		boolean hasKnowledge = true;

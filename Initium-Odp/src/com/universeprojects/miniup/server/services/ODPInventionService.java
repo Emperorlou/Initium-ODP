@@ -9,10 +9,17 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 
 public abstract class ODPInventionService extends Service
 {
-
-	protected ODPInventionService(ODPDBAccess db)
+	final protected ODPKnowledgeService knowledgeService;
+	
+	protected ODPInventionService(ODPDBAccess db, ODPKnowledgeService knowledgeService)
 	{
 		super(db);
+		this.knowledgeService = knowledgeService;
+	}
+	
+	public ODPKnowledgeService getKnowledgeService()
+	{
+		return knowledgeService;
 	}
 
 	/**This is a placeholder. The implementation of this method is in the core repo.
@@ -42,9 +49,5 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public List<CachedEntity> getAllKnowledgeTree()
-	{
-		return null;
-	}
 
 }
