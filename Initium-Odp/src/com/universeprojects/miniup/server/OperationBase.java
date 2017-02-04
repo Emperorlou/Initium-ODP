@@ -1,5 +1,10 @@
 package com.universeprojects.miniup.server;
 
+import com.universeprojects.miniup.server.model.GridCell;
+import com.universeprojects.miniup.server.model.GridObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +14,8 @@ public abstract class OperationBase
 {
 
 	private List<Map<String, String>> htmlUpdates = new ArrayList<Map<String, String>>();
+	private List<JSONObject> gridCellUpdates = new ArrayList<>();
+	private List<JSONObject> gridObjectUpdates = new ArrayList<>();
 	
 	/**
 	 * When the command returns to the browser, the page will then find the elements that match
@@ -57,9 +64,7 @@ public abstract class OperationBase
 	 * will be deleted and the then a new script tag will be added to the page with the given javascript.
 	 * The new javascript <script> tag will also have the same id as the one deleted.
 	 * 
-	 * 
-	 * @param jquerySelector
-	 * @param newHtml
+	 *
 	 */
 	public void updateJavascript(String elementId, String newJavascript)
 	{
@@ -112,5 +117,39 @@ public abstract class OperationBase
 	{
 		return htmlUpdates;
 	}
+
+	public List<JSONObject> getGridCellUpdates() {
+		return gridCellUpdates;
+	}
+
+	public void setGridCellUpdates(List<JSONObject> gridCellUpdates) {
+		this.gridCellUpdates = gridCellUpdates;
+	}
+
+	public List<JSONObject> getGridObjectUpdates() {
+		return gridObjectUpdates;
+	}
+
+	public void setGridObjectUpdates(List<JSONObject> gridObjectUpdates) {
+		this.gridObjectUpdates = gridObjectUpdates;
+	}
 	
+	public void addGridCellUpdate(GridCell gridCell) {
+		this.gridCellUpdates.add(gridCell.getJsonObject());
+	}
+	
+	public void addGridObjectUpdate(GridObject gridObject) {
+		this.gridObjectUpdates.add(gridObject.getJsonObject());
+	}
+	
+	public JSONObject getMapUpdateJSON() {
+		JSONObject finalJson = new JSONObject();
+		JSONArray gridCellJson = new JSONArray();
+		JSONArray gridObjectJson = new JSONArray();
+		gridCellJson.addAll(this.gridCellUpdates);
+		gridObjectJson.addAll(this.gridObjectUpdates);
+		finalJson.put("GridCells", gridCellJson);
+		finalJson.put("GridObject", gridObjectJson);
+		return finalJson;
+	}
 }

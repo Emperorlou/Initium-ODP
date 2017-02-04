@@ -39,9 +39,12 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.exceptions.CodeException;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MovementService;
+import com.universeprojects.miniup.server.services.ODPInventionService;
+import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
 public class ODPDBAccess
 {
@@ -4463,6 +4466,83 @@ public class ODPDBAccess
 		getParty(ds, partyCode);
 	}
 
+	
+	public void doRequestJoinParty(CachedDatastoreService ds, CachedEntity character, CachedEntity partiedCharacter) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+
+		if (character.getKey().getId() == partiedCharacter.getKey().getId())
+			throw new UserErrorMessage("You cannot join yourself in a party. You should seriously invest in some friends.");
+		
+		if (((Key)character.getProperty("locationKey")).getId() != ((Key)partiedCharacter.getProperty("locationKey")).getId())
+			throw new UserErrorMessage("You cannot party with a character that is not in the same location as you.");
+		
+		if (getParty(ds, character)!=null)
+			throw new UserErrorMessage("You cannot join another party until you leave the one you're in already. <a onclick='leaveParty()'>Click here</a> to leave your current party.");
+		
+		String partyCode = (String)partiedCharacter.getProperty("partyCode");
+		if (partyCode==null || partyCode.equals(""))
+		{
+			if ("TRUE".equals(partiedCharacter.getProperty("partyJoinsAllowed"))==false)
+				throw new UserErrorMessage("This user is not accepting party joins at this time.");
+			
+			Random rnd = new Random();
+			partyCode = rnd.nextLong()+"";
+			
+			partiedCharacter.setProperty("partyCode", partyCode);
+			partiedCharacter.setProperty("partyLeader", "TRUE");
+			
+			ds.put(partiedCharacter);
+		}
+		else
+		{
+			List<CachedEntity> currentParty = getParty(ds, partiedCharacter);
+			CachedEntity leader = null;
+			for(CachedEntity e:currentParty)
+				if ("TRUE".equals(e.getProperty("partyLeader")))
+					leader = e;
+			
+			if (leader==null)
+				throw new CodeException("Party had no leader. This shouldn't be possible.");
+			
+			if ("TRUE".equals(leader.getProperty("partyJoinsAllowed"))==false)
+				throw new UserErrorMessage("This party is not accepting new members at the moment. The party leader is "+leader.getProperty("name")+".");
+			
+			// Determine if this party can hold more members, if not, throw
+			if (currentParty.size()>=4)
+				throw new UserErrorMessage("The party is full. A party can have a maximum of 4 members.");
+		}
+		
+		character.setProperty("partyLeader", null);
+		character.setProperty("partyCode", partyCode);
+		
+		ds.put(character);
+	}
+
+	
+	public void doChangePartyLeader(CachedDatastoreService ds, CachedEntity selfCharacter, CachedEntity newLeader) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		String selfPartyCode = (String)selfCharacter.getProperty("partyCode");
+		String newLeaderPartyCode = (String)newLeader.getProperty("partyCode");
+		
+		if (selfPartyCode.equals(newLeaderPartyCode)==false)
+			throw new UserErrorMessage("You cannot assign that character as leader because he is not currently in your party.");
+		
+		if ("TRUE".equals(selfCharacter.getProperty("partyLeader"))==false)
+			throw new UserErrorMessage("You cannot change the party leader of your party because you are not the party leader.");
+		
+		newLeader.setProperty("partyLeader", "TRUE");
+		selfCharacter.setProperty("partyLeader", null);
+
+		ds.put(newLeader);
+		ds.put(selfCharacter);
+	}
+	
+	
 
 	/**
 	 * This will handle the leader state for a defence structure. It ensures the leader is always set properly (or unset).
@@ -5144,23 +5224,25 @@ public class ODPDBAccess
 		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
 		
 
-		boolean hasLiveNpc = false;
-		boolean hideOnly = false;
+		boolean hasPlayer = false;
+		boolean hasNPCWeWantToKeep = false;
 		for(CachedEntity character:characters)
 		{
 			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
-				hideOnly = true;
-			else if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d)
-				hasLiveNpc=true;
+				hasPlayer = true;
+			
+			if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d && GameUtils.equals(character.getProperty("hitpoints"), character.getProperty("maxHitpoints"))==false)
+				hasNPCWeWantToKeep=true;
+			
 		}
 		
 		
 		// Having the paths size>1 cancels the deletion of the combat site. This is very important so that people don't get
 		// stranded in rare cases where there are other sites branching from this one. The outer branches must be deleted first, 
 		// but we can do that lazily.
-		if ((hideOnly && forceDelete==false) || 
+		if ((hasPlayer && forceDelete==false) || 
 				(paths.size()>1 && forceDelete==false) || 
-				(hasLiveNpc && forceDelete==false) /*Now we don't delete the site if the NPC is alive*/)
+				(hasNPCWeWantToKeep && forceDelete==false) /*Now we don't delete the site if the NPC is alive*/)
 		{
 			// Delete the discoveries of the paths to this location
 			for(CachedEntity discovery:discoveries)
@@ -5186,7 +5268,8 @@ public class ODPDBAccess
 			
 			// Delete all characters standing in this place (should only be NPCs)
 			for(CachedEntity character:characters)
-				ds.delete(character.getKey());
+				if ("NPC".equals(character.getProperty("type")))
+					ds.delete(character.getKey());
 			
 			// Delete all items on the ground
 			for(CachedEntity item:items)
@@ -5226,7 +5309,7 @@ public class ODPDBAccess
 	 * @param location
 	 * @param forceDelete
 	 */
-	public void doCollapseCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, CachedEntity location, boolean forceDelete)
+	public void doCollapseCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, CachedEntity location, CachedEntity backupParentLocation)
 	{
 		if (ds==null)
 			ds = getDB();
@@ -5249,7 +5332,7 @@ public class ODPDBAccess
 		CachedEntity parentLocation = getParentLocation(ds, location);
 		
 		if (parentLocation==null)
-			return;
+			parentLocation = backupParentLocation;
 		
 		QueryHelper q = new QueryHelper(ds);
 		List<CachedEntity> characters = q.getFilteredList("Character", "locationKey", locationKey);
@@ -5260,40 +5343,23 @@ public class ODPDBAccess
 		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
 		
 
-		boolean hasLiveNpc = false;
-		boolean hideOnly = false;
-		for(CachedEntity character:characters)
-		{
-			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
-				hideOnly = true;
-			else if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d)
-				hasLiveNpc=true;
-		}
+//		boolean hasLiveNpc = false;
+//		boolean hideOnly = false;
+//		for(CachedEntity character:characters)
+//		{
+//			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
+//				hideOnly = true;
+//			else if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d)
+//				hasLiveNpc=true;
+//		}
 		
 		
-		// Having the paths size>1 cancels the deletion of the combat site. This is very important so that people don't get
+		// Having the paths size>1 cancels the collapse of the combat site. This is very important so that people don't get
 		// stranded in rare cases where there are other sites branching from this one. The outer branches must be deleted first, 
 		// but we can do that lazily.
-		if ((hideOnly && forceDelete==false) || 
-				(paths.size()>1 && forceDelete==false) || 
-				(hasLiveNpc && forceDelete==false) /*Now we don't delete the site if the NPC is alive*/)
+		if (paths.size()>1) 
 		{
-			// Delete the discoveries of the paths to this location
-			for(CachedEntity discovery:discoveries)
-			{
-				for(CachedEntity path:paths)
-				{
-					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
-					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
-					{
-						discovery.setProperty("hidden", "TRUE");
-						ds.put(discovery);
-					}
-				}
-				
-				// Right now discoveries are only used for paths. More may need to be handled later on.
-			}
-			
+			// We'll just leave this one for now
 			return;
 		}
 		else
@@ -5304,6 +5370,7 @@ public class ODPDBAccess
 			for(CachedEntity character:characters)
 			{
 				character.setProperty("locationKey", parentLocation.getKey());
+				character.setProperty("locationEntryDatetime", new Date());
 				ds.put(character);
 			}
 			
@@ -5311,6 +5378,7 @@ public class ODPDBAccess
 			for(CachedEntity item:items)
 			{
 				item.setProperty("containerKey", parentLocation.getKey());
+				item.setProperty("movedTimestamp", new Date());
 				ds.put(item);
 			}
 			
@@ -5651,6 +5719,33 @@ public class ODPDBAccess
 	 * @return
 	 */
 	public String getChatIdToken(Key key)
+	{
+		return null;
+	}
+	
+	/**
+	 * Returns a usable InvetionService object.
+	 * 
+	 * The InventionService requires a character so the logged-in user's character will
+	 * be used.
+	 * 
+	 * @return
+	 */
+	public ODPInventionService getInventionService()
+	{
+		return null;
+	}
+
+	/**
+	 * Returns a usable KnowledgeService object.
+	 * 
+	 * The KnowledgeService requires a character so the logged-in user's character will
+	 * be used.
+	 * 
+	 * @param characterKey The key of the character we want to work with. Only this character's knowledge will be used.
+	 * @return
+	 */
+	public ODPKnowledgeService getKnowledgeService(Key characterKey)
 	{
 		return null;
 	}

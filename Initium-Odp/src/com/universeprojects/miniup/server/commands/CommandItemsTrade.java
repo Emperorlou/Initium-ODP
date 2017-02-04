@@ -1,8 +1,10 @@
 package com.universeprojects.miniup.server.commands;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,10 +47,21 @@ public class CommandItemsTrade extends CommandItemsBase {
 		if(otherCharacter == null)
 			throw new UserErrorMessage("Not currently trading with other character.");
 		
+		// Store the equipped items, so we can quickly skip these when trading items.
+		Set<Long> equipItemIds = new HashSet<Long>();
+		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
+		{
+			Key equipKey = (Key)character.getProperty("equipment" + slot);
+			if(equipKey != null) 
+				equipItemIds.add(equipKey.getId());
+		}
+		
 		StringBuilder tradedString = new StringBuilder();
 		List<CachedEntity> tradeItems = new ArrayList<CachedEntity>();
 		for(CachedEntity tradeItem:batchItems)
 		{
+			if(equipItemIds.contains(tradeItem.getKey())) continue;
+			
 			tradeItems.add(tradeItem);
 			tradedString.append(HtmlComponents.generatePlayerTradeItemHtml(tradeItem));
 			processedItems.add(tradeItem.getKey().getId());

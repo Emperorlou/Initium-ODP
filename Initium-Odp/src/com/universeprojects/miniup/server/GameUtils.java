@@ -459,10 +459,10 @@ public class GameUtils
         Calendar cal = Calendar.getInstance();
         cal.setTime(d1);
         GregorianCalendar g1 = new GregorianCalendar(
-                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY),  cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
         cal.setTime(d2);
         GregorianCalendar g2 = new GregorianCalendar(
-                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY),  cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
         return elapsed(g1, g2, type);
     }
     
