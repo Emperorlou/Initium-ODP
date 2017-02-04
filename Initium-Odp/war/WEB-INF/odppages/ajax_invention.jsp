@@ -19,10 +19,26 @@ function changeInventionTab(event)
 </script>
 
 <div class='tab-row'>
+	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='knowledge-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='experimentation-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='idea-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='itemConstruction-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='buildingConstruction-tab'></div>
+</div>
+<div class='tab-content' id='knowledge-content'>
+	<div class='normal-container'>
+		<div class='title'>Knowledge</div>
+	</div>
+	<c:if test="${hasKnowledge!=true}">
+		<div class='normal-container'>
+			You really don't know anything yet..heh.
+		</div>
+	</c:if>
+	<c:if test="${hasKnowledge==true}">
+		<div class='normal-container'>
+			<jsp:include page="ajax_invention_knowledgepart.jsp"/>
+		</div>
+	</c:if>
 </div>
 <div class='tab-content' id='experimentation-content'>
 	<div class='normal-container'>

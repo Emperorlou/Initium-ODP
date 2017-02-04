@@ -2,6 +2,8 @@ package com.universeprojects.miniup.server;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,16 +21,25 @@ public class GameUtilsTest
 	
   private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
-	  @Before
-	  public void setUp() {
+	@Before
+	public void setUp() {
 	    helper.setUp();
-	  }
-
-	  @After
-	  public void tearDown() {
+	}
+	
+	@After
+	public void tearDown() {
 	    helper.tearDown();
-	  }	
+	}	
 
+	@Test
+	public void testElapsed()
+	{
+		Date date = new Date(117,01,03, 02,53,03);
+		
+		if (GameUtils.elapsed(date, Calendar.HOUR)<3)
+			Assert.fail();
+	}
+	  
 	@Test
 	public void testDetermineQuality_outsideRangeTest() {
 		Map<String,Object> item = new HashMap<String,Object>();

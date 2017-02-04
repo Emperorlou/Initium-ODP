@@ -7,7 +7,7 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 
-public class ODPInventionService extends Service
+public abstract class ODPInventionService extends Service
 {
 
 	protected ODPInventionService(ODPDBAccess db)
@@ -38,6 +38,11 @@ public class ODPInventionService extends Service
 	}
 	
 	public Map<Key, CachedEntity> getAllItemDefsForItemConstructionIdeas()
+	{
+		return null;
+	}
+
+	public List<CachedEntity> getAllKnowledgeTree()
 	{
 		return null;
 	}

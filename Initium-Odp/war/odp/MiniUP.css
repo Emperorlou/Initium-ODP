@@ -2148,6 +2148,10 @@ hr.items-separator {
     background-color: #00AA00;
     padding:2px;
 }
+#knowledge-tab
+{
+	background-image:url('http://initium-resources.appspot.com/images/ui/tab-knowledge-button.png');
+}
 #experimentation-tab
 {
 	background-image:url('http://initium-resources.appspot.com/images/ui/tab-experiments-button.png');
@@ -2184,6 +2188,7 @@ hr.items-separator {
 .normal-container
 {
 	color: #BBBBBB;
+	margin:8px;
 }
 
 .experiment-available-item-container
@@ -3067,10 +3072,18 @@ body
 	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 fill repeat;	  
 }
 
+/* Old cluetip style */
+.cluetip-rounded
+{
+	background-color:#000000;
+}
+
+
 .ui-cluetip-content
 {
 	padding:0px;
 }
+
 
 .cluetip-newui
 {

@@ -32,13 +32,54 @@ public class InventionController extends PageController {
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		ODPInventionService invention = db.getInventionService();
 	
-		CachedEntity character = db.getCurrentCharacter();
-		
+		populateKnowledgePageData(request, db, invention);
 		populateExperimentPageData(request, db, invention);
 		populateIdeaPageData(request, db, invention);
 		
 		
 		return "/WEB-INF/odppages/ajax_invention.jsp";
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void populateKnowledgePageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
+	{
+		List<CachedEntity> allKnowledgeEntities = invention.getAllKnowledgeTree();
+		Map<String, Object> knowledgeTree = processKnowledgeTreeRecursive(null, allKnowledgeEntities);
+		request.setAttribute("knowledgeTree", knowledgeTree);
+		boolean hasKnowledge = true;
+		if (((List<Object>)knowledgeTree.get("children")).isEmpty())
+			hasKnowledge = false;
+		request.setAttribute("hasKnowledge", hasKnowledge);
+	}
+	
+	/**
+	 * This processes the knowledge entities
+	 * @param currentNode
+	 * @param allKnowledgeEntities
+	 * @return
+	 */
+	private Map<String,Object> processKnowledgeTreeRecursive(CachedEntity currentNode, List<CachedEntity> allKnowledgeEntities)
+	{
+		Map<String,Object> result = new HashMap<String,Object>();
+		
+		// Populate the current node data
+		if (currentNode!=null)
+		{
+			result.put("name", currentNode.getProperty("name"));
+			result.put("id", currentNode.getId());
+			result.put("iconUrl", currentNode.getProperty("icon"));
+			
+		}
+
+		List<Map<String,Object>> children = new ArrayList<Map<String,Object>>();
+		for(CachedEntity knowledge:allKnowledgeEntities)
+			if ((currentNode==null && knowledge.getProperty("parentKnowledge")==null) || 
+					currentNode.getKey().equals(knowledge.getProperty("parentKnowledge")))
+				children.add(processKnowledgeTreeRecursive(knowledge, allKnowledgeEntities));
+
+		result.put("children", children);
+		
+		return result;
 	}
 	
 	private void populateIdeaPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
