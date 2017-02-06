@@ -335,16 +335,10 @@ function buildMenu() {
     if (!menuBuilt) {
         htmlString =
             "<table> <tr>" +
-            "<td>" + "Width: " + "</td><td>" + "<input type=\'text\' id=\'gridWidth\' value=20 /> " + "</td>" +
-            "<td>" + "Height: " + "</td><td>" + "<input type='text' id='gridHeight' value=20 /> " + "</td>" +
-            "</tr> <tr>" +
             "<td>" + "Zoom Rate: " + "</td><td>" + "<input type='text' id='zoom' value=.3 /> " + "</td>" +
             "<td>" + "Zoom Delta: " + "</td><td>" + "<input type='text' id='zoomDelta' value=.25 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
-            "<td>" + "Seed: " + "</td><td>" + "<input type='text' id='seed' value=123456 /> " + "</td>" +
-            "</tr> <tr>" +
-            "<td>" + "Forestry (0-10): " + "</td><td>" + "<input type='text' id='forestry' value=2 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
             "<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
