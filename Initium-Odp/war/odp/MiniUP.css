@@ -3609,3 +3609,17 @@ body
 	top: 0; right: 0; bottom: 0; left: 0;
 	/*border: 1px solid black;*/
 }
+
+div#buildingObject {
+	/*width: 163px;*/
+	/*height: 228px;*/
+	background-color: transparent;
+	background-size:     cover;
+	background-repeat:   no-repeat;
+	background-position: center center;
+	z-index: 100000000000;
+}
+
+.hoveringObject {
+	opacity: 0.5;
+}

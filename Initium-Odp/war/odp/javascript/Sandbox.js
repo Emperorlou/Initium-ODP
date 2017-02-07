@@ -24,6 +24,7 @@ var previouslySelectedObjects = [];
 var previouslyHighlightedBackground;
 var previouslyHighlightedObjects = [];
 var cursorObject = "";
+var buildingObject = "";
 var clickTimer;
 var zoomTouchX;
 var zoomTouchY;
@@ -36,6 +37,8 @@ var isMenuVisible = false;
 var menuBuilt = false;
 var displayGridLines = false;
 var keepSelectedCenter = true;
+var placingBuilding = false;
+var hoveringOverViewport = false;
 
 /**
  * Grid Objects is a HashMap of all objects in the grid
@@ -216,6 +219,10 @@ function scaleTiles(onCenter) {
     //ctx.lineTo(newX, newY);
     //ctx.stroke();
 
+    if (buildingObject != "" && buildingObject != undefined) {
+        buildingObject.div.style.width = buildingObject.width * scale + "px";
+        buildingObject.div.style.height = buildingObject.height * scale + "px";
+    }
 
     if (cursorObject != "") {
         var cursorTop = (cursorObject.yGridCoord * scaledGridCellHeight);
@@ -335,16 +342,10 @@ function buildMenu() {
     if (!menuBuilt) {
         htmlString =
             "<table> <tr>" +
-            "<td>" + "Width: " + "</td><td>" + "<input type=\'text\' id=\'gridWidth\' value=20 /> " + "</td>" +
-            "<td>" + "Height: " + "</td><td>" + "<input type='text' id='gridHeight' value=20 /> " + "</td>" +
-            "</tr> <tr>" +
             "<td>" + "Zoom Rate: " + "</td><td>" + "<input type='text' id='zoom' value=.3 /> " + "</td>" +
             "<td>" + "Zoom Delta: " + "</td><td>" + "<input type='text' id='zoomDelta' value=.25 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
-            "<td>" + "Seed: " + "</td><td>" + "<input type='text' id='seed' value=123456 /> " + "</td>" +
-            "</tr> <tr>" +
-            "<td>" + "Forestry (0-10): " + "</td><td>" + "<input type='text' id='forestry' value=2 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
             "<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
@@ -545,9 +546,14 @@ function getCenterCell() {
     return new CoordObject(xMid, yMid);
 }
 function keyPress() {
+    if (!hoveringOverViewport) {
+        return;
+    }
     if (!e) {
         var e = window.event;
     }
+    // Prevent normal key presses
+    e.preventDefault();
     if (usingKeys || !keepSelectedCenter) {
         currCoord = currentCoord();
     } else {
@@ -664,12 +670,21 @@ $('#viewport').on('contextmenu', function(){
 function startHover(e) {
     usingKeys = false;
     if (dragging) {return}
+
+    // Update building position, if we're are placing a building
+    if (placingBuilding && buildingObject != "") {
+        buildingObject.div.style.left = (event.pageX - buildingObject.xImageOrigin) + "px";
+        buildingObject.div.style.top = (event.pageY - buildingObject.yImageOrigin) + "px";
+    }
     // determine event object
     if (!e) {
         var e = window.event;
     }
     if (!checkIfHoveringOverGrid()) {
+        hoveringOverViewport = false;
         return;
+    } else {
+        hoveringOverViewport = true;
     }
     var currCoord = getCoordOfMouse();
     if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
@@ -678,6 +693,7 @@ function startHover(e) {
 
 function startDrag(e) {
     dragging = true;
+    viewportContainer.style.cursor = "move";
     // determine event object
     if (!e) {
         var e = window.event;
@@ -947,6 +963,12 @@ function updateGridOnUI() {
 function dragDiv(e) {
     if (!drag) {return};
     if (!e) { var e= window.event};
+
+    // Update building placement as well, if we're are placing a building
+    if (placingBuilding && buildingObject != "") {
+        buildingObject.div.style.left = (event.pageX - buildingObject.xImageOrigin) + "px";
+        buildingObject.div.style.top = (event.pageY - buildingObject.yImageOrigin) + "px";
+    }
     // move div element
     if (e) {
         if (e.clientX) {
@@ -998,6 +1020,7 @@ function checkIfHoveringOverGrid() {
         targ.className != 'gridObject gridSelected' &&
         targ.className != 'gridObject gridSelected highlighted' &&
         targ.className != 'gridObject highlighted gridSelected' &&
+        targ.className != 'hoveringObject' &&
         targ.className != 'cursorObject' &&
         targ.className != 'cursorSubObject' &&
         targ.className != 'objectLayer') {return false};
@@ -1005,6 +1028,7 @@ function checkIfHoveringOverGrid() {
 }
 function stopDrag() {
     dragging = false;
+    viewportContainer.style.cursor = "default";
     document.onmousemove=startHover;
     if (!drugged && checkIfHoveringOverGrid()) {
         // User clicked on map without dragging
@@ -1096,6 +1120,15 @@ function mapPlow() {
             updateGridFromServer(data);
         });
     }
+}
+
+function mapPlaceHouse() {
+    placingBuilding = true;
+    buildingHtml = "<div id='buildingObject' class='hoveringObject' style=\"background-size:100%;" +
+        "background:url(http://opengameart.org/sites/default/files/house1_4.png); top:" +
+        (event.clientY - grid.offsetTop) + "; left:" + (event.clientX - grid.offsetLeft) + "; position:relative\"></div>";
+    $('#viewportcontainer').append(buildingHtml);
+    buildingObject = new GridObject("house", document.getElementById("buildingObject"), "house1_4.png", "house", 0, 0, 0, 0, 32, 114, 163, 228);
 }
 
 /**
