@@ -105,11 +105,11 @@ input[type='checkbox']
 		
 		$(".setting-entry-checkbox input").change(function() 
 		{
-			localStorage.setItem(event.target.id+"", this.checked);    
+			localStorage.setItem(this.id+"", this.checked);    
 		});				
 		
 		$(".setting-entry-slider input").change(function(){
-			localStorage.setItem(event.target.id+"", this.value);
+			localStorage.setItem(this.id+"", this.value);
 		});
 		
 		$("#checkboxDisableMusic").change(function(){
