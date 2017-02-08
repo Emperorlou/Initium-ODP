@@ -219,9 +219,11 @@ function scaleTiles(onCenter) {
     //ctx.lineTo(newX, newY);
     //ctx.stroke();
 
-    if (buildingObject != "" && buildingObject != undefined) {
+    if (!reachedZoom && buildingObject != "" && buildingObject != undefined) {
         buildingObject.div.style.width = buildingObject.width * scale + "px";
         buildingObject.div.style.height = buildingObject.height * scale + "px";
+        buildingObject.div.style.left = event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left + "px";
+        buildingObject.div.style.top = event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top + "px";
     }
 
     if (cursorObject != "") {
@@ -432,14 +434,14 @@ function buildMap(responseJson) {
         htmlString += addGridObjectToMap(gridObject);
     });
 
-    // Append HTML
-    $('#object-layer').append(htmlString);
-    // Gather DOM elements
-    var gridObjectElements = document.getElementsByClassName('gridObject');
-    // Attach elements to gridObject structure
-    for (var i = 0; i < gridObjectElements.length; i++) {
-        gridObjects[objects[i].dataset.key].div = gridObjectElements[i];
-    }
+    //// Append HTML
+    //$('#object-layer').append(htmlString);
+    //// Gather DOM elements
+    //var gridObjectElements = document.getElementsByClassName('gridObject');
+    //// Attach elements to gridObject structure
+    //for (var i = 0; i < gridObjectElements.length; i++) {
+    //    gridObjects[objects[i].dataset.key].div = gridObjectElements[i];
+    //}
     // Move grid to center, scale, and update all tiles
     centerGridOnScreen();
 }
@@ -673,8 +675,8 @@ function startHover(e) {
 
     // Update building position, if we're are placing a building
     if (placingBuilding && buildingObject != "") {
-        buildingObject.div.style.left = (event.pageX - buildingObject.xImageOrigin) + "px";
-        buildingObject.div.style.top = (event.pageY - buildingObject.yImageOrigin) + "px";
+        buildingObject.div.style.left = (event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left) + "px";
+        buildingObject.div.style.top = (event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top) + "px";
     }
     // determine event object
     if (!e) {
@@ -814,8 +816,18 @@ function clickMap() {
     }
     var currCoord = getCoordOfMouse();
     if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
-    updateCursor(currCoord.yGridCoord, currCoord.xGridCoord);
-    updateHighlights(previouslySelectedBackground, previouslySelectedObjects, currCoord.xGridCoord, currCoord.yGridCoord, true);
+
+    if (placingBuilding) {
+        buildingObject.xGridCoord = currCoord.xGridCoord;
+        buildingObject.yGridCoord = currCoord.yGridCoord;
+        addGridObjectToMap(buildingObject);
+        placingBuilding = false;
+        buildingObject.div.remove();
+        buildingObject = "";
+    } else {
+        updateCursor(currCoord.yGridCoord, currCoord.xGridCoord);
+        updateHighlights(previouslySelectedBackground, previouslySelectedObjects, currCoord.xGridCoord, currCoord.yGridCoord, true);
+    }
 };
 
 function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, selection) {
@@ -837,7 +849,11 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
         if (previouslyUpdatedObjects[i].key == "o1") {
             previouslyUpdatedObjects[i].div.style.background = "url(" + $domain + previouslyUpdatedObjects[i].filename + ")";
         } else {
-            previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ")";
+            if (previouslyUpdatedObjects[i].filename == "house1_4.png") {
+                previouslyUpdatedObjects[i].div.style.background = "url(" + "http://opengameart.org/sites/default/files/" + previouslyUpdatedObjects[i].filename + ");";
+            } else {
+                previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
+            }
         }
         previouslyUpdatedObjects[i].div.style.backgroundSize = "100%";
         previouslyUpdatedObjects[i].div.style.backgroundBlendMode = "";
@@ -966,8 +982,8 @@ function dragDiv(e) {
 
     // Update building placement as well, if we're are placing a building
     if (placingBuilding && buildingObject != "") {
-        buildingObject.div.style.left = (event.pageX - buildingObject.xImageOrigin) + "px";
-        buildingObject.div.style.top = (event.pageY - buildingObject.yImageOrigin) + "px";
+        buildingObject.div.style.left = (event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left) + "px";
+        buildingObject.div.style.top = (event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top) + "px";
     }
     // move div element
     if (e) {
@@ -1124,11 +1140,13 @@ function mapPlow() {
 
 function mapPlaceHouse() {
     placingBuilding = true;
-    buildingHtml = "<div id='buildingObject' class='hoveringObject' style=\"background-size:100%;" +
-        "background:url(http://opengameart.org/sites/default/files/house1_4.png); top:" +
-        (event.clientY - grid.offsetTop) + "; left:" + (event.clientX - grid.offsetLeft) + "; position:relative\"></div>";
+    buildingHtml = "<div id='buildingObject' class='hoveringObject' style=\"" +
+        "background: url('http://opengameart.org/sites/default/files/house1_4.png') center center; background-size:100%; top:" +
+        (event.clientY - grid.offsetTop) + "; left:" + (event.clientX - grid.offsetLeft) + "; position:absolute\"></div>";
     $('#viewportcontainer').append(buildingHtml);
-    buildingObject = new GridObject("house", document.getElementById("buildingObject"), "house1_4.png", "house", 0, 0, 0, 0, 32, 114, 163, 228);
+    buildingObject = new GridObject("house", document.getElementById("buildingObject"), "house1_4.png", "house", 0, 0, 0, 0, 67, 160, 163, 228);
+    buildingObject.div.style.width = buildingObject.width * scale + "px";
+    buildingObject.div.style.height = buildingObject.height * scale + "px";
 }
 
 /**
@@ -1246,12 +1264,43 @@ function updateGridObject(gridObject) {
  * Returns HTML string for adding to DOM
  */
 function addGridObjectToMap(gridObject) {
-    var top = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
+    var scaledGridCellWidth = 64 * scale;
+    var topZ = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
     var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
+    var topPos = gridObject.yGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.yImageOrigin * scale) - (gridObject.yGridCellOffset * scale);
+    var leftPos = gridObject.xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
+    var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
+    var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
+    gridCell.objectKeys.push(key);
+
+    $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + gridObject.key + "\" " + "class=\"gridObject\"";
+    $hexBody += " data-key=\"" + key + "\"";
+    $hexBody += " style=\"";
+    $hexBody += " top:" + topPos + "px;";
+    $hexBody += " left:" + leftPos + "px;";
+    $hexBody += " margin:" + (scaledGridCellWidth / 2) + "px;";
+    $hexBody += " width:" + gridObject.width * scale + "px;";
+    $hexBody += " height:" + gridObject.height * scale + "px;";
+    $hexBody += " z-index:" + (Number(objectZOffset) + Number(topZ)) + ";";
+    if (gridObject.key == "o1") {
+        $hexBody += " background:url(" + $domain + gridObject.filename + ");";
+    } else {
+        if (gridObject.filename == "house1_4.png") {
+            $hexBody += " background: url(&quot;http://opengameart.org/sites/default/files/house1_4.png&quot;) 0% 0% / 100%;";
+        } else {
+            $hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
+        }
+    }
+    $hexBody += " background-size:100%;";
+    $hexBody += "\">";
+    $hexBody += "</div>";
+
+    $('#object-layer').append($hexBody);
+    objectDiv = document.getElementById("object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + gridObject.key);
 
     var cgridObject = new GridObject(
         gridObject.key,
-        "",
+        objectDiv,
         gridObject.filename,
         gridObject.name,
         gridObject.xGridCellOffset,
@@ -1262,22 +1311,7 @@ function addGridObjectToMap(gridObject) {
         gridObject.yImageOrigin,
         gridObject.width,
         gridObject.height);
-    var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
     gridObjects[key] = cgridObject;
-    var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
-    gridCell.objectKeys[gridCell.objectKeys.length] = key;
 
-    $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "\" " + "class=\"gridObject\"";
-    $hexBody += " data-key=\"" + key + "\"";
-    $hexBody += " style=\"";
-    $hexBody += " z-index:" + (Number(objectZOffset) + Number(top)) + ";";
-    if (gridObject.key == "o1") {
-        $hexBody += " background:url(" + $domain + gridObject.filename + ");";
-    } else {
-        $hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
-    }
-    $hexBody += " background-size:100%;";
-    $hexBody += "\">";
-    $hexBody += "</div>";
     return $hexBody;
 }
