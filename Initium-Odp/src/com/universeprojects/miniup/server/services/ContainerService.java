@@ -20,9 +20,11 @@ public class ContainerService extends Service {
 	}
 	
 	public void doUse(CachedDatastoreService ds, final CachedEntity container, long durabilityLoss) throws UserErrorMessage {
-		long durability = (long) container.getProperty("durability");
+		Long durability = (Long)container.getProperty("durability");
 		
-		if (durability > 0) {
+		if (durability == null) 
+			return;
+		else if (durability > 0) {
 			container.setProperty("durability", durability - durabilityLoss);
 		}
 		else { // items inside are moved to the container's container, and container is destroyed {
