@@ -3564,6 +3564,13 @@ public class ODPDBAccess
         	Key rightHand = (Key)sourceCharacter.getProperty("equipmentRightHand");
         	if (weapon!=null)
         	{
+        		// Lets increase weapon experience now already
+        		if ("PC".equals(sourceCharacter.getProperty("type")))
+        		{
+        			ODPKnowledgeService knowledgeService = getKnowledgeService(sourceCharacter.getKey());
+        			knowledgeService.increaseKnowledgeFor(weapon, 1);
+        		}
+        		
         		// If the weapon we're attacking with is in the right hand, the "otherWeapon" should be whatever is in the left hand
 	        	if (GameUtils.equals(weapon.getKey(), rightHand)==true && GameUtils.equals(weapon.getKey(), leftHand)==false)
 	        	{
@@ -4299,14 +4306,26 @@ public class ODPDBAccess
 						item.setProperty("containerKey", location.getKey());
 						item.setProperty("movedTimestamp", new Date());
 						
-						loot+=GameUtils.renderItem(item)+"<br>";
+						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
+							loot+=GameUtils.renderItem(item)+"<br>";
 					}
 					else
 					{
 						item.setProperty("containerKey", attackingCharacter.getKey());
 						item.setProperty("movedTimestamp", new Date());
 						
-						loot+=GameUtils.renderItem(item)+"<br>";
+						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
+						{
+							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+="		<div class='main-item-controls'>";
+							// Get all the slots this item can be equipped in
+							loot+="			<a onclick='ajaxAction(\"ServletCharacterControl?type=dropItem&itemId="+item.getKey().getId()+"\", event, loadInventory)' >Drop on ground</a>";
+							if (item.getProperty("maxWeight")!=null)
+							{
+								loot+="<a onclick='pagePopup(\"ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
+							}
+							loot+="		</div>";
+						}
 					}
 				}
 				db.put(item);
@@ -4940,6 +4959,8 @@ public class ODPDBAccess
 		else
 			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
 		destination = getEntity(destinationKey);
+		destination.setProperty("lastUsedDate", new Date());
+		
 
 		String forceOneWay = (String)path.getProperty("forceOneWay");
 		if ("FromLocation1Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation2Key.getId())
@@ -5121,7 +5142,7 @@ public class ODPDBAccess
 				destination.setProperty("ownerKey", user.getKey());
 				
 				db.put(path);
-				db.put(destination);
+				// Note: The destination location gets saved later
 			}
 		}
 
@@ -5154,6 +5175,9 @@ public class ODPDBAccess
 			
 		}
 		
+		if (destination.isUnsaved())
+			ds.put(destination);
+		
 		return destination;
 	}
 	
@@ -5182,6 +5206,33 @@ public class ODPDBAccess
 		return null;
 	}
 
+	
+	/**
+	 * Checks if it's time to delete a combat site based on some preset rule.
+	 * 
+	 * Currently a combat site gets deleted if it's "lastUsedDate" was set 48 hours ago. 
+	 * This date is reset any time a character enters the combat site.
+	 * 
+	 * @param combatSiteLocation
+	 * @returnf
+	 */
+	public boolean isTimeToDeleteCombatSite(CachedEntity combatSiteLocation)
+	{
+		Date lastUsedDate = (Date)combatSiteLocation.getProperty("lastUsedDate");
+		if (lastUsedDate==null)
+		{
+			lastUsedDate = new Date();
+			combatSiteLocation.setProperty("lastUsedDate", lastUsedDate);
+			ds.put(combatSiteLocation);
+		}
+		
+		// If it has been less than the amount of time we want to wait before collapsing, lets get out of here
+		if (GameUtils.elapsed(lastUsedDate, Calendar.HOUR)<48)
+			return false;
+		
+		return true;
+	}
+	
 	/**
 	 * This is a placeholder because the actual implementation is not in the ODP.
 	 * 
@@ -5191,7 +5242,7 @@ public class ODPDBAccess
 	 */
 	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey)
 	{
-		doDeleteCombatSite(ds, playerCharacter, locationKey, false);
+		doDeleteCombatSite(ds, playerCharacter, locationKey, false, false);
 	}
 	
 	/**This will need to be updated as we add more stuff.
@@ -5199,7 +5250,7 @@ public class ODPDBAccess
 	 * 
 	 * @param monster
 	 */
-	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey, boolean forceDelete)
+	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey, Boolean leaveAndForget, boolean forceDelete)
 	{
 		if (ds==null)
 			ds = getDB();
@@ -5224,25 +5275,41 @@ public class ODPDBAccess
 		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
 		
 
-		boolean hasPlayer = false;
-		boolean hasNPCWeWantToKeep = false;
-		for(CachedEntity character:characters)
+		// Here is a special case:
+		// 1. If the monster is dead
+		// 2. If the monster has no money on him anymore
+		// 3. If the player chose "leave and forget"
+		// Then we will force delete the site
+		if (leaveAndForget && forceDelete==false && characters.size()==1 && paths.size()==1)
 		{
-			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
-				hasPlayer = true;
-			
-			if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d && GameUtils.equals(character.getProperty("hitpoints"), character.getProperty("maxHitpoints"))==false)
-				hasNPCWeWantToKeep=true;
-			
+			CachedEntity monster = characters.get(0);
+			if ("NPC".equals(monster.getProperty("type")) &&
+					(Double)monster.getProperty("hitpoints")<1 &&
+					(long)monster.getProperty("dogecoins")==0)
+			{
+				forceDelete = true;
+			}
 		}
+		
+//		boolean hasPlayer = false;
+//		boolean hasNPCWeWantToKeep = false;
+//		for(CachedEntity character:characters)
+//		{
+//			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
+//				hasPlayer = true;
+//			
+//			if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d && GameUtils.equals(character.getProperty("hitpoints"), character.getProperty("maxHitpoints"))==false)
+//				hasNPCWeWantToKeep=true;
+//			
+//		}
 		
 		
 		// Having the paths size>1 cancels the deletion of the combat site. This is very important so that people don't get
 		// stranded in rare cases where there are other sites branching from this one. The outer branches must be deleted first, 
 		// but we can do that lazily.
-		if ((hasPlayer && forceDelete==false) || 
-				(paths.size()>1 && forceDelete==false) || 
-				(hasNPCWeWantToKeep && forceDelete==false) /*Now we don't delete the site if the NPC is alive*/)
+		if ((paths.size()>1 && forceDelete==false) ||
+				isTimeToDeleteCombatSite(location)==false && forceDelete==false) 
+				
 		{
 			// Delete the discoveries of the paths to this location
 			for(CachedEntity discovery:discoveries)
@@ -5270,6 +5337,14 @@ public class ODPDBAccess
 			for(CachedEntity character:characters)
 				if ("NPC".equals(character.getProperty("type")))
 					ds.delete(character.getKey());
+				else
+				{
+					Key parentLocation = getParentLocationKey(ds, location);
+					character.setProperty("locationKey", parentLocation);
+					character.setProperty("locationEntryDatetime", new Date());
+					ds.put(character);
+				}
+					
 			
 			// Delete all items on the ground
 			for(CachedEntity item:items)
@@ -5421,6 +5496,21 @@ public class ODPDBAccess
 	 */
 	public CachedEntity getParentLocation(CachedDatastoreService ds, CachedEntity location)
 	{
+		return getEntity(getParentLocationKey(ds, location));
+	}
+
+	
+	/**
+	 * Determines the parent location for the given location. This is used for certain 
+	 * game mechanics that require a parent/child concept. For example, running will always cause you 
+	 * to run to the parent location.
+	 *  
+	 * @param ds
+	 * @param location
+	 * @return The location that is considered to be the parent of the given location.
+	 */
+	public Key getParentLocationKey(CachedDatastoreService ds, CachedEntity location)
+	{
 		if (location.getProperty("parentLocationKey")==null)
 		{
 			// FOR LAZY MIGRATION OF THE DATABASE, KEEP THIS PART ACTIVE.
@@ -5440,16 +5530,14 @@ public class ODPDBAccess
 			if (ds==null) ds = getDB();
 			ds.put(location);
  			
-			CachedEntity exitLocation = getEntity(properLocationKey);
-			
 			Logger.getLogger("GameFunctions").log(Level.SEVERE, "Parent location on a "+location.getProperty("type")+" was not set properly. - We decided to associate it."); 
 			
-			return exitLocation;
+			return properLocationKey;
 		}
 		else
 		{
 			Key key = (Key)location.getProperty("parentLocationKey");
-			return getEntity(key);
+			return key;
 		}
 	}
 
@@ -5731,7 +5819,7 @@ public class ODPDBAccess
 	 * 
 	 * @return
 	 */
-	public ODPInventionService getInventionService(ODPKnowledgeService knowledgeService)
+	public ODPInventionService getInventionService(CachedEntity character, ODPKnowledgeService knowledgeService)
 	{
 		return null;
 	}
@@ -5749,4 +5837,5 @@ public class ODPDBAccess
 	{
 		return null;
 	}
+
 }

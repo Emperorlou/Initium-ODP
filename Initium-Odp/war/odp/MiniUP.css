@@ -3307,7 +3307,15 @@ body
 	margin:5px;
 }
 
+.generic-field
+{
+	color:#EEEEEE;
+}
 
+.generic-field-value
+{
+	color:#999999;
+}
 
 
 

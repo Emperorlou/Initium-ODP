@@ -11,7 +11,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 
-public class ServerTestBase {
+public class ODPServerTestBase {
 
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 

@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.DDOSProtectionException"%>
 <%@page import="com.universeprojects.miniup.server.services.ContainerService"%>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <%@page import="com.google.appengine.api.datastore.KeyFactory"%>
@@ -23,7 +24,16 @@
 <%
 	response.setHeader("Access-Control-Allow-Origin", "*");		// This is absolutely necessary for phonegap to work
 
-	Authenticator auth = Authenticator.getInstance(request);
+	Authenticator auth = null;
+	try
+	{
+		auth = Authenticator.getInstance(request, true);
+	}
+	catch(DDOSProtectionException e)
+	{
+		// Ignore this here
+	}
+
 	GameFunctions db = auth.getDB(request);
 	CachedDatastoreService ds = db.getDB();
 	try

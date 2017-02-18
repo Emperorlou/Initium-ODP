@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,5 +50,33 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
+	public GenericAffectorResult processGenericAffector(CachedEntity sourceEntity, CachedEntity genericAffector)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	
+	
+	public class GenericEntityRequirementResult
+	{
+		public List<GenericAffectorResult> processAffectors = new ArrayList<GenericAffectorResult>();
+		public List<GenericAffectorResult> resultingFieldAffectors = new ArrayList<GenericAffectorResult>();
+		
+	}
+	
+	public class GenericAffectorResult
+	{
+		public Double resultMultiplier = 0d;
+		public String resultField = null;
+	}
+
+	public boolean validateEntityRequirement(CachedEntity entityRequirement, CachedEntity entity)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 
 }

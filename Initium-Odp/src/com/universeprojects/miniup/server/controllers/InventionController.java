@@ -32,7 +32,7 @@ public class InventionController extends PageController {
 	{
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		ODPKnowledgeService knowledge = db.getKnowledgeService(db.getCurrentCharacter().getKey());
-		ODPInventionService invention = db.getInventionService(knowledge);
+		ODPInventionService invention = db.getInventionService(db.getCurrentCharacter(), knowledge);
 	
 		populateKnowledgePageData(request, db, invention);
 		populateExperimentPageData(request, db, invention);
@@ -45,7 +45,7 @@ public class InventionController extends PageController {
 	@SuppressWarnings("unchecked")
 	private void populateKnowledgePageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
 	{
-		List<CachedEntity> allKnowledgeEntities = invention.getKnowledgeService().getAllKnowledgeTree();
+		List<CachedEntity> allKnowledgeEntities = invention.getKnowledgeService().getAllKnowledge();
 		Map<String, Object> knowledgeTree = processKnowledgeTreeRecursive(null, allKnowledgeEntities);
 		request.setAttribute("knowledgeTree", knowledgeTree);
 		boolean hasKnowledge = true;
@@ -70,6 +70,7 @@ public class InventionController extends PageController {
 			result.put("name", currentNode.getProperty("name"));
 			result.put("id", currentNode.getId());
 			result.put("iconUrl", currentNode.getProperty("icon"));
+			result.put("experience", GameUtils.formatNumber(currentNode.getProperty("experience")));
 			
 		}
 
