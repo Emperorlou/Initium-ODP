@@ -19,9 +19,9 @@ var reachedZoom = false;
 var $picUrlPath = "https://initium-resources.appspot.com/images/newCombat/";
 var $domain = "https://initium-resources.appspot.com/";
 var firstLoad = true;
-var previouslySelectedBackground;
+var previouslySelectedBackground = [];
 var previouslySelectedObjects = [];
-var previouslyHighlightedBackground;
+var previouslyHighlightedBackground = [];
 var previouslyHighlightedObjects = [];
 var cursorObject = "";
 var buildingObject = "";
@@ -471,12 +471,12 @@ function currentCoord() {
     // Get currently highlighted or selected coordinates
     var xCoord;
     var yCoord;
-    if (previouslyHighlightedBackground != null) {
-        xCoord = previouslyHighlightedBackground.xGridCoord;
-        yCoord = previouslyHighlightedBackground.yGridCoord;
-    } else if (previouslySelectedBackground != null) {
-        xCoord = previouslySelectedBackground.xGridCoord;
-        yCoord = previouslySelectedBackground.yGridCoord;
+    if (previouslyHighlightedBackground != null && previouslyHighlightedBackground.length > 0) {
+        xCoord = previouslyHighlightedBackground[0].xGridCoord;
+        yCoord = previouslyHighlightedBackground[0].yGridCoord;
+    } else if (previouslySelectedBackground != null && previouslySelectedBackground.length > 0) {
+        xCoord = previouslySelectedBackground[0].xGridCoord;
+        yCoord = previouslySelectedBackground[0].yGridCoord;
     } else {
         return;
     }
@@ -616,10 +616,10 @@ function keyPress(event) {
             break;
         case 39: // right
             if (isShift) {
-                if (previouslySelectedBackground != null) {
+                if (previouslySelectedBackground != null && previouslySelectedBackground.length > 0) {
                     // Remove previously highlighted cell
-                    removeHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, false);
-                    centerCellOnScreen(previouslySelectedBackground.xGridCoord, previouslySelectedBackground.yGridCoord);
+                    removeHighlights(previouslyHighlightedBackground[0], previouslyHighlightedObjects, false);
+                    centerCellOnScreen(previouslySelectedBackground[0].xGridCoord, previouslySelectedBackground[0].yGridCoord);
                 }
             } else if (spacePressed) {
                 panGrid(panOffset, 0);
@@ -677,6 +677,7 @@ function startHover(event) {
         hoveringOverViewport = true;
     }
     var currCoord = getCoordOfMouse(event);
+    if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
     // Update building position, if we're are placing a building
     if (placingBuilding && buildingObject != "") {
         if (snapToGrid) {
@@ -691,9 +692,10 @@ function startHover(event) {
             buildingObject.div.style.left = (event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left) + "px";
             buildingObject.div.style.top = (event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top) + "px";
         }
+        updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, currCoord.xGridCoord, currCoord.yGridCoord, false, buildingObject);
+    } else {
+        updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, currCoord.xGridCoord, currCoord.yGridCoord, false);
     }
-    if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
-    updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, currCoord.xGridCoord, currCoord.yGridCoord, false);
 }
 
 function startDrag(event) {
@@ -835,16 +837,23 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
         className = "highlighted";
     }
     // Remove highlights from previously selected divs
-    if (previouslyUpdatedBackground != null) {
-        previouslyUpdatedBackground.backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground.filename + ") center center / 100%";
-        if (selection) {
-            previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)gridSelected(?!\S)/g, '');
-        } else {
-            previouslyUpdatedBackground.backgroundDiv.className = previouslyUpdatedBackground.backgroundDiv.className.replace(/(?:^|\s)highlighted(?!\S)/g, '');
+    if (previouslyUpdatedBackground != null && previouslyUpdatedBackground.length > 0) {
+        for (i=0; i<previouslyUpdatedBackground.length; i++) {
+            if (i>=20) break;
+            if (i<0) break;
+            previouslyUpdatedBackground[i].backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground[i].filename + ") center center / 100%";
+            if (selection) {
+                previouslyUpdatedBackground[i].backgroundDiv.className = previouslyUpdatedBackground[i].backgroundDiv.className.replace(/(?:^|\s)gridSelected(?!\S)/g, '');
+            } else {
+                previouslyUpdatedBackground[i].backgroundDiv.className = previouslyUpdatedBackground[i].backgroundDiv.className.replace(/(?:^|\s)highlighted(?!\S)/g, '');
+            }
         }
     }
     for (i=0; i<previouslyUpdatedObjects.length; i++) {
-        if (previouslyUpdatedObjects[i].key == "o1") {
+        if (previouslyUpdatedObjects[i].key.includes("tempKey:")) {
+            previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
+        }
+        else if (previouslyUpdatedObjects[i].key == "o1") {
             previouslyUpdatedObjects[i].div.style.background = "url(" + $domain + previouslyUpdatedObjects[i].filename + ")";
         } else {
             if (previouslyUpdatedObjects[i].filename == "house1_4.png") {
@@ -864,19 +873,17 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
         }
     }
     if (selection) {
-        previouslySelectedBackground = null;
+        previouslySelectedBackground = [];
     } else {
-        previouslyHighlightedBackground = null;
+        previouslyHighlightedBackground = [];
     }
     previouslyUpdatedObjects = [];
 }
 
-function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection) {
-    // Remove previous highlights
-    removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, selection);
+function updateHighlightsAtCoord(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection) {
     // Highlight the background div
     gridCells[gridColumn][gridRow].backgroundDiv.className += " " + className;
-    previouslyUpdatedBackground  = gridCells[gridColumn][gridRow];
+    previouslyUpdatedBackground.push(gridCells[gridColumn][gridRow]);
     // If we have an objects at this coord, highlight them and display their names
     if (gridCells[gridColumn][gridRow].objectKeys.length > 0) {
         tmpString = "";
@@ -889,7 +896,7 @@ function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
             object.div.className += " " + className;
             //object.div.style.backgroundBlendMode = "normal, overlay";
             // Add div to previouslySelected to remove highlight on later click
-            previouslyUpdatedObjects[selectedIndex] = object;
+            previouslyUpdatedObjects.push(object);
         }
         // Update object list
         if (selection) {
@@ -898,6 +905,44 @@ function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
     } else {
         if (selection) {
             $("#selectedObjects").html('<br> No objects at this coordinate. </br>');
+        }
+    }
+    var updatedMap = new Object();
+    updatedMap[0] = previouslyUpdatedBackground;
+    updatedMap[1] = previouslyUpdatedObjects;
+    return updatedMap;
+}
+
+function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection, gridObject) {
+    // Remove previous highlights
+    removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, selection);
+    previouslyUpdatedBackground = [];
+    if (gridObject == null || gridObject == undefined) {
+        updatedMap = updateHighlightsAtCoord(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection);
+        previouslyUpdatedBackground = updatedMap[0];
+        previouslyUpdatedObjects = updatedMap[1];
+    } else {
+        // Check footprint of object, highlight all cells of object's footprint
+        if (gridObject.xFootprint >= gridObject.yFootprint) {
+            for (i = 0; i < gridObject.xFootprint; i++) {
+                for (j = 0; j < gridObject.yFootprint; j++) {
+                    if (gridColumn+i>=20 || gridColumn+i<0) break;
+                    if (gridRow+j>=20 || gridRow+j<0) break;
+                    updatedMap = updateHighlightsAtCoord(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn+i, gridRow+j, selection);
+                    previouslyUpdatedBackground = updatedMap[0];
+                    previouslyUpdatedObjects = updatedMap[1];
+                }
+            }
+        } else {
+            for (i = 0; i < gridObject.yFootprint; i++) {
+                for (j = 0; j < gridObject.xFootprint; j++) {
+                    if (gridColumn+j>=20 || gridColumn+j<0) break;
+                    if (gridRow+i>=20 || gridRow+i<0) break;
+                    updatedMap = updateHighlightsAtCoord(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn+j, gridRow+i, selection);
+                    previouslyUpdatedBackground = updatedMap[0];
+                    previouslyUpdatedObjects = updatedMap[1];
+                }
+            }
         }
     }
 
@@ -971,6 +1016,10 @@ function updateGridOnUI() {
     // properties
     coordX = parseInt(grid.style.left);
     coordY = parseInt(grid.style.top);
+    if (placingBuilding) {
+        buildingCoordX = parseInt(buildingObject.div.style.left);
+        buildingCoordY = parseInt(buildingObject.div.style.top);
+    }
     drag = true;
 
     // move div element
@@ -980,7 +1029,7 @@ function dragDiv(event) {
     if (!drag) {return};
 
     // Update building placement as well, if we're are placing a building
-    if (placingBuilding && buildingObject != "") {
+    if (placingBuilding && buildingObject != "" && !snapToGrid) {
         if (snapToGrid) {
 
             var scaledGridCellWidth = 64 * scale;
@@ -1028,9 +1077,15 @@ function dragDiv(event) {
     if (Math.abs(deltaX) > dragDelta || Math.abs(deltaY) > dragDelta) {
         if (updatedX < viewport.offsetWidth && ((updatedX > coordX) || updatedX > (-1 * grid.offsetWidth))) {
             grid.style.left = coordX + userLocX - offsetX + 'px';
+            if (placingBuilding) {
+                buildingObject.div.style.left = buildingCoordX + userLocX - offsetX + 'px';
+            }
         }
         if (updatedY < viewport.offsetHeight && ((updatedY > coordY) || (updatedY > (-1 * grid.offsetHeight)))) {
             grid.style.top = coordY + userLocY - offsetY + 'px';
+            if (placingBuilding) {
+                buildingObject.div.style.top = buildingCoordY + userLocY - offsetY + 'px';
+            }
         }
         $('html, body').stop().animate({}, 500, 'linear');
         drugged = true;
@@ -1117,6 +1172,9 @@ function zoomDiv(event) {
     return false;
 }
 
+// --------------------------------------------------------------------------------------- //
+// --------------------------------------- Objects --------------------------------------- //
+// --------------------------------------------------------------------------------------- //
 function CursorObject(div, xGridCoord, yGridCoord) {
     this.div = div;
     this.xGridCoord = xGridCoord;
@@ -1156,37 +1214,9 @@ function CoordObject(xGridCoord, yGridCoord) {
     this.yGridCoord = yGridCoord;
 }
 
-function mapPlow(event) {
-    if (cursorObject != "") {
-        doCommand(event, "MapPlow", {"xGridCoord": cursorObject.xGridCoord, "yGridCoord": cursorObject.yGridCoord}, function (data, error) {
-            if (error) return;
-            updateGridFromServer(data);
-        });
-    }
-}
-
-function mapPlaceHouse(event) {
-    placingBuilding = true;
-    buildingHtml = "<div id='buildingObject' class='hoveringObject' style=\"" +
-        "background: url('http://opengameart.org/sites/default/files/house1_4.png') center center; background-size:100%; top:" +
-        (event.clientY - grid.offsetTop) + "; left:" + (event.clientX - grid.offsetLeft) + "; position:absolute\"></div>";
-    $('#viewportcontainer').append(buildingHtml);
-    buildingObject = new GridObject("house", document.getElementById("buildingObject"), "house1_4.png", "house", 0, 0, 0, 0, 67 *.6, 160 *.6, 1, 1, 163, 228, .6);
-    buildingObject.div.style.width = buildingObject.width * scale * buildingObject.scale + "px";
-    buildingObject.div.style.height = buildingObject.height * scale * buildingObject.scale + "px";
-}
-
-function mapPlaceCity(event) {
-    placingBuilding = true;
-    buildingHtml = "<div id='buildingObject' class='hoveringObject' style=\"" +
-        "background: url('http://opengameart.org/sites/default/files/city.svg_.png') center center; background-size:100%; top:" +
-        (event.clientY - grid.offsetTop) + "; left:" + (event.clientX - grid.offsetLeft) + "; position:absolute\"></div>";
-    $('#viewportcontainer').append(buildingHtml);
-    buildingObject = new GridObject("city", document.getElementById("buildingObject"), "city.svg_.png", "city", 0, 0, 0, 0, 80, 120, 3, 3, 128, 128, 3);
-    buildingObject.div.style.width = buildingObject.width * scale * buildingObject.scale + "px";
-    buildingObject.div.style.height = buildingObject.height * scale * buildingObject.scale + "px";
-}
-
+// --------------------------------------------------------------------------------------- //
+// ------------------------- Manipulating FE from BE responses --------------------------- //
+// --------------------------------------------------------------------------------------- //
 /**
  * Server response can optionally have:
  *      GridCells (A list of gridCell objects for updating the gridMap)
@@ -1226,6 +1256,10 @@ function updateGridCell(gridCell) {
     }
 }
 
+/**
+ * Takes a gridObject returned from BE and udpates the FE data accordingly
+ * @param gridObject
+ */
 function updateGridObject(gridObject) {
     // For all updates we need to have a key
     if (gridObject.key != undefined) {
@@ -1308,8 +1342,28 @@ function addGridObjectToMap(gridObject) {
     var topPos = gridObject.yGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.yImageOrigin * scale) - (gridObject.yGridCellOffset * scale);
     var leftPos = gridObject.xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.xImageOrigin * scale) - (gridObject.xGridCellOffset * scale);
     var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
-    var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
-    gridCell.objectKeys.push(key);
+
+    // If undefined footprint, assume 1x1
+    if (gridObject.xFootprint == undefined || gridObject.yFootprint == undefined) {
+        var gridCell = gridCells[gridObject.xGridCoord][gridObject.yGridCoord];
+        gridCell.objectKeys.push(key);
+    }
+    // Check footprint of object, add object to all cells it will sit in
+    else if (gridObject.xFootprint >= gridObject.yFootprint) {
+        for (i = 0; i < gridObject.xFootprint; i++) {
+            for (j = 0; j < gridObject.yFootprint; j++) {
+                var gridCell = gridCells[gridObject.xGridCoord+i][gridObject.yGridCoord+j];
+                gridCell.objectKeys.push(key);
+            }
+        }
+    } else {
+        for (i = 0; i < gridObject.yFootprint; i++) {
+            for (j = 0; j < gridObject.xFootprint; j++) {
+                var gridCell = gridCells[gridObject.xGridCoord+j][gridObject.yGridCoord+i];
+                gridCell.objectKeys.push(key);
+            }
+        }
+    }
 
     objectScale = gridObject.scale ? gridObject.scale : 1;
     $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key + "\" " + "class=\"gridObject\"";
@@ -1358,4 +1412,40 @@ function addGridObjectToMap(gridObject) {
     gridObjects[key] = cgridObject;
 
     return $hexBody;
+}
+
+// --------------------------------------------------------------------------------------- //
+// ------------------------------------ Map Functions ------------------------------------ //
+// --------------------------------------------------------------------------------------- //
+function mapPlow(event) {
+    if (cursorObject != "") {
+        doCommand(event, "MapPlow", {"xGridCoord": cursorObject.xGridCoord, "yGridCoord": cursorObject.yGridCoord}, function (data, error) {
+            if (error) return;
+            updateGridFromServer(data);
+        });
+    }
+}
+
+function mapPlaceHouse(event) {
+    // All background URL crap (opengameart) in here, and throughout logic, is temporary for testing
+    placingBuilding = true;
+    buildingHtml = "<div id='buildingObject' class='hoveringObject' style=\"" +
+        "background: url('http://opengameart.org/sites/default/files/house1_4.png') center center; background-size:100%; top:" +
+        (event.clientY - grid.offsetTop) + "; left:" + (event.clientX - grid.offsetLeft) + "; position:absolute\"></div>";
+    $('#viewportcontainer').append(buildingHtml);
+    buildingObject = new GridObject("house", document.getElementById("buildingObject"), "house1_4.png", "house", 0, 0, 0, 0, 67 *.6, 160 *.6, 1, 1, 163, 228, .6);
+    buildingObject.div.style.width = buildingObject.width * scale * buildingObject.scale + "px";
+    buildingObject.div.style.height = buildingObject.height * scale * buildingObject.scale + "px";
+}
+
+function mapPlaceCity(event) {
+    // All background URL crap (opengameart) in here, and throughout logic, is temporary for testing
+    placingBuilding = true;
+    buildingHtml = "<div id='buildingObject' class='hoveringObject' style=\"" +
+        "background: url('http://opengameart.org/sites/default/files/city.svg_.png') center center; background-size:100%; top:" +
+        (event.clientY - grid.offsetTop) + "; left:" + (event.clientX - grid.offsetLeft) + "; position:absolute\"></div>";
+    $('#viewportcontainer').append(buildingHtml);
+    buildingObject = new GridObject("city", document.getElementById("buildingObject"), "city.svg_.png", "city", 0, 0, 0, 0, 80, 120, 5, 4, 128, 128, 3);
+    buildingObject.div.style.width = buildingObject.width * scale * buildingObject.scale + "px";
+    buildingObject.div.style.height = buildingObject.height * scale * buildingObject.scale + "px";
 }
