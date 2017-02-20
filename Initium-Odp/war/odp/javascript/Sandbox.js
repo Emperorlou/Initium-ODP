@@ -36,6 +36,7 @@ var usingKeys = false;
 var isMenuVisible = false;
 var menuBuilt = false;
 var displayGridLines = false;
+var snapToGrid = true;
 var keepSelectedCenter = true;
 var placingBuilding = false;
 var hoveringOverViewport = false;
@@ -211,19 +212,20 @@ function scaleTiles(event, onCenter) {
         firstLoad = false;
     }
 
-    // Please leave for debugging zoom
-    //var c = document.getElementById("myCanvas");
-    //var ctx = c.getContext("2d");
-    //ctx.beginPath();
-    //ctx.moveTo(originX, originY);
-    //ctx.lineTo(newX, newY);
-    //ctx.stroke();
-
     if (!reachedZoom && buildingObject != "" && buildingObject != undefined) {
         buildingObject.div.style.width = buildingObject.width * scale * buildingObject.scale + "px";
         buildingObject.div.style.height = buildingObject.height * scale * buildingObject.scale + "px";
-        buildingObject.div.style.left = event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left + "px";
-        buildingObject.div.style.top = event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top + "px";
+        if (snapToGrid) {
+            var currCoord = getCoordOfMouse(event);
+            var top = currCoord.yGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (buildingObject.yImageOrigin * scale) - (buildingObject.yGridCellOffset * scale);
+            var left = currCoord.xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (buildingObject.xImageOrigin * scale) - (buildingObject.xGridCellOffset * scale);
+            buildingObject.div.style.margin = (scaledGridCellWidth / 2) + "px";
+            buildingObject.div.style.left = (left + grid.getBoundingClientRect().left) - viewportContainer.getBoundingClientRect().left + "px";
+            buildingObject.div.style.top = (top + grid.getBoundingClientRect().top) - viewportContainer.getBoundingClientRect().top + "px";
+        } else {
+            buildingObject.div.style.left = event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left + "px";
+            buildingObject.div.style.top = event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top + "px";
+        }
     }
 
     if (cursorObject != "") {
@@ -286,6 +288,7 @@ function scaleTiles(event, onCenter) {
 
 function loadMap() {
 
+    snapToGrid = (document.getElementById('snapToGrid') == null) ? true : document.getElementById('snapToGrid').checked;
     scaleRate = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
     dragDelta = ($("#dragDelta").val() == undefined) ? 10 : $("#dragDelta").val();
     gridTileWidth = isNaN(Number($("#gridWidth").val())) ? 20 : Number($("#gridWidth").val());
@@ -348,6 +351,7 @@ function buildMenu() {
             "<td>" + "Zoom Delta: " + "</td><td>" + "<input type='text' id='zoomDelta' value=.25 /> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
+            "<td>" + "Snap to Grid: <input type='checkbox' id='snapToGrid' checked> " + "</td>" +
             "</tr> <tr>" +
             "<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
             "<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
@@ -666,19 +670,28 @@ $('#viewport').on('contextmenu', function(){
 function startHover(event) {
     usingKeys = false;
     if (dragging) {return}
-
-    // Update building position, if we're are placing a building
-    if (placingBuilding && buildingObject != "") {
-        buildingObject.div.style.left = (event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left) + "px";
-        buildingObject.div.style.top = (event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top) + "px";
-    }
-    if (!checkIfHoveringOverGrid(event)) {
+    if (!checkIfHoveringOverViewport(event)) {
         hoveringOverViewport = false;
         return;
     } else {
         hoveringOverViewport = true;
     }
     var currCoord = getCoordOfMouse(event);
+    // Update building position, if we're are placing a building
+    if (placingBuilding && buildingObject != "") {
+        if (snapToGrid) {
+            var scaledGridCellWidth = 64 * scale;
+            var scaledGridCellHeight = 64 * scale;
+            var top = currCoord.yGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (buildingObject.yImageOrigin * scale) - (buildingObject.yGridCellOffset * scale);
+            var left = currCoord.xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (buildingObject.xImageOrigin * scale) - (buildingObject.xGridCellOffset * scale);
+            buildingObject.div.style.margin = (scaledGridCellWidth / 2) + "px";
+            buildingObject.div.style.left = (left + grid.getBoundingClientRect().left) - viewportContainer.getBoundingClientRect().left + "px";
+            buildingObject.div.style.top = (top + grid.getBoundingClientRect().top) - viewportContainer.getBoundingClientRect().top + "px";
+        } else {
+            buildingObject.div.style.left = (event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left) + "px";
+            buildingObject.div.style.top = (event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top) + "px";
+        }
+    }
     if (currCoord.yGridCoord < 0 || currCoord.xGridCoord < 0 || currCoord.yGridCoord > (gridTileHeight-1) || currCoord.xGridCoord > (gridTileWidth-1)) {return}
     updateHighlights(previouslyHighlightedBackground, previouslyHighlightedObjects, currCoord.xGridCoord, currCoord.yGridCoord, false);
 }
@@ -968,8 +981,34 @@ function dragDiv(event) {
 
     // Update building placement as well, if we're are placing a building
     if (placingBuilding && buildingObject != "") {
-        buildingObject.div.style.left = (event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left) + "px";
-        buildingObject.div.style.top = (event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top) + "px";
+        if (snapToGrid) {
+
+            var scaledGridCellWidth = 64 * scale;
+            var scaledGridCellHeight = 64 * scale;
+            // For mouse clicks
+            if (event.clientX) {
+                buildingOffsetX = event.clientX;
+                buildingOffsetY = event.clientY;
+                // For touch input
+            } else if (event.changedTouches && event.changedTouches[0].clientX) {
+                buildingOffsetX = event.changedTouches[0].clientX;
+                buildingOffsetY = event.changedTouches[0].clientY;
+            }
+            // Determine where the click took place in the grid
+            var gridRelx = buildingOffsetX - grid.getBoundingClientRect().left - (scaledGridCellWidth / 2);
+            var gridRely = buildingOffsetY - grid.getBoundingClientRect().top + $(window).scrollTop() - (scaledGridCellHeight / 2);
+            var gridColumn = Math.floor(gridRelx / scaledGridCellWidth);
+            var gridRow = Math.floor(gridRely / scaledGridCellHeight);
+
+            var top = gridRow * scaledGridCellWidth + scaledGridCellWidth / 2 - (buildingObject.yImageOrigin * scale) - (buildingObject.yGridCellOffset * scale);
+            var left = gridColumn * scaledGridCellWidth + scaledGridCellWidth / 2 - (buildingObject.xImageOrigin * scale) - (buildingObject.xGridCellOffset * scale);
+            buildingObject.div.style.margin = (scaledGridCellWidth / 2) + "px";
+            buildingObject.div.style.left = (left + grid.getBoundingClientRect().left) - viewportContainer.getBoundingClientRect().left + "px";
+            buildingObject.div.style.top = (top + grid.getBoundingClientRect().top) - viewportContainer.getBoundingClientRect().top + "px";
+        } else {
+            buildingObject.div.style.left = (event.pageX - (buildingObject.xImageOrigin * scale) - viewportContainer.getBoundingClientRect().left) + "px";
+            buildingObject.div.style.top = (event.pageY - (buildingObject.yImageOrigin * scale) - viewportContainer.getBoundingClientRect().top) + "px";
+        }
     }
     // move div element
     if (event) {
