@@ -26,7 +26,7 @@
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=62"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=63"></script>
 
 <script type="text/javascript" src="/odp/javascript/messager.js?v=18"></script>
 

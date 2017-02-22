@@ -2025,6 +2025,13 @@ public class ODPDBAccess
 		return ds.fetchAsList(q, 50);
 	}
 
+	public List<Key> getItemsListSortedForLocation_Keys(CachedDatastoreService ds, Key locationKey)
+	{
+		if (ds == null) ds = getDB();
+		Query q = new Query("Item").setFilter(new FilterPredicate("containerKey", FilterOperator.EQUAL, locationKey)).addSort("movedTimestamp", SortDirection.DESCENDING);
+		return ds.fetchAsList_Keys(q, 50, null);
+	}
+
 	public List<CachedEntity> getItemContentsFor(Key container)
 	{
 		if (container.getKind().equals("Location"))
@@ -4317,6 +4324,7 @@ public class ODPDBAccess
 						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
 						{
 							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+="<div>";
 							loot+="		<div class='main-item-controls'>";
 							// Get all the slots this item can be equipped in
 							loot+="			<a onclick='ajaxAction(\"ServletCharacterControl?type=dropItem&itemId="+item.getKey().getId()+"\", event, loadInventory)' >Drop on ground</a>";
@@ -4325,6 +4333,7 @@ public class ODPDBAccess
 								loot+="<a onclick='pagePopup(\"ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
 							}
 							loot+="		</div>";
+							loot+="</div>";
 						}
 					}
 				}
@@ -5099,7 +5108,7 @@ public class ODPDBAccess
 		
 
 		// Now determine if the path contains an NPC that the character would immediately enter battle with...
-		List<CachedEntity> npcsInTheArea = getFilteredList("Character", "locationKey", destinationKey);
+		List<CachedEntity> npcsInTheArea = getFilteredList("Character", 300, "locationKey", FilterOperator.EQUAL, destinationKey);
 		npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
 
 		shuffleCharactersByAttackOrder(npcsInTheArea);

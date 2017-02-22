@@ -46,7 +46,7 @@ function changeInventionTab(event)
 	</div>
 	<c:if test="${hasExperimentItems==true}">
 		<div class='normal-container big-link-list'>
-			<a class='big-link' onclick='experimentWithSelected()'>Begin Experiments</a>
+			<a class='big-link' onclick='doExperiment(event)'>Begin Experiments</a>
 		</div>	
 	</c:if>
 	<div class='normal-container'>

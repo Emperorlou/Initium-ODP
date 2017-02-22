@@ -69,12 +69,11 @@ public abstract class ODPKnowledgeService extends Service
 	 * 
 	 * @param entity Currently this must be an Item entity but this will likely be expanded.
 	 * @param amount The number of experience points to add to each knowledge entity found associated with
-	 * @return
+	 * @return Returns true if the increase was successful, false if it wasn't. It will only return false if the entity is not properly configured for learning (like if there is no itemClass specified on an Item).
 	 */	
-	public void increaseKnowledgeFor(CachedEntity entity, int amount)
+	public boolean increaseKnowledgeFor(CachedEntity entity, int amount)
 	{
-		// TODO Auto-generated method stub
-		
+		return false;
 	}
 
 
@@ -96,6 +95,14 @@ public abstract class ODPKnowledgeService extends Service
 	}
 
 
+	/**
+	 * Gets the knowledge entity that matches the given entity requirement.
+	 * 
+	 * 
+	 * @param inventionService
+	 * @param entityRequirement
+	 * @return Null will be returned if no knowledge entity is found. Otherwise, all knowledge entities that match the requirement will be returned.
+	 */
 	public List<CachedEntity> fetchKnowledgeEntityByEntityRequirement(ODPInventionService inventionService, CachedEntity entityRequirement)
 	{
 		// TODO Auto-generated method stub

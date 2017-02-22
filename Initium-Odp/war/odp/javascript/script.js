@@ -256,6 +256,23 @@ function random(start, end)
 	return Math.floor(Math.random()*(end-start+1))+start;
 }
 
+function clearPopupPermanentOverlay()
+{
+	$("#banner-base").html("");
+	window.bannerUrl = window.previousBannerUrl;
+	updateDayNightCycle(true);
+}
+
+function popupPermanentOverlay_Experiment(title, text)
+{
+	window.previousBannerUrl = bannerUrl;
+	setBannerImage("http://initium-resources.appspot.com/images/animated/invention1.gif");
+	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
+
+	$("#banner-base").html(content);
+	
+}
+
 function popupPermanentOverlay_Searching(locationName)
 {
 	popupPermanentOverlay_WalkingBase("Exploring "+locationName, "You are wandering around, looking for anything of interest...");
@@ -2441,9 +2458,9 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 			fullpageRefresh();
 			return;
 		}
-		if (data.userMessage!=null)
+		if (data.message!=null)
 		{
-			popupMessage("System Message", data.userMessage, false);
+			popupMessage("System Message", data.message, false);
 		}
 		if (responseFunction!=null)
 			responseFunction(data);
@@ -2525,6 +2542,63 @@ function doGoto(event, pathId, attack)
 			function()	// recallFunction
 			{
 				doGoto(null, pathId, true, window.biome);
+			});
+}
+
+
+
+function doExperiment(event)
+{
+	showBannerLoadingIcon();
+	longOperation(event, "/ServletCharacterControl?type=experiment_ajax&v="+window.verifyCode, 
+			function(action) // responseFunction
+			{
+				if (action.isComplete)
+				{
+					clearPopupPermanentOverlay(); 
+					reloadPagePopup(false);
+				}
+				else
+				{
+					popupPermanentOverlay_Experiment("Experimenting", "You are performing experiments on the things around you so you might understand them better...");
+
+				}
+			},
+			function()	// recallFunction
+			{
+				doExperiment(null);
+			});
+}
+
+
+function doCreatePrototype(event, ideaId)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	
+	pagePopup("/confirmrequirements?ideaId="+ideaId);
+}
+
+function doConfirmCreatePrototype(event, ideaName, entityRequirementToItemMap)
+{
+	showBannerLoadingIcon();
+	longOperation(event, "/ServletCharacterControl?type=createprototype_ajax&v="+window.verifyCode, 
+			function(action) // responseFunction
+			{
+				if (action.isComplete)
+				{
+					clearPopupPermanentOverlay(); 
+					reloadPagePopup(false);
+				}
+				else
+				{
+					popupPermanentOverlay_Experiment("Creating Prototype", "You are trying to create a working prototype of the "+ideaName+" idea...");
+
+				}
+			},
+			function()	// recallFunction
+			{
+				doCreatePrototype(null, ideaName);
 			});
 }
 
