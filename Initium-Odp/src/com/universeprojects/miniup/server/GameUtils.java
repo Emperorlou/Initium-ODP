@@ -869,15 +869,15 @@ public class GameUtils
     			
     		String bludge = (String)item.getProperty("blockBludgeoningCapability");
     		if (bludge == null)
-    			bludge = "N";
+    			bludge = "A";
     			
     		String pierce = (String)item.getProperty("blockPiercingCapability");
     		if (pierce == null)
-    			pierce = "N";
+    			pierce = "A";
     			
     		String bludge = (String)item.getProperty("blockSlashingCapability");
     		if (bludge == null)
-    			bludge = "N";
+    			bludge = "A";
     		
 	    	sb.append("title='");
 	    	sb.append( dp + "/" + bc + "/" + dr);
