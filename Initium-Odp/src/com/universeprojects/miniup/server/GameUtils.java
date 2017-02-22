@@ -850,6 +850,23 @@ public class GameUtils
 //    	
 //    }
     
+    private static String getItemTitle(CachedEntity item) {
+    	StringBuilder sb = new StringBuilder();
+    	
+    	sb.append("title='");
+    	sb.append((Long)item.getProperty("dexterityPenalty") + "/" + (Long)item.getProperty("blockChance") + "/" + (Long)item.getProperty("damageReduction"));
+    	sb.append(" " + ((String)item.getProperty("blockBludgeoningCapability")).charAt(0) + "/"
+    			      + ((String)item.getProperty("blockPiercingCapability")).charAt(0) + "/" 
+    			      + ((String)item.getProperty("blockSlashingCapability")).charAt(0));
+    	
+    	if ("Weapon".equals((String)item.getProperty("itemType")))
+    		sb.append(" " + getWeaponMaxDamage(item));
+    	
+    	sb.append("'");
+    	
+    	return sb.toString();
+    }
+    
     public static String renderItem(CachedEntity item)
     {
     	return renderItem(null, null, null, item, false);
@@ -917,9 +934,9 @@ public class GameUtils
 		}
 		
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemTitle(item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemTitle(item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)
