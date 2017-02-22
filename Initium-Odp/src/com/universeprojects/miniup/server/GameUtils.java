@@ -865,7 +865,7 @@ public class GameUtils
     			
     		Long dr = (Long)item.getProperty("damageReduction");
     		if (dr == null)
-    			dr = 0;
+    			dr = 10;
     			
     		String bludge = (String)item.getProperty("blockBludgeoningCapability");
     		if (bludge == null)
