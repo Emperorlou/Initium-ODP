@@ -857,15 +857,15 @@ public class GameUtils
     		StringBuilder sb = new StringBuilder();
     		Long dp = (Long)item.getProperty("dexterityPenalty");
     		if (dp == null) 
-    			dp = 0;
+    			dp = new Long(0);
     		
     		Long bc = (Long)item.getProperty("blockChance");
     		if (bc == null)
-    			bc = 0;
+    			bc = new Long(0);
     			
     		Long dr = (Long)item.getProperty("damageReduction");
     		if (dr == null)
-    			dr = 10;
+    			dr = new Long(10);
     			
     		String bludge = (String)item.getProperty("blockBludgeoningCapability");
     		if (bludge == null)

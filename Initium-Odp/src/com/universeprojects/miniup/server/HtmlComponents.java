@@ -202,9 +202,9 @@ public class HtmlComponents {
        	result+="<span><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
        	result+="<span class='"+notEnoughStrengthClass+"'>";
        	if ("Selling".equals(saleItem.getProperty("status")))
-   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
+   	    	result+= GameUtils.renderItem(item) + "- <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
    	    else if ("Sold".equals(saleItem.getProperty("status")))   
-   	    	result+="<a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> - <div class='saleItem-sold'>SOLD</div>";
+   	    	result+= GameUtils.renderItem(item) + " - <div class='saleItem-sold'>SOLD</div>";
        	result+="</span>";
     	result+="</div>";
        	result+="</div>";
