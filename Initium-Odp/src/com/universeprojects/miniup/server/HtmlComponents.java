@@ -117,15 +117,7 @@ public class HtmlComponents {
 		{
 			storeSale = 100.0;
 		}
-		String itemPopupAttribute = "";
-		String itemName = "";
-		String itemIconElement = "";
-		if (item!=null)
-		{
-			itemName = (String)item.getProperty("name");
-			itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
-			itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
-		}
+		
 		Long cost = (Long)saleItem.getProperty("dogecoins");
 		cost=Math.round(cost.doubleValue()*(storeSale/100));
 		String finalCost = cost.toString();
@@ -148,7 +140,7 @@ public class HtmlComponents {
 		   	   result+="<input type='checkbox'>";
 		   	   result+=" ";
 		   	   result+="<div class='main-item-container'>";
-		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> <a "+itemPopupAttribute+">"+itemIconElement+""+itemName+"</a> <div class='main-item-storefront-status'>(<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
+		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> " + GameUtils.renderItem(item) + " <div class='main-item-storefront-status'>(<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
 //		   	   result+="<br>";
 //		   	   result+="<div class='main-item-controls'>";
 //		   	   result+="</div>";
