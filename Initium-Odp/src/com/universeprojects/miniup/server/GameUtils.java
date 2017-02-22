@@ -851,20 +851,49 @@ public class GameUtils
 //    }
     
     private static String getItemTitle(CachedEntity item) {
-    	StringBuilder sb = new StringBuilder();
-    	
-    	sb.append("title='");
-    	sb.append((Long)item.getProperty("dexterityPenalty") + "/" + (Long)item.getProperty("blockChance") + "/" + (Long)item.getProperty("damageReduction"));
-    	sb.append(" " + ((String)item.getProperty("blockBludgeoningCapability")).charAt(0) + "/"
-    			      + ((String)item.getProperty("blockPiercingCapability")).charAt(0) + "/" 
-    			      + ((String)item.getProperty("blockSlashingCapability")).charAt(0));
-    	
-    	if ("Weapon".equals((String)item.getProperty("itemType")))
-    		sb.append(" " + getWeaponMaxDamage(item));
-    	
-    	sb.append("'");
-    	
-    	return sb.toString();
+    	String itemType = (String)item.getProperty("itemType");
+    	if (itemType != null && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
+    		
+    		StringBuilder sb = new StringBuilder();
+    		Long dp = (Long)item.getProperty("dexterityPenalty");
+    		if (dp == null) 
+    			dp = 0;
+    		
+    		Long bc = (Long)item.getProperty("blockChance");
+    		if (bc == null)
+    			bc = 0;
+    			
+    		Long dr = (Long)item.getProperty("damageReduction");
+    		if (dr == null)
+    			dr = 0;
+    			
+    		String bludge = (String)item.getProperty("blockBludgeoningCapability");
+    		if (bludge == null)
+    			bludge = "N";
+    			
+    		String pierce = (String)item.getProperty("blockPiercingCapability");
+    		if (pierce == null)
+    			pierce = "N";
+    			
+    		String bludge = (String)item.getProperty("blockSlashingCapability");
+    		if (bludge == null)
+    			bludge = "N";
+    		
+	    	sb.append("title='");
+	    	sb.append( dp + "/" + bc + "/" + dr);
+	    	sb.append(" " + bludge.charAt(0) + "/"
+	    			      + pierce.charAt(0) + "/" 
+	    			      + slash.charAt(0));
+	    	
+	    	if ("Weapon".equals((String)item.getProperty("itemType")))
+	    		sb.append(" " + getWeaponMaxDamage(item));
+	    	
+	    	sb.append("'");
+	    	
+	    	return sb.toString();
+    	} else {
+    		return "";
+    	}
     }
     
     public static String renderItem(CachedEntity item)
