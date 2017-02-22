@@ -875,9 +875,9 @@ public class GameUtils
     		if (pierce == null)
     			pierce = "A";
     			
-    		String bludge = (String)item.getProperty("blockSlashingCapability");
-    		if (bludge == null)
-    			bludge = "A";
+    		String slash = (String)item.getProperty("blockSlashingCapability");
+    		if (slash == null)
+    			slash = "A";
     		
 	    	sb.append("title='");
 	    	sb.append( dp + "/" + bc + "/" + dr);
