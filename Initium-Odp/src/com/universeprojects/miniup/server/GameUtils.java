@@ -855,6 +855,27 @@ public class GameUtils
     	if (itemType != null && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
     		
     		StringBuilder sb = new StringBuilder();
+	    	sb.append("minitip='");
+    		if ("Weapon".equals((String)item.getProperty("itemType"))) {
+    			String diceRoll = (String)item.getProperty("weaponDamage");
+    			if (diceRoll == null) {
+    				diceRoll = "1d1";
+    			} else {
+    				diceRoll = diceRoll.substring(2);
+    			}
+    			
+    			Double critMultiplier = (Double)item.getProperty("weaponDamageCriticalMultiplier");
+    			if (critMultiplier == null)
+    				critMultiplier = new Double(1);
+    				
+	    		Long critChance = (Long)item.getProperty("weaponDamageCriticalChance");
+	    		if (critChance == null)
+	    			critChance = new Long(0);
+	    			
+	    		sb.append(diceRoll + "x" + critMultiplier + " " + critChance + "% ");
+	    		sb.append("(" + getWeaponMaxDamage(item) + "/" + getWeaponAverageDamage(item) + ") ");
+	    	}
+    		
     		Long dp = (Long)item.getProperty("dexterityPenalty");
     		if (dp == null) 
     			dp = new Long(0);
@@ -879,19 +900,10 @@ public class GameUtils
     		if (slash == null)
     			slash = "A";
     		
-	    	sb.append("minitip='");
 	    	sb.append( dp + "/" + bc + "/" + dr);
 	    	sb.append(" " + bludge.charAt(0) + "/"
 	    			      + pierce.charAt(0) + "/" 
 	    			      + slash.charAt(0));
-	    	
-	    	if ("Weapon".equals((String)item.getProperty("itemType"))) {
-	    		sb.append(" " + getWeaponMaxDamage(item));
-	    		Long critChance = (Long)item.getProperty("weaponDamageCriticalChance");
-	    		if (critChance == null)
-	    			critChance = new Long(0);
-	    		sb.append(" " + critChance + "%");
-	    	}
 	    	
 	    	sb.append("'");
 	    	
