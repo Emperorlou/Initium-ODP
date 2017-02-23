@@ -94,8 +94,9 @@ $(window).ready(function(e){
 	
 	// Handlers for the minitip overlays
 	$('body').on("mouseover", "[minitip]", function(event) {
-		if (isTouchEvent) {return false;};
-		$(this).append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
+		if (!isTouchEvent) {
+			$(this).append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
+		};
 	});
 	
 	$('body').on("mouseout", "[minitip]", function(event) {
