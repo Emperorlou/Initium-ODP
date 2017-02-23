@@ -4123,19 +4123,7 @@ public class ODPDBAccess
 					// If the killed character is a NPC
 					if (characterToDie.getProperty("type")==null || "".equals(characterToDie.getProperty("type")) || "NPC".equals(characterToDie.getProperty("type")))
 					{
-						if ("TRUE".equals(dyingCharacterLocation.getProperty("instanceModeEnabled")) && dyingCharacterLocation.getProperty("instanceRespawnDate")==null)
-						{
-							Date instanceRespawnDate = (Date)dyingCharacterLocation.getProperty("instanceRespawnDate");
-							Long instanceRespawnDelay = (Long)dyingCharacterLocation.getProperty("instanceRespawnDelay");
-							if (instanceRespawnDate==null && instanceRespawnDelay!=null)
-							{
-								GregorianCalendar cal = new GregorianCalendar();
-								cal.add(Calendar.MINUTE, instanceRespawnDelay.intValue());
-								
-								dyingCharacterLocation.setProperty("instanceRespawnDate", cal.getTime());
-								
-							}
-						}
+						resetInstanceRespawnTimer(dyingCharacterLocation);
 						
 						
 						characterToDie.setProperty("mode", "DEAD");
@@ -5845,6 +5833,23 @@ public class ODPDBAccess
 	public ODPKnowledgeService getKnowledgeService(Key characterKey)
 	{
 		return null;
+	}
+
+	public void resetInstanceRespawnTimer(CachedEntity location)
+	{
+		if ("TRUE".equals(location.getProperty("instanceModeEnabled")) && location.getProperty("instanceRespawnDate")==null)
+		{
+			Date instanceRespawnDate = (Date)location.getProperty("instanceRespawnDate");
+			Long instanceRespawnDelay = (Long)location.getProperty("instanceRespawnDelay");
+			if (instanceRespawnDate==null && instanceRespawnDelay!=null)
+			{
+				GregorianCalendar cal = new GregorianCalendar();
+				cal.add(Calendar.MINUTE, instanceRespawnDelay.intValue());
+				
+				location.setProperty("instanceRespawnDate", cal.getTime());
+				
+			}
+		}
 	}
 
 }

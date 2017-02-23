@@ -109,4 +109,10 @@ public abstract class ODPInventionService extends Service
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public List<Key> getAllItemConstructionIdeaKeys()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
