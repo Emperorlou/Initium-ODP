@@ -872,8 +872,8 @@ public class GameUtils
 	    		if (critChance == null)
 	    			critChance = new Long(0);
 	    			
-	    		sb.append(diceRoll + "x" + critMultiplier + " " + critChance + "% ");
-	    		sb.append("(" + getWeaponMaxDamage(item) + "/" + getWeaponAverageDamage(item) + ") ");
+	    		sb.append(diceRoll + "x" + formatNumber(critMultiplier) + " " + critChance + "% ");
+	    		sb.append("(" + formatNumber(getWeaponMaxDamage(item)) + "/" + formatNumber(getWeaponAverageDamage(item)) + ") <br/> ");
 	    	}
     		
     		Long dp = (Long)item.getProperty("dexterityPenalty");
