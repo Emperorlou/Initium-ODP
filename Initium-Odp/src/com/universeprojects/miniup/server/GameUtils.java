@@ -887,7 +887,7 @@ public class GameUtils
 	    	
 	    	if ("Weapon".equals((String)item.getProperty("itemType"))) {
 	    		sb.append(" " + getWeaponMaxDamage(item));
-	    		Long critChance = item.getProperty("weaponDamageCriticalChance");
+	    		Long critChance = (Long)item.getProperty("weaponDamageCriticalChance");
 	    		if (critChance == null)
 	    			critChance = new Long(0);
 	    		sb.append(" " + critChance + "%");

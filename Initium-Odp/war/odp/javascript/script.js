@@ -1163,6 +1163,7 @@ function refreshPopup(url, event)
 function destroyThrowaway()
 {
 	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
+		enforceSingleAction();
 		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
 	});
 }
@@ -1213,6 +1214,7 @@ function acceptCharacterTransfer()
 	promptPopup("Accept Character Transfer", "What is the name of the character you are going to transfer to this account? \n\nPlease note that the name is case sensitive!", "", function(charName){
 		if (charName!=null)
 		{
+			enforceSingleAction();
 			window.location.href = "/ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode;
 		}
 	});
@@ -1223,6 +1225,7 @@ function transferCharacter(currentCharName)
 	promptPopup("Transfer Character To..", "Please type the email address of the account you wish to transfer this character to.\n\nPlease note that you are currently using: "+currentCharName, "", function(email){
 		if (email!=null)
 		{
+			enforceSingleAction();
 			window.location.href = "/ServletUserControl?type=transferCharacter&email="+email+"&v="+window.verifyCode;
 		}
 	});
@@ -1418,8 +1421,10 @@ function giftPremium()
 {
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
 		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
+			enforceSingleAction();
 			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
 		}, function(){
+			enforceSingleAction();
 			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
 		});
 	});
@@ -1428,6 +1433,7 @@ function giftPremium()
 function newPremiumToken()
 {
 	confirmPopup("Create new premium token?", "Are you sure you want to create a premium token and put it in your inventory?\n\nBe aware that this token can be traded AND looted if you die.", function(){
+		enforceSingleAction();
 		window.location.href = "/ServletUserControl?type=newPremiumToken"+"&v="+window.verifyCode;
 	});
 }
@@ -1435,6 +1441,7 @@ function newPremiumToken()
 function newCharacterFromUnconscious()
 {
 	confirmPopup("Create a new character?", "If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
+		enforceSingleAction();
 		window.location.href = "/ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode;
 	});
 }
@@ -1444,11 +1451,13 @@ function enterDefenceStructureSlot(slot)
 	if (slot=="Defending1" || slot=="Defending2" || slot=="Defending3")
 	{
 		confirmPopup("Defend this structure?", "Are you sure you want to defend this structure? If you do this, other players will be able to attack and kill you.", function(){
+			enforceSingleAction();
 			window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
 		});
 	}
 	else
 	{
+		enforceSingleAction();
 		window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
 	}
 }
@@ -1657,6 +1666,7 @@ function deleteAndRecreateCharacter(currentCharName)
 		if (currentCharName==null)
 			currentCharName = "";
 		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
+			enforceSingleAction();
 			window.location.href = "/ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+window.verifyCode;
 		});
 	});
@@ -1700,6 +1710,7 @@ function doShowHiddenSites(eventObject)
 function resendVerificationEmail()
 {
 	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
+		enforceSingleAction();
 		location.href = "/ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode;
 	});
 	
@@ -1708,6 +1719,7 @@ function resendVerificationEmail()
 function changeEmailAddress(oldEmail)
 {
 	promptPopup("Change email", "What email address would you like to use for your account?", oldEmail, function(value){
+		enforceSingleAction();
 		location.href = "/ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value)+"&v="+window.verifyCode;
 	});
 }
@@ -1727,6 +1739,7 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 {
 	confirmPopup("Are you sure?", "This will send an email to a content developer notifying them that you'd like to customize an item.<br>You will be asked to provide some details in the next popup.", function(){
 		promptPopup("Customization Details", requiredDetails, "", function(value){
+			enforceSingleAction();
 			location.href="/ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+window.verifyCode+"&requiredDetails="+encodeURIComponent(value);
 		});
 	});
@@ -1776,37 +1789,53 @@ function joinPartyCharacterName(eventObject, characterName) {
 function leaveParty()
 {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
+		enforceSingleAction();
 		location.href = "/ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
 	});
 }
 
+var singleActionIssued = false;
+function enforceSingleAction()
+{
+	if (singleActionIssued)
+		throw "Attempted to execute more than one action at a time. This action has been cancelled.";
+	
+	singleActionIssued = true;
+}
+
 function combatAttackWithLeftHand()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode;
 }
 
 function combatAttackWithRightHand()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode;
 }
 
 function combatEscape()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=escape"+"&v="+window.verifyCode;
 }
 
 function combatAllowCharacterIn()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode;
 }
 
 function storeDisabled()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode;
 }
 
 function storeEnabled()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
 }
 
@@ -1840,16 +1869,19 @@ function toggleHideUserActivity(eventObject)
 
 function campsiteDefend()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
 }
 
 function leaveAndForgetCombatSite(pathId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode;
 }
 
 function forgetCombatSite(locationId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
 }
 
@@ -1872,6 +1904,7 @@ function groupMemberKick(eventObject, characterId, characterName)
 
 function groupMemberKickCancel(characterId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
 }
 
@@ -1920,26 +1953,31 @@ function groupMergeCancelRequest(eventObject)
 
 function tradeRemoveItem(itemId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
 }
 
 function tradeCancel()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode;
 }
 
 function tradeReady(version)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode;
 }
 
 function tradeAddItem(itemId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
 }
 
 function partyJoin(characterId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
 }
 
@@ -2026,6 +2064,7 @@ function tradeAddAllItemsNew(eventObject)
 
 function duelRequest(characterId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
 }
 
@@ -2039,21 +2078,25 @@ function viewManageStore()
 
 function newCharacterFromDead()
 {
+	enforceSingleAction();
 	location.href = "/ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
 }
 
 function switchCharacter(characterId)
 {
+	enforceSingleAction();
 	location.href = "/ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
 }
 
 function logout()
 {
+	enforceSingleAction();
 	location.href = "/ServletUserControl?type=logout"+"&v="+verifyCode;
 }
 
 function attackStructure()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=attackStructure"+"&v="+verifyCode;
 }
 
@@ -2078,6 +2121,7 @@ function viewStore(characterId)
 
 function setBlockadeRule(rule)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
 }
 
