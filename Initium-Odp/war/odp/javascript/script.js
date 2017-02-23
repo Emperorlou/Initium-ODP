@@ -90,8 +90,11 @@ $(window).ready(function(e){
 		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
 	
+	var isTouchEvent = false;
+	
 	// Handlers for the minitip overlays
 	$('body').on("mouseover", "[minitip]", function(event) {
+		if (isTouchEvent) {return false;};
 		$(this).append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
 	});
 	
@@ -99,6 +102,10 @@ $(window).ready(function(e){
 		$(this).find(".minitip").remove();
 	});
 	
+	$('body').on("touchstart", "[minitip]", function(event) {
+		isTouchEvent = true;
+		setTimeout(function() { isTouchEvent = false;}, 300);
+	});
 	
 	$(".main-expandable .main-expandable-title").click(function(){
 		$(this).parent().find(".main-expandable-content").show();
