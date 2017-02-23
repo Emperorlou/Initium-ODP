@@ -885,8 +885,13 @@ public class GameUtils
 	    			      + pierce.charAt(0) + "/" 
 	    			      + slash.charAt(0));
 	    	
-	    	if ("Weapon".equals((String)item.getProperty("itemType")))
+	    	if ("Weapon".equals((String)item.getProperty("itemType"))) {
 	    		sb.append(" " + getWeaponMaxDamage(item));
+	    		Long critChance = item.getProperty("weaponDamageCriticalChance");
+	    		if (critChance == null)
+	    			critChance = new Long(0);
+	    		sb.append(" " + critChance + "%");
+	    	}
 	    	
 	    	sb.append("'");
 	    	
