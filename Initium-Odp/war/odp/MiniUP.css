@@ -2206,9 +2206,10 @@ hr.items-separator {
 {
     position:absolute;
     background-color:#000000;
-    padding:4px;
-    border-radius:4px;
+    padding:8px;
+    border-radius:8px;
     color:#EEEEEE;
+    font-size:medium;
 }
 
 

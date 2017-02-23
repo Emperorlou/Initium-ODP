@@ -91,11 +91,11 @@ $(window).ready(function(e){
 	});
 	
 	// Handlers for the minitip overlays
-	$('#page-popup-root').on("mouseover", "[minitip]", function(event) {
-		$(this).append('<div class="minitip">' + $(this).attr("title") + '</div>');
+	$('body').on("mouseover", "[minitip]", function(event) {
+		$(this).append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
 	});
 	
-	$('#page-popup-root').on("mouseout", "[minitip]", function(event) {
+	$('body').on("mouseout", "[minitip]", function(event) {
 		$(this).find(".minitip").remove();
 	});
 	
