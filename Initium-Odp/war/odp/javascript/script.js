@@ -90,6 +90,16 @@ $(window).ready(function(e){
 		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
 	
+	// Handlers for the minitip overlays
+	$('#page-popup-root').on("mouseover", "[minitip]", function(event) {
+		$(this).append('<div class="minitip">' + $(this).attr("title") + '</div>');
+	});
+	
+	$('#page-popup-root').on("mouseout", "[minitip]", function(event) {
+		$(this).find(".minitip").remove();
+	});
+	
+	
 	$(".main-expandable .main-expandable-title").click(function(){
 		$(this).parent().find(".main-expandable-content").show();
 		$(this).hide();

@@ -2202,7 +2202,14 @@ hr.items-separator {
 	font-size:16px;
 }
 
-
+.minitip
+{
+    position:absolute;
+    background-color:#000000;
+    padding:4px;
+    border-radius:4px;
+    color:#EEEEEE;
+}
 
 
 
