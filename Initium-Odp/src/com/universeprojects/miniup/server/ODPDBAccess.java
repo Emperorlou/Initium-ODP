@@ -129,6 +129,17 @@ public class ODPDBAccess
 		return factory.getInstance(request);
 	}
 
+	public boolean isTestServer()
+	{
+		if (getRequest().getRequestURL().toString().contains("test")) 
+			return true;
+		
+		if (CachedDatastoreService.isUsingRemoteAPI()==true)
+			return true;
+		
+		return false;
+	}
+	
 	public HttpServletRequest getRequest()
 	{
 		return request;
