@@ -11,7 +11,7 @@ public abstract class CommonChecks
 	 * @param character
 	 * @return True if not busy
 	 */
-	public static boolean checkCharacterIsNotBusy(CachedEntity character)
+	public static boolean checkCharacterIsBusy(CachedEntity character)
 	{
 		if (character.getProperty("mode")==null || "NORMAL".equals(character.getProperty("mode")))
 			return true;
