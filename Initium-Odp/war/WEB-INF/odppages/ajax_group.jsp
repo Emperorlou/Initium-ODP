@@ -5,7 +5,7 @@
 			<c:out value="${groupName}" />
 		</h1>
 		<p>
-			<c:out value="${groupDescription}" />
+			${groupDescription}
 			<br />
 		</p>
 	</div>
