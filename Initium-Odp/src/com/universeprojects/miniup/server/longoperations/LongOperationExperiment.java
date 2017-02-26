@@ -32,6 +32,9 @@ public class LongOperationExperiment extends LongOperation
 	@Override
 	int doBegin(Map<String, String> parameters) throws UserErrorMessage
 	{
+		if(db.isTestServer()==false)
+			throw new UserErrorMessage("Experimentation is temporarily disabled.");
+		
 		CachedEntity character = db.getCurrentCharacter();
 		doChecks(character);
 		
@@ -73,6 +76,7 @@ public class LongOperationExperiment extends LongOperation
 		String message = "";
 		
 		// Research one of the available items at random
+		@SuppressWarnings("unchecked")
 		List<Key> selectedItems = (List<Key>)data.get("selectedItems");
 		if (selectedItems==null)
 			selectedItems = inventionService.getAvailableItemKeys();

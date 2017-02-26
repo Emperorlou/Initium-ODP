@@ -2199,7 +2199,19 @@ function viewInvention()
 	pagePopup("/odp/invention", null, "Invention");
 }
 
+function combineChippedTokens(event, itemId)
+{
+	doCommand(event, "CombineChippedTokens", {itemId:itemId}, function(){
+		closeAllTooltips();		
+	});
+}
 
+function splitPremiumToken(event, itemId)
+{
+	doCommand(event, "SplitPremiumToken", {itemId:itemId}, function(){
+		closeAllTooltips();		
+	});
+}
 
 
 

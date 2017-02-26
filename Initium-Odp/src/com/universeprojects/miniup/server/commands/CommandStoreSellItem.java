@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -57,7 +58,13 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		CachedEntity saleItem = db.newSaleItem(ds, character, item, amount);
 
 		// This is a special case
-		if ("Initium Premium Membership".equals(item.getProperty("name")))
+		if (CommonChecks.checkItemIsPremiumToken(item))
+		{
+			setPopupMessage("This item has been listed on the global exchange for premium tokens.");
+		}
+		
+		// This is a special case
+		if (CommonChecks.checkItemIsChippedToken(item))
 		{
 			setPopupMessage("This item has been listed on the global exchange for premium tokens.");
 		}

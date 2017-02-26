@@ -39,6 +39,7 @@ import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.ContainerService;
@@ -979,10 +980,11 @@ public class ODPDBAccess
 		result.setProperty("name", character.getProperty("name") + " - " + item.getProperty("name") + " - " + dogecoins);
 
 		// This is a special case for premium tokens to set the specialId
-		if ("Initium Premium Membership".equals(item.getProperty("name")))
+		if (CommonChecks.checkItemIsPremiumToken(item) || CommonChecks.checkItemIsChippedToken(item))
 		{
 			result.setProperty("specialId", "Initium Premium Membership");
 		}
+		
 		
 		db.put(result);
 
@@ -5861,6 +5863,11 @@ public class ODPDBAccess
 				
 			}
 		}
+	}
+
+	public CachedEntity _newPremiumMembershipToken(Key owningCharacterKey)
+	{
+		return null;
 	}
 
 }
