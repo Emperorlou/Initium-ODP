@@ -61,8 +61,12 @@
 
 
 <script type="text/javascript">
+	<c:if test="${chatIdToken!=null}">
 	window.chatIdToken = "${chatIdToken}";
+	</c:if>
+	<c:if test="${characterId!=null}">
 	window.characterId = ${characterId};
+	</c:if>
 	window.verifyCode = "${verifyCode}";
 	window.serverTime=<c:out value="${serverTime}"/>;
 	window.clientTime=new Date().getTime();

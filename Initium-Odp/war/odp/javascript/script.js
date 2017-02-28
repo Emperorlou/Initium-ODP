@@ -2345,7 +2345,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 		// Ajax updates get overwritten if they're not simple updates
 		// on the original element.
 		if (eventObject!=null && originalText)
-			clickedElement.html(originalText);
+			clickedElement.html(originalText.replace("hasTooltip", ""));
 		
 		if (data.antiBotQuestionActive == true)
 		{
@@ -2395,7 +2395,7 @@ function doCommand(eventObject, commandName, parameters, callback)
 	{
 		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
 		if (eventObject!=null)
-			clickedElement.html(originalText);
+			clickedElement.html(originalText.replace("hasTooltip", ""));
 	});
 	
 	if (eventObject!=null)
@@ -2650,12 +2650,42 @@ function doExperiment(event)
 }
 
 
-function doCreatePrototype(event, ideaId)
+function doCreatePrototype(event, ideaId, ideaName)
 {
 	closeAllPopups();
 	closeAllTooltips();
 	
-	pagePopup("/confirmrequirements?ideaId="+ideaId);
+	pagePopup("/odp/confirmrequirements?ideaId="+ideaId, function(){
+		clearPopupPermanentOverlay();
+	}, "Develop "+ideaName);
+}
+
+function doBeginPrototype(event, ideaId, selectedItems)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	closePagePopup(true);
+
+	
+	showBannerLoadingIcon();
+	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&v="+window.verifyCode, 
+			function(action) // responseFunction
+			{
+				if (action.isComplete)
+				{
+					clearPopupPermanentOverlay(); 
+					reloadPagePopup(false);
+				}
+				else
+				{
+					popupPermanentOverlay_Experiment("Prototyping", "You are attempting to create a new prototype of an idea. This can take some time...");
+				}
+			},
+			function()	// recallFunction
+			{
+				doBeginPrototype(null, ideaId, selectedItems);
+			});
+	
 }
 
 function doConfirmCreatePrototype(event, ideaName, entityRequirementToItemMap)

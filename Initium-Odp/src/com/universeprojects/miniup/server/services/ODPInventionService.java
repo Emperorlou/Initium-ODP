@@ -115,4 +115,23 @@ public abstract class ODPInventionService extends Service
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public void poolConstructItemIdea(EntityPool pool, CachedEntity entity)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void poolGenericEntityRequirement(EntityPool pool, Object genericEntityRequirementListFieldValue)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public List<CachedEntity> getItemCandidatesFor(EntityPool pool, CachedEntity genericEntityRequirement)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

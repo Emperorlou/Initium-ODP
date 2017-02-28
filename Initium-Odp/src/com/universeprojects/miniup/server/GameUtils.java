@@ -892,15 +892,15 @@ public class GameUtils
 	    			dr = new Long(10);
 	    			
 	    		String bludge = (String)item.getProperty("blockBludgeoningCapability");
-	    		if (bludge == null)
+	    		if (bludge == null || bludge.length()==0)
 	    			bludge = "A";
 	    			
 	    		String pierce = (String)item.getProperty("blockPiercingCapability");
-	    		if (pierce == null)
+	    		if (pierce == null || pierce.length()==0)
 	    			pierce = "A";
 	    			
 	    		String slash = (String)item.getProperty("blockSlashingCapability");
-	    		if (slash == null)
+	    		if (slash == null || slash.length()==0)
 	    			slash = "A";
 	    		
 		    	sb.append( dp + "/" + bc + "/" + dr);
