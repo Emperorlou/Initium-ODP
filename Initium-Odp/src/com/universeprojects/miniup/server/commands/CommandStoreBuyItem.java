@@ -126,8 +126,8 @@ public class CommandStoreBuyItem extends Command {
 			{
 				// newItem is the purchased item, and will be the purchased quantity.
 				// newSaleItem is the sale record.
-				CachedEntity newItem = new CachedEntity(item.getKind());
-				CachedEntity newSaleItem = new CachedEntity(saleItem.getKind());
+				CachedEntity newItem = new CachedEntity(item.getKind(), ds.getPreallocatedIdFor(item.getKind()));
+				CachedEntity newSaleItem = new CachedEntity(saleItem.getKind(), ds.getPreallocatedIdFor(saleItem.getKind()));
 				CachedDatastoreService.copyFieldValues(item, newItem);
 				CachedDatastoreService.copyFieldValues(saleItem, newSaleItem);
 				
