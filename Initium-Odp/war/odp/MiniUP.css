@@ -6,7 +6,7 @@
 
 
 strong
-{f
+{
 	color:#FFFFFF;
 }
 html
@@ -381,13 +381,12 @@ hr:after {
 .mini-window-header
 {
 	position:relative;
-	top:-12px;
-	left:-15px;
-	width:330px;
+	width:290px;
 	height:80px;
 	background-color:#222222;
 	padding:10px;	
 	font-size:16px;
+	margin: 0 auto;
 }
 
 .mini-window-header-split
@@ -422,7 +421,7 @@ p a, li a
 
 .main-highlight
 {
-	color:#777777;
+	color:#999999;
 }
 
 a.main-highlight:HOVER
@@ -440,9 +439,14 @@ a.main-highlight:HOVER
 	font-weight: bold;
 	float:right;
 }
+#buttonbar-main
+{
+	text-align:center;	
+}
 
 #buttonbar-main span a
 {
+
 	margin-left:4px;
 	margin-right:4px;
 }
@@ -1124,7 +1128,29 @@ hr.items-separator {
     word-break: normal;
     overflow-y: auto;
     line-height: 16px;
-    }
+}
+.popup_range_slider {
+    vertical-align: middle;
+    height: 32px;
+}
+.popup_range_number {
+    vertical-align: middle;
+    text-align:center;
+    width: 13%;
+    font-size: 14pt;
+    font-family: DOS, Monospace;
+    margin: 0 3%;
+}
+a.range-increment {
+    margin: 0px 3%;
+    letter-spacing: -4px;
+}
+.noselect{
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
 .popup_footer {
     width: 100%;
     height: 46px;
@@ -1136,12 +1162,11 @@ hr.items-separator {
     background-repeat: no-repeat;*/
     /*background-color:#777777;*/
 
-    }
+}
 .popup_footer > a {
     display: table-cell;
     width: 33%;
-
-	}
+}
 
 
 
@@ -2085,7 +2110,7 @@ hr.items-separator {
 }
 .big-link
 {
-	font-size:30px;
+	font-size:24px;
 	color: #DAA520;
 	text-shadow: 3px 3px 5px rgba(0, 0, 0, 1);
 	margin-bottom:8px;
@@ -2114,20 +2139,83 @@ hr.items-separator {
 
 .tab-row
 {
-	
+	text-align:center;
 }
 .tab-row-tab
 {
+	display:inline-block;
 	width:32px;
 	height:32px;
-	padding:4px;
+	margin:4px;
+	background-repeat: no-repeat;
+	background-position: center;
+	text-shadow: 1px 1px 0px rgba(0, 0, 0, 1);
+	padding:3px;
+	border-width:1px;
+	border-radius:4px;
+	cursor:pointer;
+}
+.tab-row-tab:hover
+{
+	box-shadow: 0px 0px 30px rgba(0, 180, 0, 0.6);
+    border: solid 1px #008800;
+    background-color: #008800;
+    padding:2px;
+}
+.tab-row-tab.tab-selected
+{
+	box-shadow: 0px 0px 30px rgba(0, 255, 0, 1);
+    border: solid 1px #00AA00;
+    background-color: #00AA00;
+    padding:2px;
+}
+#knowledge-tab
+{
+	background-image:url('http://initium-resources.appspot.com/images/ui/tab-knowledge-button.png');
+}
+#experimentation-tab
+{
+	background-image:url('http://initium-resources.appspot.com/images/ui/tab-experiments-button.png');
+}
+#idea-tab
+{
+	background-image:url('http://initium-resources.appspot.com/images/ui/tab-ideas-button.png');
+}
+#itemConstruction-tab
+{
+	background-image:url('http://initium-resources.appspot.com/images/ui/tab-builditem-button.png');
+}
+#buildingConstruction-tab
+{
+	background-image:url('http://initium-resources.appspot.com/images/ui/tab-buildbuilding-button.png');
+}
+.tab-content
+{
+	display:none;
+}
+.tab-content-selected
+{
+	display:block;
 }
 
+.normal-container .title
+{
+	color:#FFFFFF;
+	text-align: center;
+    font-size: 30px;
+    margin-bottom: 15px;	
+}
 
+.normal-container
+{
+	color: #BBBBBB;
+	margin:8px;
+}
 
-
-
-
+.experiment-available-item-container
+{
+	height:40px;
+}
 
 
 
@@ -3005,6 +3093,19 @@ body
 	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 fill repeat;	  
 }
 
+/* Old cluetip style */
+.cluetip-rounded
+{
+	background-color:#000000;
+}
+
+
+.ui-cluetip-content
+{
+	padding:0px;
+}
+
+
 .cluetip-newui
 {
 	border-style: solid;
@@ -3212,6 +3313,21 @@ body
 {
 	display:none;
 }
+
+
+#newui .normal-container
+{
+	background-color: #4e4a4e;
+	
+	border-style: solid;
+	border-width: 8px 9px 9px 8px;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 fill stretch;
+	margin:5px;
+}
+
 
 
 
@@ -3513,4 +3629,18 @@ body
 .vp {
 	top: 0; right: 0; bottom: 0; left: 0;
 	/*border: 1px solid black;*/
+}
+
+div#buildingObject {
+	/*width: 163px;*/
+	/*height: 228px;*/
+	background-color: transparent;
+	background-size:     cover;
+	background-repeat:   no-repeat;
+	background-position: center center;
+	z-index: 100000000000;
+}
+
+.hoveringObject {
+	opacity: 0.5;
 }

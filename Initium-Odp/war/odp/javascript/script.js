@@ -579,19 +579,30 @@ function deletePlayerHouse(eventObject, pathId)
 	});
 }
 
-function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, characterId)
+function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, characterId, quantity)
 {
-	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
-		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId},function(data,error){
+	var yesFunction = function(qty=null){
+		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId,"quantity":qty},function(data,error){
 			if (error) return;
 			$(".saleItem[ref='"+saleItemId+"']").html(data.createStoreItem);
 		});
-	});
+	};
+	
+	if(quantity == 1)
+		confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", yesFunction);
+	else{
+		rangePopup("Buy Item", "Please specify the number of <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> to purchase ("+itemPrice+" gold each):",0,quantity,
+			function(qty) { // textFunction
+				return "Total cost: " + (qty*itemPrice);
+			},
+			yesFunction,
+			null); // noFunction
+	}
 }
 
 function storeSellItemNew(eventObject,itemId)
 {
-	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(amount){
+	promptPopup("Sell Item", "How much do you want to sell this item for? (Unit Price)", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
 		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
@@ -2853,7 +2864,7 @@ function confirmCancelPopup(title, content, showCancel, yesFunction, noFunction)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div tabindex="0" id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p><br></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option">Yes</a><a id="'+unique+'-no"  class="popup_confirm_option">No</a>' + (showCancel ? '<a id="'+unique+'-cancel"  class="popup_confirm_option">Cancel</a>' : '') + '</div></div></div></div>');
+    $("#popups").html(currentPopups + '<div tabindex="0" id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p><br></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option confirm_yes">Yes</a><a id="'+unique+'-no"  class="popup_confirm_option confirm_no">No</a>' + (showCancel ? '<a id="'+unique+'-cancel"  class="popup_confirm_option confirm_cancel">Cancel</a>' : '') + '</div></div></div></div>');
     expandpopupMessage();
     
     var popupRoot = $('#popupWrapperBackground_' + popupsNum).focus();
@@ -2911,6 +2922,113 @@ function confirmPopup(title, content, yesFunction, noFunction)
 	confirmCancelPopup(title, content, false, yesFunction, noFunction);
 }
 
+function rangePopup(title, content, minValue, maxValue, valueFunction, yesFunction, noFunction)
+{
+	if (content!=null)
+		content = content.replace("\n", "<br>");
+	
+	let unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
+	let popupClassOverride = null;
+	if (popupClassOverride==null)
+		popupClassOverride = "popup";
+	closeAllPopups();
+    window.popupsNum++;
+    window.popupsOpen++;
+    window.popupsArray[popupsNum-1] = "yes";
+    $("#popups").show();
+    currentPopups = $("#popups").html();
+	let step = (maxValue-minValue) / 4;
+	let rangeId = "popup_prompt_range_"+unique;
+	let numberId = "popup_prompt_number_"+unique;
+	let displayId = "popup_prompt_displaytext_"+unique;
+	let changeText = function() { 
+		let newText = this.value;
+		if(valueFunction) {
+			newText = valueFunction(Math.min(this.value,maxValue));
+		} 
+		$("#"+displayId).text(newText);
+	};
+	let newPopup = 
+		'<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground">' +
+		'<div id="popupWrapper_' + popupsNum + '" class="popupWrapper">'+
+		'<div id="popup_' + popupsNum + '" class="'+popupClassOverride+'">'+
+		'<div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div>'+
+		'<div id="popup_body_' + popupsNum + '" class="popup_body">'+
+		'<div id="popup_text_' + popupsNum + '" class="popup_text" style="max-height:200px">'+
+		'<p style="margin:0px 2px">' + content + '</p>'+
+		'<div class="popup_range_body" style="text-align:center">';
+	let nudHtml = '<input id="'+numberId+'" class="popup_range_number" type="number" min="'+minValue+'" max="'+maxValue+'" value="1" onchange="'+rangeId+'.value=this.value;"/>'; 
+	let increment = 1, numArrow = 1;
+	while(increment < maxValue && numArrow < 5) // Don't allow more than 4 increment arrows
+	{
+		nudHtml = '<a class="range-increment" data-inc="'+(increment*-1)+'" style="float-left">'+('&lt;'.repeat(numArrow))+'</a>' + nudHtml + 
+				'<a class="range-increment" data-inc="'+increment+'" style="float-right">'+('&gt;'.repeat(numArrow))+'</a>';
+		numArrow++;
+		increment*=10;
+	}
+	
+	newPopup += '<div class="noselect">'+nudHtml+'</div><input id="'+rangeId+'" class="popup_range_slider" style="width:80%;" type="range" min="'+minValue+'" max="'+maxValue+'" step="1" value="'+minValue+'" oninput="'+numberId+'.value = this.value;" onchange="'+numberId+'.value = this.value;"/>';	
+	newPopup += '<br/><span id="'+displayId+'"></span>';
+	newPopup += '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option option_okay">Okay</a><a id="'+unique+'-no" class="popup_confirm_option option_cancel">Cancel</a></div></div></div></div>';
+    $("#popups").html(currentPopups + newPopup);
+	$("#popup_"+popupsNum).on("change", "#"+rangeId+",#"+numberId, changeText);
+    expandpopupMessage();
+    
+	// Use range, since that limits the acceptable values.
+    let inputRange = $('#'+rangeId);
+    inputRange.change();
+	
+	let promptNo = function()
+	{
+		closepopupMessage(currentPopup());
+    	if (noFunction)
+    	{
+    		noFunction();
+    	}
+	};
+	let promptYes = function()
+	{
+		let value = null;
+		if (yesFunction)
+		{
+			value = inputRange.val();
+			if(value === "0")
+			{
+				promptNo();
+				return;
+			}
+		}
+		
+		closepopupMessage(currentPopup());
+		
+		if (yesFunction)
+			yesFunction(value);
+	};
+	
+    inputRange.keyup(function(e){
+    	stopEventPropagation(e);
+    });
+    inputRange.keydown(function(e){
+    	stopEventPropagation(e);
+        if (e.keyCode == 13) 
+        {
+        	promptYes();
+        }
+        if (e.keyCode == 27)
+        {
+        	promptNo();
+        }
+        
+        e.stopPropagation();
+    });
+    
+    // Increment arrow click.
+    $("#popup_"+popupsNum).on("click", ".range-increment", function(event) { let inc = +$(this).data("inc"); inputRange.val(+inputRange.val()+inc); inputRange.change(); });
+    // Yes/no click.
+    $("#"+unique+"-yes").click(promptYes);
+    $("#"+unique+"-no").click(promptNo);
+}
+
 function promptPopup(title, content, defaultText, yesFunction, noFunction)
 {
 	if (content!=null)
@@ -2934,7 +3052,7 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p style="margin:0px">' + content + '</p><br><div style="text-align:center"><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/></div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option">Okay</a><a id="'+unique+'-no" class="popup_confirm_option">Cancel</a></div></div></div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p style="margin:0px">' + content + '</p><br><div style="text-align:center"><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/></div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option confirm_okay">Okay</a><a id="'+unique+'-no" class="popup_confirm_option confirm_cancel">Cancel</a></div></div></div></div>');
     //$("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="page-popup"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><p>' + content + '</p><br><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div>');
     expandpopupMessage();
     
