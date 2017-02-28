@@ -62,7 +62,7 @@ public class CommandPlayerCreateHouseMap extends Command
 
 		// Check that we don't already have too many maps out there...
 		QueryHelper q = new QueryHelper(ds);
-		Integer count = q.getFilteredList_Count("Item", "keyCode", FilterOperator.EQUAL, housePath.getId());
+		Long count = q.getFilteredList_Count("Item", "keyCode", FilterOperator.EQUAL, housePath.getId());
 		if (count>=10)
 			throw new UserErrorMessage("10 maps already exist for this location. You cannot make more.");
 		

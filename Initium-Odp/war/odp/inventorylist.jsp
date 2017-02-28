@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.DDOSProtectionException"%>
 <%@page import="com.universeprojects.miniup.server.HiddenUtils"%>
 <%@page import="com.universeprojects.miniup.server.WebUtils"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
@@ -16,7 +17,16 @@
 <%
 	response.setHeader("Access-Control-Allow-Origin", "*");		// This is absolutely necessary for phonegap to work
 
-	Authenticator auth = Authenticator.getInstance(request);
+	Authenticator auth = null;
+	try
+	{
+		auth = Authenticator.getInstance(request, true);
+	}
+	catch(DDOSProtectionException e)
+	{
+		// Ignore this here
+	}
+
 	GameFunctions db = auth.getDB(request);
 	
 	CommonEntities common = CommonEntities.getInstance(request);

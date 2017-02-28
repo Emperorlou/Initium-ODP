@@ -225,7 +225,7 @@ public class MainPageUpdateService extends Service
 			
 			// Now that we have a list of destLocations to load, we will load them in now and delete any that ended up being null..
 			destLocations = db.getEntities(destLocationsToLoad);
-			List<Key> entitiesToDelete = new ArrayList<Key>();
+//			List<Key> entitiesToDelete = new ArrayList<Key>();
 			for(int i = destLocations.size()-1; i>=0; i--)
 			{
 				if (destLocations.get(i)==null)
@@ -367,7 +367,7 @@ public class MainPageUpdateService extends Service
 	 */
 	public String updateTestPanel()
 	{
-		if (db.getRequest().getRequestURL().toString().contains("test")) {
+		if (db.isTestServer()) {
 			StringBuilder newHtml = new StringBuilder();
 			
 			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
@@ -382,7 +382,9 @@ public class MainPageUpdateService extends Service
 			newHtml.append("</div>");
 			newHtml.append("</div>");
 			newHtml.append("<button type=\"button\" onclick=\"openMenu()\">Menu</button>");
-			newHtml.append("<button type=\"button\" onclick=\"mapPlow()\">Plow</button>");
+			newHtml.append("<button type=\"button\" onclick=\"mapPlow(event)\">Plow</button>");
+			newHtml.append("<button type=\"button\" onclick=\"mapPlaceHouse(event)\" style=\"position:relative\">Place House</button>");
+			newHtml.append("<button type=\"button\" onclick=\"mapPlaceCity(event)\" style=\"position:relative\">Place City</button>");
 			newHtml.append("<center><p id=\"selectedObjects\" class=\"selectedObjectList\"></p></center>");
 			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
 			newHtml.append("<script>");
@@ -438,8 +440,6 @@ public class MainPageUpdateService extends Service
 			if (travelTime==null || travelTime>0)
 				onclick = "onclick='popupPermanentOverlay_Walking(\""+destLocationName+"\")'";
 			
-			String shortcutPart = "";
-			String shortcutKeyIndicatorPart = "";
 	
 			newHtml.append("<a onclick='doGoto(event, "+path.getKey().getId()+", true)' class='path-overlay-link' style='top:"+top+"%;left: "+left+"%;' "+onclick+">"+buttonCaption+"</a>");
 	
@@ -691,6 +691,7 @@ public class MainPageUpdateService extends Service
 	public String updateLocationDirectScripts()
 	{
 		StringBuilder newHtml = new StringBuilder();
+		@SuppressWarnings("unchecked")
 		List<Key> scriptKeys = (List<Key>)location.getProperty("scripts");
 		if (scriptKeys!=null && scriptKeys.isEmpty()==false)
 		{

@@ -96,7 +96,7 @@
 			cluetipClass: 'newui2',
 			showTitle: false, 
 			height: 'auto', 
-			width: 350,
+			width: 303,
 	        sticky: true, 
 	        closePosition: 'title',
 	        arrows: true,
@@ -123,7 +123,7 @@
 			cluetipClass: 'newui2',
 			showTitle: false, 
 			height: 'auto', 
-			width: 350,
+			width: 303,
 	        sticky: true, 
 	        closePosition: 'title', 
 	        arrows: true,
@@ -158,7 +158,7 @@
 			cluetipClass: 'newui2',
 			showTitle: false, 
 			height: 'auto', 
-			width: 350,
+			width: 303,
 	        sticky: true, 
 	        closePosition: 'title',
 	        closeText: ' ',
@@ -372,7 +372,7 @@ https://github.com/Emperorlou/Initium-ODP
 
                                            -->
 
-<body>
+<body id='newui'>
 	<div class='page'>
 		<div class='page-upperhalf'>
 			<div id='main-header' class='header1'>

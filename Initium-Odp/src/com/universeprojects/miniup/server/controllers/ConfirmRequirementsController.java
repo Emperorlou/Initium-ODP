@@ -2,9 +2,7 @@ package com.universeprojects.miniup.server.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,12 +12,18 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.web.PageController;
 
 public class ConfirmRequirementsController extends PageController
 {
-
+	public enum Type
+	{
+		IdeaToPrototype
+	}
+	
 	public ConfirmRequirementsController()
 	{
 		super("confirmrequirements");
@@ -28,48 +32,37 @@ public class ConfirmRequirementsController extends PageController
 	@Override
 	protected String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		Type type = determineType(request);
+		
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
-		CachedDatastoreService ds = db.getDB();
-		CachedEntity character = db.getCurrentCharacter(); 
-		
-//		InventionService invention = new InventionService(db, character);
 
-		// Get the list of EntityRequirements we were given and work from those
-		// (Maybe include the entity that owns the EntityRequirement for backreference [like the ConstructionToolRequirement])
-		String[] entityRequirementKeysRaw = request.getParameterValues("entityRequirements");
-		String[] entityRequirementOwnerKeysRaw = request.getParameterValues("entityRequirementOwners");
-		
-		List<Key> entityRequirementKeys = rawKeysToKeys(entityRequirementKeysRaw);
-		List<Key> entityRequirementOwnerKeys = rawKeysToKeys(entityRequirementOwnerKeysRaw);
-		
-		List<CachedEntity> entityRequirements = new ArrayList<CachedEntity>();
-		List<CachedEntity> entityRequirementOwners = new ArrayList<CachedEntity>();
-		List<List<CachedEntity>> candidatesForRequirement = new ArrayList<List<CachedEntity>>();
-		
-		@SuppressWarnings("unchecked")
-		List<CachedEntity> batchEntities = ds.get(entityRequirementKeys, entityRequirementOwnerKeys);
-		for(int i = 0; i<entityRequirementKeys.size(); i++)
-			entityRequirements.add(batchEntities.get(i));
-		for(int i = 0; i<entityRequirementOwnerKeys.size(); i++)
-			entityRequirementOwners.add(batchEntities.get(i+entityRequirementKeys.size()));
-			
-		
-		Set<CachedEntity> itemsAlreadyAdded = new HashSet<CachedEntity>();
-		// Now we have all the entity requirements for the thing we're working on, we're going to look for 
-		// candidates that are available to the character for the thing in question
-		for(CachedEntity entityRequirement:entityRequirements)
+		if (type == Type.IdeaToPrototype)
 		{
-//			List<CachedEntity> candidatesFor = invention.getItemCandidatesFor(entityRequirement, itemsAlreadyAdded);
-//			if (candidatesFor.size()>0)
-//				itemsAlreadyAdded.add(candidatesFor.get(0));
+			processForIdea(request, db);
 		}
-	    
-		
 		
 		
 	    return "/WEB-INF/odppages/ajax_confirmrequirements.jsp";
 	}
 
+
+	private void processForIdea(HttpServletRequest request, ODPDBAccess db)
+	{
+		CachedEntity character = db.getCurrentCharacter(); 
+		CachedDatastoreService ds = db.getDB();
+		EntityPool pool = new EntityPool(ds);
+		Long ideaId = Long.parseLong(request.getParameter("ideaId"));
+		CachedEntity idea = db.getEntity(KeyFactory.createKey("ConstructItemIdea", ideaId));
+		
+		// Make sure the idea we're processing is actually owned by the character who is executing it
+		if (GameUtils.equals(idea.getProperty("characterKey"), character.getKey())==false)
+			throw new IllegalArgumentException("Possible hack attempt. An ideaId from a different character was used.");
+		
+		
+	}
+	
+	
+	
 	
 	private List<Key> rawKeysToKeys(String[] rawKeys)
 	{
@@ -103,6 +96,14 @@ public class ConfirmRequirementsController extends PageController
 			}
 		}
 		return result;
+	}
+	
+	private Type determineType(HttpServletRequest request)
+	{
+		if (request.getParameterMap().containsKey("ideaId"))
+			return Type.IdeaToPrototype;
+		
+		throw new IllegalArgumentException("Unable to determine type for confirm requirements page.");
 	}
 }
 

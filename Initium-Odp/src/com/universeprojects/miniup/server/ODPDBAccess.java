@@ -34,15 +34,18 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheService.IdentifiableValue;
 import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
+import com.sun.org.apache.bcel.internal.classfile.CodeException;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MovementService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
+import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
 public class ODPDBAccess
 {
@@ -127,6 +130,17 @@ public class ODPDBAccess
 		return factory.getInstance(request);
 	}
 
+	public boolean isTestServer()
+	{
+		if (getRequest().getRequestURL().toString().contains("test")) 
+			return true;
+		
+		if (CachedDatastoreService.isUsingRemoteAPI()==true)
+			return true;
+		
+		return false;
+	}
+	
 	public HttpServletRequest getRequest()
 	{
 		return request;
@@ -966,10 +980,11 @@ public class ODPDBAccess
 		result.setProperty("name", character.getProperty("name") + " - " + item.getProperty("name") + " - " + dogecoins);
 
 		// This is a special case for premium tokens to set the specialId
-		if ("Initium Premium Membership".equals(item.getProperty("name")))
+		if (CommonChecks.checkItemIsPremiumToken(item) || CommonChecks.checkItemIsChippedToken(item))
 		{
 			result.setProperty("specialId", "Initium Premium Membership");
 		}
+		
 		
 		db.put(result);
 
@@ -2021,6 +2036,13 @@ public class ODPDBAccess
 		if (ds == null) ds = getDB();
 		Query q = new Query("Item").setFilter(new FilterPredicate("containerKey", FilterOperator.EQUAL, locationKey)).addSort("movedTimestamp", SortDirection.DESCENDING);
 		return ds.fetchAsList(q, 50);
+	}
+
+	public List<Key> getItemsListSortedForLocation_Keys(CachedDatastoreService ds, Key locationKey)
+	{
+		if (ds == null) ds = getDB();
+		Query q = new Query("Item").setFilter(new FilterPredicate("containerKey", FilterOperator.EQUAL, locationKey)).addSort("movedTimestamp", SortDirection.DESCENDING);
+		return ds.fetchAsList_Keys(q, 50, null);
 	}
 
 	public List<CachedEntity> getItemContentsFor(Key container)
@@ -3562,6 +3584,13 @@ public class ODPDBAccess
         	Key rightHand = (Key)sourceCharacter.getProperty("equipmentRightHand");
         	if (weapon!=null)
         	{
+        		// Lets increase weapon experience now already
+        		if ("PC".equals(sourceCharacter.getProperty("type")))
+        		{
+        			ODPKnowledgeService knowledgeService = getKnowledgeService(sourceCharacter.getKey());
+        			knowledgeService.increaseKnowledgeFor(weapon, 1);
+        		}
+        		
         		// If the weapon we're attacking with is in the right hand, the "otherWeapon" should be whatever is in the left hand
 	        	if (GameUtils.equals(weapon.getKey(), rightHand)==true && GameUtils.equals(weapon.getKey(), leftHand)==false)
 	        	{
@@ -4107,19 +4136,7 @@ public class ODPDBAccess
 					// If the killed character is a NPC
 					if (characterToDie.getProperty("type")==null || "".equals(characterToDie.getProperty("type")) || "NPC".equals(characterToDie.getProperty("type")))
 					{
-						if ("TRUE".equals(dyingCharacterLocation.getProperty("instanceModeEnabled")) && dyingCharacterLocation.getProperty("instanceRespawnDate")==null)
-						{
-							Date instanceRespawnDate = (Date)dyingCharacterLocation.getProperty("instanceRespawnDate");
-							Long instanceRespawnDelay = (Long)dyingCharacterLocation.getProperty("instanceRespawnDelay");
-							if (instanceRespawnDate==null && instanceRespawnDelay!=null)
-							{
-								GregorianCalendar cal = new GregorianCalendar();
-								cal.add(Calendar.MINUTE, instanceRespawnDelay.intValue());
-								
-								dyingCharacterLocation.setProperty("instanceRespawnDate", cal.getTime());
-								
-							}
-						}
+						resetInstanceRespawnTimer(dyingCharacterLocation);
 						
 						
 						characterToDie.setProperty("mode", "DEAD");
@@ -4297,14 +4314,28 @@ public class ODPDBAccess
 						item.setProperty("containerKey", location.getKey());
 						item.setProperty("movedTimestamp", new Date());
 						
-						loot+=GameUtils.renderItem(item)+"<br>";
+						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
+							loot+=GameUtils.renderItem(item)+"<br>";
 					}
 					else
 					{
 						item.setProperty("containerKey", attackingCharacter.getKey());
 						item.setProperty("movedTimestamp", new Date());
 						
-						loot+=GameUtils.renderItem(item)+"<br>";
+						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
+						{
+							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+="<div>";
+							loot+="		<div class='main-item-controls'>";
+							// Get all the slots this item can be equipped in
+							loot+="			<a onclick='ajaxAction(\"ServletCharacterControl?type=dropItem&itemId="+item.getKey().getId()+"\", event, loadInventory)' >Drop on ground</a>";
+							if (item.getProperty("maxWeight")!=null)
+							{
+								loot+="<a onclick='pagePopup(\"ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
+							}
+							loot+="		</div>";
+							loot+="</div>";
+						}
 					}
 				}
 				db.put(item);
@@ -4464,6 +4495,83 @@ public class ODPDBAccess
 		getParty(ds, partyCode);
 	}
 
+	
+	public void doRequestJoinParty(CachedDatastoreService ds, CachedEntity character, CachedEntity partiedCharacter) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+
+		if (character.getKey().getId() == partiedCharacter.getKey().getId())
+			throw new UserErrorMessage("You cannot join yourself in a party. You should seriously invest in some friends.");
+		
+		if (((Key)character.getProperty("locationKey")).getId() != ((Key)partiedCharacter.getProperty("locationKey")).getId())
+			throw new UserErrorMessage("You cannot party with a character that is not in the same location as you.");
+		
+		if (getParty(ds, character)!=null)
+			throw new UserErrorMessage("You cannot join another party until you leave the one you're in already. <a onclick='leaveParty()'>Click here</a> to leave your current party.");
+		
+		String partyCode = (String)partiedCharacter.getProperty("partyCode");
+		if (partyCode==null || partyCode.equals(""))
+		{
+			if ("TRUE".equals(partiedCharacter.getProperty("partyJoinsAllowed"))==false)
+				throw new UserErrorMessage("This user is not accepting party joins at this time.");
+			
+			Random rnd = new Random();
+			partyCode = rnd.nextLong()+"";
+			
+			partiedCharacter.setProperty("partyCode", partyCode);
+			partiedCharacter.setProperty("partyLeader", "TRUE");
+			
+			ds.put(partiedCharacter);
+		}
+		else
+		{
+			List<CachedEntity> currentParty = getParty(ds, partiedCharacter);
+			CachedEntity leader = null;
+			for(CachedEntity e:currentParty)
+				if ("TRUE".equals(e.getProperty("partyLeader")))
+					leader = e;
+			
+			if (leader==null)
+				throw new RuntimeException("Party had no leader. This shouldn't be possible.");
+			
+			if ("TRUE".equals(leader.getProperty("partyJoinsAllowed"))==false)
+				throw new UserErrorMessage("This party is not accepting new members at the moment. The party leader is "+leader.getProperty("name")+".");
+			
+			// Determine if this party can hold more members, if not, throw
+			if (currentParty.size()>=4)
+				throw new UserErrorMessage("The party is full. A party can have a maximum of 4 members.");
+		}
+		
+		character.setProperty("partyLeader", null);
+		character.setProperty("partyCode", partyCode);
+		
+		ds.put(character);
+	}
+
+	
+	public void doChangePartyLeader(CachedDatastoreService ds, CachedEntity selfCharacter, CachedEntity newLeader) throws UserErrorMessage
+	{
+		if (ds==null)
+			ds = getDB();
+		
+		String selfPartyCode = (String)selfCharacter.getProperty("partyCode");
+		String newLeaderPartyCode = (String)newLeader.getProperty("partyCode");
+		
+		if (selfPartyCode.equals(newLeaderPartyCode)==false)
+			throw new UserErrorMessage("You cannot assign that character as leader because he is not currently in your party.");
+		
+		if ("TRUE".equals(selfCharacter.getProperty("partyLeader"))==false)
+			throw new UserErrorMessage("You cannot change the party leader of your party because you are not the party leader.");
+		
+		newLeader.setProperty("partyLeader", "TRUE");
+		selfCharacter.setProperty("partyLeader", null);
+
+		ds.put(newLeader);
+		ds.put(selfCharacter);
+	}
+	
+	
 
 	/**
 	 * This will handle the leader state for a defence structure. It ensures the leader is always set properly (or unset).
@@ -4861,6 +4969,8 @@ public class ODPDBAccess
 		else
 			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
 		destination = getEntity(destinationKey);
+		destination.setProperty("lastUsedDate", new Date());
+		
 
 		String forceOneWay = (String)path.getProperty("forceOneWay");
 		if ("FromLocation1Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation2Key.getId())
@@ -4999,7 +5109,7 @@ public class ODPDBAccess
 		
 
 		// Now determine if the path contains an NPC that the character would immediately enter battle with...
-		List<CachedEntity> npcsInTheArea = getFilteredList("Character", "locationKey", destinationKey);
+		List<CachedEntity> npcsInTheArea = getFilteredList("Character", 300, "locationKey", FilterOperator.EQUAL, destinationKey);
 		npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
 
 		shuffleCharactersByAttackOrder(npcsInTheArea);
@@ -5042,7 +5152,7 @@ public class ODPDBAccess
 				destination.setProperty("ownerKey", user.getKey());
 				
 				db.put(path);
-				db.put(destination);
+				// Note: The destination location gets saved later
 			}
 		}
 
@@ -5075,6 +5185,9 @@ public class ODPDBAccess
 			
 		}
 		
+		if (destination.isUnsaved())
+			ds.put(destination);
+		
 		return destination;
 	}
 	
@@ -5103,6 +5216,33 @@ public class ODPDBAccess
 		return null;
 	}
 
+	
+	/**
+	 * Checks if it's time to delete a combat site based on some preset rule.
+	 * 
+	 * Currently a combat site gets deleted if it's "lastUsedDate" was set 48 hours ago. 
+	 * This date is reset any time a character enters the combat site.
+	 * 
+	 * @param combatSiteLocation
+	 * @returnf
+	 */
+	public boolean isTimeToDeleteCombatSite(CachedEntity combatSiteLocation)
+	{
+		Date lastUsedDate = (Date)combatSiteLocation.getProperty("lastUsedDate");
+		if (lastUsedDate==null)
+		{
+			lastUsedDate = new Date();
+			combatSiteLocation.setProperty("lastUsedDate", lastUsedDate);
+			ds.put(combatSiteLocation);
+		}
+		
+		// If it has been less than the amount of time we want to wait before collapsing, lets get out of here
+		if (GameUtils.elapsed(lastUsedDate, Calendar.HOUR)<48)
+			return false;
+		
+		return true;
+	}
+	
 	/**
 	 * This is a placeholder because the actual implementation is not in the ODP.
 	 * 
@@ -5112,7 +5252,7 @@ public class ODPDBAccess
 	 */
 	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey)
 	{
-		doDeleteCombatSite(ds, playerCharacter, locationKey, false);
+		doDeleteCombatSite(ds, playerCharacter, locationKey, false, false);
 	}
 	
 	/**This will need to be updated as we add more stuff.
@@ -5120,7 +5260,7 @@ public class ODPDBAccess
 	 * 
 	 * @param monster
 	 */
-	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey, boolean forceDelete)
+	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey, Boolean leaveAndForget, boolean forceDelete)
 	{
 		if (ds==null)
 			ds = getDB();
@@ -5145,23 +5285,41 @@ public class ODPDBAccess
 		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
 		
 
-		boolean hasLiveNpc = false;
-		boolean hideOnly = false;
-		for(CachedEntity character:characters)
+		// Here is a special case:
+		// 1. If the monster is dead
+		// 2. If the monster has no money on him anymore
+		// 3. If the player chose "leave and forget"
+		// Then we will force delete the site
+		if (leaveAndForget && forceDelete==false && characters.size()==1 && paths.size()==1)
 		{
-			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
-				hideOnly = true;
-			else if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d)
-				hasLiveNpc=true;
+			CachedEntity monster = characters.get(0);
+			if ("NPC".equals(monster.getProperty("type")) &&
+					(Double)monster.getProperty("hitpoints")<1 &&
+					(long)monster.getProperty("dogecoins")==0)
+			{
+				forceDelete = true;
+			}
 		}
+		
+//		boolean hasPlayer = false;
+//		boolean hasNPCWeWantToKeep = false;
+//		for(CachedEntity character:characters)
+//		{
+//			if (character.getProperty("type")==null || character.getProperty("type").equals("NPC")==false)
+//				hasPlayer = true;
+//			
+//			if ("NPC".equals(character.getProperty("type")) && (Double)character.getProperty("hitpoints")>0d && GameUtils.equals(character.getProperty("hitpoints"), character.getProperty("maxHitpoints"))==false)
+//				hasNPCWeWantToKeep=true;
+//			
+//		}
 		
 		
 		// Having the paths size>1 cancels the deletion of the combat site. This is very important so that people don't get
 		// stranded in rare cases where there are other sites branching from this one. The outer branches must be deleted first, 
 		// but we can do that lazily.
-		if ((hideOnly && forceDelete==false) || 
-				(paths.size()>1 && forceDelete==false) || 
-				(hasLiveNpc && forceDelete==false) /*Now we don't delete the site if the NPC is alive*/)
+		if ((paths.size()>1 && forceDelete==false) ||
+				isTimeToDeleteCombatSite(location)==false && forceDelete==false) 
+				
 		{
 			// Delete the discoveries of the paths to this location
 			for(CachedEntity discovery:discoveries)
@@ -5187,7 +5345,16 @@ public class ODPDBAccess
 			
 			// Delete all characters standing in this place (should only be NPCs)
 			for(CachedEntity character:characters)
-				ds.delete(character.getKey());
+				if ("NPC".equals(character.getProperty("type")))
+					ds.delete(character.getKey());
+				else
+				{
+					Key parentLocation = getParentLocationKey(ds, location);
+					character.setProperty("locationKey", parentLocation);
+					character.setProperty("locationEntryDatetime", new Date());
+					ds.put(character);
+				}
+					
 			
 			// Delete all items on the ground
 			for(CachedEntity item:items)
@@ -5339,6 +5506,21 @@ public class ODPDBAccess
 	 */
 	public CachedEntity getParentLocation(CachedDatastoreService ds, CachedEntity location)
 	{
+		return getEntity(getParentLocationKey(ds, location));
+	}
+
+	
+	/**
+	 * Determines the parent location for the given location. This is used for certain 
+	 * game mechanics that require a parent/child concept. For example, running will always cause you 
+	 * to run to the parent location.
+	 *  
+	 * @param ds
+	 * @param location
+	 * @return The location that is considered to be the parent of the given location.
+	 */
+	public Key getParentLocationKey(CachedDatastoreService ds, CachedEntity location)
+	{
 		if (location.getProperty("parentLocationKey")==null)
 		{
 			// FOR LAZY MIGRATION OF THE DATABASE, KEEP THIS PART ACTIVE.
@@ -5358,16 +5540,14 @@ public class ODPDBAccess
 			if (ds==null) ds = getDB();
 			ds.put(location);
  			
-			CachedEntity exitLocation = getEntity(properLocationKey);
-			
 			Logger.getLogger("GameFunctions").log(Level.SEVERE, "Parent location on a "+location.getProperty("type")+" was not set properly. - We decided to associate it."); 
 			
-			return exitLocation;
+			return properLocationKey;
 		}
 		else
 		{
 			Key key = (Key)location.getProperty("parentLocationKey");
-			return getEntity(key);
+			return key;
 		}
 	}
 
@@ -5641,8 +5821,53 @@ public class ODPDBAccess
 		return null;
 	}
 	
-	public ODPInventionService getInventionService()
+	/**
+	 * Returns a usable InvetionService object.
+	 * 
+	 * The InventionService requires a character so the logged-in user's character will
+	 * be used.
+	 * 
+	 * @return
+	 */
+	public ODPInventionService getInventionService(CachedEntity character, ODPKnowledgeService knowledgeService)
 	{
 		return null;
 	}
+
+	/**
+	 * Returns a usable KnowledgeService object.
+	 * 
+	 * The KnowledgeService requires a character so the logged-in user's character will
+	 * be used.
+	 * 
+	 * @param characterKey The key of the character we want to work with. Only this character's knowledge will be used.
+	 * @return
+	 */
+	public ODPKnowledgeService getKnowledgeService(Key characterKey)
+	{
+		return null;
+	}
+
+	public void resetInstanceRespawnTimer(CachedEntity location)
+	{
+		if ("TRUE".equals(location.getProperty("instanceModeEnabled")) && location.getProperty("instanceRespawnDate")==null)
+		{
+			Date instanceRespawnDate = (Date)location.getProperty("instanceRespawnDate");
+			Long instanceRespawnDelay = (Long)location.getProperty("instanceRespawnDelay");
+			if (instanceRespawnDate==null && instanceRespawnDelay!=null)
+			{
+				GregorianCalendar cal = new GregorianCalendar();
+				cal.add(Calendar.MINUTE, instanceRespawnDelay.intValue());
+				
+				location.setProperty("instanceRespawnDate", cal.getTime());
+				
+			}
+		}
+	}
+
+	public CachedEntity _newPremiumMembershipToken(Key owningCharacterKey)
+	{
+		return null;
+	}
+
 }

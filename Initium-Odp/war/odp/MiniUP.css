@@ -2217,10 +2217,21 @@ a.range-increment {
 	height:40px;
 }
 
+.message-newidea
+{
+	margin-bottom:10px;
+	font-size:16px;
+}
 
-
-
-
+.minitip
+{
+    position:absolute;
+    background-color:#000000;
+    padding:8px;
+    border-radius:8px;
+    color:#EEEEEE;
+    font-size:medium;
+}
 
 
 
@@ -3328,7 +3339,15 @@ body
 	margin:5px;
 }
 
+.generic-field
+{
+	color:#EEEEEE;
+}
 
+.generic-field-value
+{
+	color:#999999;
+}
 
 
 

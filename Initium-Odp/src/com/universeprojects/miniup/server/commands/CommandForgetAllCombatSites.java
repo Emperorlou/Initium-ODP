@@ -46,7 +46,7 @@ public class CommandForgetAllCombatSites extends Command {
 			for(Long forgettableCombatSite : forgettableCombatSiteList) {
 				if(System.currentTimeMillis() - startTime >= MAX_MILLISECONDS_TO_SPEND)
 					throw new UserErrorMessage("The bulk forgetting of sites has stopped due to it taking a while.  A total of "+numberOfSitesForgotten+" sites were forgotten.");
-				db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", forgettableCombatSite));
+				db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", forgettableCombatSite), true, false);
 				numberOfSitesForgotten++;
 			}
 		} catch (UserErrorMessage e) {
