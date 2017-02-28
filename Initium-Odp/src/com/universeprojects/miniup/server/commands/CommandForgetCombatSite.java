@@ -1,7 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
 
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,9 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -37,7 +34,7 @@ public class CommandForgetCombatSite extends Command {
 		CachedEntity character = db.getCurrentCharacter();
 		Long locationId = WebUtils.getLongParam(request, "locationId");
 
-		db.doDeleteCombatSite(null, character, KeyFactory.createKey("Location", locationId));		
+		db.doDeleteCombatSite(null, character, KeyFactory.createKey("Location", locationId), true, false);		
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(((Key) character.getProperty("locationKey")).getId()), this);
 		mpus.updateButtonList(new CombatService(db));

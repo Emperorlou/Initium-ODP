@@ -459,10 +459,10 @@ public class GameUtils
         Calendar cal = Calendar.getInstance();
         cal.setTime(d1);
         GregorianCalendar g1 = new GregorianCalendar(
-                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY),  cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
         cal.setTime(d2);
         GregorianCalendar g2 = new GregorianCalendar(
-                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), cal.get(Calendar.HOUR_OF_DAY),  cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
         return elapsed(g1, g2, type);
     }
     
@@ -850,6 +850,79 @@ public class GameUtils
 //    	
 //    }
     
+    private static String getItemMiniTip(CachedEntity item) 
+    {
+    	try
+    	{
+	    	String itemType = (String)item.getProperty("itemType");
+	    	if (itemType != null && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
+	    		
+	    		StringBuilder sb = new StringBuilder();
+		    	sb.append("minitip='");
+	    		if ("Weapon".equals((String)item.getProperty("itemType"))) {
+	    			String diceRoll = (String)item.getProperty("weaponDamage");
+	    			if (diceRoll == null) {
+	    				diceRoll = "1d1";
+	    			} else {
+	    				diceRoll = diceRoll.substring(2);
+	    			}
+	    			
+	    			Double critMultiplier = (Double)item.getProperty("weaponDamageCriticalMultiplier");
+	    			if (critMultiplier == null)
+	    				critMultiplier = new Double(1);
+	    				
+		    		Long critChance = (Long)item.getProperty("weaponDamageCriticalChance");
+		    		if (critChance == null)
+		    			critChance = new Long(0);
+		    			
+		    		sb.append(diceRoll + "x" + formatNumber(critMultiplier) + " " + critChance + "% ");
+		    		sb.append("(" + formatNumber(getWeaponMaxDamage(item)) + "/" + formatNumber(getWeaponAverageDamage(item)) + ") <br/> ");
+		    	}
+	    		
+	    		Long dp = (Long)item.getProperty("dexterityPenalty");
+	    		if (dp == null) 
+	    			dp = new Long(0);
+	    		
+	    		Long bc = (Long)item.getProperty("blockChance");
+	    		if (bc == null)
+	    			bc = new Long(0);
+	    			
+	    		Long dr = (Long)item.getProperty("damageReduction");
+	    		if (dr == null)
+	    			dr = new Long(10);
+	    			
+	    		String bludge = (String)item.getProperty("blockBludgeoningCapability");
+	    		if (bludge == null)
+	    			bludge = "A";
+	    			
+	    		String pierce = (String)item.getProperty("blockPiercingCapability");
+	    		if (pierce == null)
+	    			pierce = "A";
+	    			
+	    		String slash = (String)item.getProperty("blockSlashingCapability");
+	    		if (slash == null)
+	    			slash = "A";
+	    		
+		    	sb.append( dp + "/" + bc + "/" + dr);
+		    	sb.append(" " + bludge.charAt(0) + "/"
+		    			      + pierce.charAt(0) + "/" 
+		    			      + slash.charAt(0));
+		    	
+		    	sb.append("'");
+		    	
+		    	return sb.toString();
+	    	} else {
+	    		return "";
+	    	}
+    	}
+    	catch(Exception e)
+    	{
+    		// Can't afford to have these exceptions stop the show, so I'm just gonna swallow em for now
+    		log.log(Level.SEVERE, "Item Minitip Failure", e);
+    		return "";
+    	}
+    }
+    
     public static String renderItem(CachedEntity item)
     {
     	return renderItem(null, null, null, item, false);
@@ -917,9 +990,9 @@ public class GameUtils
 		}
 		
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
 
     public static String renderCollectable(CachedEntity item)

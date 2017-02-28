@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -98,15 +99,21 @@ public class ExchangeController extends PageController {
 	    }
 	    items = db.sortSaleItemList(items);
 	    
-	    List<String> formattedItems = new ArrayList<String>();
+	    List<String> formattedPremiumTokens = new ArrayList<String>();
+	    List<String> formattedChippedTokens = new ArrayList<String>();
 	    
 	    for(CachedEntity item:items)
         {
         	CachedEntity saleItem = itemToSaleItemMap.get(item);
-        	formattedItems.add(HtmlComponents.generateStoreItemHtml(db,character, sellingCharacters.get(saleItem.getProperty("characterKey")),item,saleItem,request));
+        	if (CommonChecks.checkItemIsPremiumToken(item))
+        		formattedPremiumTokens.add(HtmlComponents.generateStoreItemHtml(db,character, sellingCharacters.get(saleItem.getProperty("characterKey")),item,saleItem,request));
+        	else if (CommonChecks.checkItemIsChippedToken(item))
+        		formattedChippedTokens.add(HtmlComponents.generateStoreItemHtml(db,character, sellingCharacters.get(saleItem.getProperty("characterKey")),item,saleItem,request));
+        		
         }
 	    
-	    request.setAttribute("items", formattedItems);
+	    request.setAttribute("premiumTokens", formattedPremiumTokens);
+	    request.setAttribute("chippedTokens", formattedChippedTokens);
 	    
 	    return "/WEB-INF/odppages/ajax_exchange.jsp";
 	}

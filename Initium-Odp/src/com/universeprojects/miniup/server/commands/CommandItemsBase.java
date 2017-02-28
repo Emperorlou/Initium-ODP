@@ -52,7 +52,7 @@ public abstract class CommandItemsBase extends Command {
 			{}
 		}
 		
-		List<CachedEntity> batchItems = ds.fetchEntitiesFromKeys(itemKeys);
+		List<CachedEntity> batchItems = ds.get(itemKeys);
 		processBatchItems(parameters, db, ds, character, batchItems);
 		
 		if(processedItems.isEmpty()==false)

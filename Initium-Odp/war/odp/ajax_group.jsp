@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.DDOSProtectionException"%>
 <%@page import="com.universeprojects.miniup.server.ODPDBAccess"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="java.util.Date"%>
@@ -21,7 +22,15 @@
 <%
 	response.setHeader("Access-Control-Allow-Origin", "*"); // This is absolutely necessary for phonegap to work
 
-	Authenticator auth = Authenticator.getInstance(request);
+	Authenticator auth = null;
+	try
+	{
+		auth = Authenticator.getInstance(request, true);
+	}
+	catch(DDOSProtectionException e)
+	{
+		// Ignore this here
+	}
 	ODPDBAccess db = auth.getDB(request);
 	try {
 		auth.doSecurityChecks(request);
