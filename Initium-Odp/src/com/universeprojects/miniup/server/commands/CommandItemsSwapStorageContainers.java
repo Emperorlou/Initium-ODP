@@ -44,8 +44,8 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			
 			CachedEntity containerOne = batchItems.get(0);
 			CachedEntity containerTwo = batchItems.get(1);
-			List<CachedEntity> itemOneContents = db.getItemContentsFor(containerOne.getKey(), false);
-			List<CachedEntity> itemTwoContents = db.getItemContentsFor(containerTwo.getKey(), false);
+			List<CachedEntity> itemOneContents = db.getItemContentsFor(containerOne.getKey());
+			List<CachedEntity> itemTwoContents = db.getItemContentsFor(containerTwo.getKey());
 			
 			//check that at least one container is empty.
 			if(itemOneContents.size() != 0 && 

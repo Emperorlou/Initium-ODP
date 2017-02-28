@@ -260,7 +260,7 @@ public class CommandDevTools extends Command {
 					if ("NPC".equals(c.getProperty("type")))
 					{
 						// Delete both the monster and its items
-						List<CachedEntity> itemList = db.getItemContentsFor(c.getKey(), false);
+						List<CachedEntity> itemList = db.getItemContentsFor(c.getKey());
 						ds.delete(c);
 						for (CachedEntity i : itemList)
 							ds.delete(i);
