@@ -1,6 +1,9 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +32,13 @@ public class CommandStoreBuyItem extends Command {
 		
 		Long saleItemId = Long.parseLong(parameters.get("saleItemId"));
 		Long characterId = Long.parseLong(parameters.get("characterId"));
-		
+		Long buyQuantity = 1L;
+		try
+		{
+			if(parameters.containsKey("quantity")) buyQuantity = Long.parseLong(parameters.get("quantity"));
+		}
+		catch(Exception ex) 
+		{}
 		
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity saleItem = db.getEntity("SaleItem", saleItemId);
@@ -39,7 +48,8 @@ public class CommandStoreBuyItem extends Command {
 		CachedEntity storeCharacter = db.getEntity("Character", characterId);
 		if (item==null)
 			throw new UserErrorMessage("The item being sold has been removed.");
-		
+		if(buyQuantity < 1)
+			throw new UserErrorMessage("You can only buy a positive quantity of items.");
 		
 		boolean isPremiumMembership = false;
 		if (CommonChecks.checkItemIsPremiumToken(item) || CommonChecks.checkItemIsChippedToken(item))
@@ -56,6 +66,11 @@ public class CommandStoreBuyItem extends Command {
 		if (cost==null)
 			throw new UserErrorMessage("The sale item is not setup properly. It has no cost.");
 		
+		// Handle purchase of quantity here.
+		Long quantity = (Long)item.getProperty("quantity");
+		if(quantity == null) quantity = 1L;
+		if(buyQuantity > quantity)
+			throw new UserErrorMessage("Cannot purchase more quantity than the seller is offering.");
 		
 		CachedEntity sellingCharacter = db.getEntity((Key)saleItem.getProperty("characterKey"));
 		if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(sellingCharacter.getProperty("mode"))==false)
@@ -69,10 +84,10 @@ public class CommandStoreBuyItem extends Command {
 		Double storeSale = (Double)sellingCharacter.getProperty("storeSale");
 		if (storeSale==null) storeSale = 100d;
 
-		cost=Math.round(cost.doubleValue()*(storeSale/100));
+		cost=Math.round(cost.doubleValue()*(storeSale/100)) * buyQuantity;
 		
 		if (cost>(Long)character.getProperty("dogecoins"))
-			throw new UserErrorMessage("You do not have enough funds to buy this item. You have "+character.getProperty("dogecoins")+" and it costs "+saleItem.getProperty("dogecoins")+".");	
+			throw new UserErrorMessage("You do not have enough funds to buy this item. You have "+character.getProperty("dogecoins")+" and it costs "+cost+".");	
 		if (((Key)item.getProperty("containerKey")).getId()!=sellingCharacter.getKey().getId())
 			throw new UserErrorMessage("The item you tried to buy is not actually in the seller's posession. Purchase has been cancelled.");
 		
@@ -83,6 +98,47 @@ public class CommandStoreBuyItem extends Command {
 		ds.beginTransaction();
 		try
 		{
+			// Refetch all items in transaction.
+			List<CachedEntity> refetched = ds.refetch(Arrays.asList(item, saleItem, sellingCharacter, character));
+			item = refetched.get(0);
+			saleItem = refetched.get(1);
+			sellingCharacter = refetched.get(2);
+			character = refetched.get(3);
+			
+			// If quantity item, need to make sure enough 
+			// quantity still available to purchase.
+			if(quantity > 1)
+			{
+				quantity = (Long)item.getProperty("quantity");
+				if(quantity == null) quantity = 1L;
+				if(buyQuantity > quantity)
+				{
+					// Force reload of the popup so the quantity is updated.
+					setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+					throw new UserErrorMessage("Seller no longer has enough inventory to purchase (buying " + buyQuantity + ", seller has " + quantity + ")");
+				}
+			}
+
+			// Sanitized quantity already. If we're buying less than
+			// the item stack quantity, we need to create a new SaleItem 
+			// record of the purchased amount.
+			if(buyQuantity < quantity)
+			{
+				// newItem is the purchased item, and will be the purchased quantity.
+				// newSaleItem is the sale record.
+				CachedEntity newItem = new CachedEntity(item.getKind());
+				CachedEntity newSaleItem = new CachedEntity(saleItem.getKind());
+				CachedDatastoreService.copyFieldValues(item, newItem);
+				CachedDatastoreService.copyFieldValues(saleItem, newSaleItem);
+				
+				item.setProperty("quantity", quantity - buyQuantity);
+				newSaleItem.setProperty("itemKey", newItem.getKey());
+				newItem.setProperty("quantity", buyQuantity);
+				ds.put(item);
+				item = newItem;
+				saleItem = newSaleItem;
+			}
+			
 			saleItem.setProperty("status", "Sold");
 			saleItem.setProperty("soldTo", character.getKey());
 			sellingCharacter.setProperty("dogecoins", ((Long)sellingCharacter.getProperty("dogecoins"))+cost);

@@ -1128,7 +1128,29 @@ hr.items-separator {
     word-break: normal;
     overflow-y: auto;
     line-height: 16px;
-    }
+}
+.popup_range_slider {
+    vertical-align: middle;
+    height: 32px;
+}
+.popup_range_number {
+    vertical-align: middle;
+    text-align:center;
+    width: 13%;
+    font-size: 14pt;
+    font-family: DOS, Monospace;
+    margin: 0 3%;
+}
+a.range-increment {
+    margin: 0px 3%;
+    letter-spacing: -4px;
+}
+.noselect{
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
 .popup_footer {
     width: 100%;
     height: 46px;
@@ -1140,12 +1162,11 @@ hr.items-separator {
     background-repeat: no-repeat;*/
     /*background-color:#777777;*/
 
-    }
+}
 .popup_footer > a {
     display: table-cell;
     width: 33%;
-
-	}
+}
 
 
 
@@ -2211,7 +2232,6 @@ hr.items-separator {
     color:#EEEEEE;
     font-size:medium;
 }
-
 
 
 

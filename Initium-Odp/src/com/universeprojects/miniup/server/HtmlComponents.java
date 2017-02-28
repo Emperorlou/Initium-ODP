@@ -195,6 +195,9 @@ public class HtmlComponents {
         cost=Math.round(cost.doubleValue()*(storeSale/100));
         String finalCost = GameUtils.formatNumber(cost, false);
         
+        Long quantity = (Long)item.getProperty("quantity");
+        if(quantity == null) quantity = 1L;
+        String quantityString = quantity > 1L ? ("," + quantity.toString()) : "";
       
         String result ="";
 		result+="<div class='saleItem' ref='"+saleItem.getKey().getId()+"'>";
@@ -202,7 +205,7 @@ public class HtmlComponents {
        	result+="<span><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+"</span>";
        	result+="<span class='"+notEnoughStrengthClass+"'>";
        	if ("Selling".equals(saleItem.getProperty("status")))
-   	    	result+= GameUtils.renderItem(item) + " - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+")'>Buy this</a>";
+   	    	result+= GameUtils.renderItem(item) + " - <a onclick='storeBuyItemNew(event, \""+itemName.replace("'", "`")+"\",\""+finalCost+"\","+storeCharacter.getKey().getId()+","+saleItem.getId()+", "+storeCharacter.getKey().getId()+quantityString+")'>Buy this</a>";
    	    else if ("Sold".equals(saleItem.getProperty("status")))   
    	    	result+= GameUtils.renderItem(item) + " - <div class='saleItem-sold'>SOLD</div>";
        	result+="</span>";
@@ -271,7 +274,7 @@ public class HtmlComponents {
 		return result;
 	}
 	
-public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
+	public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		
 		String result = "";
 			   result+="<div class='tradeItem' ref="+item.getKey().getId()+">";
@@ -454,7 +457,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 		
 		if (viewAdmin || viewCreator) 
 		{
-			sb.append("<a href='#' onclick='setGroupMemberRank(event, \""+ character.getProperty("groupRank") + "\", "+ character.getKey().getId()+ ")'>Set position</a>");
+			sb.append("<a href='#' onclick='setGroupMemberRank(event, \""+ groupRank + "\", "+ character.getKey().getId()+ ")'>Set position</a>");
 			if (viewCreator) 
 			{
 				if (isAdmin == false)
@@ -468,7 +471,7 @@ public static String generateOtherPlayerTradeItemHtml(CachedEntity item){
 				}
 			}
 			
-			if (groupStatus.equals("Kicked") == false)
+			if ("Kicked".equals(groupStatus) == false)
 				sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ", \""+character.getProperty("name")+"\")'>Kick</a>");
 			else
 				sb.append("<a onclick='groupMemberKickCancel(" + character.getKey().getId() + ")'>Cancel Kick</a>");
