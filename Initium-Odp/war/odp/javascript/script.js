@@ -90,6 +90,29 @@ $(window).ready(function(e){
 		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
 	
+	var isTouchEvent = false;
+	
+	// Handlers for the minitip overlays
+	$('body').on("mouseover", "[minitip]", function(event) {
+		if (!isTouchEvent) {
+			$(this).append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
+		};
+	});
+	
+	$('body').on("mouseout", "[minitip]", function(event) {
+		$(this).find(".minitip").remove();
+	});
+	
+	$('body').on("touchstart", "[minitip]", function(event) {
+		isTouchEvent = true;
+		setTimeout(function() { isTouchEvent = false;}, 300);
+	});
+	
+	$('body').on("taphold", "[minitip]", function(event) {
+		$(this).append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
+		return false;
+	});
+	
 	$(".main-expandable .main-expandable-title").click(function(){
 		$(this).parent().find(".main-expandable-content").show();
 		$(this).hide();
@@ -254,6 +277,23 @@ function expandpopupMessage()
 function random(start, end)
 {
 	return Math.floor(Math.random()*(end-start+1))+start;
+}
+
+function clearPopupPermanentOverlay()
+{
+	$("#banner-base").html("");
+	window.bannerUrl = window.previousBannerUrl;
+	updateDayNightCycle(true);
+}
+
+function popupPermanentOverlay_Experiment(title, text)
+{
+	window.previousBannerUrl = bannerUrl;
+	setBannerImage("http://initium-resources.appspot.com/images/animated/invention1.gif");
+	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
+
+	$("#banner-base").html(content);
+	
 }
 
 function popupPermanentOverlay_Searching(locationName)
@@ -588,7 +628,7 @@ function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, c
 		});
 	};
 	
-	if(quantity == 1)
+	if(typeof quantity === "undefined" || quantity === 1)
 		confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", yesFunction);
 	else{
 		rangePopup("Buy Item", "Please specify the number of <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> to purchase ("+itemPrice+" gold each):",0,quantity,
@@ -602,15 +642,15 @@ function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, c
 
 function storeSellItemNew(eventObject,itemId)
 {
-	promptPopup("Sell Item", "How much do you want to sell this item for? (Unit Price)", "0", function(amount){
+	promptPopup("Sell Item", "How much do you want to sell this item for?<br/>For stacks of items, will be per item purchased.", "0", function(amount){
 		if (amount!=null && amount!="")
 		{
-		doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
-			if (error) return;
-			$(".invItem[ref='"+itemId+"']").remove();
-			var container = $("#saleItems");
-			container.html(data.createSellItem+container.html());
-			});
+			doCommand(eventObject,"StoreSellItem",{"itemId":itemId,"amount":amount},function(data,error){
+				if (error) return;
+				$(".invItem[ref='"+itemId+"']").remove();
+				var container = $("#saleItems");
+				container.html(data.createSellItem+container.html());
+				});
 		}
 	});
 }
@@ -1139,6 +1179,7 @@ function refreshPopup(url, event)
 function destroyThrowaway()
 {
 	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
+		enforceSingleAction();
 		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
 	});
 }
@@ -1189,6 +1230,7 @@ function acceptCharacterTransfer()
 	promptPopup("Accept Character Transfer", "What is the name of the character you are going to transfer to this account? \n\nPlease note that the name is case sensitive!", "", function(charName){
 		if (charName!=null)
 		{
+			enforceSingleAction();
 			window.location.href = "/ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode;
 		}
 	});
@@ -1199,6 +1241,7 @@ function transferCharacter(currentCharName)
 	promptPopup("Transfer Character To..", "Please type the email address of the account you wish to transfer this character to.\n\nPlease note that you are currently using: "+currentCharName, "", function(email){
 		if (email!=null)
 		{
+			enforceSingleAction();
 			window.location.href = "/ServletUserControl?type=transferCharacter&email="+email+"&v="+window.verifyCode;
 		}
 	});
@@ -1394,8 +1437,10 @@ function giftPremium()
 {
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
 		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
+			enforceSingleAction();
 			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
 		}, function(){
+			enforceSingleAction();
 			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
 		});
 	});
@@ -1404,6 +1449,7 @@ function giftPremium()
 function newPremiumToken()
 {
 	confirmPopup("Create new premium token?", "Are you sure you want to create a premium token and put it in your inventory?\n\nBe aware that this token can be traded AND looted if you die.", function(){
+		enforceSingleAction();
 		window.location.href = "/ServletUserControl?type=newPremiumToken"+"&v="+window.verifyCode;
 	});
 }
@@ -1411,6 +1457,7 @@ function newPremiumToken()
 function newCharacterFromUnconscious()
 {
 	confirmPopup("Create a new character?", "If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
+		enforceSingleAction();
 		window.location.href = "/ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode;
 	});
 }
@@ -1420,11 +1467,13 @@ function enterDefenceStructureSlot(slot)
 	if (slot=="Defending1" || slot=="Defending2" || slot=="Defending3")
 	{
 		confirmPopup("Defend this structure?", "Are you sure you want to defend this structure? If you do this, other players will be able to attack and kill you.", function(){
+			enforceSingleAction();
 			window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
 		});
 	}
 	else
 	{
+		enforceSingleAction();
 		window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
 	}
 }
@@ -1633,6 +1682,7 @@ function deleteAndRecreateCharacter(currentCharName)
 		if (currentCharName==null)
 			currentCharName = "";
 		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
+			enforceSingleAction();
 			window.location.href = "/ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+window.verifyCode;
 		});
 	});
@@ -1676,6 +1726,7 @@ function doShowHiddenSites(eventObject)
 function resendVerificationEmail()
 {
 	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
+		enforceSingleAction();
 		location.href = "/ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode;
 	});
 	
@@ -1684,6 +1735,7 @@ function resendVerificationEmail()
 function changeEmailAddress(oldEmail)
 {
 	promptPopup("Change email", "What email address would you like to use for your account?", oldEmail, function(value){
+		enforceSingleAction();
 		location.href = "/ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value)+"&v="+window.verifyCode;
 	});
 }
@@ -1703,6 +1755,7 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 {
 	confirmPopup("Are you sure?", "This will send an email to a content developer notifying them that you'd like to customize an item.<br>You will be asked to provide some details in the next popup.", function(){
 		promptPopup("Customization Details", requiredDetails, "", function(value){
+			enforceSingleAction();
 			location.href="/ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+window.verifyCode+"&requiredDetails="+encodeURIComponent(value);
 		});
 	});
@@ -1752,37 +1805,53 @@ function joinPartyCharacterName(eventObject, characterName) {
 function leaveParty()
 {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
+		enforceSingleAction();
 		location.href = "/ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
 	});
 }
 
+var singleActionIssued = false;
+function enforceSingleAction()
+{
+	if (singleActionIssued)
+		throw "Attempted to execute more than one action at a time. This action has been cancelled.";
+	
+	singleActionIssued = true;
+}
+
 function combatAttackWithLeftHand()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode;
 }
 
 function combatAttackWithRightHand()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode;
 }
 
 function combatEscape()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=escape"+"&v="+window.verifyCode;
 }
 
 function combatAllowCharacterIn()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode;
 }
 
 function storeDisabled()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode;
 }
 
 function storeEnabled()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
 }
 
@@ -1816,16 +1885,19 @@ function toggleHideUserActivity(eventObject)
 
 function campsiteDefend()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
 }
 
 function leaveAndForgetCombatSite(pathId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode;
 }
 
 function forgetCombatSite(locationId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
 }
 
@@ -1848,6 +1920,7 @@ function groupMemberKick(eventObject, characterId, characterName)
 
 function groupMemberKickCancel(characterId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
 }
 
@@ -1896,26 +1969,31 @@ function groupMergeCancelRequest(eventObject)
 
 function tradeRemoveItem(itemId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
 }
 
 function tradeCancel()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode;
 }
 
 function tradeReady(version)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode;
 }
 
 function tradeAddItem(itemId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
 }
 
 function partyJoin(characterId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
 }
 
@@ -2002,6 +2080,7 @@ function tradeAddAllItemsNew(eventObject)
 
 function duelRequest(characterId)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
 }
 
@@ -2015,21 +2094,25 @@ function viewManageStore()
 
 function newCharacterFromDead()
 {
+	enforceSingleAction();
 	location.href = "/ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
 }
 
 function switchCharacter(characterId)
 {
+	enforceSingleAction();
 	location.href = "/ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
 }
 
 function logout()
 {
+	enforceSingleAction();
 	location.href = "/ServletUserControl?type=logout"+"&v="+verifyCode;
 }
 
 function attackStructure()
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=attackStructure"+"&v="+verifyCode;
 }
 
@@ -2054,6 +2137,7 @@ function viewStore(characterId)
 
 function setBlockadeRule(rule)
 {
+	enforceSingleAction();
 	location.href = "/ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
 }
 
@@ -2126,7 +2210,19 @@ function viewInvention()
 	pagePopup("/odp/invention", null, "Invention");
 }
 
+function combineChippedTokens(event, itemId)
+{
+	doCommand(event, "CombineChippedTokens", {itemId:itemId}, function(){
+		closeAllTooltips();		
+	});
+}
 
+function splitPremiumToken(event, itemId)
+{
+	doCommand(event, "SplitPremiumToken", {itemId:itemId}, function(){
+		closeAllTooltips();		
+	});
+}
 
 
 
@@ -2322,7 +2418,7 @@ function doSetLeader(eventObject, charId, charName)
 {
 	closeAllPopups();
 	closeAllTooltips();
-	confirmPopup("Set new leader", "Are you sure you want set " + charName + " to be the leader of your group?", function(){
+	confirmPopup("Set new leader", "Are you sure you want set " + charName + " to be the leader of your party?", function(){
 		doCommand(eventObject,"SetLeader",{"charId":charId});
 	});
 }
@@ -2452,9 +2548,9 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 			fullpageRefresh();
 			return;
 		}
-		if (data.userMessage!=null)
+		if (data.message!=null)
 		{
-			popupMessage("System Message", data.userMessage, false);
+			popupMessage("System Message", data.message, false);
 		}
 		if (responseFunction!=null)
 			responseFunction(data);
@@ -2536,6 +2632,63 @@ function doGoto(event, pathId, attack)
 			function()	// recallFunction
 			{
 				doGoto(null, pathId, true, window.biome);
+			});
+}
+
+
+
+function doExperiment(event)
+{
+	showBannerLoadingIcon();
+	longOperation(event, "/ServletCharacterControl?type=experiment_ajax&v="+window.verifyCode, 
+			function(action) // responseFunction
+			{
+				if (action.isComplete)
+				{
+					clearPopupPermanentOverlay(); 
+					reloadPagePopup(false);
+				}
+				else
+				{
+					popupPermanentOverlay_Experiment("Experimenting", "You are performing experiments on the things around you so you might understand them better...");
+
+				}
+			},
+			function()	// recallFunction
+			{
+				doExperiment(null);
+			});
+}
+
+
+function doCreatePrototype(event, ideaId)
+{
+	closeAllPopups();
+	closeAllTooltips();
+	
+	pagePopup("/confirmrequirements?ideaId="+ideaId);
+}
+
+function doConfirmCreatePrototype(event, ideaName, entityRequirementToItemMap)
+{
+	showBannerLoadingIcon();
+	longOperation(event, "/ServletCharacterControl?type=createprototype_ajax&v="+window.verifyCode, 
+			function(action) // responseFunction
+			{
+				if (action.isComplete)
+				{
+					clearPopupPermanentOverlay(); 
+					reloadPagePopup(false);
+				}
+				else
+				{
+					popupPermanentOverlay_Experiment("Creating Prototype", "You are trying to create a working prototype of the "+ideaName+" idea...");
+
+				}
+			},
+			function()	// recallFunction
+			{
+				doCreatePrototype(null, ideaName);
 			});
 }
 

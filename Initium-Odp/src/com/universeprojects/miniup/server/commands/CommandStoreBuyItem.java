@@ -1,6 +1,9 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -48,7 +52,7 @@ public class CommandStoreBuyItem extends Command {
 			throw new UserErrorMessage("You can only buy a positive quantity of items.");
 		
 		boolean isPremiumMembership = false;
-		if ("Initium Premium Membership".equals(item.getProperty("name")))
+		if (CommonChecks.checkItemIsPremiumToken(item) || CommonChecks.checkItemIsChippedToken(item))
 			isPremiumMembership = true;
 		
 		addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,character, storeCharacter,item,saleItem,request));
@@ -94,34 +98,45 @@ public class CommandStoreBuyItem extends Command {
 		ds.beginTransaction();
 		try
 		{
-			// If quantity item, need to refetch in transaction, to make 
-			// sure enough quantity available to purchase.
+			// Refetch all items in transaction.
+			List<CachedEntity> refetched = ds.refetch(Arrays.asList(item, saleItem, sellingCharacter, character));
+			item = refetched.get(0);
+			saleItem = refetched.get(1);
+			sellingCharacter = refetched.get(2);
+			character = refetched.get(3);
+			
+			// If quantity item, need to make sure enough 
+			// quantity still available to purchase.
 			if(quantity > 1)
 			{
-				item = ds.refetch(item);
 				quantity = (Long)item.getProperty("quantity");
 				if(quantity == null) quantity = 1L;
 				if(buyQuantity > quantity)
-					throw new UserErrorMessage("Seller no longer has enough inventory to purchase!");
+				{
+					// Force reload of the popup so the quantity is updated.
+					setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+					throw new UserErrorMessage("Seller no longer has enough inventory to purchase (buying " + buyQuantity + ", seller has " + quantity + ")");
+				}
 			}
 
 			// Sanitized quantity already. If we're buying less than
 			// the item stack quantity, we need to create a new SaleItem 
-			// record of the remaining amount.
+			// record of the purchased amount.
 			if(buyQuantity < quantity)
 			{
-				// newItem is the remaining amount belonging to seller, and will be the quantity less purchased.
-				// newSaleItem is the remaining sale record.
+				// newItem is the purchased item, and will be the purchased quantity.
+				// newSaleItem is the sale record.
 				CachedEntity newItem = new CachedEntity(item.getKind());
 				CachedEntity newSaleItem = new CachedEntity(saleItem.getKind());
 				CachedDatastoreService.copyFieldValues(item, newItem);
 				CachedDatastoreService.copyFieldValues(saleItem, newSaleItem);
 				
+				item.setProperty("quantity", quantity - buyQuantity);
 				newSaleItem.setProperty("itemKey", newItem.getKey());
-				newItem.setProperty("quantity", quantity - buyQuantity);
-				item.setProperty("quantity", buyQuantity);
-				ds.put(newItem);
-				ds.put(newSaleItem);
+				newItem.setProperty("quantity", buyQuantity);
+				ds.put(item);
+				item = newItem;
+				saleItem = newSaleItem;
 			}
 			
 			saleItem.setProperty("status", "Sold");
