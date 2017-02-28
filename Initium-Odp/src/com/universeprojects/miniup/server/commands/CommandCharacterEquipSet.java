@@ -48,7 +48,11 @@ public class CommandCharacterEquipSet extends Command {
 		final Key containerKey = KeyFactory.createKey("Item", containerId);
 		CachedEntity container = db.getEntity(containerKey);
 
-		if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), container) == false)
+		//Don't add toEquip if we cannot wear it.
+		if (character == null)
+			throw new IllegalArgumentException("Character cannot be null.");
+		
+		if (cs.checkContainerAccessAllowed(character, container) == false)
 			throw new UserErrorMessage(
 					"You do not have access to this container.");
 
@@ -111,10 +115,6 @@ public class CommandCharacterEquipSet extends Command {
 				break;
 			}
 			
-			//Don't add toEquip if we cannot wear it.
-			if (character == null)
-				throw new IllegalArgumentException("Character cannot be null.");
-
 			if (equipment.getProperty("strengthRequirement") instanceof String)
 				equipment.setProperty("strengthRequirement", null);
 			Double strengthRequirement = (Double) equipment
@@ -124,7 +124,6 @@ public class CommandCharacterEquipSet extends Command {
 					&& "NPC".equals(character.getProperty("type")) == false)
 				continue;
 			
-
 			String equipSlotRaw = (String) equipment.getProperty("equipSlot");
 
 			if (equipSlotRaw == null){
