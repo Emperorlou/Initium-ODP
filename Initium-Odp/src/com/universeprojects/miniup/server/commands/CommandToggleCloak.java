@@ -11,6 +11,7 @@ import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
  * Toggle cloak command.
@@ -53,5 +54,8 @@ public class CommandToggleCloak extends Command
 		ds.put(character);
 
 		updateHtml("#"+parameters.get("buttonId"), HtmlComponents.generateToggleCloak(character));
+		// Update character widget.
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		mpus.updateInBannerCharacterWidget();
 	}
 }
