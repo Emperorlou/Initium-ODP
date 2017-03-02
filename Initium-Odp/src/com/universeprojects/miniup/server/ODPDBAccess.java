@@ -5183,18 +5183,11 @@ public class ODPDBAccess
 		shuffleCharactersByAttackOrder(npcsInTheArea);
 		
 		for(CachedEntity possibleNPC:npcsInTheArea)
-			if ("NPC".equals(possibleNPC.getProperty("type")) && (Double)possibleNPC.getProperty("hitpoints")>0d
-					&& CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode")))
+			if ("NPC".equals(possibleNPC.getProperty("type")) && (Double)possibleNPC.getProperty("hitpoints")>0d)
 			{
-				CachedEntity combatNPC = ds.refetch(possibleNPC);
-				if(CHARACTER_MODE_NORMAL.equals(combatNPC.getProperty("mode")) == false) continue;
-				
 				resetInstanceRespawnTimer(destination);
 				setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
 				setPartiedField(party, character, "combatant", possibleNPC.getKey());
-				combatNPC.setProperty("mode", CHARACTER_MODE_COMBAT);
-				ds.put(combatNPC);
-				break;
 //				// If we've been interrupted, we'll just get out and not actually travel to the location, but ONLY
 //				// if we're not entering a CombatSite!
 //				if ("CombatSite".equals(destination.getProperty("type"))==false)
