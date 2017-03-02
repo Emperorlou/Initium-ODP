@@ -89,6 +89,9 @@ public class LongOperationTakePath extends LongOperation {
 		if (db.getCurrentCharacter().getProperty("partyCode")==null || db.getCurrentCharacter().getProperty("partyCode").equals(""))
 			isInParty = false;
 		
+		if(isInParty && GameUtils.isCharacterPartyLeader(db.getCurrentCharacter()) == false)
+			throw new UserErrorMessage("You cannot move your party because you are not the leader.");
+		
 		// Do the territory interruption now
 		doTerritoryInterruption(destination, path, allowAttack, isInParty);
 		
@@ -98,6 +101,9 @@ public class LongOperationTakePath extends LongOperation {
 		// Check if we're going to enter combat from Instance
 		if ("Instance".equals(destination.getProperty("combatType")))
 		{
+			if(isInParty)
+				throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
+			
 			CachedEntity monster = db.getCombatantFor(db.getCurrentCharacter(), destination);
 			if (monster!=null)
 			{
@@ -107,6 +113,8 @@ public class LongOperationTakePath extends LongOperation {
 				ds.put(db.getCurrentCharacter());
 				
 				db.resetInstanceRespawnTimer(destination);
+				if(destination.isUnsaved())
+					ds.put(destination);
 				
 				ds.commitBulkWrite();
 				throw new GameStateChangeException("A "+monster.getProperty("name")+" stands in your way.");
@@ -114,7 +122,6 @@ public class LongOperationTakePath extends LongOperation {
 		}
 		else if ("CombatSite".equals(destination.getProperty("type"))==false)	// However, for non-instances... (and not combat sites)
 		{
-		
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
 			List<CachedEntity> npcsInTheArea = db.getFilteredList("Character", 300, "locationKey", FilterOperator.EQUAL, destinationKey);
 			npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
