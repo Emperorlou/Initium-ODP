@@ -55,6 +55,9 @@ public class CommandStoreBuyItem extends Command {
 		if (CommonChecks.checkItemIsPremiumToken(item) || CommonChecks.checkItemIsChippedToken(item))
 			isPremiumMembership = true;
 		
+		if (isPremiumMembership && GameUtils.equals(character.getProperty("userKey"), storeCharacter.getProperty("userKey")))
+			throw new UserErrorMessage("You cannot buy premium tokens that are being sold by your own characters.");
+		
 		addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,character, storeCharacter,item,saleItem,request));
 		
 		if ("Sold".equals(saleItem.getProperty("status")))

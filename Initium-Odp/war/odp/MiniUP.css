@@ -2231,6 +2231,7 @@ a.range-increment {
     border-radius:8px;
     color:#EEEEEE;
     font-size:medium;
+    z-index:1000;
 }
 
 

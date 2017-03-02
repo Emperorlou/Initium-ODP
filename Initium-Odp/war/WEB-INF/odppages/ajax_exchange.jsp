@@ -1,22 +1,4 @@
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
-<script type="text/javascript">
-	function focusPremiumToken()
-	{
-		$("#premium-token-tab").addClass("tab-selected");
-		$("#chipped-token-tab").removeClass("tab-selected")
-		$("#premium-membership-token-pane").addClass("tab-selected").show();		
-		$("#chipped-token-pane").removeClass("tab-selected").hide();
-		
-	}
-	
-	function focusChippedToken()
-	{
-		$("#premium-token-tab").removeClass("tab-selected");
-		$("#chipped-token-tab").addClass("tab-selected")
-		$("#premium-membership-token-pane").hide();		
-		$("#chipped-token-pane").show();		
-	}
-</script>
 <div>
 	<h4>Global Premium Membership Token Exchange</h4> 
 	<p>This is a special system that is ONLY for buying and selling Initium Premium Membership tokens and Chipped Tokens. Use gold to always buy at the lowest price quickly and easily.</p>
@@ -35,3 +17,26 @@
 	</c:forEach>
 	</div>
 </div>
+
+<script type="text/javascript">
+	function focusPremiumToken()
+	{
+		$("#premium-token-tab").addClass("tab-selected");
+		$("#chipped-token-tab").removeClass("tab-selected")
+		$("#premium-membership-token-pane").addClass("tab-selected").show();		
+		$("#chipped-token-pane").removeClass("tab-selected").hide();
+		localStorage.setItem("exchange_page_tab", "Premium");
+	}
+	
+	function focusChippedToken()
+	{
+		$("#premium-token-tab").removeClass("tab-selected");
+		$("#chipped-token-tab").addClass("tab-selected")
+		$("#premium-membership-token-pane").hide();		
+		$("#chipped-token-pane").show();
+		localStorage.setItem("exchange_page_tab", "Chipped");
+	}
+	
+	if (localStorage.getItem("exchange_page_tab") == "Chipped")
+		focusChippedToken();
+</script>

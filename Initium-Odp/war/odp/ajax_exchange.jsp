@@ -83,14 +83,16 @@
     items = db.sortSaleItemList(items);
     
 %>
-        <div>
-        <h4>Global Premium Membership Token Exchange</h4> 
-        <p>This is a special system that is ONLY for buying and selling Initium Premium Membership tokens. Use gold to always buy at the lowest price quickly and easily.</p>
-        <%
-            for(CachedEntity item:items)
-            {
-            	CachedEntity saleItem = itemToSaleItemMap.get(item);
-                out.println(HtmlComponents.generateStoreItemHtml(db,character, sellingCharacters.get(saleItem.getProperty("characterKey")),item,saleItem,request));
-            }
-        %>
-        </div>
+<div>
+	<h4>Global Premium Membership Token Exchange</h4> 
+	<p>This is a special system that is ONLY for buying and selling Initium Premium Membership tokens. Use gold to always buy at the lowest price quickly and easily.</p>
+	<%
+	    for(CachedEntity item:items)
+	    {
+	    	CachedEntity saleItem = itemToSaleItemMap.get(item);
+	        out.println(HtmlComponents.generateStoreItemHtml(db,character, sellingCharacters.get(saleItem.getProperty("characterKey")),item,saleItem,request));
+	    }
+	%>
+</div>
+
+

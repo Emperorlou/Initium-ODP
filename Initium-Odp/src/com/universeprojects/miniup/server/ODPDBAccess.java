@@ -3204,7 +3204,7 @@ public class ODPDBAccess
 		request.setAttribute("notLooter", true);
 	}
 	
-
+	@Deprecated
 	public void doCharacterAttemptTakePath(CachedDatastoreService ds, HttpServletRequest request, CachedEntity path, CachedEntity character, boolean attack) throws UserErrorMessage, AbortedActionException
 	{
 		if (ds==null)
@@ -4136,7 +4136,7 @@ public class ODPDBAccess
 					// If the killed character is a NPC
 					if (characterToDie.getProperty("type")==null || "".equals(characterToDie.getProperty("type")) || "NPC".equals(characterToDie.getProperty("type")))
 					{
-						resetInstanceRespawnTimer(dyingCharacterLocation);
+//						resetInstanceRespawnTimer(dyingCharacterLocation);
 						
 						
 						characterToDie.setProperty("mode", "DEAD");
@@ -5117,6 +5117,7 @@ public class ODPDBAccess
 		for(CachedEntity possibleNPC:npcsInTheArea)
 			if ("NPC".equals(possibleNPC.getProperty("type")) && (Double)possibleNPC.getProperty("hitpoints")>0d)
 			{
+				resetInstanceRespawnTimer(destination);
 				setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
 				setPartiedField(party, character, "combatant", possibleNPC.getKey());
 //				// If we've been interrupted, we'll just get out and not actually travel to the location, but ONLY

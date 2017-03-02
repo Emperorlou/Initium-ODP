@@ -45,6 +45,29 @@
 		border-color:#00FF00 !important;
 		background-color:rgba(0,255,0,0.1);
 	}
+	.selectarea
+	{
+		position:relative;
+	}
+	.selectarea .X
+	{
+		position:absolute;
+		top:0px;
+		left:0px;
+		display:none;
+		width:32px;
+		height:32px;
+		text-align:center;
+		margin-top: 6px;
+		margin-left: 2px;
+		font-size: 21px;
+		font-size:20px;
+	}
+	.confirm-requirements-selected .selectarea .X
+	{
+		display:block;
+		
+	}
 </style>
 <script type='text/javascript'>
 var crSelectedRequirementId = null;
@@ -58,16 +81,40 @@ function selectRequirement(event, requirementId)
 
 function selectItem(event, itemId)
 {
+	// Check that we're not trying to select an item that is already chosen as a requirement. It doesn't work that way.
+	if ($(event.target).closest(".confirm-requirements-requirement").length>0)
+		return;
+	
+	unselectItem(null);
+	
+	
 	$("#itemForRequirement"+crSelectedRequirementId).val(itemId);
 	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementId);
-	var itemVisual = $(event.target).closest(".confirm-requirements-item-candidate").find(".itemToSelect");
+	var itemVisual = $(event.target).closest(".confirm-requirements-item-candidate");
 	itemVisual.detach();
 	itemPanelForRequirement.append(itemVisual);
+	itemVisual.hide();
+	itemVisual.fadeIn("slow");
+	event.stopPropagation();
 }
 
 function unselectItem(event)
 {
+	var candidatesContainer = $("#item-candidates");
+	var container = $("#requirement-container-"+crSelectedRequirementId);
+	var currentSelectedItem = container.find(".itemToSelect");
+	if (currentSelectedItem.length==0)
+		return; 	// Nothing is selected
+
+	// Get all .confirm-requirements-item-candidate divs and find one that is empty for reuse
+	container.children("input").val("");
+	var e = container.find(".itemToSelect").detach();
+	candidatesContainer.children(".list").prepend(e);
+	e.hide();
+	e.fadeIn("slow");
 	
+	if (event!=null)
+		event.stopPropagation();
 }
 </script>
 <div class='main-splitScreen'>
@@ -75,8 +122,8 @@ function unselectItem(event)
 	<h4><c:out value="${requirementCategory.name}"/></h4>
 	<c:forEach var="requirement" items="${requirementCategory.list}">
 		<div class='hiddenTooltip' id='requirementHelp-${requirement.id }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
-		<input type='hidden' id='itemForRequirement${requirement.id}' name='itemForRequirement${requirement.id}'/>
-		<div onclick='selectRequirement(event, ${requirement.id})' class='confirm-requirements-entry confirm-requirements-requirement'>
+		<div id='requirement-container-${requirement.id}' onclick='selectRequirement(event, ${requirement.id})' class='confirm-requirements-entry confirm-requirements-requirement'>
+			<input type='hidden' id='itemForRequirement${requirement.id}' name='itemForRequirement${requirement.id}'/>
 			<div class='hint questionmark' rel='#requirementHelp-${requirement.id}'>?</div><div><c:out value="${requirement.name}"/></div>
 			<div id='itemHtmlForRequirement${requirement.id}'></div>
 		</div>
@@ -84,7 +131,7 @@ function unselectItem(event)
 </c:forEach>
 <br>
 <div class='center'>
-	<a class='big-link center'>Start Prototyping</a>
+	<a class='big-link'>Start Prototyping</a>
 </div>
 
 </div>

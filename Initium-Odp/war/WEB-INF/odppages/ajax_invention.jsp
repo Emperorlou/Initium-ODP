@@ -75,7 +75,7 @@ function changeInventionTab(event)
 		<c:if test="${hasIdeas==true}">
 			<c:forEach var="idea" items="${ideas}">
 				<div class='idea-container'>
-					<a onclick='doCreatePrototype(event, ${idea.id}, \"<c:out value="${idea.name}"/>\");'><img src='${idea.iconUrl}' border=0/> ${idea.name}</a>
+					<a onclick='doCreatePrototype(event, ${idea.id}, "<c:out value="${idea.name}"/>");'><img src='${idea.iconUrl}' border=0/> ${idea.name}</a>
 				</div>
 			</c:forEach>
 		</c:if>

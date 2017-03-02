@@ -42,6 +42,7 @@ public class ConfirmRequirementsController extends PageController
 		
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 
+		request.setAttribute("type", type.toString());
 		if (type == Type.IdeaToPrototype)
 		{
 			processForCreatePrototype(request, db);

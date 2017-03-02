@@ -621,7 +621,7 @@ function deletePlayerHouse(eventObject, pathId)
 
 function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, characterId, quantity)
 {
-	var yesFunction = function(qty=null){
+	var yesFunction = function(qty){
 		doCommand(eventObject, "StoreBuyItem",{"saleItemId":saleItemId,"characterId":characterId,"quantity":qty},function(data,error){
 			if (error) return;
 			$(".saleItem[ref='"+saleItemId+"']").html(data.createStoreItem);
@@ -3110,8 +3110,8 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 	if (content!=null)
 		content = content.replace("\n", "<br>");
 	
-	let unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
-	let popupClassOverride = null;
+	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
+	var popupClassOverride = null;
 	if (popupClassOverride==null)
 		popupClassOverride = "popup";
 	closeAllPopups();
@@ -3120,18 +3120,18 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-	let step = (maxValue-minValue) / 4;
-	let rangeId = "popup_prompt_range_"+unique;
-	let numberId = "popup_prompt_number_"+unique;
-	let displayId = "popup_prompt_displaytext_"+unique;
-	let changeText = function() { 
-		let newText = this.value;
+	var step = (maxValue-minValue) / 4;
+	var rangeId = "popup_prompt_range_"+unique;
+	var numberId = "popup_prompt_number_"+unique;
+	var displayId = "popup_prompt_displaytext_"+unique;
+	var changeText = function() { 
+		var newText = this.value;
 		if(valueFunction) {
 			newText = valueFunction(Math.min(this.value,maxValue));
 		} 
 		$("#"+displayId).text(newText);
 	};
-	let newPopup = 
+	var newPopup = 
 		'<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground">' +
 		'<div id="popupWrapper_' + popupsNum + '" class="popupWrapper">'+
 		'<div id="popup_' + popupsNum + '" class="'+popupClassOverride+'">'+
@@ -3140,8 +3140,8 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 		'<div id="popup_text_' + popupsNum + '" class="popup_text" style="max-height:200px">'+
 		'<p style="margin:0px 2px">' + content + '</p>'+
 		'<div class="popup_range_body" style="text-align:center">';
-	let nudHtml = '<input id="'+numberId+'" class="popup_range_number" type="number" min="'+minValue+'" max="'+maxValue+'" value="1" onchange="'+rangeId+'.value=this.value;"/>'; 
-	let increment = 1, numArrow = 1;
+	var nudHtml = '<input id="'+numberId+'" class="popup_range_number" type="number" min="'+minValue+'" max="'+maxValue+'" value="1" onchange="'+rangeId+'.value=this.value;"/>'; 
+	var increment = 1, numArrow = 1;
 	while(increment < maxValue && numArrow < 5) // Don't allow more than 4 increment arrows
 	{
 		nudHtml = '<a class="range-increment" data-inc="'+(increment*-1)+'" style="float-left">'+('&lt;'.repeat(numArrow))+'</a>' + nudHtml + 
@@ -3158,10 +3158,10 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
     expandpopupMessage();
     
 	// Use range, since that limits the acceptable values.
-    let inputRange = $('#'+rangeId);
+    var inputRange = $('#'+rangeId);
     inputRange.change();
 	
-	let promptNo = function()
+	var promptNo = function()
 	{
 		closepopupMessage(currentPopup());
     	if (noFunction)
@@ -3169,9 +3169,9 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
     		noFunction();
     	}
 	};
-	let promptYes = function()
+	var promptYes = function()
 	{
-		let value = null;
+		var value = null;
 		if (yesFunction)
 		{
 			value = inputRange.val();
@@ -3206,7 +3206,7 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
     });
     
     // Increment arrow click.
-    $("#popup_"+popupsNum).on("click", ".range-increment", function(event) { let inc = +$(this).data("inc"); inputRange.val(+inputRange.val()+inc); inputRange.change(); });
+    $("#popup_"+popupsNum).on("click", ".range-increment", function(event) { var inc = +$(this).data("inc"); inputRange.val(+inputRange.val()+inc); inputRange.change(); });
     // Yes/no click.
     $("#"+unique+"-yes").click(promptYes);
     $("#"+unique+"-no").click(promptNo);
@@ -3222,7 +3222,7 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
 	
 	defaultText = defaultText+"";
 	
-	defaultText = defaultText.replace("\"", "`").replace("'", "`")
+	defaultText = defaultText.replace("\"", "`").replace("'", "`");
 	
 	
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);

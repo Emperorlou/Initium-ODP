@@ -38,10 +38,12 @@ public class CommandConfirmRequirementsUpdate extends Command
 
 		StringBuilder html = new StringBuilder();
 		html.append("<div>For ").append(ger.getProperty("name")).append("...</div>");
+		html.append("<div class='list'>");
 		for(CachedEntity item:items)
 		{
-			html.append("<div onclick='selectItem(event, ").append(item.getId()).append(")' class='confirm-requirements-entry confirm-requirements-item-candidate'><div class='selectarea'></div><span class='itemToSelect'>").append(GameUtils.renderItem(db, db.getCurrentCharacter(), item)).append("</span></div>");
+			html.append("<div onclick='selectItem(event, ").append(item.getId()).append(")' class='itemToSelect confirm-requirements-entry confirm-requirements-item-candidate'><div class='selectarea'><div onclick='unselectItem(event)' class='X'>X</div></div>").append(GameUtils.renderItem(db, db.getCurrentCharacter(), item)).append("</div>");
 		}
+		html.append("</div>");
 		if (items.isEmpty())
 			html.append("<p>You do not have anything in your inventory or where you're standing for this.</p>");
 		updateHtmlContents("#item-candidates", html.toString());
