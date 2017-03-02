@@ -1495,7 +1495,49 @@ public class ODPDBAccess
 
 		return carrying + charWeight;
 	}
-
+	
+    /**
+     * Drops (and possibly revives) the character to the specified location
+     * @param location Current location of the characters.
+     * @param currentCharacter Character who will be performing the drop.
+     * @param dropCharacter Character who will be dropped (and possibly revived).
+     */
+    public void doCharacterDropCharacter(CachedEntity location, CachedEntity character, CachedEntity characterToDrop) throws UserErrorMessage
+    {
+        if (character==null)
+            throw new IllegalArgumentException("Character cannot be null.");
+        if (characterToDrop==null)
+            throw new IllegalArgumentException("Character to drop cannot be null.");
+         
+        if (GameUtils.equals(character.getKey(), characterToDrop.getProperty("locationKey"))==false)
+            throw new UserErrorMessage("You cannot put this character down, you're not carrying them.");
+         
+        Key characterLocationKey = (Key)character.getProperty("locationKey");
+         
+        characterToDrop.setProperty("locationKey", characterLocationKey);
+        characterToDrop.setProperty("movedTimestamp", new Date());
+         
+        // If we are dropping the character in a rest area, heal him to 1 hp
+        if ("RestSite".equals(location.getProperty("type")) || "CampSite".equals(location.getProperty("type")))
+        {
+            if ((Double)characterToDrop.getProperty("hitpoints")<=0 && 
+                    "NPC".equals(characterToDrop.getProperty("type"))==false &&
+                    GameUtils.enumEquals(characterToDrop.getProperty("mode"), CharacterMode.UNCONSCIOUS))
+            {
+                characterToDrop.setProperty("hitpoints", 1d);
+                 
+                // Also unequip all of his equipment. 
+                for(String slot:EQUIPMENT_SLOTS)
+                    characterToDrop.setProperty("equipment"+slot, null);
+                 
+                // Reset his mode to normal
+                characterToDrop.setProperty("mode", CHARACTER_MODE_NORMAL);
+            }
+        }
+         
+        getDB().put(characterToDrop);
+    }
+	
 	/**
 	 * Performs the drop of the item from the character and saves the entity. 
 	 * Calls tryCharacterDropItem, which will throw if not successful. 
@@ -2045,9 +2087,26 @@ public class ODPDBAccess
 		return ds.fetchAsList_Keys(q, 50, null);
 	}
 
+	/**
+	 * Returns a list of items for the specified container. Location will return 50 max items.
+	 * @param container
+	 * @return
+	 */
 	public List<CachedEntity> getItemContentsFor(Key container)
 	{
-		if (container.getKind().equals("Location"))
+		return getItemContentsFor(container, false);
+	}
+	
+	/**
+	 * Returns a list of items for the specified container. If not in a player/group owned house,
+	 * will only show 50 items.
+	 * @param container
+	 * @param inOwnedHouse
+	 * @return
+	 */
+	public List<CachedEntity> getItemContentsFor(Key container, boolean inOwnedHouse)
+	{
+		if (container.getKind().equals("Location") && inOwnedHouse == false)
 		{
 			return getItemsListSortedForLocation(null, container);
 		}
@@ -2056,11 +2115,10 @@ public class ODPDBAccess
 			return getFilteredList("Item", "containerKey", FilterOperator.EQUAL, container);
 		}
 	}
-
-	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
+	
+	public boolean tryMoveItem(CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
 	{
-		if (ds==null)
-			ds = getDB();
+		CachedDatastoreService ds = getDB();
 		
 		if (GameUtils.equals(item.getKey(), newContainer.getKey()))
 			throw new UserErrorMessage("lol, you cannot transfer an item into itself, the universe would explode.");
@@ -2224,16 +2282,19 @@ public class ODPDBAccess
 		if (handled==false)
 			throw new UserErrorMessage("Unable to move this item. It is probably no longer there. Try hitting the refresh button at the top of this popup?");
 
-		
-		
 		item.setProperty("containerKey", newContainer.getKey());
 		item.setProperty("movedTimestamp", new Date());
 		
+		return handled;
+	}
+
+	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
+	{
+		// Throws if unsuccessful.
+		tryMoveItem(character, item, newContainer);
 		ds.put(item);
 	}
-	
 
-	
 	public void doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
 	{
 		if (ds==null)
@@ -3247,6 +3308,12 @@ public class ODPDBAccess
 		
 	}
 
+	/**
+	 * METHOD STUB. Implemented elsewhere. Handles adding text to the (!) chat window.
+	 */
+	public void addGameMessage(CachedDatastoreService ds, Key characterKey, String message)
+	{
+	}
 
 	public void setClientDescription(CachedDatastoreService ds, Key characterKey, String message)
 	{
