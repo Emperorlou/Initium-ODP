@@ -47,7 +47,7 @@ public class CommandCharacterEquipItem extends Command {
 		if(cs.isInCombat(character)) 
 			throw new UserErrorMessage("You cannot equip items while in combat!");
 		
-		if(CommonChecks.checkCharacterIsBusy(character))
+		if(CommonChecks.checkCharacterIsBusy(character) == false)
 			throw new UserErrorMessage("Your character is currently busy and cannot change equipment.");
 		
 		// This method will throw relevant errors if it fails (not enough strength, no available slots, etc.) 
