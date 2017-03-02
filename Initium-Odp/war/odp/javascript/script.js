@@ -862,7 +862,81 @@ function loadInventoryAndEquipment()
 
 function loadInventory()
 {
-	$("#inventory").load("/odp/inventorylist.jsp?ajax=true");
+	$("#inventory").load("/odp/inventorylist.jsp?ajax=true", function(){
+		var sortArmor = function(a, b) {
+		    var parser = /([\-\d]+)\/([\-\d]+)\/([\-\d]+) ([EGAPMN])\/([EGAPMN])\/([EGAPMN])/;
+		    var astats = parser.exec($(a).find('[minitip]').attr('minitip'));
+		    var bstats = parser.exec($(b).find('[minitip]').attr('minitip'));
+		    var adp = parseFloat(astats[1]);
+			var abc = parseFloat(astats[2]);
+			var adr = parseFloat(astats[3]);
+		    var bdp = parseFloat(bstats[1]);
+			var bbc = parseFloat(bstats[2]);
+			var bdr = parseFloat(bstats[3]);
+			switch ($(a).find(".main-item-name").html().localeCompare($(b).find(".main-item-name").html())) {
+				case -1:
+					return 1;
+				case 1:
+					return -1;
+				default:
+					if (abc < bbc) {
+						return -1;
+					}
+					if (abc > bbc) {
+						return 1;
+					}
+					if (adr < bdr) {
+						return -1;
+					}
+					if (adr > bdr) {
+						return 1;
+					}
+					if (adp < bdp) {
+						return 1;
+					}
+					if (adp > bdp) {
+						return -1;
+					}
+					return 0;
+			}
+		};
+		
+		var sortWep = function(a, b) {
+    		var parser = /(\d+)D(\d+)x([.\d]+) (\d+)% \(([\d.,]+)\/([\d.,]+)\).*?([\-\d]+)\/([\-\d]+)\/([\-\d]+) ([EGAPMN])\/([EGAPMN])\/([EGAPMN])/;
+		    var astats = parser.exec($(a).find('[minitip]').attr('minitip'));
+		    var bstats = parser.exec($(b).find('[minitip]').attr('minitip'));
+		    var amax = parseFloat(astats[5]);
+			var aavg = parseFloat(astats[6]);
+		    var bmax = parseFloat(bstats[5]);
+			var bavg = parseFloat(bstats[6]);
+			switch ($(a).find(".main-item-name").html().localeCompare($(b).find(".main-item-name").html())) {
+				case -1:
+					return 1;
+				case 1:
+					return -1;
+				default:
+					if (amax < bmax) {
+						return -1;
+					}
+					if (amax > bmax) {
+						return 1;
+					}
+					if (aavg < bavg) {
+						return -1;
+					}
+					if (aavg > bavg) {
+						return 1;
+					}
+					return 0;
+			}
+		}
+		var sorted = $('#invItems h4:contains("Armor")').nextUntil('#invItems h4').sort(sortArmor);
+		sorted.map(function() { var html = $(this)[0].outerHTML; $(this).remove(); $('#invItems h4:contains("Armor")').after(html)});
+		sorted = $('#invItems h4:contains("Shield")').nextUntil('#invItems h4').sort(sortArmor);
+		sorted.map(function() { var html = $(this)[0].outerHTML; $(this).remove(); $('#invItems h4:contains("Shield")').after(html)});
+		sorted = $('#invItems h4:contains("Weapon")').nextUntil('#invItems h4').sort(sortWep);
+		sorted.map(function() { var html = $(this)[0].outerHTML; $(this).remove(); $('#invItems h4:contains("Weapon")').after(html)});
+	});
 //	$("#inventory").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
 //	});
