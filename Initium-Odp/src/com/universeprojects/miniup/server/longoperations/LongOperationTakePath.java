@@ -120,7 +120,7 @@ public class LongOperationTakePath extends LongOperation {
 				throw new GameStateChangeException("A "+monster.getProperty("name")+" stands in your way.");
 			}
 		}
-		if ("CombatSite".equals(destination.getProperty("type"))==false)	// However, for non-instances... (and not combat sites)
+		else if ("CombatSite".equals(destination.getProperty("type"))==false)	// However, for non-instances... (and not combat sites)
 		{
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
 			List<CachedEntity> npcsInTheArea = db.getFilteredList("Character", 300, "locationKey", FilterOperator.EQUAL, destinationKey);
