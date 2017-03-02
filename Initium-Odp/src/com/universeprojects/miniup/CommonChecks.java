@@ -15,9 +15,9 @@ public abstract class CommonChecks
 	public static boolean checkCharacterIsBusy(CachedEntity character)
 	{
 		if (character.getProperty("mode")==null || "NORMAL".equals(character.getProperty("mode")))
-			return true;
+			return false;
 		
-		return false;
+		return true;
 	}
 	
 	/**

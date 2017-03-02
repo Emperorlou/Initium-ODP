@@ -33,7 +33,7 @@ public class CommandCharacterDropCharacter extends Command {
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		
-		if(CommonChecks.checkCharacterIsBusy(character) == false)
+		if(CommonChecks.checkCharacterIsBusy(character))
 			throw new UserErrorMessage("You are currently busy and cannot drop this character");
 		
 		Long characterId = tryParseId(parameters, "characterId");

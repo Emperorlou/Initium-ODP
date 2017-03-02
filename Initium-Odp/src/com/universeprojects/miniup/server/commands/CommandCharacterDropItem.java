@@ -37,7 +37,7 @@ public class CommandCharacterDropItem extends Command {
 		if(dropItem == null) throw new RuntimeException("Item does not exist");
 		if(GameUtils.equals(dropItem.getProperty("containerKey"), character.getKey()) == false)
 			throw new UserErrorMessage("Item does not belong to character");
-		if(CommonChecks.checkCharacterIsBusy(character) == false)
+		if(CommonChecks.checkCharacterIsBusy(character))
 			throw new UserErrorMessage("Your character is currently busy and cannot drop items.");
 		
 		db.doCharacterDropItem(character, dropItem);
