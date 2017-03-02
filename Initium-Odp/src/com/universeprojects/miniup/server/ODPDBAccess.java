@@ -2290,6 +2290,7 @@ public class ODPDBAccess
 
 	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
 	{
+		if(ds == null) ds = getDB();
 		// Throws if unsuccessful.
 		tryMoveItem(character, item, newContainer);
 		ds.put(item);
