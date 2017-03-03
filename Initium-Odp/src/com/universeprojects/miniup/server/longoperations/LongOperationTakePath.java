@@ -92,6 +92,9 @@ public class LongOperationTakePath extends LongOperation {
 		if(isInParty && GameUtils.isCharacterPartyLeader(db.getCurrentCharacter()) == false)
 			throw new UserErrorMessage("You cannot move your party because you are not the leader.");
 		
+		if(isInParty && db.getParty(ds, db.getCurrentCharacter()).size() > 4)
+			throw new UserErrorMessage("You have too many members in your party!");
+		
 		// Do the territory interruption now
 		doTerritoryInterruption(destination, path, allowAttack, isInParty);
 		
