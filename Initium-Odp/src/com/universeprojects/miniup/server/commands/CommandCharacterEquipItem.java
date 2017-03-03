@@ -33,7 +33,6 @@ public class CommandCharacterEquipItem extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
-		CachedEntity user = db.getCurrentUser();
 		
 		Long itemId = tryParseId(parameters, "itemId");
 		CachedEntity item = db.getEntity("Item", itemId);
@@ -55,7 +54,7 @@ public class CommandCharacterEquipItem extends Command {
 		
 		// If we've gotten this far, we can assume it was successful. Update the in banner widget.
 		// JS function reloads the page popup.
-		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, null, this);
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
 	}
 
