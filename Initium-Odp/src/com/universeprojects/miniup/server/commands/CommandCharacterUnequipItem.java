@@ -9,11 +9,13 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 import com.universeprojects.miniup.server.services.CombatService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
  * Unequips the specified item from the character.
@@ -46,7 +48,15 @@ public class CommandCharacterUnequipItem extends Command {
 		if(cs.isInCombat(character))
 			throw new UserErrorMessage("Cannot unequip items in combat!");
 		
+		if(CommonChecks.checkCharacterIsBusy(character))
+			throw new UserErrorMessage("Your character is currently busy and cannot change equipment.");
+		
 		db.doCharacterUnequipEntity(ds, character, equipmentItem);
+		
+		// If we've gotten this far, we can assume it was successful. Update the in banner widget.
+		// JS function reloads the page popup.
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		mpus.updateInBannerCharacterWidget();
 	}
 
 }

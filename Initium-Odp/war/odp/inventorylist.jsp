@@ -80,7 +80,7 @@
 					out.println(GameUtils.renderCharacter(null, c, true, false));
 					out.println("<br>");
 					out.println("<div class='main-item-controls'>");
-					out.println("<a onclick='ajaxAction(\"ServletCharacterControl?type=dropCharacter&characterId="+c.getKey().getId()+"\", event, loadInventoryAndEquipment)'>Put on ground</a>");
+					out.println("<a onclick='characterDropCharacter(event, " + c.getId() + ")'>Put on ground</a>");
 					out.println("</div>");
 					out.println("</div>");
 				}
@@ -122,11 +122,11 @@
 				out.println("		<div class='main-item-controls'>");
 				// Get all the slots this item can be equipped in
 				
-				out.println("			<a onclick='ajaxAction(\"ServletCharacterControl?type=equip&itemId="+item.getKey().getId()+"\", event, loadInventoryAndEquipment)'>Equip</a>");
-				out.println("			<a onclick='ajaxAction(\"ServletCharacterControl?type=dropItem&itemId="+item.getKey().getId()+"\", event, loadInventory)' >Drop on ground</a>");
+				out.println("			<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
+				out.println("			<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
 				if (item.getProperty("maxWeight")!=null)
 				{
-					out.println("<a onclick='pagePopup(\"ajax_moveitems.jsp?selfSide=Character_"+common.getCharacter().getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>");
+					out.println("<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"+common.getCharacter().getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>");
 				}
 				out.println("		</div>");
 				out.println("	</div>");
