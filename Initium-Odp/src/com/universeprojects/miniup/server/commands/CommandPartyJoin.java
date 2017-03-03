@@ -10,6 +10,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
  * 
@@ -32,40 +33,30 @@ public class CommandPartyJoin extends Command {
 		CachedDatastoreService ds = getDS();
 
 		CachedEntity character = db.getCurrentCharacter();
-		String toJoin = "";
+		CachedEntity partyCharacter = null;
+		
+		String mode = (String) character.getProperty("mode");
+		if (mode != null && mode.equals("COMBAT"))
+			throw new UserErrorMessage("You cannot join a party while in combat!");
 		
 		if(parameters.get("inputType").equals("partyCode")) {
-			toJoin = parameters.get("partyCode");
+			String toJoin = parameters.get("partyCode");
+			if(toJoin == null || "".equals(toJoin))
+				throw new RuntimeException("Specified party code is null!");
+			
+			partyCharacter = db.getPartyLeader(ds, toJoin, null);
 		} else if (parameters.get("inputType").equals("characterName")) {
 			String characterName = parameters.get("characterName");
-			CachedEntity otherCharacter = db.getCharacterByName(characterName);
-			if(otherCharacter == null) {
-				throw new UserErrorMessage("Character with name of "+characterName+" does not exist!");
-			}
-			toJoin = (String) otherCharacter.getProperty("partyCode");
+			partyCharacter = db.getCharacterByName(characterName);
 		}
 		
-		String currentParty = (String) character.getProperty("partyCode");
+		if(partyCharacter == null)
+			throw new UserErrorMessage("Specified character is not in a group!");
 		
-		if (toJoin.equals(currentParty)) {
-			throw new UserErrorMessage("You are already apart of this party!");
-		}
-		if (currentParty != null && !currentParty.trim().equals("")) {
-			throw new UserErrorMessage("You are already in a party! You must leave this one first!");
-		}
+		// This method contains all the validations necessary.
+		db.doRequestJoinParty(ds, character, partyCharacter);
 		
-		CachedEntity leader = db.getPartyLeader(ds, toJoin, null);
-		if (leader.getProperty("partyJoinsAllowed").equals("FALSE")) {
-			throw new UserErrorMessage("This party is not accepting members currently!");
-		}
-		String mode = (String) character.getProperty("mode");
-		if (mode != null && mode.equals("COMBAT")) {
-			throw new UserErrorMessage("You cannot join a party while in combat!");
-		}
-		
-		character.setProperty("partyCode", toJoin);
-		character.setProperty("partyLeader", "FALSE");
-		
-		ds.put(character);
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		mpus.updatePartyView();
 	}
 }
