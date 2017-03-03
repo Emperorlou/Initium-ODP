@@ -1468,7 +1468,8 @@ function characterDropCharacter(event, characterId)
 
 function characterDropItem(event, itemId)
 {
-	doCommand(event, "CharacterDropItem", {"itemId":itemId}, loadInventory);
+	// No callback necessary. Command clears out the item (doesn't touch header).
+	doCommand(event, "CharacterDropItem", {"itemId":itemId});
 }
 
 function characterEquipSet(event, containerId)
