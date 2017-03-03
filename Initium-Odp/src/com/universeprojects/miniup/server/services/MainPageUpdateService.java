@@ -356,6 +356,11 @@ public class MainPageUpdateService extends Service
 	 */
 	public String updateInBannerCharacterWidget()
 	{
+		if(user != null && Boolean.TRUE.equals(user.getProperty("premium")) && db.getRequest().getAttribute("characterList") == null)
+		{
+			List<CachedEntity> characterList = db.getFilteredList("Character", "userKey", user.getKey());
+			db.getRequest().setAttribute("characterList", characterList);  
+		}
 		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, character, user, true);
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
@@ -499,7 +504,10 @@ public class MainPageUpdateService extends Service
 		
 		if (db.isCharacterAbleToCreateCampsite(db.getDB(), character, location))
 		{
-			newHtml.append("<a href='#' class='main-button' onclick='createCampsite()'>Create a campsite here</a>");
+			if("RestSite".equals(location.getProperty("type")))
+				newHtml.append("<a href='#' class='main-button' onclick='createCampsite()'>Create a campsite here</a>");
+			else
+				newHtml.append("<a href='#' class='main-button' shortcut='82' onclick='createCampsite()'><span class='shortcut-key'>(R)</span>Create a campsite here</a>");
 			newHtml.append("<br>");
 		}
 
