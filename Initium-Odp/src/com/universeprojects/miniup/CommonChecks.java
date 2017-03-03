@@ -2,6 +2,8 @@ package com.universeprojects.miniup;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
 
 public abstract class CommonChecks
 {
@@ -128,6 +130,31 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+	
+	/**
+	 * Checks if the given character is a member of the group he is marked as being in. If he is not part
+	 * of a group, or is not yet an official member of it (so, excluding new applications, kicked members..etc)
+	 * then this method will return false. Otherwise if a character is a member of their group, it will return true.
+	 * 
+	 * @param character
+	 * @return
+	 */
+	public static boolean checkCharacterIsMemberOfHisGroup(CachedEntity character)
+	{
+		String charGroupStatus = (String)character.getProperty("groupStatus");
+		if (charGroupStatus==null) return false;
+		
+		if(character.getProperty("groupKey") != null &&
+				(GameUtils.enumEquals(charGroupStatus, GroupStatus.Admin) ||
+				 GameUtils.enumEquals(charGroupStatus, GroupStatus.Member)))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
 }
 
 

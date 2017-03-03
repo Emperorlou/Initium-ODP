@@ -68,6 +68,8 @@ public class GamePageController extends PageController {
 			throw new RuntimeException("Character is null. We have to code something to handle this.");
 		
 		request.setAttribute("chatIdToken", db.getChatIdToken(character.getKey()));
+		if (user!=null)
+			request.setAttribute("newChatIdToken", db.getNewChatIdToken(user.getKey()));
 		request.setAttribute("characterId", character.getId());
 		
 		

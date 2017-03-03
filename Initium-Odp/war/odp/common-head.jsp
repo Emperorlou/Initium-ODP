@@ -67,6 +67,9 @@
 	<c:if test="${characterId!=null}">
 	window.characterId = ${characterId};
 	</c:if>
+	<c:if test='${newChatIdToken}'>
+	window.newChatIdToken = "${newChatIdToken}";
+	</c:if>
 	window.verifyCode = "${verifyCode}";
 	window.serverTime=<c:out value="${serverTime}"/>;
 	window.clientTime=new Date().getTime();

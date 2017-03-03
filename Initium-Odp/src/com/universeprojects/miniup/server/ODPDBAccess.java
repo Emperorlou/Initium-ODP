@@ -5939,4 +5939,10 @@ public class ODPDBAccess
 		return null;
 	}
 
+	public String getNewChatIdToken(Key key)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
