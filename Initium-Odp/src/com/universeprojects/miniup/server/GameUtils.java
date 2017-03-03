@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.cheffo.jeplite.JEP;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
@@ -2098,4 +2099,29 @@ public class GameUtils
 			return "https://initium-resources.appspot.com/"+relativeUrl;
 	}
 
+	
+	/**
+	 * This method is parses the output from Key.toString() and turns it
+	 * back into an actual Key object.
+	 * 
+	 * @param keyString
+	 * @return
+	 */
+	public static Key parseKey(String keyString)
+	{
+		int index = keyString.indexOf("(");
+		String kind = keyString.substring(0, index);
+		
+		String idName = keyString.substring(index, keyString.length());
+		if (idName.startsWith("(\""))
+		{
+			// Parse for a named key
+			return KeyFactory.createKey(kind, idName.substring(2, idName.length()-2));
+		}
+		else
+		{
+			// Parse for an ID'd key
+			return KeyFactory.createKey(kind, Long.parseLong(idName.substring(1, idName.length()-1)));
+		}
+	}
 }

@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/appengine-tools-api.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-codec-1.6.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/rhinojs.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-io-2.4.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

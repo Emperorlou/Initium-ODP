@@ -5939,10 +5939,15 @@ public class ODPDBAccess
 		return null;
 	}
 
-	public String getNewChatIdToken(Key key)
+	public String getNewChatAuthToken(Key key)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	public Key decodeAndCheckChatAuthToken(String authToken) throws SecurityException
+	{
+		return null;
+	}
+	
+	
 }

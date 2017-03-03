@@ -69,7 +69,7 @@ public class GamePageController extends PageController {
 		
 		request.setAttribute("chatIdToken", db.getChatIdToken(character.getKey()));
 		if (user!=null)
-			request.setAttribute("newChatIdToken", db.getNewChatIdToken(user.getKey()));
+			request.setAttribute("newChatIdToken", db.getNewChatAuthToken(user.getKey()));
 		request.setAttribute("characterId", character.getId());
 		
 		
