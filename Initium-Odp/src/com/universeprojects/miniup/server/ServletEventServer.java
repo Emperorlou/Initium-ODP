@@ -77,18 +77,22 @@ public class ServletEventServer extends HttpServlet
 					String groupId = "";
 					if (CommonChecks.checkCharacterIsMemberOfHisGroup(character)) {
 						Long gId = ((Key)character.getProperty("groupKey")).getId();
-						groupId = gId.toString();
+						groupId = "G" + gId.toString();
 					}
 						
 					Long locationId = ((Key)character.getProperty("locationKey")).getId();
 					String partyCode = ((String)character.getProperty("partyCode"));
 					
+					String partyId = "";
+					if (partyCode != null) {
+						partyId = "P" + partyCode;
+					}
 					
 					respBody.put("success", true);
 					respBody.put("accountId", userOrCharacter.toString());
 					respBody.put("groupId", groupId);
-					respBody.put("locationId", locationId.toString());
-					respBody.put("partyId", partyCode.toString());
+					respBody.put("locationId", "L" + locationId);
+					respBody.put("partyId", partyId);
 					
 				}
 				catch (SecurityException e)
@@ -110,17 +114,52 @@ public class ServletEventServer extends HttpServlet
 				{
 					CachedEntity user = db.getEntity(accountKey);
 					character = db.getEntity((Key)user.getProperty("characterKey"));
+				} else {
+					// accountId was invalid
+					break;
 				}
-				
 				String characterName = (String)character.getProperty("name");
 				
-				// do something to format the contents, and maybe other checks depending on the channel
-				respBody.put("success", true);
-
-				contents = characterName+": " + contents;
-				respBody.put("id", channel);
-						
-				respBody.put("formattedMsg", contents);
+				switch(channel) {
+				case "public":
+					respBody.put("id", "public");
+					respBody.put("formattedMsg", characterName + ": " + contents);
+					respBody.put("success", true);
+					break;
+				case "location":
+					Long locationId = ((Key)character.getProperty("locationKey")).getId();
+					respBody.put("id", "L"+locationId);
+					respBody.put("formattedMsg", characterName + ": " + contents);
+					respBody.put("success", true);
+					break;
+				case "group":
+					String groupId = "";
+					if (CommonChecks.checkCharacterIsMemberOfHisGroup(character)) {
+						Long gId = ((Key)character.getProperty("groupKey")).getId();
+						groupId = "G" + gId.toString();
+						respBody.put("id", groupId);
+						respBody.put("formattedMsg", characterName + ": " + contents);
+						respBody.put("success", true);
+					}
+					break;
+				case "party":
+					String partyCode = ((String)character.getProperty("partyCode"));
+					String partyId = "";
+					if (partyCode != null) {
+						partyId = "P" + partyCode;
+						respBody.put("id", partyId);
+						respBody.put("formattedMsg", characterName + ": " + contents);
+						respBody.put("success", true);
+					}
+					break;
+				case "private":
+					// TODO resolve an Alt name to an account ID
+					break;
+				default:
+					// TODO decide if we need a default case
+					
+					break;
+				}
 				break;
 			}
 			System.out.println("responding with: " + respBody.toJSONString());
