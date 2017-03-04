@@ -74,9 +74,12 @@ public class ServletEventServer extends HttpServlet
 					if (character==null)
 						throw new SecurityException();
 					
-					Long groupId = null;
-					if (CommonChecks.checkCharacterIsMemberOfHisGroup(character))
-						groupId = ((Key)character.getProperty("groupKey")).getId();
+					String groupId = "";
+					if (CommonChecks.checkCharacterIsMemberOfHisGroup(character)) {
+						Long gId = ((Key)character.getProperty("groupKey")).getId();
+						groupId = gId.toString();
+					}
+						
 					Long locationId = ((Key)character.getProperty("locationKey")).getId();
 					String partyCode = ((String)character.getProperty("partyCode"));
 					
@@ -84,8 +87,8 @@ public class ServletEventServer extends HttpServlet
 					respBody.put("success", true);
 					respBody.put("accountId", userOrCharacter.toString());
 					respBody.put("groupId", groupId);
-					respBody.put("locationId", locationId);
-					respBody.put("partyId", partyCode);
+					respBody.put("locationId", locationId.toString());
+					respBody.put("partyId", partyCode.toString());
 					
 				}
 				catch (SecurityException e)
