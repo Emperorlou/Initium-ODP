@@ -1,8 +1,6 @@
 <!doctype html>
 <html>
 <body>
-	<center><h1>Your Inventory</h1></center>
-
 		<div class='main-splitScreen'>
 		<div id='equipment'>
 			<img src='javascript/images/wait.gif' border=0/>

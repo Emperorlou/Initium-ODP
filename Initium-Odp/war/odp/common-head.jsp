@@ -1,6 +1,7 @@
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <%@page import="com.google.appengine.api.datastore.Key"%>
 <%@page import="com.google.appengine.api.datastore.Entity"%>
+<%@page import="com.universeprojects.miniup.server.GameUtils"%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
@@ -9,6 +10,8 @@
 
 	long serverTime = System.currentTimeMillis();
 	request.setAttribute("serverTime", serverTime);
+	
+	request.setAttribute("isTestServer", GameUtils.isTestServer(request));
 %>
     
 <meta charset="UTF-8">    
@@ -26,7 +29,7 @@
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=66"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=67"></script>
 
 <script type="text/javascript" src="/odp/javascript/messager.js?v=18"></script>
 
@@ -38,7 +41,7 @@
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=58">
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=60">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="javascript/rangeslider/rangeslider.min.js"></script>
@@ -70,6 +73,7 @@ window.characterId = ${characterId};
 <c:if test='${newChatIdToken!=null}'>
 window.newChatIdToken = "${newChatIdToken}";
 </c:if>
+	window.isTestServer = ${isTestServer};
 	window.verifyCode = "${verifyCode}";
 	window.serverTime=<c:out value="${serverTime}"/>;
 	window.clientTime=new Date().getTime();

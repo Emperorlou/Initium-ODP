@@ -116,6 +116,20 @@ function unselectItem(event)
 	if (event!=null)
 		event.stopPropagation();
 }
+
+function collectChoices(event)
+{
+	
+	var result = {};
+	var inputBoxes = $(event.target).closest(".main-splitScreen").find(".itemForRequirementInput");
+	for(var i = 0; i<inputBoxes.length; i++)
+	{
+		var input = $(inputBoxes[i]);
+		result[input.attr("id")] = input.val();
+	}
+	
+	return result;
+}
 </script>
 <div class='main-splitScreen'>
 <c:forEach var="requirementCategory" items="${formattedRequirements}">
@@ -123,7 +137,7 @@ function unselectItem(event)
 	<c:forEach var="requirement" items="${requirementCategory.list}">
 		<div class='hiddenTooltip' id='requirementHelp-${requirement.id }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
 		<div id='requirement-container-${requirement.id}' onclick='selectRequirement(event, ${requirement.id})' class='confirm-requirements-entry confirm-requirements-requirement'>
-			<input type='hidden' id='itemForRequirement${requirement.id}' name='itemForRequirement${requirement.id}'/>
+			<input type='hidden' class='itemForRequirementInput' id='itemForRequirement${requirement.id}' name='itemForRequirement${requirement.id}'/>
 			<div class='hint questionmark' rel='#requirementHelp-${requirement.id}'>?</div><div><c:out value="${requirement.name}"/></div>
 			<div id='itemHtmlForRequirement${requirement.id}'></div>
 		</div>
@@ -131,7 +145,7 @@ function unselectItem(event)
 </c:forEach>
 <br>
 <div class='center'>
-	<a class='big-link'>Start Prototyping</a>
+	<a onclick='doBeginPrototype(event, ${ideaId}, collectChoices(event))' class='big-link'>Start Prototyping</a>
 </div>
 
 </div>

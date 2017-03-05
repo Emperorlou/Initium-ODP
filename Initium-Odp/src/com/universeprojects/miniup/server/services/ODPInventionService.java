@@ -8,6 +8,7 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public abstract class ODPInventionService extends Service
 {
@@ -133,5 +134,11 @@ public abstract class ODPInventionService extends Service
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void checkIdeaWithSelectedItems(EntityPool pool, CachedEntity idea, Map<Key, Key> itemRequirementsToItems) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

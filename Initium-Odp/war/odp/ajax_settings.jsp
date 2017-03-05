@@ -47,8 +47,6 @@ input[type='checkbox']
 </style>
 </head>
 <body>
-	<center><h1>Game Settings</h1></center>
-	
 	<div class='settings-page'>
 		<h2>Sound/Music</h2>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableMusic'> Disable music</div>

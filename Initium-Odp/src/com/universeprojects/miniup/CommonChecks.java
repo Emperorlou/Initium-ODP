@@ -153,6 +153,35 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+
+	/**
+	 * Checks that the idea actually belongs to the given character. 
+	 * 
+	 * @param idea
+	 * @param characterKey
+	 * @return
+	 */
+	public static boolean checkIdeaIsCharacters(CachedEntity idea, Key characterKey)
+	{
+		if (characterKey.equals(idea.getProperty("characterKey")))
+			return true;
+		
+		return false;
+	}
+
+	/**
+	 * Checks if the given character is currently in combat.
+	 * 
+	 * @param character
+	 * @return
+	 */
+	public static boolean checkCharacterIsInCombat(CachedEntity character)
+	{
+		if ("COMBAT".equals(character.getProperty("mode")))
+			return true;
+		
+		return false;
+	}
 	
 	
 }

@@ -2124,4 +2124,15 @@ public class GameUtils
 			return KeyFactory.createKey(kind, Long.parseLong(idName.substring(1, idName.length()-1)));
 		}
 	}
+	
+	public static boolean isTestServer(HttpServletRequest request)
+	{
+		if (request.getRequestURL().toString().contains("test")) 
+			return true;
+		
+		if (CachedDatastoreService.isUsingRemoteAPI()==true)
+			return true;
+		
+		return false;
+	}
 }

@@ -97,7 +97,7 @@ public class LongOperationExperiment extends LongOperation
 		CachedEntity idea = inventionService.attemptToDiscoverIdea(selectedItems, pool);
 		if (idea!=null)
 		{
-			message="<div class='message-newidea'>You have a new idea sto "+idea.getProperty("name")+"!</div>"+message;
+			message="<div class='message-newidea'>You have a new idea to "+idea.getProperty("name")+"!</div>"+message;
 		}
 		
 		setUserMessage(message);

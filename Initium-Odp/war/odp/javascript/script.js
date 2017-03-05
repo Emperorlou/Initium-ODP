@@ -1495,7 +1495,8 @@ function characterUnequipAll(event)
 function giveHouseToGroup(eventObject)
 {
 	confirmPopup("Give House to Group", "Are you sure you want to PERMANENTLY give this house to your group? You cannot take it back!", function(){
-		doCommand(eventObject,"GivePlayerHouseToGroup")});
+		doCommand(eventObject,"GivePlayerHouseToGroup");
+	});
 }
 
 function refreshInstanceRespawnWarning()
@@ -1609,7 +1610,7 @@ function decrementStackIndex()
 	return currentPopupStackIndex;
 }
 
-function pagePopup(url, closeCallback)
+function pagePopup(url, closeCallback, title)
 {
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
@@ -1621,7 +1622,7 @@ function pagePopup(url, closeCallback)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div class='page-popup-title'><h4>"+title+"</h4></div><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	
 	if (closeCallback!=null)
@@ -2772,7 +2773,8 @@ function doBeginPrototype(event, ideaId, selectedItems)
 
 	
 	showBannerLoadingIcon();
-	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&v="+window.verifyCode, 
+	if (selectedItems==null) selectedItems = {};
+	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaId="+ideaId+"&selectedItems="+JSON.stringify(selectedItems)+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)

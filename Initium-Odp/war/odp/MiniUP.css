@@ -1952,6 +1952,29 @@ a.range-increment {
   content:" ";
 }
 
+.page-popup-title
+{
+    position: relative;
+    text-align: center;
+    top: -45px;
+    width: 80%;
+    margin: 0 auto;
+    margin-bottom: -35px;
+}
+.page-popup-title h4
+{
+	display:inline-block;
+	margin: 0 auto;
+	background-color: rgb(4, 22, 31);
+    padding: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-width: 2px;
+    border-color: rgb(103, 81, 52);
+    border-style: solid;
+    border-radius: 4px;
+}
+
 .page-popup
 {
 	min-height:30px;

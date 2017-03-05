@@ -43,6 +43,7 @@ public class ConfirmRequirementsController extends PageController
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 
 		request.setAttribute("type", type.toString());
+		
 		if (type == Type.IdeaToPrototype)
 		{
 			processForCreatePrototype(request, db);
@@ -141,6 +142,7 @@ public class ConfirmRequirementsController extends PageController
 		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", idea.getProperty("prototypeItemsRequired"));
 		addGenericEntityRequirements(request, pool, "Optional Tools/Equipment", idea.getProperty("skillToolsOptional"));
 		
+		request.setAttribute("ideaId", ideaId);
 	}
 	
 	
