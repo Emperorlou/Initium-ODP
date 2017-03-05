@@ -80,10 +80,10 @@ public class CommandGroupMemberKick extends Command
 		
 		// If the target is an admin and the current player is not the group creator,
 		if (kickCharacter.getProperty("groupStatus").equals("Admin") &&
-				!(GameUtils.equals((Key)admin.getKey(),
+				!(GameUtils.equals(admin.getKey(),
 						(Key)group.getProperty("creatorKey"))))
 		{
-			throw new UserErrorMessage("You cannot kick a group member of the same rank.");
+			throw new UserErrorMessage("Only the creator can kick admins.");
 		}
 
 		db.doLeaveGroup(ds, kickCharacter);
