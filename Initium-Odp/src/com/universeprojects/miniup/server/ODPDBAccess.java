@@ -1277,7 +1277,7 @@ public class ODPDBAccess
 		String equipSlotRaw = (String)equipment.getProperty("equipSlot");
 		
 		if (equipSlotRaw==null)
-			throw new UserErrorMessage("This item not equipable.");
+			throw new UserErrorMessage("This item is not equipable.");
 		
 		if (equipSlotRaw.equals("Ring"))
 			equipSlotRaw = "LeftRing, RightRing";
