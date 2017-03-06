@@ -474,7 +474,7 @@ public class HtmlComponents {
 			}
 			
 			// Show the "Kick" and "Cancel Kick" buttons if target is not an admin or the creator, or if the logged in user is the group creator.
-			if( !(isAdmin || isCreator) || viewCreator )
+			if ((viewAdmin && (isAdmin == false)) || viewCreator)
 			{
 				if ("Kicked".equals(groupStatus) == false)
 					sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ", \""+character.getProperty("name")+"\")'>Kick</a>");
