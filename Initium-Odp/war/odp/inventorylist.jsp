@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.CommonChecks"%>
 <%@page import="com.universeprojects.miniup.server.DDOSProtectionException"%>
 <%@page import="com.universeprojects.miniup.server.HiddenUtils"%>
 <%@page import="com.universeprojects.miniup.server.WebUtils"%>
@@ -121,8 +122,9 @@
 				out.println("<br>");
 				out.println("		<div class='main-item-controls'>");
 				// Get all the slots this item can be equipped in
+				if(CommonChecks.checkItemIsEquippable(item))
+					out.println("			<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
 				
-				out.println("			<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
 				out.println("			<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
 				if (item.getProperty("maxWeight")!=null)
 				{

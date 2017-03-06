@@ -132,6 +132,17 @@ public abstract class CommonChecks
 	}
 	
 	/**
+	 * Checks if the given item is equippable to a slot. Ignores strength requirements.
+	 * @param item
+	 * @return
+	 */
+	public static boolean checkItemIsEquippable(CachedEntity item)
+	{
+		String slot = (String)item.getProperty("equipSlot");
+		return slot != null && "".equals(slot) == false;
+	}
+	
+	/**
 	 * Checks if the given character is a member of the group he is marked as being in. If he is not part
 	 * of a group, or is not yet an official member of it (so, excluding new applications, kicked members..etc)
 	 * then this method will return false. Otherwise if a character is a member of their group, it will return true.
