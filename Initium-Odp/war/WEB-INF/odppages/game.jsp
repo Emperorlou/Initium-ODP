@@ -25,6 +25,9 @@
 
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
+<script type="text/javascript" src="/javascript/sockjs.min.js"></script>
+<script type="text/javascript" src="/javascript/vertx-eventbus.js"></script>
+
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
 <script type="text/javascript" src="/odp/javascript/script.js?v=60"></script>
 
