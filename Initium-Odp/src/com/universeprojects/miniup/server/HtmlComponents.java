@@ -419,10 +419,12 @@ public class HtmlComponents {
 	
 	public static String generateGroupMember(CachedEntity viewingChar, CachedEntity character, CachedEntity group, boolean inGroup, boolean canDeleteGroup)
 	{
+		// Properties of the currently logged in character
 		String viewStatus = (String)viewingChar.getProperty("groupStatus");
 		boolean viewAdmin = inGroup && "Admin".equals(viewStatus);
 		boolean viewCreator = inGroup && GameUtils.equals((Key)group.getProperty("creatorKey"), viewingChar.getKey());
 
+		// Properties of the character being generated
 		String groupStatus = (String)character.getProperty("groupStatus");
 		boolean isAdmin = "Admin".equals(groupStatus);
 		boolean isCreator = GameUtils.equals((Key)group.getProperty("creatorKey"), character.getKey());
@@ -471,11 +473,14 @@ public class HtmlComponents {
 				}
 			}
 			
-			if ("Kicked".equals(groupStatus) == false)
-				sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ", \""+character.getProperty("name")+"\")'>Kick</a>");
-			else
-				sb.append("<a onclick='groupMemberKickCancel(" + character.getKey().getId() + ")'>Cancel Kick</a>");
-			
+			// Show the "Kick" and "Cancel Kick" buttons if target is not an admin or the creator, or if the logged in user is the group creator.
+			if ((viewAdmin && (isAdmin == false)) || viewCreator)
+			{
+				if ("Kicked".equals(groupStatus) == false)
+					sb.append("<a onclick='groupMemberKick(event, " + character.getKey().getId() + ", \""+character.getProperty("name")+"\")'>Kick</a>");
+				else
+					sb.append("<a onclick='groupMemberKickCancel(" + character.getKey().getId() + ")'>Cancel Kick</a>");
+			}
 			if (viewCreator && canDeleteGroup)
 				sb.append("<a onclick='deleteGroup(event)'>Delete group</a>");
 		}
