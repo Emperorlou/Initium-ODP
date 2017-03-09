@@ -80,9 +80,6 @@ public class NearbyCharactersController extends PageController {
             charsToShow.add(sb.toString());
 	    }
 	    
-	    if(charsToShow.isEmpty()==false)
-	    	charsToShow.add(0, "<h5>Characters</h5>");
-	    
 	    request.setAttribute("charToShow", charsToShow);
 	    
 		return "/WEB-INF/odppages/locationcharacterlist.jsp";
