@@ -19,7 +19,7 @@ import com.universeprojects.web.PageController;
 @Controller
 public class NearbyItemsController extends PageController 
 {
-	public NearbyItemsController(String pageName) 
+	public NearbyItemsController() 
 	{
 		super("locationitemlist");
 	}
