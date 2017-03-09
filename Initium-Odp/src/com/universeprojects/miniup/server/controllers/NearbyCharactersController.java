@@ -46,7 +46,7 @@ public class NearbyCharactersController extends PageController {
 		List<CachedEntity> charactersHere = db.getFilteredList("Character", 51, "locationKey", FilterOperator.EQUAL, locationKey);
 	    int charCount = charactersHere.size();
 	    
-	    request.setAttribute("charCount", charCount <= 50 ? charCount : "50+");
+	    request.setAttribute("charCount", charCount <= 50 ? charCount-1 : "50+");
 	    
 	    List<String> charsToShow = new ArrayList<String>();
 	    for(CachedEntity curChar:charactersHere)
