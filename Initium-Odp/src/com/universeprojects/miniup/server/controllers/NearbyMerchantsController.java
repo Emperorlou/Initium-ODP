@@ -21,7 +21,7 @@ import com.universeprojects.web.PageController;
 @Controller
 public class NearbyMerchantsController extends PageController 
 {
-	public NearbyMerchantsController(String pageName) 
+	public NearbyMerchantsController() 
 	{
 		super("locationmerchantlist");
 	}

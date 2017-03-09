@@ -21,7 +21,8 @@ import com.universeprojects.web.PageController;
 @Controller
 public class NearbyCharactersController extends PageController {
 
-	public NearbyCharactersController(String pageName) {
+	public NearbyCharactersController() 
+	{
 		super("locationcharacterlist");
 	}
 
