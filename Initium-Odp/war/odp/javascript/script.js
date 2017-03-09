@@ -836,7 +836,7 @@ function loadLocationItems()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("/ajax_moveitems.jsp?preset=location", null, "Nearby Items");
+	pagePopup("/odp/ajax_moveitems.jsp?preset=location", null, "Nearby Items");
 //	$("#main-itemlist").load("locationitemlist.jsp");
 //	$("#main-itemlist").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby items</h4></div>");

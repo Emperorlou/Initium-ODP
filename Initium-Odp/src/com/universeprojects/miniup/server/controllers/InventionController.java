@@ -37,6 +37,7 @@ public class InventionController extends PageController {
 		populateKnowledgePageData(request, db, invention);
 		populateExperimentPageData(request, db, invention);
 		populateIdeaPageData(request, db, invention);
+		populateConstructItemSkillPageData(request, db, invention);
 		
 		
 		return "/WEB-INF/odppages/ajax_invention.jsp";
@@ -112,6 +113,35 @@ public class InventionController extends PageController {
 		if (ideas.isEmpty())
 			hasIdeas = false;
 		request.setAttribute("hasIdeas", hasIdeas);
+	}
+	
+	private void populateConstructItemSkillPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
+	{
+		List<CachedEntity> constructItemSkills = invention.getAllItemConstructionSkills();
+		Map<Key, CachedEntity> itemDefs = invention.getAllItemDefsForItemConstructionIdeas();
+		
+		List<Map<String, Object>> skills = new ArrayList<Map<String, Object>>();
+		for(CachedEntity skill:constructItemSkills)
+		{
+			String skillName = (String)skill.getProperty("name");
+			Long skillId = skill.getId();
+			CachedEntity item = itemDefs.get((Key)skill.getProperty("item"));
+			if (item==null) continue;	// This shouldn't happen really, but if it does we'll skip.
+			String iconUrl = GameUtils.getResourceUrl(item.getProperty("icon"));
+			
+			Map<String, Object> skillData = new HashMap<String, Object>();
+			
+			skillData.put("name", skillName);
+			skillData.put("id", skillId);
+			skillData.put("icon", iconUrl);
+			
+			skills.add(skillData);
+		}
+		request.setAttribute("constructItemSkills", skills);
+		boolean hasSkills = true;
+		if (skills.isEmpty())
+			hasSkills = false;
+		request.setAttribute("hasIdeas", hasSkills);
 	}
 	
 	private void populateExperimentPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)

@@ -141,4 +141,34 @@ public abstract class ODPInventionService extends Service
 		// TODO Auto-generated method stub
 		
 	}
+
+	public CachedEntity createBaseSkillFromIdea(Key key, CachedEntity idea, EntityPool pool)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public CachedEntity createBaseItemFromSkill(CachedEntity skill, EntityPool pool)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<CachedEntity> getAllItemConstructionSkills()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<Key> getAllItemConstructionSkillKeys()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void poolConstructItemSkill(EntityPool pool, CachedEntity entity)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

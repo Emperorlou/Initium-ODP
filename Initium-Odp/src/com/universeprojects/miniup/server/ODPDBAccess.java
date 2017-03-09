@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -26,6 +27,7 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -34,7 +36,6 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheService.IdentifiableValue;
 import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
-import com.sun.org.apache.bcel.internal.classfile.CodeException;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -49,6 +50,8 @@ import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
 public class ODPDBAccess
 {
+	Logger log = Logger.getLogger(ODPDBAccess.class.getName());
+
 	public static ODPDBAccessFactory factory = null;
 	
 	final public static int welcomeMessagesLimiter = 0;
@@ -1034,6 +1037,7 @@ public class ODPDBAccess
 			discovery.setProperty("kind", entity.getKind());
 			discovery.setProperty("location1Key", entity.getProperty("location1Key"));
 			discovery.setProperty("location2Key", entity.getProperty("location2Key"));
+			discovery.setProperty("hidden", false);
 
 			// Set some default attributes
 
@@ -1048,6 +1052,7 @@ public class ODPDBAccess
 			discovery.setProperty("characterKey", character.getKey());
 			discovery.setProperty("entityKey", entity.getKey());
 			discovery.setProperty("kind", entity.getKind());
+			discovery.setProperty("hidden", false);
 
 			// Set some default attributes
 
@@ -1108,12 +1113,40 @@ public class ODPDBAccess
 		return discoveries;
 	}
 
-	public List<CachedEntity> getDiscoveriesForCharacterAndLocation(Key characterKey, Key location)
+	public List<CachedEntity> getDiscoveriesForCharacterAndLocation(Key characterKey, Key location, boolean showHidden)
 	{
-		Query q = new Query("Discovery").setFilter(CompositeFilterOperator.and(new FilterPredicate("characterKey", FilterOperator.EQUAL, characterKey),
-				CompositeFilterOperator.or(new FilterPredicate("location1Key", FilterOperator.EQUAL, location), new FilterPredicate("location2Key", FilterOperator.EQUAL, location))));
+		Collection<Filter> andFilters = new ArrayList<Filter>();
+		andFilters.add(new FilterPredicate("characterKey", FilterOperator.EQUAL, characterKey));
+		if (showHidden==false)
+			andFilters.add(new FilterPredicate("hidden", FilterOperator.EQUAL, false));
+		andFilters.add(CompositeFilterOperator.or(new FilterPredicate("location1Key", FilterOperator.EQUAL, location), new FilterPredicate("location2Key", FilterOperator.EQUAL, location)));
+		
+		CompositeFilter filters = CompositeFilterOperator.and(andFilters);
+		
+		Query q = new Query("Discovery").setFilter(filters);
 		List<CachedEntity> fetchAsList = getDB().fetchAsList(q, 1000);
-		System.out.println(fetchAsList.size() + " discoveries found.");
+
+		log.log(Level.WARNING, fetchAsList.size() + " discoveries found.");
+		
+		// TODO: Delete me after a while! This will slowly convert all discoveries to use the boolean hidden value type instead of strings of TRUE|FALSE
+		if (showHidden)
+		{
+			List<CachedEntity> entitiesToSave = null;
+			for(CachedEntity discovery:fetchAsList)
+			{
+				Object hiddenVal = discovery.getProperty("hidden");
+				if (hiddenVal==null || hiddenVal instanceof String)
+				{
+					if (entitiesToSave==null) entitiesToSave = new ArrayList<CachedEntity>();
+					discovery.setProperty("hidden", GameUtils.booleanEquals(discovery.getProperty("hidden"), true));
+					entitiesToSave.add(discovery);
+				}
+			}
+			
+			if (entitiesToSave!=null)
+				ds.put(entitiesToSave);
+		}
+		
 		return fetchAsList;
 	}
 
@@ -5039,7 +5072,8 @@ public class ODPDBAccess
 		else
 			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
 		destination = getEntity(destinationKey);
-		destination.setProperty("lastUsedDate", new Date());
+		if (CommonChecks.checkLocationIsCombatSite(destination));
+			destination.setProperty("lastUsedDate", new Date());
 		
 
 		String forceOneWay = (String)path.getProperty("forceOneWay");
@@ -5204,9 +5238,9 @@ public class ODPDBAccess
 		}
 		else
 		{
-			if ("TRUE".equals(discovery.getProperty("hidden")))
+			if (GameUtils.booleanEquals(discovery.getProperty("hidden"), true))
 			{
-				discovery.setProperty("hidden", "FALSE");
+				discovery.setProperty("hidden", false);
 				db.put(discovery);
 			}
 		}
@@ -5352,7 +5386,7 @@ public class ODPDBAccess
 		List<CachedEntity> paths = getPathsByLocation_KeysOnly(locationKey);
 		List<CachedEntity> discoveries = new ArrayList<CachedEntity>();
 		if (playerCharacter!=null)
-			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey);
+			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey, true);
 		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
 		
 
@@ -5400,7 +5434,7 @@ public class ODPDBAccess
 					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
 					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
 					{
-						discovery.setProperty("hidden", "TRUE");
+						discovery.setProperty("hidden", true);
 						ds.put(discovery);
 					}
 				}
@@ -5495,7 +5529,7 @@ public class ODPDBAccess
 		List<CachedEntity> paths = getPathsByLocation_KeysOnly(locationKey);
 		List<CachedEntity> discoveries = new ArrayList<CachedEntity>();
 		if (playerCharacter!=null)
-			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey);
+			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey, true);
 		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
 		
 
@@ -5950,6 +5984,5 @@ public class ODPDBAccess
 	{
 		return null;
 	}
-	
 	
 }

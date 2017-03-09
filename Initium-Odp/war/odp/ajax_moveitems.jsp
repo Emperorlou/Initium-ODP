@@ -160,12 +160,33 @@
 {
 	float:left;
 }
+
+.location-heading-style
+{
+	position:relative;
+}
+.location-heading-style h5
+{
+	position: absolute;
+    right: 4px;
+    bottom: 2px;
+    margin: 0px;
+}
+.location-heading-style .banner-background-image
+{
+    width: 100%;
+    height: 50px;
+    background-position: center center;
+    background-size: cover;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
 </style>
 
 </head>
 
 <body>
-		<center><h1>Item Transfer</h1></center>
+		<div class='page-popup-description'>Transfer items to and from your inventory here with this page.</div>
 		<div class='table'>
 		<div class='header-bar'>
 		<div class='header-cell'>
@@ -192,11 +213,13 @@
 		<%
 			if (otherSide.getKey().getKind().equals("Location"))
 			{
+				out.println("<div class='location-heading-style'>");
 				out.println("<h5>"+otherSide.getProperty("name")+"</h5>");
 				if (otherSide.getProperty("banner")!=null)
 				{
-					out.println("<img src='https://initium-resources.appspot.com/"+otherSide.getProperty("banner")+"' border=0 style='width:80%'/>");
+					out.println("<div class='banner-background-image' style='background-image:url(\"https://initium-resources.appspot.com/"+otherSide.getProperty("banner")+"\")' border=0 style='width:80%'></div>");
 				}
+				out.println("</div>");
 			}
 			else if (otherSide.getKey().getKind().equals("Character"))
 			{

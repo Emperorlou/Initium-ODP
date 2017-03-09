@@ -32,6 +32,18 @@ public class GameUtilsTest
 	}	
 
 	@Test
+	public void testBooleanEquals()
+	{
+		Assert.assertEquals(true, GameUtils.booleanEquals("TRUE", true));
+		Assert.assertEquals(false, GameUtils.booleanEquals("TRUE", false));
+		Assert.assertEquals(true, GameUtils.booleanEquals("FALSE", false));
+		Assert.assertEquals(false, GameUtils.booleanEquals("FALSE", true));
+
+		Assert.assertEquals(false, GameUtils.booleanEquals(null, true));
+		Assert.assertEquals(true, GameUtils.booleanEquals(null, false));
+	}
+	
+	@Test
 	public void testElapsed()
 	{
 		Date date = new Date(117,01,03, 02,53,03);

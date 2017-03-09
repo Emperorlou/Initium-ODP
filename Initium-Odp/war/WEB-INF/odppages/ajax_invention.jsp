@@ -90,6 +90,13 @@ function changeInventionTab(event)
 		<c:if test="${hasConstructItemSkills!=true}">
 			You don't have any skills that allow you to construct things at the moment.
 		</c:if>
+		<c:if test="${hasConstructItemSkills==true}">
+			<c:forEach var="skill" items="${constructItemSkills}">
+				<div class='skill-container'>
+					<a onclick='doConstructItemSkill(event, ${skill.id}, "<c:out value="${skill.name}"/>");'><img src='${skill.iconUrl}' border=0/> ${skill.name}</a>
+				</div>
+			</c:forEach>
+		</c:if>
 		
 	</div>
 </div>

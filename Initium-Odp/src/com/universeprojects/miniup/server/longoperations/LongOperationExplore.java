@@ -95,7 +95,7 @@ public class LongOperationExplore extends LongOperation {
 			List<CachedEntity> discoverablePaths = db.getPathsByLocation(locationKey);
 			
 			// And get all the things the character has discovered...
-			List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacter().getKey(), locationKey);
+			List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacter().getKey(), locationKey, true);
 			
 			
 	//		Logger.getLogger("ServletCharacterControl").log(Level.WARNING, 

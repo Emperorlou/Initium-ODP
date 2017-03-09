@@ -193,7 +193,20 @@ public abstract class CommonChecks
 		
 		return false;
 	}
-	
+
+	/**
+	 * Checks if the given location is considered a combat site.
+	 * 
+	 * @param location
+	 * @return
+	 */
+	public static boolean checkLocationIsCombatSite(CachedEntity location)
+	{
+		if ("CombatSite".equals(location.getProperty("type")))
+			return true;
+		
+		return false;
+	}
 	
 }
 

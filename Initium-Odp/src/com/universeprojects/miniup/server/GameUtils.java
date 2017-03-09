@@ -1958,6 +1958,28 @@ public class GameUtils
 		return false;
 	}
 	
+	public static boolean booleanEquals(Object fieldValue, boolean bool)
+	{
+		if (fieldValue==null)
+			return bool==false;
+		
+		if (fieldValue instanceof String)
+		{
+			if (((String) fieldValue).equalsIgnoreCase("true"))
+				return bool==true;
+			else if (((String) fieldValue).equalsIgnoreCase("false"))
+				return bool==false;
+			else
+				throw new IllegalArgumentException("Invalid field value: "+fieldValue);
+		}
+		else if (fieldValue instanceof Boolean)
+			return (Boolean)fieldValue;
+		else
+			throw new IllegalArgumentException("Invalid field value type.");
+		
+	}
+	
+	
 	public static double getWeaponMaxDamage(CachedEntity weapon)
     {
         String damageFormula = (String)weapon.getProperty("weaponDamage");

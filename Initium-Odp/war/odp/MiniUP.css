@@ -1975,6 +1975,13 @@ a.range-increment {
     border-radius: 4px;
 }
 
+.page-popup-description
+{
+	margin:4px;
+	color:#AAAAAA;
+	text-align:center;
+}
+
 .page-popup
 {
 	min-height:30px;
@@ -3132,6 +3139,11 @@ body
 .cluetip-rounded
 {
 	background-color:#000000;
+}
+
+.cluetip-rounded .cluetip-outer
+{
+	margin:7px;
 }
 
 

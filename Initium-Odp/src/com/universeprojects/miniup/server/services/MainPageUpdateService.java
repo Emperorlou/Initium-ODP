@@ -101,7 +101,7 @@ public class MainPageUpdateService extends Service
 	{
 		if (paths==null)
 		{
-			discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), location.getKey());
+			discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), location.getKey(), showHidden);
 			
 			paths = new ArrayList<CachedEntity>();
 			destLocations = new ArrayList<CachedEntity>();
@@ -208,7 +208,7 @@ public class MainPageUpdateService extends Service
 						if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
 							continue;
 				
-						if ("TRUE".equals(discovery.getProperty("hidden")) && !showHidden)
+						if (GameUtils.booleanEquals(discovery.getProperty("hidden"), true) && !showHidden)
 						{
 							// Skip this path, it's hidden
 							hasHiddenPaths = true;
@@ -618,10 +618,7 @@ public class MainPageUpdateService extends Service
 		}
 			
 		
-		if (hasHiddenPaths)
-		{
-			newHtml.append("<center><a onclick='doShowHiddenSites(event)'>Show hidden paths</a></center>");
-		}
+		newHtml.append("<center><a onclick='doShowHiddenSites(event)'>Show hidden paths</a></center>");
 		
 		return updateHtmlContents("#main-button-list", newHtml.toString());
 	}
