@@ -804,7 +804,10 @@ function collectDogecoinsFromItem(itemId, event)
 function collectDogecoinsFromCharacter(characterId, event)
 {
 	// Command updates the gold indicator as needed.
-	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId});
+	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId}, function(data,error){
+		if(error) return;
+		$(event.currentTarget).text("Collect 0 gold");
+	}
 }
 
 //function tradeSetDogecoin(currentDogecoin)
@@ -848,7 +851,7 @@ function loadLocationCharacters()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("/locationcharacterlist.jsp", null, "Nearby Characters");
+	pagePopup("/odp/locationcharacterlist", null, "Nearby Characters");
 //	$("#main-characterlist").click(function(){
 //		$("#main-characterlist").html("<div class='boldbox' onclick='loadLocationCharacters()'><h4 id='main-characterlist-close'>Nearby characters</h4></div>");
 //	});
@@ -859,7 +862,7 @@ function loadLocationMerchants()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("/locationmerchantlist.jsp", null, "Nearby Merchants");
+	pagePopup("/odp/locationmerchantlist", null, "Nearby Merchants");
 //	$("#main-merchantlist").load("locationmerchantlist.jsp");
 //	$("#main-merchantlist").click(function(){
 //		$("#main-merchantlist").html("<div class='boldbox' onclick='loadLocationMerchants()'><h4 id='main-merchantlist-close'>Nearby merchants</h4></div>");
@@ -1724,8 +1727,8 @@ function moveItem(event, itemId, newContainerKind, newContainerId)
 
 function loadInlineItemsAndCharacters()
 {
-	$("#inline-items").load("locationitemlist.jsp?ajax=true");	
-	$("#inline-characters").load("locationcharacterlist.jsp?ajax=true");	
+	$("#inline-items").load("/odp/locationitemlist?ajax=true");	
+	$("#inline-characters").load("/odp/locationcharacterlist?ajax=true");	
 }
 
 function loadInlineCollectables()
