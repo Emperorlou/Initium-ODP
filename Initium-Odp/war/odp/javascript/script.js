@@ -807,7 +807,7 @@ function collectDogecoinsFromCharacter(characterId, event)
 	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId}, function(data,error){
 		if(error) return;
 		$(event.currentTarget).text("Collect 0 gold");
-	}
+	});
 }
 
 //function tradeSetDogecoin(currentDogecoin)
