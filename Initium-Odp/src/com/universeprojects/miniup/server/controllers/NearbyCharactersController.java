@@ -64,7 +64,7 @@ public class NearbyCharactersController extends PageController {
 	    	sb.append("<div class='main-item-controls' style='top:0px'>");
             if (dead)
             {
-            	sb.append("<a onclick='collectDogecoinsFromCharacter(event, "+curChar.getId()+")'>Collect "+curChar.getProperty("dogecoins")+" gold</a> ");
+            	sb.append("<a onclick='collectDogecoinsFromCharacter("+curChar.getId()+", event)'>Collect "+curChar.getProperty("dogecoins")+" gold</a> ");
             	sb.append("<a onclick='ajaxAction(\"ServletCharacterControl?type=collectCharacter&characterId="+curChar.getId()+"\", event, reloadPagePopup)'>Pick up</a>");
             }
             

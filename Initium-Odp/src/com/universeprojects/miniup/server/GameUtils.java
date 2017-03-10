@@ -1001,7 +1001,7 @@ public class GameUtils
     	String attackText = "Attack with bare hands";
     	if(item != null)
     	{
-    		attackText = ("Shield".equals(item.getProperty("type")) ? "Bash with " : "Attack with ") + 
+    		attackText = ("Shield".equals(item.getProperty("itemType")) ? "Bash with " : "Attack with ") + 
     				item.getProperty("name");
     	}
     	

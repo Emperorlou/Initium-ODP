@@ -806,7 +806,7 @@ function collectDogecoinsFromCharacter(characterId, event)
 	// Command updates the gold indicator as needed.
 	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId}, function(data,error){
 		if(error) return;
-		$(event.currentTarget).text("Collect 0 gold");
+		$(event.currentTarget || event.target).text("Collect 0 gold");
 	});
 }
 
