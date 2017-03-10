@@ -644,7 +644,7 @@ public class MainPageUpdateService extends Service
 			List<CachedEntity> weapons = db.getEntities((Key)character.getProperty("equipmentLeftHand"), (Key)character.getProperty("equipmentRightHand"));
 			newHtml.append(GameUtils.renderWeaponCommand(weapons.get(0), true));
 			newHtml.append(GameUtils.renderWeaponCommand(weapons.get(1), false));
-			newHtml.append("<a onclick='doCombatEscape()' class='main-button' shortcut='51'><span class='shortcut-key'>(3)</span>Try to run away</a>");
+			newHtml.append("<a onclick='doCombatEscape(event)' class='main-button' shortcut='51'><span class='shortcut-key'>(3)</span>Try to run away</a>");
 		}
 		
 		return updateHtmlContents(".main-buttonbox", newHtml.toString());
