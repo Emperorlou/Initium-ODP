@@ -995,6 +995,21 @@ public class GameUtils
 		else
 			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
+    
+    public static String renderWeaponCommand(CachedEntity item, boolean leftHand)
+    {
+    	String attackText = "Attack with bare hands";
+    	if(item != null)
+    	{
+    		attackText = ("Shield".equals(item.getProperty("type")) ? "Bash with " : "Attack with ") + 
+    				item.getProperty("name");
+    	}
+    	
+    	return "<a onclick='doCombatAttack" 
+    		+ (leftHand ? "Left" : "Right") + "Hand()' class='main-button' shortcut='" 
+    		+ (leftHand ? "49" : "50") + "'><span class='shortcut-key'>(" 
+    		+ (leftHand ? "1" : "2") + ")</span>" + attackText + "</a>";
+    }
 
     public static String renderCollectable(CachedEntity item)
     {
