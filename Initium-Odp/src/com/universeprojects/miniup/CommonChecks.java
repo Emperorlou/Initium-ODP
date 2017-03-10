@@ -3,6 +3,7 @@ package com.universeprojects.miniup;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
 
 public abstract class CommonChecks
@@ -208,12 +209,20 @@ public abstract class CommonChecks
 		return false;
 	}
 	
+	/**
+	 * Checks if the given slot exists in the list of available equipment slots.
+	 * 
+	 * @param slot
+	 * @return
+	 */
+	public static boolean checkIsValidEquipSlot(String slot)
+	{
+		if(slot == null || slot.isEmpty()) return false;
+		
+		for(String str:ODPDBAccess.EQUIPMENT_SLOTS)
+			if(slot.equals(str))
+				return true;
+		
+		return false;
+	}
 }
-
-
-
-
-
-
-
-

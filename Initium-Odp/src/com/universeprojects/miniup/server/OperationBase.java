@@ -12,6 +12,13 @@ import java.util.Map;
 
 public abstract class OperationBase
 {
+	/**
+	 * Method stub. Returns back an ODPAuthenticator object to use in various ODPDBAccess methods.
+	 * @return
+	 */
+	protected ODPAuthenticator getAuthenticator(){
+		return null;
+	}
 
 	private List<Map<String, String>> htmlUpdates = new ArrayList<Map<String, String>>();
 	private List<JSONObject> gridCellUpdates = new ArrayList<>();
@@ -65,6 +72,8 @@ public abstract class OperationBase
 	 * The new javascript <script> tag will also have the same id as the one deleted.
 	 * 
 	 *
+	 * @param jquerySelector
+	 * @param newHtml
 	 */
 	public void updateJavascript(String elementId, String newJavascript)
 	{

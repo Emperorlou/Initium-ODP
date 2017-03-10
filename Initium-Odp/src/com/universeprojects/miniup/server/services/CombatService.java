@@ -67,7 +67,15 @@ public class CombatService extends Service
 		else
 			return false;
 	}
-	
+
+	public boolean isInDefenseStructure(CachedEntity character, CachedEntity location)
+	{
+		Key defenceStructure = (Key)location.getProperty("defenceStructure");
+		if (defenceStructure==null && "Instance".equals(location.getProperty("combatType"))==false)
+			return false;
+		return true;
+	}	
+
 	/**
 	 * Removes all items from the specified character for which the strength requirement
 	 * is no longer met (i.e. a buff is applied or expires).
