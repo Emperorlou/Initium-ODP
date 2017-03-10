@@ -1006,7 +1006,7 @@ public class GameUtils
     	}
     	
     	return "<a onclick='doCombatAttack" 
-    		+ (leftHand ? "Left" : "Right") + "Hand()' class='main-button' shortcut='" 
+    		+ (leftHand ? "Left" : "Right") + "Hand(event)' class='main-button' shortcut='" 
     		+ (leftHand ? "49" : "50") + "'><span class='shortcut-key'>(" 
     		+ (leftHand ? "1" : "2") + ")</span>" + attackText + "</a>";
     }
