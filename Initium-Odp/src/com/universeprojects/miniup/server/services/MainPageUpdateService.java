@@ -12,6 +12,8 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.WebUtils;
+import com.universeprojects.miniup.server.commands.framework.Command;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 public class MainPageUpdateService extends Service
 {
@@ -365,6 +367,16 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
 	}
+	
+	/**
+	 * This updates the html in the combatant widget that is in the top right corner of the banner.
+	 */
+	public String updateInBannerCombatantWidget(CachedEntity combatant)
+	{
+		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, combatant, null, false);
+		
+		return updateHtmlContents("#inBannerCombatantWidget", newHtml);
+	}
 
 	/**
 	 * This updates the TestPanel if environment is currently in test
@@ -618,7 +630,7 @@ public class MainPageUpdateService extends Service
 		}
 			
 		
-		newHtml.append("<center><a onclick='doShowHiddenSites(event)'>Show hidden paths</a></center>");
+			newHtml.append("<center><a onclick='doShowHiddenSites(event)'>Show hidden paths</a></center>");
 		
 		return updateHtmlContents("#main-button-list", newHtml.toString());
 	}
@@ -630,7 +642,29 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#main-button-list", newHtml.toString());
 		
 	}
+	
 
+	public String updateCombatView(CombatService cs, CachedEntity combatant, String combatResult)
+	{
+		StringBuilder csb = new StringBuilder();
+		if(cs.isInCombat(character))
+		{
+			// Handle updating all the combat UI: widgets, button lists, and combat results.
+			csb.append(updateInBannerCharacterWidget());
+			csb.append(updateInBannerCombatantWidget(combatant));
+			csb.append(updateButtonList(cs));
+		}
+		
+		if(combatResult != null && combatResult.isEmpty()==false)
+		{
+			db.addGameMessage(db.getDB(), character.getKey(), combatResult);
+			operation.updateHtmlContents("#combatDescriptionText", combatResult);
+		}
+		
+		// Empty string is the non-combat condition, which will be used to update 
+		// game state for first pass, which will be refresh.
+		return csb.toString();
+	}
 	
 	public String updateLocationJs()
 	{
