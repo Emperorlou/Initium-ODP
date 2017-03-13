@@ -171,4 +171,11 @@ public abstract class ODPInventionService extends Service
 		// TODO Auto-generated method stub
 		
 	}
+
+	public Map<Key, CachedEntity> getAllItemsForItemConstructionSkills()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

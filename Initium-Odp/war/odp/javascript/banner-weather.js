@@ -107,6 +107,7 @@ function updateDayNightCycle(forceRefresh)
 	if (Modernizr.backgroundblendmode==false || Modernizr.multiplebgs==false)
 	{
 		banner.css("background", "url('"+bannerUrl+"') no-repeat center center");
+		banner.css("background-size", "cover");
 		return;
 	}
 	

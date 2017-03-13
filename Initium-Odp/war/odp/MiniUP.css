@@ -276,6 +276,7 @@ hr:after {
 {
 	position:relative;
 	top:14px;
+	background-size:cover;
 }
 
 .main-banner-textonly

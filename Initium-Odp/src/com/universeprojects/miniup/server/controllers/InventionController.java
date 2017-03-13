@@ -118,14 +118,14 @@ public class InventionController extends PageController {
 	private void populateConstructItemSkillPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
 	{
 		List<CachedEntity> constructItemSkills = invention.getAllItemConstructionSkills();
-		Map<Key, CachedEntity> itemDefs = invention.getAllItemDefsForItemConstructionIdeas();
+		Map<Key, CachedEntity> items = invention.getAllItemsForItemConstructionSkills();
 		
 		List<Map<String, Object>> skills = new ArrayList<Map<String, Object>>();
 		for(CachedEntity skill:constructItemSkills)
 		{
 			String skillName = (String)skill.getProperty("name");
 			Long skillId = skill.getId();
-			CachedEntity item = itemDefs.get((Key)skill.getProperty("item"));
+			CachedEntity item = items.get((Key)skill.getProperty("item"));
 			if (item==null) continue;	// This shouldn't happen really, but if it does we'll skip.
 			String iconUrl = GameUtils.getResourceUrl(item.getProperty("icon"));
 			
@@ -141,7 +141,7 @@ public class InventionController extends PageController {
 		boolean hasSkills = true;
 		if (skills.isEmpty())
 			hasSkills = false;
-		request.setAttribute("hasIdeas", hasSkills);
+		request.setAttribute("hasConstructItemSkills", hasSkills);
 	}
 	
 	private void populateExperimentPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
