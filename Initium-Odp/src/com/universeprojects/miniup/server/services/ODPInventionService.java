@@ -178,4 +178,10 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
+	public void checkSkillWithSelectedItems(EntityPool pool, CachedEntity skill, Map<Key, Key> itemRequirementsToItems) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }
