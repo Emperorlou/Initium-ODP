@@ -171,4 +171,17 @@ public abstract class ODPInventionService extends Service
 		// TODO Auto-generated method stub
 		
 	}
+
+	public Map<Key, CachedEntity> getAllItemsForItemConstructionSkills()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void checkSkillWithSelectedItems(EntityPool pool, CachedEntity skill, Map<Key, Key> itemRequirementsToItems) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

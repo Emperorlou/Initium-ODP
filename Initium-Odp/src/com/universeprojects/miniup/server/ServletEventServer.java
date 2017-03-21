@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server;
 
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -120,16 +121,19 @@ public class ServletEventServer extends HttpServlet
 				}
 				String characterName = (String)character.getProperty("name");
 				
+				JSONObject payload = new JSONObject();
+				Date d = new Date();
+				payload.put("timestamp", d.getTime());
 				switch(channel) {
 				case "public":
 					respBody.put("id", "public");
-					respBody.put("formattedMsg", characterName + ": " + contents);
+					payload.put("formattedMsg", characterName + ": " + contents);
 					respBody.put("success", true);
 					break;
 				case "location":
 					Long locationId = ((Key)character.getProperty("locationKey")).getId();
 					respBody.put("id", "L"+locationId);
-					respBody.put("formattedMsg", characterName + ": " + contents);
+					payload.put("formattedMsg", characterName + ": " + contents);
 					respBody.put("success", true);
 					break;
 				case "group":
@@ -138,7 +142,7 @@ public class ServletEventServer extends HttpServlet
 						Long gId = ((Key)character.getProperty("groupKey")).getId();
 						groupId = "G" + gId.toString();
 						respBody.put("id", groupId);
-						respBody.put("formattedMsg", characterName + ": " + contents);
+						payload.put("formattedMsg", characterName + ": " + contents);
 						respBody.put("success", true);
 					}
 					break;
@@ -148,7 +152,7 @@ public class ServletEventServer extends HttpServlet
 					if (partyCode != null) {
 						partyId = "P" + partyCode;
 						respBody.put("id", partyId);
-						respBody.put("formattedMsg", characterName + ": " + contents);
+						payload.put("formattedMsg", characterName + ": " + contents);
 						respBody.put("success", true);
 					}
 					break;
@@ -160,6 +164,7 @@ public class ServletEventServer extends HttpServlet
 					
 					break;
 				}
+				respBody.put("payload", payload);
 				break;
 			}
 			System.out.println("responding with: " + respBody.toJSONString());

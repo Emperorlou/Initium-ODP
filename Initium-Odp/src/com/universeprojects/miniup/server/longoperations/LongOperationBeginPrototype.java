@@ -74,7 +74,6 @@ public class LongOperationBeginPrototype extends LongOperation
 		@SuppressWarnings("unchecked")
 		Map<Key, Key> itemRequirementsToItems = (Map<Key, Key>)data.get("selectedItems");
 		
-		ds.beginBulkWriteMode();
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity idea = db.getEntity("ConstructItemIdea", (Long)data.get("ideaId"));
 		
@@ -103,7 +102,6 @@ public class LongOperationBeginPrototype extends LongOperation
 		// Give the player a message that points to the skill and the new item he made
 		setUserMessage("You have a new skill! You successfully turned your idea of "+idea.getProperty("name")+" into a skill. A prototype of your skill is now in your inventory.<br><br>You created an item: "+GameUtils.renderItem(item));
 		
-		ds.commitBulkWrite();
 		
 		return "Experimentation complete.";
 	}
