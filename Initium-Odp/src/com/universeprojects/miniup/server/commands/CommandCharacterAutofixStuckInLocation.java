@@ -15,6 +15,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 /**
  * Checks to see if a character is stuck in a location with no discoverable paths available. If the character
@@ -64,5 +65,6 @@ public class CommandCharacterAutofixStuckInLocation extends Command {
 		character.setProperty("locationKey", parentLocation);
 		//I think this should be a good enough fix, even if the parent is invalid since characters with
 		//an invalid locationKey are sent to their hometownKey (or default spawn loc if hometown is invalid)
+		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 	}
 }

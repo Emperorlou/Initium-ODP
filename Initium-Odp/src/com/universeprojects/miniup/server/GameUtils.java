@@ -1327,6 +1327,7 @@ public class GameUtils
 			sb.append("<h5 style='margin-top:0px;'>"+character.getProperty("name")+"'s Options</h5>");
 			sb.append("<p><a onclick='viewProfile()'>View "+character.getProperty("name")+"'s profile</a></p>");
 			sb.append("<p><a onclick='popupCharacterTransferService("+character.getKey().getId()+", \""+character.getProperty("name")+"\", \""+request.getAttribute("characterToTransfer")+"\")' style='cursor:pointer'>Open the Character Transfer Service</a></p>");
+			sb.append("<p><a onclick='viewAutofix()'>Help! Something's Wrong!</a></p>");
 			sb.append("<p><a onclick='logout()'>Logout</a></p>");
 			if (request.getAttribute("characterList")!=null)
 			{
