@@ -2335,7 +2335,7 @@ function doRenameConstructItemSkill(event, currentName, skillId)
 function doForgetConstructItemSkill(event, name, skillId)
 {
 	closeAllTooltips();
-	
+
 	confirmPopup("Permanently Forget Skill", "Are you sure you want to forget the "+name+" skill? You cannot undo this operation.", function(){
 		doCommand(event, "ConstructItemSkillForget", {skillId:skillId});
 	});
@@ -2466,13 +2466,13 @@ function activateWaitGif(eventObject)
 			originalText = clickedElement.html();
 			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
 		}
-	}
+		}
 	
 	return function(){
 		if (eventObject!=null)
 		{
 			clickedElement.html(originalText.replace("hasTooltip", ""));
-		}
+	}
 	};
 	
 }
@@ -2705,7 +2705,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 		actionUrl+="&ajax=true";
 	else
 		actionUrl+="?ajax=true";
-
+	
 	ga('send', 'pageview', actionUrl);	
 	
 	$.get(actionUrl)
@@ -2873,7 +2873,7 @@ function doExperiment(event)
 
 function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 {
-	
+
 	var selectedItems = null;
 	if (userRequestId!=null)
 		selectedItems = confirmRequirements_collectChoices(event);
@@ -3066,7 +3066,7 @@ function handleUserRequest(data)
 		data.pagePopupUrl+="&userRequestId="+data.userRequestId;
 	else
 		data.pagePopupUrl+="?userRequestId="+data.userRequestId;
-	
+
 	closeAllPopups();
 	closeAllTooltips();
 	pagePopup(data.pagePopupUrl, null, data.pagePopupTitle);
