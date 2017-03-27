@@ -17,8 +17,6 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.services.ODPInventionService;
-import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
@@ -27,7 +25,8 @@ public class ConfirmRequirementsController extends PageController
 {
 	public enum Type
 	{
-		IdeaToPrototype 
+		IdeaToPrototype,
+		ConstructItemSkill
 	}
 	
 	public ConfirmRequirementsController()
@@ -38,6 +37,8 @@ public class ConfirmRequirementsController extends PageController
 	@Override
 	protected String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		request.setAttribute("userRequestId", request.getParameter("userRequestId"));
+		
 		Type type = determineType(request);
 		
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
@@ -47,6 +48,10 @@ public class ConfirmRequirementsController extends PageController
 		if (type == Type.IdeaToPrototype)
 		{
 			processForCreatePrototype(request, db);
+		}
+		else if (type == Type.ConstructItemSkill)
+		{
+			processForConstructItemSkill(request, db);
 		}
 		
 		
@@ -117,32 +122,61 @@ public class ConfirmRequirementsController extends PageController
 		EntityPool pool = new EntityPool(ds);
 		Long ideaId = Long.parseLong(request.getParameter("ideaId"));
 		CachedEntity idea = db.getEntity(KeyFactory.createKey("ConstructItemIdea", ideaId));
+		CachedEntity ideaDef = db.getEntity((Key)idea.getProperty("_definitionKey"));
 		
 		// Make sure the idea we're processing is actually owned by the character who is executing it
 		if (GameUtils.equals(idea.getProperty("characterKey"), character.getKey())==false)
 			throw new IllegalArgumentException("Possible hack attempt. An ideaId from a different character was used.");
 		
-		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());
-		ODPInventionService invention = db.getInventionService(character, knowledgeService);
-
 		// Load all the generic entity requirements (but not the subentities. That's why I didn't use inventionservice.poolConstructItemIdea())
-		pool.addToQueue(idea.getProperty("skillMaterialsRequired"));
-		pool.addToQueue(idea.getProperty("prototypeItemsConsumed"));
-		pool.addToQueue(idea.getProperty("skillMaterialsOptional"));
-		pool.addToQueue(idea.getProperty("skillToolsRequired"));
-		pool.addToQueue(idea.getProperty("prototypeItemsRequired"));
-		pool.addToQueue(idea.getProperty("skillToolsOptional"));
+		pool.addToQueue(ideaDef.getProperty("skillMaterialsRequired"));
+		pool.addToQueue(ideaDef.getProperty("prototypeItemsConsumed"));
+		pool.addToQueue(ideaDef.getProperty("skillMaterialsOptional"));
+		pool.addToQueue(ideaDef.getProperty("skillToolsRequired"));
+		pool.addToQueue(ideaDef.getProperty("prototypeItemsRequired"));
+		pool.addToQueue(ideaDef.getProperty("skillToolsOptional"));
 
 		pool.loadEntities();
 		
-		addGenericEntityRequirements(request, pool, "Required Materials", idea.getProperty("skillMaterialsRequired"));
-		addGenericEntityRequirements(request, pool, "Required Materials", idea.getProperty("prototypeItemsConsumed"));
-		addGenericEntityRequirements(request, pool, "Optional Materials", idea.getProperty("skillMaterialsOptional"));
-		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", idea.getProperty("skillToolsRequired"));
-		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", idea.getProperty("prototypeItemsRequired"));
-		addGenericEntityRequirements(request, pool, "Optional Tools/Equipment", idea.getProperty("skillToolsOptional"));
+		addGenericEntityRequirements(request, pool, "Required Materials", ideaDef.getProperty("skillMaterialsRequired"));
+		addGenericEntityRequirements(request, pool, "Required Materials", ideaDef.getProperty("prototypeItemsConsumed"));
+		addGenericEntityRequirements(request, pool, "Optional Materials", ideaDef.getProperty("skillMaterialsOptional"));
+		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", ideaDef.getProperty("skillToolsRequired"));
+		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", ideaDef.getProperty("prototypeItemsRequired"));
+		addGenericEntityRequirements(request, pool, "Optional Tools/Equipment", ideaDef.getProperty("skillToolsOptional"));
 		
 		request.setAttribute("ideaId", ideaId);
+		request.setAttribute("ideaName", idea.getProperty("name"));
+	}
+	
+	
+	private void processForConstructItemSkill(HttpServletRequest request, ODPDBAccess db)
+	{
+		CachedEntity character = db.getCurrentCharacter(); 
+		CachedDatastoreService ds = db.getDB();
+		EntityPool pool = new EntityPool(ds);
+		Long skillId = Long.parseLong(request.getParameter("constructItemSkillId"));
+		CachedEntity skill = db.getEntity(KeyFactory.createKey("ConstructItemSkill", skillId));
+		
+		// Make sure the idea we're processing is actually owned by the character who is executing it
+		if (GameUtils.equals(skill.getProperty("characterKey"), character.getKey())==false)
+			throw new IllegalArgumentException("Possible hack attempt. An skillId from a different character was used.");
+		
+		// Load all the generic entity requirements (but not the subentities. That's why I didn't use inventionservice.poolConstructItemIdea())
+		pool.addToQueue(skill.getProperty("skillMaterialsRequired"));
+		pool.addToQueue(skill.getProperty("skillMaterialsOptional"));
+		pool.addToQueue(skill.getProperty("skillToolsRequired"));
+		pool.addToQueue(skill.getProperty("skillToolsOptional"));
+
+		pool.loadEntities();
+		
+		addGenericEntityRequirements(request, pool, "Required Materials", skill.getProperty("skillMaterialsRequired"));
+		addGenericEntityRequirements(request, pool, "Optional Materials", skill.getProperty("skillMaterialsOptional"));
+		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", skill.getProperty("skillToolsRequired"));
+		addGenericEntityRequirements(request, pool, "Optional Tools/Equipment", skill.getProperty("skillToolsOptional"));
+		
+		request.setAttribute("skillId", skillId);
+		request.setAttribute("skillName", skill.getProperty("name"));
 	}
 	
 	
@@ -186,6 +220,8 @@ public class ConfirmRequirementsController extends PageController
 	{
 		if (request.getParameterMap().containsKey("ideaId"))
 			return Type.IdeaToPrototype;
+		else if (request.getParameterMap().containsKey("constructItemSkillId"))
+			return Type.ConstructItemSkill;
 		
 		throw new IllegalArgumentException("Unable to determine type for confirm requirements page.");
 	}

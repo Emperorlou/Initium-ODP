@@ -69,6 +69,7 @@ public class ViewProfileController extends PageController {
 			request.setAttribute("inGroup", false);
 		}
 
+		request.setAttribute("maximumCharacterCount", db.getUserCharacterSlotCount(user));
 		
 		// User specific info
 		Long totalDonations = null;
@@ -94,6 +95,8 @@ public class ViewProfileController extends PageController {
 		Double donationDollars = totalDonations.doubleValue()/100;
 		request.setAttribute("donationHistory", "$"+GameUtils.formatNumber(donationHistoryDollars));
 		request.setAttribute("totalDonations", "$"+GameUtils.formatNumber(donationDollars));
+		
+		
 		
 		return "/WEB-INF/odppages/view_profile.jsp";
 	}

@@ -165,7 +165,7 @@ messager.checkClientSideChatCommands = function(chatMessage)
 		}
 	}
 	return false;
-}
+};
 
 function changeChatTab(code)
 {

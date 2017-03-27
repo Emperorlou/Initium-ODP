@@ -175,7 +175,7 @@ public abstract class CommonChecks
 	 */
 	public static boolean checkIdeaIsCharacters(CachedEntity idea, Key characterKey)
 	{
-		if (characterKey.equals(idea.getProperty("characterKey")))
+		if (GameUtils.equals(characterKey, idea.getProperty("characterKey")))
 			return true;
 		
 		return false;
@@ -224,5 +224,12 @@ public abstract class CommonChecks
 				return true;
 		
 		return false;
+	}
+
+	public static boolean checkUserIsPremium(CachedEntity user)
+	{
+		if (user==null) return false;
+		Boolean isPremium = Boolean.TRUE.equals(user.getProperty("premium"));
+		return isPremium;
 	}
 }

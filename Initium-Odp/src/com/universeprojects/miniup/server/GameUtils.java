@@ -35,6 +35,7 @@ public class GameUtils
 {
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
+	final static DecimalFormat singleDigitFormat = new DecimalFormat("#,##0.0");
 	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,##0.00");
 	final static DecimalFormat noDigitFormat = new DecimalFormat("#,###");
 	final static DateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yyyy HH:mm:ss");
@@ -646,7 +647,7 @@ public class GameUtils
 	    	if ("Junk".equals(qualityClassOverride))
 	    		qualityClass = "item-junk";
 	    	else if ("Average".equals(qualityClassOverride))
-	    		qualityClass = "";
+	    		qualityClass = "item-normal";
 	    	else if ("Rare".equals(qualityClassOverride))
 	    		qualityClass = "item-rare";
 	    	else if ("Unique".equals(qualityClassOverride))
@@ -926,15 +927,15 @@ public class GameUtils
     
     public static String renderItem(CachedEntity item)
     {
-    	return renderItem(null, null, null, item, false);
+    	return renderItem(null, null, null, item, false, false);
     }
     
     public static String renderItem(ODPDBAccess db, CachedEntity character, CachedEntity item)
     {
-    	return renderItem(db, null, character, item, false);
+    	return renderItem(db, null, character, item, false, false);
     }
     
-    public static String renderItem(ODPDBAccess db, HttpServletRequest request, CachedEntity character, CachedEntity item, boolean popupEmbedded)
+    public static String renderItem(ODPDBAccess db, HttpServletRequest request, CachedEntity character, CachedEntity item, boolean popupEmbedded, boolean smallMode)
     {
 		if (item==null)
 			return "";
@@ -986,8 +987,15 @@ public class GameUtils
 		
 		Long quantity = (Long)item.getProperty("quantity");
 		String quantityDiv = "";
-		if (quantity!=null){
-			quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div></div>";
+		if (quantity!=null)
+		{
+			if (quantity>10000L && smallMode)
+				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+noDigitFormat.format(quantity.doubleValue()/1000D)+" k</div></div>";
+			else if (quantity>1000L && smallMode)
+				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+singleDigitFormat.format(quantity.doubleValue()/1000D)+" k</div></div>";
+			else
+				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div></div>";
+				
 		}
 		
 		if (popupEmbedded)
@@ -1352,7 +1360,7 @@ public class GameUtils
 			}
 			else
 			{
-				sb.append("<p>To enable multiple character support, <a href='profile.jsp'>upgrade to premium!</a></p>");
+				sb.append("<p>To enable multiple character support, <a onclick='viewProfile()'>upgrade to premium!</a></p>");
 			}
 			
 			

@@ -15,11 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.miniup.server.Convert;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
+import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.CaptchaService;
@@ -114,11 +116,21 @@ public abstract class LongOperation extends OperationBase
 		return false;
 	}
 	
+	/**
+	 * Returns true if the user is to see how much time is left on the long operation.
+	 * 
+	 * @return
+	 */
+	public boolean isShowingTimeLeft()
+	{
+		return true;
+	}
+	
 	
 	/**
 	 * This causes the long operation to start.
 	 */
-	public void begin() throws UserErrorMessage
+	public void begin() throws UserErrorMessage, UserRequestIncompleteException
 	{
 		if (data==null)
 			data = new HashMap<String, Object>();
@@ -136,7 +148,7 @@ public abstract class LongOperation extends OperationBase
 		putLongOperationToMC(data);
 	}
 	
-	public String complete() throws UserErrorMessage
+	public String complete() throws UserErrorMessage, UserRequestIncompleteException
 	{
 		try
 		{
@@ -165,14 +177,14 @@ public abstract class LongOperation extends OperationBase
 	}
 	
 	
-	abstract int doBegin(Map<String, String> parameters) throws UserErrorMessage;
+	abstract int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException;
 	
 	/**
 	 * 
 	 * @return Text output that the player will see after completing this operation.
 	 * @throws UserErrorMessage
 	 */
-	abstract String doComplete() throws UserErrorMessage;
+	abstract String doComplete() throws UserErrorMessage, UserRequestIncompleteException;
 	
 	
 	public Map<String, Object> getStateData()
@@ -187,6 +199,7 @@ public abstract class LongOperation extends OperationBase
 		result.put("message", userMessage);
 		result.put("responseHtml", getHtmlUpdates());
 		result.put("_2dViewportUpdates", getMapUpdateJSON());
+		result.put("isShowingTimeLeft", isShowingTimeLeft());
 		
 		
 		result.put("refresh", fullRefresh);
@@ -227,6 +240,11 @@ public abstract class LongOperation extends OperationBase
 		} catch (UserErrorMessage e) {
 			sendErrorMessage(response, e.getMessage());
 			cancelLongOperations(db, db.getCurrentCharacter().getKey());
+			return;
+		}
+		catch(UserRequestIncompleteException e)
+		{
+			sendUserRequest(response, e);
 			return;
 		}
 		catch (GameStateChangeException e)
@@ -271,6 +289,19 @@ public abstract class LongOperation extends OperationBase
 		if (message!=null)
 			result.put("error", message);
 		result.put("refresh", true);
+		out.print(result.toJSONString());
+		out.flush();
+		out.close();
+	}
+
+	public static void sendUserRequest(HttpServletResponse response, UserRequestIncompleteException e) throws IOException {
+		response.setContentType("application/json");
+		PrintWriter out = response.getWriter();
+		JSONObject result = new JSONObject();
+		result.put("message", e.playerMessage);
+		result.put("pagePopupUrl", e.pagePopupUrl);
+		result.put("pagePopupTitle", e.pagePopupTitle);
+		result.put("userRequestId", e.userRequestId);
 		out.print(result.toJSONString());
 		out.flush();
 		out.close();

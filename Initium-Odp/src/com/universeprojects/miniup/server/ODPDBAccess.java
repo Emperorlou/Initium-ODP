@@ -5984,5 +5984,31 @@ public class ODPDBAccess
 	{
 		return null;
 	}
+
+	public Long getUserCharacterSlotCount(CachedEntity user)
+	{
+		if (user==null) return 1L;
+		Long count = (Long)user.getProperty("maximumCharacterCount");
+		if (count==null)
+		{
+			if (CommonChecks.checkUserIsPremium(user))
+				count = 8L;
+			else
+				count = 1L;
+		}
+		
+		return count;
+	}
 	
+	public List<CachedEntity> getUserCharacters(CachedEntity user)
+	{
+		List<CachedEntity> chars = getFilteredList("Character", "userKey", user.getKey());
+		for(int i = chars.size()-1; i>=0; i--)
+		{
+			if (CommonChecks.checkCharacterIsDead(chars.get(i)))
+				chars.remove(i);
+		}
+		
+		return chars;
+	}
 }
