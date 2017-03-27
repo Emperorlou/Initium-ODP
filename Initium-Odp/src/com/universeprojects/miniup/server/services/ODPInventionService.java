@@ -142,17 +142,6 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
-	public CachedEntity createBaseSkillFromIdea(Key key, CachedEntity idea, EntityPool pool)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public CachedEntity createBaseItemFromSkill(CachedEntity skill, EntityPool pool)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public List<CachedEntity> getAllItemConstructionSkills()
 	{
@@ -179,6 +168,24 @@ public abstract class ODPInventionService extends Service
 	}
 
 	public void checkSkillWithSelectedItems(EntityPool pool, CachedEntity skill, Map<Key, Key> itemRequirementsToItems) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public CachedEntity doCreateConstructItemPrototype(CachedEntity idea, Map<Key, Key> itemRequirementsToItems, EntityPool pool) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public CachedEntity doConstructItemSkill(CachedEntity skill, Map<Key, Key> itemRequirementsToItems, EntityPool pool) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void processConstructItemSkillForProcessVariables(CachedEntity skill, Map<Key, Key> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool)
 	{
 		// TODO Auto-generated method stub
 		

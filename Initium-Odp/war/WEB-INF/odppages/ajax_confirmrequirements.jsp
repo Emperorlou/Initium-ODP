@@ -48,6 +48,7 @@
 	.selectarea
 	{
 		position:relative;
+		vertical-align:middle;
 	}
 	.selectarea .X
 	{
@@ -117,7 +118,7 @@ function unselectItem(event)
 		event.stopPropagation();
 }
 
-function collectChoices(event)
+function confirmRequirements_collectChoices(event)
 {
 	
 	var result = {};
@@ -145,7 +146,12 @@ function collectChoices(event)
 </c:forEach>
 <br>
 <div class='center'>
-	<a onclick='doBeginPrototype(event, ${ideaId}, collectChoices(event))' class='big-link'>Start Prototyping</a>
+	<c:if test="${type=='IdeaToPrototype'}">
+		<a onclick='doCreatePrototype(event, ${ideaId}, "${ideaName}", "${userRequestId}")' class='big-link'>Start Prototyping</a>
+	</c:if>
+	<c:if test="${type=='ConstructItemSkill'}">
+		<a onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}")' class='big-link'>Begin</a>
+	</c:if>
 </div>
 
 </div>
