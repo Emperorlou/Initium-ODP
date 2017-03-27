@@ -44,6 +44,8 @@ That should do it.
 I personally use TortoiseGIT. You can download that here: 
 https://tortoisegit.org/
 
+(If you’re using Mac OSX, you’ll need an alternative to TortoiseGIT. SourceTree is a great option, found at https://www.sourcetreeapp.com/)
+
 Before you clone the repo, create a fork of this project in GitHub, then create an upstream repo to link back to the root.
 
 From your own fork, click the "Clone or download" button, and copy the path (typically https://github.com/*username*/initium-odp.git). Right-click a folder in Explorer, and select `Git Clone...`. Paste the link you copied in URL, and specify the directory where you'll be working on your fork. 
