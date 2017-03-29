@@ -16,7 +16,9 @@ import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ConfirmIdeaRequirementsBuilder;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -32,21 +34,42 @@ public class LongOperationBeginPrototype extends LongOperation
 	@Override
 	public String getPageRefreshJavascriptCall() {
 		Long ideaId = (Long)data.get("ideaId");
-		return "doBeginPrototype(null, "+ideaId+", selectedItems);";
+		String ideaName = ((String)data.get("ideaName")).replace("'", "\\'");
+		return "doCreatePrototype(null, "+ideaId+", '"+ideaName+"');"; 
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	int doBegin(Map<String, String> parameters) throws UserErrorMessage
+	int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 	{
 		Long ideaId = Long.parseLong(parameters.get("ideaId"));
 		Key ideaKey = KeyFactory.createKey("ConstructItemIdea", ideaId);
 		CachedEntity idea = db.getEntity(ideaKey);
+		if (idea==null)
+			throw new UserErrorMessage("Invalid idea specified.");
 		
 		CachedEntity character = db.getCurrentCharacter();
 		
 		doChecks(character, idea);
 		
-		Map<Key, Key> itemRequirementsToItems = getSelectedItems(parameters.get("selectedItems"));
+//		pool.addToQueue(entity.getProperty("prototypeItemsConsumed"));
+//		pool.addToQueue(entity.getProperty("prototypeItemsRequired"));
+//		pool.addToQueue(entity.getProperty("skillCharacterProcessAffectors"));
+//		pool.addToQueue(entity.getProperty("skillCharacterResultAffectors"));
+//		pool.addToQueue(entity.getProperty("skillKnowledgeRequirements"));
+//		pool.addToQueue(entity.getProperty("skillMaterialsOptional"));
+//		pool.addToQueue(entity.getProperty("skillMaterialsRequired"));
+//		pool.addToQueue(entity.getProperty("skillToolsOptional"));
+//		pool.addToQueue(entity.getProperty("skillToolsRequired"));
+
+		Map<Key, Key> itemRequirementsToItems = new ConfirmIdeaRequirementsBuilder("1", db, this, idea)
+		.addGenericEntityRequirements("Required Materials", (List<Key>)idea.getProperty("skillMaterialsRequired"))
+		.addGenericEntityRequirements("Required Materials", (List<Key>)idea.getProperty("prototypeItemsConsumed"))
+		.addGenericEntityRequirements("Optional Materials", (List<Key>)idea.getProperty("skillMaterialsOptional"))
+		.addGenericEntityRequirements("Required Tools/Equipment", (List<Key>)idea.getProperty("skillToolsRequired"))
+		.addGenericEntityRequirements("Required Tools/Equipment", (List<Key>)idea.getProperty("prototypeItemsRequired"))
+		.addGenericEntityRequirements("Optional Tools/Equipment", (List<Key>)idea.getProperty("skillToolsOptional"))
+		.go();
 		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());
 		ODPInventionService inventionService = db.getInventionService(character, knowledgeService);
@@ -61,15 +84,24 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		data.put("selectedItems", itemRequirementsToItems);
 		data.put("ideaId", ideaId);
+		data.put("ideaName", idea.getProperty("name"));
+		
+		int seconds = 5;
+		
+		CachedEntity ideaDef = pool.get((Key)idea.getProperty("_definitionKey"));
+		if (ideaDef.getProperty("prototypeConstructionSpeed")!=null)
+			seconds = ((Long)ideaDef.getProperty("prototypeConstructionSpeed")).intValue();
 		
 		
-		return 5;
+		data.put("description", "It will take "+seconds+" seconds to finish this prototype.");
+		
+		return seconds;
 	}
 
 
 
 	@Override
-	String doComplete() throws UserErrorMessage
+	String doComplete() throws UserErrorMessage, UserRequestIncompleteException
 	{
 		@SuppressWarnings("unchecked")
 		Map<Key, Key> itemRequirementsToItems = (Map<Key, Key>)data.get("selectedItems");
@@ -85,19 +117,12 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		// Pooling entities...
 		pool.addToQueue(itemRequirementsToItems.keySet(), itemRequirementsToItems.values());
-		inventionService.poolConstructItemIdea(pool, idea);
-		
-		// This check will throw a UserErrorMessage if it finds anything off
-		inventionService.checkIdeaWithSelectedItems(pool, idea, itemRequirementsToItems);
 		
 		
 		// We're ready to create the final prototype and skill
 		
 		// Create the skill so we can use it again
-		CachedEntity skill = inventionService.createBaseSkillFromIdea(character.getKey(), idea, pool);
-		
-		// Create the prototype item and put it in the player's inventory
-		CachedEntity item = inventionService.createBaseItemFromSkill(skill, pool);
+		CachedEntity item = inventionService.doCreateConstructItemPrototype(idea, itemRequirementsToItems, pool);
 		
 		// Give the player a message that points to the skill and the new item he made
 		setUserMessage("You have a new skill! You successfully turned your idea of "+idea.getProperty("name")+" into a skill. A prototype of your skill is now in your inventory.<br><br>You created an item: "+GameUtils.renderItem(item));
@@ -159,4 +184,13 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		return result;
 	}
+	
+	@Override
+	public Map<String, Object> getStateData() {
+		Map<String, Object> stateData = super.getStateData();
+		
+		stateData.put("description", data.get("description"));
+		
+		return stateData;
+	}	
 }

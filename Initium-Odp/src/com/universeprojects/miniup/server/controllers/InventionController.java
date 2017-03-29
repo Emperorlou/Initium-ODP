@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.ODPInventionService;
@@ -31,20 +32,21 @@ public class InventionController extends PageController {
 	protected final String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		EntityPool pool = new EntityPool(db.getDB());
 		ODPKnowledgeService knowledge = db.getKnowledgeService(db.getCurrentCharacter().getKey());
 		ODPInventionService invention = db.getInventionService(db.getCurrentCharacter(), knowledge);
 	
-		populateKnowledgePageData(request, db, invention);
-		populateExperimentPageData(request, db, invention);
-		populateIdeaPageData(request, db, invention);
-		populateConstructItemSkillPageData(request, db, invention);
+		populateKnowledgePageData(request, db, invention, pool);
+		populateExperimentPageData(request, db, invention, pool);
+		populateIdeaPageData(request, db, invention, pool);
+		populateConstructItemSkillPageData(request, db, invention, pool);
 		
 		
 		return "/WEB-INF/odppages/ajax_invention.jsp";
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void populateKnowledgePageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
+	private void populateKnowledgePageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention, EntityPool pool)
 	{
 		List<CachedEntity> allKnowledgeEntities = invention.getKnowledgeService().getAllKnowledge();
 		Map<String, Object> knowledgeTree = processKnowledgeTreeRecursive(null, allKnowledgeEntities);
@@ -86,25 +88,51 @@ public class InventionController extends PageController {
 		return result;
 	}
 	
-	private void populateIdeaPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
+	private void poolIdeaPageData(EntityPool pool, List<CachedEntity> constructItemIdeas)
+	{
+		// Level 1
+		for(CachedEntity idea:constructItemIdeas)
+		{
+			pool.addToQueue(idea.getProperty("_definitionKey"));
+		}
+		
+		pool.loadEntities();
+		
+		// Level 2
+		for(CachedEntity idea:constructItemIdeas)
+		{
+			CachedEntity ideaDef = pool.get((Key)idea.getProperty("_definitionKey"));
+			pool.addToQueue(ideaDef.getProperty("itemDef"));
+		}	
+		
+		pool.loadEntities();
+	}
+	
+	private void populateIdeaPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention, EntityPool pool)
 	{
 		List<CachedEntity> constructItemIdeas = invention.getAllItemConstructionIdeas();
-		Map<Key, CachedEntity> itemDefs = invention.getAllItemDefsForItemConstructionIdeas();
+		poolIdeaPageData(pool, constructItemIdeas);
 		
 		List<Map<String, Object>> ideas = new ArrayList<Map<String, Object>>();
 		for(CachedEntity idea:constructItemIdeas)
 		{
-			String ideaName = (String)idea.getProperty("name");
+			CachedEntity ideaDef = pool.get((Key)idea.getProperty("_definitionKey"));
+			
+			String ideaName = (String)ideaDef.getProperty("name");
+			String ideaDescription = (String)ideaDef.getProperty("ideaDescription");
 			Long ideaId = idea.getId();
-			CachedEntity itemDef = itemDefs.get((Key)idea.getProperty("itemDef"));
+			CachedEntity itemDef = pool.get((Key)ideaDef.getProperty("itemDef"));
 			if (itemDef==null) continue;	// This shouldn't happen really, but if it does we'll skip.
 			String iconUrl = GameUtils.getResourceUrl(itemDef.getProperty("icon"));
+			Long ideaSpeed = (Long)ideaDef.getProperty("prototypeConstructionSpeed");
 			
 			Map<String, Object> ideaData = new HashMap<String, Object>();
 			
 			ideaData.put("name", ideaName);
 			ideaData.put("id", ideaId);
 			ideaData.put("icon", iconUrl);
+			ideaData.put("description", ideaDescription);
+			ideaData.put("speed", ideaSpeed);
 			
 			ideas.add(ideaData);
 		}
@@ -115,25 +143,46 @@ public class InventionController extends PageController {
 		request.setAttribute("hasIdeas", hasIdeas);
 	}
 	
-	private void populateConstructItemSkillPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
+	private void poolSkillPageData(EntityPool pool, List<CachedEntity> constructItemSkills)
+	{
+		// Level 1
+		for(CachedEntity skill:constructItemSkills)
+		{
+			pool.addToQueue(skill.getProperty("_definitionKey"));
+			pool.addToQueue(skill.getProperty("item"));
+		}
+		
+		pool.loadEntities();
+		
+	}
+	
+	private void populateConstructItemSkillPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention, EntityPool pool)
 	{
 		List<CachedEntity> constructItemSkills = invention.getAllItemConstructionSkills();
-		Map<Key, CachedEntity> items = invention.getAllItemsForItemConstructionSkills();
+		poolSkillPageData(pool, constructItemSkills);
 		
 		List<Map<String, Object>> skills = new ArrayList<Map<String, Object>>();
 		for(CachedEntity skill:constructItemSkills)
 		{
 			String skillName = (String)skill.getProperty("name");
+			String skillDescription = (String)skill.getProperty("skillDescription");
+			Long skillSpeed = (Long)skill.getProperty("skillConstructionSpeed");
 			Long skillId = skill.getId();
-			CachedEntity item = items.get((Key)skill.getProperty("item"));
+			CachedEntity item = pool.get((Key)skill.getProperty("item"));
 			if (item==null) continue;	// This shouldn't happen really, but if it does we'll skip.
 			String iconUrl = GameUtils.getResourceUrl(item.getProperty("icon"));
+			
+			// We'll also get the idea this skill came from
+			CachedEntity idea = pool.get((Key)skill.getProperty("_definitionKey"));
 			
 			Map<String, Object> skillData = new HashMap<String, Object>();
 			
 			skillData.put("name", skillName);
+			skillData.put("description", skillDescription);
+			skillData.put("speed", skillSpeed);
 			skillData.put("id", skillId);
 			skillData.put("icon", iconUrl);
+			skillData.put("class", idea.getProperty("name"));
 			
 			skills.add(skillData);
 		}
@@ -144,7 +193,7 @@ public class InventionController extends PageController {
 		request.setAttribute("hasConstructItemSkills", hasSkills);
 	}
 	
-	private void populateExperimentPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention)
+	private void populateExperimentPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention, EntityPool pool)
 	{
 		// Get all available items (but only unique by name) that you have access to...
 		List<CachedEntity> allAvailableItems = invention.getAvailableItems();

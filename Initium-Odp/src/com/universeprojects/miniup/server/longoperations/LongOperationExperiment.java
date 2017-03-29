@@ -32,8 +32,8 @@ public class LongOperationExperiment extends LongOperation
 	@Override
 	int doBegin(Map<String, String> parameters) throws UserErrorMessage
 	{
-		if(db.isTestServer()==false)
-			throw new UserErrorMessage("Experimentation is temporarily disabled.");
+//		if(db.isTestServer()==false)
+//			throw new UserErrorMessage("Experimentation is temporarily disabled.");
 		
 		CachedEntity character = db.getCurrentCharacter();
 		doChecks(character);

@@ -232,7 +232,7 @@
 		%>
 		</div>
 		</div>
-		<div id='left'>
+		<div class='move-items-column' id='left'>
 		<%
 			boolean disableCategories = false;
 			if (selfSide.getKey().getKind().equals("Location"))
@@ -336,7 +336,7 @@
 
 
 
-		<div id='right'>
+		<div class='move-items-column' id='right'>
 		<%
 			Boolean transmuteEnabled = (Boolean)otherSide.getProperty("transmuteEnabled");
 			if (GameUtils.equals(transmuteEnabled, true))

@@ -32,9 +32,9 @@
 <script type="text/javascript" src="/odp/javascript/vertx-eventbus.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=67"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=69"></script>
 
-<script type="text/javascript" src="/odp/javascript/messager.js?v=18"></script>
+<script type="text/javascript" src="/odp/javascript/messager.js?v=20"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
 <script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>

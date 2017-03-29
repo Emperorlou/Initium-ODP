@@ -2,9 +2,11 @@ package com.universeprojects.miniup.server;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
@@ -30,6 +32,16 @@ public class GameUtilsTest
 	public void tearDown() {
 	    helper.tearDown();
 	}	
+	
+	@Test
+	public void deleteMe()
+	{
+		int[] test1 = new int[]{1,2,3};
+		List<int[]> asList = Arrays.asList(test1);
+		test1[0] = 10;
+		System.out.println(asList);
+		
+	}
 
 	@Test
 	public void testBooleanEquals()

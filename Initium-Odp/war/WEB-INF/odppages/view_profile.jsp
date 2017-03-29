@@ -34,6 +34,7 @@
 
 <h2>User Account</h2>
 <p>You joined Initium on ${joinDate}.</p>
+<p>You can have up to <strong>${maximumCharacterCount}</strong> characters on this account. <a onclick='doBuyCharacterSlots(event)'>Click here</a> to get more!</p>
 <p>
 	<c:if test="${isVerified==false }">
 		<div class='highlightbox-red'>You have not yet verified your email address. If you need to re-send the verification email, <a onclick='resendVerificationEmail()'>click here to re-send it now</a>.</div>
