@@ -1,5 +1,5 @@
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
-
+<%@ page language="java" contentType="text/html; charset=UTF8" pageEncoding="UTF8"%>
 
 <!doctype html>
 <html>
@@ -17,13 +17,14 @@
 	max-width:100%;
 	margin-left:30px;
 }
-
 </style>
 </head>
 <body>
 	<div class='settings-page'>
 		<h2>Character Fixes</h2>
-		<div class='setting-entry setting-entry-checkbox'><a onclick='characterAutofixStuckInLocation(event)'> Character is stuck in a location</a></div>
+		<div class='autofix-entry'><a onclick='characterAutofixStuckInLocation(event)'> Stuck in Location</a>
+			<div><h4>Use this tool if your character is stuck in a location with no discoverable exit paths</h4></div>
+		</div>
 	</div>
 </body>
 </html>

@@ -36,9 +36,16 @@ public class CommandCharacterAutofixStuckInLocation extends Command {
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		CachedDatastoreService ds = getDS();
 		
-		//grab the current character, its location, and the location's parent
+		//grab the current character and its location
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity currentLocation = db.getEntity((Key) character.getProperty("locationKey"));
+		if(currentLocation==null)
+		{
+			//If a character with null locationKey uses the command, a refresh will send them to their hometown
+			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+			return;
+		}
+		//grab the parent location of the character's current locationKey
 		CachedEntity parentLocation = db.getParentLocation(ds, currentLocation);
 		
 		//special case for if user is in hell
@@ -52,7 +59,7 @@ public class CommandCharacterAutofixStuckInLocation extends Command {
 		for(CachedEntity checkPath:pathList)
 		{
 			CachedEntity checkPathLocation1 = db.getEntity((Key) checkPath.getProperty("location1Key"));
-			CachedEntity checkPathLocation2 = db.getEntity((Key) checkPath.getProperty("location1Key"));
+			CachedEntity checkPathLocation2 = db.getEntity((Key) checkPath.getProperty("location2Key"));
 			Double checkPathDiscoveryChance = (Double) checkPath.getProperty("discoveryChance");
 			
 			//check if path is discoverable and both locationKeys are valid entities
