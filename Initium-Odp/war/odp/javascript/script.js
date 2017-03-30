@@ -1768,7 +1768,7 @@ function viewProfile()
 function viewAutofix()
 {
     closeAllPopupsTooltips();
-	pagePopup("/odp/ajax_autofix", null, "Autofix Tools");
+	pagePopup("/odp/autofix", null, "Autofix Tools");
 }
 
 function viewMap()

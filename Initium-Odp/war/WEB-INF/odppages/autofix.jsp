@@ -23,7 +23,7 @@
 	<div class='settings-page'>
 		<h2>Character Fixes</h2>
 		<div class='autofix-entry'><a onclick='characterAutofixStuckInLocation(event)'> Stuck in Location</a>
-			<div><h4>Use this tool if your character is stuck in a location with no discoverable exit paths</h4></div>
+			<div class='paragraph'>Use this tool if your character is stuck in a location with no discoverable exit paths</div>
 		</div>
 	</div>
 </body>

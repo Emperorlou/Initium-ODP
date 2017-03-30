@@ -24,12 +24,12 @@ import com.universeprojects.web.PageController;
 public class AutofixController extends PageController {
 	
 	public AutofixController() {
-		super("ajax_autofix");
+		super("autofix");
 	}
 
 	@Override
 	protected String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		return "/WEB-INF/odppages/ajax_autofix.jsp";
+		return "/WEB-INF/odppages/autofix.jsp";
 	}
 }
