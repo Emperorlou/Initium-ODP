@@ -49,7 +49,7 @@ public class CommandCharacterAutofixStuckInLocation extends Command {
 		Key parentLocation = db.getParentLocationKey(ds, currentLocation);
 		
 		//special case for if user is in hell
-		if(currentLocation==db.getLocationByName("Ninth Circle of Hell"))
+		if("Ninth Circle of Hell".equals(currentLocation.getProperty("name")))
 		{
 			throw new UserErrorMessage("Nice Try! But there's no escape from Hell :)");
 		}
@@ -65,7 +65,7 @@ public class CommandCharacterAutofixStuckInLocation extends Command {
 			//check if path is discoverable and both locationKeys are valid entities
 			if(checkPathLocation1!=null && checkPathLocation2!=null && checkPathDiscoveryChance>0)
 			{
-				throw new UserErrorMessage("At least one exit path exists");
+				throw new UserErrorMessage("It looks like there's at least one path from this location.");
 			}
 		}
 		//if no discoverable paths are found at the location, set character's locationKey to the parent
