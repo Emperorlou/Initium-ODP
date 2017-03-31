@@ -46,7 +46,7 @@ public class CommandCharacterAutofixStuckInLocation extends Command {
 			return;
 		}
 		//grab the parent location of the character's current locationKey
-		CachedEntity parentLocation = db.getParentLocation(ds, currentLocation);
+		Key parentLocation = db.getParentLocationKey(ds, currentLocation);
 		
 		//special case for if user is in hell
 		if(currentLocation==db.getLocationByName("Ninth Circle of Hell"))
