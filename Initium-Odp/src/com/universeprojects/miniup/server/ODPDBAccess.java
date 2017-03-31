@@ -3930,8 +3930,13 @@ public class ODPDBAccess
 		            String armorNames = "";
 		            for(int i = 0; i<blockingArmor.size();i++)
 		            {
-		                if (i>0)
-		                    armorNames+=", ";
+		                if (i>0) 
+				{
+				    if (blockingArmor.size() == 2)
+					armorNames += " and ";
+				    else 
+					armorNames+=", ";
+				}
 		                if (i==blockingArmor.size()-1 && i>0)
 		                    armorNames+="and ";
 		                armorNames+=(String)blockingArmor.get(i).getProperty("name");
