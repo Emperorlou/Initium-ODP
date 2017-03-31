@@ -1664,6 +1664,9 @@ function closePagePopup(doNotCallback)
 	
 	decrementStackIndex();
 	
+	if (currentPopupStackIndex==0)
+		$(".half-page-variant").hide();
+	
 	if (doNotCallback!=true)
 	{
 		var func = popupStackCloseCallbackHandlers.pop();

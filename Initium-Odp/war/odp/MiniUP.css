@@ -3099,6 +3099,16 @@ body
 	background-color: #757161;
 
 }
+
+.location-controls-container.half-page-variant
+{
+	display: none;
+    z-index: 1;
+    position: absolute;
+    left: 50%;
+    width: 100%;	
+}
+
 .location-controls-page
 {
 	position:absolute;
@@ -3505,7 +3515,7 @@ body
 	}
 }
 
-@media (max-width:900px)
+@media (max-width:950px)
 {
 	.chatMessage-main
 	{
@@ -3539,6 +3549,11 @@ body
 		display:block;
 		width:100%;
 		margin-top:27px;
+	}
+	
+	.location-controls-container.half-page-variant
+	{
+		display:none !important;
 	}
 	
 	.location-controls
@@ -3654,7 +3669,7 @@ body
 	}
 }
 
-@media screen and (max-width:900px)
+@media screen and (max-width:950px)
 {
 	.page
 	{
