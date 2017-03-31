@@ -8,7 +8,8 @@ It's possible to get things working using a different IDE and other different va
 
 ## Download and install JDK 1.7
 You should be able to find what you need here:
-http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
+http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html
+You’ll want to download the “Java SE Development Kit 7u80” (It’s possible that you’ll be prompted to create an Oracle account)
 
 ## Download Eclipse JUNO
 Pick the first download labelled **Eclipse IDE for Java EE Developers**
@@ -42,6 +43,8 @@ That should do it.
 ## Get this GIT repo onto your system
 I personally use TortoiseGIT. You can download that here: 
 https://tortoisegit.org/
+
+(If you’re using Mac OSX, you’ll need an alternative to TortoiseGIT. SourceTree is a great option, found at https://www.sourcetreeapp.com/)
 
 Before you clone the repo, create a fork of this project in GitHub, then create an upstream repo to link back to the root.
 

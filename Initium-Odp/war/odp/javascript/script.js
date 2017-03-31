@@ -1464,6 +1464,11 @@ function selectedItemsTrade(event, selector)
 	});
 }
 
+function characterAutofixStuckInLocation(event)
+{
+	doCommand(event, "CharacterAutofixStuckInLocation"); //Does this need a callback? I'm not sure I fully understand that part.
+}
+
 function characterDropCharacter(event, characterId)
 {
 	doCommand(event, "CharacterDropCharacter", {"characterId":characterId}, loadInventory);
@@ -1760,6 +1765,12 @@ function viewProfile()
 {
     closeAllPopupsTooltips();
 	pagePopup("/odp/view_profile", null, "Your Profile");
+}
+
+function viewAutofix()
+{
+    closeAllPopupsTooltips();
+	pagePopup("/odp/autofix", null, "Autofix Tools");
 }
 
 function viewMap()
