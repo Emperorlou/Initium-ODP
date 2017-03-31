@@ -837,7 +837,7 @@ public class GameUtils
 			if (finalQuality<1)
 				result = "item-junk";
 			else if (finalQuality<2)
-				result = "";
+				result = "item-normal";
 			else if (finalQuality<3)
 				result = "item-rare";
 			else 
