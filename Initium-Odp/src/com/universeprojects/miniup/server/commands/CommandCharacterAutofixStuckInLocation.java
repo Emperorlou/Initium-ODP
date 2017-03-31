@@ -70,6 +70,7 @@ public class CommandCharacterAutofixStuckInLocation extends Command {
 		}
 		//if no discoverable paths are found at the location, set character's locationKey to the parent
 		character.setProperty("locationKey", parentLocation);
+		ds.put(character);
 		//I think this should be a good enough fix, even if the parent is invalid since characters with
 		//an invalid locationKey are sent to their hometownKey (or default spawn loc if hometown is invalid)
 		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
