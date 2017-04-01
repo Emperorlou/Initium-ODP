@@ -1254,11 +1254,11 @@ public class GameUtils
 
 		if (leftSide==false)
 		{
-			sb.append("<div class='character-display-box' style='float:right'>");
+			sb.append("<div id='newui' class='character-display-box' style='float:right'>");
 			sb.append(nameAndBars);
 		}
 		else
-			sb.append("<div class='character-display-box'>");
+			sb.append("<div id='newui' class='character-display-box'>");
 		
 		
 		if (isSelf)

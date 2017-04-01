@@ -31,15 +31,18 @@ public class InventionController extends PageController {
 	@Override
 	protected final String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
-		ODPDBAccess db = ODPDBAccess.getInstance(request);
-		EntityPool pool = new EntityPool(db.getDB());
-		ODPKnowledgeService knowledge = db.getKnowledgeService(db.getCurrentCharacter().getKey());
-		ODPInventionService invention = db.getInventionService(db.getCurrentCharacter(), knowledge);
-	
-		populateKnowledgePageData(request, db, invention, pool);
-		populateExperimentPageData(request, db, invention, pool);
-		populateIdeaPageData(request, db, invention, pool);
-		populateConstructItemSkillPageData(request, db, invention, pool);
+		if (GameUtils.isTestServer(request))
+		{
+			ODPDBAccess db = ODPDBAccess.getInstance(request);
+			EntityPool pool = new EntityPool(db.getDB());
+			ODPKnowledgeService knowledge = db.getKnowledgeService(db.getCurrentCharacter().getKey());
+			ODPInventionService invention = db.getInventionService(db.getCurrentCharacter(), knowledge);
+		
+			populateKnowledgePageData(request, db, invention, pool);
+			populateExperimentPageData(request, db, invention, pool);
+			populateIdeaPageData(request, db, invention, pool);
+			populateConstructItemSkillPageData(request, db, invention, pool);
+		}
 		
 		
 		return "/WEB-INF/odppages/ajax_invention.jsp";

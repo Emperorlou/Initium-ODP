@@ -18,7 +18,7 @@ function changeInventionTab(event)
 
 </script>
 
-<div class='tab-row'>
+<div class='tab-row normal-container backdrop1b'>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='knowledge-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='experimentation-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='idea-tab'></div>

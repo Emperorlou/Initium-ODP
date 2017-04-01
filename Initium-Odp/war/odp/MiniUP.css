@@ -3107,6 +3107,8 @@ body
     position: absolute;
     left: 50%;
     width: 100%;	
+    
+    box-shadow: 0px 0px 43px 2px #000000;
 }
 
 .location-controls-page
@@ -3154,7 +3156,7 @@ body
 
 
 
-.backdrop1a
+#newui .backdrop1a
 {
 	background-color: #442434;
 	
@@ -3166,7 +3168,7 @@ body
 	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
-.backdrop1b
+#newui .backdrop1b
 {
 	background-color: #30346d;
 	
@@ -3178,7 +3180,7 @@ body
 	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
-.backdrop1c
+#newui .backdrop1c
 {
 	background-color: #30346d;
 	
@@ -3190,7 +3192,7 @@ body
 	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
-.backdrop1d
+#newui .backdrop1d
 {
 	background-color: #1d1d1d;
 	
@@ -3204,7 +3206,7 @@ body
 	margin:8px;
 }
 
-.backdrop2a
+#newui .backdrop2a
 {
 	background-color: #854c30;
 	
@@ -3216,7 +3218,7 @@ body
 	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 fill repeat;
 }
 
-.backdrop3d
+#newui .backdrop3d
 {
 	/*background-color: #854c30;*/
 	
@@ -3673,7 +3675,7 @@ body
 {
 	.page
 	{
-		position:static;
+		position:relative;
 	}
 	.main1
 	{
