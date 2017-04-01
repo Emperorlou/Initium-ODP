@@ -46,7 +46,9 @@ public class CommandAutofixDeathModeNotSet extends Command {
 		String mode = (String) character.getProperty("mode");
 		
 		//check for non-positive HP while mode is not either unconscious or dead
-		if(hitpoints<=0 && mode!="UNCONSCIOUS" && mode!="DEAD")
+		//we're not using checkCharacterIsUnconscious and checkCharacterIsDead here because the 
+		//unconscious check would return true for characters affected by this bug. 
+		if(hitpoints<=0 && "UNCONSCIOUS".equals(mode)==false && "DEAD".equals(mode)==false)
 		{
 			//clear combatant
 			character.setProperty("combatant", null);
@@ -75,10 +77,10 @@ public class CommandAutofixDeathModeNotSet extends Command {
 		else if(hitpoints>0)
 			throw new UserErrorMessage("Your hitpoints is greater than 0!");
 		
-		else if(mode=="UNCONSCIOUS")
+		else if("UNCONSCIOUS".equals(mode))
 			throw new UserErrorMessage("You're already unconscious! Get someone to save you, quick!");
 		
-		else if(mode=="DEAD")
+		else if("DEAD".equals(mode))
 			throw new UserErrorMessage("RIP. You're already dead!");
 		
 		else
