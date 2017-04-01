@@ -1464,9 +1464,14 @@ function selectedItemsTrade(event, selector)
 	});
 }
 
-function characterAutofixStuckInLocation(event)
+function autofixStuckInLocation(event)
 {
-	doCommand(event, "CharacterAutofixStuckInLocation"); //Does this need a callback? I'm not sure I fully understand that part.
+	doCommand(event, "AutofixStuckInLocation"); //Does this need a callback? Still not sure I fully understand that part.
+}
+
+function autofixStuckInLocation(event)
+{
+	doCommand(event, "AutofixDeathModeNotSet"); //Does this need a callback? Still not sure I fully understand that part.
 }
 
 function characterDropCharacter(event, characterId)

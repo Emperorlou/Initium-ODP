@@ -22,8 +22,11 @@
 <body>
 	<div class='settings-page'>
 		<h2>Character Fixes</h2>
-		<div class='autofix-entry'><a onclick='characterAutofixStuckInLocation(event)'> Stuck in Location</a>
-			<div class='paragraph'>Use this tool if your character is stuck in a location with no discoverable exit paths</div>
+		<div class='autofix-entry'><a onclick='autofixStuckInLocation(event)'> Stuck In Location</a>
+			<div class='paragraph'>Use this if you're stuck with no discoverable paths out of your current location.</div>
+		</div>
+		<div class='autofix-entry'><a onclick='autofixDeathModeNotSet(event)'> Negative HP But Not Unconscious</a>
+			<div class='paragraph'>Use this if your character has negative HP but is not showing up as "Dead" or "Unconscious".</div>
 		</div>
 	</div>
 </body>
