@@ -24,9 +24,9 @@ import com.universeprojects.miniup.server.commands.framework.Command.JavascriptR
  * @author papamarsh
  * 
  */
-public class CommandCharacterAutofixStuckInLocation extends Command {
+public class CommandAutofixStuckInLocation extends Command {
 
-	public CommandCharacterAutofixStuckInLocation(ODPDBAccess db, HttpServletRequest request,
+	public CommandAutofixStuckInLocation(ODPDBAccess db, HttpServletRequest request,
 			HttpServletResponse response) {
 		super(db, request, response);
 	}
