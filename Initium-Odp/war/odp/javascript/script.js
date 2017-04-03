@@ -1464,6 +1464,16 @@ function selectedItemsTrade(event, selector)
 	});
 }
 
+function autofixStuckInLocation(event)
+{
+	doCommand(event, "AutofixStuckInLocation"); //Does this need a callback? Still not sure I fully understand that part.
+}
+
+function autofixStuckInLocation(event)
+{
+	doCommand(event, "AutofixDeathModeNotSet"); //Does this need a callback? Still not sure I fully understand that part.
+}
+
 function characterDropCharacter(event, characterId)
 {
 	doCommand(event, "CharacterDropCharacter", {"characterId":characterId}, loadInventory);
@@ -1659,6 +1669,9 @@ function closePagePopup(doNotCallback)
 	
 	decrementStackIndex();
 	
+	if (currentPopupStackIndex==0)
+		$(".half-page-variant").hide();
+	
 	if (doNotCallback!=true)
 	{
 		var func = popupStackCloseCallbackHandlers.pop();
@@ -1760,6 +1773,12 @@ function viewProfile()
 {
     closeAllPopupsTooltips();
 	pagePopup("/odp/view_profile", null, "Your Profile");
+}
+
+function viewAutofix()
+{
+    closeAllPopupsTooltips();
+	pagePopup("/odp/autofix", null, "Autofix Tools");
 }
 
 function viewMap()

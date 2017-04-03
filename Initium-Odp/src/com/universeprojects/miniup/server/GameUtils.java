@@ -837,7 +837,7 @@ public class GameUtils
 			if (finalQuality<1)
 				result = "item-junk";
 			else if (finalQuality<2)
-				result = "";
+				result = "item-normal";
 			else if (finalQuality<3)
 				result = "item-rare";
 			else 
@@ -1254,11 +1254,11 @@ public class GameUtils
 
 		if (leftSide==false)
 		{
-			sb.append("<div class='character-display-box' style='float:right'>");
+			sb.append("<div id='newui' class='character-display-box' style='float:right'>");
 			sb.append(nameAndBars);
 		}
 		else
-			sb.append("<div class='character-display-box'>");
+			sb.append("<div id='newui' class='character-display-box'>");
 		
 		
 		if (isSelf)
@@ -1335,6 +1335,7 @@ public class GameUtils
 			sb.append("<h5 style='margin-top:0px;'>"+character.getProperty("name")+"'s Options</h5>");
 			sb.append("<p><a onclick='viewProfile()'>View "+character.getProperty("name")+"'s profile</a></p>");
 			sb.append("<p><a onclick='popupCharacterTransferService("+character.getKey().getId()+", \""+character.getProperty("name")+"\", \""+request.getAttribute("characterToTransfer")+"\")' style='cursor:pointer'>Open the Character Transfer Service</a></p>");
+			sb.append("<p><a onclick='viewAutofix()'>Help! Something's Wrong!</a></p>");
 			sb.append("<p><a onclick='logout()'>Logout</a></p>");
 			if (request.getAttribute("characterList")!=null)
 			{

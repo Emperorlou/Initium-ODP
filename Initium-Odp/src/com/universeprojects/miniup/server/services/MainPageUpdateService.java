@@ -12,8 +12,6 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.WebUtils;
-import com.universeprojects.miniup.server.commands.framework.Command;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 public class MainPageUpdateService extends Service
 {
