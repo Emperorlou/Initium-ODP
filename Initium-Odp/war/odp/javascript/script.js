@@ -1469,7 +1469,7 @@ function autofixStuckInLocation(event)
 	doCommand(event, "AutofixStuckInLocation"); //Does this need a callback? Still not sure I fully understand that part.
 }
 
-function autofixStuckInLocation(event)
+function autofixDeathModeNotSet(event)
 {
 	doCommand(event, "AutofixDeathModeNotSet"); //Does this need a callback? Still not sure I fully understand that part.
 }

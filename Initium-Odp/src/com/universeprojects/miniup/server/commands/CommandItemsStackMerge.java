@@ -2,8 +2,10 @@ package com.universeprojects.miniup.server.commands;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,7 +100,7 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 
 	/**
 	 * Compares two entities for stackability - that is that all properties are
-	 * equal excluding quantity
+	 * equal excluding quantity and movedTimestamp
 	 * 
 	 * @param entity1
 	 *            - First entity
@@ -109,16 +111,15 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 	protected boolean canStack(CachedEntity entity1, CachedEntity entity2) {
 		Map<String, Object> entity1Props = entity1.getProperties();
 		Map<String, Object> entity2Props = entity2.getProperties();
-		if (entity1Props.size() != entity2Props.size()) {
-			return false;
-		} // simplest check
-		// could instead remove quantity and do equal check between the two
-		// maps?
-		for (String checking : entity1Props.keySet()) {
-			if (!checking.equals("quantity") && !checking.equals("movedTimestamp")) {
-				if (!GameUtils.equals(entity1Props.get(checking), entity2Props.get(checking))) {
-					return false;
-				}
+		// Merge the keysets, so that newly added fields also get considered
+		Set<String> allKeys = entity1Props.keySet();
+		allKeys.addAll(entity2Props.keySet());
+		allKeys.remove("movedTimestamp");
+		allKeys.remove("quantity");
+		// If a field doesn't exist on one entity, then will resolve to null when checking the property
+		for (String checking : allKeys) {
+			if (!GameUtils.equals(entity1Props.get(checking), entity2Props.get(checking))) {
+				return false;
 			}
 		}
 		return true;
