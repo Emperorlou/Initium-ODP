@@ -6016,4 +6016,19 @@ public class ODPDBAccess
 		
 		return chars;
 	}
+
+	/**
+	 * Gets 2D list of keys stored in an Entity2DCollection field type on an entity.
+	 * This field type stores it's data in a funny way for indexing purposes, making
+	 * this method necessary.
+	 * 
+	 * @param entity
+	 * @param fieldName
+	 * @return
+	 */
+	public List<List<Key>> getEntity2DCollectionValueFromEntity(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

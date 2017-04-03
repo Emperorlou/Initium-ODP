@@ -911,6 +911,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	float:left;
 	font-size:14px;
 	color:#AAAAAA;
+	margin-left:-7px;
 }
 
 .main-button

@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -136,7 +137,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public void checkIdeaWithSelectedItems(EntityPool pool, CachedEntity idea, Map<Key, Key> itemRequirementsToItems) throws UserErrorMessage
+	public void checkIdeaWithSelectedItems(EntityPool pool, CachedEntity idea, Map<String, Key> itemRequirementsToItems) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
@@ -189,6 +190,12 @@ public abstract class ODPInventionService extends Service
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Set<CachedEntity> getItemCandidatesFor(EntityPool pool, List<CachedEntity> genericEntityRequirementsList)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

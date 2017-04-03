@@ -1,7 +1,5 @@
 package com.universeprojects.miniup.server.services;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;

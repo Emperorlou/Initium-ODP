@@ -18,7 +18,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.services.ConfirmIdeaRequirementsBuilder;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -38,9 +38,10 @@ public class LongOperationBeginPrototype extends LongOperation
 		return "doCreatePrototype(null, "+ideaId+", '"+ideaName+"');"; 
 	}
 	
+	
+	
 	@SuppressWarnings("unchecked")
-	@Override
-	int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
+	int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException 
 	{
 		Long ideaId = Long.parseLong(parameters.get("ideaId"));
 		Key ideaKey = KeyFactory.createKey("ConstructItemIdea", ideaId);
@@ -62,13 +63,13 @@ public class LongOperationBeginPrototype extends LongOperation
 //		pool.addToQueue(entity.getProperty("skillToolsOptional"));
 //		pool.addToQueue(entity.getProperty("skillToolsRequired"));
 
-		Map<Key, Key> itemRequirementsToItems = new ConfirmIdeaRequirementsBuilder("1", db, this, idea)
-		.addGenericEntityRequirements("Required Materials", (List<Key>)idea.getProperty("skillMaterialsRequired"))
-		.addGenericEntityRequirements("Required Materials", (List<Key>)idea.getProperty("prototypeItemsConsumed"))
-		.addGenericEntityRequirements("Optional Materials", (List<Key>)idea.getProperty("skillMaterialsOptional"))
-		.addGenericEntityRequirements("Required Tools/Equipment", (List<Key>)idea.getProperty("skillToolsRequired"))
-		.addGenericEntityRequirements("Required Tools/Equipment", (List<Key>)idea.getProperty("prototypeItemsRequired"))
-		.addGenericEntityRequirements("Optional Tools/Equipment", (List<Key>)idea.getProperty("skillToolsOptional"))
+		Map<String, Key> itemRequirementsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, idea)
+		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
+		.addGenericEntityRequirements("Required Materials", "prototypeItemsConsumed")
+		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
+		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
+		.addGenericEntityRequirements("Required Tools/Equipment", "prototypeItemsRequired")
+		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
 		.go();
 		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());

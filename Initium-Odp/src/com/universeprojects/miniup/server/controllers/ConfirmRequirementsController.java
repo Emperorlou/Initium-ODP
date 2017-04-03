@@ -58,25 +58,24 @@ public class ConfirmRequirementsController extends PageController
 	    return "/WEB-INF/odppages/ajax_confirmrequirements.jsp";
 	}
 
-	private void addGenericEntityRequirements(HttpServletRequest request, EntityPool pool, String categoryName, Object genericRequirementKeysList)
+	private void addGenericEntityRequirements(HttpServletRequest request, ODPDBAccess db, EntityPool pool, String categoryName, int slotIndex, CachedEntity entity, String ger2DCollectionFieldName)
 	{
-		if (genericRequirementKeysList==null)
-			return;
-		if ((genericRequirementKeysList instanceof List)==false)
-			throw new IllegalArgumentException("The genericRequirementKeysList type is not a list.");
+		List<List<Key>> entity2dList = db.getEntity2DCollectionValueFromEntity(entity, ger2DCollectionFieldName);
 		
-		for(Object gerKeyObj:(List<?>)genericRequirementKeysList)
+		if (entity2dList==null)
+			return;
+		
+		for(List<Key> gerSlotList:entity2dList)
 		{
-			if ((gerKeyObj instanceof Key)==false)
-				throw new IllegalArgumentException("The genericRequirementKeysList was a list but contained objects that were not Key types.");
-			addGenericEntityRequirement(request, categoryName, pool.get((Key)gerKeyObj));
+			addGenericEntityRequirementSlot(request, pool, categoryName, slotIndex, gerSlotList);
 		}
 	}
 	
-	private void addGenericEntityRequirement(HttpServletRequest request, String categoryName, CachedEntity genericRequirement)
+	private void addGenericEntityRequirementSlot(HttpServletRequest request, EntityPool pool, String categoryName, int gerSlotIndex, List<Key> genericRequirementSlotList)
 	{
 		if (categoryName==null) throw new IllegalArgumentException("categoryName cannot be null.");
 		
+		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> formattedRequirementsCategories = (List<Map<String, Object>>)request.getAttribute("formattedRequirements");
 		if (formattedRequirementsCategories == null)
 			formattedRequirementsCategories = new ArrayList<Map<String, Object>>();
@@ -98,14 +97,36 @@ public class ConfirmRequirementsController extends PageController
 		}
 		
 		// Now add the formatted entity requirements...
+		@SuppressWarnings("unchecked")
 		List<Map<String,String>> formattedEntityRequirements = (List<Map<String,String>>)formattedRequirementsCategory.get("list");
 
 		Map<String, String> fer = new HashMap<String, String>();	// fer = Formatted Entity Requirement
 		
 		// Formatting the output
-		fer.put("name", (String)genericRequirement.getProperty("name"));
-		fer.put("description", (String)genericRequirement.getProperty("description"));
-		fer.put("id", genericRequirement.getId().toString());
+		StringBuilder name = new StringBuilder();
+		StringBuilder description = new StringBuilder();
+		StringBuilder gerKeyStringList = new StringBuilder();
+		boolean firstTime = true;
+		for(Key gerKey:genericRequirementSlotList)
+		{
+			if (firstTime)
+				firstTime = false;
+			else
+			{
+				name.append(" or ");
+				description.append("<hr class='hr-or'>");
+				gerKeyStringList.append(",");
+			}
+			
+			CachedEntity ger = pool.get(gerKey);
+			name.append(ger.getProperty("name"));
+			description.append(ger.getProperty("description"));
+			gerKeyStringList.append(KeyFactory.keyToString(gerKey));
+		}
+		fer.put("name", name.toString());
+		fer.put("description", description.toString());
+		fer.put("slotIndex", gerSlotIndex+"");
+		fer.put("gerKeyList", gerKeyStringList.toString());
 		
 		
 		formattedEntityRequirements.add(fer);
@@ -138,12 +159,12 @@ public class ConfirmRequirementsController extends PageController
 
 		pool.loadEntities();
 		
-		addGenericEntityRequirements(request, pool, "Required Materials", ideaDef.getProperty("skillMaterialsRequired"));
-		addGenericEntityRequirements(request, pool, "Required Materials", ideaDef.getProperty("prototypeItemsConsumed"));
-		addGenericEntityRequirements(request, pool, "Optional Materials", ideaDef.getProperty("skillMaterialsOptional"));
-		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", ideaDef.getProperty("skillToolsRequired"));
-		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", ideaDef.getProperty("prototypeItemsRequired"));
-		addGenericEntityRequirements(request, pool, "Optional Tools/Equipment", ideaDef.getProperty("skillToolsOptional"));
+		addGenericEntityRequirements(request, db, pool, "Required Materials", 0, ideaDef, "skillMaterialsRequired");
+		addGenericEntityRequirements(request, db, pool, "Required Materials", 1, ideaDef, "prototypeItemsConsumed");
+		addGenericEntityRequirements(request, db, pool, "Optional Materials", 2, ideaDef, "skillMaterialsOptional");
+		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", 3, ideaDef, "skillToolsRequired");
+		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", 4, ideaDef, "prototypeItemsRequired");
+		addGenericEntityRequirements(request, db, pool, "Optional Tools/Equipment", 5, ideaDef, "skillToolsOptional");
 		
 		request.setAttribute("ideaId", ideaId);
 		request.setAttribute("ideaName", idea.getProperty("name"));
@@ -160,9 +181,10 @@ public class ConfirmRequirementsController extends PageController
 		
 		// Make sure the idea we're processing is actually owned by the character who is executing it
 		if (GameUtils.equals(skill.getProperty("characterKey"), character.getKey())==false)
-			throw new IllegalArgumentException("Possible hack attempt. An skillId from a different character was used.");
+			throw new IllegalArgumentException("Possible hack attempt. A skillId from a different character was used.");
 		
 		// Load all the generic entity requirements (but not the subentities. That's why I didn't use inventionservice.poolConstructItemIdea())
+		pool.addToQueue(skill.getProperty("_definitionKey"));
 		pool.addToQueue(skill.getProperty("skillMaterialsRequired"));
 		pool.addToQueue(skill.getProperty("skillMaterialsOptional"));
 		pool.addToQueue(skill.getProperty("skillToolsRequired"));
@@ -170,10 +192,11 @@ public class ConfirmRequirementsController extends PageController
 
 		pool.loadEntities();
 		
-		addGenericEntityRequirements(request, pool, "Required Materials", skill.getProperty("skillMaterialsRequired"));
-		addGenericEntityRequirements(request, pool, "Optional Materials", skill.getProperty("skillMaterialsOptional"));
-		addGenericEntityRequirements(request, pool, "Required Tools/Equipment", skill.getProperty("skillToolsRequired"));
-		addGenericEntityRequirements(request, pool, "Optional Tools/Equipment", skill.getProperty("skillToolsOptional"));
+		CachedEntity ideaDef = pool.get((Key)skill.getProperty("_definitionKey"));
+		addGenericEntityRequirements(request, db, pool, "Required Materials", 0, ideaDef, "skillMaterialsRequired");
+		addGenericEntityRequirements(request, db, pool, "Optional Materials", 1, ideaDef, "skillMaterialsOptional");
+		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", 2, ideaDef, "skillToolsRequired");
+		addGenericEntityRequirements(request, db, pool, "Optional Tools/Equipment", 3, ideaDef, "skillToolsOptional");
 		
 		request.setAttribute("skillId", skillId);
 		request.setAttribute("skillName", skill.getProperty("name"));
@@ -182,39 +205,39 @@ public class ConfirmRequirementsController extends PageController
 	
 	
 	
-	private List<Key> rawKeysToKeys(String[] rawKeys)
-	{
-		List<Key> result = new ArrayList<Key>();
-		for(String rawKey:rawKeys)
-		{
-			if (rawKey.endsWith("\")"))
-			{
-				// Keys using names
-				String[] parts = rawKey.split("\\(\"");
-				if (parts.length!=2)
-					throw new IllegalArgumentException("Key was malformed: "+rawKey);
-				
-				String kind = parts[0];
-				String name = parts[1].substring(0, parts[1].length()-2);
-				
-				result.add(KeyFactory.createKey(kind, name));
-			}
-			else
-			{
-				// Keys using IDs
-				String[] parts = rawKey.split("\\(");
-				if (parts.length!=2)
-					throw new IllegalArgumentException("Key was malformed: "+rawKey);
-				
-				String kind = parts[0];
-				String idStr = parts[1].substring(0, parts[1].length()-1);
-				Long id = Long.parseLong(idStr);
-				
-				result.add(KeyFactory.createKey(kind, id));
-			}
-		}
-		return result;
-	}
+//	private List<Key> rawKeysToKeys(String[] rawKeys)
+//	{
+//		List<Key> result = new ArrayList<Key>();
+//		for(String rawKey:rawKeys)
+//		{
+//			if (rawKey.endsWith("\")"))
+//			{
+//				// Keys using names
+//				String[] parts = rawKey.split("\\(\"");
+//				if (parts.length!=2)
+//					throw new IllegalArgumentException("Key was malformed: "+rawKey);
+//				
+//				String kind = parts[0];
+//				String name = parts[1].substring(0, parts[1].length()-2);
+//				
+//				result.add(KeyFactory.createKey(kind, name));
+//			}
+//			else
+//			{
+//				// Keys using IDs
+//				String[] parts = rawKey.split("\\(");
+//				if (parts.length!=2)
+//					throw new IllegalArgumentException("Key was malformed: "+rawKey);
+//				
+//				String kind = parts[0];
+//				String idStr = parts[1].substring(0, parts[1].length()-1);
+//				Long id = Long.parseLong(idStr);
+//				
+//				result.add(KeyFactory.createKey(kind, id));
+//			}
+//		}
+//		return result;
+//	}
 	
 	private Type determineType(HttpServletRequest request)
 	{

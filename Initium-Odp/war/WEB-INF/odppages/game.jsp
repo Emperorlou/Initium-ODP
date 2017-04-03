@@ -390,7 +390,7 @@ https://github.com/Emperorlou/Initium-ODP
 		<div class='page-upperhalf'>
 			<div id='main-header' class='header1'>
 				<div class='header1-spacer'></div>
-				<div class='header1-display'><span id='locationName'>${locationName}</span></div>
+				<div class='header1-display'><span id='locationName'><a href='/odp/game'>${locationName}</a></span></div>
 				<div class='header1-spacer'></div>
 				<div class='header1-rightchunk'>
 					<div class='header1-button' onclick='viewMap()'>MAP</div>
