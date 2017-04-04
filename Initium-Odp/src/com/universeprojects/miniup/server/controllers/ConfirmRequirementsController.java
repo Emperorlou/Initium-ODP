@@ -58,20 +58,22 @@ public class ConfirmRequirementsController extends PageController
 	    return "/WEB-INF/odppages/ajax_confirmrequirements.jsp";
 	}
 
-	private void addGenericEntityRequirements(HttpServletRequest request, ODPDBAccess db, EntityPool pool, String categoryName, int slotIndex, CachedEntity entity, String ger2DCollectionFieldName)
+	private void addGenericEntityRequirements(HttpServletRequest request, ODPDBAccess db, EntityPool pool, String categoryName, CachedEntity entity, String ger2DCollectionFieldName)
 	{
 		List<List<Key>> entity2dList = db.getEntity2DCollectionValueFromEntity(entity, ger2DCollectionFieldName);
 		
 		if (entity2dList==null)
 			return;
 		
+		int slotIndex = 0;
 		for(List<Key> gerSlotList:entity2dList)
 		{
-			addGenericEntityRequirementSlot(request, pool, categoryName, slotIndex, gerSlotList);
+			addGenericEntityRequirementSlot(request, pool, categoryName, slotIndex, ger2DCollectionFieldName, gerSlotList);
+			slotIndex++;
 		}
 	}
 	
-	private void addGenericEntityRequirementSlot(HttpServletRequest request, EntityPool pool, String categoryName, int gerSlotIndex, List<Key> genericRequirementSlotList)
+	private void addGenericEntityRequirementSlot(HttpServletRequest request, EntityPool pool, String categoryName, int slotIndex, String entityFieldName, List<Key> genericRequirementSlotList)
 	{
 		if (categoryName==null) throw new IllegalArgumentException("categoryName cannot be null.");
 		
@@ -125,7 +127,7 @@ public class ConfirmRequirementsController extends PageController
 		}
 		fer.put("name", name.toString());
 		fer.put("description", description.toString());
-		fer.put("slotIndex", gerSlotIndex+"");
+		fer.put("slotName", entityFieldName+":"+slotIndex);
 		fer.put("gerKeyList", gerKeyStringList.toString());
 		
 		
@@ -159,12 +161,12 @@ public class ConfirmRequirementsController extends PageController
 
 		pool.loadEntities();
 		
-		addGenericEntityRequirements(request, db, pool, "Required Materials", 0, ideaDef, "skillMaterialsRequired");
-		addGenericEntityRequirements(request, db, pool, "Required Materials", 1, ideaDef, "prototypeItemsConsumed");
-		addGenericEntityRequirements(request, db, pool, "Optional Materials", 2, ideaDef, "skillMaterialsOptional");
-		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", 3, ideaDef, "skillToolsRequired");
-		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", 4, ideaDef, "prototypeItemsRequired");
-		addGenericEntityRequirements(request, db, pool, "Optional Tools/Equipment", 5, ideaDef, "skillToolsOptional");
+		addGenericEntityRequirements(request, db, pool, "Required Materials", ideaDef, "skillMaterialsRequired");
+		addGenericEntityRequirements(request, db, pool, "Required Materials", ideaDef, "prototypeItemsConsumed");
+		addGenericEntityRequirements(request, db, pool, "Optional Materials", ideaDef, "skillMaterialsOptional");
+		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", ideaDef, "skillToolsRequired");
+		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", ideaDef, "prototypeItemsRequired");
+		addGenericEntityRequirements(request, db, pool, "Optional Tools/Equipment", ideaDef, "skillToolsOptional");
 		
 		request.setAttribute("ideaId", ideaId);
 		request.setAttribute("ideaName", idea.getProperty("name"));
@@ -193,10 +195,10 @@ public class ConfirmRequirementsController extends PageController
 		pool.loadEntities();
 		
 		CachedEntity ideaDef = pool.get((Key)skill.getProperty("_definitionKey"));
-		addGenericEntityRequirements(request, db, pool, "Required Materials", 0, ideaDef, "skillMaterialsRequired");
-		addGenericEntityRequirements(request, db, pool, "Optional Materials", 1, ideaDef, "skillMaterialsOptional");
-		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", 2, ideaDef, "skillToolsRequired");
-		addGenericEntityRequirements(request, db, pool, "Optional Tools/Equipment", 3, ideaDef, "skillToolsOptional");
+		addGenericEntityRequirements(request, db, pool, "Required Materials", ideaDef, "skillMaterialsRequired");
+		addGenericEntityRequirements(request, db, pool, "Optional Materials", ideaDef, "skillMaterialsOptional");
+		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", ideaDef, "skillToolsRequired");
+		addGenericEntityRequirements(request, db, pool, "Optional Tools/Equipment", ideaDef, "skillToolsOptional");
 		
 		request.setAttribute("skillId", skillId);
 		request.setAttribute("skillName", skill.getProperty("name"));

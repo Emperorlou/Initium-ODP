@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -2001,6 +2002,15 @@ public class GameUtils
 		else
 			throw new IllegalArgumentException("Invalid field value type.");
 		
+	}
+	
+	public static boolean containsKey(Collection<Key> list, Key key)
+	{
+		for(Key listKey:list)
+			if (GameUtils.equals(listKey, key))
+				return true;
+		
+		return false;
 	}
 	
 	

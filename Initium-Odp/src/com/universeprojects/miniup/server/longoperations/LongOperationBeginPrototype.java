@@ -52,18 +52,10 @@ public class LongOperationBeginPrototype extends LongOperation
 		CachedEntity character = db.getCurrentCharacter();
 		
 		doChecks(character, idea);
-		
-//		pool.addToQueue(entity.getProperty("prototypeItemsConsumed"));
-//		pool.addToQueue(entity.getProperty("prototypeItemsRequired"));
-//		pool.addToQueue(entity.getProperty("skillCharacterProcessAffectors"));
-//		pool.addToQueue(entity.getProperty("skillCharacterResultAffectors"));
-//		pool.addToQueue(entity.getProperty("skillKnowledgeRequirements"));
-//		pool.addToQueue(entity.getProperty("skillMaterialsOptional"));
-//		pool.addToQueue(entity.getProperty("skillMaterialsRequired"));
-//		pool.addToQueue(entity.getProperty("skillToolsOptional"));
-//		pool.addToQueue(entity.getProperty("skillToolsRequired"));
 
-		Map<String, Key> itemRequirementsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, idea)
+		
+
+		Map<String, Key> itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, idea)
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Required Materials", "prototypeItemsConsumed")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
@@ -72,13 +64,24 @@ public class LongOperationBeginPrototype extends LongOperation
 		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
 		.go();
 		
+		CachedEntity ideaDef = db.getEntity((Key)idea.getProperty("_definitionKey"));
+		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());
 		ODPInventionService inventionService = db.getInventionService(character, knowledgeService);
 		EntityPool pool = new EntityPool(ds);
+
+		
 		
 		// Pooling entities...
-		pool.addToQueue(itemRequirementsToItems.keySet(), itemRequirementsToItems.values());
+		pool.addEntityDirectly(ideaDef);
 		inventionService.poolConstructItemIdea(pool, idea);
+		inventionService.poolGerSlotsAndSelectedItems(pool, ideaDef, itemRequirementSlotsToItems);
+		
+		pool.loadEntities();
+		
+		
+		// Now figure out which of the gers in each slot should actually be used
+		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems);
 		
 		// This check will throw a UserErrorMessage if it finds anything off
 		inventionService.checkIdeaWithSelectedItems(pool, idea, itemRequirementsToItems);
@@ -89,7 +92,6 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		int seconds = 5;
 		
-		CachedEntity ideaDef = pool.get((Key)idea.getProperty("_definitionKey"));
 		if (ideaDef.getProperty("prototypeConstructionSpeed")!=null)
 			seconds = ((Long)ideaDef.getProperty("prototypeConstructionSpeed")).intValue();
 		

@@ -137,7 +137,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public void checkIdeaWithSelectedItems(EntityPool pool, CachedEntity idea, Map<String, Key> itemRequirementsToItems) throws UserErrorMessage
+	public void checkIdeaWithSelectedItems(EntityPool pool, CachedEntity idea, Map<Key, Key> itemRequirementsToItems) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
@@ -196,6 +196,18 @@ public abstract class ODPInventionService extends Service
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public Map<Key, Key> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void poolGerSlotsAndSelectedItems(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

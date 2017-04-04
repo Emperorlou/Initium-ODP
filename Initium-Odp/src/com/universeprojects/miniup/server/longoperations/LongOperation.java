@@ -177,7 +177,7 @@ public abstract class LongOperation extends OperationBase
 	}
 	
 	
-//	int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException;
+	abstract int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException;
 	
 	/**
 	 * 
