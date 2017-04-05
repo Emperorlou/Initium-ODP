@@ -112,7 +112,7 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		Map<String, Object> entity1Props = entity1.getProperties();
 		Map<String, Object> entity2Props = entity2.getProperties();
 		// Merge the keysets, so that newly added fields also get considered
-		Set<String> allKeys = entity1Props.keySet();
+		Set<String> allKeys = new HashSet<String>(entity1Props.keySet());
 		allKeys.addAll(entity2Props.keySet());
 		allKeys.remove("movedTimestamp");
 		allKeys.remove("quantity");
