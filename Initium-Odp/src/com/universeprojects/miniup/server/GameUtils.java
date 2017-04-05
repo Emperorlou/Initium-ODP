@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -2190,5 +2192,58 @@ public class GameUtils
 			return true;
 		
 		return false;
+	}
+	
+	public static Object createObject(String fullClassPath, Object...arguments)
+	{
+		// Reflectively get the command class...
+		Class<?> c;
+		try
+		{
+			c = (Class<?>) Class.forName(fullClassPath);
+		}
+		catch (ClassNotFoundException e1)
+		{
+			throw new RuntimeException("Class not found: "+fullClassPath, e1);
+		}
+		
+		// Reflectively get the constructor for the command...
+		Constructor<?> constructor = null;
+		try 
+		{
+			Class<?>[] classes = new Class[arguments.length];
+			for(int i = 0; i<classes.length; i++)
+				classes[i] = arguments[i].getClass();
+			constructor = c.getConstructor(classes);
+		} 
+		catch (NoSuchMethodException e) 
+		{
+			throw new RuntimeException("Unable to find a constructor that matches the given arguments. "+e.getMessage());
+		}
+		
+		// Now create the command instance...
+		Object result = null;
+		try 
+		{
+			result = constructor.newInstance(arguments);
+		} 
+		catch (InstantiationException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (IllegalAccessException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (IllegalArgumentException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (InvocationTargetException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		}
+		
+		return result;
 	}
 }

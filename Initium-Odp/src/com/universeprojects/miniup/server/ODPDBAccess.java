@@ -3444,6 +3444,13 @@ public class ODPDBAccess
 		return false;
 	}
 
+	
+	public boolean randomMonsterEncounter(CachedDatastoreService ds, CachedEntity character, CachedEntity location, int tries, Double individualMonsterChanceMultilier, Boolean noCombatSiteOverride)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 
 //	/**
 //	 * This is a placeholder since the actual implementation is not in the ODP.
@@ -6031,4 +6038,5 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }
