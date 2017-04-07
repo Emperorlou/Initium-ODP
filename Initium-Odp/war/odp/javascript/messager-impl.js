@@ -163,6 +163,10 @@ messager.checkClientSideChatCommands = function(chatMessage)
 			joinPartyCharacterName(null, characterName);
 			return true;
 		}
+		if (chatMessage.toLowerCase().startsWith("/pickup")) {
+			var characterName = chatMessage.slice(8);
+			doCollectCharacter(null, null, characterName);
+		}
 	}
 	return false;
 };
