@@ -126,26 +126,32 @@
     
     // TODO: Check if all saleItems are sold, if so, take the player out of store mode
 %>
-        <div>
-        <h4><%=storeCharacter.getProperty("name")%>'s Storefront</h4> 
-        <p><%=storeCharacter.getProperty("storeName")%></p>
-        <div class="main-item-filter">
-			<input class="main-item-filter-input" id="filter_saleItem" type="text" placeholder="Filter store items...">
-		</div>
-        <%
-            String currentCategory = "";
-            for(CachedEntity item:items)
-            {
-                String itemType = (String)item.getProperty("itemType");
-                if (itemType==null || itemType.length() == 0) itemType = "Other";
-                
-                if (currentCategory.equals(itemType)==false)
-                {
-                    out.println("<h3>"+itemType+"</h3>");
-                    currentCategory = itemType;
-                }
-                out.println(HtmlComponents.generateStoreItemHtml(db,common.getCharacter(), storeCharacter,item,itemToSaleItemMap.get(item),request));
-            }
-        %>
-        <center><a onclick="closePagePopup()" class="big-link">Leave Store</a></center>
-        </div>
+
+
+
+
+<div class='normal-container'>
+	<h4><%=storeCharacter.getProperty("name")%>'s Storefront</h4> 
+	<p><%=storeCharacter.getProperty("storeName")%></p>
+	<div class="main-item-filter">
+		<input class="main-item-filter-input" id="filter_saleItem" type="text" placeholder="Filter store items...">
+	</div>
+</div>
+<div class='normal-container'>
+	<%
+	String currentCategory = "";
+	for(CachedEntity item:items)
+	{
+	    String itemType = (String)item.getProperty("itemType");
+	    if (itemType==null || itemType.length() == 0) itemType = "Other";
+	    
+	    if (currentCategory.equals(itemType)==false)
+	    {
+	        out.println("<h3>"+itemType+"</h3>");
+	        currentCategory = itemType;
+	    }
+	    out.println(HtmlComponents.generateStoreItemHtml(db,common.getCharacter(), storeCharacter,item,itemToSaleItemMap.get(item),request));
+	}
+	%>
+	<center><a onclick="closePagePopup()" class="big-link">Leave Store</a></center>
+</div>

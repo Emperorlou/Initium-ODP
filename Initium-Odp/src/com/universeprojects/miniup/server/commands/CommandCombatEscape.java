@@ -45,14 +45,13 @@ public class CommandCombatEscape extends Command {
 		boolean success = db.doCharacterAttemptEscape(location, character, monster);
 		db.flagNotALooter(request);
 		
+		String userMessage = "";
 		if(success)
 		{
-			transitionFromCombat(null);
-			return;
+			userMessage = "You managed to escape!";
 		}
 		else
 		{
-			String userMessage = "";
 			ODPAuthenticator auth = new ODPAuthenticator();
 			String counterAttackStatus = db.doMonsterCounterAttack(auth, user, monster, character);
 			
@@ -70,13 +69,13 @@ public class CommandCombatEscape extends Command {
                     userMessage+=counterAttackStatus;
                 }
             }
-
-			MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
-			String combatUpdate = mpus.updateCombatView(cs, monster, userMessage);
-			if(combatUpdate == null || combatUpdate.isEmpty())
-			{
-				transitionFromCombat(userMessage);
-			}
+		}
+		
+		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
+		String combatUpdate = mpus.updateCombatView(cs, monster, userMessage);
+		if(combatUpdate == null || combatUpdate.isEmpty())
+		{
+			transitionFromCombat(userMessage);
 		}
 	}
 

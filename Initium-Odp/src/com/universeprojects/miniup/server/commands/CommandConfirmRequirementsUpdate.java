@@ -1,11 +1,14 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
@@ -26,18 +29,24 @@ public class CommandConfirmRequirementsUpdate extends Command
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage
 	{
-		Long genericEntityRequirementId = tryParseId(parameters, "id");
-		CachedEntity ger = db.getEntity(KeyFactory.createKey("GenericEntityRequirement", genericEntityRequirementId));
-		if (ger==null) throw new RuntimeException("Unable to find the entity requirement by ID: "+genericEntityRequirementId);
+		List<Key> gerKeyList = new ArrayList<Key>();
+		String gerKeyListRaw = parameters.get("gerKeyList");
+		for(String gerKeyString:gerKeyListRaw.split(","))
+			gerKeyList.add(KeyFactory.stringToKey(gerKeyString));
+		
+		List<CachedEntity> gers = db.getDB().get(gerKeyList);
+//		Long genericEntityRequirementId = tryParseId(parameters, "id");
+//		CachedEntity ger = db.getEntity(KeyFactory.createKey("GenericEntityRequirement", genericEntityRequirementId));
+//		if (ger==null) throw new RuntimeException("Unable to find the entity requirement by ID: "+genericEntityRequirementId);
 		
 		ODPInventionService invention = db.getInventionService(db.getCurrentCharacter(), null);
 		
 		EntityPool pool = new EntityPool(db.getDB());
 		
-		List<CachedEntity> items = invention.getItemCandidatesFor(pool, ger); 
+		Set<CachedEntity> items = invention.getItemCandidatesFor(pool, gers); 
 
 		StringBuilder html = new StringBuilder();
-		html.append("<div>For ").append(ger.getProperty("name")).append("...</div>");
+		html.append("<div>For ").append(gers.get(0).getProperty("name")).append("...</div>");
 		html.append("<div class='list'>");
 		for(CachedEntity item:items)
 		{

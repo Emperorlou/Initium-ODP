@@ -48,6 +48,7 @@
 	.selectarea
 	{
 		position:relative;
+		vertical-align:middle;
 	}
 	.selectarea .X
 	{
@@ -70,13 +71,13 @@
 	}
 </style>
 <script type='text/javascript'>
-var crSelectedRequirementId = null;
-function selectRequirement(event, requirementId)
+var crSelectedRequirementSlotIndex = null;
+function selectRequirement(event, requirementSlotIndex, gerKeyList)
 {
-	crSelectedRequirementId = requirementId;
+	crSelectedRequirementSlotIndex = requirementSlotIndex.split(":").join("\\:");
 	$(".confirm-requirements-requirement").removeClass("confirm-requirements-selected");
 	$(event.target).closest(".confirm-requirements-requirement").addClass("confirm-requirements-selected");
-	doCommand(event, "ConfirmRequirementsUpdate", {id:requirementId});	
+	doCommand(event, "ConfirmRequirementsUpdate", {slotIndex:requirementSlotIndex, gerKeyList:gerKeyList});	
 }
 
 function selectItem(event, itemId)
@@ -88,8 +89,8 @@ function selectItem(event, itemId)
 	unselectItem(null);
 	
 	
-	$("#itemForRequirement"+crSelectedRequirementId).val(itemId);
-	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementId);
+	$("#"+crSelectedRequirementSlotIndex).val(itemId);
+	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementSlotIndex);
 	var itemVisual = $(event.target).closest(".confirm-requirements-item-candidate");
 	itemVisual.detach();
 	itemPanelForRequirement.append(itemVisual);
@@ -101,7 +102,7 @@ function selectItem(event, itemId)
 function unselectItem(event)
 {
 	var candidatesContainer = $("#item-candidates");
-	var container = $("#requirement-container-"+crSelectedRequirementId);
+	var container = $("#requirement-container-"+crSelectedRequirementSlotIndex);
 	var currentSelectedItem = container.find(".itemToSelect");
 	if (currentSelectedItem.length==0)
 		return; 	// Nothing is selected
@@ -117,7 +118,7 @@ function unselectItem(event)
 		event.stopPropagation();
 }
 
-function collectChoices(event)
+function confirmRequirements_collectChoices(event)
 {
 	
 	var result = {};
@@ -135,17 +136,22 @@ function collectChoices(event)
 <c:forEach var="requirementCategory" items="${formattedRequirements}">
 	<h4><c:out value="${requirementCategory.name}"/></h4>
 	<c:forEach var="requirement" items="${requirementCategory.list}">
-		<div class='hiddenTooltip' id='requirementHelp-${requirement.id }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
-		<div id='requirement-container-${requirement.id}' onclick='selectRequirement(event, ${requirement.id})' class='confirm-requirements-entry confirm-requirements-requirement'>
-			<input type='hidden' class='itemForRequirementInput' id='itemForRequirement${requirement.id}' name='itemForRequirement${requirement.id}'/>
-			<div class='hint questionmark' rel='#requirementHelp-${requirement.id}'>?</div><div><c:out value="${requirement.name}"/></div>
-			<div id='itemHtmlForRequirement${requirement.id}'></div>
+		<div class='hiddenTooltip' id='requirementHelp-${requirement.slotName }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
+		<div id='requirement-container-${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
+			<input type='hidden' class='itemForRequirementInput' id='${requirement.slotName}' name='${requirement.slotName}'/>
+			<div class='hint questionmark' rel='#requirementHelp-${requirement.slotName}'>?</div><div><c:out value="${requirement.name}"/></div>
+			<div id='itemHtmlForRequirement${requirement.slotName}'></div>
 		</div>
 	</c:forEach>
 </c:forEach>
 <br>
 <div class='center'>
-	<a onclick='doBeginPrototype(event, ${ideaId}, collectChoices(event))' class='big-link'>Start Prototyping</a>
+	<c:if test="${type=='IdeaToPrototype'}">
+		<a onclick='doCreatePrototype(event, ${ideaId}, "${ideaName}", "${userRequestId}")' class='big-link'>Start Prototyping</a>
+	</c:if>
+	<c:if test="${type=='ConstructItemSkill'}">
+		<a onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}")' class='big-link'>Begin</a>
+	</c:if>
 </div>
 
 </div>

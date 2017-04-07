@@ -12,8 +12,6 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.WebUtils;
-import com.universeprojects.miniup.server.commands.framework.Command;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 public class MainPageUpdateService extends Service
 {
@@ -639,16 +637,12 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder newHtml = new StringBuilder();
 		
-		if(db.isTestServer())
-		{
-			List<CachedEntity> weapons = db.getEntities((Key)character.getProperty("equipmentLeftHand"), (Key)character.getProperty("equipmentRightHand"));
-			newHtml.append(GameUtils.renderWeaponCommand(weapons.get(0), true));
-			newHtml.append(GameUtils.renderWeaponCommand(weapons.get(1), false));
-			newHtml.append("<a onclick='doCombatEscape(event)' class='main-button' shortcut='51'><span class='shortcut-key'>(3)</span>Try to run away</a>");
-		}
+		List<CachedEntity> weapons = db.getEntities((Key)character.getProperty("equipmentLeftHand"), (Key)character.getProperty("equipmentRightHand"));
+		newHtml.append(GameUtils.renderWeaponCommand(weapons.get(0), true));
+		newHtml.append(GameUtils.renderWeaponCommand(weapons.get(1), false));
+		newHtml.append("<a onclick='doCombatEscape(event)' class='main-button' shortcut='51'><span class='shortcut-key'>(3)</span>Try to run away</a>");
 		
 		return updateHtmlContents(".main-buttonbox", newHtml.toString());
-		
 	}
 	
 

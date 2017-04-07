@@ -189,7 +189,7 @@ function popupMessage(title, content, noBackground)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><div class="paragraph">' + content + '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
     expandpopupMessage();
     enterPopupClose();
    }
@@ -807,6 +807,16 @@ function collectDogecoinsFromCharacter(characterId, event)
 	doCommand(event, "DogeCoinsCollectFromCharacter", {"characterId" : characterId}, function(data,error){
 		if(error) return;
 		$(event.currentTarget || event.target).text("Collect 0 gold");
+	});
+}
+
+function doCollectCharacter(event, characterId, characterName)
+{
+	doCommand(event, "CharacterCollectCharacter", {"characterId" : characterId, "characterName" : characterName}, function(data,error){
+		if(error) return;
+		// Inline nearby characters isn't in a popup, so clear the link as well.
+		$(event.currentTarget || event.target).html("");
+		reloadPagePopup();
 	});
 }
 
@@ -1474,6 +1484,7 @@ function autofixLootStuckOnMonster(event)
 	doCommand(event, "AutofixLootStuckOnMonster"); //callback? 
 }
 
+
 function autofixDeathModeNotSet(event)
 {
 	doCommand(event, "AutofixDeathModeNotSet"); //callback? 
@@ -1674,6 +1685,9 @@ function closePagePopup(doNotCallback)
 	
 	decrementStackIndex();
 	
+	if (currentPopupStackIndex==0)
+		$(".half-page-variant").hide();
+	
 	if (doNotCallback!=true)
 	{
 		var func = popupStackCloseCallbackHandlers.pop();
@@ -1712,6 +1726,8 @@ function reloadPagePopup(quietly)
 	
 	var url = content.attr("src");
 
+	ga('send', 'pageview', url);	
+	
 	if (quietly==false)
 		content.html("<img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/>");
 	else
@@ -2342,6 +2358,38 @@ function splitPremiumToken(event, itemId)
 	});
 }
 
+function doRenameConstructItemSkill(event, currentName, skillId)
+{
+	closeAllTooltips();
+	
+	promptPopup("Rename Skill", "Provide a new name for this skill. You may use letters, numbers, spaces, or any of these characters: . ' #", currentName, function(name){
+		doCommand(event, "ConstructItemSkillRename", {skillId:skillId,name:name});
+	});
+}
+
+function doForgetConstructItemSkill(event, name, skillId)
+{
+	closeAllTooltips();
+	
+	confirmPopup("Permanently Forget Skill", "Are you sure you want to forget the "+name+" skill? You cannot undo this operation.", function(){
+		doCommand(event, "ConstructItemSkillForget", {skillId:skillId});
+	});
+}
+
+function doBuyCharacterSlots(event)
+{
+	confirmPopup("Get more character slots", "Are you sure you want to get 8 more character slots for $5 in donation credit?", function(){
+		doCommand(event, "BuyCharacterSlots");
+	});
+}
+
+function doLightFireplace(event, itemKey)
+{
+	closeAllTooltips();
+	
+	doCommand(event, "LightFireplace", {itemKey:itemKey});
+}
+
 
 
 
@@ -2439,8 +2487,40 @@ function ajaxUpdatePage(ajaxResponseData)
 				$("#"+htmlData.id).remove();
 				$("body").append("<script id='"+htmlData.id+"' type='text/javascript'>"+htmlData.js+"</script>");
 			}
+			else if (htmlData.type==5)
+			{
+				$(htmlData.selector).remove();
+			}
 		}
 	}
+}
+
+/**
+ * This function activates the wait gif animation on the clicked element and returns 
+ * a function that, when called, will restore the original html for the clicked element.
+ * @param eventObject
+ * @returns {Function}
+ */
+function activateWaitGif(eventObject)
+{
+	var clickedElement = null;
+	var originalText = null;
+	if (eventObject!=null)
+	{
+		clickedElement = $(eventObject.currentTarget);
+		if(clickedElement.find("img.wait").length == 0) {
+			originalText = clickedElement.html();
+			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
+		}
+	}
+	
+	return function(){
+		if (eventObject!=null)
+		{
+			clickedElement.html(originalText.replace("hasTooltip", ""));
+		}
+	};
+	
 }
 
 
@@ -2454,6 +2534,8 @@ function doCommand(eventObject, commandName, parameters, callback)
 	
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "/cmd?cmd="+commandName;
+	
+	ga('send', 'pageview', url);	
 	
 	var clickedElement = null;
 	var originalText = null;
@@ -2494,6 +2576,12 @@ function doCommand(eventObject, commandName, parameters, callback)
 		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
 
+		// Here we handle the special: UserRequestBuilder page popup mechanism
+		if (data.pagePopupUrl!=null)
+		{
+			handleUserRequest(data);
+		}
+		
 		// Here we display the system message if there was a system message
 		if (data.message!=null && data.message.length>0)
 			popupMessage("System Message", data.message);
@@ -2599,9 +2687,32 @@ function doTerritorySetDefense(eventObject, line)
 // LONG OPERATIONS
 
 
+var longOperationCountdownTimer = null;
+function startLongOperationCountdown(timeLeftSeconds)
+{
+	lastLongOperationDueTime = new Date().getTime()+((timeLeftSeconds+1)*1000);
+	updateLongOperationTimeLeft();
+	longOperationCountdownTimer = setInterval(updateLongOperationTimeLeft, 1000);
+}
+function stopLongOperationCountdown()
+{
+	if (window.longOperationCountdownTimer!=null)
+		clearInterval(longOperationCountdownTimer);
+}
 
-
-
+function updateLongOperationTimeLeft()
+{
+	if (lastLongOperationDueTime!=null)
+	{
+		var currentTime = new Date().getTime();
+		var dueTime = lastLongOperationDueTime;
+		var timeLeft = (dueTime-currentTime)/1000;
+		if (timeLeft<0)
+			$("#long-operation-timeleft").text("0 seconds remaining.");
+		else
+			$("#long-operation-timeleft").text(Math.floor(timeLeft)+" seconds remaining.");
+	}
+}
 
 
 function longOperation_fullPageRefresh(eventObject, operationName, operationDescription, operationBannerUrl, actionUrl, fullPageRefreshSeconds)
@@ -2623,7 +2734,7 @@ function longOperation_fullPageRefresh(eventObject, operationName, operationDesc
 	
 }
 
-
+var lastLongOperationDueTime = null;
 var lastLongOperationEventObject = null;
 /**
  * 
@@ -2640,6 +2751,8 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 		actionUrl+="&ajax=true";
 	else
 		actionUrl+="?ajax=true";
+
+	ga('send', 'pageview', actionUrl);	
 	
 	$.get(actionUrl)
 	.done(function(data)
@@ -2670,6 +2783,15 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 		{
 			popupMessage("System Message", data.message, false);
 		}
+		
+		// Here we handle the special: UserRequestBuilder page popup mechanism
+		if (data.pagePopupUrl!=null)
+		{
+			handleUserRequest(data);
+			return;
+		}
+
+		
 		if (responseFunction!=null)
 			responseFunction(data);
 		
@@ -2686,6 +2808,12 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 		{
 			if (data.description!=null)
 				$("#long-operation-complete-text").html(data.description);
+		}
+		
+		// And at the end of it all, we'll update the time left, but only if we're supposed to show it...
+		if (data.isShowingTimeLeft)
+		{
+			startLongOperationCountdown(data.timeLeft);
 		}
 		lastLongOperationEventObject = null;
 	})
@@ -2779,26 +2907,26 @@ function doExperiment(event)
 }
 
 
-function doCreatePrototype(event, ideaId, ideaName)
+//function doCreatePrototype(event, ideaId, ideaName)
+//{
+//	closeAllPopups();
+//	closeAllTooltips();
+//	
+//	pagePopup("/odp/confirmrequirements?ideaId="+ideaId, function(){
+//		clearPopupPermanentOverlay();
+//	}, "Develop "+ideaName);
+//}
+
+function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 {
-	closeAllPopups();
-	closeAllTooltips();
 	
-	pagePopup("/odp/confirmrequirements?ideaId="+ideaId, function(){
-		clearPopupPermanentOverlay();
-	}, "Develop "+ideaName);
-}
-
-function doBeginPrototype(event, ideaId, selectedItems)
-{
-	closeAllPopups();
-	closeAllTooltips();
-	closePagePopup(true);
-
+	var selectedItems = null;
+	if (userRequestId!=null)
+		selectedItems = confirmRequirements_collectChoices(event);
 	
 	showBannerLoadingIcon();
 	if (selectedItems==null) selectedItems = {};
-	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaId="+ideaId+"&selectedItems="+JSON.stringify(selectedItems)+"&v="+window.verifyCode, 
+	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaName="+encodeURIComponent(ideaName)+"&ideaId="+ideaId+"&__"+userRequestId+"UserResponse="+encodeURIComponent(JSON.stringify(selectedItems))+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2808,20 +2936,27 @@ function doBeginPrototype(event, ideaId, selectedItems)
 				}
 				else
 				{
-					popupPermanentOverlay_Experiment("Prototyping", "You are attempting to create a new prototype of an idea. This can take some time...");
+					popupPermanentOverlay_Experiment("Prototyping", "You are attempting to create a new prototype of the "+ideaName+" idea.<br><span id='long-operation-timeleft'></span>");
 				}
 			},
 			function()	// recallFunction
 			{
-				doBeginPrototype(null, ideaId, selectedItems);
+				doCreatePrototype(event, ideaId, ideaName);
 			});
 	
 }
 
-function doConfirmCreatePrototype(event, ideaName, entityRequirementToItemMap)
+function doConstructItemSkill(event, skillId, skillName, userRequestId)
 {
+	closeAllTooltips();
+	
+	var selectedItems = null;
+	if (userRequestId!=null)
+		selectedItems = confirmRequirements_collectChoices(event);
+	
 	showBannerLoadingIcon();
-	longOperation(event, "/ServletCharacterControl?type=createprototype_ajax&v="+window.verifyCode, 
+	if (selectedItems==null) selectedItems = {};
+	longOperation(event, "/ServletCharacterControl?type=constructItemSkill_ajax&skillName="+encodeURIComponent(skillName)+"&skillId="+skillId+"&__"+userRequestId+"UserResponse="+encodeURIComponent(JSON.stringify(selectedItems))+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2831,15 +2966,70 @@ function doConfirmCreatePrototype(event, ideaName, entityRequirementToItemMap)
 				}
 				else
 				{
-					popupPermanentOverlay_Experiment("Creating Prototype", "You are trying to create a working prototype of the "+ideaName+" idea...");
-
+					popupPermanentOverlay_Experiment("Construct Item", "You are performing your "+skillName+" skill.<br><span id='long-operation-timeleft'></span>");
 				}
 			},
 			function()	// recallFunction
 			{
-				doCreatePrototype(null, ideaName);
+				doConstructItemSkill(event, skillId, skillName);
 			});
+	
 }
+
+
+
+
+//function doBeginPrototype(event, ideaId, selectedItems)
+//{
+//	closeAllPopups();
+//	closeAllTooltips();
+//	closePagePopup(true);
+//
+//	
+//	showBannerLoadingIcon();
+//	if (selectedItems==null) selectedItems = {};
+//	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaId="+ideaId+"&selectedItems="+JSON.stringify(selectedItems)+"&v="+window.verifyCode, 
+//			function(action) // responseFunction
+//			{
+//				if (action.isComplete)
+//				{
+//					clearPopupPermanentOverlay(); 
+//					reloadPagePopup(false);
+//				}
+//				else
+//				{
+//					popupPermanentOverlay_Experiment("Prototyping", "You are attempting to create a new prototype of an idea. This can take some time...");
+//				}
+//			},
+//			function()	// recallFunction
+//			{
+//				doBeginPrototype(null, ideaId, selectedItems);
+//			});
+//	
+//}
+//
+//function doConfirmCreatePrototype(event, ideaName, entityRequirementToItemMap)
+//{
+//	showBannerLoadingIcon();
+//	longOperation(event, "/ServletCharacterControl?type=createprototype_ajax&v="+window.verifyCode, 
+//			function(action) // responseFunction
+//			{
+//				if (action.isComplete)
+//				{
+//					clearPopupPermanentOverlay(); 
+//					reloadPagePopup(false);
+//				}
+//				else
+//				{
+//					popupPermanentOverlay_Experiment("Creating Prototype", "You are trying to create a working prototype of the "+ideaName+" idea...");
+//
+//				}
+//			},
+//			function()	// recallFunction
+//			{
+//				doCreatePrototype(null, ideaName);
+//			});
+//}
 
 
 
@@ -2916,8 +3106,17 @@ function doCollectCollectable(event, collectableId)
 			});
 }
 
-
-
+function handleUserRequest(data)
+{
+	if (data.pagePopupUrl.indexOf("?")>=0)
+		data.pagePopupUrl+="&userRequestId="+data.userRequestId;
+	else
+		data.pagePopupUrl+="?userRequestId="+data.userRequestId;
+	
+	closeAllPopups();
+	closeAllTooltips();
+	pagePopup(data.pagePopupUrl, null, data.pagePopupTitle);
+}
 
 /*
  * 1. Regular method doGoto() is called which calls longOperation, passes in the doGoto_ajaxResponse() function
@@ -3569,7 +3768,7 @@ function antiBotAnswer(response)
 function antiBotQuestionPopup()
 {
 	popupMessage("Anti Bot Check", "<div id='myCaptcha' style='float:left;margin-right:10px;'></div><p>We have to check from time to time to make sure you're a human playing. This is to prevent people from " +
-			"playing the game automatically using bots.</p>");
+			"playing the game automatically using bots. Having trouble? <a onclick='location.reload()'>Click here</a> to refresh.</p>");
 	
 	grecaptcha.render( 'myCaptcha', {
 		  'sitekey' : '6Ldx9wcUAAAAAG78kIIiv-pnhHBaAaTrpcX5ZDwT',  // required

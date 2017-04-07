@@ -18,7 +18,7 @@ function changeInventionTab(event)
 
 </script>
 
-<div class='tab-row'>
+<div class='tab-row normal-container backdrop1b'>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='knowledge-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='experimentation-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='idea-tab'></div>
@@ -74,8 +74,16 @@ function changeInventionTab(event)
 		</c:if>
 		<c:if test="${hasIdeas==true}">
 			<c:forEach var="idea" items="${ideas}">
-				<div class='idea-container'>
-					<a onclick='doCreatePrototype(event, ${idea.id}, "<c:out value="${idea.name}"/>");'><img src='${idea.iconUrl}' border=0/> ${idea.name}</a>
+				<div class='idea-container' id='idea-id-${idea.id}'>
+					<div class='hiddenTooltip' id='idea-popup-1-${idea.id}'>
+						<h4>${idea.name}</h4>
+						<p>${idea.description}</p>
+						<div class='paragraph generic-field'>Time to develop: <span class='generic-field-value'>${idea.speed} seconds</span></div>
+						<p>
+							<a onclick='doCreatePrototype(event, ${idea.id}, "<c:out value="${idea.name}"/>");'>Create prototype now</a>
+						</p>
+					</div>
+					<a class='hint' rel='#idea-popup-1-${idea.id}'><img src='${idea.icon}' style='vertical-align:middle' border=0/> ${idea.name}</a>
 				</div>
 			</c:forEach>
 		</c:if>
@@ -92,8 +100,30 @@ function changeInventionTab(event)
 		</c:if>
 		<c:if test="${hasConstructItemSkills==true}">
 			<c:forEach var="skill" items="${constructItemSkills}">
-				<div class='skill-container'>
-					<a onclick='doConstructItemSkill(event, ${skill.id}, "<c:out value="${skill.name}"/>");'><img src='${skill.iconUrl}' border=0/> ${skill.name}</a>
+				<div class='skill-container' id='skill-id-${skill.id}'>
+					<div class='hiddenTooltip' id='skill-popup-1-${skill.id}'>
+						<h4 id='skill-popup-title-name-${skill.id}'>${skill.name}</h4>
+						<p>${skill.description}</p>
+						<div class='paragraph generic-field'>Construction time: <span class='generic-field-value'>${skill.speed} seconds</span></div>
+						<p>
+							<a onclick='doConstructItemSkill(event, ${skill.id}, "<c:out value="${skill.name}"/>");'>Create this now</a>
+						</p>
+						<p>
+							<a onclick='doRenameConstructItemSkill(event, "<c:out value="${skill.name}"/>", ${skill.id})'>Rename this skill</a>
+						</p>
+						<p>
+							<a onclick='doForgetConstructItemSkill(event, "<c:out value="${skill.name}"/>", ${skill.id})'>Forget this skill</a>
+						</p>
+						
+					</div>
+					<div class='generic-itemlike-container'>
+						<a class='hint' rel='#skill-popup-1-${skill.id}'><img src='${skill.icon}' border=0/> 
+							<div class='generic-itemlike-name-container'>
+								<div class='generic-itemlike-name' id='skill-name-${skill.id}'>${skill.name}</div>
+								<div class='generic-itemlike-lowerline'>${skill.class}</div>
+							</div>
+						</a>
+					</div>
 				</div>
 			</c:forEach>
 		</c:if>

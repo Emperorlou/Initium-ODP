@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -142,17 +143,6 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
-	public CachedEntity createBaseSkillFromIdea(Key key, CachedEntity idea, EntityPool pool)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public CachedEntity createBaseItemFromSkill(CachedEntity skill, EntityPool pool)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public List<CachedEntity> getAllItemConstructionSkills()
 	{
@@ -179,6 +169,48 @@ public abstract class ODPInventionService extends Service
 	}
 
 	public void checkSkillWithSelectedItems(EntityPool pool, CachedEntity skill, Map<Key, Key> itemRequirementsToItems) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public CachedEntity doCreateConstructItemPrototype(CachedEntity idea, Map<Key, Key> itemRequirementsToItems, EntityPool pool) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public CachedEntity doConstructItemSkill(CachedEntity skill, Map<Key, Key> itemRequirementsToItems, EntityPool pool) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void processConstructItemSkillForProcessVariables(CachedEntity skill, Map<Key, Key> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Set<CachedEntity> getItemCandidatesFor(EntityPool pool, List<CachedEntity> genericEntityRequirementsList)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Map<Key, Key> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void poolGerSlotsAndSelectedItems(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void checkGersMatchItems(EntityPool pool, Map<Key, Key> gerToItemMap) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		

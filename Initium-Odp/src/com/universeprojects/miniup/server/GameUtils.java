@@ -1,10 +1,13 @@
 package com.universeprojects.miniup.server;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,6 +38,7 @@ public class GameUtils
 {
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
+	final static DecimalFormat singleDigitFormat = new DecimalFormat("#,##0.0");
 	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,##0.00");
 	final static DecimalFormat noDigitFormat = new DecimalFormat("#,###");
 	final static DateFormat longDateFormat = new SimpleDateFormat("MMM, dd, yyyy HH:mm:ss");
@@ -646,7 +650,7 @@ public class GameUtils
 	    	if ("Junk".equals(qualityClassOverride))
 	    		qualityClass = "item-junk";
 	    	else if ("Average".equals(qualityClassOverride))
-	    		qualityClass = "";
+	    		qualityClass = "item-normal";
 	    	else if ("Rare".equals(qualityClassOverride))
 	    		qualityClass = "item-rare";
 	    	else if ("Unique".equals(qualityClassOverride))
@@ -836,7 +840,7 @@ public class GameUtils
 			if (finalQuality<1)
 				result = "item-junk";
 			else if (finalQuality<2)
-				result = "";
+				result = "item-normal";
 			else if (finalQuality<3)
 				result = "item-rare";
 			else 
@@ -926,15 +930,15 @@ public class GameUtils
     
     public static String renderItem(CachedEntity item)
     {
-    	return renderItem(null, null, null, item, false);
+    	return renderItem(null, null, null, item, false, false);
     }
     
     public static String renderItem(ODPDBAccess db, CachedEntity character, CachedEntity item)
     {
-    	return renderItem(db, null, character, item, false);
+    	return renderItem(db, null, character, item, false, false);
     }
     
-    public static String renderItem(ODPDBAccess db, HttpServletRequest request, CachedEntity character, CachedEntity item, boolean popupEmbedded)
+    public static String renderItem(ODPDBAccess db, HttpServletRequest request, CachedEntity character, CachedEntity item, boolean popupEmbedded, boolean smallMode)
     {
 		if (item==null)
 			return "";
@@ -986,14 +990,66 @@ public class GameUtils
 		
 		Long quantity = (Long)item.getProperty("quantity");
 		String quantityDiv = "";
-		if (quantity!=null){
-			quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div></div>";
+		if (quantity!=null)
+		{
+			if (quantity>10000L && smallMode)
+				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+noDigitFormat.format(quantity.doubleValue()/1000D)+" k</div></div>";
+			else if (quantity>1000L && smallMode)
+				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+singleDigitFormat.format(quantity.doubleValue()/1000D)+" k</div></div>";
+			else
+				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div></div>";
+				
 		}
 		
 		if (popupEmbedded)
 			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
 			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+    }
+    
+    public static String renderEquipSlot(CachedEntity item)
+    {
+    	StringBuilder sb = new StringBuilder();
+		if (item==null)
+		{
+			sb.append("None");
+		}
+		else
+		{
+			sb.append(" <div class='main-item-container'>");
+			sb.append(GameUtils.renderItem(item));
+			sb.append("<br>");
+			sb.append("<div class='main-item-controls'>");
+			sb.append("<a onclick='characterUnequipItem(event, "+item.getId()+")'>Unequip</a>");
+			sb.append("</div>");
+			sb.append("</div>");
+		}
+		
+		return sb.toString();
+    }
+    
+    public static String renderInventoryItem(ODPDBAccess db, CachedEntity item, CachedEntity character, boolean isSelling)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	String saleText = isSelling ? "<div class='main-item-subnote' style='color:#FF0000'> - Selling</div>" : "";
+    	sb.append("<div class='invItem' ref=" + item.getKey().getId() + ">\r\n");
+		sb.append("	<div class='main-item'><input type=checkbox>");
+		sb.append("		<div class='main-item-container'>");
+		sb.append("			" + GameUtils.renderItem(db, character, item) + saleText + "<br/>");
+		sb.append("			<div class='main-item-controls'>");
+		sb.append("				<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
+		sb.append("				<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
+		if (item.getProperty("maxWeight") != null) {
+			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"
+										+ character.getId()
+										+ "&otherSide=Item_"
+										+ item.getKey().getId() + "\")'>Open</a>");
+		}
+		sb.append("			</div>");
+		sb.append("		</div>");
+		sb.append("	</div>");
+		sb.append("</div>");
+		return sb.toString();
     }
     
     public static String renderWeaponCommand(CachedEntity item, boolean leftHand)
@@ -1246,11 +1302,11 @@ public class GameUtils
 
 		if (leftSide==false)
 		{
-			sb.append("<div class='character-display-box' style='float:right'>");
+			sb.append("<div id='newui' class='character-display-box' style='float:right'>");
 			sb.append(nameAndBars);
 		}
 		else
-			sb.append("<div class='character-display-box'>");
+			sb.append("<div id='newui' class='character-display-box'>");
 		
 		
 		if (isSelf)
@@ -1353,7 +1409,7 @@ public class GameUtils
 			}
 			else
 			{
-				sb.append("<p>To enable multiple character support, <a href='profile.jsp'>upgrade to premium!</a></p>");
+				sb.append("<p>To enable multiple character support, <a onclick='viewProfile()'>upgrade to premium!</a></p>");
 			}
 			
 			
@@ -1995,6 +2051,15 @@ public class GameUtils
 		
 	}
 	
+	public static boolean containsKey(Collection<Key> list, Key key)
+	{
+		for(Key listKey:list)
+			if (GameUtils.equals(listKey, key))
+				return true;
+		
+		return false;
+	}
+	
 	
 	public static double getWeaponMaxDamage(CachedEntity weapon)
     {
@@ -2172,5 +2237,63 @@ public class GameUtils
 			return true;
 		
 		return false;
+	}
+	
+	public static Object createObject(String fullClassPath, Object...arguments)
+	{
+		// Reflectively get the command class...
+		Class<?> c;
+		try
+		{
+			c = (Class<?>) Class.forName(fullClassPath);
+		}
+		catch (ClassNotFoundException e1)
+		{
+			throw new RuntimeException("Class not found: "+fullClassPath, e1);
+		}
+		
+		return createObject(c, arguments);
+	}
+	
+	public static Object createObject(Class<?> c, Object...arguments)
+	{
+		// Reflectively get the constructor for the command...
+		Constructor<?> constructor = null;
+		try 
+		{
+			Class<?>[] classes = new Class[arguments.length];
+			for(int i = 0; i<classes.length; i++)
+				classes[i] = arguments[i].getClass();
+			constructor = c.getConstructor(classes);
+		} 
+		catch (NoSuchMethodException e) 
+		{
+			throw new RuntimeException("Unable to find a constructor that matches the given arguments. "+e.getMessage());
+		}
+		
+		// Now create the command instance...
+		Object result = null;
+		try 
+		{
+			result = constructor.newInstance(arguments);
+		} 
+		catch (InstantiationException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (IllegalAccessException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (IllegalArgumentException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (InvocationTargetException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		}
+		
+		return result;
 	}
 }
