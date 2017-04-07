@@ -1479,9 +1479,15 @@ function autofixStuckInLocation(event)
 	doCommand(event, "AutofixStuckInLocation"); //Does this need a callback? Still not sure I fully understand that part.
 }
 
+function autofixLootStuckOnMonster(event)
+{
+	doCommand(event, "AutofixLootStuckOnMonster"); //callback? 
+}
+
+
 function autofixDeathModeNotSet(event)
 {
-	doCommand(event, "AutofixDeathModeNotSet"); //Does this need a callback? Still not sure I fully understand that part.
+	doCommand(event, "AutofixDeathModeNotSet"); //callback? 
 }
 
 function characterDropCharacter(event, characterId)

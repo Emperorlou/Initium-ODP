@@ -855,13 +855,20 @@ public class ODPDBAccess
 		return getDB().fetchAsList(q, 1000, cursor);
 	}
 
+	public List<CachedEntity> getLocationCharacters(Key locationKey)
+	{
+		QueryHelper qh = new QueryHelper(getDB());
+		List<CachedEntity> charactersHere = qh.getFilteredList("Character", 51, "locationKey", FilterOperator.EQUAL, locationKey);
+		return charactersHere;
+	}
+	
 	public Iterable<CachedEntity> getLocationsForMonsterLevelUpdate()
 	{
 		Query q = new Query("Location").setFilter(CompositeFilterOperator.or(new FilterPredicate("type", FilterOperator.EQUAL, "Permanent"), new FilterPredicate("type", FilterOperator.EQUAL,
 				"CampSite")));
 		return getDB().fetchAsIterable(q);
 	}
-
+	
 	public Iterable<CachedEntity> getLocations_CampSites()
 	{
 		Query q = new Query("Location").setFilter(new FilterPredicate("type", FilterOperator.EQUAL, "CampSite"));
