@@ -2367,6 +2367,17 @@ function doBuyCharacterSlots(event)
 	});
 }
 
+function doLightFireplace(event, itemKey)
+{
+	closeAllTooltips();
+	
+	doCommand(event, "LightFireplace", {itemKey:itemKey});
+}
+
+
+
+
+
 
 
 

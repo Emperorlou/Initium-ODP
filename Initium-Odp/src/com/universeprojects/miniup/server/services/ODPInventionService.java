@@ -210,4 +210,10 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
+	public void checkGersMatchItems(EntityPool pool, Map<Key, Key> gerToItemMap) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -1899,6 +1899,7 @@ a.range-increment {
 {
 	cursor:pointer;
 	margin:3px;
+	display:inline-block;
 }
 
 .buff-pane img

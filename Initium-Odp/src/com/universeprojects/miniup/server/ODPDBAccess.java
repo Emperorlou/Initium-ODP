@@ -423,6 +423,29 @@ public class ODPDBAccess
 	}
 
 	/**
+	 * Gets an entity from the database by it's kind and ID. If no entity was
+	 * found, this method will simply return null.
+	 * 
+	 * @param kind
+	 *            Must not be null.
+	 * @param id
+	 *            If this is null, the method will return null.
+	 * @return
+	 */
+	public CachedEntity getEntity(String kind, String entityName)
+	{
+		Key key = createKey(kind, entityName);
+		try
+		{
+			return ds.get(key);
+		}
+		catch (EntityNotFoundException e)
+		{
+			return null;
+		}
+	}
+	
+	/**
 	 * Creates a datastore key out of a kind and ID.
 	 * 
 	 * @param kind
@@ -437,6 +460,23 @@ public class ODPDBAccess
 		if (kind == null) throw new IllegalArgumentException("Kind cannot be null.");
 
 		return KeyFactory.createKey(kind, id);
+	}
+
+	/**
+	 * Creates a datastore key out of a kind and name.
+	 * 
+	 * @param kind
+	 *            Must not be null.
+	 * @param entityName
+	 *            If this is null, the method will return null.
+	 * @return
+	 */
+	public Key createKey(String kind, String entityName)
+	{
+		if (entityName == null) return null;
+		if (kind == null) throw new IllegalArgumentException("Kind cannot be null.");
+
+		return KeyFactory.createKey(kind, entityName);
 	}
 
 	/**
@@ -467,6 +507,14 @@ public class ODPDBAccess
 		return ds.fetchEntitiesFromKeys(keyList);
 	}
 
+	public InitiumObject getInitiumObject(Key key)
+	{
+		if (key==null) return null;
+		CachedEntity entity = getEntity(key);
+		if (entity==null) return null;
+		return new InitiumObject(this, entity);
+	}
+	
 	/**
 	 * Fetches the CachedEntity from the given key.
 	 * 
@@ -2154,6 +2202,9 @@ public class ODPDBAccess
 	public boolean tryMoveItem(CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
 	{
 		CachedDatastoreService ds = getDB();
+		
+		if (CommonChecks.checkItemIsMovable(item)==false)
+			throw new UserErrorMessage("You cannot move this item.");
 		
 		if (GameUtils.equals(item.getKey(), newContainer.getKey()))
 			throw new UserErrorMessage("lol, you cannot transfer an item into itself, the universe would explode.");

@@ -144,6 +144,20 @@ public abstract class CommonChecks
 	}
 	
 	/**
+	 * Checks if the item can be picked up and/or moved or if it's a permanent feature of wherever it was placed.
+	 * 
+	 * @param item
+	 * @return
+	 */
+	public static boolean checkItemIsMovable(CachedEntity item)
+	{
+		if (Boolean.TRUE.equals(item.getProperty("immovable")))
+			return false;
+		
+		return true;
+	}
+	
+	/**
 	 * Checks if the given character is a member of the group he is marked as being in. If he is not part
 	 * of a group, or is not yet an official member of it (so, excluding new applications, kicked members..etc)
 	 * then this method will return false. Otherwise if a character is a member of their group, it will return true.

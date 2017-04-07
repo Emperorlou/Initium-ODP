@@ -2207,6 +2207,11 @@ public class GameUtils
 			throw new RuntimeException("Class not found: "+fullClassPath, e1);
 		}
 		
+		return createObject(c, arguments);
+	}
+	
+	public static Object createObject(Class<?> c, Object...arguments)
+	{
 		// Reflectively get the constructor for the command...
 		Constructor<?> constructor = null;
 		try 
