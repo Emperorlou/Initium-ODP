@@ -57,7 +57,7 @@ public class CommandAutofixLootStuckOnMonster extends Command {
 			for(CachedEntity monster:charactersHere)
 			{
 				//check if character is NPC and Dead
-				if (("NPC".equals(monster.getProperty("type")) && ("Dead".equals(monster.getProperty("mode")))))
+				if (("NPC".equals(monster.getProperty("type")) && ("DEAD".equals(monster.getProperty("mode")))))
 				{
 					//check all items in the dead monster's inventory
 					for (CachedEntity monsterInventoryItem:db.getItemContentsFor(monster.getKey()))
