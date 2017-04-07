@@ -4251,7 +4251,7 @@ public class ODPDBAccess
 					// If the killed character is a NPC
 					if (characterToDie.getProperty("type")==null || "".equals(characterToDie.getProperty("type")) || "NPC".equals(characterToDie.getProperty("type")))
 					{
-//						resetInstanceRespawnTimer(dyingCharacterLocation);
+						resetInstanceRespawnTimer(dyingCharacterLocation);
 						
 						
 						characterToDie.setProperty("mode", "DEAD");
