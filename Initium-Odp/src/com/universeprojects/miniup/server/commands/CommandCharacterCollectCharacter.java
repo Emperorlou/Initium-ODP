@@ -30,7 +30,7 @@ public class CommandCharacterCollectCharacter extends Command {
 		
 		CachedEntity pickupChar = null;
 		
-		if(parameters.containsKey("characterId"))
+		if(parameters.get("characterId") != null)
 		{
 			try
 			{

@@ -166,6 +166,7 @@ messager.checkClientSideChatCommands = function(chatMessage)
 		if (chatMessage.toLowerCase().startsWith("/pickup")) {
 			var characterName = chatMessage.slice(8);
 			doCollectCharacter(null, null, characterName);
+			return true;
 		}
 	}
 	return false;
