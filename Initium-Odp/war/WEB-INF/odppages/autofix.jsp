@@ -34,6 +34,13 @@
 			</div>
 			<div class='paragraph'>Use this if your character has negative HP but is not showing up as "Dead" or "Unconscious".</div>
 		</div>
+		<h2>Other Fixes</h2>
+		<div>
+			<div class='autofix-entry'>
+				<a class="big-link" onclick='autofixLootStuckOnMonster(event)'> Loot Stuck on Monster</a>
+			</div>
+			<div class='paragraph'>Use this is you've killed a monster but its loot is stuck to the corpse (only works in combat sites).</div>
+		</div>
 	</div>
 </body>
 </html>
