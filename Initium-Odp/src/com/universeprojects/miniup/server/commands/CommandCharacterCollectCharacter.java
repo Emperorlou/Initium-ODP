@@ -29,6 +29,7 @@ public class CommandCharacterCollectCharacter extends Command {
 		CachedEntity user = db.getCurrentUser();
 		
 		CachedEntity pickupChar = null;
+		boolean showPopup = false;
 		
 		if(parameters.get("characterId") != null && parameters.get("characterId").length() > 0)
 		{
@@ -46,6 +47,7 @@ public class CommandCharacterCollectCharacter extends Command {
 		{
 			String characterName = parameters.get("characterName");
 			pickupChar = db.getCharacterByName(characterName);
+			showPopup = true;
 		}
 		else
 			throw new RuntimeException("Invalid parameters passed to command!");
@@ -55,6 +57,9 @@ public class CommandCharacterCollectCharacter extends Command {
 		
 		// This will put to DB.
 		db.doCharacterCollectCharacter(user, character, pickupChar);
+		
+		if(showPopup)
+			setPopupMessage("You have successfully picked up " + pickupChar.getProperty("name"));
 	}
 
 }
