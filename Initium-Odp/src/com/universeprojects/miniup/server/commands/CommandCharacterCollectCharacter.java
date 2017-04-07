@@ -30,7 +30,7 @@ public class CommandCharacterCollectCharacter extends Command {
 		
 		CachedEntity pickupChar = null;
 		
-		if(parameters.get("characterId") != null)
+		if(parameters.get("characterId") != null && parameters.get("characterId").length() > 0)
 		{
 			try
 			{
@@ -42,7 +42,7 @@ public class CommandCharacterCollectCharacter extends Command {
 				throw new RuntimeException("characterId parameter is malformed", ex);
 			}
 		}
-		else if(parameters.containsKey("characterName"))
+		else if(parameters.get("characterName") != null && parameters.get("characterName").length() > 0)
 		{
 			String characterName = parameters.get("characterName");
 			pickupChar = db.getCharacterByName(characterName);
