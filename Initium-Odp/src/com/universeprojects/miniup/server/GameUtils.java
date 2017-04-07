@@ -1,10 +1,13 @@
 package com.universeprojects.miniup.server;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -1002,6 +1005,51 @@ public class GameUtils
 			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
 			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+    }
+    
+    public static String renderEquipSlot(CachedEntity item)
+    {
+    	StringBuilder sb = new StringBuilder();
+		if (item==null)
+		{
+			sb.append("None");
+		}
+		else
+		{
+			sb.append(" <div class='main-item-container'>");
+			sb.append(GameUtils.renderItem(item));
+			sb.append("<br>");
+			sb.append("<div class='main-item-controls'>");
+			sb.append("<a onclick='characterUnequipItem(event, "+item.getId()+")'>Unequip</a>");
+			sb.append("</div>");
+			sb.append("</div>");
+		}
+		
+		return sb.toString();
+    }
+    
+    public static String renderInventoryItem(ODPDBAccess db, CachedEntity item, CachedEntity character, boolean isSelling)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	String saleText = isSelling ? "<div class='main-item-subnote' style='color:#FF0000'> - Selling</div>" : "";
+    	sb.append("<div class='invItem' ref=" + item.getKey().getId() + ">\r\n");
+		sb.append("	<div class='main-item'><input type=checkbox>");
+		sb.append("		<div class='main-item-container'>");
+		sb.append("			" + GameUtils.renderItem(db, character, item) + saleText + "<br/>");
+		sb.append("			<div class='main-item-controls'>");
+		sb.append("				<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
+		sb.append("				<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
+		if (item.getProperty("maxWeight") != null) {
+			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"
+										+ character.getId()
+										+ "&otherSide=Item_"
+										+ item.getKey().getId() + "\")'>Open</a>");
+		}
+		sb.append("			</div>");
+		sb.append("		</div>");
+		sb.append("	</div>");
+		sb.append("</div>");
+		return sb.toString();
     }
     
     public static String renderWeaponCommand(CachedEntity item, boolean leftHand)
@@ -2003,6 +2051,15 @@ public class GameUtils
 		
 	}
 	
+	public static boolean containsKey(Collection<Key> list, Key key)
+	{
+		for(Key listKey:list)
+			if (GameUtils.equals(listKey, key))
+				return true;
+		
+		return false;
+	}
+	
 	
 	public static double getWeaponMaxDamage(CachedEntity weapon)
     {
@@ -2180,5 +2237,58 @@ public class GameUtils
 			return true;
 		
 		return false;
+	}
+	
+	public static Object createObject(String fullClassPath, Object...arguments)
+	{
+		// Reflectively get the command class...
+		Class<?> c;
+		try
+		{
+			c = (Class<?>) Class.forName(fullClassPath);
+		}
+		catch (ClassNotFoundException e1)
+		{
+			throw new RuntimeException("Class not found: "+fullClassPath, e1);
+		}
+		
+		// Reflectively get the constructor for the command...
+		Constructor<?> constructor = null;
+		try 
+		{
+			Class<?>[] classes = new Class[arguments.length];
+			for(int i = 0; i<classes.length; i++)
+				classes[i] = arguments[i].getClass();
+			constructor = c.getConstructor(classes);
+		} 
+		catch (NoSuchMethodException e) 
+		{
+			throw new RuntimeException("Unable to find a constructor that matches the given arguments. "+e.getMessage());
+		}
+		
+		// Now create the command instance...
+		Object result = null;
+		try 
+		{
+			result = constructor.newInstance(arguments);
+		} 
+		catch (InstantiationException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (IllegalAccessException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (IllegalArgumentException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		} 
+		catch (InvocationTargetException e) 
+		{
+			throw new RuntimeException("Error in command constructor.", e);
+		}
+		
+		return result;
 	}
 }

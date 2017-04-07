@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.miniup.server.Convert;
 import com.universeprojects.miniup.server.GameUtils;
@@ -177,7 +176,7 @@ public abstract class LongOperation extends OperationBase
 	}
 	
 	
-//	int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException;
+	abstract int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException;
 	
 	/**
 	 * 

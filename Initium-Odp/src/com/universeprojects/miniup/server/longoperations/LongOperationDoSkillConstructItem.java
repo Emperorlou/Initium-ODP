@@ -39,22 +39,35 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		CachedEntity character = db.getCurrentCharacter();
 		
 		doChecks(character, skill);
-		
 
-		Map<Key, Key> itemRequirementsToItems = new ConfirmSkillRequirementsBuilder("1", db, this, skill)
-		.addGenericEntityRequirements("Required Materials", (List<Key>)skill.getProperty("skillMaterialsRequired"))
-		.addGenericEntityRequirements("Optional Materials", (List<Key>)skill.getProperty("skillMaterialsOptional"))
-		.addGenericEntityRequirements("Required Tools/Equipment", (List<Key>)skill.getProperty("skillToolsRequired"))
-		.addGenericEntityRequirements("Optional Tools/Equipment", (List<Key>)skill.getProperty("skillToolsOptional"))
+		Map<String, Key> itemRequirementSlotsToItems = new ConfirmSkillRequirementsBuilder("1", db, this, skill)
+		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
+		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
+		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
+		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
 		.go();
+		
+		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
+
 		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());
 		ODPInventionService inventionService = db.getInventionService(character, knowledgeService);
 		EntityPool pool = new EntityPool(ds);
 		
+		
+		
 		// Pooling entities...
-		pool.addToQueue(itemRequirementsToItems.keySet(), itemRequirementsToItems.values());
+		pool.addEntityDirectly(ideaDef);
 		inventionService.poolConstructItemSkill(pool, skill);
+		inventionService.poolGerSlotsAndSelectedItems(pool, ideaDef, itemRequirementSlotsToItems);
+		
+		pool.loadEntities();
+		
+		
+		
+		// Now figure out which of the gers in each slot should actually be used
+		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems);
+		
 		
 		// This check will throw a UserErrorMessage if it finds anything off
 		inventionService.checkSkillWithSelectedItems(pool, skill, itemRequirementsToItems);

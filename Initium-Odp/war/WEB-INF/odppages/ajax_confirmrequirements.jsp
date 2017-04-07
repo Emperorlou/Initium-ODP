@@ -74,7 +74,7 @@
 var crSelectedRequirementSlotIndex = null;
 function selectRequirement(event, requirementSlotIndex, gerKeyList)
 {
-	crSelectedRequirementSlotIndex = requirementSlotIndex;
+	crSelectedRequirementSlotIndex = requirementSlotIndex.split(":").join("\\:");
 	$(".confirm-requirements-requirement").removeClass("confirm-requirements-selected");
 	$(event.target).closest(".confirm-requirements-requirement").addClass("confirm-requirements-selected");
 	doCommand(event, "ConfirmRequirementsUpdate", {slotIndex:requirementSlotIndex, gerKeyList:gerKeyList});	
@@ -89,7 +89,7 @@ function selectItem(event, itemId)
 	unselectItem(null);
 	
 	
-	$("#itemForRequirement"+crSelectedRequirementSlotIndex).val(itemId);
+	$("#"+crSelectedRequirementSlotIndex).val(itemId);
 	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementSlotIndex);
 	var itemVisual = $(event.target).closest(".confirm-requirements-item-candidate");
 	itemVisual.detach();
@@ -136,11 +136,11 @@ function confirmRequirements_collectChoices(event)
 <c:forEach var="requirementCategory" items="${formattedRequirements}">
 	<h4><c:out value="${requirementCategory.name}"/></h4>
 	<c:forEach var="requirement" items="${requirementCategory.list}">
-		<div class='hiddenTooltip' id='requirementHelp-${requirement.slotIndex }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
-		<div id='requirement-container-${requirement.slotIndex}' onclick='selectRequirement(event, ${requirement.slotIndex}, "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
-			<input type='hidden' class='itemForRequirementInput' id='itemForRequirement${requirement.slotIndex}' name='itemForRequirement${requirement.slotIndex}'/>
-			<div class='hint questionmark' rel='#requirementHelp-${requirement.slotIndex}'>?</div><div><c:out value="${requirement.name}"/></div>
-			<div id='itemHtmlForRequirement${requirement.slotIndex}'></div>
+		<div class='hiddenTooltip' id='requirementHelp-${requirement.slotName }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
+		<div id='requirement-container-${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
+			<input type='hidden' class='itemForRequirementInput' id='${requirement.slotName}' name='${requirement.slotName}'/>
+			<div class='hint questionmark' rel='#requirementHelp-${requirement.slotName}'>?</div><div><c:out value="${requirement.name}"/></div>
+			<div id='itemHtmlForRequirement${requirement.slotName}'></div>
 		</div>
 	</c:forEach>
 </c:forEach>

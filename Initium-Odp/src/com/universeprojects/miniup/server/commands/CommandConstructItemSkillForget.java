@@ -35,7 +35,7 @@ public class CommandConstructItemSkillForget extends Command
 			throw new UserErrorMessage("This skill is not your skill to forget.");
 		
 		
-		db.getDB().delete((Key)skill.getProperty("item"), skill.getKey());
+		//db.getDB().delete((Key)skill.getProperty("item"), skill.getKey());
 
 		deleteHtml("#skill-id-"+skillKey.getId());
 	}
