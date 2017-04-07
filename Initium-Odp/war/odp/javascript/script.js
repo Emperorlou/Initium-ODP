@@ -810,6 +810,16 @@ function collectDogecoinsFromCharacter(characterId, event)
 	});
 }
 
+function doCollectCharacter(event, characterId, characterName)
+{
+	doCommand(event, "CharacterCollectCharacter", {"characterId" : characterId, "characterName" : characterName}, function(data,error){
+		if(error) return;
+		// Inline nearby characters isn't in a popup, so clear the link as well.
+		$(event.currentTarget || event.target).html("");
+		reloadPagePopup();
+	});
+}
+
 //function tradeSetDogecoin(currentDogecoin)
 //{
 //	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){

@@ -1007,6 +1007,51 @@ public class GameUtils
 			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
     
+    public static String renderEquipSlot(CachedEntity item)
+    {
+    	StringBuilder sb = new StringBuilder();
+		if (item==null)
+		{
+			sb.append("None");
+		}
+		else
+		{
+			sb.append(" <div class='main-item-container'>");
+			sb.append(GameUtils.renderItem(item));
+			sb.append("<br>");
+			sb.append("<div class='main-item-controls'>");
+			sb.append("<a onclick='characterUnequipItem(event, "+item.getId()+")'>Unequip</a>");
+			sb.append("</div>");
+			sb.append("</div>");
+		}
+		
+		return sb.toString();
+    }
+    
+    public static String renderInventoryItem(ODPDBAccess db, CachedEntity item, CachedEntity character, boolean isSelling)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	String saleText = isSelling ? "<div class='main-item-subnote' style='color:#FF0000'> - Selling</div>" : "";
+    	sb.append("<div class='invItem' ref=" + item.getKey().getId() + ">\r\n");
+		sb.append("	<div class='main-item'><input type=checkbox>");
+		sb.append("		<div class='main-item-container'>");
+		sb.append("			" + GameUtils.renderItem(db, character, item) + saleText + "<br/>");
+		sb.append("			<div class='main-item-controls'>");
+		sb.append("				<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
+		sb.append("				<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
+		if (item.getProperty("maxWeight") != null) {
+			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"
+										+ character.getId()
+										+ "&otherSide=Item_"
+										+ item.getKey().getId() + "\")'>Open</a>");
+		}
+		sb.append("			</div>");
+		sb.append("		</div>");
+		sb.append("	</div>");
+		sb.append("</div>");
+		return sb.toString();
+    }
+    
     public static String renderWeaponCommand(CachedEntity item, boolean leftHand)
     {
     	String attackText = "Attack with bare hands";

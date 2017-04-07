@@ -6090,4 +6090,57 @@ public class ODPDBAccess
 		return null;
 	}
 
+	/**
+	 * Picks up the character, ensuring the user accounts are different,
+	 * characters are at the same location, and pickupCharacter is able to
+	 * be collected (premium, incapacitated, etc).
+	 * 
+	 * @param user
+	 * @param character
+	 * @param pickupChar
+	 */
+	public void doCharacterCollectCharacter(CachedEntity user, CachedEntity character, CachedEntity characterToBePickedUp) throws UserErrorMessage
+    {
+        if (character==null)
+            throw new IllegalArgumentException("Character cannot be null.");
+        if (characterToBePickedUp==null)
+            throw new IllegalArgumentException("Character to be picked up cannot be null.");
+        
+        if (GameUtils.equals(character.getProperty("locationKey"),characterToBePickedUp.getProperty("locationKey"))==false)
+            throw new UserErrorMessage("The "+characterToBePickedUp.getProperty("name")+" is not here anymore.");
+        
+        // Check if the character being picked up is not conscious. If he isn't, we can't pick him up
+        if ((Double)characterToBePickedUp.getProperty("hitpoints")>0)
+            throw new UserErrorMessage("You can only pick up characters that are unconscious or dead.");
+        
+        if (user==null || Boolean.TRUE.equals((Boolean)user.getProperty("premium"))==false)
+            throw new UserErrorMessage("This is a premium member feature. You cannot pick someone up unless you're a premium member.");
+
+        if ("NPC".equals(characterToBePickedUp.getProperty("type"))==false)
+        {
+        	if (GameUtils.equals(user.getKey(), characterToBePickedUp.getProperty("userKey")))
+        		throw new UserErrorMessage("You cannot use one of your own characters to pick up another one of your characters. It needs to be another player!");
+        			
+            CachedEntity userOfCharacterToBePickedUp = getEntity((Key)characterToBePickedUp.getProperty("userKey"));
+            if (userOfCharacterToBePickedUp==null || Boolean.TRUE.equals((Boolean)userOfCharacterToBePickedUp.getProperty("premium"))==false)
+                throw new UserErrorMessage("You cannot pick up an unconsious person unless THEY are a premium member.");
+        }
+        
+        // Check if the character can actually carry something else or if its all too heavy...
+        Long newItemWeight = getCharacterWeight(characterToBePickedUp);
+        if (newItemWeight!=null && newItemWeight>0d)
+        {
+            long carrying = getCharacterCarryingWeight(character);
+            long maxCarrying = getCharacterMaxCarryingWeight(character);
+            
+            if (carrying+newItemWeight>maxCarrying)
+                throw new UserErrorMessage("You cannot carry "+characterToBePickedUp.getProperty("name")+"! You are currently carrying "+GameUtils.formatNumber(carrying)+" grams and can carry a maximum of "+GameUtils.formatNumber(maxCarrying)+" grams.");
+        }
+        
+        
+        characterToBePickedUp.setProperty("locationKey", character.getKey());
+        characterToBePickedUp.setProperty("movedTimestamp", new Date());
+        
+        getDB().put(characterToBePickedUp);
+    }
 }
