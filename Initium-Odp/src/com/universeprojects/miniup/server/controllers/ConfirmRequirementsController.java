@@ -251,3 +251,4 @@ public class ConfirmRequirementsController extends PageController
 		throw new IllegalArgumentException("Unable to determine type for confirm requirements page.");
 	}
 }
+
