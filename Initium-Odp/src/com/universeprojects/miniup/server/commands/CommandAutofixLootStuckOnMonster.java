@@ -52,48 +52,50 @@ public class CommandAutofixLootStuckOnMonster extends Command {
 		//make sure that character is in a combat site, otherwise throw error
 		if("CombatSite".equals(location.getProperty("type")))
 		{
-			throw new UserErrorMessage("This command only works in combat sites.");
-		}
-		
-		//list of the characters at the location
-		List<CachedEntity> charactersHere = db.getLocationCharacters(location.getKey());
-		for(CachedEntity monster:charactersHere)
-		{
-			//check if character is NPC and Dead
-			if (("NPC".equals(monster.getProperty("type")) && ("Dead".equals(monster.getProperty("mode")))))
+			//list of the characters at the location
+			List<CachedEntity> charactersHere = db.getLocationCharacters(location.getKey());
+			for(CachedEntity monster:charactersHere)
 			{
-				//check all items in the dead monster's inventory
-				for (CachedEntity monsterInventoryItem:db.getItemContentsFor(monster.getKey()))
+				//check if character is NPC and Dead
+				if (("NPC".equals(monster.getProperty("type")) && ("Dead".equals(monster.getProperty("mode")))))
 				{
-					//if the item is non-natural, move it to the player's inventory
-					String isNatural = (String) monsterInventoryItem.getProperty("naturalEquipment");
-					if ("FALSE".equals(isNatural) || isNatural==null || "".equals(isNatural))
+					//check all items in the dead monster's inventory
+					for (CachedEntity monsterInventoryItem:db.getItemContentsFor(monster.getKey()))
 					{
-						monsterInventoryItem.setProperty("containerKey", characterKey);
-						monsterInventoryItem.setProperty("movedTimestamp", new Date());
-						ds.put(monsterInventoryItem);
-					}	
-				}
-				
-				//check each equipment slot to clear the non-natural items
-				for (String slot:ODPDBAccess.EQUIPMENT_SLOTS)
-				{
-					//check if there's an item in this slot
-					Key equipmentInSlotKey = (Key) character.getProperty("equipment" + slot);
-					if (equipmentInSlotKey != null)
-					{
-						//if item is non-natural then clear the equip field on the monster
-						CachedEntity equipmentInSlot = db.getEntity(equipmentInSlotKey);
-						String isNatural = (String) equipmentInSlot.getProperty("naturalEquipment");
+						//if the item is non-natural, move it to the player's inventory
+						String isNatural = (String) monsterInventoryItem.getProperty("naturalEquipment");
 						if ("FALSE".equals(isNatural) || isNatural==null || "".equals(isNatural))
 						{
-							monster.setProperty("equipment" + slot, null);
-							ds.put(monster);
+							monsterInventoryItem.setProperty("containerKey", characterKey);
+							monsterInventoryItem.setProperty("movedTimestamp", new Date());
+							ds.put(monsterInventoryItem);
+						}	
+					}
+					
+					//check each equipment slot to clear the non-natural items
+					for (String slot:ODPDBAccess.EQUIPMENT_SLOTS)
+					{
+						//check if there's an item in this slot
+						Key equipmentInSlotKey = (Key) character.getProperty("equipment" + slot);
+						if (equipmentInSlotKey != null)
+						{
+							//if item is non-natural then clear the equip field on the monster
+							CachedEntity equipmentInSlot = db.getEntity(equipmentInSlotKey);
+							String isNatural = (String) equipmentInSlot.getProperty("naturalEquipment");
+							if ("FALSE".equals(isNatural) || isNatural==null || "".equals(isNatural))
+							{
+								monster.setProperty("equipment" + slot, null);
+								ds.put(monster);
+							}
 						}
 					}
 				}
 			}
+			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 		}
-		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+		else
+		{
+			throw new UserErrorMessage("This command only works in combat sites.");
+		}
 	}
 }
