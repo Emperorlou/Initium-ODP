@@ -423,6 +423,29 @@ public class ODPDBAccess
 	}
 
 	/**
+	 * Gets an entity from the database by it's kind and ID. If no entity was
+	 * found, this method will simply return null.
+	 * 
+	 * @param kind
+	 *            Must not be null.
+	 * @param id
+	 *            If this is null, the method will return null.
+	 * @return
+	 */
+	public CachedEntity getEntity(String kind, String entityName)
+	{
+		Key key = createKey(kind, entityName);
+		try
+		{
+			return ds.get(key);
+		}
+		catch (EntityNotFoundException e)
+		{
+			return null;
+		}
+	}
+	
+	/**
 	 * Creates a datastore key out of a kind and ID.
 	 * 
 	 * @param kind
@@ -437,6 +460,23 @@ public class ODPDBAccess
 		if (kind == null) throw new IllegalArgumentException("Kind cannot be null.");
 
 		return KeyFactory.createKey(kind, id);
+	}
+
+	/**
+	 * Creates a datastore key out of a kind and name.
+	 * 
+	 * @param kind
+	 *            Must not be null.
+	 * @param entityName
+	 *            If this is null, the method will return null.
+	 * @return
+	 */
+	public Key createKey(String kind, String entityName)
+	{
+		if (entityName == null) return null;
+		if (kind == null) throw new IllegalArgumentException("Kind cannot be null.");
+
+		return KeyFactory.createKey(kind, entityName);
 	}
 
 	/**
@@ -467,6 +507,14 @@ public class ODPDBAccess
 		return ds.fetchEntitiesFromKeys(keyList);
 	}
 
+	public InitiumObject getInitiumObject(Key key)
+	{
+		if (key==null) return null;
+		CachedEntity entity = getEntity(key);
+		if (entity==null) return null;
+		return new InitiumObject(this, entity);
+	}
+	
 	/**
 	 * Fetches the CachedEntity from the given key.
 	 * 
@@ -2162,6 +2210,9 @@ public class ODPDBAccess
 	{
 		CachedDatastoreService ds = getDB();
 		
+		if (CommonChecks.checkItemIsMovable(item)==false)
+			throw new UserErrorMessage("You cannot move this item.");
+		
 		if (GameUtils.equals(item.getKey(), newContainer.getKey()))
 			throw new UserErrorMessage("lol, you cannot transfer an item into itself, the universe would explode.");
 
@@ -3451,6 +3502,13 @@ public class ODPDBAccess
 		return false;
 	}
 
+	
+	public boolean randomMonsterEncounter(CachedDatastoreService ds, CachedEntity character, CachedEntity location, int tries, Double individualMonsterChanceMultilier, Boolean noCombatSiteOverride)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 
 //	/**
 //	 * This is a placeholder since the actual implementation is not in the ODP.
@@ -3937,8 +3995,13 @@ public class ODPDBAccess
 		            String armorNames = "";
 		            for(int i = 0; i<blockingArmor.size();i++)
 		            {
-		                if (i>0)
-		                    armorNames+=", ";
+		                if (i>0) 
+				{
+				    if (blockingArmor.size() == 2)
+					armorNames += " and ";
+				    else 
+					armorNames+=", ";
+				}
 		                if (i==blockingArmor.size()-1 && i>0)
 		                    armorNames+="and ";
 		                armorNames+=(String)blockingArmor.get(i).getProperty("name");
@@ -5991,5 +6054,100 @@ public class ODPDBAccess
 	{
 		return null;
 	}
+
+	public Long getUserCharacterSlotCount(CachedEntity user)
+	{
+		if (user==null) return 1L;
+		Long count = (Long)user.getProperty("maximumCharacterCount");
+		if (count==null)
+		{
+			if (CommonChecks.checkUserIsPremium(user))
+				count = 8L;
+			else
+				count = 1L;
+		}
+		
+		return count;
+	}
 	
+	public List<CachedEntity> getUserCharacters(CachedEntity user)
+	{
+		List<CachedEntity> chars = getFilteredList("Character", "userKey", user.getKey());
+		for(int i = chars.size()-1; i>=0; i--)
+		{
+			if (CommonChecks.checkCharacterIsDead(chars.get(i)))
+				chars.remove(i);
+		}
+		
+		return chars;
+	}
+
+	/**
+	 * Gets 2D list of keys stored in an Entity2DCollection field type on an entity.
+	 * This field type stores it's data in a funny way for indexing purposes, making
+	 * this method necessary.
+	 * 
+	 * @param entity
+	 * @param fieldName
+	 * @return
+	 */
+	public List<List<Key>> getEntity2DCollectionValueFromEntity(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Picks up the character, ensuring the user accounts are different,
+	 * characters are at the same location, and pickupCharacter is able to
+	 * be collected (premium, incapacitated, etc).
+	 * 
+	 * @param user
+	 * @param character
+	 * @param pickupChar
+	 */
+	public void doCharacterCollectCharacter(CachedEntity user, CachedEntity character, CachedEntity characterToBePickedUp) throws UserErrorMessage
+    {
+        if (character==null)
+            throw new IllegalArgumentException("Character cannot be null.");
+        if (characterToBePickedUp==null)
+            throw new IllegalArgumentException("Character to be picked up cannot be null.");
+        
+        if (GameUtils.equals(character.getProperty("locationKey"),characterToBePickedUp.getProperty("locationKey"))==false)
+            throw new UserErrorMessage("The "+characterToBePickedUp.getProperty("name")+" is not here anymore.");
+        
+        // Check if the character being picked up is not conscious. If he isn't, we can't pick him up
+        if ((Double)characterToBePickedUp.getProperty("hitpoints")>0)
+            throw new UserErrorMessage("You can only pick up characters that are unconscious or dead.");
+        
+        if (user==null || Boolean.TRUE.equals((Boolean)user.getProperty("premium"))==false)
+            throw new UserErrorMessage("This is a premium member feature. You cannot pick someone up unless you're a premium member.");
+
+        if ("NPC".equals(characterToBePickedUp.getProperty("type"))==false)
+        {
+        	if (GameUtils.equals(user.getKey(), characterToBePickedUp.getProperty("userKey")))
+        		throw new UserErrorMessage("You cannot use one of your own characters to pick up another one of your characters. It needs to be another player!");
+        			
+            CachedEntity userOfCharacterToBePickedUp = getEntity((Key)characterToBePickedUp.getProperty("userKey"));
+            if (userOfCharacterToBePickedUp==null || Boolean.TRUE.equals((Boolean)userOfCharacterToBePickedUp.getProperty("premium"))==false)
+                throw new UserErrorMessage("You cannot pick up an unconsious person unless THEY are a premium member.");
+        }
+        
+        // Check if the character can actually carry something else or if its all too heavy...
+        Long newItemWeight = getCharacterWeight(characterToBePickedUp);
+        if (newItemWeight!=null && newItemWeight>0d)
+        {
+            long carrying = getCharacterCarryingWeight(character);
+            long maxCarrying = getCharacterMaxCarryingWeight(character);
+            
+            if (carrying+newItemWeight>maxCarrying)
+                throw new UserErrorMessage("You cannot carry "+characterToBePickedUp.getProperty("name")+"! You are currently carrying "+GameUtils.formatNumber(carrying)+" grams and can carry a maximum of "+GameUtils.formatNumber(maxCarrying)+" grams.");
+        }
+        
+        
+        characterToBePickedUp.setProperty("locationKey", character.getKey());
+        characterToBePickedUp.setProperty("movedTimestamp", new Date());
+        
+        getDB().put(characterToBePickedUp);
+    }
 }

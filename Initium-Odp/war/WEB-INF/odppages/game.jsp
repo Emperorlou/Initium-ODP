@@ -347,8 +347,17 @@ function pagePopup(url, closeCallback, popupTitle)
 	
 	if (popupTitle==null)
 		popupTitle = "";
-	$(".location-controls-container").append("<div id='"+pagePopupId+"' class='page-popup-newui location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div id='page-popup-reloadbutton' class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div class='header1-display' id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>");
+	
+	if ($(window).width()>950)
+	{
+		$(".location-controls-container.half-page-variant").append("<div id='"+pagePopupId+"' class='page-popup-newui location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-spacer'></div><div id='page-popup-reloadbutton' class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div class='header1-display' id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div><div class='header1-spacer'></div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>");
+		$(".half-page-variant").show();
+	}
+	else
+		$(".location-controls-container").append("<div id='"+pagePopupId+"' class='page-popup-newui location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div id='page-popup-reloadbutton' class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div class='header1-display' id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>");
+	
 	$("#"+pagePopupId+"-content").load(url);
+	
 	
 	if (closeCallback!=null)
 		popupStackCloseCallbackHandlers.push(closeCallback);
@@ -377,10 +386,11 @@ https://github.com/Emperorlou/Initium-ODP
 
 <body id='newui'>
 	<div class='page'>
+		<div class='location-controls-container half-page-variant'></div>
 		<div class='page-upperhalf'>
 			<div id='main-header' class='header1'>
 				<div class='header1-spacer'></div>
-				<div class='header1-display'><span id='locationName'>${locationName}</span></div>
+				<div class='header1-display'><span id='locationName'><a href='/odp/game'>${locationName}</a></span></div>
 				<div class='header1-spacer'></div>
 				<div class='header1-rightchunk'>
 					<div class='header1-button' onclick='viewMap()'>MAP</div>
@@ -474,21 +484,6 @@ https://github.com/Emperorlou/Initium-ODP
 							<div class='location-controls'>
 							
 							
-								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-									${mainButtonList}
-								</div>					
-								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-									${mainButtonList}
-								</div>					
-								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-									${mainButtonList}
-								</div>					
-								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-									${mainButtonList}
-								</div>					
-								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
-									${mainButtonList}
-								</div>					
 								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
 									${mainButtonList}
 								</div>					

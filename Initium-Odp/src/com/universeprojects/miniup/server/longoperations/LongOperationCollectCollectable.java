@@ -46,6 +46,14 @@ public class LongOperationCollectCollectable extends LongOperation {
 		}
 		
 		int seconds = ((Long)collectable.getProperty("extractionEase")).intValue();
+
+		CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
+		
+		int monsterTries = seconds/30;
+		if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, monsterTries, 0.1d))
+			throw new GameStateChangeException("While you were working, someone found you..");
+		
+		
 		
 		data.put("collectableId", collectable.getKey().getId());
 		data.put("secondsToWait", seconds);

@@ -122,6 +122,23 @@ public abstract class OperationBase
 		htmlUpdates.add(htmlData);
 	}
 	
+	/**
+	 * When the command returns to the browser, the element that has the given elementId 
+	 * will be deleted.
+	 *
+	 * @param jquerySelector
+	 * @param newHtml
+	 */
+	public void deleteHtml(String jquerySelector)
+	{
+		Map<String,String> htmlData = new HashMap<String,String>();
+		
+		htmlData.put("type", "5");
+		htmlData.put("selector", jquerySelector);
+		
+		htmlUpdates.add(htmlData);
+	}
+	
 	public List<Map<String,String>> getHtmlUpdates()
 	{
 		return htmlUpdates;

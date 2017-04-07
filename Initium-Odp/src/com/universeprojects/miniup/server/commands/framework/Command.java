@@ -12,6 +12,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
+import com.universeprojects.miniup.server.UserRequestIncompleteException;
 
 public abstract class Command extends OperationBase
 {
@@ -154,7 +155,7 @@ public abstract class Command extends OperationBase
 	/**
 	 * The command's execution logic is done here. 
 	 */
-	public abstract void run(Map<String, String> parameters) throws UserErrorMessage;
+	public abstract void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException;
 
 	
 	/**

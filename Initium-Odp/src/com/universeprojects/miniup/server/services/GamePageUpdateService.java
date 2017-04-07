@@ -16,7 +16,34 @@ public class GamePageUpdateService extends MainPageUpdateService {
 			OperationBase operation) {
 		super(db, user, character, location, operation);
 	}
-
+/*
+ *		<div class='main-splitScreen'>
+			<div id='main-merchantlist'>
+				<div class='main-button-half' onclick='loadLocationMerchants()' shortcut='83'>
+ 					<span class='shortcut-key'> (S)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby stores
+				</div>
+			</div>
+		</div>
+		<div id='partyPanel' class='main-splitScreen'>
+		${partyPanel}
+		</div>
+		<div></div>
+		<div class='main-splitScreen'>
+			<div id='main-itemlist'>
+				<div class='main-button-half' onclick='loadLocationItems()' shortcut='86'>
+ 					<span class='shortcut-key'> (V)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby items
+				</div>
+			</div>
+		</div>
+		<div class='main-splitScreen'>
+			<div id='main-characterlist'>
+				<div class='main-button-half' onclick='loadLocationCharacters()' shortcut='66'>
+ 					<span class='shortcut-key'> (B)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby characters
+				</div>
+			</div>
+		</div>
+ *
+ */
 	@Override
 	protected String updateButtonList_NormalMode()
 	{
@@ -28,6 +55,9 @@ public class GamePageUpdateService extends MainPageUpdateService {
 		newHtml.append("	<a href='/main.jsp' class='button2' title='This will take you back to the old UI.'>Old UI</a>");
 		newHtml.append("	<a href='#' class='button2' shortcut='69' onclick='doExplore(false)' title='Explore this location for new paths or monsters.'><span class='shortcut-key'>(E)</span>Explore</a>");
 		newHtml.append("	<a href='#' class='button2' shortcut='87' onclick='doExplore(true)' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.'><span class='shortcut-key'>(W)</span>Explore <img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' border=0/></a>");
+		newHtml.append("	<a href='#' class='button2' shortcut='83' onclick='loadLocationMerchants()' title='Shows all players that are currently vending in your location.'><span class='shortcut-key'>(S)</span>Nearby Merchants</a>");
+		newHtml.append("	<a href='#' class='button2' shortcut='86' onclick='loadLocationItems()' title='Shows all items that are on the ground in your location.'><span class='shortcut-key'>(V)</span>Nearby Items</a>");
+		newHtml.append("	<a href='#' class='button2' shortcut='66' onclick='loadLocationCharacters()' title='Shows all characters that are with you in your location.'><span class='shortcut-key'>(B)</span>Nearby Characters</a>");
 		if ("CampSite".equals(location.getProperty("type")))
 		{
 			newHtml.append("<a onclick='campsiteDefend()' class='button2' shortcut='68' onclick='popupPermanentOverlay(\"Defending...\", \"You are looking out for threats to your camp.\")'><span class='shortcut-key'>(D)</span>Defend</a>");
