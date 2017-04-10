@@ -24,7 +24,7 @@ public class InitiumObject
 			this.aspects = new HashMap<String, InitiumAspect>();
 			
 			for(String aspectId:aspectIds)
-				aspects.put(aspectId, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId));
+				aspects.put(aspectId, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId, this));
 		}
 		else
 		{
@@ -75,6 +75,12 @@ public class InitiumObject
 	public Collection<InitiumAspect> getAspects()
 	{
 		return aspects.values();
+	}
+
+	public InitiumAspect getInitiumAspect(String aspectId)
+	{
+		if (aspects==null) return null;
+		return aspects.get(aspectId);
 	}
 
 }

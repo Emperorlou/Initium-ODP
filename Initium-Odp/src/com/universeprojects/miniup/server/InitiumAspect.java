@@ -46,7 +46,7 @@ public abstract class InitiumAspect
 	public static Map<String, Class<? extends Command>> aspectCommands = new HashMap<>();
 	public static void addCommand(String commandName, Class<? extends Command> commandClass)
 	{
-		if (commandName.contains(commandName)) throw new IllegalArgumentException("An aspect command by the name '"+commandName+"' already exists. Use another name.");
+		if (aspectCommands.containsKey(commandName)) throw new IllegalArgumentException("An aspect command by the name '"+commandName+"' already exists. Use another name.");
 		aspectCommands.put(commandName, commandClass);
 	}
 	

@@ -109,8 +109,14 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		ODPInventionService inventionService = db.getInventionService(character, knowledgeService);
 		EntityPool pool = new EntityPool(ds);
 		
+		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
+		
 		// Pooling entities...
+		pool.addEntityDirectly(ideaDef);
+		inventionService.poolConstructItemSkill(pool, skill);
 		pool.addToQueue(itemRequirementsToItems.keySet(), itemRequirementsToItems.values());
+		
+		pool.loadEntities();
 		
 		
 		// We're ready to create the final prototype and skill

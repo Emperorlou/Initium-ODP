@@ -84,7 +84,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems);
 		
 		// This check will throw a UserErrorMessage if it finds anything off
-		inventionService.checkIdeaWithSelectedItems(pool, idea, itemRequirementsToItems);
+		inventionService.checkIdeaWithSelectedItems(pool, ideaDef, itemRequirementsToItems);
 		
 		data.put("selectedItems", itemRequirementsToItems);
 		data.put("ideaId", ideaId);

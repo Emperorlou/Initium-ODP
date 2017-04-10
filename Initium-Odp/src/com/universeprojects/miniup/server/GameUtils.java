@@ -2259,22 +2259,39 @@ public class GameUtils
 	{
 		// Reflectively get the constructor for the command...
 		Constructor<?> constructor = null;
-		try 
+		Class<?>[] classes = new Class[arguments.length];
+		for(int i = 0; i<classes.length; i++)
+			classes[i] = arguments[i].getClass();
+
+		// Pick the most appropriate constructor to use with the given arguments
+		for(Constructor<?> ctor:c.getDeclaredConstructors())
 		{
-			Class<?>[] classes = new Class[arguments.length];
-			for(int i = 0; i<classes.length; i++)
-				classes[i] = arguments[i].getClass();
-			constructor = c.getConstructor(classes);
-		} 
-		catch (NoSuchMethodException e) 
-		{
-			throw new RuntimeException("Unable to find a constructor that matches the given arguments. "+e.getMessage());
+			Class<?>[] argTypes = ctor.getParameterTypes();
+			if (argTypes.length==arguments.length)
+				for(int i = 0; i<argTypes.length; i++)
+				{
+					Class<?> argType = argTypes[i];
+					
+					if (argType.isAssignableFrom(arguments[i].getClass()))
+					{
+						constructor = ctor;
+						break;
+					}						
+					else
+						break;
+				}
+			if (constructor!=null)
+				break;
 		}
+
+		if (constructor==null)
+			throw new RuntimeException("Unable to find a constructor that matches the given arguments. ");
 		
 		// Now create the command instance...
 		Object result = null;
 		try 
 		{
+			constructor.setAccessible(true);
 			result = constructor.newInstance(arguments);
 		} 
 		catch (InstantiationException e) 

@@ -187,14 +187,16 @@ public class ConfirmRequirementsController extends PageController
 		
 		// Load all the generic entity requirements (but not the subentities. That's why I didn't use inventionservice.poolConstructItemIdea())
 		pool.addToQueue(skill.getProperty("_definitionKey"));
-		pool.addToQueue(skill.getProperty("skillMaterialsRequired"));
-		pool.addToQueue(skill.getProperty("skillMaterialsOptional"));
-		pool.addToQueue(skill.getProperty("skillToolsRequired"));
-		pool.addToQueue(skill.getProperty("skillToolsOptional"));
-
 		pool.loadEntities();
 		
 		CachedEntity ideaDef = pool.get((Key)skill.getProperty("_definitionKey"));
+		pool.addToQueue(ideaDef.getProperty("skillMaterialsRequired"));
+		pool.addToQueue(ideaDef.getProperty("skillMaterialsOptional"));
+		pool.addToQueue(ideaDef.getProperty("skillToolsRequired"));
+		pool.addToQueue(ideaDef.getProperty("skillToolsOptional"));
+
+		pool.loadEntities();
+		
 		addGenericEntityRequirements(request, db, pool, "Required Materials", ideaDef, "skillMaterialsRequired");
 		addGenericEntityRequirements(request, db, pool, "Optional Materials", ideaDef, "skillMaterialsOptional");
 		addGenericEntityRequirements(request, db, pool, "Required Tools/Equipment", ideaDef, "skillToolsRequired");

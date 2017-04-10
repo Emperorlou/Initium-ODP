@@ -246,4 +246,21 @@ public abstract class CommonChecks
 		Boolean isPremium = Boolean.TRUE.equals(user.getProperty("premium"));
 		return isPremium;
 	}
+
+	public static boolean checkItemIsClass(CachedEntity item, String className)
+	{
+		Object itemClassObj = item.getProperty("itemClass");
+		if (itemClassObj==null) return false;
+		else if (itemClassObj instanceof Key)
+		{
+			if (className.equals(((Key)itemClassObj).getName()))
+				return true;
+		}
+		else if (itemClassObj instanceof String)
+		{
+			if (className.equals(itemClassObj))
+				return true;
+		}
+		return false;
+	}
 }
