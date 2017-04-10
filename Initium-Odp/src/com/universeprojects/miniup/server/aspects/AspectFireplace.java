@@ -47,7 +47,7 @@ public class AspectFireplace extends ItemAspect
 	{
 		InitiumObject firewood = new InitiumObject(db, firewoodEntity);
 		if (CommonChecks.checkItemIsClass(firewoodEntity, "Firewood")==false ||
-				firewood.isAspectPresent(AspectFlammablee.class)==false)
+				firewood.isAspectPresent(AspectFlammable.class)==false)
 			throw new UserErrorMessage("The item you chose to add to the fire is not valid fuel.");
 	
 //		Long fuelSpace = (Long)firewood.getProperty("space");
