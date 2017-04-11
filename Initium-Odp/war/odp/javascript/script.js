@@ -2391,6 +2391,13 @@ function doLightFireplace(event, itemKey)
 }
 
 
+function doFireplaceAddFuel(event, itemKey)
+{
+	closeAllTooltips();
+	
+	doCommand(event, "FireplaceAddFuel", {itemKey:itemKey});
+}
+
 
 
 

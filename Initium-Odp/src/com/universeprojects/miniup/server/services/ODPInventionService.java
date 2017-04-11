@@ -198,7 +198,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public Map<Key, Key> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems)
+	public Map<Key, Key> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		return null;

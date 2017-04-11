@@ -26,7 +26,8 @@ public class ConfirmRequirementsController extends PageController
 	public enum Type
 	{
 		IdeaToPrototype,
-		ConstructItemSkill
+		ConstructItemSkill,
+		Generic
 	}
 	
 	public ConfirmRequirementsController()
@@ -52,6 +53,10 @@ public class ConfirmRequirementsController extends PageController
 		else if (type == Type.ConstructItemSkill)
 		{
 			processForConstructItemSkill(request, db);
+		}
+		else if (type == Type.Generic)
+		{
+			processForGeneric(request, db);
 		}
 		
 		
@@ -209,6 +214,30 @@ public class ConfirmRequirementsController extends PageController
 	
 	
 	
+	private void processForGeneric(HttpServletRequest request, ODPDBAccess db)
+	{
+		CachedDatastoreService ds = db.getDB();
+		EntityPool pool = new EntityPool(ds);
+		Key entityKey = KeyFactory.stringToKey(request.getParameter("entity"));
+		CachedEntity entity = db.getEntity(entityKey);
+		String[] entityFields = request.getParameter("entityFields").split(",");
+		
+		// Load all the generic entity requirements (but not the subentities. That's why I didn't use inventionservice.poolConstructItemIdea())
+		for(String entityField:entityFields)
+			pool.addToQueue(entity.getProperty(entityField));
+
+		pool.loadEntities();
+
+		for(String entityField:entityFields)
+			addGenericEntityRequirements(request, db, pool, "", entity, entityField);
+		
+		request.setAttribute("entity", request.getParameter("entity"));
+		request.setAttribute("processName", request.getParameter("processName"));
+	}
+	
+	
+	
+	
 //	private List<Key> rawKeysToKeys(String[] rawKeys)
 //	{
 //		List<Key> result = new ArrayList<Key>();
@@ -249,6 +278,8 @@ public class ConfirmRequirementsController extends PageController
 			return Type.IdeaToPrototype;
 		else if (request.getParameterMap().containsKey("constructItemSkillId"))
 			return Type.ConstructItemSkill;
+		else if (request.getParameterMap().containsKey("entity"))
+			return Type.Generic;
 		
 		throw new IllegalArgumentException("Unable to determine type for confirm requirements page.");
 	}

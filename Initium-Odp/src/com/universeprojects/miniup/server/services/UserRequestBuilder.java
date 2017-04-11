@@ -14,14 +14,16 @@ public abstract class UserRequestBuilder<T> extends Service
 {
 	final protected OperationBase command;
 	final protected String uniqueId;
+	protected String jsInitiatingFunctionCall;
 	
 	protected String playerMessage = null;
 	
-	public UserRequestBuilder(String uniqueId, ODPDBAccess db, OperationBase command)
+	public UserRequestBuilder(String uniqueId, ODPDBAccess db, OperationBase command, String jsInitiatingFunctionCall)
 	{
 		super(db);
 		this.command = command;
 		this.uniqueId = uniqueId;
+		this.jsInitiatingFunctionCall = jsInitiatingFunctionCall;
 	}
 	
 	protected abstract T convertParametersToResult(JSONObject parameters);
@@ -36,7 +38,7 @@ public abstract class UserRequestBuilder<T> extends Service
 	 * 
 	 * @return
 	 */
-	protected abstract String getJavascriptRecallFunction();
+//	protected abstract String getJavascriptRecallFunction();
 	
 	/**
 	 * This message will appear as a popup for the user as soon as the user request builder's page popup has appeared.
@@ -53,7 +55,7 @@ public abstract class UserRequestBuilder<T> extends Service
 		if (isCompleted())
 			return convertParametersToResult(getUserResponse());
 
-		throw new UserRequestIncompleteException(getPagePopupTitle(), getPagePopupUrl(), playerMessage, uniqueId);
+		throw new UserRequestIncompleteException(getPagePopupTitle(), getPagePopupUrl(), jsInitiatingFunctionCall, playerMessage, uniqueId);
 	}
 
 	private JSONObject getUserResponse()

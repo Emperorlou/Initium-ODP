@@ -16,13 +16,14 @@ import com.universeprojects.miniup.server.OperationBase;
 
 public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<Map<String,Key>>
 {
+	List<String> fieldNames = new ArrayList<String>();
 	Map<String, Collection<String>> requirements = new HashMap<>();
 	
 	CachedEntity entity;
 	
-	public ConfirmGenericEntityRequirementsBuilder(String uniqueId, ODPDBAccess db, OperationBase command, CachedEntity entity)
+	public ConfirmGenericEntityRequirementsBuilder(String uniqueId, ODPDBAccess db, OperationBase command, String jsInitiatingFunctionCall, CachedEntity entity)
 	{
-		super(uniqueId, db, command);
+		super(uniqueId, db, command, jsInitiatingFunctionCall);
 		this.entity = entity;
 	}
 	
@@ -49,6 +50,8 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 			}
 		}
 		
+		fieldNames.add(fieldName);
+		
 		return this;
 	}
 	
@@ -73,7 +76,18 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 	@Override
 	protected String getPagePopupUrl()
 	{
-		return "/odp/confirmrequirements?ideaId="+entity.getId();
+		StringBuilder sb = new StringBuilder();
+		boolean firstTime = true;
+		for(String fieldName:fieldNames)
+		{
+			if (firstTime)
+				firstTime=false;
+			else
+				sb.append(",");
+			
+			sb.append(fieldName);
+		}
+		return "/odp/confirmrequirements?entity="+KeyFactory.keyToString(entity.getKey())+"&entityFields="+sb.toString();
 	}
 
 
@@ -81,13 +95,6 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 	protected String getPagePopupTitle()
 	{
 		return "Select the tools/materials to use";
-	}
-
-
-	@Override
-	protected String getJavascriptRecallFunction()
-	{
-		return "doCreatePrototype(null, "+entity.getId()+", '"+entity.getProperty("name").toString().replace("'", "\\'")+"');";
 	}
 
 }

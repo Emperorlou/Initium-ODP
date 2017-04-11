@@ -1,7 +1,6 @@
 package com.universeprojects.miniup.server.longoperations;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -48,14 +47,20 @@ public class LongOperationBeginPrototype extends LongOperation
 		CachedEntity idea = db.getEntity(ideaKey);
 		if (idea==null)
 			throw new UserErrorMessage("Invalid idea specified.");
+
+		data.put("ideaId", ideaId);
+		data.put("ideaName", idea.getProperty("name"));
+		
 		
 		CachedEntity character = db.getCurrentCharacter();
 		
 		doChecks(character, idea);
 
 		
+		CachedEntity ideaDef = db.getEntity((Key)idea.getProperty("_definitionKey"));
 
-		Map<String, Key> itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, idea)
+		
+		Map<String, Key> itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, getPageRefreshJavascriptCall(), ideaDef)
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Required Materials", "prototypeItemsConsumed")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
@@ -64,7 +69,6 @@ public class LongOperationBeginPrototype extends LongOperation
 		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
 		.go();
 		
-		CachedEntity ideaDef = db.getEntity((Key)idea.getProperty("_definitionKey"));
 		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());
 		ODPInventionService inventionService = db.getInventionService(character, knowledgeService);
@@ -83,12 +87,11 @@ public class LongOperationBeginPrototype extends LongOperation
 		// Now figure out which of the gers in each slot should actually be used
 		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems);
 		
+		
 		// This check will throw a UserErrorMessage if it finds anything off
 		inventionService.checkIdeaWithSelectedItems(pool, ideaDef, itemRequirementsToItems);
 		
 		data.put("selectedItems", itemRequirementsToItems);
-		data.put("ideaId", ideaId);
-		data.put("ideaName", idea.getProperty("name"));
 		
 		int seconds = 5;
 		

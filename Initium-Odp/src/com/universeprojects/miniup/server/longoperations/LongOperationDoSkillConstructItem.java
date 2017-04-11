@@ -1,7 +1,6 @@
 package com.universeprojects.miniup.server.longoperations;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
@@ -13,7 +12,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.services.ConfirmSkillRequirementsBuilder;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -40,14 +39,15 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		doChecks(character, skill);
 
-		Map<String, Key> itemRequirementSlotsToItems = new ConfirmSkillRequirementsBuilder("1", db, this, skill)
+		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
+
+		Map<String, Key> itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, getPageRefreshJavascriptCall(), ideaDef)
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
 		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
 		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
 		.go();
 		
-		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
 
 		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());

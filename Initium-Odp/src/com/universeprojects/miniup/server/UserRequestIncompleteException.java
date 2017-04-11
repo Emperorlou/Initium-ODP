@@ -9,8 +9,9 @@ public class UserRequestIncompleteException extends Exception
 	final public String pagePopupUrl;
 	final public String pagePopupTitle;
 	final public String userRequestId;
+	final public String jsFunctionCall;
 	
-	public UserRequestIncompleteException(String pagePopupTitle, String pagePopupUrl, String playerMessage, String userRequestId)
+	public UserRequestIncompleteException(String pagePopupTitle, String pagePopupUrl, String jsFunctionCall, String playerMessage, String userRequestId)
 	{
 		if (userRequestId==null) throw new RuntimeException("userRequestId cannot be null.");
 		if (pagePopupUrl==null) throw new RuntimeException("pagePopupUrl cannot be null.");
@@ -19,6 +20,7 @@ public class UserRequestIncompleteException extends Exception
 		this.pagePopupUrl = pagePopupUrl;
 		this.pagePopupTitle = pagePopupTitle;
 		this.userRequestId = userRequestId;
+		this.jsFunctionCall = jsFunctionCall;
 	}
 	
 }
