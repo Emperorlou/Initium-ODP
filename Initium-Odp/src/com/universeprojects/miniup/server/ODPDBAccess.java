@@ -1734,6 +1734,7 @@ public class ODPDBAccess
 				cal.add(Calendar.SECOND, expiry);
 				newBuff.setProperty("expiry", cal.getTime());
 				newBuff.setProperty("parentKey", characterKey);
+				addBuffToBuffsCache(characterKey, newBuff);
 			}
 			return newBuff;
 		}

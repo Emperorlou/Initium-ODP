@@ -136,6 +136,14 @@ public class DBAccessor {
 	
 	public void moveItem(EntityWrapper currentCharacter, EntityWrapper item, EntityWrapper newContainer) throws UserErrorMessage 
 	{
+		db.getDB().beginBulkWriteMode();
 		db.doMoveItem(null, currentCharacter.wrappedEntity, item.wrappedEntity, newContainer.wrappedEntity);
+	}
+	
+	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)
+	{
+		db.getDB().beginBulkWriteMode();
+		db.doDestroyEquipment(null, currentCharacter.wrappedEntity, item.wrappedEntity);
+		return true;
 	}
 }

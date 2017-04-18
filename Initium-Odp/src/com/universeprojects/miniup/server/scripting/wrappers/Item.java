@@ -15,7 +15,7 @@ import com.universeprojects.miniup.server.services.ScriptService;
  */
 public class Item extends EntityWrapper
 {
-	public boolean destroyed = true;
+	public boolean destroyed = false;
 	protected EntityWrapper containerEntity;
 	
 	public Item(CachedEntity item, ODPDBAccess db)
@@ -54,12 +54,19 @@ public class Item extends EntityWrapper
 		return (Long)this.getProperty("maxDurability");
 	}
 	
-	public Long adjustDurability(long addDura)
+	/**
+	 * Adjusts the durability by the specified amount.
+	 * @param addDura Amount to add (or subtract) from durability.
+	 * @return Whether the item needs to be destroyed.
+	 */
+	public boolean adjustDurability(Long addDura)
 	{
-		long newDura = getDurability();
+		Long newDura = getDurability();
+		Long maxDura = getMaxDurability();
+		if(newDura == null) return false;
+		if(maxDura == null) maxDura = newDura;
 		newDura += addDura;
-		this.setProperty("charges", Math.min(newDura, getMaxDurability()));
-		destroyed = newDura < 0;
-		return newDura;
+		this.setProperty("durability", Math.min(newDura, maxDura));
+		return newDura < 1;
 	}
 }

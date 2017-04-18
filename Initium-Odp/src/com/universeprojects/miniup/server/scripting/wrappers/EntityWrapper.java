@@ -30,7 +30,7 @@ public abstract class EntityWrapper
 
 	protected Object getProperty(String propertyName)
 	{
-		return wrappedEntity.getProperty(propertyName);
+		return wrappedEntity.hasProperty(propertyName) ? wrappedEntity.getProperty(propertyName) : null;
 	}
 	
 	protected void setProperty(String propertyName, Object propValue)
@@ -45,13 +45,20 @@ public abstract class EntityWrapper
 	
 	public Long getCharges()
 	{
-		return wrappedEntity.hasProperty("charges") ? (Long)this.getProperty("charges") : -1;
+		Long charges = (Long)this.getProperty("charges");
+		if(charges == null) charges = -1l;
+		return charges;
 	}
-
+	
 	public boolean adjustCharges(Long addCharges)
 	{
+		return adjustCharges(addCharges, false);
+	}
+
+	public boolean adjustCharges(Long addCharges, boolean allowEmpty)
+	{
 		Long newCharges = getCharges();
-		if(newCharges > -1)
+		if(newCharges > -1 || (allowEmpty && newCharges > 0 && addCharges > 0))
 		{
 			newCharges += addCharges;
 			this.setProperty("charges", addCharges);
@@ -75,7 +82,7 @@ public abstract class EntityWrapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void removeScript(String scriptName)
+	public boolean removeScript(String scriptName)
 	{
 		List<CachedEntity> scriptList = db.getFilteredList("Script", "name", scriptName);
 		if(scriptList.size() > 0)
@@ -100,7 +107,11 @@ public abstract class EntityWrapper
 			
 			if(found)
 				this.setProperty("scripts", scriptKeys);
+			
+			return found;
 		}
+		
+		return false;
 	}
 	
 	@SuppressWarnings("unchecked")
