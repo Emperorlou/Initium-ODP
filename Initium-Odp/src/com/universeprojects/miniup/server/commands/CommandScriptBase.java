@@ -110,15 +110,21 @@ public abstract class CommandScriptBase extends Command {
 		try
 		{
 			ScriptService service = ScriptService.getScriptService(db);
+			CachedDatastoreService ds = db.getDB();
+			ds.beginBulkWriteMode();
 			if(service.executeScript(event, scriptSource, entitySource))
 			{
-				CachedDatastoreService ds = db.getDB();
 				if(!event.haltExecution)
 				{
 					for(CachedEntity saveEntity:event.getSaveEntities())
 						ds.put(saveEntity);
 					for(CachedEntity delEntity:event.getDeleteEntities())
 						ds.delete(delEntity);
+					
+					if(ds.getBulkPutEntityCount() > 0)
+					{
+						ds.commitBulkWrite();
+					}
 				}
 				
 				afterExecuteScript(db, event);

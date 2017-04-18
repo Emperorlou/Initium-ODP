@@ -138,4 +138,10 @@ public class DBAccessor {
 	{
 		db.doMoveItem(null, currentCharacter.wrappedEntity, item.wrappedEntity, newContainer.wrappedEntity);
 	}
+	
+	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)
+	{
+		db.doDestroyEquipment(null, currentCharacter.wrappedEntity, item.wrappedEntity);
+		return true;
+	}
 }
