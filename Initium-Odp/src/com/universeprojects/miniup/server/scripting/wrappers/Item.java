@@ -67,6 +67,6 @@ public class Item extends EntityWrapper
 		if(maxDura == null) maxDura = newDura;
 		newDura += addDura;
 		this.setProperty("durability", Math.min(newDura, maxDura));
-		return newDura < 1;
+		return newDura < 0;
 	}
 }
