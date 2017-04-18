@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONObject;
+
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -27,7 +29,8 @@ public class ConfirmRequirementsController extends PageController
 	{
 		IdeaToPrototype,
 		ConstructItemSkill,
-		Generic
+		GenericCommand,
+		GenericLongOperation
 	}
 	
 	public ConfirmRequirementsController()
@@ -54,9 +57,13 @@ public class ConfirmRequirementsController extends PageController
 		{
 			processForConstructItemSkill(request, db);
 		}
-		else if (type == Type.Generic)
+		else if (type == Type.GenericCommand || type == Type.GenericLongOperation)
 		{
-			processForGeneric(request, db);
+			processForGenericCommand(request, db);
+		}
+		else if (type == Type.GenericLongOperation)
+		{
+			processForGenericLongOperation(request, db);
 		}
 		
 		
@@ -233,6 +240,33 @@ public class ConfirmRequirementsController extends PageController
 		
 		request.setAttribute("entity", request.getParameter("entity"));
 		request.setAttribute("processName", request.getParameter("processName"));
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	private void processForGenericCommand(HttpServletRequest request, ODPDBAccess db)
+	{
+		processForGeneric(request, db);
+		
+		JSONObject params = new JSONObject();
+		for(String key:((Map<String,String[]>)request.getParameterMap()).keySet())
+			params.put(key, request.getParameter(key));
+		
+		request.setAttribute("commandName", request.getParameter("cmd"));
+		request.setAttribute("commandParameters", params.toJSONString());
+	}
+
+	private void processForGenericLongOperation(HttpServletRequest request, ODPDBAccess db)
+	{
+		
+		processForGeneric(request, db);
+		
+		//TODO: THIS
+		JSONObject params = new JSONObject();
+		params.putAll(request.getParameterMap());
+		
+		request.setAttribute("commandName", request.getParameter("cmd"));
+		request.setAttribute("commandParameters", params.toJSONString());
 	}
 	
 	
@@ -279,7 +313,12 @@ public class ConfirmRequirementsController extends PageController
 		else if (request.getParameterMap().containsKey("constructItemSkillId"))
 			return Type.ConstructItemSkill;
 		else if (request.getParameterMap().containsKey("entity"))
-			return Type.Generic;
+		{
+			if (request.getParameter("cmd")!=null)
+				return Type.GenericCommand;
+			else
+				return Type.GenericLongOperation;
+		}
 		
 		throw new IllegalArgumentException("Unable to determine type for confirm requirements page.");
 	}

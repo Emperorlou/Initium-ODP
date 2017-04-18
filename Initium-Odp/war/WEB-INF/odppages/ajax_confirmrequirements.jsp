@@ -152,6 +152,12 @@ function confirmRequirements_collectChoices(event)
 	<c:if test="${type=='ConstructItemSkill'}">
 		<a onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}")' class='big-link'>Begin</a>
 	</c:if>
+	<c:if test="${type=='GenericCommand'}">
+		<a onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}")' class='big-link'>Okay</a>
+	</c:if>
+	<c:if test="${type=='GenericLongOperation'}">
+		<a onclick='longOperation(event, "${longOperationUrl}", null, null, "${userRequestId}")' class='big-link'>Okay</a>
+	</c:if>
 </div>
 
 </div>

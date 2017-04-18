@@ -1331,7 +1331,7 @@ function transferCharacter(currentCharName)
 		if (email!=null)
 		{
 			enforceSingleAction();
-			window.location.href = "/ServletUserControl?type=transferCharacter&email="+email+"&v="+window.verifyCode;
+			window.location.href = "/ServletUserControl?type=transferCharacter&email="+encodeURIComponent(email)+"&v="+window.verifyCode;
 		}
 	});
 }
@@ -2383,11 +2383,11 @@ function doBuyCharacterSlots(event)
 	});
 }
 
-function doLightFireplace(event, itemKey)
+function doFireplaceLight(event, itemKey)
 {
 	closeAllTooltips();
 	
-	doCommand(event, "LightFireplace", {itemKey:itemKey});
+	doCommand(event, "FireplaceLight", {itemKey:itemKey});
 }
 
 
@@ -2531,7 +2531,7 @@ function activateWaitGif(eventObject)
 }
 
 
-function doCommand(eventObject, commandName, parameters, callback)
+function doCommand(eventObject, commandName, parameters, callback, userRequestId)
 {
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
@@ -2554,6 +2554,15 @@ function doCommand(eventObject, commandName, parameters, callback)
 			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
 		}
 	}
+	
+	var selectedItems = null;
+	if (userRequestId!=null)
+	{
+		selectedItems = confirmRequirements_collectChoices(event);
+		if (selectedItems==null) selectedItems = {};
+		parameters["__"+userRequestId+"UserResponse"] = JSON.stringify(selectedItems);
+	}
+	
 	
 	// We need to post, as larger batch operations failed due to URL string being too long
 	$.post(url, parameters)
@@ -2750,8 +2759,11 @@ var lastLongOperationEventObject = null;
  * @param responseFunction This is the handler that is called when the operation returns. The data that is passed into the handler includes: data.isComplete (boolean), data.error (boolean), data.timeLeft (seconds remaining to wait)
  * @param recallFunction This function should call the original javascript call that includes the call to longOperation. This handler is invoked when the time on the long operation runs out.
  */
-function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
+function longOperation(eventObject, actionUrl, responseFunction, recallFunction, userRequestId)
 {
+
+	
+	
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
 
 	if (actionUrl.indexOf("?")>0)
@@ -2760,6 +2772,16 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction)
 		actionUrl+="?ajax=true";
 
 	ga('send', 'pageview', actionUrl);	
+
+	
+	var selectedItems = null;
+	if (userRequestId!=null)
+	{
+		selectedItems = confirmRequirements_collectChoices(event);
+		if (selectedItems==null) selectedItems = {};
+		actionUrl+="&__"+userRequestId+"UserResponse="+encodeURIComponent(JSON.stringify(selectedItems));
+	}
+	
 	
 	$.get(actionUrl)
 	.done(function(data)
@@ -2927,13 +2949,8 @@ function doExperiment(event)
 function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 {
 	
-	var selectedItems = null;
-	if (userRequestId!=null)
-		selectedItems = confirmRequirements_collectChoices(event);
-	
 	showBannerLoadingIcon();
-	if (selectedItems==null) selectedItems = {};
-	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaName="+encodeURIComponent(ideaName)+"&ideaId="+ideaId+"&__"+userRequestId+"UserResponse="+encodeURIComponent(JSON.stringify(selectedItems))+"&v="+window.verifyCode, 
+	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaName="+encodeURIComponent(ideaName)+"&ideaId="+ideaId+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -2949,7 +2966,8 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 			function()	// recallFunction
 			{
 				doCreatePrototype(event, ideaId, ideaName);
-			});
+			}, 
+			userRequestId);
 	
 }
 
@@ -3116,9 +3134,12 @@ function doCollectCollectable(event, collectableId)
 function handleUserRequest(data)
 {
 	if (data.pagePopupUrl.indexOf("?")>=0)
-		data.pagePopupUrl+="&userRequestId="+data.userRequestId;
+		data.pagePopupUrl+="&userRequestId="+data.userRequestId+"&"+data.urlParameters;
 	else
-		data.pagePopupUrl+="?userRequestId="+data.userRequestId;
+		data.pagePopupUrl+="?userRequestId="+data.userRequestId+"&"+data.urlParameters;
+	
+	// Add the exta request data to the url..
+	
 	
 	closeAllPopups();
 	closeAllTooltips();

@@ -129,10 +129,16 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		// Create the skill so we can use it again
 		CachedEntity item = inventionService.doCreateConstructItemPrototype(idea, itemRequirementsToItems, pool);
+
+		// Now add to the knowledge we gain
+		knowledgeService.increaseKnowledgeFor(idea, 2);
+		knowledgeService.increaseKnowledgeFor(item, 1);
+		
 		
 		// Give the player a message that points to the skill and the new item he made
 		setUserMessage("You have a new skill! You successfully turned your idea of "+idea.getProperty("name")+" into a skill. A prototype of your skill is now in your inventory.<br><br>You created an item: "+GameUtils.renderItem(item));
 		
+
 		
 		return "Experimentation complete.";
 	}

@@ -12,7 +12,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
+import com.universeprojects.miniup.server.services.ConfirmSkillRequirementsBuilder;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -39,9 +39,12 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		doChecks(character, skill);
 
+		data.put("skillId", skillId);
+		data.put("skillName", skill.getProperty("name"));
+		
 		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
 
-		Map<String, Key> itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, getPageRefreshJavascriptCall(), ideaDef)
+		Map<String, Key> itemRequirementSlotsToItems = new ConfirmSkillRequirementsBuilder("1", db, this, ideaDef, skill)
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
 		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
@@ -83,8 +86,6 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		seconds = (Long)processVariables.get("speed");
 		
 		data.put("selectedItems", itemRequirementsToItems);
-		data.put("skillId", skillId);
-		data.put("skillName", skill.getProperty("name"));
 		
 		
 		data.put("description", "It will take "+seconds+" seconds to finish this construction.");
@@ -123,6 +124,10 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		// Create the skill so we can use it again
 		CachedEntity item = inventionService.doConstructItemSkill(skill, itemRequirementsToItems, pool);
+		
+		// Now add to the knowledge we gain
+		knowledgeService.increaseKnowledgeFor(skill, 1);
+		knowledgeService.increaseKnowledgeFor(item, 1);
 		
 		// Give the player a message that points to the skill and the new item he made
 		setUserMessage("You created an item: "+GameUtils.renderItem(item));

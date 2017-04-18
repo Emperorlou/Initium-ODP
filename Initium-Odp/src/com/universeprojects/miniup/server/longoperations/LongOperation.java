@@ -300,6 +300,7 @@ public abstract class LongOperation extends OperationBase
 		result.put("message", e.playerMessage);
 		result.put("pagePopupUrl", e.pagePopupUrl);
 		result.put("pagePopupTitle", e.pagePopupTitle);
+		result.put("urlParameters", e.urlParameters);
 		result.put("userRequestId", e.userRequestId);
 		out.print(result.toJSONString());
 		out.flush();

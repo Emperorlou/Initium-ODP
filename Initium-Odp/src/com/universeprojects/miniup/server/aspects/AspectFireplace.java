@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ItemAspect;
@@ -21,7 +20,6 @@ import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
-import com.universeprojects.miniup.server.services.ODPInventionService;
 
 public class AspectFireplace extends ItemAspect
 {
@@ -43,7 +41,7 @@ public class AspectFireplace extends ItemAspect
 
 		itemPopupEntries.add(new ItemPopupEntry("Light Fire", 
 				"Using kindling and something to start the fire, this command will light a fire here.", 
-				"doLightFireplace(event, '"+entity.getUrlSafeKey()+"');"));
+				"doFireplaceLight(event, '"+entity.getUrlSafeKey()+"');"));
 		
 		itemPopupEntries.add(new ItemPopupEntry("Add Fuel", 
 				"Add something flammable to the fire to keep it going.", 
@@ -89,14 +87,14 @@ public class AspectFireplace extends ItemAspect
 	
 	static 
 	{
-		addCommand("LightFireplace", AspectFireplace.CommandLightFireplace.class);
+		addCommand("FireplaceLight", AspectFireplace.CommandFireplaceLight.class);
 		addCommand("FireplaceAddFuel", AspectFireplace.CommandFireplaceAddFuel.class);
 	}
 	
-	public static class CommandLightFireplace extends Command
+	public static class CommandFireplaceLight extends Command
 	{
 
-		public CommandLightFireplace(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
+		public CommandFireplaceLight(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 		{
 			super(db, request, response);
 		}
@@ -134,19 +132,15 @@ public class AspectFireplace extends ItemAspect
 			
 			Map<String, Key> gerSlotsToItem = new ConfirmGenericEntityRequirementsBuilder("1", db, this, "doAddFuelToFireplace(null, '"+itemKey+"')", fireplaceFuel)
 			.addGenericEntityRequirements("Material", "genericEntityRequirements1")
-			.addGenericEntityRequirements("Material", "genericEntityRequirements1")
-			.addGenericEntityRequirements("Material", "genericEntityRequirements1")
-			.addGenericEntityRequirements("Material", "genericEntityRequirements1")
 			.go();
 			
-			Collection<Key> fuel = gerSlotsToItem.values();
+			Collection<Key> fuelList = gerSlotsToItem.values();
+			Key fuelKey = fuelList.iterator().next();
 			
-			EntityPool pool = new EntityPool(db.getDB());
-			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), null);
+			CachedEntity fuel = db.getEntity(fuelKey);
 			
-			inventionService.resolveGerSlotsToGers(pool, fireplaceFuel, gerSlotsToItem);
 			
-//			inventionService.checkIdeaWithSelectedItems(pool, idea, itemRequirementsToItems)
+			// TODO: add the fuel to the fire
 		}
 
 	}

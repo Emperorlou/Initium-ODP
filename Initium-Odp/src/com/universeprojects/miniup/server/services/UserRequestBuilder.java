@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
@@ -9,6 +11,7 @@ import org.json.simple.parser.ParseException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
+import com.universeprojects.miniup.server.WebUtils;
 
 public abstract class UserRequestBuilder<T> extends Service
 {
@@ -38,7 +41,24 @@ public abstract class UserRequestBuilder<T> extends Service
 	 * 
 	 * @return
 	 */
-//	protected abstract String getJavascriptRecallFunction();
+	@SuppressWarnings("unchecked")
+	private String getUrlParameters()
+	{
+		StringBuilder sb = new StringBuilder();
+		HttpServletRequest request = db.getRequest();
+		boolean firstTime = true;
+		for(String key:((Map<String,String[]>)request.getParameterMap()).keySet())
+		{
+			if (firstTime) 
+				firstTime = false;
+			else
+				sb.append("&");
+			sb.append(key).append("=");
+			sb.append(WebUtils.encode(request.getParameter(key)));
+		}
+		
+		return sb.toString();
+	}
 	
 	/**
 	 * This message will appear as a popup for the user as soon as the user request builder's page popup has appeared.
@@ -55,7 +75,7 @@ public abstract class UserRequestBuilder<T> extends Service
 		if (isCompleted())
 			return convertParametersToResult(getUserResponse());
 
-		throw new UserRequestIncompleteException(getPagePopupTitle(), getPagePopupUrl(), jsInitiatingFunctionCall, playerMessage, uniqueId);
+		throw new UserRequestIncompleteException(getPagePopupTitle(), getPagePopupUrl(), WebUtils.textToHtml(getUrlParameters()), playerMessage, uniqueId);
 	}
 
 	private JSONObject getUserResponse()

@@ -54,7 +54,7 @@ public abstract class ODPKnowledgeService extends Service
 	 * @param entity Currently this must be an Item entity but this will likely be expanded.
 	 * @return
 	 */
-	public List<CachedEntity> getKnowledgeEntityFor(CachedEntity entity, boolean createIfNoExist)
+	public List<CachedEntity> getKnowledgeEntitiesFor(CachedEntity entity, boolean createIfNoExist)
 	{
 		// TODO Auto-generated method stub
 		return null;
@@ -76,23 +76,6 @@ public abstract class ODPKnowledgeService extends Service
 		return false;
 	}
 
-
-	/**
-	 * This method will return the ancestors and any related knowledge entity keys that apply
-	 * when the given entity is used by the character. 
-	 * 
-	 * This method currently supports the following entity types: Item
-	 * 
-	 * In this version of the method no additional database calls are made.
-	 * 
-	 * @param entity Currently this must be an Item entity but this will likely be expanded.
-	 * @return
-	 */
-	public List<Key> getKnowledgeKeyFor(CachedEntity entity)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 	/**

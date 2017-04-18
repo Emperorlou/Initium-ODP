@@ -9,7 +9,7 @@ public class UserRequestIncompleteException extends Exception
 	final public String pagePopupUrl;
 	final public String pagePopupTitle;
 	final public String userRequestId;
-	final public String jsFunctionCall;
+	final public String urlParameters;
 	
 	public UserRequestIncompleteException(String pagePopupTitle, String pagePopupUrl, String jsFunctionCall, String playerMessage, String userRequestId)
 	{
@@ -20,7 +20,7 @@ public class UserRequestIncompleteException extends Exception
 		this.pagePopupUrl = pagePopupUrl;
 		this.pagePopupTitle = pagePopupTitle;
 		this.userRequestId = userRequestId;
-		this.jsFunctionCall = jsFunctionCall;
+		this.urlParameters = jsFunctionCall;
 	}
 	
 }

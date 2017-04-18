@@ -2,6 +2,8 @@ package com.universeprojects.miniup.server;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +20,14 @@ public class InitiumObject
 	{
 		this.db = db;
 		this.entity = entity;
-		Set<String> aspectIds = (Set<String>)entity.getProperty("_aspects");
+		
+		Object aspectsObj = entity.getProperty("_aspects");
+		Set<String> aspectIds = null;
+		if (aspectsObj instanceof Set)
+			aspectIds = (Set<String>)aspectsObj;
+		else if (aspectsObj instanceof List)
+			aspectIds = new LinkedHashSet<String>((List<String>)aspectsObj);
+		
 		if (aspectIds!=null)
 		{
 			this.aspects = new HashMap<String, InitiumAspect>();

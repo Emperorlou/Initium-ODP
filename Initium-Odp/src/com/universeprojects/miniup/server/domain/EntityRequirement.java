@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.domain;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -76,7 +77,7 @@ public class EntityRequirement extends OdpDomain {
 	 *  
 	 * @param requiredAspects
 	 */
-	public void setRequiredAspects(List<String> requiredAspects) { // TODO - type
+	public void setRequiredAspects(Set<String> requiredAspects) { // TODO - type
 		getCachedEntity().setProperty("requiredAspects", requiredAspects);
 	}
 
