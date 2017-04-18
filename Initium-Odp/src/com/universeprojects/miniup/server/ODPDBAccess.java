@@ -1774,11 +1774,10 @@ public class ODPDBAccess
 			{
 				Long maximumCount = (Long)def.getProperty("maxCount");
 				int existingCount = 0;
-				List<CachedEntity> buffs = buffsCache.get(characterKey);
-				if (buffs!=null)
-					for(CachedEntity appliedBuff:buffs)
-						if(buffDefName.equals(appliedBuff.getProperty("name")))
-							existingCount++;
+				List<CachedEntity> buffs = getBuffsFor(characterKey);
+				for(CachedEntity appliedBuff:buffs)
+					if(buffDefName.equals(appliedBuff.getProperty("name")))
+						existingCount++;
 				if (existingCount >= maximumCount) return null;
 			}
 			
