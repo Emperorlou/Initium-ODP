@@ -232,7 +232,7 @@ function SocketMessager(url, token) {
 	this.chatSecondsToIdle = 30;
 
 	this.chatServer = url;
-	this.idToken = idToken;
+	this.idToken = token;
 
 	this.channel = "GlobalChat";
 
