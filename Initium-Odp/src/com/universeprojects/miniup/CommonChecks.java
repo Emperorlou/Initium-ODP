@@ -10,6 +10,27 @@ public abstract class CommonChecks
 {
 
 	/**
+	 * Returns true if the given idea definition is active and available for use or not.
+	 * 
+	 * @param db
+	 * @param ideaDef
+	 * @return
+	 */
+	public static boolean checkIdeaIsLive(ODPDBAccess db, CachedEntity ideaDef)
+	{
+		String mode = (String)ideaDef.getProperty("mode");
+		if (mode==null) return false;
+
+		if (GameUtils.isTestServer(db.getRequest()))
+		{
+			if (mode.equals("Live") || mode.equals("Test"))
+				 return true;
+		}
+		
+		return mode.equals("Live");
+	}
+	
+	/**
 	 * Checks if the character is not currently trading, in combat, manning a store, unconscious/dead, or anything else that would cause the character to be otherwise occupied.
 	 * 
 	 * @param character
