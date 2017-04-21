@@ -231,7 +231,7 @@ function SocketMessager(url, token) {
 	this.chatIdleTime = new Date();
 	this.chatSecondsToIdle = 30;
 
-	this.chatServer = chatServerUrl;
+	this.chatServer = url;
 	this.idToken = idToken;
 
 	this.channel = "GlobalChat";
