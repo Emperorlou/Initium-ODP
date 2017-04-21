@@ -222,7 +222,23 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 function SocketMessager(url, token) {
 	eb = new EventBus(url);
     var that = this;
-    that.channel = "GlobalChat";
+    this.markers = [];
+
+	this.chatIdleMode = false;
+	this.messageChecker = null;
+	this.waitingForSendResponse = false;
+
+	this.chatIdleTime = new Date();
+	this.chatSecondsToIdle = 30;
+
+	this.chatServer = chatServerUrl;
+	this.idToken = idToken;
+
+	this.channel = "GlobalChat";
+
+	this.firstGet = true;
+
+	this.ping = null;
     var handler = function(error, msg) {
         if(error) {
             console.warn(error);
@@ -244,7 +260,7 @@ function SocketMessager(url, token) {
         }, 750);
     };
 
-    this.sendMessage(message, target) {
+    this.sendMessage = function(message, target) {
         message = encode_utf8(message);
         switch(that.channel) {
             case "GlobalChat":
@@ -269,4 +285,13 @@ function SocketMessager(url, token) {
                 break;
         }
     }
+    this.onChatMessage = null;
+    this.onNotificationMessage = null;
+    this.checkClientSideChatCommands = null;
+    /**
+     * Args: xhr, textStatus, error
+     */
+    this.onError = null;
+    this.onConnectionStateChange = null;
+    this.onMessagesChecked = null;
 }
