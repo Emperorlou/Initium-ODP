@@ -264,7 +264,7 @@ function SocketMessager(url, token) {
         message = encode_utf8(message);
         switch(that.channel) {
             case "GlobalChat":
-                eb.send('chat.global.in', {'contents':message});
+                eb.send('chat.public.in', {'contents':message});
                 break;
             case "LocationChat":
                 eb.send('chat.location.in', {'contents':message});
