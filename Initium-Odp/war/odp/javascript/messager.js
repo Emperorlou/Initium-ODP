@@ -244,12 +244,12 @@ function SocketMessager(url, token) {
             console.warn(error);
             console.log(msg);
         } else {
-            if (Array.isArray(msg.body) {
+            if (Array.isArray(msg.body)) {
                 var sorted = msg.body.sort(function(a,b) { return a.createdDate - b.createdDate});
                 for (var i = 0; i < sorted.length; i++) {
                     that.onChatMessage(sorted[i]);
                 }
-            }) else {
+            } else {
                 that.onChatMessage(msg.body);
             }
         }
