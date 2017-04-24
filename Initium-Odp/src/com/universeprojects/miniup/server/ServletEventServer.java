@@ -294,7 +294,7 @@ public class ServletEventServer extends HttpServlet
 				case "public":
 					respBody.put("id", "public");
 					payload.put("message", message);
-					payload.put("code", "PublicChat");
+					payload.put("code", "GlobalChat");
 					respBody.put("success", true);
 					break;
 				case "location":
