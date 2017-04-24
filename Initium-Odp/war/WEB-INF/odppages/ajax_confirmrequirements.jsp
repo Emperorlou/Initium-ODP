@@ -129,10 +129,16 @@ function confirmRequirements_collectChoices(event)
 		result[input.attr("id")] = input.val();
 	}
 	
+	if ($("#repetitionCount").length>0)
+		result['repetitionCount'] = $("#repetitionCount").val();
+	
 	return result;
 }
 </script>
 <div class='main-splitScreen'>
+<c:if test="${hasRepetitions}">
+How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='30'/> 
+</c:if>
 <c:forEach var="requirementCategory" items="${formattedRequirements}">
 	<h4><c:out value="${requirementCategory.name}"/></h4>
 	<c:forEach var="requirement" items="${requirementCategory.list}">

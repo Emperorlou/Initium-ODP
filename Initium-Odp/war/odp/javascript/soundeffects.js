@@ -52,44 +52,44 @@ var audioDescriptorPresets =
 "LightForest":"" +
 		"wind1(100,20,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(10,10,false,clearday)&&" +
-		"bird3(10,10,false,clearday)&&" +
-		"bird4(10,10,false,clearday)&&" +
-		"bird9(10,10,false,clearday)&&" +
-		"bird10(10,10,false,clearday)&&" +
-		"bird11(10,10,false,clearday)&&" +
-		"squirrel1(5,10,false,clearday)&&" +
-		"squirrel2(5,10,false,clearday)&&" +
-		"squirrel3(5,10,false,clearday)&&" +
-		"crow1(5,10,false,clearday)",
+		"bird2(5,10,false,clearday)&&" +
+		"bird3(5,10,false,clearday)&&" +
+		"bird4(5,10,false,clearday)&&" +
+		"bird9(5,10,false,clearday)&&" +
+		"bird10(5,10,false,clearday)&&" +
+		"bird11(5,10,false,clearday)&&" +
+		"squirrel1(3,10,false,clearday)&&" +
+		"squirrel2(3,10,false,clearday)&&" +
+		"squirrel3(3,10,false,clearday)&&" +
+		"crow1(3,10,false,clearday)",
 "DenseForest":"" +
 		"wind1(100,20,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(10,10,false,clearday)&&" +
-		"bird3(10,10,false,clearday)&&" +
-		"bird4(10,10,false,clearday)&&" +
-		"bird5(10,10,false,clearday)&&" +
-		"bird6(10,10,false,clearday)&&" +
-		"bird7(10,10,false,clearday)&&" +
-		"bird8(10,10,false,clearday)&&" +
-		"bird9(10,10,false,clearday)&&" +
-		"bird10(10,10,false,clearday)&&" +
-		"bird11(10,10,false,clearday)&&" +
-		"bird12(10,10,false,clearday)&&" +
-		"squirrel1(5,10,false,clearday)&&" +
-		"squirrel2(5,10,false,clearday)&&" +
-		"squirrel3(5,10,false,clearday)&&" +
-		"crow1(5,7,false,clearday)",
+		"bird2(6,10,false,clearday)&&" +
+		"bird3(6,10,false,clearday)&&" +
+		"bird4(6,10,false,clearday)&&" +
+		"bird5(6,10,false,clearday)&&" +
+		"bird6(6,10,false,clearday)&&" +
+		"bird7(6,10,false,clearday)&&" +
+		"bird8(6,10,false,clearday)&&" +
+		"bird9(6,10,false,clearday)&&" +
+		"bird10(6,10,false,clearday)&&" +
+		"bird11(6,10,false,clearday)&&" +
+		"bird12(6,10,false,clearday)&&" +
+		"squirrel1(3,10,false,clearday)&&" +
+		"squirrel2(3,10,false,clearday)&&" +
+		"squirrel3(3,10,false,clearday)&&" +
+		"crow1(3,7,false,clearday)",
 "GrassyPlains":"" +
 		"cicada1(100,10,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(5,10,false,clearday)&&" +
-		"bird3(5,10,false,clearday)&&" +
-		"bird6(5,10,false,clearday)&&" +
-		"bird7(5,10,false,clearday)&&" +
-		"bird11(5,10,false,clearday)&&" +
-		"bird12(5,10,false,clearday)&&" +
-		"crow1(5,5,false,clearday)",
+		"bird2(3,10,false,clearday)&&" +
+		"bird3(3,10,false,clearday)&&" +
+		"bird6(3,10,false,clearday)&&" +
+		"bird7(3,10,false,clearday)&&" +
+		"bird11(3,10,false,clearday)&&" +
+		"bird12(3,10,false,clearday)&&" +
+		"crow1(3,5,false,clearday)",
 "Mountains":"" +
 		"wind2(100,15,true)",
 "Ocean":"" +
@@ -109,16 +109,16 @@ var audioDescriptorPresets =
 		"stream1(100,30,true)&&" +
 		"wind1(100,20,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(10,10,false,clearday)&&" +
-		"bird4(10,10,false,clearday)&&" +
-		"bird6(10,10,false,clearday)&&" +
-		"bird8(10,10,false,clearday)&&" +
-		"bird10(10,10,false,clearday)&&" +
-		"bird12(10,10,false,clearday)&&" +
-		"squirrel1(5,10,false,clearday)&&" +
-		"squirrel2(5,10,false,clearday)&&" +
-		"squirrel3(5,10,false,clearday)&&" +
-		"crow1(5,10,false,clearday)",
+		"bird2(6,10,false,clearday)&&" +
+		"bird4(6,10,false,clearday)&&" +
+		"bird6(6,10,false,clearday)&&" +
+		"bird8(6,10,false,clearday)&&" +
+		"bird10(6,10,false,clearday)&&" +
+		"bird12(6,10,false,clearday)&&" +
+		"squirrel1(3,10,false,clearday)&&" +
+		"squirrel2(3,10,false,clearday)&&" +
+		"squirrel3(3,10,false,clearday)&&" +
+		"crow1(3,10,false,clearday)",
 "Windy":"" +
 		"wind1(100,20,true)&&"+
 		"wind3(100,40,true)",

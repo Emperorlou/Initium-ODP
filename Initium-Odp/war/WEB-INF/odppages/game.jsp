@@ -29,7 +29,7 @@
 <script type="text/javascript" src="/javascript/vertx-eventbus.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=60"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=70"></script>
 
 <script type="text/javascript" src="/odp/javascript/messager.js?v=18"></script>
 
@@ -385,7 +385,8 @@ https://github.com/Emperorlou/Initium-ODP
                                            -->
 
 <body id='newui'>
-	<div class='page'>
+	<div id="popups"></div>
+	<div class='page popupBlurrable'>
 		<div class='location-controls-container half-page-variant'></div>
 		<div class='page-upperhalf'>
 			<div id='main-header' class='header1'>

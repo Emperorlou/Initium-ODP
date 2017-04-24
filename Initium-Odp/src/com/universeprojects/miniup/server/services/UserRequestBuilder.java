@@ -21,6 +21,7 @@ public abstract class UserRequestBuilder<T> extends Service
 	
 	protected String playerMessage = null;
 	
+	
 	public UserRequestBuilder(String uniqueId, ODPDBAccess db, OperationBase command, String jsInitiatingFunctionCall)
 	{
 		super(db);
@@ -69,6 +70,7 @@ public abstract class UserRequestBuilder<T> extends Service
 	{
 		this.playerMessage = playerMessage;
 	}
+	
 	
 	public T go() throws UserRequestIncompleteException
 	{

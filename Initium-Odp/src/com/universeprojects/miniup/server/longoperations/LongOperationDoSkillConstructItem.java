@@ -15,6 +15,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmSkillRequirementsBuilder;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 
 public class LongOperationDoSkillConstructItem extends LongOperation
 {
@@ -44,7 +45,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
 
-		Map<String, Key> itemRequirementSlotsToItems = new ConfirmSkillRequirementsBuilder("1", db, this, ideaDef, skill)
+		GenericEntityRequirementResult itemRequirementSlotsToItems = new ConfirmSkillRequirementsBuilder("1", db, this, ideaDef, skill)
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
 		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
@@ -62,14 +63,14 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		// Pooling entities...
 		pool.addEntityDirectly(ideaDef);
 		inventionService.poolConstructItemSkill(pool, skill);
-		inventionService.poolGerSlotsAndSelectedItems(pool, ideaDef, itemRequirementSlotsToItems);
+		inventionService.poolGerSlotsAndSelectedItems(pool, ideaDef, itemRequirementSlotsToItems.slots);
 		
 		pool.loadEntities();
 		
 		
 		
 		// Now figure out which of the gers in each slot should actually be used
-		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems);
+		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots);
 		
 		
 		// This check will throw a UserErrorMessage if it finds anything off

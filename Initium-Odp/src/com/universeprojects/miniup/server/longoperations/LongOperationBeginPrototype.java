@@ -18,6 +18,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -60,7 +61,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		CachedEntity ideaDef = db.getEntity((Key)idea.getProperty("_definitionKey"));
 
 		
-		Map<String, Key> itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, getPageRefreshJavascriptCall(), ideaDef)
+		GenericEntityRequirementResult itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, getPageRefreshJavascriptCall(), ideaDef)
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Required Materials", "prototypeItemsConsumed")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
@@ -79,13 +80,13 @@ public class LongOperationBeginPrototype extends LongOperation
 		// Pooling entities...
 		pool.addEntityDirectly(ideaDef);
 		inventionService.poolConstructItemIdea(pool, idea);
-		inventionService.poolGerSlotsAndSelectedItems(pool, ideaDef, itemRequirementSlotsToItems);
+		inventionService.poolGerSlotsAndSelectedItems(pool, ideaDef, itemRequirementSlotsToItems.slots);
 		
 		pool.loadEntities();
 		
 		
 		// Now figure out which of the gers in each slot should actually be used
-		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems);
+		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots);
 		
 		
 		// This check will throw a UserErrorMessage if it finds anything off

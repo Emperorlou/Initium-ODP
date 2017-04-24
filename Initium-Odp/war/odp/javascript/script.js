@@ -168,8 +168,9 @@ function flagUnreadMessages()
 function popupPermanentOverlay(title, content, popupClassOverride) 
 {
 	if (popupClassOverride==null)
-		popupClassOverride = "popup";
+		popupClassOverride = "popup backdrop1c";
 	closeAllPopups();
+	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
     window.popupsOpen++;
     window.popupsArray[popupsNum-1] = "yes";
@@ -184,12 +185,14 @@ function popupMessage(title, content, noBackground)
 	noBackgroundHtml = "";
 	if (noBackground==true)
 		noBackgroundHtml = 'style="background:none"';
+
+	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
     window.popupsOpen++;
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><div class="paragraph">' + content + '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup backdrop1c" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><div class="paragraph">' + content + '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
     expandpopupMessage();
     enterPopupClose();
    }
@@ -234,7 +237,10 @@ function closepopupMessage(popupID) {
     window.popupsArray[popupID-1] = "no";
     window.documentBindEnter = false;
     if (window.popupsOpen<=0)
+    {
 		$("#popups").hide();
+		$(".blur").removeClass("blur");
+    }
     else
     	enterPopupClose();
 }
@@ -253,6 +259,7 @@ function expandpopupMessage()
 		popup.css("left", viewportWidth/2-(width/2)+"px");
 		popup.css("top", viewportHeight/2-(height/2)+"px");
 	});
+	
 	
 //    var winHeight = window.innerHeight;
 //    var popupWrapperH = winHeight-125;
@@ -3386,8 +3393,9 @@ function confirmCancelPopup(title, content, showCancel, yesFunction, noFunction)
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
-		popupClassOverride = "popup";
+		popupClassOverride = "popup backdrop1c";
 	closeAllPopups();
+	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
     window.popupsOpen++;
     window.popupsArray[popupsNum-1] = "yes";
@@ -3459,8 +3467,9 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
-		popupClassOverride = "popup";
+		popupClassOverride = "popup backdrop1c";
 	closeAllPopups();
+	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
     window.popupsOpen++;
     window.popupsArray[popupsNum-1] = "yes";
@@ -3574,8 +3583,9 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
-		popupClassOverride = "popup";
+		popupClassOverride = "popup backdrop1c";
 	closeAllPopups();
+	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
     window.popupsOpen++;
     window.popupsArray[popupsNum-1] = "yes";

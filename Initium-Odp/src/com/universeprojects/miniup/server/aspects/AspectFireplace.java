@@ -20,6 +20,7 @@ import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 
 public class AspectFireplace extends ItemAspect
 {
@@ -130,11 +131,11 @@ public class AspectFireplace extends ItemAspect
 			String itemKey = parameters.get("itemKey");
 			CachedEntity fireplaceFuel = db.getEntity("GenericActivity", "FireplaceFuel");
 			
-			Map<String, Key> gerSlotsToItem = new ConfirmGenericEntityRequirementsBuilder("1", db, this, "doAddFuelToFireplace(null, '"+itemKey+"')", fireplaceFuel)
+			GenericEntityRequirementResult gerSlotsToItem = new ConfirmGenericEntityRequirementsBuilder("1", db, this, "doAddFuelToFireplace(null, '"+itemKey+"')", fireplaceFuel)
 			.addGenericEntityRequirements("Material", "genericEntityRequirements1")
 			.go();
 			
-			Collection<Key> fuelList = gerSlotsToItem.values();
+			Collection<Key> fuelList = gerSlotsToItem.slots.values();
 			Key fuelKey = fuelList.iterator().next();
 			
 			CachedEntity fuel = db.getEntity(fuelKey);

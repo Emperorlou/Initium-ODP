@@ -13,11 +13,14 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 
-public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<Map<String,Key>>
+public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<GenericEntityRequirementResult>
 {
 	List<String> fieldNames = new ArrayList<String>();
 	Map<String, Collection<String>> requirements = new HashMap<>();
+	Integer repetitionCount = null;
+	
 	
 	CachedEntity entity;
 	
@@ -55,20 +58,37 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 		return this;
 	}
 	
-	@Override
-	protected Map<String, Key> convertParametersToResult(JSONObject userResponse)
+	public ConfirmGenericEntityRequirementsBuilder setRepetitionCount(Integer count)
 	{
-		Map<String, Key> result = new HashMap<>();
+		this.repetitionCount = count;
+		return this;
+	}
+
+	
+	@Override
+	protected GenericEntityRequirementResult convertParametersToResult(JSONObject userResponse)
+	{
+		GenericEntityRequirementResult result = new GenericEntityRequirementResult();
 		for(Object key:userResponse.keySet())
 		{
 			String itemId = userResponse.get(key).toString();
 			String gerFieldNameAndSlotIndex = key.toString();
 	
 			if (itemId==null || itemId.length()==0)
-				result.put(gerFieldNameAndSlotIndex, null);
+				result.slots.put(gerFieldNameAndSlotIndex, null);
 			else
-				result.put(gerFieldNameAndSlotIndex, KeyFactory.createKey("Item", Long.parseLong(itemId)));
+				result.slots.put(gerFieldNameAndSlotIndex, KeyFactory.createKey("Item", Long.parseLong(itemId)));
 		}
+		
+		try
+		{
+			result.repetitionCount = new Integer(userResponse.get("repetitionCount").toString());
+		}
+		catch(Exception e)
+		{
+			// Ignore. We'll leave the rep count as null.
+		}
+		
 		return result;
 	}
 
@@ -97,4 +117,10 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 		return "Select the tools/materials to use";
 	}
 
+	
+	public class GenericEntityRequirementResult
+	{
+		public Map<String,Key> slots = new HashMap<>();
+		public Integer repetitionCount = null; 
+	}
 }

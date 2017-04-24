@@ -3274,7 +3274,8 @@ body
 	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
 	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
 	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 fill repeat;	
+	border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 fill repeat;
+	background-color: #757161;	
 }
 
 
@@ -3465,6 +3466,11 @@ body
 	display:none;
 }
 
+#newui .popupWrapperBackground
+{
+	background:none;
+}
+
 
 #newui .normal-container
 {
@@ -3489,6 +3495,10 @@ body
 	color:#999999;
 }
 
+.blur
+{
+	filter:blur(12px);
+}
 
 
 
