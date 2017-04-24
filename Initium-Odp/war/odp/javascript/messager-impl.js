@@ -16,7 +16,7 @@ var messageCodes = [
              "Notifications"
              ];
 var messager;
-if(window.isTestServer && window.localStorage["sockets"]) {
+if(window.isTestServer) {
     messager = new SocketMessager("http://www.derekabenson.com:6969/eventbus", newChatIdToken);
 } else {
     messager = new Messager(5000, 10000, 30, "https://chat-dot-playinitium.appspot.com", chatIdToken);
