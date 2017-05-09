@@ -23,7 +23,9 @@ public class CommandBuyCharacterSlots extends TransactionCommand
 	@Override
 	public void runBeforeTransaction(Map<String, String> parameters) throws UserErrorMessage
 	{
-		
+		CachedEntity user = db.getCurrentUser();
+		int characterCount = db.getUserCharacters(user).size();
+		request.setAttribute("characterCount", characterCount);
 	}
 
 	@Override
@@ -44,7 +46,7 @@ public class CommandBuyCharacterSlots extends TransactionCommand
 			throw new UserErrorMessage("You need at least 5 USD in donation credit to get additional character slots.");
 		
 		Long maxCharacterCount = db.getUserCharacterSlotCount(user);
-		int characterCount = db.getUserCharacters(user).size();
+		int characterCount = (Integer)request.getAttribute("characterCount");
 		Long rawMaxCount = (Long)user.getProperty("maximumCharacterCount");
 		
 		user.setProperty("totalDonations", availableCredit-500L);

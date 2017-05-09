@@ -45,12 +45,19 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
 
+		Integer maxRepCount = null;
+		if (ideaDef.getProperty("skillMaxRepetitions")!=null)
+			maxRepCount = ((Long)ideaDef.getProperty("skillMaxRepetitions")).intValue();
+		
 		GenericEntityRequirementResult itemRequirementSlotsToItems = new ConfirmSkillRequirementsBuilder("1", db, this, ideaDef, skill)
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
 		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
 		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
+		.setRepetitionCount(maxRepCount)
 		.go();
+		if (itemRequirementSlotsToItems.repetitionCount==null)
+			itemRequirementSlotsToItems.repetitionCount = 1; 
 		
 
 		
@@ -70,23 +77,33 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		
 		// Now figure out which of the gers in each slot should actually be used
-		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots);
+		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots, itemRequirementSlotsToItems.repetitionCount);
 		
-		
+
 		// This check will throw a UserErrorMessage if it finds anything off
-		inventionService.checkSkillWithSelectedItems(pool, skill, itemRequirementsToItems);
+		inventionService.checkSkillWithSelectedItems(pool, skill, itemRequirementsToItems, itemRequirementSlotsToItems.repetitionCount);
 
 		Map<String,Object> processVariables = new HashMap<String,Object>();
 		Long seconds = 5L;
 		if (skill.getProperty("skillConstructionSpeed")!=null)
 			seconds = ((Long)skill.getProperty("skillConstructionSpeed")).longValue();
+		
+		
 		processVariables.put("speed", seconds);
+
+		// Add in the repetitions...
+		if (itemRequirementSlotsToItems.repetitionCount!=null)
+			seconds*=itemRequirementSlotsToItems.repetitionCount;
 		
 		inventionService.processConstructItemSkillForProcessVariables(skill, itemRequirementsToItems, processVariables, pool);
 		
+		
 		seconds = (Long)processVariables.get("speed");
+		if (itemRequirementSlotsToItems.repetitionCount!=null)
+			seconds*=itemRequirementSlotsToItems.repetitionCount;
 		
 		data.put("selectedItems", itemRequirementsToItems);
+		data.put("repetitionCount", itemRequirementSlotsToItems.repetitionCount);
 		
 		
 		data.put("description", "It will take "+seconds+" seconds to finish this construction.");
@@ -101,6 +118,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 	{
 		@SuppressWarnings("unchecked")
 		Map<Key, Key> itemRequirementsToItems = (Map<Key, Key>)data.get("selectedItems");
+		Integer repetitionCount = (Integer)data.get("repetitionCount");
 		
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity skill = db.getEntity("ConstructItemSkill", (Long)data.get("skillId"));
@@ -124,7 +142,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		// We're ready to create the final prototype and skill
 		
 		// Create the skill so we can use it again
-		CachedEntity item = inventionService.doConstructItemSkill(skill, itemRequirementsToItems, pool);
+		CachedEntity item = inventionService.doConstructItemSkill(skill, itemRequirementsToItems, pool, repetitionCount);
 		
 		// Now add to the knowledge we gain
 		knowledgeService.increaseKnowledgeFor(skill, 1);

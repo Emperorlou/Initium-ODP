@@ -17,7 +17,7 @@ public class ConfirmPrototypeRequirementsBuilder extends ConfirmGenericEntityReq
 	@Override
 	protected String getPagePopupUrl()
 	{
-		return "/odp/confirmrequirements?ideaId="+idea.getId();
+		return "/odp/confirmrequirements?ideaId="+idea.getId()+getRepetitionsUrlParam();
 	}
 
 

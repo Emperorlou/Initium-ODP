@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.CommonChecks"%>
 <%@page import="com.universeprojects.miniup.server.DDOSProtectionException"%>
 <%@page import="com.universeprojects.miniup.server.services.ContainerService"%>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
@@ -303,7 +304,8 @@
 					itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
 				}
 
-				out.println("<a onclick='moveItem(event, "+item.getKey().getId()+", \""+otherSide.getKind()+"\", "+otherSide.getKey().getId()+")' class='move-left'>--&gt;</a>");
+				if (CommonChecks.checkItemIsMovable(item))
+					out.println("<a onclick='moveItem(event, "+item.getKey().getId()+", \""+otherSide.getKind()+"\", "+otherSide.getKey().getId()+")' class='move-left'>--&gt;</a>");
 				out.println("<div class='main-item'>");
 				out.println(GameUtils.renderItem(db, common.getCharacter(), item));
 				out.println("<div class='main-item-controls'>");
@@ -392,7 +394,8 @@
 					itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
 				}
 
-				out.println("<a onclick='moveItem(event, "+item.getKey().getId()+", \""+selfSide.getKind()+"\", "+selfSide.getKey().getId()+")' class='move-right'>&lt;--</a>");
+				if (CommonChecks.checkItemIsMovable(item))
+					out.println("<a onclick='moveItem(event, "+item.getKey().getId()+", \""+selfSide.getKind()+"\", "+selfSide.getKey().getId()+")' class='move-right'>&lt;--</a>");
 				out.println("<div class='main-item'>");
 				out.println(GameUtils.renderItem(db, common.getCharacter(), item));				
 				out.println("<div class='main-item-controls'>");

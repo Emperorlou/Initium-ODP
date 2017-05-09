@@ -32,6 +32,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ODPInventionService.GenericAffectorResult;
 
 
 public class GameUtils 
@@ -1078,9 +1079,9 @@ public class GameUtils
     		return "";
     	
     	if (popupEmbedded)
-    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     	else
-    		return "<a rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     }
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)
@@ -2313,4 +2314,55 @@ public class GameUtils
 		
 		return result;
 	}
+	
+	public static double curveMultiplier(double sourceValue, double sourceMin, double sourceMax, double multiplierMin, double multiplierMax)
+	{
+		// Calculate source multiplier (as though the destination multiplier was 0..1)
+		double multiplier = 0d;
+		if (sourceMin<=sourceMax)
+		{
+			if (sourceValue<sourceMin) sourceValue = sourceMin;
+			if (sourceValue>sourceMax) sourceValue = sourceMax;
+		}
+		else
+		{
+			if (sourceValue>sourceMin) sourceValue = sourceMin;
+			if (sourceValue<sourceMax) sourceValue = sourceMax;
+		}
+		
+		double range = sourceMax-sourceMin;
+		multiplier = (sourceValue-sourceMin)/range;
+		
+		// Now scale the multiplier to fit inside the destination multiplier range
+		double destinationRange = multiplierMax-multiplierMin;
+		double destinationMultiplier = (multiplier*destinationRange)+multiplierMin;
+		
+		return destinationMultiplier;
+		
+	}
+	
+	/**
+	 * The multiplier is meant to be between 0 and 1. The power is mean to be between -40 and 40 (for extreme cases).
+	 * 
+	 * A positive power means gains will be quick early on and taper off.
+	 * A negative power means that gains will be very slow at the beginning and then accelerate toward the end.
+	 * 
+	 * @param multiplier
+	 * @param power Should not be a number between -1 and 1.
+	 * @return
+	 */
+	public static double curveScaleMultiplier(double multiplier, double power)
+	{
+		if (power>=1)
+		{
+			return Math.pow(multiplier, 1/((power+4)/5));
+		}
+		else if (power<=-1)
+		{
+			return Math.pow(multiplier, (-power+4)/5);
+		}
+		else
+			throw new ContentDeveloperException("Curve scale power must be above 1 or below -1.");
+	}
+	
 }

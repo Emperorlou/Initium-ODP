@@ -1,12 +1,20 @@
 package com.universeprojects.miniup.server.longoperations;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
+import com.universeprojects.miniup.server.services.ODPInventionService;
+import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
 public class LongOperationCollectCollectable extends LongOperation {
 
@@ -18,7 +26,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 	}
 
 	@Override
-	int doBegin(Map<String, String> parameters) throws UserErrorMessage {
+	int doBegin(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException {
 		
 		if (ODPDBAccess.CHARACTER_MODE_COMBAT.equals(db.getCurrentCharacter().getProperty("mode")))
 			throw new UserErrorMessage("You cannot collect stuff right now because you are currently in combat.");
@@ -35,6 +43,9 @@ public class LongOperationCollectCollectable extends LongOperation {
 		
 		String collectableIdStr = parameters.get("collectableId");
 		CachedEntity collectable = db.getEntity("Collectable", Long.parseLong(collectableIdStr));
+		CachedEntity collectableDef = db.getEntity((Key)collectable.getProperty("_definitionKey"));
+
+		data.put("collectableId", collectable.getKey().getId());
 		
 		if (GameUtils.equals(collectable.getProperty("locationKey"), db.getCurrentCharacter().getProperty("locationKey"))==false)
 			throw new UserErrorMessage("You cannot collect this, you're not even near it!");
@@ -45,27 +56,57 @@ public class LongOperationCollectCollectable extends LongOperation {
 			throw new UserErrorMessage("Looks like there's nothing left to collect here.");
 		}
 		
-		int seconds = ((Long)collectable.getProperty("extractionEase")).intValue();
+		Long seconds = (Long)collectable.getProperty("extractionEase");
 
 		CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
 		
-		int monsterTries = seconds/30;
-		if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, monsterTries, 0.1d))
+		
+		if (collectableDef.getProperty("toolsRequired")!=null || collectableDef.getProperty("toolsOptional")!=null)
+		{
+			GenericEntityRequirementResult itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, getPageRefreshJavascriptCall(), collectableDef)
+			.addGenericEntityRequirements("Required Tools/Equipment", "toolsRequired")
+			.addGenericEntityRequirements("Optional Tools/Equipment", "toolsOptional")
+			.go();
+			
+			ODPKnowledgeService knowledgeService = db.getKnowledgeService(db.getCurrentCharacterKey());
+			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), knowledgeService);
+			EntityPool pool = new EntityPool(db.getDB());
+			
+			pool.addToQueue(collectableDef.getProperty("toolsRequired"));
+			pool.addToQueue(collectableDef.getProperty("toolsOptional"));
+			pool.loadEntities();
+			inventionService.poolGerSlotsAndSelectedItems(pool, collectableDef, itemRequirementSlotsToItems.slots);
+			pool.loadEntities();
+			
+			Map<Key, Key> tools = inventionService.resolveGerSlotsToGers(pool, collectableDef, itemRequirementSlotsToItems.slots, 1);
+			
+			Map<String,Object> processVariables = new HashMap<>();
+			processVariables.put("speed",  seconds);
+			
+			inventionService.beginCollectableProcess(collectableDef, tools, processVariables, pool);
+			
+			seconds = (Long)processVariables.get("speed");
+			
+			data.put("tools", tools);
+		}
+		
+		int monsterTries = seconds.intValue()/30;
+		if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, monsterTries, 0.25d))
 			throw new GameStateChangeException("While you were working, someone found you..");
 		
-		
-		
-		data.put("collectableId", collectable.getKey().getId());
 		data.put("secondsToWait", seconds);
 		data.put("bannerUrl", collectable.getProperty("bannerUrl"));
 		
-		return seconds;
+		return seconds.intValue();
 	}
 
 	@Override
 	String doComplete() throws UserErrorMessage {
 		Long collectableId = (Long)data.get("collectableId");
 		CachedEntity collectable = db.getEntity("Collectable", collectableId);
+		CachedEntity collectableDef = db.getEntity((Key)collectable.getProperty("_definitionKey"));
+
+		Map<Key, Key> tools = (Map<Key, Key>)data.get("tools");
 		
 		// Now update the collectable..
 		Long collectionCount = (Long)collectable.getProperty("collectionCount");
@@ -83,18 +124,47 @@ public class LongOperationCollectCollectable extends LongOperation {
 		}
 		
 		
-		CachedEntity itemDef = db.getEntity((Key)collectable.getProperty("itemDefKey"));
+		CachedEntity itemDef = db.getEntity((Key)collectableDef.getProperty("itemDefKey"));
 		
 		if (itemDef==null)
-			throw new RuntimeException("ItemDef is null on the collectable.");
+			throw new RuntimeException("ItemDef is null on the collectable definition: "+collectableDef.getKey());
 		
 		CachedEntity item = db.generateNewObject(itemDef, "Item");
-		
+
+		if (collectableDef.getProperty("toolsRequired")!=null || collectableDef.getProperty("toolsOptional")!=null)
+		{
+			ODPKnowledgeService knowledgeService = db.getKnowledgeService(db.getCurrentCharacterKey());
+			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), knowledgeService);
+			EntityPool pool = new EntityPool(db.getDB());
+			
+			inventionService.poolItemRequirementsToItems(pool, tools);
+
+			inventionService.processCollectableResult(pool, collectableDef, tools, item, 1);
+		}		
+
 		// Finish off some of those properties..
-		item.setProperty("containerKey", db.getCurrentCharacter().getKey());
+
+		// Check if the character is able to carry the thing or if it's too heavy...
+		Long currentCarryWeight = db.getCharacterCarryingWeight(db.getCurrentCharacter());
+		Long maxCarryWeight = db.getCharacterMaxCarryingWeight(db.getCurrentCharacter());
+		Long itemWeight = db.getItemWeight(item);
+		boolean onGround = false;
+		if (currentCarryWeight+itemWeight>maxCarryWeight)
+		{
+			item.setProperty("containerKey", db.getCurrentCharacter().getProperty("locationKey"));
+			onGround = true;
+		}
+		else
+			item.setProperty("containerKey", db.getCurrentCharacter().getKey());
+		
+		item.setProperty("movedTimestamp", new Date());
 		ds.put(item);
 		
-		return "You collected: "+GameUtils.renderItem(item);
+		if (onGround)
+			return "You got "+GameUtils.renderItem(item)+" however it was too heavy to hold and it is laying on the ground where you stand.";
+		else
+			return "You collected "+GameUtils.renderItem(item)+".";
+			
 	}
 
 	@Override

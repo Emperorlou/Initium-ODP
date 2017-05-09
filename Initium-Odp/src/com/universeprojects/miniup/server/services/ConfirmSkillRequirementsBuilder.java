@@ -16,7 +16,7 @@ public class ConfirmSkillRequirementsBuilder extends ConfirmGenericEntityRequire
 	
 	protected String getPagePopupUrl()
 	{
-		return "/odp/confirmrequirements?constructItemSkillId="+skill.getId();
+		return "/odp/confirmrequirements?constructItemSkillId="+skill.getId()+getRepetitionsUrlParam();
 	}
 
 

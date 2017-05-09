@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.services;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,9 +70,10 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 	protected GenericEntityRequirementResult convertParametersToResult(JSONObject userResponse)
 	{
 		GenericEntityRequirementResult result = new GenericEntityRequirementResult();
-		for(Object key:userResponse.keySet())
+		Map<Object,Object> slots = (Map<Object,Object>)userResponse.get("slots");
+		for(Object key:slots.keySet())
 		{
-			String itemId = userResponse.get(key).toString();
+			String itemId = slots.get(key).toString();
 			String gerFieldNameAndSlotIndex = key.toString();
 	
 			if (itemId==null || itemId.length()==0)
@@ -92,6 +94,14 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 		return result;
 	}
 
+	protected String getRepetitionsUrlParam()
+	{
+		String maxReps = "";
+		if (repetitionCount!=null && repetitionCount>1)
+			maxReps = "&maxReps="+repetitionCount;
+
+		return maxReps;
+	}
 
 	@Override
 	protected String getPagePopupUrl()
@@ -107,7 +117,8 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 			
 			sb.append(fieldName);
 		}
-		return "/odp/confirmrequirements?entity="+KeyFactory.keyToString(entity.getKey())+"&entityFields="+sb.toString();
+		
+		return "/odp/confirmrequirements?entity="+KeyFactory.keyToString(entity.getKey())+"&entityFields="+sb.toString()+getRepetitionsUrlParam();
 	}
 
 
@@ -118,8 +129,9 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 	}
 
 	
-	public class GenericEntityRequirementResult
+	public class GenericEntityRequirementResult implements Serializable
 	{
+		private static final long serialVersionUID = 5635978106621359645L;
 		public Map<String,Key> slots = new HashMap<>();
 		public Integer repetitionCount = null; 
 	}

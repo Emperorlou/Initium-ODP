@@ -284,4 +284,20 @@ public abstract class CommonChecks
 		}
 		return false;
 	}
+
+	public static boolean checkIsRaining(CachedEntity location)
+	{
+		boolean isOutside = false;
+		if (location.getProperty("isOutside")!=null)
+			isOutside = location.getProperty("isOutside").equals("TRUE");
+		
+		String biomeType = "Temperate";
+		if (location.getProperty("biomeType")!=null)
+			biomeType = (String)location.getProperty("biomeType");
+		
+		if (GameUtils.getWeather()>0.65d && isOutside && biomeType.equals("Temperate"))
+			return true;
+		
+		return false;
+	}
 }

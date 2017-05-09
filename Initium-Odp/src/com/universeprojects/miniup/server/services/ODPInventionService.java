@@ -168,19 +168,19 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public void checkSkillWithSelectedItems(EntityPool pool, CachedEntity skill, Map<Key, Key> itemRequirementsToItems) throws UserErrorMessage
+	public void checkSkillWithSelectedItems(EntityPool pool, CachedEntity skill, Map<Key, Key> itemRequirementsToItems, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	public CachedEntity doCreateConstructItemPrototype(CachedEntity idea, Map<Key, Key> itemRequirementsToItems, EntityPool pool) throws UserErrorMessage
+	public CachedEntity doCreateConstructItemPrototype(CachedEntity idea, Map<Key, Key> itemRequirementsToItems, EntityPool pool, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public CachedEntity doConstructItemSkill(CachedEntity skill, Map<Key, Key> itemRequirementsToItems, EntityPool pool) throws UserErrorMessage
+	public CachedEntity doConstructItemSkill(CachedEntity skill, Map<Key, Key> itemRequirementsToItems, EntityPool pool, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		return null;
@@ -198,7 +198,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public Map<Key, Key> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems) throws UserErrorMessage
+	public Map<Key, Key> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		return null;
@@ -210,7 +210,38 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
-	public void checkGersMatchItems(EntityPool pool, Map<Key, Key> gerToItemMap) throws UserErrorMessage
+	public void checkGersMatchItems(EntityPool pool, Map<Key, Key> gerToItemMap, Integer repetitionCount) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void checkRequiredItemsAreAccountedFor(Object ideagenericEntityRequirementFieldValue, Map<Key, Key> itemRequirementsToItems, String categoryName) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void processCollectableResult(EntityPool pool, CachedEntity collectableDef, Map<Key, Key> itemRequirementsToItems, CachedEntity resultingItem, Integer repetitionCount)
+			throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void beginCollectableProcess(CachedEntity collectableDef, Map<Key, Key> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void poolItemRequirementsToItems(EntityPool pool, Map<Key, Key> itemRequirementsToItems)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void modifyFieldsOn(Object genericEntityRequirementFieldValue, Map<Key, Key> itemRequirementsToItems, EntityPool pool, Integer repetitionCount)
 	{
 		// TODO Auto-generated method stub
 		

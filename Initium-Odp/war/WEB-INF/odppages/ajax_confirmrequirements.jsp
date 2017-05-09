@@ -122,23 +122,26 @@ function confirmRequirements_collectChoices(event)
 {
 	
 	var result = {};
+	result.slots = {};
+	result.repetitionCount = null;
 	var inputBoxes = $(event.target).closest(".main-splitScreen").find(".itemForRequirementInput");
 	for(var i = 0; i<inputBoxes.length; i++)
 	{
 		var input = $(inputBoxes[i]);
-		result[input.attr("id")] = input.val();
+		
+		result.slots[input.attr("id")] = input.val();
 	}
 	
 	if ($("#repetitionCount").length>0)
-		result['repetitionCount'] = $("#repetitionCount").val();
+		result.repetitionCount = $("#repetitionCount").val();
 	
 	return result;
 }
 </script>
-<div class='main-splitScreen'>
-<c:if test="${hasRepetitions}">
-How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='30'/> 
+<c:if test="${maxReps!=null}">
+How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}'/> 
 </c:if>
+<div class='main-splitScreen'>
 <c:forEach var="requirementCategory" items="${formattedRequirements}">
 	<h4><c:out value="${requirementCategory.name}"/></h4>
 	<c:forEach var="requirement" items="${requirementCategory.list}">
@@ -157,6 +160,9 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 	</c:if>
 	<c:if test="${type=='ConstructItemSkill'}">
 		<a onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}")' class='big-link'>Begin</a>
+	</c:if>
+	<c:if test="${type=='CollectCollectable'}">
+		<a onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}")' class='big-link'>Begin</a>
 	</c:if>
 	<c:if test="${type=='GenericCommand'}">
 		<a onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}")' class='big-link'>Okay</a>

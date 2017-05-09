@@ -1757,7 +1757,7 @@ a.range-increment {
 
 .hint
 {
-	cursor: help;
+	cursor: pointer;
 }
 
 .titlehint

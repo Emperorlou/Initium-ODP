@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.services;
 
 import java.util.List;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -90,6 +91,20 @@ public abstract class ODPKnowledgeService extends Service
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	public CachedEntity fetchKnowledgeByName(String knowledgeName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public boolean hasRequiredKnowledge(EmbeddedEntity ideaKnowledgeRequirements)
+	{
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 

@@ -483,7 +483,10 @@ https://github.com/Emperorlou/Initium-ODP
 						</div>
 						<div class='main1 location-controls-page-internal'>
 							<div class='location-controls'>
-							
+
+								<div id='collectablesPanel'>
+									${collectablesView}
+								</div>							
 							
 								<div id='mainButtonList' class='main1-inset1 location-controls-navigation'>
 									${mainButtonList}

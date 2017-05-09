@@ -1,6 +1,8 @@
 package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -102,6 +104,22 @@ public class MainPageUpdateService extends Service
 		if (paths==null)
 		{
 			discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), location.getKey(), showHidden);
+			
+			// Order discoveries by createdDate of discovery entity
+			Collections.sort(discoveries, new Comparator<CachedEntity>()
+			{
+
+				@Override
+				public int compare(CachedEntity o1, CachedEntity o2)
+				{
+					if (o1==null || o2==null)
+						return 0;
+					Date o1Date = (Date)o1.getProperty("createdDate");
+					Date o2Date = (Date)o2.getProperty("createdDate");
+					if (o1Date==null || o2Date==null) return 0;
+					return o1Date.compareTo(o2Date);
+				}
+			});
 			
 			paths = new ArrayList<CachedEntity>();
 			destLocations = new ArrayList<CachedEntity>();
@@ -815,6 +833,39 @@ public class MainPageUpdateService extends Service
 		}
 		
 		return updateHtmlContents("#partyPanel", newHtml.toString());
+	}
+
+	public String updateCollectablesView()
+	{
+		StringBuilder html = new StringBuilder();
+		
+		List<CachedEntity> collectablesHere = db.getCollectablesForLocation(location.getKey());
+		
+		if (collectablesHere!=null && collectablesHere.isEmpty()==false)
+		{
+			html.append("<h5>Resources</h5>");
+			
+			for(CachedEntity collectable:collectablesHere)
+			{
+				Long secondsTime = (Long)collectable.getProperty("extractionEase");
+				if (secondsTime==null)
+					secondsTime = 0L;
+				
+				html.append("<div class='main-item'> ");
+				html.append("<div class='main-item-container'>");
+				html.append(GameUtils.renderCollectable(collectable)); 
+				html.append("<br>");
+				html.append("<div class='main-item-controls'>");
+				html.append("<a href='#' onclick='doCollectCollectable(event, "+collectable.getKey().getId()+")'>Extract/Collect</a>");
+				html.append("</div>"); 
+				html.append("</div>");
+				html.append("</div>");
+				html.append("<br/>");
+			}
+		}
+		
+		
+		return updateHtmlContents("#collectablesPanel", html.toString());
 	}
 	
 }

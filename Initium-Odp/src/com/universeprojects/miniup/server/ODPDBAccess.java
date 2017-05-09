@@ -1093,6 +1093,7 @@ public class ODPDBAccess
 			discovery.setProperty("location1Key", entity.getProperty("location1Key"));
 			discovery.setProperty("location2Key", entity.getProperty("location2Key"));
 			discovery.setProperty("hidden", false);
+			discovery.setProperty("createdDate", new Date());
 
 			// Set some default attributes
 
@@ -1108,6 +1109,7 @@ public class ODPDBAccess
 			discovery.setProperty("entityKey", entity.getKey());
 			discovery.setProperty("kind", entity.getKind());
 			discovery.setProperty("hidden", false);
+			discovery.setProperty("createdDate", new Date());
 
 			// Set some default attributes
 
@@ -1551,6 +1553,9 @@ public class ODPDBAccess
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
 		if (item == null) throw new IllegalArgumentException("Item cannot be null.");
 
+		if (CommonChecks.checkItemIsMovable(item)==false)
+			throw new UserErrorMessage("You cannot pick up this item.");
+		
 		if (character.getProperty("locationKey").equals(item.getProperty("containerKey")) == false) throw new UserErrorMessage("The item is not here anymore. Perhaps someone else grabbed it.");
 
 		// Check if the character can actually carry something else or if its

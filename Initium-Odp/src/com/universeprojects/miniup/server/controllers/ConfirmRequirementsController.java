@@ -29,6 +29,7 @@ public class ConfirmRequirementsController extends PageController
 	{
 		IdeaToPrototype,
 		ConstructItemSkill,
+		CollectCollectable,
 		GenericCommand,
 		GenericLongOperation
 	}
@@ -47,7 +48,6 @@ public class ConfirmRequirementsController extends PageController
 		
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 
-		request.setAttribute("type", type.toString());
 		
 		if (type == Type.IdeaToPrototype)
 		{
@@ -61,11 +61,14 @@ public class ConfirmRequirementsController extends PageController
 		{
 			processForGenericCommand(request, db);
 		}
-		else if (type == Type.GenericLongOperation)
+		else if (type == Type.CollectCollectable)
 		{
-			processForGenericLongOperation(request, db);
+			processForGenericCommand(request, db);
 		}
 		
+		request.setAttribute("type", type.toString());
+		if (request.getParameter("maxReps")!=null && request.getParameter("maxReps").length()>0)
+			request.setAttribute("maxReps", request.getParameter("maxReps"));
 		
 	    return "/WEB-INF/odppages/ajax_confirmrequirements.jsp";
 	}
@@ -250,7 +253,10 @@ public class ConfirmRequirementsController extends PageController
 		
 		JSONObject params = new JSONObject();
 		for(String key:((Map<String,String[]>)request.getParameterMap()).keySet())
+		{
 			params.put(key, request.getParameter(key));
+			request.setAttribute(key, request.getParameter(key));
+		}
 		
 		request.setAttribute("commandName", request.getParameter("cmd"));
 		request.setAttribute("commandParameters", params.toJSONString());
@@ -312,6 +318,8 @@ public class ConfirmRequirementsController extends PageController
 			return Type.IdeaToPrototype;
 		else if (request.getParameterMap().containsKey("constructItemSkillId"))
 			return Type.ConstructItemSkill;
+		else if (request.getParameterMap().containsKey("collectableId"))
+			return Type.CollectCollectable;
 		else if (request.getParameterMap().containsKey("entity"))
 		{
 			if (request.getParameter("cmd")!=null)

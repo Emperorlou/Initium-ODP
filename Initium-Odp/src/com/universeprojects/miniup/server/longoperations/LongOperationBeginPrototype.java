@@ -69,7 +69,8 @@ public class LongOperationBeginPrototype extends LongOperation
 		.addGenericEntityRequirements("Required Tools/Equipment", "prototypeItemsRequired")
 		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
 		.go();
-		
+		if (itemRequirementSlotsToItems.repetitionCount==null)
+			itemRequirementSlotsToItems.repetitionCount = 1; 
 		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());
 		ODPInventionService inventionService = db.getInventionService(character, knowledgeService);
@@ -86,19 +87,23 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		
 		// Now figure out which of the gers in each slot should actually be used
-		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots);
+		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots, itemRequirementSlotsToItems.repetitionCount);
 		
 		
 		// This check will throw a UserErrorMessage if it finds anything off
 		inventionService.checkIdeaWithSelectedItems(pool, ideaDef, itemRequirementsToItems);
 		
 		data.put("selectedItems", itemRequirementsToItems);
+		data.put("repetitionCount", itemRequirementSlotsToItems.repetitionCount);
 		
 		int seconds = 5;
 		
 		if (ideaDef.getProperty("prototypeConstructionSpeed")!=null)
 			seconds = ((Long)ideaDef.getProperty("prototypeConstructionSpeed")).intValue();
 		
+		// Add in the repetitions...
+		if (itemRequirementSlotsToItems.repetitionCount!=null)
+			seconds*=itemRequirementSlotsToItems.repetitionCount;
 		
 		data.put("description", "It will take "+seconds+" seconds to finish this prototype.");
 		
@@ -111,7 +116,8 @@ public class LongOperationBeginPrototype extends LongOperation
 	String doComplete() throws UserErrorMessage, UserRequestIncompleteException
 	{
 		@SuppressWarnings("unchecked")
-		Map<Key, Key> itemRequirementsToItems = (Map<Key, Key>)data.get("selectedItems");
+		Map<Key,Key> itemRequirementsToItems = (Map<Key, Key>)data.get("selectedItems");
+		Integer repetitionCount = (Integer)data.get("repetitionCount");
 		
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity idea = db.getEntity("ConstructItemIdea", (Long)data.get("ideaId"));
@@ -129,7 +135,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		// We're ready to create the final prototype and skill
 		
 		// Create the skill so we can use it again
-		CachedEntity item = inventionService.doCreateConstructItemPrototype(idea, itemRequirementsToItems, pool);
+		CachedEntity item = inventionService.doCreateConstructItemPrototype(idea, itemRequirementsToItems, pool, repetitionCount);
 
 		// Now add to the knowledge we gain
 		knowledgeService.increaseKnowledgeFor(idea, 2);

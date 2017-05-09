@@ -1610,7 +1610,7 @@ function enterDefenceStructureSlot(slot)
 
 var popupStackCloseCallbackHandlers = [];
 var currentPopupStackIndex = 0;
-var popupKeydownHandler = function(e){if (e.keyCode == 27) closePagePopup();}
+var popupKeydownHandler = function(e){if (e.keyCode == 27) closePagePopup();};
 function incrementStackIndex()
 {
 	currentPopupStackIndex++;
@@ -2782,7 +2782,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction,
 
 	
 	var selectedItems = null;
-	if (userRequestId!=null)
+	if (userRequestId!=null && event!=null)
 	{
 		selectedItems = confirmRequirements_collectChoices(event);
 		if (selectedItems==null) selectedItems = {};
@@ -2943,23 +2943,15 @@ function doExperiment(event)
 }
 
 
-//function doCreatePrototype(event, ideaId, ideaName)
-//{
-//	closeAllPopups();
-//	closeAllTooltips();
-//	
-//	pagePopup("/odp/confirmrequirements?ideaId="+ideaId, function(){
-//		clearPopupPermanentOverlay();
-//	}, "Develop "+ideaName);
-//}
+
 
 function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 {
 	
-	showBannerLoadingIcon();
 	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaName="+encodeURIComponent(ideaName)+"&ideaId="+ideaId+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
+				showBannerLoadingIcon();
 				if (action.isComplete)
 				{
 					clearPopupPermanentOverlay(); 
@@ -2982,15 +2974,10 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId)
 {
 	closeAllTooltips();
 	
-	var selectedItems = null;
-	if (userRequestId!=null)
-		selectedItems = confirmRequirements_collectChoices(event);
-	
-	showBannerLoadingIcon();
-	if (selectedItems==null) selectedItems = {};
-	longOperation(event, "/ServletCharacterControl?type=constructItemSkill_ajax&skillName="+encodeURIComponent(skillName)+"&skillId="+skillId+"&__"+userRequestId+"UserResponse="+encodeURIComponent(JSON.stringify(selectedItems))+"&v="+window.verifyCode, 
+	longOperation(event, "/ServletCharacterControl?type=constructItemSkill_ajax&skillName="+encodeURIComponent(skillName)+"&skillId="+skillId+"&v="+window.verifyCode, 
 			function(action) // responseFunction
 			{
+				showBannerLoadingIcon();
 				if (action.isComplete)
 				{
 					clearPopupPermanentOverlay(); 
@@ -3004,64 +2991,36 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId)
 			function()	// recallFunction
 			{
 				doConstructItemSkill(event, skillId, skillName);
-			});
+			}, 
+			userRequestId);
 	
 }
 
 
+function doCollectCollectable(event, collectableId, userRequestId)
+{
+	showBannerLoadingIcon();
+	longOperation(event, "/ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode, 
+			function(action) // responseFunction
+			{
+				if (action.isComplete)
+				{
+					fullpageRefresh();
+				}
+				else
+				{
+					setBannerImage(action.bannerUrl);
+					setBannerOverlayText("Collecting", "This process will take "+action.secondsToWait+" seconds.<br><span id='long-operation-timeleft'></span>");
+					hideBannerLoadingIcon();
+				}
+			},
+			function()	// recallFunction
+			{
+				doCollectCollectable(null, collectableId, userRequestId);
+			},
+			userRequestId);
+}
 
-
-//function doBeginPrototype(event, ideaId, selectedItems)
-//{
-//	closeAllPopups();
-//	closeAllTooltips();
-//	closePagePopup(true);
-//
-//	
-//	showBannerLoadingIcon();
-//	if (selectedItems==null) selectedItems = {};
-//	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaId="+ideaId+"&selectedItems="+JSON.stringify(selectedItems)+"&v="+window.verifyCode, 
-//			function(action) // responseFunction
-//			{
-//				if (action.isComplete)
-//				{
-//					clearPopupPermanentOverlay(); 
-//					reloadPagePopup(false);
-//				}
-//				else
-//				{
-//					popupPermanentOverlay_Experiment("Prototyping", "You are attempting to create a new prototype of an idea. This can take some time...");
-//				}
-//			},
-//			function()	// recallFunction
-//			{
-//				doBeginPrototype(null, ideaId, selectedItems);
-//			});
-//	
-//}
-//
-//function doConfirmCreatePrototype(event, ideaName, entityRequirementToItemMap)
-//{
-//	showBannerLoadingIcon();
-//	longOperation(event, "/ServletCharacterControl?type=createprototype_ajax&v="+window.verifyCode, 
-//			function(action) // responseFunction
-//			{
-//				if (action.isComplete)
-//				{
-//					clearPopupPermanentOverlay(); 
-//					reloadPagePopup(false);
-//				}
-//				else
-//				{
-//					popupPermanentOverlay_Experiment("Creating Prototype", "You are trying to create a working prototype of the "+ideaName+" idea...");
-//
-//				}
-//			},
-//			function()	// recallFunction
-//			{
-//				doCreatePrototype(null, ideaName);
-//			});
-//}
 
 
 
@@ -3115,28 +3074,6 @@ function doRest()
 }
 
 
-function doCollectCollectable(event, collectableId)
-{
-	showBannerLoadingIcon();
-	longOperation(event, "/ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode, 
-			function(action) // responseFunction
-			{
-				if (action.isComplete)
-				{
-					fullpageRefresh();
-				}
-				else
-				{
-					setBannerImage(action.bannerUrl);
-					setBannerOverlayText("Collecting", "This process will take "+action.secondsToWait+" seconds..");
-					hideBannerLoadingIcon();
-				}
-			},
-			function()	// recallFunction
-			{
-				doCollectCollectable(null, collectableId);
-			});
-}
 
 function handleUserRequest(data)
 {
