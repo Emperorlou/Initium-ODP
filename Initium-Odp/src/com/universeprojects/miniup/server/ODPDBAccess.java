@@ -692,6 +692,9 @@ public class ODPDBAccess
 
 	public double calculateHitpoints(double strength)
 	{
+		if (strength >= 10.995 && strength <= 11.01) {
+			strength = strength + 0.006;
+		}
 		return 16d + Math.ceil(strength * 3);
 	}
 
