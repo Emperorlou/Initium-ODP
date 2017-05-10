@@ -31,6 +31,8 @@ public class MainPageUpdateService extends Service
 	protected List<CachedEntity> destLocations = null;  // The location entities at the other end of the paths; on the side we're not on currently.
 	protected List<Integer> pathEnds = null;  // 1 or 2. Since each path is 2 sided, this number indicates which side we are NOT on currently.
 	
+	
+	protected List<CachedEntity> immovables = null;	// All items that are immovable will be fetched and stored here for the location
 	/**
 	 * 
 	 * @param db
@@ -81,6 +83,15 @@ public class MainPageUpdateService extends Service
 		this.destLocations = destLocations;
 		this.pathEnds = pathEnds;
 		this.hasHiddenPaths = hasHiddenPaths;
+	}
+
+	protected void loadImmovables()
+	{
+		if (immovables==null)
+		{
+			immovables = query.getFilteredList("Item", "containerKey", location.getKey(), "immovable", true);
+			if (immovables == null) immovables = new ArrayList<CachedEntity>(0);
+		}
 	}
 	
 	/**
@@ -867,5 +878,32 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#collectablesPanel", html.toString());
 	}
+
+	public String updateImmovablesPanel()
+	{
+		StringBuilder html = new StringBuilder();
+		
+		loadImmovables();
+		
+		if (immovables!=null && immovables.isEmpty()==false)
+		{
+			for(CachedEntity item:immovables)
+			{
+				String iconUrl = (String)item.getProperty("icon");
+				if (iconUrl!=null && iconUrl.startsWith("http://"))
+					iconUrl = "https://"+iconUrl.substring(7);
+				else if (iconUrl!=null && iconUrl.startsWith("http")==false)
+					iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
+				html.append("<div class='clue' rel='/viewitemmini.jsp?itemId=").append(item.getKey().getId()).append("'>");
+				html.append("<img src='").append(iconUrl).append("' border=0/>");
+				html.append("</div>");
+			}
+		}
+		
+		
+		return updateHtmlContents("#immovablesPanel", html.toString());
+	}
+
+	
 	
 }

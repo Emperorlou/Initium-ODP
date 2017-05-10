@@ -2310,7 +2310,18 @@ a.range-increment {
 	font-size: 12px;
 }
 
+#immovablesPanel
+{
+	position:absolute;
+	left:0px;
+	bottom:0px;
+}
 
+#immovablesPanel div
+{
+	margin-right:4px;
+	cursor:pointer;
+}
 
 
 
