@@ -112,6 +112,7 @@ public class GamePageController extends PageController {
 		request.setAttribute("locationScripts", updateService.updateLocationDirectScripts());
 		request.setAttribute("locationName", updateService.updateLocationName());
 		request.setAttribute("locationDescription", updateService.updateLocationDescription());
+		request.setAttribute("immovablesPanel", updateService.updateImmovablesPanel()); 
 
 		
 		return "/WEB-INF/odppages/game.jsp";

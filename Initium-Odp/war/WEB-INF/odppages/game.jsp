@@ -64,6 +64,7 @@
 
 
 <script type="text/javascript">
+	window.newUI = true;
 	window.chatIdToken = "${chatIdToken}";
 	window.characterId = ${characterId};
 	window.verifyCode = "${verifyCode}";
@@ -409,6 +410,7 @@ https://github.com/Emperorlou/Initium-ODP
 				<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
 					${inBannerCharacterWidget}
 				</div>				
+				<div id='immovablesPanel'>${immovablesPanel}</div>				
 			
 			</div>
 		</div>

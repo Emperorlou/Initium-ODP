@@ -77,7 +77,12 @@ public class AspectFireplace extends ItemAspect
 		return itemPopupEntries;
 	}
 	
-	public void addFuel(CachedEntity firewoodEntity) throws UserErrorMessage
+	public void addFuel(ODPInventionService inventionService, CachedEntity firewoodEntity) throws UserErrorMessage
+	{
+		addFuel(inventionService, firewoodEntity, null);
+	}
+	
+	public void addFuel(ODPInventionService inventionService, CachedEntity firewoodEntity, Integer quantity) throws UserErrorMessage
 	{
 		if (isFireActive(System.currentTimeMillis())==false)
 			throw new UserErrorMessage("You can only add fuel to a fire that is already started.");
@@ -87,9 +92,20 @@ public class AspectFireplace extends ItemAspect
 				firewood.isAspectPresent(AspectFlammable.class)==false)
 			throw new UserErrorMessage("The item you chose to add to the fire is not valid fuel.");
 	
+		Long firewoodQuantity = (Long)firewoodEntity.getProperty("quantity");
 		Long fuelSpace = db.getItemSpace(firewoodEntity);
-		Long fuelWeight = db.getItemWeight(firewoodEntity);
+		Long fuelWeight = (Long)firewoodEntity.getProperty("weight");
+		if (fuelWeight==null) fuelWeight = 0L;
 		Long depletionDate = getFuelDepletionDate().getTime();
+		
+		// Reduce fuelWeight to match the quantity we're actually going to burn (if applicable)
+		if (quantity!=null && firewoodQuantity!=null)
+		{
+			if (firewoodQuantity<quantity)
+				throw new UserErrorMessage("You have enough '"+firewoodEntity.getProperty("name")+"'. You have "+firewoodQuantity+" but require "+quantity+".");
+			
+			fuelWeight*=quantity;
+		}
 		
 		if (getSpace()+fuelSpace>getMaxSpace())
 			throw new UserErrorMessage("There is not enough room to put all of this into the fire.");
@@ -109,7 +125,10 @@ public class AspectFireplace extends ItemAspect
 		setFuelDepletionDate(new Date(depletionDate));
 		setSpace(getSpace()+fuelSpace);
 
-		db.getDB().delete(firewoodEntity);
+		if (quantity!=null)
+			inventionService.consumeItems(firewoodEntity, quantity);
+		else
+			db.getDB().delete(firewoodEntity);
 		
 	}
 	
@@ -153,6 +172,8 @@ public class AspectFireplace extends ItemAspect
 	{
 		if (entity.getProperty("icon")==null) return;
 
+		String oldIcon = (String)entity.getProperty("icon");
+		
 		long currentTimeMs = System.currentTimeMillis();
 		
 		if (isFireActive(currentTimeMs) && isFireExpired(currentTimeMs)==false)
@@ -170,7 +191,16 @@ public class AspectFireplace extends ItemAspect
 			setIconToUnlit();
 		}
 		
+		String newIcon = (String)entity.getProperty("icon");
+		
+		if (GameUtils.equals(oldIcon, newIcon)==false)
+		{
+			Key locationKey = (Key)entity.getProperty("containerKey");
+			db.sendMainPageUpdateForLocation(locationKey, db.getDB(), new String[]{"updateImmovablesPanel"});
+		}
+		
 	}
+	
 	
 	private void setIconPostfix(String postfix)
 	{
@@ -398,6 +428,7 @@ public class AspectFireplace extends ItemAspect
 			if (fireplace.isAspectPresent(AspectFireplace.class)==false)
 				throw new UserErrorMessage("You can only light a fire in a fireplace. The item you selected is not a fireplace.");
 
+			
 			CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
 			
 			if (CommonChecks.checkIsRaining(location))
@@ -470,10 +501,10 @@ public class AspectFireplace extends ItemAspect
 				fireplaceAspect.setFuelDepletionDate(new Date(System.currentTimeMillis()+1000));	// The spark that lasts 1 second
 				fireplaceAspect.setIconPostfix();
 				
-				fireplaceAspect.addFuel(tinder);
-				fireplaceAspect.addFuel(kindling);
+				fireplaceAspect.addFuel(inventionService, tinder, 1);
+				fireplaceAspect.addFuel(inventionService, kindling, 3);
 				if (additionalFirewood!=null)
-					fireplaceAspect.addFuel(additionalFirewood);
+					fireplaceAspect.addFuel(inventionService, additionalFirewood);
 				
 				// Also use the firestarter
 				Long durability = (Long)firestarter.getProperty("durability");
@@ -491,6 +522,7 @@ public class AspectFireplace extends ItemAspect
 				}
 				
 				ds.put(fireplace.getEntity());
+
 			}
 			finally
 			{
@@ -520,7 +552,11 @@ public class AspectFireplace extends ItemAspect
 
 			AspectFireplace fireplaceAspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
 				
-			db.getDB().beginBulkWriteMode();
+			CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
+			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), null);
+			
+			CachedDatastoreService ds = db.getDB();
+			ds.beginBulkWriteMode();
 			try
 			{
 				fireplaceAspect.updateFireProgress();
@@ -540,13 +576,16 @@ public class AspectFireplace extends ItemAspect
 				
 				CachedEntity fuel = db.getEntity(fuelKey);
 
-				fireplaceAspect.addFuel(fuel);
+				fireplaceAspect.addFuel(inventionService, fuel);
 				
-				db.getDB().put(fireplace.getEntity());
+				
+				ds.put(fireplace.getEntity());
+
+
 			}
 			finally
 			{
-				db.getDB().commitBulkWrite();
+				ds.commitBulkWrite();
 			}
 				
 		}

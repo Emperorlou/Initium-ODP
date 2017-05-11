@@ -879,6 +879,20 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#collectablesPanel", html.toString());
 	}
 
+	public String updateImmovablesPanel(CachedEntity updatedItem)
+	{
+		loadImmovables();
+		
+		for(int i = 0; i<immovables.size(); i++)
+			if (GameUtils.equals(immovables.get(i).getKey(), updatedItem.getKey()))
+			{
+				immovables.set(i, updatedItem);
+				break;
+			}
+				
+		return updateImmovablesPanel();
+	}
+	
 	public String updateImmovablesPanel()
 	{
 		StringBuilder html = new StringBuilder();

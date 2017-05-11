@@ -2405,7 +2405,10 @@ function doFireplaceAddFuel(event, itemKey)
 	doCommand(event, "FireplaceAddFuel", {itemKey:itemKey});
 }
 
-
+function requestUpdateMainPage(updateList)
+{
+	doCommand(null, "RequestMainPageUpdate", {updateList:updateList});
+}
 
 
 

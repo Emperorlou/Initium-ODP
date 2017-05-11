@@ -56,6 +56,8 @@ messager.onNotificationMessage = function(message)
 		cancelledTradeWindow();
 	if (message.type == "territoryChanged")
 		updateTerritory();
+	if (message.type == "mainPageUpdate")
+		requestUpdateMainPage(message.details);
 };
 
 

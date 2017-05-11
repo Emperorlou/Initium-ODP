@@ -247,4 +247,10 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
+	public void consumeItems(CachedEntity item, long quantityToConsume) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

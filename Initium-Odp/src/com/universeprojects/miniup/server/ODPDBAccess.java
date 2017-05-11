@@ -6159,4 +6159,32 @@ public class ODPDBAccess
         
         getDB().put(characterToBePickedUp);
     }
+
+	/**This tells all active characters in a given location to update their page with the given updateMethods (the names of the methods).
+	 * 
+	 * Note, this only works for update methods that take no arguments.
+	 * 
+	 * @param locationKey The location where the update should trigger (all active characters in this location)
+	 * @param ds
+	 * @param updateMethods The list of method names in the MainPageUpdateService you wish to trigger (arg-less methods only).
+	 */
+	public void sendMainPageUpdateForLocation(Key locationKey, CachedDatastoreService ds, String...updateMethods)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**This tells all characters given via the characterKeys param to update their page with the given updateMethods (the names of the methods).
+	 * 
+	 * Note, this only works for update methods that take no arguments.
+	 * 
+	 * @param ds
+	 * @param characterKeys The characters to send the update to
+	 * @param updateMethods The list of method names in the MainPageUpdateService you wish to trigger (arg-less methods only).
+	 */
+	public void sendMainPageUpdateForCharacters(CachedDatastoreService ds, Collection<Key> characterKeys, String...updateMethods)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
