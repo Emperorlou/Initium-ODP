@@ -6187,4 +6187,18 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		
 	}
+
+	/**This tells all characters given via the characterKeys param to update their page with the given updateMethods (the names of the methods).
+	 * 
+	 * Note, this only works for update methods that take no arguments.
+	 * 
+	 * @param ds
+	 * @param characterKeys The characters to send the update to
+	 * @param updateMethods The list of method names in the MainPageUpdateService you wish to trigger (arg-less methods only).
+	 */
+	public void sendMainPageUpdateForCharacters(CachedDatastoreService ds, Key characterKey, String...updateMethods)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

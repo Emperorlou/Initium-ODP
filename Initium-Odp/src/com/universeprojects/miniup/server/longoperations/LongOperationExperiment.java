@@ -100,6 +100,9 @@ public class LongOperationExperiment extends LongOperation
 			message="<div class='message-newidea'>You have a new idea to "+idea.getProperty("name")+"!</div>"+message;
 		}
 		
+		if (message.equals(""))
+			message = "You couldn't find anything interesting to experiment with. Try experimenting with something different.";
+		
 		setUserMessage(message);
 		
 		ds.commitBulkWrite();

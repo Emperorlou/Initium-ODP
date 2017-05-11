@@ -10,10 +10,13 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
+import com.universeprojects.miniup.server.InitiumAspect;
+import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.WebUtils;
+import com.universeprojects.miniup.server.aspects.AspectFireplace;
 
 public class MainPageUpdateService extends Service
 {
@@ -911,6 +914,29 @@ public class MainPageUpdateService extends Service
 				html.append("<div class='clue' rel='/viewitemmini.jsp?itemId=").append(item.getKey().getId()).append("'>");
 				html.append("<img src='").append(iconUrl).append("' border=0/>");
 				html.append("</div>");
+				
+				// Special case for an active fire, we want sound effects for that
+				InitiumObject obj = new InitiumObject(db, item);
+				if (obj.isAspectPresent(AspectFireplace.class))
+				{
+					AspectFireplace fireplaceAspect = (AspectFireplace)obj.getInitiumAspect("Fireplace");
+					long currentTimeMs = System.currentTimeMillis();
+					if (fireplaceAspect.isFireActive(currentTimeMs))
+					{
+						double minutesLeft = new Long(fireplaceAspect.getMinutesUntilExpired(currentTimeMs)).doubleValue();
+						
+						double maxVolume = 0.1;
+						double volume = (minutesLeft/40);
+						volume*=maxVolume; // Max volume
+						if (volume>maxVolume) volume = maxVolume;
+						if (volume<0) volume = 0;
+						html.append("<script type='text/javascript'>if (isSoundEffectsEnabled()) playLoopedSound('campfire1', ").append(volume).append(");</script>");
+					}
+					else
+					{
+						html.append("<script type='text/javascript'>stopLoopedSound('campfire1');</script>");
+					}
+				}
 			}
 		}
 		

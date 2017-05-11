@@ -254,7 +254,7 @@ ${bannerJs}
 
 <script type='text/javascript' src='/odp/javascript/messager-impl.js'></script>
 
-<script type='text/javascript' src='/odp/javascript/soundeffects.js?v=1'></script>
+<script type='text/javascript' src='/odp/javascript/soundeffects.js?v=9'></script>
 <script type='text/javascript'>
 	// THIS SECTION IS NEEDED FOR THE SOUND EFFECTS
 	$(document).ready(function(){

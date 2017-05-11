@@ -2405,9 +2405,39 @@ function doFireplaceAddFuel(event, itemKey)
 	doCommand(event, "FireplaceAddFuel", {itemKey:itemKey});
 }
 
+var lastUpdate = null;
+var queuedMainPageUpdates = [];
 function requestUpdateMainPage(updateList)
 {
-	doCommand(null, "RequestMainPageUpdate", {updateList:updateList});
+	// Add all the new updates we need to do to the queue if they aren't already there
+	var newUpdateList = [];
+	if (updateList!=null)
+		newUpdateList = updateList.split(",");
+	for(var i = 0; i<newUpdateList.length; i++)
+		if (queuedMainPageUpdates.indexOf(newUpdateList[i])==-1)
+			queuedMainPageUpdates.push(newUpdateList[i]);
+	
+	
+	var currentTime = new Date().getTime();
+	if (lastUpdate==null || lastUpdate<currentTime-3000)
+	{
+		var data = "";
+		var firstTime = true;
+		for(var i = 0; i<queuedMainPageUpdates.length; i++)
+		{
+			if (firstTime)
+				firstTime = false;
+			else
+				data+=",";
+			data+=queuedMainPageUpdates[i];
+		}
+		doCommand(null, "RequestMainPageUpdate", {updateList:data});
+		lastUpdate = currentTime;
+	}
+	else
+	{
+		setTimeout(requestUpdateMainPage, 500);
+	}
 }
 
 
@@ -2568,7 +2598,7 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	var selectedItems = null;
 	if (userRequestId!=null)
 	{
-		selectedItems = confirmRequirements_collectChoices(event);
+		selectedItems = confirmRequirements_collectChoices(eventObject);
 		if (selectedItems==null) selectedItems = {};
 		parameters["__"+userRequestId+"UserResponse"] = JSON.stringify(selectedItems);
 	}

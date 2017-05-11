@@ -157,6 +157,8 @@ public class CommandStoreBuyItem extends Command {
 			ds.commit();
 
 			addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,character, storeCharacter,item,saleItem,request));
+			
+			db.sendMainPageUpdateForCharacters(ds, sellingCharacter.getKey(), "updateMoney");
 		}
 		finally
 		{

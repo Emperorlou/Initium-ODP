@@ -52,73 +52,73 @@ var audioDescriptorPresets =
 "LightForest":"" +
 		"wind1(100,20,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(5,10,false,clearday)&&" +
-		"bird3(5,10,false,clearday)&&" +
-		"bird4(5,10,false,clearday)&&" +
-		"bird9(5,10,false,clearday)&&" +
-		"bird10(5,10,false,clearday)&&" +
-		"bird11(5,10,false,clearday)&&" +
-		"squirrel1(3,10,false,clearday)&&" +
-		"squirrel2(3,10,false,clearday)&&" +
-		"squirrel3(3,10,false,clearday)&&" +
-		"crow1(3,10,false,clearday)",
+		"bird2(2,5,false,clearday)&&" +
+		"bird3(2,5,false,clearday)&&" +
+		"bird4(2,5,false,clearday)&&" +
+		"bird9(2,5,false,clearday)&&" +
+		"bird10(2,5,false,clearday)&&" +
+		"bird11(2,5,false,clearday)&&" +
+		"squirrel1(1,5,false,clearday)&&" +
+		"squirrel2(1,5,false,clearday)&&" +
+		"squirrel3(1,5,false,clearday)&&" +
+		"crow1(1,5,false,clearday)",
 "DenseForest":"" +
 		"wind1(100,20,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(6,10,false,clearday)&&" +
-		"bird3(6,10,false,clearday)&&" +
-		"bird4(6,10,false,clearday)&&" +
-		"bird5(6,10,false,clearday)&&" +
-		"bird6(6,10,false,clearday)&&" +
-		"bird7(6,10,false,clearday)&&" +
-		"bird8(6,10,false,clearday)&&" +
-		"bird9(6,10,false,clearday)&&" +
-		"bird10(6,10,false,clearday)&&" +
-		"bird11(6,10,false,clearday)&&" +
-		"bird12(6,10,false,clearday)&&" +
-		"squirrel1(3,10,false,clearday)&&" +
-		"squirrel2(3,10,false,clearday)&&" +
-		"squirrel3(3,10,false,clearday)&&" +
-		"crow1(3,7,false,clearday)",
+		"bird2(3,5,false,clearday)&&" +
+		"bird3(3,5,false,clearday)&&" +
+		"bird4(3,5,false,clearday)&&" +
+		"bird5(3,5,false,clearday)&&" +
+		"bird6(3,5,false,clearday)&&" +
+		"bird7(3,5,false,clearday)&&" +
+		"bird8(3,5,false,clearday)&&" +
+		"bird9(3,5,false,clearday)&&" +
+		"bird10(3,5,false,clearday)&&" +
+		"bird11(3,5,false,clearday)&&" +
+		"bird12(3,5,false,clearday)&&" +
+		"squirrel1(1,5,false,clearday)&&" +
+		"squirrel2(1,5,false,clearday)&&" +
+		"squirrel3(1,5,false,clearday)&&" +
+		"crow1(1,7,false,clearday)",
 "GrassyPlains":"" +
 		"cicada1(100,10,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(3,10,false,clearday)&&" +
-		"bird3(3,10,false,clearday)&&" +
-		"bird6(3,10,false,clearday)&&" +
-		"bird7(3,10,false,clearday)&&" +
-		"bird11(3,10,false,clearday)&&" +
-		"bird12(3,10,false,clearday)&&" +
-		"crow1(3,5,false,clearday)",
+		"bird2(2,5,false,clearday)&&" +
+		"bird3(2,5,false,clearday)&&" +
+		"bird6(2,5,false,clearday)&&" +
+		"bird7(2,5,false,clearday)&&" +
+		"bird11(2,5,false,clearday)&&" +
+		"bird12(2,5,false,clearday)&&" +
+		"crow1(1,5,false,clearday)",
 "Mountains":"" +
 		"wind2(100,15,true)",
 "Ocean":"" +
 		"oceanshore1(100,30,true)&&"+
 		"wind1(100,10,true,day)&&" +
-		"seagull1(15,10,false,day)&&"+
-		"seagull2(15,10,false,day)&&"+
-		"seagull3(15,10,false,day)&&"+
-		"seagull4(15,60,false,day)&&"+
-		"seagull5(15,60,false,day)",
+		"seagull1(5,10,false,day)&&"+
+		"seagull2(5,10,false,day)&&"+
+		"seagull3(5,10,false,day)&&"+
+		"seagull4(5,60,false,day)&&"+
+		"seagull5(5,60,false,day)",
 "OceanSailing":"" +
 		"sailing1(100,30,true)&&"+
-		"seagull1(5,5,false,day)&&"+
-		"seagull2(5,5,false,day)&&"+
-		"seagull3(5,10,false,day)",
+		"seagull1(2,5,false,day)&&"+
+		"seagull2(2,5,false,day)&&"+
+		"seagull3(2,10,false,day)",
 "ForestStream":"" +
 		"stream1(100,30,true)&&" +
 		"wind1(100,20,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(6,10,false,clearday)&&" +
-		"bird4(6,10,false,clearday)&&" +
-		"bird6(6,10,false,clearday)&&" +
-		"bird8(6,10,false,clearday)&&" +
-		"bird10(6,10,false,clearday)&&" +
-		"bird12(6,10,false,clearday)&&" +
-		"squirrel1(3,10,false,clearday)&&" +
-		"squirrel2(3,10,false,clearday)&&" +
-		"squirrel3(3,10,false,clearday)&&" +
-		"crow1(3,10,false,clearday)",
+		"bird2(3,5,false,clearday)&&" +
+		"bird4(3,5,false,clearday)&&" +
+		"bird6(3,5,false,clearday)&&" +
+		"bird8(3,5,false,clearday)&&" +
+		"bird10(3,5,false,clearday)&&" +
+		"bird12(3,5,false,clearday)&&" +
+		"squirrel1(1,5,false,clearday)&&" +
+		"squirrel2(1,5,false,clearday)&&" +
+		"squirrel3(1,5,false,clearday)&&" +
+		"crow1(1,5,false,clearday)",
 "Windy":"" +
 		"wind1(100,20,true)&&"+
 		"wind3(100,40,true)",
@@ -131,7 +131,8 @@ var audioDescriptorPresets =
 var audioFilesToForceLoad = [
 "rain1",
 "wind2",
-"rain2"
+"rain2",
+"campfire1"
 ];
 
 var lastEnvironmentAudioMode = "";
@@ -459,12 +460,62 @@ function playLoopedSounds()
 	}
 }
 
+var nonAutomaticLoopedSounds = [];
+function playLoopedSound(id, volume)
+{
+	var audioInstance = getAudioInstance(id);
+
+	if (playingLoopedSounds.indexOf(audioInstance)>-1 && volume==0)
+	{
+		stopLoopedSound(id);
+		return;
+	}
+	
+	if (audioInstance==null)
+	{
+		loadedFilenames.push(id);
+		createjs.Sound.registerSound("https://initium-resources.appspot.com/audio/"+id+".ogg", id);
+		audioInstances.push(createjs.Sound.createInstance(id));
+		audioInstance = createjs.Sound.createInstance(id);
+	}
+	
+	audioInstance
+
+	var ppc = new createjs.PlayPropsConfig().set({interrupt: createjs.Sound.INTERRUPT_ANY, loop: -1, volume: volume});
+	
+	audioInstance.on("failed", function(event){
+		setTimeout(function(){playLoopedSound(id, volume);}, 1000);
+	});
+	
+	audioInstance.play(ppc);
+	playingLoopedSounds.push(audioInstance);
+	console.log("Permanently playing: "+id);
+	nonAutomaticLoopedSounds.push(audioInstance);
+}
+
+function stopLoopedSound(id)
+{
+	var audioInstance = getAudioInstance(id);
+	if (audioInstance==null) return;
+	
+	playingLoopedSounds.pop(audioInstance);
+
+	audioInstance.stop();
+	console.log("Stopped playing: "+id);
+}
+
 function clearLoopedSounds()
 {
 	for(var i = 0; i<playingLoopedSounds.length; i++)
-		playingLoopedSounds[i].stop();
+	{
+		var ai = playingLoopedSounds[i];
+		if (nonAutomaticLoopedSounds.indexOf(ai)==-1)
+		{
+			ai.stop();
+			playingLoopedSounds.pop(ai);
+		}
+	}
 	
-	playingLoopedSounds = [];
 }
 
 /**
