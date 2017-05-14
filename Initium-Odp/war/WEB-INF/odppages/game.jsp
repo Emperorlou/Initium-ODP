@@ -29,7 +29,7 @@
 <script type="text/javascript" src="/javascript/vertx-eventbus.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=70"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=82"></script>
 
 <script type="text/javascript" src="/odp/javascript/messager.js?v=18"></script>
 
@@ -254,7 +254,7 @@ ${bannerJs}
 
 <script type='text/javascript' src='/odp/javascript/messager-impl.js'></script>
 
-<script type='text/javascript' src='/odp/javascript/soundeffects.js?v=9'></script>
+<script type='text/javascript' src='/odp/javascript/soundeffects.js?v=13'></script>
 <script type='text/javascript'>
 	// THIS SECTION IS NEEDED FOR THE SOUND EFFECTS
 	$(document).ready(function(){

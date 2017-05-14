@@ -498,6 +498,14 @@ a.main-highlight:HOVER
 	font-size:15px;
 }
 
+.simple-aspect-list
+{
+	margin-top:7px;
+	font-size:12px;
+	font-style: italic;
+	color:#999999;
+}
+
 .backgroundcliptext .item-custom
 {
 	font-size:20px;
@@ -2323,6 +2331,7 @@ a.range-increment {
 {
 	margin-right:4px;
 	cursor:pointer;
+	display:inline-block;
 }
 
 

@@ -47,6 +47,8 @@ public class CommandTradeReady extends Command {
     		MainPageUpdateService service = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
     		service.updateMoney();
     		
+    		// Also update the money of the guy on the other side
+    		db.sendMainPageUpdateForCharacter(ds, otherCharacter, "updateMoney");
     	}
     	else setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
     	

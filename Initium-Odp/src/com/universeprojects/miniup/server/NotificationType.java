@@ -6,5 +6,6 @@ public enum NotificationType {
 	tradeChanged,
 	tradeCancelled,
 	territoryChanged, 
-	mainPageUpdate
+	mainPageUpdate, 
+	playSound
 }

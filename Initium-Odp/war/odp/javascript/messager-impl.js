@@ -58,6 +58,8 @@ messager.onNotificationMessage = function(message)
 		updateTerritory();
 	if (message.type == "mainPageUpdate")
 		requestUpdateMainPage(message.details);
+	if (message.type == "playSound")
+		playSoundsFromNotification(message.details);
 };
 
 

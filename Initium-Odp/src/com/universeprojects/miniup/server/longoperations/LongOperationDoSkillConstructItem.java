@@ -108,6 +108,12 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		data.put("description", "It will take "+seconds+" seconds to finish this construction.");
 		
+		// Issue the soundeffect for the location if one is necessary..
+		if (ideaDef.getProperty("executionSoundeffect")!=null)
+		{
+			db.sendSoundEffectToLocation(ds, (Key)character.getProperty("locationKey"), (String)ideaDef.getProperty("executionSoundeffect"));
+		}
+		
 		return seconds.intValue();
 	}
 
@@ -150,6 +156,12 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		// Give the player a message that points to the skill and the new item he made
 		setUserMessage("You created an item: "+GameUtils.renderItem(item));
+		
+		// Delete all HTML of an item
+		if (inventionService.getDeletedEntities()!=null)
+			for(Key deletedKey:inventionService.getDeletedEntities())
+				if (deletedKey.getKind().equals("Item"))
+					deleteHtml(".deletable-Item"+deletedKey.getId());
 		
 		
 		return "Skill complete.";

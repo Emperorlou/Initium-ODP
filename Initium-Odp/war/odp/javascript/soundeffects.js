@@ -14,6 +14,9 @@ var audioFilenames = [
 "campfire1",
 "cicada1",
 "construction1",
+"construction2",
+"woodchopping1",
+"woodchopping2",
 "crickets1",
 "crow1",
 "crow2",
@@ -61,7 +64,19 @@ var audioDescriptorPresets =
 		"squirrel1(1,5,false,clearday)&&" +
 		"squirrel2(1,5,false,clearday)&&" +
 		"squirrel3(1,5,false,clearday)&&" +
-		"crow1(1,5,false,clearday)",
+		"crow1(1,5,false,clearday)" +
+		
+		// Below are the very ambient sounds..
+		"bird2(6,1,false,clearday)&&" +
+		"bird3(6,1,false,clearday)&&" +
+		"bird4(6,1,false,clearday)&&" +
+		"bird9(6,1,false,clearday)&&" +
+		"bird10(6,1,false,clearday)&&" +
+		"bird11(6,1,false,clearday)&&" +
+		"squirrel1(3,1,false,clearday)&&" +
+		"squirrel2(3,1,false,clearday)&&" +
+		"squirrel3(3,1,false,clearday)&&" +
+		"crow1(3,1,false,clearday)",
 "DenseForest":"" +
 		"wind1(100,20,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
@@ -132,7 +147,10 @@ var audioFilesToForceLoad = [
 "rain1",
 "wind2",
 "rain2",
-"campfire1"
+"campfire1",
+"coins1",
+"construction1",
+"blacksmith1"
 ];
 
 var lastEnvironmentAudioMode = "";
@@ -232,8 +250,8 @@ function setAudioDescriptor(newAudioDescriptor, preset, isOutside)
 	
 	// Now trigger the registering and loading of sounds, but only if we haven't already done so for a given sound...
 	// MANUALLY include the special audio sound effects to the loading as well...
-	if(outsideAudio)
-	{
+//	if(outsideAudio)
+//	{
 		for(var i = 0; i<audioFilenames.length; i++)
 		{
 			if (loadedFilenames.indexOf(audioFilenames[i])==-1 && (audioDescriptor_filenames.indexOf(audioFilenames[i])>-1 || audioFilesToForceLoad.indexOf(audioFilenames[i])>-1))
@@ -244,7 +262,7 @@ function setAudioDescriptor(newAudioDescriptor, preset, isOutside)
 				audioInstances.push(createjs.Sound.createInstance(audioFilenames[i]));
 			}
 		}
-	}
+//	}
 }
 
 
@@ -479,16 +497,19 @@ function playLoopedSound(id, volume)
 		audioInstance = createjs.Sound.createInstance(id);
 	}
 	
-	audioInstance
-
+	
 	var ppc = new createjs.PlayPropsConfig().set({interrupt: createjs.Sound.INTERRUPT_ANY, loop: -1, volume: volume});
 	
-	audioInstance.on("failed", function(event){
-		setTimeout(function(){playLoopedSound(id, volume);}, 1000);
-	});
+	if (audioInstance.hasEventListener("failed")==false)
+	{
+		audioInstance.on("failed", function(event){
+			setTimeout(function(){playLoopedSound(id, volume);}, 1000);
+		});
+	}
 	
 	audioInstance.play(ppc);
-	playingLoopedSounds.push(audioInstance);
+	if (playingLoopedSounds.indexOf(audioInstance)==-1)
+		playingLoopedSounds.push(audioInstance);
 	console.log("Permanently playing: "+id);
 	nonAutomaticLoopedSounds.push(audioInstance);
 }
@@ -527,6 +548,8 @@ function clearLoopedSounds()
  */
 function playAudio(id, volume, delay)
 {
+	if (volume==null) volume = 1;
+	if (delay==null) delay = 0;
 	var audioInstance = getAudioInstance(id);
 
 	console.log("One-shot playing: "+id);
@@ -535,11 +558,18 @@ function playAudio(id, volume, delay)
 		loadedFilenames.push(id);
 		createjs.Sound.registerSound("https://initium-resources.appspot.com/audio/"+id+".ogg", id);
 		audioInstances.push(createjs.Sound.createInstance(id));
-		return;	// Don't play the sound, it wasn't loaded in yet and it'll be too late by the time it is.
+		audioInstance = getAudioInstance(id);
 	}
 	
 	var ppc = new createjs.PlayPropsConfig().set({interrupt: createjs.Sound.INTERRUPT_NONE, loop: 0, volume: volume, delay: delay});
 
+	if (audioInstance.hasEventListener("failed")==false)
+	{
+		audioInstance.on("failed", function(event){
+			setTimeout(function(){playAudio(id, volume, delay);}, 1000);
+		});
+	}
+	
 	audioInstance.play(ppc);
 
 }

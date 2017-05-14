@@ -6196,7 +6196,31 @@ public class ODPDBAccess
 	 * @param characterKeys The characters to send the update to
 	 * @param updateMethods The list of method names in the MainPageUpdateService you wish to trigger (arg-less methods only).
 	 */
-	public void sendMainPageUpdateForCharacters(CachedDatastoreService ds, Key characterKey, String...updateMethods)
+	public void sendMainPageUpdateForCharacter(CachedDatastoreService ds, Key characterKey, String...updateMethods)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendSoundEffectToCharacters(CachedDatastoreService ds, Collection<Key> characterKeys, String...soundEffects)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendSoundEffectToCharacter(CachedDatastoreService ds, Key characterKey, String...soundEffects)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendSoundEffectToLocation(CachedDatastoreService ds, Key locationKey, String...soundEffects)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendSystemMessageToLocation(Key locationKey, String message)
 	{
 		// TODO Auto-generated method stub
 		

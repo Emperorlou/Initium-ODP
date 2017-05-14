@@ -50,7 +50,7 @@ public class CommandConfirmRequirementsUpdate extends Command
 		html.append("<div class='list'>");
 		for(CachedEntity item:items)
 		{
-			html.append("<div onclick='selectItem(event, ").append(item.getId()).append(")' class='itemToSelect confirm-requirements-entry confirm-requirements-item-candidate'><div class='selectarea'><div onclick='unselectItem(event)' class='X'>X</div></div>").append(GameUtils.renderItem(db, db.getCurrentCharacter(), item)).append("</div>");
+			html.append("<div onclick='selectItem(event, ").append(item.getId()).append(")' class='itemToSelect confirm-requirements-entry confirm-requirements-item-candidate ").append("deletable-Item").append(item.getId()).append("'><div class='selectarea'><div onclick='unselectItem(event)' class='X'>X</div></div>").append(GameUtils.renderItem(db, db.getCurrentCharacter(), item)).append("</div>");
 		}
 		html.append("</div>");
 		if (items.isEmpty())

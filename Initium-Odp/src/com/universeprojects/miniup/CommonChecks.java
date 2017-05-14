@@ -300,4 +300,24 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+
+	/**
+	 * Returns true only if the item is in your inventory or on the ground in your location.
+	 * 
+	 * @param item
+	 * @param character
+	 * @return
+	 */
+	public static boolean checkItemIsAccessible(CachedEntity item, CachedEntity character)
+	{
+		Key locationKey = (Key)character.getProperty("locationKey");
+		
+		Key itemContainer = (Key)item.getProperty("containerKey");
+		
+		if (GameUtils.equals(itemContainer, character.getKey()) || GameUtils.equals(itemContainer, locationKey))
+			return true;
+		
+		
+		return false;
+	}
 }

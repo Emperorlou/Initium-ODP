@@ -107,6 +107,12 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		data.put("description", "It will take "+seconds+" seconds to finish this prototype.");
 		
+		// Issue the soundeffect for the location if one is necessary..
+		if (ideaDef.getProperty("executionSoundeffect")!=null)
+		{
+			db.sendSoundEffectToLocation(ds, (Key)character.getProperty("locationKey"), (String)ideaDef.getProperty("executionSoundeffect"));
+		}
+		
 		return seconds;
 	}
 
@@ -145,7 +151,11 @@ public class LongOperationBeginPrototype extends LongOperation
 		// Give the player a message that points to the skill and the new item he made
 		setUserMessage("You have a new skill! You successfully turned your idea of "+idea.getProperty("name")+" into a skill. A prototype of your skill is now in your inventory.<br><br>You created an item: "+GameUtils.renderItem(item));
 		
-
+		// Delete all HTML of an item
+		if (inventionService.getDeletedEntities()!=null)
+			for(Key deletedKey:inventionService.getDeletedEntities())
+				if (deletedKey.getKind().equals("Item"))
+					deleteHtml(".deletable-Item"+deletedKey.getId());
 		
 		return "Experimentation complete.";
 	}

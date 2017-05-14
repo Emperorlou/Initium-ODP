@@ -2431,7 +2431,7 @@ function requestUpdateMainPage(updateList)
 				data+=",";
 			data+=queuedMainPageUpdates[i];
 		}
-		doCommand(null, "RequestMainPageUpdate", {updateList:data});
+		doCommand(null, "RequestMainPageUpdate", {updateList:data, newUI:window.newUI});
 		lastUpdate = currentTime;
 	}
 	else
@@ -2440,6 +2440,17 @@ function requestUpdateMainPage(updateList)
 	}
 }
 
+function playSoundsFromNotification(soundList)
+{
+	if (isSoundEffectsEnabled()==false) return;
+	
+	var sounds = [];
+	if (soundList!=null)
+		sounds = soundList.split(",");
+	
+	for(var i = 0; i<sounds.length; i++)
+		playAudio(sounds[i], 0.3);
+}
 
 
 
@@ -2988,7 +2999,6 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 				if (action.isComplete)
 				{
 					clearPopupPermanentOverlay(); 
-					reloadPagePopup(false);
 				}
 				else
 				{
@@ -3014,7 +3024,6 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId)
 				if (action.isComplete)
 				{
 					clearPopupPermanentOverlay(); 
-					reloadPagePopup(false);
 				}
 				else
 				{

@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -251,6 +252,12 @@ public abstract class ODPInventionService extends Service
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Collection<Key> getDeletedEntities()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

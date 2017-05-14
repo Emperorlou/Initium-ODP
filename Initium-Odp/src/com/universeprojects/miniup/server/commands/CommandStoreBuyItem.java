@@ -158,7 +158,8 @@ public class CommandStoreBuyItem extends Command {
 
 			addCallbackData("createStoreItem", HtmlComponents.generateStoreItemHtml(db,character, storeCharacter,item,saleItem,request));
 			
-			db.sendMainPageUpdateForCharacters(ds, sellingCharacter.getKey(), "updateMoney");
+			db.sendMainPageUpdateForCharacter(ds, sellingCharacter.getKey(), "updateMoney");
+			db.sendSoundEffectToCharacter(ds, sellingCharacter.getKey(), "coins1");
 		}
 		finally
 		{

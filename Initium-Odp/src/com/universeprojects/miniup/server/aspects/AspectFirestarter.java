@@ -1,9 +1,11 @@
 package com.universeprojects.miniup.server.aspects;
 
-import com.universeprojects.miniup.server.InitiumAspect;
-import com.universeprojects.miniup.server.InitiumObject;
+import java.util.List;
 
-public class AspectFirestarter extends InitiumAspect
+import com.universeprojects.miniup.server.InitiumObject;
+import com.universeprojects.miniup.server.ItemAspect;
+
+public class AspectFirestarter extends ItemAspect
 {
 
 	public AspectFirestarter(InitiumObject object)
@@ -15,6 +17,18 @@ public class AspectFirestarter extends InitiumAspect
 	protected void initialize()
 	{
 
+	}
+
+	@Override
+	public List<ItemPopupEntry> getItemPopupEntries()
+	{
+		return null;
+	}
+
+	@Override
+	public String getPopupTag()
+	{
+		return "Can start a fire";
 	}
 
 }

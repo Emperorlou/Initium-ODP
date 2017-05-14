@@ -125,11 +125,8 @@ public class AspectFireplace extends ItemAspect
 		setFuelDepletionDate(new Date(depletionDate));
 		setSpace(getSpace()+fuelSpace);
 
-		if (quantity!=null)
-			inventionService.consumeItems(firewoodEntity, quantity);
-		else
-			db.getDB().delete(firewoodEntity);
-		
+		if (quantity==null) quantity = 1;
+		inventionService.consumeItems(firewoodEntity, quantity);
 	}
 	
 	public void updateFireProgress()
@@ -434,6 +431,7 @@ public class AspectFireplace extends ItemAspect
 			if (CommonChecks.checkIsRaining(location))
 				throw new UserErrorMessage("You cannot light a fire while it's raining.");
 			
+			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), null);
 			AspectFireplace fireplaceAspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
 
 			CachedDatastoreService ds = db.getDB();
@@ -453,7 +451,6 @@ public class AspectFireplace extends ItemAspect
 				.addGenericEntityRequirements((String)fireplaceLight.getProperty("genericEntityRequirements2Name"), "genericEntityRequirements2")
 				.go();
 				
-				ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter()	, null);
 				
 				
 				List<String> slots = new ArrayList<String>(gerSlotsToItem.slots.keySet());
@@ -529,6 +526,11 @@ public class AspectFireplace extends ItemAspect
 				ds.commitBulkWrite();
 			}
 				
+			// Delete all HTML of an item
+			for(Key deletedKey:inventionService.getDeletedEntities())
+				if (deletedKey.getKind().equals("Item"))
+					deleteHtml(".deletable-Item"+deletedKey.getId());
+			
 		}
 		
 	}
@@ -587,9 +589,22 @@ public class AspectFireplace extends ItemAspect
 			{
 				ds.commitBulkWrite();
 			}
+			
+			// Delete all HTML of an item
+			if (inventionService.getDeletedEntities()!=null)
+				for(Key deletedKey:inventionService.getDeletedEntities())
+					if (deletedKey.getKind().equals("Item"))
+						deleteHtml(".deletable-Item"+deletedKey.getId());
+			
 				
 		}
 
+	}
+
+	@Override
+	public String getPopupTag()
+	{
+		return "Can contain a fire";
 	}
 	
 	
