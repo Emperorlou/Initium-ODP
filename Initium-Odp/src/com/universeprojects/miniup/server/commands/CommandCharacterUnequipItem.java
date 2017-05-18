@@ -1,5 +1,8 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +13,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -51,12 +55,25 @@ public class CommandCharacterUnequipItem extends Command {
 		if(CommonChecks.checkCharacterIsBusy(character))
 			throw new UserErrorMessage("Your character is currently busy and cannot change equipment.");
 		
+		// Keep track of which slots the item is in, so we can update the necessary slots in equipment list.
+		List<String> oldEquips = new ArrayList<String>();
+		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
+			if(GameUtils.equals(character.getProperty("equipment"+slot), itemKey))
+				oldEquips.add(slot);
+		
 		db.doCharacterUnequipEntity(ds, character, equipmentItem);
 		
 		// If we've gotten this far, we can assume it was successful. Update the in banner widget.
 		// JS function reloads the page popup.
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
+		
+		// Now update the slots
+		for(String slot:oldEquips)
+			updateHtmlContents(".equip-slot div[rel='" + slot + "']", "None");
+		
+		// Add the unequipped item to top of inventory list.
+		prependChildHtml("#invItems", GameUtils.renderInventoryItem(db, equipmentItem, character, false));
 	}
 
 }

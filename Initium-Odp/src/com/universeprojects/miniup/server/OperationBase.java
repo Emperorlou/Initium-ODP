@@ -36,13 +36,7 @@ public abstract class OperationBase
 	 */
 	public void updateHtmlContents(String jquerySelector, String htmlContents)
 	{
-		Map<String,String> htmlData = new HashMap<String,String>();
-		
-		htmlData.put("type", "0");
-		htmlData.put("selector", jquerySelector);
-		htmlData.put("html", htmlContents);
-		
-		htmlUpdates.add(htmlData);
+		addHtmlUpdate("0", jquerySelector, htmlContents);
 	}
 	
 	/**
@@ -57,13 +51,31 @@ public abstract class OperationBase
 	 */
 	public void updateHtml(String jquerySelector, String newHtml)
 	{
-		Map<String,String> htmlData = new HashMap<String,String>();
-		
-		htmlData.put("type", "1");
-		htmlData.put("selector", jquerySelector);
-		htmlData.put("html", newHtml);
-		
-		htmlUpdates.add(htmlData);
+		addHtmlUpdate("1", jquerySelector, newHtml);
+	}
+	
+	/**
+	 * When the command returns to the browser, the page will then find the first element 
+	 * that matches the given jquerySelector and will insert the given htmlContents before.
+	 * 
+	 * @param jquerySelector
+	 * @param htmlContents
+	 */
+	public void insertHtmlBefore(String jquerySelector, String htmlContents)
+	{
+		addHtmlUpdate("2", jquerySelector, htmlContents);
+	}
+	
+	/**
+	 * When the command returns to the browser, the page will then find the last element 
+	 * that matches the given jquerySelector and will insert the given htmlContents after.
+	 * 
+	 * @param jquerySelector
+	 * @param htmlContents
+	 */
+	public void insertHtmlAfter(String jquerySelector, String htmlContents)
+	{
+		addHtmlUpdate("3", jquerySelector, htmlContents);
 	}
 	
 	/**
@@ -87,42 +99,6 @@ public abstract class OperationBase
 	}
 	
 	/**
-	 * When the command returns to the browser, the page will then find the first element 
-	 * that matches the given jquerySelector and will insert the given htmlContents before.
-	 * 
-	 * @param jquerySelector
-	 * @param htmlContents
-	 */
-	public void insertHtmlBefore(String jquerySelector, String htmlContents)
-	{
-		Map<String,String> htmlData = new HashMap<String,String>();
-		
-		htmlData.put("type", "2");
-		htmlData.put("selector", jquerySelector);
-		htmlData.put("html", htmlContents);
-		
-		htmlUpdates.add(htmlData);
-	}
-	
-	/**
-	 * When the command returns to the browser, the page will then find the last element 
-	 * that matches the given jquerySelector and will insert the given htmlContents after.
-	 * 
-	 * @param jquerySelector
-	 * @param htmlContents
-	 */
-	public void insertHtmlAfter(String jquerySelector, String htmlContents)
-	{
-		Map<String,String> htmlData = new HashMap<String,String>();
-		
-		htmlData.put("type", "3");
-		htmlData.put("selector", jquerySelector);
-		htmlData.put("html", htmlContents);
-		
-		htmlUpdates.add(htmlData);
-	}
-	
-	/**
 	 * When the command returns to the browser, the element that has the given elementId 
 	 * will be deleted.
 	 *
@@ -131,10 +107,38 @@ public abstract class OperationBase
 	 */
 	public void deleteHtml(String jquerySelector)
 	{
+		addHtmlUpdate("5", jquerySelector, null);
+	}
+	
+	/**
+	 * When the command returns to the browser, the elements matching the selector will
+	 * have the htmlContents inserted as the first child element.
+	 * @param jquerySelector jQuery matching a set of elements
+	 * @param htmlContents New HTML contents to prepend.
+	 */
+	public void prependChildHtml(String jquerySelector, String htmlContents)
+	{
+		addHtmlUpdate("6", jquerySelector, htmlContents);
+	}
+	
+	/**
+	 * When the command returns to the browser, the elements matching the selector will
+	 * have the htmlContents inserted as the last child element.
+	 * @param jquerySelector jQuery matching a set of elements
+	 * @param htmlContents New HTML contents to append.
+	 */
+	public void appendChildHtml(String jquerySelector, String htmlContents)
+	{
+		addHtmlUpdate("7", jquerySelector, htmlContents);
+	}
+	
+	private void addHtmlUpdate(String updateType, String jquerySelector, String htmlContents)
+	{
 		Map<String,String> htmlData = new HashMap<String,String>();
 		
-		htmlData.put("type", "5");
+		htmlData.put("type", updateType);
 		htmlData.put("selector", jquerySelector);
+		htmlData.put("html", htmlContents);
 		
 		htmlUpdates.add(htmlData);
 	}

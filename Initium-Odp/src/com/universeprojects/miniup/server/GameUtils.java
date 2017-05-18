@@ -1017,6 +1017,11 @@ public class GameUtils
 		else
 			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
+
+	public static String renderItemMini(CachedEntity equipment, boolean isComparisonItem) {
+		// TODO Auto-generated method stub
+		return null;
+	}
     
     public static String renderEquipSlot(CachedEntity item)
     {

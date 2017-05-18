@@ -1,10 +1,14 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
@@ -49,13 +53,54 @@ public class CommandCharacterEquipItem extends Command {
 		if(CommonChecks.checkCharacterIsBusy(character))
 			throw new UserErrorMessage("Your character is currently busy and cannot change equipment.");
 		
+		// Keep track of old slots, so we can update the necessary slots in equipment list.
+		Map<String,Key> oldEquips = new HashMap<String,Key>();
+		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
+			oldEquips.put(slot, (Key)character.getProperty("equipment"+slot));
+		
 		// This method will throw relevant errors if it fails (not enough strength, no available slots, etc.) 
 		db.doCharacterEquipEntity(ds, character, item);
 		
 		// If we've gotten this far, we can assume it was successful. Update the in banner widget.
-		// JS function reloads the page popup.
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
+		
+		// Remove the item from inventory first.
+		deleteHtml("#inventory .invItem[ref='" + item.getId() + "']");
+		
+		// Update equipment slots next
+		String equipItem = GameUtils.renderEquipSlot(item);
+		List<Key> invItems = new ArrayList<Key>();
+		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
+		{
+			Key curSlot = (Key)character.getProperty("equipment"+slot);
+			// If both slots are null, method checks null == null, which is true. 
+			// Otherwise, something changed.
+			if(GameUtils.equals(curSlot, oldEquips.get(slot))==false)
+			{
+				// curSlot will either be null (meaning something else caused it to unequip) or
+				// the new item we equipped. If oldEquips[slot] is non-null, then we generate
+				// the inventory entry for it. Keep a map of the inventory entries for every removed
+				// item (so we don't generate more than one), and always update current slot.
+				
+				String newSlot = curSlot != null ? equipItem : "None";
+				updateHtmlContents(".equip-slot div[rel='" + slot + "']", newSlot);
+				
+				Key oldSlot = oldEquips.get(slot);
+				if(oldSlot != null && invItems.contains(oldSlot)==false)
+					invItems.add(oldSlot);
+			}
+		}
+		
+		// Finally, add any removed items back to inventory (at the top)
+		if(invItems.isEmpty()==false)
+		{
+			StringBuilder sb = new StringBuilder();
+			List<CachedEntity> eqItems = ds.get(invItems);
+			for(CachedEntity curItem:eqItems)
+				sb.append(GameUtils.renderInventoryItem(db, curItem, character, false));
+			
+			prependChildHtml("#invItems", sb.toString());
+		}
 	}
-
 }
