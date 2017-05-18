@@ -19,13 +19,15 @@ import com.universeprojects.web.PageController;
 @Controller
 public class EquipmentController extends PageController {
 
-	public EquipmentController(String pageName) {
+	public EquipmentController() {
 		super("equipmentlist");
 	}
 
 	@Override
 	protected String processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
+		
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		CachedEntity character = db.getCurrentCharacter();
 		
