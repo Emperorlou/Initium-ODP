@@ -977,7 +977,7 @@ function loadInventory()
 
 function loadEquipment()
 {
-	$("#equipment").load("/odp/equipmentlist.jsp?ajax=true");
+	$("#equipment").load("/odp/equipmentlist?ajax=true");
 //	$("#inventory").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
 //	});
@@ -1515,17 +1515,17 @@ function characterEquipSet(event, containerId)
 
 function characterEquipItem(event, itemId)
 {
-	doCommand(event, "CharacterEquipItem", {"itemId":itemId}, loadInventoryAndEquipment);
+	doCommand(event, "CharacterEquipItem", {"itemId":itemId});
 }
 
 function characterUnequipItem(event, itemId)
 {
-	doCommand(event, "CharacterUnequipItem", {"itemId":itemId}, loadInventoryAndEquipment);
+	doCommand(event, "CharacterUnequipItem", {"itemId":itemId});
 }
 
 function characterUnequipAll(event)
 {
-	doCommand(event, "CharacterUnequipAll", null, loadInventoryAndEquipment);
+	doCommand(event, "CharacterUnequipAll");
 }
 
 function giveHouseToGroup(eventObject)
@@ -2548,6 +2548,14 @@ function ajaxUpdatePage(ajaxResponseData)
 			else if (htmlData.type==5)
 			{
 				$(htmlData.selector).remove();
+			}
+			else if (htmlData.type==6)
+			{
+				$(htmlData.selector).prepend(htmlData.html);
+			}
+			else if (htmlData.type==7)
+			{
+				$(htmlData.selector).append(htmlData.html);
 			}
 		}
 	}
