@@ -1032,7 +1032,7 @@ public class GameUtils
 		}
 		else
 		{
-			sb.append(" <div class='main-item-container'>");
+			sb.append(" <div class='main-item-container' style='display:block'>");
 			sb.append(GameUtils.renderItem(item));
 			sb.append("<br>");
 			sb.append("<div class='main-item-controls'>");

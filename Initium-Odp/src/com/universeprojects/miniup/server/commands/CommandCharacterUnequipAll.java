@@ -44,7 +44,7 @@ public class CommandCharacterUnequipAll extends Command {
 				itemKeys.add(item);
 			
 			character.setProperty("equipment" + slot, null);
-			updateHtmlContents(".equip-item div[rel='" + slot + "']", "None");
+			updateHtmlContents(".equip-item span[rel='" + slot + "']", "None");
 		}
 		ds.put(character);
 		

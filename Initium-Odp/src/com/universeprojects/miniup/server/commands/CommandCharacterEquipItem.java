@@ -84,7 +84,7 @@ public class CommandCharacterEquipItem extends Command {
 				// item (so we don't generate more than one), and always update current slot.
 				
 				String newSlot = curSlot != null ? equipItem : "None";
-				updateHtmlContents(".equip-item div[rel='" + slot + "']", newSlot);
+				updateHtmlContents(".equip-item span[rel='" + slot + "']", newSlot);
 				
 				Key oldSlot = oldEquips.get(slot);
 				if(oldSlot != null && invItems.contains(oldSlot)==false)

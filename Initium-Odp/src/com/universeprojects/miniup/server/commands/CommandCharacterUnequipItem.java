@@ -70,7 +70,7 @@ public class CommandCharacterUnequipItem extends Command {
 		
 		// Now update the slots
 		for(String slot:oldEquips)
-			updateHtmlContents(".equip-item div[rel='" + slot + "']", "None");
+			updateHtmlContents(".equip-item span[rel='" + slot + "']", "None");
 		
 		// Add the unequipped item to top of inventory list.
 		prependChildHtml("#invItems", GameUtils.renderInventoryItem(db, equipmentItem, character, false));
