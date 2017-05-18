@@ -39,9 +39,9 @@ public class EquipmentController extends PageController {
 			CachedEntity item = db.getEntity((Key)character.getProperty("equipment"+slot));
 			// Allow updating specific slots via commands.
 			// Selector would be ".equip-item div[rel='RightHand']"
-			sb.append("<div rel='" + slot + "'>");
+			sb.append("<span rel='" + slot + "'>");
 			sb.append(GameUtils.renderEquipSlot(item));
-			sb.append("</div>");
+			sb.append("</span>");
 			sb.append("</div>");
 			equipList.add(sb.toString());
 		}
