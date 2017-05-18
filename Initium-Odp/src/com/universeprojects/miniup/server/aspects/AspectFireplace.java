@@ -82,30 +82,33 @@ public class AspectFireplace extends ItemAspect
 		addFuel(inventionService, firewoodEntity, null);
 	}
 	
-	public void addFuel(ODPInventionService inventionService, CachedEntity firewoodEntity, Integer quantity) throws UserErrorMessage
+	public void addFuel(ODPInventionService inventionService, CachedEntity firewoodEntity, Integer quantityLimit) throws UserErrorMessage
 	{
 		if (isFireActive(System.currentTimeMillis())==false)
 			throw new UserErrorMessage("You can only add fuel to a fire that is already started.");
 		
 		InitiumObject firewood = new InitiumObject(db, firewoodEntity);
-		if (CommonChecks.checkItemIsClass(firewoodEntity, "Firewood")==false &&
-				firewood.isAspectPresent(AspectFlammable.class)==false)
+		if (CommonChecks.checkItemIsClass(firewoodEntity, "Firewood")==false && firewood.isAspectPresent(AspectFlammable.class)==false)
 			throw new UserErrorMessage("The item you chose to add to the fire is not valid fuel.");
 	
 		Long firewoodQuantity = (Long)firewoodEntity.getProperty("quantity");
 		Long fuelSpace = db.getItemSpace(firewoodEntity);
-		Long fuelWeight = (Long)firewoodEntity.getProperty("weight");
-		if (fuelWeight==null) fuelWeight = 0L;
+		Long fuelWeight = db.getItemWeight(firewoodEntity);
 		Long depletionDate = getFuelDepletionDate().getTime();
 		
 		// Reduce fuelWeight to match the quantity we're actually going to burn (if applicable)
-		if (quantity!=null && firewoodQuantity!=null)
+		if (quantityLimit!=null && firewoodQuantity!=null)
 		{
-			if (firewoodQuantity<quantity)
-				throw new UserErrorMessage("You have enough '"+firewoodEntity.getProperty("name")+"'. You have "+firewoodQuantity+" but require "+quantity+".");
+			if (firewoodQuantity<quantityLimit)
+				throw new UserErrorMessage("You don't have enough '"+firewoodEntity.getProperty("name")+"'. You have "+firewoodQuantity+" but require "+quantityLimit+".");
 			
-			fuelWeight*=quantity;
+			fuelWeight = (Long)firewoodEntity.getProperty("weight");
+			fuelWeight*=quantityLimit;
+			
+			fuelSpace = (Long)firewoodEntity.getProperty("space");
+			fuelSpace*=quantityLimit;
 		}
+		
 		
 		if (getSpace()+fuelSpace>getMaxSpace())
 			throw new UserErrorMessage("There is not enough room to put all of this into the fire.");
@@ -114,7 +117,7 @@ public class AspectFireplace extends ItemAspect
 		Long percentFlammable = (Long)firewoodEntity.getProperty("Flammable:percentOfFlammableMaterial");
 		if (percentFlammable!=null)
 		{
-			fuelWeight=new Double(Math.round(fuelWeight.doubleValue()*(1d/percentFlammable.doubleValue()))).longValue();
+			fuelWeight=new Double(Math.round(fuelWeight.doubleValue()*(percentFlammable.doubleValue()/100d))).longValue();
 		}
 		
 		int burnTime = getBurnTime(fuelWeight, fuelSpace);
@@ -125,8 +128,8 @@ public class AspectFireplace extends ItemAspect
 		setFuelDepletionDate(new Date(depletionDate));
 		setSpace(getSpace()+fuelSpace);
 
-		if (quantity==null) quantity = 1;
-		inventionService.consumeItems(firewoodEntity, quantity);
+		if (quantityLimit==null) quantityLimit = 1;
+		inventionService.consumeItems(firewoodEntity, quantityLimit);
 	}
 	
 	public void updateFireProgress()
@@ -527,9 +530,10 @@ public class AspectFireplace extends ItemAspect
 			}
 				
 			// Delete all HTML of an item
-			for(Key deletedKey:inventionService.getDeletedEntities())
-				if (deletedKey.getKind().equals("Item"))
-					deleteHtml(".deletable-Item"+deletedKey.getId());
+			if (inventionService.getDeletedEntities()!=null)
+				for(Key deletedKey:inventionService.getDeletedEntities())
+					if (deletedKey.getKind().equals("Item"))
+						deleteHtml(".deletable-Item"+deletedKey.getId());
 			
 		}
 		

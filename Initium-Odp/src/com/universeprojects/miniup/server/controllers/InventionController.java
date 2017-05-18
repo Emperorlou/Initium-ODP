@@ -125,8 +125,9 @@ public class InventionController extends PageController {
 			String ideaDescription = (String)ideaDef.getProperty("ideaDescription");
 			Long ideaId = idea.getId();
 			CachedEntity itemDef = pool.get((Key)ideaDef.getProperty("itemDef"));
-			if (itemDef==null) continue;	// This shouldn't happen really, but if it does we'll skip.
-			String iconUrl = GameUtils.getResourceUrl(itemDef.getProperty("icon"));
+			String iconUrl = null;
+			if (itemDef!=null)
+				iconUrl = GameUtils.getResourceUrl(itemDef.getProperty("icon"));
 			Long ideaSpeed = (Long)ideaDef.getProperty("prototypeConstructionSpeed");
 			
 			Map<String, Object> ideaData = new HashMap<String, Object>();
@@ -171,9 +172,13 @@ public class InventionController extends PageController {
 			String skillDescription = (String)skill.getProperty("skillDescription");
 			Long skillSpeed = (Long)skill.getProperty("skillConstructionSpeed");
 			Long skillId = skill.getId();
-			CachedEntity item = pool.get((Key)skill.getProperty("item"));
-			if (item==null) continue;	// This shouldn't happen really, but if it does we'll skip.
-			String iconUrl = GameUtils.getResourceUrl(item.getProperty("icon"));
+			CachedEntity item = null;
+			String iconUrl = null;
+			if (skill.getProperty("item")!=null)
+			{
+				item = pool.get((Key)skill.getProperty("item"));
+				iconUrl = GameUtils.getResourceUrl(item.getProperty("icon"));
+			}
 			
 			// We'll also get the idea this skill came from
 			CachedEntity idea = pool.get((Key)skill.getProperty("_definitionKey"));

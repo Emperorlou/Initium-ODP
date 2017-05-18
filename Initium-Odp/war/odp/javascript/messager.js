@@ -211,9 +211,9 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 
     this.getMessages();
 
-    setTimeout(function(){
+//    setTimeout(function(){
     	that.messageChecker = setInterval(function(){that.getMessages();}, delay);
-    }, 10000);
+//    }, 10000);
 
 
 

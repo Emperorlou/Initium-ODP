@@ -33,8 +33,8 @@ public class LongOperationBeginPrototype extends LongOperation
 	
 	@Override
 	public String getPageRefreshJavascriptCall() {
-		Long ideaId = (Long)data.get("ideaId");
-		String ideaName = ((String)data.get("ideaName")).replace("'", "\\'");
+		Long ideaId = (Long)getDataProperty("ideaId");
+		String ideaName = ((String)getDataProperty("ideaName")).replace("'", "\\'");
 		return "doCreatePrototype(null, "+ideaId+", '"+ideaName+"');"; 
 	}
 	
@@ -49,11 +49,12 @@ public class LongOperationBeginPrototype extends LongOperation
 		if (idea==null)
 			throw new UserErrorMessage("Invalid idea specified.");
 
-		data.put("ideaId", ideaId);
-		data.put("ideaName", idea.getProperty("name"));
-		
-		
 		CachedEntity character = db.getCurrentCharacter();
+		
+		setDataProperty(character, "ideaId", ideaId);
+		setDataProperty(character, "ideaName", idea.getProperty("name"));
+		
+		
 		
 		doChecks(character, idea);
 
@@ -62,6 +63,7 @@ public class LongOperationBeginPrototype extends LongOperation
 
 		
 		GenericEntityRequirementResult itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, getPageRefreshJavascriptCall(), ideaDef)
+		.addGenericEntityRequirements("", "skillItemFocus")
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Required Materials", "prototypeItemsConsumed")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
@@ -93,8 +95,8 @@ public class LongOperationBeginPrototype extends LongOperation
 		// This check will throw a UserErrorMessage if it finds anything off
 		inventionService.checkIdeaWithSelectedItems(pool, ideaDef, itemRequirementsToItems);
 		
-		data.put("selectedItems", itemRequirementsToItems);
-		data.put("repetitionCount", itemRequirementSlotsToItems.repetitionCount);
+		setDataProperty(character, "selectedItems", itemRequirementsToItems);
+		setDataProperty(character, "repetitionCount", itemRequirementSlotsToItems.repetitionCount);
 		
 		int seconds = 5;
 		
@@ -105,7 +107,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		if (itemRequirementSlotsToItems.repetitionCount!=null)
 			seconds*=itemRequirementSlotsToItems.repetitionCount;
 		
-		data.put("description", "It will take "+seconds+" seconds to finish this prototype.");
+		setDataProperty(character, "description", "It will take "+seconds+" seconds to finish this prototype.");
 		
 		// Issue the soundeffect for the location if one is necessary..
 		if (ideaDef.getProperty("executionSoundeffect")!=null)
@@ -122,11 +124,11 @@ public class LongOperationBeginPrototype extends LongOperation
 	String doComplete() throws UserErrorMessage, UserRequestIncompleteException
 	{
 		@SuppressWarnings("unchecked")
-		Map<Key,Key> itemRequirementsToItems = (Map<Key, Key>)data.get("selectedItems");
-		Integer repetitionCount = (Integer)data.get("repetitionCount");
-		
 		CachedEntity character = db.getCurrentCharacter();
-		CachedEntity idea = db.getEntity("ConstructItemIdea", (Long)data.get("ideaId"));
+		Map<Key,Key> itemRequirementsToItems = (Map<Key, Key>)getDataProperty(character, "selectedItems");
+		Integer repetitionCount = (Integer)getDataProperty(character, "repetitionCount");
+		
+		CachedEntity idea = db.getEntity("ConstructItemIdea", (Long)getDataProperty(character, "ideaId"));
 		
 		doChecks(character, idea);
 		
@@ -218,7 +220,7 @@ public class LongOperationBeginPrototype extends LongOperation
 	public Map<String, Object> getStateData() {
 		Map<String, Object> stateData = super.getStateData();
 		
-		stateData.put("description", data.get("description"));
+		stateData.put("description", getDataProperty("description"));
 		
 		return stateData;
 	}	

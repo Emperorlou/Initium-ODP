@@ -22,6 +22,7 @@ var audioFilenames = [
 "crow2",
 "crowd1",
 "crowd2",
+"complete1",
 "distant_drums1",
 "drips1",
 "music_eerie_electronic1",
@@ -53,7 +54,7 @@ var audioFilenames = [
 var audioDescriptorPresets = 
 {
 "LightForest":"" +
-		"wind1(100,20,true,clearday)&&" +
+		"wind1(100,15,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
 		"bird2(2,5,false,clearday)&&" +
 		"bird3(2,5,false,clearday)&&" +
@@ -78,7 +79,7 @@ var audioDescriptorPresets =
 		"squirrel3(3,1,false,clearday)&&" +
 		"crow1(3,1,false,clearday)",
 "DenseForest":"" +
-		"wind1(100,20,true,clearday)&&" +
+		"wind1(100,10,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
 		"bird2(3,5,false,clearday)&&" +
 		"bird3(3,5,false,clearday)&&" +
@@ -109,7 +110,7 @@ var audioDescriptorPresets =
 		"wind2(100,15,true)",
 "Ocean":"" +
 		"oceanshore1(100,30,true)&&"+
-		"wind1(100,10,true,day)&&" +
+		"wind1(100,20,true,day)&&" +
 		"seagull1(5,10,false,day)&&"+
 		"seagull2(5,10,false,day)&&"+
 		"seagull3(5,10,false,day)&&"+

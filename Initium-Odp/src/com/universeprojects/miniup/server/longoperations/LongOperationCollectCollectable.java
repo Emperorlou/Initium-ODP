@@ -45,7 +45,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 		CachedEntity collectable = db.getEntity("Collectable", Long.parseLong(collectableIdStr));
 		CachedEntity collectableDef = db.getEntity((Key)collectable.getProperty("_definitionKey"));
 
-		data.put("collectableId", collectable.getKey().getId());
+		setDataProperty("collectableId", collectable.getKey().getId());
 		
 		if (GameUtils.equals(collectable.getProperty("locationKey"), db.getCurrentCharacter().getProperty("locationKey"))==false)
 			throw new UserErrorMessage("You cannot collect this, you're not even near it!");
@@ -87,26 +87,26 @@ public class LongOperationCollectCollectable extends LongOperation {
 			
 			seconds = (Long)processVariables.get("speed");
 			
-			data.put("tools", tools);
+			setDataProperty("tools", tools);
 		}
 		
 		int monsterTries = seconds.intValue()/30;
 		if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, monsterTries, 0.25d))
 			throw new GameStateChangeException("While you were working, someone found you..");
 		
-		data.put("secondsToWait", seconds);
-		data.put("bannerUrl", collectable.getProperty("bannerUrl"));
+		setDataProperty("secondsToWait", seconds);
+		setDataProperty("bannerUrl", collectable.getProperty("bannerUrl"));
 		
 		return seconds.intValue();
 	}
 
 	@Override
 	String doComplete() throws UserErrorMessage {
-		Long collectableId = (Long)data.get("collectableId");
+		Long collectableId = (Long)getDataProperty("collectableId");
 		CachedEntity collectable = db.getEntity("Collectable", collectableId);
 		CachedEntity collectableDef = db.getEntity((Key)collectable.getProperty("_definitionKey"));
 
-		Map<Key, Key> tools = (Map<Key, Key>)data.get("tools");
+		Map<Key, Key> tools = (Map<Key, Key>)getDataProperty("tools");
 		
 		// Now update the collectable..
 		Long collectionCount = (Long)collectable.getProperty("collectionCount");
@@ -169,7 +169,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 
 	@Override
 	public String getPageRefreshJavascriptCall() {
-		Long collectableId = (Long)data.get("collectableId");
+		Long collectableId = (Long)getDataProperty("collectableId");
 		return "doCollectCollectable(null, "+collectableId+");";
 	}
 
@@ -177,7 +177,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 	public Map<String, Object> getStateData() {
 		Map<String, Object> stateData = super.getStateData();
 		
-		stateData.put("secondsToWait", data.get("secondsToWait"));
+		stateData.put("secondsToWait", getDataProperty("secondsToWait"));
 		
 		return stateData;
 	}

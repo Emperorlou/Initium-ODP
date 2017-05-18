@@ -32,7 +32,7 @@ public class LongOperationRest extends LongOperation {
 		if (hitpointsToRegain<=0)
 			throw new UserErrorMessage("You don't need to rest, you're already at full health! NOW GET OUT THERE AND KICK SOME ASS!");
 		
-		data.put("description", "It will take "+hitpointsToRegain.intValue()+" seconds to regain your health.");
+		setDataProperty("description", "It will take "+hitpointsToRegain.intValue()+" seconds to regain your health.");
 		
 		return hitpointsToRegain.intValue();
 	}
@@ -65,7 +65,7 @@ public class LongOperationRest extends LongOperation {
 	public Map<String, Object> getStateData() {
 		Map<String, Object> stateData = super.getStateData();
 		
-		stateData.put("description", data.get("description"));
+		stateData.put("description", getDataProperty("description"));
 		
 		return stateData;
 	}

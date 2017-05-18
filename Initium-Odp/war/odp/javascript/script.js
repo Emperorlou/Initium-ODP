@@ -2999,6 +2999,8 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 				if (action.isComplete)
 				{
 					clearPopupPermanentOverlay(); 
+					playAudio("complete1");
+					doSimpleDesktopNotification(ideaName+" prototyping complete.", "");
 				}
 				else
 				{
@@ -3023,7 +3025,9 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId)
 				showBannerLoadingIcon();
 				if (action.isComplete)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
+					playAudio("complete1");
+					doSimpleDesktopNotification(skillName+" skill complete.", "");
 				}
 				else
 				{
@@ -3762,6 +3766,11 @@ function doPopupNotification(iconUrl, title, text, category, options, onclick, o
 	return notifyHandler.popupNotify(iconUrl, title, text, category, options, onclick, onerror);
 }
 
+
+function doSimpleDesktopNotification(text, category)
+{
+	doPopupNotification(null, "Initium", text, category, null, null);
+}
 
 
 ////////////////////////////////////////////////////////////

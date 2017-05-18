@@ -56,7 +56,7 @@ public class LongOperationExperiment extends LongOperation
 		if (itemKeys==null || itemKeys.isEmpty())
 			itemKeys = inventionService.getAvailableItemKeys();
 		
-		data.put("selectedItems", itemKeys);
+		setDataProperty("selectedItems", itemKeys);
 		
 		
 		return 5;
@@ -77,7 +77,7 @@ public class LongOperationExperiment extends LongOperation
 		
 		// Research one of the available items at random
 		@SuppressWarnings("unchecked")
-		List<Key> selectedItems = (List<Key>)data.get("selectedItems");
+		List<Key> selectedItems = (List<Key>)getDataProperty("selectedItems");
 		if (selectedItems==null)
 			selectedItems = inventionService.getAvailableItemKeys();
 		Collections.shuffle(selectedItems);

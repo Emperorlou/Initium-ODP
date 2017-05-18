@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -14,8 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
 
-import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.DBUtils;
 import com.universeprojects.miniup.server.Convert;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -29,7 +31,6 @@ import com.universeprojects.miniup.server.services.CaptchaService;
 
 public abstract class LongOperation extends OperationBase
 {
-	Map<String, Object> data = null;
 	ODPDBAccess db;
 	CachedDatastoreService ds;
 	private Map<String,String> parameters;
@@ -57,15 +58,38 @@ public abstract class LongOperation extends OperationBase
 		this.parameters = params;
 		this.db = db;
 
-		data = fetchLongOperationFromMC();
-		
-		if (data!=null && getPageRefreshJavascriptCall().equals(data.get("pageRefreshJavascriptCall"))==false)
-			throw new UserErrorMessage("You are already performing an action and cannot perform another until the first action is either cancelled or finished.");
+		try
+		{
+			Map<String, Object> data = getLongOperationData(db.getCurrentCharacter());
+			
+			if (data!=null && getPageRefreshJavascriptCall().equals(data.get("pageRefreshJavascriptCall"))==false)
+				throw new UserErrorMessage("You are already performing an action and cannot perform another until the first action is either cancelled or finished.");
+		}
+		catch(InvalidLongOperationFieldValueException e)
+		{
+			db.getCurrentCharacter().setProperty("longOperation", null);
+		}
 	}
 	
-	public static boolean continueLongOperationIfActive(ODPDBAccess db, Key characterKey, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	@SuppressWarnings("unchecked")
+	public static Map<String,Object> getLongOperationData(CachedEntity character)
 	{
-		Map<String,Object> data = (Map<String,Object>)db.getDB().getMC().get("LongOperation-"+characterKey);
+		String packedLongOperation = (String)character.getProperty("longOperation");
+		if (packedLongOperation==null || packedLongOperation.equals("")) return null;
+		
+		try
+		{
+			return (Map<String,Object>)DBUtils.deserializeObjectFromString(packedLongOperation);
+		}
+		catch (Exception e)
+		{
+			throw new InvalidLongOperationFieldValueException(e);
+		}
+	}
+	
+	public static boolean continueLongOperationIfActive(ODPDBAccess db, CachedEntity character, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+		Map<String,Object> data = getLongOperationData(character);
 		
 		if (data==null) return false;
 		
@@ -75,34 +99,61 @@ public abstract class LongOperation extends OperationBase
 		return true;
 	}
 	
-	public static String getLongOperationRecall(ODPDBAccess db, Key characterKey) throws ServletException, IOException
+	public static String getLongOperationRecall(ODPDBAccess db, CachedEntity character) throws ServletException, IOException
 	{
-		Map<String,Object> data = (Map<String,Object>)db.getDB().getMC().get("LongOperation-"+characterKey);
+		Map<String,Object> data = getLongOperationData(character);
 		
 		if (data==null) return null;
 		
 		String js = (String)data.get("pageRefreshJavascriptCall");
 		
+		if (js==null)
+			throw new InvalidLongOperationFieldValueException();
+		
 		return js;
 	}
 	
-	private Map<String, Object> fetchLongOperationFromMC()
+	public void setDataProperty(String fieldName, Object value)
 	{
-		return (Map<String, Object>)ds.getMC().get("LongOperation-"+db.getCurrentCharacter().getKey());
+		setDataProperty(db.getCurrentCharacter(), fieldName, value);
 	}
 	
-	private void putLongOperationToMC(Map<String, Object> data)
+	public void setDataProperty(CachedEntity character, String fieldName, Object value)
 	{
-		ds.getMC().put("LongOperation-"+db.getCurrentCharacter().getKey(), data);
+		Map<String,Object> data = getLongOperationData(character);
+		if (data==null) data = new LinkedHashMap<String,Object>();
+		data.put(fieldName, value);
+		setLongOperationData(character, data);
 	}
 	
-	public static void cancelLongOperations(ODPDBAccess db, Key characterKey)
+	public Object getDataProperty(String fieldName)
 	{
-		db.getDB().getMC().put("LongOperation-"+characterKey, null);		
+		return getDataProperty(db.getCurrentCharacter(), fieldName);
+	}
+	
+	public Object getDataProperty(CachedEntity character, String fieldName)
+	{
+		Map<String,Object> data = getLongOperationData(character);
+		if (data==null) return null;
+		return data.get(fieldName);
+	}
+	
+	
+	private void setLongOperationData(CachedEntity character, Map<String,Object> data)
+	{
+		character.setProperty("longOperation", DBUtils.serializeObjectToString(data));
+	}
+	
+	public static void cancelLongOperations(ODPDBAccess db, CachedEntity character)
+	{
+		character.setProperty("longOperation", null);
+		
+		db.getDB().put(character);
 	}
 	
 	public boolean isComplete()
 	{
+		Map<String, Object> data = getLongOperationData(db.getCurrentCharacter());
 		if (data==null)
 			return false;
 		Date endTime = (Date)data.get("endTime");
@@ -131,20 +182,27 @@ public abstract class LongOperation extends OperationBase
 	 */
 	public void begin() throws UserErrorMessage, UserRequestIncompleteException
 	{
-		if (data==null)
-			data = new HashMap<String, Object>();
-		
 		int operationSeconds = 0;
 		operationSeconds = doBegin(parameters);
+		Map<String, Object> data = getLongOperationData(db.getCurrentCharacter());
+		if (data==null)
+			data = new LinkedHashMap<String,Object>();
+		// Here we are going to save the longOperation data that was prepared in the doBegin() call
+		// then grab from the database to make sure we have the latest character data, then REput the
+		// longOperation data into the character now that we know it's the latest, then save it
+		CachedEntity character = db.getEntity(db.getCurrentCharacterKey());
+		setLongOperationData(character, data);
+		
 		data.put("pageRefreshJavascriptCall", getPageRefreshJavascriptCall());
-
 		
 		Calendar endTime = new GregorianCalendar();
 		endTime.add(Calendar.SECOND, operationSeconds);
-		
 		data.put("endTime", endTime.getTime());
 		
-		putLongOperationToMC(data);
+		setLongOperationData(character, data);
+		setLongOperationData(db.getCurrentCharacter(), data);
+		
+		db.getDB().put(character);
 	}
 	
 	public String complete() throws UserErrorMessage, UserRequestIncompleteException
@@ -155,7 +213,11 @@ public abstract class LongOperation extends OperationBase
 		}
 		finally
 		{
-			putLongOperationToMC(null);
+			// Here we are going to grab from the database to make sure we have the latest character data, then put the
+			// null longOperation data into the character now that we know it's the latest, then save it
+			CachedEntity character = db.getEntity(db.getCurrentCharacterKey());
+			setLongOperationData(character, null);
+			db.getDB().put(character);
 		}
 		
 	}
@@ -190,7 +252,7 @@ public abstract class LongOperation extends OperationBase
 	{
 		Map<String,Object> result = new HashMap<String,Object>();
 		
-		Date endTime = (Date)data.get("endTime");
+		Date endTime = (Date)getDataProperty(db.getCurrentCharacter(), "endTime");
 		long timeLeft = GameUtils.elapsed(Convert.DateToCalendar(endTime), new GregorianCalendar(), Calendar.SECOND);
 		
 		result.put("timeLeft", timeLeft);
@@ -238,7 +300,7 @@ public abstract class LongOperation extends OperationBase
 			}
 		} catch (UserErrorMessage e) {
 			sendErrorMessage(response, e.getMessage());
-			cancelLongOperations(db, db.getCurrentCharacter().getKey());
+			cancelLongOperations(db, db.getCurrentCharacter());
 			return;
 		}
 		catch(UserRequestIncompleteException e)
@@ -250,7 +312,7 @@ public abstract class LongOperation extends OperationBase
 		{
 			db.addToClientDescription(ds, db.getCurrentCharacter().getKey(), e.getMessage());
 			sendErrorMessageAndFullRefresh(response, null);
-			cancelLongOperations(db, db.getCurrentCharacter().getKey());
+			cancelLongOperations(db, db.getCurrentCharacter());
 			return;
 		}
 		
@@ -308,6 +370,7 @@ public abstract class LongOperation extends OperationBase
 	}
 
 	private boolean isNotStarted() {
+		Map<String, Object> data = getLongOperationData(db.getCurrentCharacter());
 		if (data==null)
 			return true;
 		else

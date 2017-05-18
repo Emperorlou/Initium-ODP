@@ -244,6 +244,11 @@ hr:after {
     margin: 0 auto;	
 }
 
+.main-bottomhalf
+{
+	position:relative;
+}
+
 .main-banner-container
 {
 	position:absolute;
@@ -1957,9 +1962,8 @@ a.range-increment {
 {
 	max-width:728px;
 	width:100%;
-	position:absolute;
 	z-index:1000000;
-	margin-top:-30px;
+	margin-top:0px;
 }
 
 .page-popup::before
@@ -2014,7 +2018,7 @@ a.range-increment {
   	background-position:center;
 	width:100%;
 	color:#FFFFFF;
-	margin-top:56px;
+	margin-top:13px;
 	margin-bottom:61px;
 	
 	padding-top:25px;
@@ -2022,6 +2026,7 @@ a.range-increment {
 	padding-left: 5px;
 	padding-right: 5px;
 	
+	top:11px;
 	bottom:0px;
 	
 	z-index:1000000;
@@ -2042,10 +2047,10 @@ a.range-increment {
 .page-popup-glass
 {
 	background-color:#0e0b06;
-	position:fixed;
+	position:absolute;
 	top:0px;
 	bottom:0px;
-	left:0px;
+	left:-1px;
 	right:0px;
 	
 	z-index:999999;
@@ -2068,7 +2073,7 @@ a.range-increment {
 
 .page-popup-X {
    position: absolute;
-   top: 36px;
+   top: -12px;
    right: 0px;
    z-index: 1100001;
    font-family: Arial;
@@ -2078,7 +2083,7 @@ a.range-increment {
 .page-popup-Reload
 {
    position: absolute;
-   top: 30px;
+   top: -18px;
    left: 0px;
    z-index: 1100001;
    font-family: Lucida Sans;
@@ -3051,6 +3056,12 @@ body
 #buttonbar
 {
 	text-align: center;
+	margin-top:10px;
+}
+
+#newui #buttonbar
+{
+	margin-top:0px;
 }
 
 

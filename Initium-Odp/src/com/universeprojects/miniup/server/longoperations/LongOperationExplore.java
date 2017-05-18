@@ -41,8 +41,8 @@ public class LongOperationExplore extends LongOperation {
 		CachedEntity location = db.getEntity(locationKey);
 		
 		
-		data.put("ignoreCombatSites", ignoreCombatSites);
-		data.put("locationName", location.getProperty("name"));
+		setDataProperty("ignoreCombatSites", ignoreCombatSites);
+		setDataProperty("locationName", location.getProperty("name"));
 		
 //		if ((db.getCurrentCharacter().getProperty("mode")!=null && db.getCurrentCharacter().getProperty("mode").equals(GameFunctions.CHARACTER_MODE_COMBAT)) || result==PrefixCodes.EXPLORERESULT_MONSTER)
 //			WebUtils.forceRedirectClientTo("combat.jsp?pre="+result, request, response);
@@ -55,7 +55,7 @@ public class LongOperationExplore extends LongOperation {
 	@Override
 	String doComplete() throws UserErrorMessage 
 	{
-		Boolean ignoreCombatSites = (Boolean)data.get("ignoreCombatSites");
+		Boolean ignoreCombatSites = (Boolean)getDataProperty("ignoreCombatSites");
 		if (ignoreCombatSites==null) ignoreCombatSites = false;
 		
 		String result = explore(db, ignoreCombatSites);
@@ -72,7 +72,7 @@ public class LongOperationExplore extends LongOperation {
 	public Map<String, Object> getStateData() {
 		Map<String,Object> result = super.getStateData();
 		
-		result.put("locationName", data.get("locationName"));
+		result.put("locationName", getDataProperty("locationName"));
 		
 		return result;
 	}

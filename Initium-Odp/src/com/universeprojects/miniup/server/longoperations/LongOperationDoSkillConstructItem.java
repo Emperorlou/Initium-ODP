@@ -40,16 +40,17 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		doChecks(character, skill);
 
-		data.put("skillId", skillId);
-		data.put("skillName", skill.getProperty("name"));
+		setDataProperty("skillId", skillId);
+		setDataProperty("skillName", skill.getProperty("name"));
 		
 		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
 
 		Integer maxRepCount = null;
-		if (ideaDef.getProperty("skillMaxRepetitions")!=null)
-			maxRepCount = ((Long)ideaDef.getProperty("skillMaxRepetitions")).intValue();
+		if (ideaDef.getProperty("skillMaxRepeat")!=null)
+			maxRepCount = ((Long)ideaDef.getProperty("skillMaxRepeat")).intValue();
 		
 		GenericEntityRequirementResult itemRequirementSlotsToItems = new ConfirmSkillRequirementsBuilder("1", db, this, ideaDef, skill)
+		.addGenericEntityRequirements("", "skillItemFocus")
 		.addGenericEntityRequirements("Required Materials", "skillMaterialsRequired")
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
 		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
@@ -102,11 +103,11 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		if (itemRequirementSlotsToItems.repetitionCount!=null)
 			seconds*=itemRequirementSlotsToItems.repetitionCount;
 		
-		data.put("selectedItems", itemRequirementsToItems);
-		data.put("repetitionCount", itemRequirementSlotsToItems.repetitionCount);
+		setDataProperty("selectedItems", itemRequirementsToItems);
+		setDataProperty("repetitionCount", itemRequirementSlotsToItems.repetitionCount);
 		
 		
-		data.put("description", "It will take "+seconds+" seconds to finish this construction.");
+		setDataProperty("description", "It will take "+seconds+" seconds to finish this construction.");
 		
 		// Issue the soundeffect for the location if one is necessary..
 		if (ideaDef.getProperty("executionSoundeffect")!=null)
@@ -123,11 +124,11 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 	String doComplete() throws UserErrorMessage, UserRequestIncompleteException
 	{
 		@SuppressWarnings("unchecked")
-		Map<Key, Key> itemRequirementsToItems = (Map<Key, Key>)data.get("selectedItems");
-		Integer repetitionCount = (Integer)data.get("repetitionCount");
+		Map<Key, Key> itemRequirementsToItems = (Map<Key, Key>)getDataProperty("selectedItems");
+		Integer repetitionCount = (Integer)getDataProperty("repetitionCount");
 		
 		CachedEntity character = db.getCurrentCharacter();
-		CachedEntity skill = db.getEntity("ConstructItemSkill", (Long)data.get("skillId"));
+		CachedEntity skill = db.getEntity("ConstructItemSkill", (Long)getDataProperty("skillId"));
 		
 		doChecks(character, skill);
 		
@@ -169,8 +170,8 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 
 	@Override
 	public String getPageRefreshJavascriptCall() {
-		Long skillId = (Long)data.get("skillId");
-		String skillName = ((String)data.get("skillName")).replace("'", "\\'");
+		Long skillId = (Long)getDataProperty("skillId");
+		String skillName = ((String)getDataProperty("skillName")).replace("'", "\\'");
 		return "doConstructItemSkill(null, "+skillId+", '"+skillName+"');"; 
 	}
 

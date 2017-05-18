@@ -25,9 +25,9 @@ public class LongOperationTakePath extends LongOperation {
 
 	@Override
 	public String getPageRefreshJavascriptCall() {
-		Long pathId = (Long)data.get("pathId");
+		Long pathId = (Long)getDataProperty("pathId");
 		boolean attack = false;
-		if (data.get("attack")!=null && "true".equals(data.get("attack").toString()))
+		if (getDataProperty("attack")!=null && "true".equals(getDataProperty("attack").toString()))
 			attack = true;
 		return "doGoto(null, "+pathId+", "+attack+");";
 	}
@@ -40,8 +40,8 @@ public class LongOperationTakePath extends LongOperation {
 		boolean allowAttack = false;
 		if ("true".equals(parameters.get("attack")))
 			allowAttack=true;
-		data.put("attack", allowAttack);
-		data.put("pathId", Long.parseLong(parameters.get("pathId")));
+		setDataProperty("attack", allowAttack);
+		setDataProperty("pathId", Long.parseLong(parameters.get("pathId")));
 		
 		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", Long.parseLong(parameters.get("pathId"))));
 		if (path==null)
@@ -161,12 +161,12 @@ public class LongOperationTakePath extends LongOperation {
 		
 		
 		// Ok, lets begin then...
-		data.put("locationName", destination.getProperty("name"));
+		setDataProperty("locationName", destination.getProperty("name"));
 		
 		Long travelTime = (Long)path.getProperty("travelTime");
 		if (travelTime==null)
 			travelTime = 6L;
-		data.put("secondsToWait", travelTime);
+		setDataProperty("secondsToWait", travelTime);
 		
 		return travelTime.intValue();
 	}
@@ -180,8 +180,8 @@ public class LongOperationTakePath extends LongOperation {
 			throw new GameStateChangeException("While you were on your way, someone found you..");
 		
 		
-		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)data.get("pathId")));
-		Boolean attack = (Boolean)data.get("attack");
+		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
+		Boolean attack = (Boolean)getDataProperty("attack");
 		if (attack==null) attack = false;
 		
 		CachedEntity newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
@@ -206,7 +206,7 @@ public class LongOperationTakePath extends LongOperation {
 	public Map<String, Object> getStateData() {
 		Map<String, Object> result = super.getStateData();
 		
-		result.put("locationName", data.get("locationName"));
+		result.put("locationName", getDataProperty("locationName"));
 		
 		return result;
 	}
@@ -231,7 +231,7 @@ public class LongOperationTakePath extends LongOperation {
 			}
 			catch (WarnPlayerException e)
 			{
-				data.put("attack", true);
+				setDataProperty("attack", true);
 				throw new UserErrorMessage("You are entering a territory that is restricted to you. If you continue, the defenders of this territory will attack you.<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here</a> to continue to advance anyway.");
 			}
 		}
