@@ -1326,6 +1326,18 @@ a.range-increment {
 	color:#BA3E3C;
 }
 
+.gameMessage-time
+{
+	color: inherit;
+    font-size: 14px;
+}
+
+.gameMessage-text
+{
+	color: rgb(191, 170, 110);
+    font-size: 14px;
+}
+
 .fullscreenChat
 {
 	position:fixed !important;

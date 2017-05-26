@@ -873,6 +873,8 @@ public class GameUtils
 	    				diceRoll = diceRoll.substring(2);
 	    			}
 	    			
+	    			if (item.getProperty("weaponDamageCriticalMultiplier") instanceof Long)
+	    				item.setProperty("weaponDamageCriticalMultiplier", ((Long)item.getProperty("weaponDamageCriticalMultiplier")).doubleValue());
 	    			Double critMultiplier = (Double)item.getProperty("weaponDamageCriticalMultiplier");
 	    			if (critMultiplier == null)
 	    				critMultiplier = new Double(1);

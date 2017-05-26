@@ -11,7 +11,6 @@ import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 /** 
  * 
  * Sell an Item!
@@ -42,6 +41,5 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		db.doCharacterTimeRefresh(ds, character);	// This is saving the character, so no need to save after this
 		
 		addCallbackData("html", HtmlComponents.generateToggleStorefront(character));
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);		
 	}
 }

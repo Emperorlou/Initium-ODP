@@ -32,9 +32,9 @@
 <script type="text/javascript" src="/odp/javascript/vertx-eventbus.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=83"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=97"></script>
 
-<script type="text/javascript" src="/odp/javascript/messager.js?v=22"></script>
+<script type="text/javascript" src="/odp/javascript/messager.js?v=23"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
 <script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
@@ -44,7 +44,7 @@
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=65">
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=66">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="javascript/rangeslider/rangeslider.min.js"></script>

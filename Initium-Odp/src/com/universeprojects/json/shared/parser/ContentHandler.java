@@ -1,12 +1,12 @@
-package org.json.simple.parser;
+package com.universeprojects.json.shared.parser;
 
 import java.io.IOException;
 
 /**
- * A simplified and stoppable SAX-like content handler for stream processing of JSON text. 
+ * A simplified and stoppable SAX-like contentcom.universeprojects.json.shared.parserocessing of JSON text. 
  * 
  * @see org.xml.sax.ContentHandler
- * @see org.json.simple.parser.JSONServerParser#parse(java.io.Reader, ContentHandler, boolean)
+ * @see com.universeprojects.json.shared.parser.JSONServerParser#parse(java.io.Reader, ContentHandler, boolean)
  * 
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */

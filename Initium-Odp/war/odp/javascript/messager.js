@@ -117,7 +117,7 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 	    			receivedMessage = true;
 
 	    			this.markers[i] = incomingMarker;
-	    			if (message.code.endsWith("Chat"))
+	    			if (message.code.endsWith("Chat") || message.code === "GameMessages")
 	    			{
 	    				this.onChatMessage(message);
 	    			}
@@ -139,14 +139,14 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 	};
 
 	this.lastGetMessageCall = null;
-	this.getMessages = function()
+	this.getMessages = function(force)
 	{
     	if (this.waitingForSendResponse)
     		return;
 
     	var time = new Date().getTime();
 
-    	if (this.lastGetMessageCall!=null && this.lastGetMessageCall>time-delay)
+    	if (this.lastGetMessageCall!=null && this.lastGetMessageCall>time-delay && force!=true)
     		return;
     	this.lastGetMessageCall = time;
 
@@ -192,6 +192,7 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 
     this.onChatMessage = null;
     this.onNotificationMessage = null;
+    this.onGameMessage = null;
     this.checkClientSideChatCommands = null;
     /**
      * Args: xhr, textStatus, error
@@ -209,7 +210,7 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
     if (this.chatServer==null)
     	this.chatServer = "";
 
-    this.getMessages();
+    this.getMessages(true);
 
 //    setTimeout(function(){
     	that.messageChecker = setInterval(function(){that.getMessages();}, delay);
@@ -294,6 +295,7 @@ function SocketMessager(url, token) {
     }
     this.onChatMessage = null;
     this.onNotificationMessage = null;
+    this.onGameMessage = null;
     this.checkClientSideChatCommands = null;
     /**
      * Args: xhr, textStatus, error

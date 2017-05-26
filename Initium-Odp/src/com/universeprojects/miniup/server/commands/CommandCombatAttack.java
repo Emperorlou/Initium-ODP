@@ -12,11 +12,8 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPAuthenticator;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
-import com.universeprojects.miniup.server.domain.Item.EquipSlot;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
@@ -38,13 +35,16 @@ public class CommandCombatAttack extends Command
 		CachedEntity user = db.getCurrentUser();
 		CachedEntity location = ds.getIfExists((Key)character.getProperty("locationKey"));
 
+		CombatService cs = new CombatService(db);
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+		
 		if (GameUtils.isPlayerIncapacitated(character))
 		{
-			transitionFromCombat("You cannot attack, you're incapacitated.", true);
+			mpus.shortcut_fullPageUpdate(cs);
+			setPopupMessage("You are incapacitated and cannot attack.");
 			return;
 		}
 		
-		CombatService cs = new CombatService(db);
 		if(cs.isInCombat(character) == false)
 			throw new UserErrorMessage("You are not currently in combat and cannot attack!");
 		
@@ -52,7 +52,7 @@ public class CommandCombatAttack extends Command
 		if (targetCharacter==null)
 		{
 			cs.leaveCombat(character, null);
-			transitionFromCombat("You are no longer in combat.", true);
+			mpus.shortcut_fullPageUpdate(cs);
 			return;
 		}
 		
@@ -83,8 +83,8 @@ public class CommandCombatAttack extends Command
 		String counterAttackStatus = db.doMonsterCounterAttack(auth, user, targetCharacter, character);
 		if (((Double)targetCharacter.getProperty("hitpoints"))>0)
 		{
-			status+="<br><br>";
-			status+="<h3>The "+targetCharacter.getProperty("name")+" counter attacks...</h3>";
+			status+="<br>";
+			status+="<strong>The "+targetCharacter.getProperty("name")+" counter attacks...</strong>";
 			
 			if (counterAttackStatus==null)
 			{
@@ -95,26 +95,27 @@ public class CommandCombatAttack extends Command
 				status+=counterAttackStatus;
 			}
 		}
+		if(status != null && status.isEmpty() == false)
+			db.sendGameMessage(db.getDB(), character, status);
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
-		String combatUpdate = mpus.updateCombatView(cs, targetCharacter, status);
-		if(combatUpdate == null || combatUpdate.isEmpty())
+		
+		if (GameUtils.isPlayerIncapacitated(character) || GameUtils.isPlayerIncapacitated(targetCharacter))
 		{
-			transitionFromCombat(status, false);
+			// We're done with combat
+			cs = new CombatService(db);
+			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			mpus.shortcut_fullPageUpdate(cs);
+			return;
 		}
+		else
+		{
+			// We're not done with combat
+			mpus.updateInBannerCharacterWidget();
+			mpus.updateInBannerCombatantWidget(targetCharacter);
+			mpus.updateButtonList(cs);
+		}
+		
+		
 	}
 	
-	private void transitionFromCombat(String updateMessage, boolean isError)
-	{
-		// TODO: Convert to refreshless transition from combat to non-combat
-		if(updateMessage != null && updateMessage.isEmpty() == false)
-		{
-			if(isError)
-				GameUtils.setPopupError(request, updateMessage);
-			else
-				GameUtils.addMessageForClient(request, updateMessage);
-		}
-		// Refresh full page for now.
-		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
-	}
 }

@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.model;
 
-import org.json.simple.JSONObject;
+import com.universeprojects.json.shared.JSONObject;
+
 
 public class GridObject {
 

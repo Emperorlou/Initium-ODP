@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.WebUtils"%>
 <%@page import="com.universeprojects.miniup.server.DDOSProtectionException"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.HashMap"%>
@@ -62,14 +63,9 @@
 	
 %>
 
-		<h4 style='cursor:pointer'onclick='storeRenameNew(event)'>Store name: <%=common.getCharacter().getProperty("storeName")%></h4>
-		<c:if test="${storeOpen==true}">
-			<a onclick='storeDisabledNew(event)'>Click here to shutdown your store</a>
-		</c:if>
-		<c:if test="${storeOpen==false}">
-			<a onclick='storeEnabledNew(event)'>Click here to open your store for business</a>
-		</c:if>
+		<h4 style='cursor:pointer'onclick='storeRenameNew(event, "<%=WebUtils.jsSafe((String)common.getCharacter().getProperty("storeName"))%>")'>Store name: <%=common.getCharacter().getProperty("storeName")%></h4>
 		<br><br>
+		<div>Store-wide price is currently: ${storeSale}%</div>
 		<a onclick='storeSetSaleNew(event)' title='Use this feature to set a store-wide sale on all items (or even a store-wide price hike)'>Click here to change your store sale/adjustment value</a>
 		<div class='main-splitScreen'>
 		<div class='boldbox selection-root'>

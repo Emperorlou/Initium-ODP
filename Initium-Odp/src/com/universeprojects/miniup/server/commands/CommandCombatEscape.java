@@ -13,7 +13,6 @@ import com.universeprojects.miniup.server.ODPAuthenticator;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
@@ -57,8 +56,8 @@ public class CommandCombatEscape extends Command {
 			
 			if (((Double)monster.getProperty("hitpoints"))>0)
             {
-                userMessage+="<br><br>";
-                userMessage+="<h3>The "+monster.getProperty("name")+" attacks you as you're fleeing...</h3>";
+                userMessage+="<br>";
+                userMessage+="<strong>The "+monster.getProperty("name")+" attacks you as you're fleeing...</strong><br>";
 
                 if (counterAttackStatus==null)
                 {
@@ -71,20 +70,26 @@ public class CommandCombatEscape extends Command {
             }
 		}
 		
+		character = ds.refetch(character);
+		location = db.getEntity((Key)character.getProperty("locationKey"));
 		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
-		String combatUpdate = mpus.updateCombatView(cs, monster, userMessage);
-		if(combatUpdate == null || combatUpdate.isEmpty())
+		
+		if(userMessage != null && userMessage.isEmpty() == false)
+			db.sendGameMessage(db.getDB(), character, userMessage);
+		
+		if (cs.isInCombat(character)==false || GameUtils.isPlayerIncapacitated(character))
 		{
-			transitionFromCombat(userMessage);
+			// We're done with combat
+			mpus.shortcut_fullPageUpdate(cs);
+			return;
+		}
+		else
+		{
+			// We're not done with combat
+			mpus.updateInBannerCharacterWidget();
+			mpus.updateInBannerCombatantWidget(monster);
+			mpus.updateButtonList(cs);
 		}
 	}
 
-	private void transitionFromCombat(String updateMessage)
-	{
-		// TODO: Convert to refreshless transition from combat to non-combat.
-		// Refresh full page for now.
-		if(updateMessage != null && updateMessage.isEmpty() == false)
-			GameUtils.addMessageForClient(request, updateMessage);
-		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
-	}
 }

@@ -2,7 +2,7 @@
  * $Id: JSONParser.java,v 1.1 2006/04/15 14:10:48 platform Exp $
  * Created on 2006-4-15
  */
-package org.json.simple.parser;
+package com.universeprojects.json.shared.parser;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -11,10 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import com.google.appengine.labs.repackaged.com.google.common.annotations.GwtIncompatible;
+import com.google.common.annotations.GwtIncompatible;
+import com.universeprojects.json.shared.JSONArray;
+import com.universeprojects.json.shared.JSONObject;
 
 
 /**
@@ -23,7 +22,7 @@ import com.google.appengine.labs.repackaged.com.google.common.annotations.GwtInc
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */
 @SuppressWarnings({"rawtypes","unchecked"})
-@GwtIncompatible
+@GwtIncompatible(value = "")
 public class JSONServerParser implements JSONParser {
 	public static final int S_INIT=0;
 	public static final int S_IN_FINISHED_VALUE=1;//string,number,boolean,null,object,array

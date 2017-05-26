@@ -2,7 +2,7 @@
  * $Id: JSONArray.java,v 1.1 2006/04/15 14:10:48 platform Exp $
  * Created on 2006-4-10
  */
-package org.json.simple;
+package com.universeprojects.json.shared;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -21,10 +21,9 @@ public class JSONArray extends ArrayList<Object> implements List<Object>, JSONAw
 	private static final long serialVersionUID = 3957988303675231981L;
 
 	/**
-	 * Encode a list into JSON text and write it to out.
-	 * If this list is also a JSONStreamAware or a JSONAware, JSONStreamAware and JSONAware specific behaviours will be ignored at this top level.
+	 * Encode a list into JSON text and write it to oucom.universeprojects.json.shared list is also a JSONStreamAware or a JSONAware, JSONStreamAware and JSONAware specific behaviours will be ignored at this top level.
 	 * 
-	 * @see org.json.simple.JSONValue#writeJSONString(Object, Writer)
+	 * @see com.universeprojects.json.shared.JSONValue#writeJSONString(Object, Writer)
 	 * 
 	 * @param list
 	 * @param out
@@ -76,10 +75,10 @@ public class JSONArray extends ArrayList<Object> implements List<Object>, JSONAw
 	}
 
 	/**
-	 * Convert a list to JSON text. The result is a JSON array.
+com.universeprojects.json.sharedist to JSON text. The result is a JSON array.
 	 * If this list is also a JSONAware, JSONAware specific behaviours will be omitted at this top level.
 	 * 
-	 * @see org.json.simple.JSONValue#toJSONString(Object)
+	 * @see com.universeprojects.json.shared.JSONValue#toJSONString(Object)
 	 * 
 	 * @param list
 	 * @return JSON text, or "null" if list is null.

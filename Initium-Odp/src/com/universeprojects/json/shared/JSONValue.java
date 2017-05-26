@@ -2,7 +2,7 @@
  * $Id: JSONValue.java,v 1.1 2006/04/15 14:37:04 platform Exp $
  * Created on 2006-4-15
  */
-package org.json.simple;
+package com.universeprojects.json.shared;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -10,10 +10,8 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
-import org.json.simple.parser.JSONParserFactory;
-import org.json.simple.parser.ParseException;
-
-import com.google.appengine.labs.repackaged.com.google.common.annotations.GwtIncompatible;
+import com.universeprojects.json.shared.parser.JSONParserFactory;
+import com.universeprojects.json.shared.parser.ParseException;
 
 
 /**
@@ -41,7 +39,6 @@ public class JSONValue {
 	 * 	null
 	 * 
 	 */
-	@GwtIncompatible
 	public static Object parse(Reader in){
 		try{
 			return JSONParserFactory.getServerParser().parse(in);
@@ -51,7 +48,6 @@ public class JSONValue {
 		}
 	}
 
-	@GwtIncompatible
 	public static Object parse(String s){
 		try{
 			return JSONParserFactory.getServerParser().parse(s);
@@ -78,7 +74,6 @@ public class JSONValue {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	@GwtIncompatible
 	public static Object parseWithException(Reader in) throws IOException, ParseException{
 		return JSONParserFactory.getServerParser().parse(in);
 	}
@@ -93,15 +88,14 @@ public class JSONValue {
 	 * If this object is a Map or a List, and it's also a JSONStreamAware or a JSONAware, JSONStreamAware or JSONAware will be considered firstly.
 	 * <p>
 	 * DO NOT call this method from writeJSONString(Writer) of a class that implements both JSONStreamAware and (Map or List) with
-	 * "this" as the first parameter, use JSONObject.writeJSONString(Map, Writer) or JSONArray.writeJSONString(List, Writer) instead.
+com.universeprojects.json.sharedhe first parameter, use JSONObject.writeJSONString(com.universeprojects.json.shared JSONArray.writeJSONString(List, Writer) instead.
 	 * 
-	 * @see org.json.simple.JSONObject#writeJSONString(Map, Writer)
-	 * @see org.json.simple.JSONArray#writeJSONString(List, Writer)
+	 * @see com.universeprojects.json.shared.JSONObject#writeJSONString(Map, Writer)
+	 * @see com.universeprojects.json.shared.JSONArray#writeJSONString(List, Writer)
 	 * 
 	 * @param value
 	 * @param writer
 	 */
-	@GwtIncompatible
 	public static void writeJSONString(Object value, Writer out, final String indent) throws IOException {
 		if(value == null){
 			out.write("null");
@@ -164,7 +158,6 @@ public class JSONValue {
 		out.write(value.toString());
 	}
 
-	@GwtIncompatible
 	public static String createIndent(int indent) {
 		if(indent <= 0) return "";
 		StringBuilder sb = new StringBuilder();
@@ -178,11 +171,10 @@ public class JSONValue {
 	 * <p>
 	 * If this object is a Map or a List, and it's also a JSONAware, JSONAware will be considered firstly.
 	 * <p>
-	 * DO NOT call this method from toJSONString() of a class that implements both JSONAware and Map or List with
-	 * "this" as the parameter, use JSONObject.toJSONString(Map) or JSONArray.toJSONString(List) instead.
+	 * DO NOT call this method from toJSONString() ofcom.universeprojects.json.sharedmplements both JSONAware and Map or Listcom.universeprojects.json.shareds" as the parameter, use JSONObject.toJSONString(Map) or JSONArray.toJSONString(List) instead.
 	 * 
-	 * @see org.json.simple.JSONObject#toJSONString(Map)
-	 * @see org.json.simple.JSONArray#toJSONString(List)
+	 * @see com.universeprojects.json.shared.JSONObject#toJSONString(Map)
+	 * @see com.universeprojects.json.shared.JSONArray#toJSONString(List)
 	 * 
 	 * @param value
 	 * @return JSON text, or "null" if value is null or it's an NaN or an INF number.

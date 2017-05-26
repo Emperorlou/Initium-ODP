@@ -1,4 +1,4 @@
-package org.json.simple.parser;
+package com.universeprojects.json.shared.parser;
 
 /**
  * ParseException explains why and where the error occurs in source JSON text.
@@ -48,7 +48,7 @@ public class ParseException extends Exception {
 	}
 
 	/**
-	 * @see org.json.simple.parser.JSONServerParser#getPosition()
+	 * @see com.universeprojects.json.shared.parser.JSONServerParser#getPosition()
 	 * 
 	 * @return The character position (starting with 0) of the input where the error occurs.
 	 */
@@ -61,7 +61,7 @@ public class ParseException extends Exception {
 	}
 
 	/**
-	 * @see org.json.simple.parser.Yytoken
+	 * @see com.universeprojects.json.shared.parser.Yytoken
 	 * 
 	 * @return One of the following base on the value of errorType:
 	 * 		   	ERROR_UNEXPECTED_CHAR		java.lang.Character

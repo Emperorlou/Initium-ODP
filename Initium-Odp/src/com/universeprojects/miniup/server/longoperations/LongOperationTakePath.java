@@ -13,6 +13,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.WarnPlayerException;
 import com.universeprojects.miniup.server.services.CombatService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.TerritoryService;
 
 public class LongOperationTakePath extends LongOperation {
@@ -176,30 +177,35 @@ public class LongOperationTakePath extends LongOperation {
 		Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
 		CachedEntity location = db.getEntity(locationKey);
 		
-		if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, 1, 0.5d))
-			throw new GameStateChangeException("While you were on your way, someone found you..");
+		db.getDB().beginBulkWriteMode();
+		CachedEntity newLocation = null;
+		try
+		{
+			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, 1, 0.5d))
+				throw new GameStateChangeException("While you were on your way, someone found you..");
+			
+			
+			CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
+			Boolean attack = (Boolean)getDataProperty("attack");
+			if (attack==null) attack = false;
 		
-		
-		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
-		Boolean attack = (Boolean)getDataProperty("attack");
-		if (attack==null) attack = false;
-		
-		CachedEntity newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
+			
+			newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
+		}
+		finally
+		{
+			db.getCurrentCharacter().setProperty("longOperation", null);
+			
+			db.getDB().commitBulkWrite();
+		}
 
-//		CombatService cs = new CombatService(db);
-//		MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
-//		update.updateInBannerOverlayLinks();
-//		update.updateLocationDescription();
-//		update.updateLocationDirectScripts();
-//		update.updateLocationJs();
-//		update.updateTerritoryView();
-//		update.updateActivePlayerCount();
-//		update.updateLocationName();
-//		update.updateButtonList(cs);
+		CombatService cs = new CombatService(db);
+		MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
+		update.shortcut_fullPageUpdate(cs);
 
-		setFullRefresh(true);
+//		setFullRefresh(true);
 		
-		return "You have arrived.";
+		return "You have arrived at "+newLocation.getProperty("name")+".";
 	}
 
 	@Override

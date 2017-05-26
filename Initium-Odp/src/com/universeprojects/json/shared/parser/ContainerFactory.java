@@ -1,12 +1,12 @@
-package org.json.simple.parser;
+package com.universeprojects.json.shared.parser;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Container factory for creating containers for JSON object and JSON array.
+ * Container factory focom.universeprojects.json.shared.parserfor JSON object and JSON array.
  * 
- * @see org.json.simple.parser.JSONServerParser#parse(java.io.Reader, ContainerFactory)
+ * @see com.universeprojects.json.shared.parser.JSONServerParser#parse(java.io.Reader, ContainerFactory)
  * 
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */

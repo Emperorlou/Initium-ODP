@@ -1,15 +1,13 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 import com.universeprojects.miniup.server.SeededSimplexNoise;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
 import com.universeprojects.miniup.server.model.GridObject;
-import org.json.simple.JSONArray;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 public class GridMapService {
 	

@@ -8,9 +8,9 @@ import java.util.List;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
-import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
@@ -66,6 +66,24 @@ public class MainPageUpdateService extends Service
 		return js;
 	}
 
+	private CachedEntity combatantCache = null;
+	protected CachedEntity getCombatant()
+	{
+		if (combatantCache==null)
+		{
+			Key combatantKey = (Key)character.getProperty("combatant");
+			combatantCache = db.getEntity(combatantKey);
+			
+			// QUICK FIX for a recurring state issue...
+			if (CommonChecks.checkCharacterIsInCombat(character) && combatantCache==null)
+			{
+				character.setProperty("mode", "NORMAL");
+				character.setProperty("combatant", null);
+				ds.put(character);
+			}
+		}
+		return combatantCache;
+	}
 
 	private boolean isGroupLoaded = false;
 	protected CachedEntity getGroup()
@@ -283,6 +301,27 @@ public class MainPageUpdateService extends Service
 	public String getLocationBanner()
 	{
 		String banner = (String)location.getProperty("banner");
+		
+		if (CommonChecks.checkCharacterIsInCombat(character) && CommonChecks.checkLocationIsCombatSite(location)==false)
+		{
+			CachedEntity combatant = getCombatant();
+			if (combatant!=null && CommonChecks.checkCharacterIsDead(combatant)==false)
+			{
+				banner = (String)combatant.getProperty("bannerUrl");
+				if (banner==null)
+					banner = "images/npc-generic1.jpg";
+			}
+			else
+			{
+				// THIS IS A BAD STATE, we will go ahead and fix it now. The player should not be in combat at this point.
+				db.getCurrentCharacter().setProperty("mode", "NORMAL");
+				db.getCurrentCharacter().setProperty("combatant", null);
+				db.getCurrentCharacter().setProperty("combatType", null);
+				db.getDB().put(db.getCurrentCharacter());
+			}
+		}
+			
+		
 		if (banner!=null && banner.startsWith("http")==false)
 			return "https://initium-resources.appspot.com/"+banner;
 		else
@@ -362,6 +401,26 @@ public class MainPageUpdateService extends Service
 	}
 	
 	
+	public void shortcut_fullPageUpdate(CombatService combatService)
+	{
+		updateInBannerOverlayLinks();
+		updateButtonList(combatService);
+		updateLocationJs();	
+		updateActivePlayerCount();
+		updateButtonBar();
+		updateLocationName();
+		updateLocationDescription();
+		updateTerritoryView();
+		updatePartyView();
+		updateCollectablesView();
+		updateLocationDirectScripts();
+		updateInBannerCharacterWidget();
+		updateInBannerCombatantWidget();
+		updateTestPanel();
+		updateImmovablesPanel(); 
+		updateMidMessagePanel();
+		updateLocationQuicklist();
+	}
 	
 	
 	/**
@@ -398,6 +457,22 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
 	}
 	
+	/**
+	 * This fetches the combatant and updates the html in the combatant widget that is in the top right corner of the banner.
+	 */
+	public String updateInBannerCombatantWidget()
+	{
+		String newHtml = "";
+		
+		if (CommonChecks.checkCharacterIsInCombat(character))
+		{
+			CachedEntity combatant = getCombatant();
+			newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, combatant, null, false);
+		}
+		
+		return updateHtmlContents("#inBannerCombatantWidget", newHtml);
+	}
+
 	/**
 	 * This updates the html in the combatant widget that is in the top right corner of the banner.
 	 */
@@ -497,12 +572,14 @@ public class MainPageUpdateService extends Service
 	}
 
 	public String updateButtonList(CombatService cs, boolean showHidden){
-		loadPathCache(showHidden);
 		
 		if (cs.isInCombat(character))
 			return updateButtonList_CombatMode();
 		else
+		{
+			loadPathCache(showHidden);
 			return updateButtonList_NormalMode();
+		}
 	}
 	
 	public String updateButtonList(CombatService cs)
@@ -514,6 +591,31 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder newHtml = new StringBuilder();
 
+		newHtml.append("<div class='main-splitScreen'>");
+		newHtml.append("<div id='main-merchantlist'>");
+		newHtml.append("<div class='main-button-half' onclick='loadLocationMerchants()' shortcut='83'>");
+		newHtml.append("<span class='shortcut-key'> (S)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby stores");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		newHtml.append("<div></div>");
+		newHtml.append("<div class='main-splitScreen'>");
+		newHtml.append("<div id='main-itemlist'>");
+		newHtml.append("<div class='main-button-half' onclick='loadLocationItems()' shortcut='86'>");
+		newHtml.append("<span class='shortcut-key'> (V)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby items");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		newHtml.append("<div class='main-splitScreen'>");
+		newHtml.append("<div id='main-characterlist'>");
+		newHtml.append("<div class='main-button-half' onclick='loadLocationCharacters()' shortcut='66'>");
+		newHtml.append("<span class='shortcut-key'> (B)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby characters");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		newHtml.append("<div class='main-buttonbox'>");
+		
+		
 		newHtml.append("<a class='main-button-icon' href='#' shortcut='87' onclick='doExplore(true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
 		newHtml.append("<a href='#' class='main-button' shortcut='69' onclick='doExplore(false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
 					
@@ -620,7 +722,7 @@ public class MainPageUpdateService extends Service
 			{
 				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 				newHtml.append("<br>");
-				newHtml.append("<a onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
+				newHtml.append("<a href='#' onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
 				newHtml.append("<br>");
 			}
 			else if ("CombatSite".equals(destLocation.getProperty("type"))) {
@@ -634,12 +736,12 @@ public class MainPageUpdateService extends Service
 			else if ("CollectionSite".equals(location.getProperty("type")))
 			{
 				newHtml.append("<br>");
-				newHtml.append("<a onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
+				newHtml.append("<a href='#' onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
 			}
 			// If we're looking at a player-house path, but we're not actually INSIDE the player house currently
 			else if (GameUtils.equals(location.getProperty("ownerKey"), null) && "PlayerHouse".equals(path.getProperty("type")))
 			{
-				newHtml.append("<a class='main-forgetPath' onclick='deletePlayerHouse(event, "+path.getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<a href='#' class='main-forgetPath' onclick='deletePlayerHouse(event, "+path.getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 			}
 			else
 				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
@@ -674,39 +776,38 @@ public class MainPageUpdateService extends Service
 		newHtml.append(GameUtils.renderWeaponCommand(weapons.get(1), false));
 		newHtml.append("<a onclick='doCombatEscape(event)' class='main-button' shortcut='51'><span class='shortcut-key'>(3)</span>Try to run away</a>");
 		
-		return updateHtmlContents(".main-buttonbox", newHtml.toString());
+		return updateHtmlContents("#main-button-list", newHtml.toString());
 	}
 	
 
-	public String updateCombatView(CombatService cs, CachedEntity combatant, String combatResult)
-	{
-		StringBuilder csb = new StringBuilder();
-		if(cs.isInCombat(character))
-		{
-			// Handle updating all the combat UI: widgets, button lists, and combat results.
-			csb.append(updateInBannerCharacterWidget());
-			csb.append(updateInBannerCombatantWidget(combatant));
-			csb.append(updateButtonList(cs));
-		}
-		
-		if(combatResult != null && combatResult.isEmpty()==false)
-		{
-			db.addGameMessage(db.getDB(), character.getKey(), combatResult);
-			operation.updateHtmlContents("#combatDescriptionText", combatResult);
-		}
-		
-		// Empty string is the non-combat condition, which will be used to update 
-		// game state for first pass, which will be refresh.
-		return csb.toString();
-	}
+//	public String updateCombatView(CombatService cs, CachedEntity combatant, String combatResult)
+//	{
+//		StringBuilder csb = new StringBuilder();
+//		if(cs.isInCombat(character))
+//		{
+//			// Handle updating all the combat UI: widgets, button lists, and combat results.
+//			csb.append(updateInBannerCharacterWidget());
+//			csb.append(updateInBannerCombatantWidget(combatant));
+//			csb.append(updateButtonList(cs));
+//		}
+//		
+//		if(combatResult != null && combatResult.isEmpty()==false)
+//		{
+//			db.addGameMessage(db.getDB(), character.getKey(), combatResult);
+//		}
+//		
+//		// Empty string is the non-combat condition, which will be used to update 
+//		// game state for first pass, which will be refresh.
+//		return csb.toString();
+//	}
 	
 	public String updateLocationJs()
 	{
 		StringBuilder js = new StringBuilder();
 		
 		
-		
-		js.append("var bannerUrl = '"+getLocationBanner()+"';");
+		js.append("window.bannerUrl = '"+getLocationBanner()+"';");
+		js.append("window.previousBannerUrl = null;");
 
 		js.append("if (isAnimatedBannersEnabled()==false && bannerUrl.indexOf('.gif')>0)");
 		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
@@ -738,7 +839,22 @@ public class MainPageUpdateService extends Service
 		// Remove the walking man stuff
 		js.append("$('#banner-base').html('');");
 		
-		js.append("$(document).ready(updateBannerWeatherSystem);");
+		js.append("updateBannerWeatherSystem();");
+		
+		
+		// Now do the audio stuff..		
+		String locationAudioDescriptor = (String)location.getProperty("audioDescriptor");
+		if (locationAudioDescriptor==null) locationAudioDescriptor = "";
+		js.append("locationAudioDescriptor = '"+locationAudioDescriptor+"';");
+
+		
+		
+		String locationAudioDescriptorPreset = (String)location.getProperty("audioDescriptorPreset");
+		if (locationAudioDescriptorPreset==null) locationAudioDescriptorPreset = "";
+		js.append("locationAudioDescriptorPreset = '"+locationAudioDescriptorPreset+"';");
+		
+		js.append("setAudioDescriptor(locationAudioDescriptor, locationAudioDescriptorPreset, isOutside);");
+		
 		
 		return updateJavascript("ajaxJs", js.toString());
 	}
@@ -944,6 +1060,91 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#immovablesPanel", html.toString());
 	}
 
+	public String updateMonsterCountPanel()
+	{
+		StringBuilder html = new StringBuilder();
+
+		Double monsterCount = db.getMonsterCountForLocation(ds, location);
+		Double maxMonsterCount = (Double)location.getProperty("maxMonsterCount");
+		
+		
+		if (monsterCount!=null && maxMonsterCount!=null)
+		{
+			if ("CampSite".equals(location.getProperty("type")))
+			{
+				if (monsterCount<1) monsterCount = 0d;
+				{
+					double monsterPercent = monsterCount/maxMonsterCount;
+					html.append("<p>Camp integrity: <span class='main-item-subnote'>"+GameUtils.formatPercent(1d-monsterPercent)+"</span></p>");
+					
+				}
+				
+			}
+			else
+			{
+				if (maxMonsterCount>10)
+				{
+					if (monsterCount<1) monsterCount = 0d;
+					double monsterPercent = monsterCount/maxMonsterCount;
+					html.append("<div class='main-description'>");
+					html.append("The monster activity in this area seems ");
+					if (monsterPercent>0.75)
+						html.append("high compared to usual.");
+					else if (monsterPercent>0.50)
+						html.append("moderate compared to usual.");
+					else if (monsterPercent>0.25)
+						html.append("low compared to usual.");
+					else if (monsterPercent>0)
+						html.append("very low compared to usual.");
+					else
+						html.append("to be none.");
+					
+					//html.append("Debug: "+monsterCount+"/"+maxMonsterCount);
+					html.append("</div>");
+				}
+			}
+			
+		}
+		return updateHtmlContents("#monsterCountPanel", html.toString());
+	}
+
+	public String updateMidMessagePanel()
+	{
+		StringBuilder html = new StringBuilder();
+
+		
+		String clientDescription = db.getClientDescriptionAndClear(null, db.getCurrentCharacter().getKey());	// This should be near the end of the jsp's java head to reduce the chance of being redirected away from the page before the message gets displayed
+		if (clientDescription==null || "null".equals(clientDescription)) clientDescription = "";
+		if (clientDescription.equals("")==false)
+		{
+			 html.append("<div class='main-dynamic-content-box paragraph'>");			
+			 html.append(clientDescription);
+			 html.append("</div>");
+		}
+		
+		return updateHtmlContents("#midMessagePanel", html.toString());
+	}
 	
-	
+	public String updateLocationQuicklist()
+	{
+		StringBuilder html = new StringBuilder();
+		
+		if (CommonChecks.checkLocationIsCombatSite(location) && CommonChecks.checkCharacterIsInCombat(character)==false)
+		{
+			html.append("<div class='boldbox'>");
+			html.append("	<div id='inline-items' class='main-splitScreen'>");
+			html.append("	</div>");
+			html.append("	<div id='inline-characters' class='main-splitScreen'>");
+			html.append("	</div>");
+			html.append("</div>");
+			html.append("<script type='text/javascript'>");
+			html.append("	loadInlineItemsAndCharacters();");
+			html.append("	loadInlineCollectables();");
+			html.append("</script>");
+		}
+		
+		
+		
+		return updateHtmlContents("#locationQuicklist", html.toString());
+	}
 }

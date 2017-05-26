@@ -289,15 +289,18 @@ function random(start, end)
 function clearPopupPermanentOverlay()
 {
 	$("#banner-base").html("");
-	window.bannerUrl = window.previousBannerUrl;
-	updateDayNightCycle(true);
+	if (window.previousBannerUrl!=null)
+	{
+		window.bannerUrl = window.previousBannerUrl;
+		updateBannerWeatherSystem();
+	}
 }
 
 function popupPermanentOverlay_Experiment(title, text)
 {
 	window.previousBannerUrl = bannerUrl;
 	setBannerImage("http://initium-resources.appspot.com/images/animated/invention1.gif");
-	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
+	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 
 	$("#banner-base").html(content);
 	
@@ -305,11 +308,13 @@ function popupPermanentOverlay_Experiment(title, text)
 
 function popupPermanentOverlay_Searching(locationName)
 {
+	window.previousBannerUrl = bannerUrl;
 	popupPermanentOverlay_WalkingBase("Exploring "+locationName, "You are wandering around, looking for anything of interest...");
 }
 
 function popupPermanentOverlay_Walking(locationName)
 {
+	window.previousBannerUrl = bannerUrl;
 	popupPermanentOverlay_WalkingBase("Walking to "+locationName);
 }
 
@@ -555,7 +560,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		text = "";
 	
 	
-	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
+	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 	content+="</div>";
 
 	$("#banner-base").html(content);
@@ -693,9 +698,9 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 		
 }
 
-function storeRenameNew(eventObject)
+function storeRenameNew(eventObject, oldName)
 {
-	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
+	promptPopup("Rename Storefront", "Provide a new name for your store:", oldName, function(name){
 		if (name!=null && name!="")
 		{
 			doCommand(eventObject,"StoreRename",{"name":name});
@@ -2651,6 +2656,12 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
 
+		if (data.hasNewGameMessages==true)
+		{
+			messager.getMessages(true);
+		}
+
+		
 		// Here we handle the special: UserRequestBuilder page popup mechanism
 		if (data.pagePopupUrl!=null)
 		{
@@ -2809,6 +2820,7 @@ function longOperation_fullPageRefresh(eventObject, operationName, operationDesc
 	
 }
 
+var lastLongOperationTimer = null;
 var lastLongOperationDueTime = null;
 var lastLongOperationEventObject = null;
 /**
@@ -2818,31 +2830,42 @@ var lastLongOperationEventObject = null;
  * @param responseFunction This is the handler that is called when the operation returns. The data that is passed into the handler includes: data.isComplete (boolean), data.error (boolean), data.timeLeft (seconds remaining to wait)
  * @param recallFunction This function should call the original javascript call that includes the call to longOperation. This handler is invoked when the time on the long operation runs out.
  */
-function longOperation(eventObject, actionUrl, responseFunction, recallFunction, userRequestId)
+function longOperation(eventObject, commandName, parameters, responseFunction, recallFunction, userRequestId)
 {
-
-	
-	
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
 
-	if (actionUrl.indexOf("?")>0)
-		actionUrl+="&ajax=true";
+	// Changing to a post now, so no need to generate the URL parameter string anymore.
+	if (parameters==null)
+		parameters = {"v":verifyCode};
 	else
-		actionUrl+="?ajax=true";
-
-	ga('send', 'pageview', actionUrl);	
-
+		parameters.v = verifyCode;
+	
+	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
+	var url = "/longoperation?cmd="+commandName;
+	
+	ga('send', 'pageview', url);	
+	
+	var clickedElement = null;
+	var originalText = null;
+	if (eventObject!=null)
+	{
+		clickedElement = $(eventObject.currentTarget);
+		if(clickedElement.find("img.wait").length == 0) {
+			originalText = clickedElement.html();
+			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
+		}
+	}
 	
 	var selectedItems = null;
-	if (userRequestId!=null && event!=null)
+	if (userRequestId!=null)
 	{
-		selectedItems = confirmRequirements_collectChoices(event);
+		selectedItems = confirmRequirements_collectChoices(eventObject);
 		if (selectedItems==null) selectedItems = {};
-		actionUrl+="&__"+userRequestId+"UserResponse="+encodeURIComponent(JSON.stringify(selectedItems));
+		parameters["__"+userRequestId+"UserResponse"] = JSON.stringify(selectedItems);
 	}
 	
 	
-	$.get(actionUrl)
+	$.post(url, parameters)
 	.done(function(data)
 	{
 		if (data.captcha==true)
@@ -2853,6 +2876,11 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction,
 		
 		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
+	
+		if (data.hasNewGameMessages==true)
+		{
+			messager.getMessages(true);
+		}
 		
 		if (data.error!=undefined)
 		{
@@ -2862,6 +2890,12 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction,
 				fullpageRefresh();
 			return;
 		}
+		if (data.silentError==true)
+		{
+			hideBannerLoadingIcon();
+			return;
+		}
+		
 		if (data.refresh==true)
 		{
 			fullpageRefresh();
@@ -2887,7 +2921,7 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction,
 		{
 			if (data.timeLeft>=0)
 			{
-				setTimeout(recallFunction, (data.timeLeft+1)*1000);
+				lastLongOperationTimer = setTimeout(recallFunction, (data.timeLeft+1)*1000);
 				if (data.timeLeft>=5)
 					popupPremiumReminder();
 			}
@@ -2903,6 +2937,10 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction,
 		{
 			startLongOperationCountdown(data.timeLeft);
 		}
+		
+		if (clickedElement!=null)
+			clickedElement.html(originalText);
+		
 		lastLongOperationEventObject = null;
 	})
 	.fail(function(xhr, textStatus, errorThrown){
@@ -2911,12 +2949,28 @@ function longOperation(eventObject, actionUrl, responseFunction, recallFunction,
 		else
 			popupMessage(errorThrown, "There was an error when trying to perform the action.");
 
+		if (clickedElement!=null)
+			clickedElement.html(originalText);
+		
 		lastLongOperationEventObject = null;
 	});
 	
 	if (eventObject!=null)
 		eventObject.stopPropagation();
 }
+
+function cancelLongOperations(eventObject)
+{
+	longOperation(eventObject, "cancelLongOperations", null, function(){
+		clearPopupPermanentOverlay();
+		if (lastLongOperationTimer!=null)
+		{
+			clearTimeout(lastLongOperationTimer);
+			lastLongOperationTimer = null;
+		}
+	});
+}
+
 
 function showBannerLoadingIcon()
 {
@@ -2933,7 +2987,7 @@ function setBannerOverlayText(title, text)
 {
 	if (text==null)
 		text = "";
-	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a href='/ServletCharacterControl?type=cancelLongOperations&v="+window.verifyCode+"'>Cancel</a></p></div>";
+	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 	
 	$(".travel-scene-text").remove();
 	$("#banner-base").append(contents);
@@ -2949,11 +3003,16 @@ function doGoto(event, pathId, attack)
 	if (attack == null)
 		attack = false;
 	showBannerLoadingIcon();
-	longOperation(event, "/ServletCharacterControl?type=goto_ajax&pathId="+pathId+"&attack="+attack+"&v="+window.verifyCode, 
+	longOperation(event, "TakePath", {pathId:pathId,attack:attack}, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
 				{
+					updateBannerWeatherSystem();
+					setAudioDescriptor(locationAudioDescriptor, locationAudioDescriptorPreset, isOutside);
+					clearLoopedSounds();
+					playLoopedSounds();
+					//clearPopupPermanentOverlay(); 
 					//fullpageRefresh();
 				}
 				else
@@ -2974,7 +3033,7 @@ function doGoto(event, pathId, attack)
 function doExperiment(event)
 {
 	showBannerLoadingIcon();
-	longOperation(event, "/ServletCharacterControl?type=experiment_ajax&v="+window.verifyCode, 
+	longOperation(event, "Experiment", null, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
@@ -3000,7 +3059,7 @@ function doExperiment(event)
 function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 {
 	
-	longOperation(event, "/ServletCharacterControl?type=prototype_ajax&ideaName="+encodeURIComponent(ideaName)+"&ideaId="+ideaId+"&v="+window.verifyCode, 
+	longOperation(event, "BeginPrototype", {ideaName:ideaName,ideaId:ideaId}, 
 			function(action) // responseFunction
 			{
 				showBannerLoadingIcon();
@@ -3027,7 +3086,7 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId)
 {
 	closeAllTooltips();
 	
-	longOperation(event, "/ServletCharacterControl?type=constructItemSkill_ajax&skillName="+encodeURIComponent(skillName)+"&skillId="+skillId+"&v="+window.verifyCode, 
+	longOperation(event, "DoSkillConstructItem", {skillName:skillName, skillId:skillId}, 
 			function(action) // responseFunction
 			{
 				showBannerLoadingIcon();
@@ -3054,12 +3113,13 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId)
 function doCollectCollectable(event, collectableId, userRequestId)
 {
 	showBannerLoadingIcon();
-	longOperation(event, "/ServletCharacterControl?type=collectCollectable_ajax&collectableId="+collectableId+"&v="+window.verifyCode, 
+	longOperation(event, "CollectCollectable", {collectableId:collectableId},  
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
 				{
-					fullpageRefresh();
+					clearPopupPermanentOverlay(); 
+//					fullpageRefresh();
 				}
 				else
 				{
@@ -3083,12 +3143,13 @@ function doExplore(ignoreCombatSites)
 	if (ignoreCombatSites == null)
 		ignoreCombatSites = false;
 	showBannerLoadingIcon();
-	longOperation(null, "/ServletCharacterControl?type=explore_ajax&ignoreCombatSites="+ignoreCombatSites+"&v="+window.verifyCode, 
+	longOperation(null, "Explore", {ignoreCombatSites:ignoreCombatSites}, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)
 				{
-					fullpageRefresh();
+					clearPopupPermanentOverlay();
+					//fullpageRefresh();
 				}
 				else
 				{
@@ -3107,7 +3168,7 @@ function doExplore(ignoreCombatSites)
 function doRest()
 {
 	showBannerLoadingIcon();
-	longOperation(null, "/ServletCharacterControl?type=rest_ajax"+"&v="+window.verifyCode, 
+	longOperation(null, "Rest", null, 
 			function(action) // responseFunction
 			{
 				if (action.isComplete)

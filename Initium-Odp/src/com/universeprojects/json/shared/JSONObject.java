@@ -2,15 +2,13 @@
  * $Id: JSONObject.java,v 1.1 2006/04/15 14:10:48 platform Exp $
  * Created on 2006-4-10
  */
-package org.json.simple;
+package com.universeprojects.json.shared;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.google.appengine.labs.repackaged.com.google.common.annotations.GwtIncompatible;
 
 /**
  * A JSON object. Key value pairs are unordered. JSONObject supports java.util.Map interface.
@@ -25,12 +23,11 @@ public class JSONObject extends LinkedHashMap<Object,Object> implements Map<Obje
 	 * Encode a map into JSON text and write it to out.
 	 * If this map is also a JSONAware or JSONStreamAware, JSONAware or JSONStreamAware specific behaviours will be ignored at this top level.
 	 * 
-	 * @see org.json.simple.JSONValue#writeJSONString(Object, Writer)
+	 * @see com.universeprojects.json.shared.JSONValue#writeJSONString(Object, Writer)
 	 * 
 	 * @param map
 	 * @param out
 	 */
-	@GwtIncompatible
 	public static void writeJSONString(Map map, Writer out, final String indent) throws IOException {
 		if(map == null){
 			out.write("null");
@@ -70,7 +67,6 @@ public class JSONObject extends LinkedHashMap<Object,Object> implements Map<Obje
 		out.write('}');
 	}
 
-	@GwtIncompatible
 	@Override
 	public void writeJSONString(Writer out, String indent) throws IOException{
 		writeJSONString(this, out, indent);
@@ -80,7 +76,7 @@ public class JSONObject extends LinkedHashMap<Object,Object> implements Map<Obje
 	 * Convert a map to JSON text. The result is a JSON object.
 	 * If this map is also a JSONAware, JSONAware specific behaviours will be omitted at this top level.
 	 * 
-	 * @see org.json.simple.JSONValue#toJSONString(Object)
+	 * @see com.universeprojects.json.shared.JSONValue#toJSONString(Object)
 	 * 
 	 * @param map
 	 * @return JSON text, or "null" if map is null.
@@ -159,7 +155,7 @@ public class JSONObject extends LinkedHashMap<Object,Object> implements Map<Obje
 	 * Escape quotes, \, /, \r, \n, \b, \f, \t and other control characters (U+0000 through U+001F).
 	 * It's the same as JSONValue.escape() only for compatibility here.
 	 * 
-	 * @see org.json.simple.JSONValue#escape(String)
+	 * @see com.universeprojects.json.shared.JSONValue#escape(String)
 	 * 
 	 * @param s
 	 * @return

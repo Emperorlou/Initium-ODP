@@ -2,13 +2,11 @@
  * $Id: ItemList.java,v 1.1 2006/04/15 14:10:48 platform Exp $
  * Created on 2006-3-24
  */
-package org.json.simple;
+package com.universeprojects.json.shared;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import com.google.appengine.labs.repackaged.com.google.common.annotations.GwtIncompatible;
 
 /**
  * |a:b:c| => |a|,|b|,|c|
@@ -16,7 +14,6 @@ import com.google.appengine.labs.repackaged.com.google.common.annotations.GwtInc
  * |a:| => |a|,||
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */
-@GwtIncompatible
 @SuppressWarnings({"rawtypes","unchecked"})
 public class ItemList {
 	private String sp=",";

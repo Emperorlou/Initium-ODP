@@ -1,14 +1,14 @@
 package com.universeprojects.miniup.server;
 
-import com.universeprojects.miniup.server.model.GridCell;
-import com.universeprojects.miniup.server.model.GridObject;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.universeprojects.json.shared.JSONArray;
+import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.miniup.server.model.GridCell;
+import com.universeprojects.miniup.server.model.GridObject;
 
 public abstract class OperationBase
 {

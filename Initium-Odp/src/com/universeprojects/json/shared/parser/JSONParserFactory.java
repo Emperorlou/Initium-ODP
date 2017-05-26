@@ -1,4 +1,4 @@
-package org.json.simple.parser;
+package com.universeprojects.json.shared.parser;
 
 import com.google.appengine.labs.repackaged.com.google.common.annotations.GwtIncompatible;
 

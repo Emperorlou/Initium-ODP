@@ -73,7 +73,7 @@ messager.onChatMessage = function(chatMessage)
 	chatMessage.message = decode_utf8(chatMessage.message);
 
 	var html = "<div class='chatMessage-main'>";
-	if (chatMessage.createdDate!=null)
+	if (chatMessage.createdDate!=null && chatMessage.code!="GameMessages")
 	{
 		var date = new Date(chatMessage.createdDate);
 		var shortTime = date.toLocaleTimeString();
@@ -105,6 +105,44 @@ messager.onChatMessage = function(chatMessage)
 				doPopupNotification(null, "New private message", chatMessage.nickname+": "+chatMessage.message, "PrivateMessage", null, function(){
 					setPrivateChatTo(chatMessage.nickname, chatMessage.characterId);
 				});
+
+				// Change the title to include a * but only if the tab doesn't have focus
+				flagUnreadMessages();
+			}
+
+		}
+		catch(e)
+		{
+			// Ignore errors if there are any
+		}
+	}
+	else if (chatMessage.code=="GameMessages")
+	{
+		var date = new Date(chatMessage.createdDate);
+		var shortTime = date.toLocaleTimeString();
+		var cutoff = shortTime.length;
+		if (shortTime.indexOf(":")>0)
+			cutoff = shortTime.lastIndexOf(":");
+		else if (shortTime.indexOf(".")>0)
+			cutoff = shortTime.lastIndexOf(".");
+
+		shortTime = shortTime.substring(0, cutoff);
+		var longDate = date.toLocaleDateString();
+
+		html+="<span class='gameMessage-time' title='"+longDate+"'>";
+		html+="["+shortTime+"] ";
+		html+="</span>";
+		html+="<span class='gameMessage-text'>";
+		html+=chatMessage.message;
+		html+="</div>";
+
+		try
+		{
+			if (characterId != chatMessage.characterId)
+			{
+//				doPopupNotification(null, "New private message", chatMessage.nickname+": "+chatMessage.message, "PrivateMessage", null, function(){
+//					setPrivateChatTo(chatMessage.nickname, chatMessage.characterId);
+//				});
 
 				// Change the title to include a * but only if the tab doesn't have focus
 				flagUnreadMessages();

@@ -1,4 +1,4 @@
-package org.json.simple;
+package com.universeprojects.json.shared;
 
 /**
  * Beans that support customized output of JSON text shall implement this interface.  

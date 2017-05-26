@@ -48,6 +48,11 @@ public abstract class Command extends OperationBase
 		return getDB().getDB();
 	}
 	
+	protected void debugLog(String log)
+	{
+		db.sendGameMessage(db.getDB(), db.getCurrentCharacter(), "[DEBUG] "+log);
+	}
+	
 	/**
 	 * When the command is complete, the given message will appear in a popup on the player's screen.
 	 * 

@@ -14,15 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.JSONParserFactory;
-import org.json.simple.parser.ParseException;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.json.shared.parser.JSONParser;
+import com.universeprojects.json.shared.parser.JSONParserFactory;
+import com.universeprojects.json.shared.parser.ParseException;
 import com.universeprojects.miniup.CommonChecks;
 
 

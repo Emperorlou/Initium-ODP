@@ -4,10 +4,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParserFactory;
-import org.json.simple.parser.ParseException;
-
+import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.json.shared.parser.JSONParserFactory;
+import com.universeprojects.json.shared.parser.ParseException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;

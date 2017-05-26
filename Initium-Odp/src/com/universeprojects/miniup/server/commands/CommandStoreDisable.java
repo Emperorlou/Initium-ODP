@@ -38,6 +38,5 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 			db.doCharacterTimeRefresh(ds, character);
 		}
 		addCallbackData("html", HtmlComponents.generateToggleStorefront(character));
-		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 }

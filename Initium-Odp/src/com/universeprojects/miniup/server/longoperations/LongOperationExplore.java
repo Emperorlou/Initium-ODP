@@ -9,6 +9,8 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.CombatService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 public class LongOperationExplore extends LongOperation {
 
@@ -58,7 +60,28 @@ public class LongOperationExplore extends LongOperation {
 		Boolean ignoreCombatSites = (Boolean)getDataProperty("ignoreCombatSites");
 		if (ignoreCombatSites==null) ignoreCombatSites = false;
 		
+		Object oldLocaiton = db.getCurrentCharacter().getProperty("locationKey");
+		Object oldCombatant = db.getCurrentCharacter().getProperty("combatant");
+		
 		String result = explore(db, ignoreCombatSites);
+		
+		Object newLocation = db.getCurrentCharacter().getProperty("locationKey");
+		Object newCombatant = db.getCurrentCharacter().getProperty("combatant");
+		
+		if (GameUtils.equals(oldLocaiton, newLocation)==false || GameUtils.equals(oldCombatant, newCombatant)==false)
+		{
+			CombatService cs = new CombatService(db);
+			MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getEntity((Key)newLocation), this);
+			update.shortcut_fullPageUpdate(cs);
+			
+		}
+		else
+		{
+			MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), null, this);
+			update.updateActivePlayerCount();
+			update.updateMidMessagePanel();
+		}
+		
 		
 		return result;
 	}

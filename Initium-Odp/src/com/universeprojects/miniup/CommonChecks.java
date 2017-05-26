@@ -224,8 +224,16 @@ public abstract class CommonChecks
 	 */
 	public static boolean checkCharacterIsInCombat(CachedEntity character)
 	{
+		
 		if ("COMBAT".equals(character.getProperty("mode")))
+		{
+			if (character.getProperty("combatant")==null)
+			{
+				character.setProperty("mode", "NORMAL");
+				return false;
+			}
 			return true;
+		}
 		
 		return false;
 	}

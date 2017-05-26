@@ -3217,6 +3217,11 @@ public class ODPDBAccess
 			return null;
 		
 		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
+		
+		// Replace the newly fetched self character with the entity we already have
+		for(int i = 0; i<result.size(); i++)
+			if (GameUtils.equals(selfCharacter.getKey(), result.get(i).getKey()))
+				result.set(i, selfCharacter);
 	
 		if (result.size() == 1)
 		{
@@ -3806,7 +3811,7 @@ public class ODPDBAccess
 	        		
 	        		if (doubleHit)
 	        		{
-	        			status +="<h5>"+sourceCharacter.getProperty("name")+" also attacks with "+otherWeapon.getProperty("name")+"..</h5>";
+	        			status +="<strong>"+sourceCharacter.getProperty("name")+" also attacks with "+otherWeapon.getProperty("name")+"..</strong><br>";
 	        			AttackResult attackResult2 = attackWithWeapon(db, sourceCharacter, otherWeapon, targetCharacter);
 	        			status += attackResult2.status;
 	        			damage += attackResult2.damage;
@@ -3854,8 +3859,7 @@ public class ODPDBAccess
                     status+=" The battle is over, you won!";
                     if (loot!=null)
                     {
-                        status+="<br>";
-                        status+=loot;
+                        status=loot+"<br>"+status;
                     }
                     return status;
                 }
@@ -4020,9 +4024,9 @@ public class ODPDBAccess
 		            if ((Long)blockResult.get("damageReduction")!=null)
 		                damageReduction = (Long)blockResult.get("damageReduction");
 		            if (damageReduction == attackResult.damage)
-		            	attackResult.status += "<br><br>However, this attack was completely blocked due to the "+armorNames+". No "+((String)blockResult.get("damageType")).toLowerCase()+" damage was done.";
+		            	attackResult.status += "<br>However, this attack was completely blocked due to the "+armorNames+". No "+((String)blockResult.get("damageType")).toLowerCase()+" damage was done.";
 		            else
-		            	attackResult.status += "<br><br>However, this attack was <u>partially</u> blocked.<br> "+blockResult.get("damageType")+" damage was reduced by "+blockResult.get("damageReduction")+" due to the "+armorNames+", "+(attackResult.damage-damageReduction)+" total damage was dealt.";
+		            	attackResult.status += "<br>However, this attack was <u>partially</u> blocked.<br> "+blockResult.get("damageType")+" damage was reduced by "+blockResult.get("damageReduction")+" due to the "+armorNames+", "+(attackResult.damage-damageReduction)+" total damage was dealt.";
 		            
 		            if (blockResult.get("status")!=null)
 		            	attackResult.status += "<br>"+(String)blockResult.get("status");
@@ -4453,7 +4457,8 @@ public class ODPDBAccess
 			if (defenceStructure!=null)
 				refreshDefenceStructureLeader(db, defenceStructure, null);
 			// Add the gold collected to the loot message...
-			loot+="<h5>Gold Collected</h5>"+result.get("goldCollected")+"<br>";
+			loot+="<strong>Loot</strong><br>";
+			loot+="<span>Gold Collected: "+result.get("goldCollected")+"</span><br>";
 			
 			// Check if the character is overburdened or not. If so, we cannot give the loot to the attacker
 			double carryingWeight = getCharacterCarryingWeight(attackingCharacter);
@@ -4473,8 +4478,6 @@ public class ODPDBAccess
 		// First, move all items in his inventory to the ground...
 		List<CachedEntity> items = getFilteredList("Item", "containerKey", characterToDie.getKey());
 		
-		if (giveLootToAttacker)
-			loot+="<h5>Items Collected</h5>";
 		for(CachedEntity item:items)
 		{
 			// If the item is a "naturalEquipment", simply delete it instead of moving to the ground
@@ -4506,6 +4509,7 @@ public class ODPDBAccess
 						
 						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
 						{
+							loot+="<div style='display:inline-block; margin-right:3px;'>";
 							loot+=GameUtils.renderItem(item)+"<br>";
 							loot+="<div>";
 							loot+="		<div class='main-item-controls'>";
@@ -4516,6 +4520,7 @@ public class ODPDBAccess
 								loot+="<a onclick='pagePopup(\"ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
 							}
 							loot+="		</div>";
+							loot+="</div>";
 							loot+="</div>";
 						}
 					}
@@ -4857,7 +4862,6 @@ public class ODPDBAccess
 			}
 		}
 		
-		ds.put(character);
 	}
 	
 
@@ -6224,5 +6228,23 @@ public class ODPDBAccess
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Double getMonsterCountForLocation(CachedDatastoreService db, CachedEntity location)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void sendGameMessage(CachedDatastoreService ds, CachedEntity character, String message)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean hasNewGameMessages()
+	{
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

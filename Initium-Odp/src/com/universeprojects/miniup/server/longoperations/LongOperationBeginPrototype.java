@@ -3,15 +3,14 @@ package com.universeprojects.miniup.server.longoperations;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParserFactory;
-import org.json.simple.parser.JSONServerParser;
-import org.json.simple.parser.ParseException;
-
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.json.shared.parser.JSONParserFactory;
+import com.universeprojects.json.shared.parser.JSONServerParser;
+import com.universeprojects.json.shared.parser.ParseException;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -51,8 +50,8 @@ public class LongOperationBeginPrototype extends LongOperation
 
 		CachedEntity character = db.getCurrentCharacter();
 		
-		setDataProperty(character, "ideaId", ideaId);
-		setDataProperty(character, "ideaName", idea.getProperty("name"));
+		setDataProperty("ideaId", ideaId);
+		setDataProperty("ideaName", idea.getProperty("name"));
 		
 		
 		
@@ -95,8 +94,8 @@ public class LongOperationBeginPrototype extends LongOperation
 		// This check will throw a UserErrorMessage if it finds anything off
 		inventionService.checkIdeaWithSelectedItems(pool, ideaDef, itemRequirementsToItems);
 		
-		setDataProperty(character, "selectedItems", itemRequirementsToItems);
-		setDataProperty(character, "repetitionCount", itemRequirementSlotsToItems.repetitionCount);
+		setDataProperty("selectedItems", itemRequirementsToItems);
+		setDataProperty("repetitionCount", itemRequirementSlotsToItems.repetitionCount);
 		
 		int seconds = 5;
 		
@@ -107,7 +106,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		if (itemRequirementSlotsToItems.repetitionCount!=null)
 			seconds*=itemRequirementSlotsToItems.repetitionCount;
 		
-		setDataProperty(character, "description", "It will take "+seconds+" seconds to finish this prototype.");
+		setDataProperty("description", "It will take "+seconds+" seconds to finish this prototype.");
 		
 		// Issue the soundeffect for the location if one is necessary..
 		if (ideaDef.getProperty("executionSoundeffect")!=null)
@@ -125,10 +124,10 @@ public class LongOperationBeginPrototype extends LongOperation
 	{
 		@SuppressWarnings("unchecked")
 		CachedEntity character = db.getCurrentCharacter();
-		Map<Key,Key> itemRequirementsToItems = (Map<Key, Key>)getDataProperty(character, "selectedItems");
-		Integer repetitionCount = (Integer)getDataProperty(character, "repetitionCount");
+		Map<Key,Key> itemRequirementsToItems = (Map<Key, Key>)getDataProperty("selectedItems");
+		Integer repetitionCount = (Integer)getDataProperty("repetitionCount");
 		
-		CachedEntity idea = db.getEntity("ConstructItemIdea", (Long)getDataProperty(character, "ideaId"));
+		CachedEntity idea = db.getEntity("ConstructItemIdea", (Long)getDataProperty("ideaId"));
 		
 		doChecks(character, idea);
 		
