@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -70,7 +72,8 @@ public class CommandScriptLink extends CommandScriptBase {
 	}
 	
 	@Override
-	protected ScriptEvent generateEvent(CachedEntity character, CachedEntity triggerEntity, CachedEntity script) throws UserErrorMessage
+	protected ScriptEvent generateEvent(CachedEntity character, CachedEntity triggerEntity, 
+			CachedEntity script, Map<String, String> parameters) throws UserErrorMessage
 	{
 		return new SimpleEvent(character, getDB());
 	}

@@ -15,10 +15,13 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
+import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -39,7 +42,7 @@ public abstract class CommandScriptBase extends Command {
 	
 	protected abstract void validateScriptState(CachedEntity trigger, CachedEntity script) throws UserErrorMessage;
 	
-	protected abstract ScriptEvent generateEvent(CachedEntity character, CachedEntity trigger, CachedEntity script) throws UserErrorMessage;
+	protected abstract ScriptEvent generateEvent(CachedEntity character, CachedEntity trigger, CachedEntity script, Map<String, String> parameters) throws UserErrorMessage;
 	
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
@@ -57,26 +60,42 @@ public abstract class CommandScriptBase extends Command {
 		CachedEntity entitySource = db.getEntity(entityKey);
 
 		//// SECURITY CHECKS
-		@SuppressWarnings("unchecked")
-		List<Key> sourceScriptKeys = (List<Key>)entitySource.getProperty("scripts");
-		if(sourceScriptKeys == null) sourceScriptKeys = new ArrayList<Key>();
-		for(Key scriptKey:sourceScriptKeys)
+		if("Script".equals(entitySource.getKind()))
 		{
-			if (GameUtils.equals(scriptId, scriptKey.getId()))
-			{
-				scriptSource = db.getEntity(scriptKey);
-				break;
-			}
+			if(GameUtils.enumEquals(scriptSource.getProperty("type"), ScriptType.global)==false)
+				throw new RuntimeException("Specified script is not a global type!");
 		}
-		if(scriptSource == null)
-			throw new UserErrorMessage("The " + (entitySource != null ? entitySource.getKind() : "entity") + " does not have this effect!");
+		else
+		{
+			// If it's not a Script entity, allow it to go through.
+			@SuppressWarnings("unchecked")
+			List<Key> sourceScriptKeys = (List<Key>)entitySource.getProperty("scripts");
+			if(sourceScriptKeys == null) sourceScriptKeys = new ArrayList<Key>();
+			for(Key scriptKey:sourceScriptKeys)
+			{
+				if (GameUtils.equals(scriptId, scriptKey.getId()))
+				{
+					scriptSource = db.getEntity(scriptKey);
+					break;
+				}
+			}
+			if(scriptSource == null)
+				throw new UserErrorMessage("The " + (entitySource != null ? entitySource.getKind() : "entity") + " does not have this effect!");
+		}
 		
 		// Can player trigger this effect...
 		switch(entitySource.getKind())
 		{
-			// ...by being its originator:
+
+			case("Script"):
+			{
+				// ...as a global script. Script is responsible for validating "permission" to execute.
+				if(scriptSource != null)
+					throw new RuntimeException("CommandExecuteScript: Invalid parameters specified!");
+			}
 			case("Character"):
 			{
+				// ...by being its originator:
 				if (GameUtils.equals(entityKey, character.getKey())==false)
 					throw new UserErrorMessage("You are not allowed to trigger others");
 				break;
@@ -106,7 +125,7 @@ public abstract class CommandScriptBase extends Command {
 		validateScriptState(entitySource, scriptSource);
 		
 		// Implementing commands are responsible for their own event objects.
-		ScriptEvent event = generateEvent(character, entitySource, scriptSource);
+		ScriptEvent event = generateEvent(character, entitySource, scriptSource, parameters);
 		try
 		{
 			ScriptService service = ScriptService.getScriptService(db);
@@ -121,10 +140,20 @@ public abstract class CommandScriptBase extends Command {
 					for(CachedEntity delEntity:event.getDeleteEntities())
 						ds.delete(delEntity);
 					
-					if(ds.getBulkPutEntityCount() > 0)
+					ds.commitBulkWrite();
+					
+					this.mergeOperationUpdates(event);
+					
+					if(character != null && event.getJavascriptResponse()==JavascriptResponse.FullPageRefresh)
 					{
-						ds.commitBulkWrite();
+						CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
+						CachedEntity user = db.getCurrentUser();
+						MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
+						CombatService cs = new CombatService(db);
+						mpus.shortcut_fullPageUpdate(cs);
 					}
+					else
+						setJavascriptResponse(event.getJavascriptResponse());
 				}
 				
 				afterExecuteScript(db, event);
@@ -198,11 +227,11 @@ public abstract class CommandScriptBase extends Command {
 	 */
 	protected void afterExecuteScript(ODPDBAccess db, ScriptEvent event) throws UserErrorMessage
 	{
-		if(event.descriptionText != null && event.descriptionText != "")
+		if(event.descriptionText != null && event.descriptionText.isEmpty() == false && db.getCurrentCharacterKey() != null)
 		{
-			insertHtmlBefore(".main-description", "<div class='main-description'>" + event.descriptionText + "</div>");
+			db.addGameMessage(getDS(), db.getCurrentCharacterKey(), event.descriptionText);
 		}
-		if(event.errorText != null)
+		if(event.errorText != null && event.errorText.isEmpty() == false)
 		{
 			throw new UserErrorMessage(event.errorText);
 		}

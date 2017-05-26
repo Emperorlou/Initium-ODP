@@ -1,5 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,7 +56,7 @@ public class CommandScriptCombat extends CommandScriptBase {
 
 	@Override
 	protected ScriptEvent generateEvent(CachedEntity character,
-			CachedEntity trigger, CachedEntity script) throws UserErrorMessage {
+			CachedEntity trigger, CachedEntity script, Map<String, String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 		CachedEntity combatant = db.getCharacterCombatant(character);
 		
