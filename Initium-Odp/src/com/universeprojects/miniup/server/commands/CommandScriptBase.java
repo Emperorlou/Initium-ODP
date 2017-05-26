@@ -155,7 +155,6 @@ public abstract class CommandScriptBase extends Command {
 					else
 						setJavascriptResponse(event.getJavascriptResponse());
 				}
-				
 				afterExecuteScript(db, event);
 			}
 		}
@@ -166,7 +165,7 @@ public abstract class CommandScriptBase extends Command {
 		catch(Exception ex)
 		{
 			// First pass, we want to log the exception but still allow it to continue.
-			ScriptService.log.log(Level.ALL, "Unexpected error in ExecuteScript!", ex);
+			ScriptService.log.log(Level.SEVERE, "Unexpected error in ExecuteScript!", ex);
 		}
 	}
 
@@ -227,9 +226,9 @@ public abstract class CommandScriptBase extends Command {
 	 */
 	protected void afterExecuteScript(ODPDBAccess db, ScriptEvent event) throws UserErrorMessage
 	{
-		if(event.descriptionText != null && event.descriptionText.isEmpty() == false && db.getCurrentCharacterKey() != null)
+		if(event.descriptionText != null && event.descriptionText.isEmpty() == false && db.getCurrentCharacter() != null)
 		{
-			db.addGameMessage(getDS(), db.getCurrentCharacterKey(), event.descriptionText);
+			db.sendGameMessage(getDS(), db.getCurrentCharacter(), event.descriptionText);
 		}
 		if(event.errorText != null && event.errorText.isEmpty() == false)
 		{

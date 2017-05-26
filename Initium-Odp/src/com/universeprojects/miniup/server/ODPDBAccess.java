@@ -3416,13 +3416,6 @@ public class ODPDBAccess
 		
 	}
 
-	/**
-	 * METHOD STUB. Implemented elsewhere. Handles adding text to the (!) chat window.
-	 */
-	public void addGameMessage(CachedDatastoreService ds, Key characterKey, String message)
-	{
-	}
-
 	public void setClientDescription(CachedDatastoreService ds, Key characterKey, String message)
 	{
 		if (ds==null)
