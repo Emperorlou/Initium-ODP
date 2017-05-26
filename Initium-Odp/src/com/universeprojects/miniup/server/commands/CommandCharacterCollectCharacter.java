@@ -31,6 +31,9 @@ public class CommandCharacterCollectCharacter extends Command {
 		CachedEntity pickupChar = null;
 		boolean showPopup = false;
 		
+		if(CommonChecks.checkCharacterIsInCombat(character))
+			throw new UserErrorMessage("You are in combat! Worry about yourself first!");
+		
 		if(parameters.get("characterId") != null && parameters.get("characterId").length() > 0)
 		{
 			try
