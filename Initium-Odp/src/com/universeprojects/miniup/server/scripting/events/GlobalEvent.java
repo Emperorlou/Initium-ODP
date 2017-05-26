@@ -13,19 +13,24 @@ import com.universeprojects.miniup.server.services.ScriptService;
 
 public class GlobalEvent extends ScriptEvent {
 	public List<Object> arguments = new ArrayList<Object>();
-	public GlobalEvent(CachedEntity character, ODPDBAccess db) throws NotSupportedException {
+	public GlobalEvent(CachedEntity character, ODPDBAccess db) {
 		super(character, db);
-		throw new NotSupportedException("Constructor type not supported.");
 	}
 
-	public GlobalEvent(EntityWrapper character) throws NotSupportedException {
+	public GlobalEvent(EntityWrapper character) {
 		super(character);
-		throw new NotSupportedException("Constructor type not supported.");
 	}
 	
 	public GlobalEvent(ODPDBAccess db, Object... objects)
 	{
 		super(null, db);
+		addArguments(db, objects);
+	}
+	
+	public void addArguments(ODPDBAccess db, Object... objects)
+	{
+		if(objects == null || objects.length == 0) return;
+		
 		for(Object obj:objects)
 		{
 			if(obj instanceof CachedEntity)

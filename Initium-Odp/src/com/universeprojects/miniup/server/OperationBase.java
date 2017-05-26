@@ -182,4 +182,18 @@ public abstract class OperationBase
 		finalJson.put("GridObject", gridObjectJson);
 		return finalJson;
 	}
+	
+	/**
+	 * Allows merging updates from one OperationBase to another.
+	 * Primarily used in Scripting, where updates performed in Script
+	 * context don't necessarily get updated on the command level.
+	 * Does a simple merge, not dealing with duplicates.
+	 * @param toMerge OperationBase to merge with current instance. 
+	 */
+	public void mergeOperationUpdates(OperationBase toMerge)
+	{
+		htmlUpdates.addAll(toMerge.htmlUpdates);
+		gridCellUpdates.addAll(toMerge.gridCellUpdates);
+		gridObjectUpdates.addAll(toMerge.gridObjectUpdates);
+	}
 }

@@ -10,6 +10,8 @@ import java.util.logging.Level;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.OperationBase;
+import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.services.ScriptService;
 
@@ -21,7 +23,7 @@ import com.universeprojects.miniup.server.services.ScriptService;
  *   
  * @author spfiredrake
  */
-public abstract class ScriptEvent 
+public abstract class ScriptEvent extends OperationBase
 {
 	public ScriptEvent(CachedEntity character, ODPDBAccess db)
 	{
@@ -110,6 +112,27 @@ public abstract class ScriptEvent
 	{
 		if(attributes.containsKey(key)) return attributes.get(key);
 		return null;
+	}
+	
+	private JavascriptResponse jsResponse = JavascriptResponse.None;
+	public JavascriptResponse getJavascriptResponse()
+	{
+		return jsResponse;
+	}
+	
+	public void setResponseRefresh()
+	{
+		jsResponse = JavascriptResponse.FullPageRefresh;
+	}
+	
+	public void setResponseReloadPopup()
+	{
+		jsResponse = JavascriptResponse.ReloadPagePopup;
+	}
+	
+	public void setResponseClear()
+	{
+		jsResponse = JavascriptResponse.None;
 	}
 	
 	/**
