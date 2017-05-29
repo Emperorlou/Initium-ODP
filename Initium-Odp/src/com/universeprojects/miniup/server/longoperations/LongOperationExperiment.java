@@ -86,7 +86,7 @@ public class LongOperationExperiment extends LongOperation
 		// Gain some experience with one of the items available
 		for(Key itemKey:selectedItems)
 		{
-			if (knowledgeService.increaseKnowledgeFor(pool.get(itemKey), new Random().nextInt(2)+1))
+			if (knowledgeService.increaseKnowledgeFor(pool.get(itemKey), new Random().nextInt(2)+1, 10))
 			{
 				message = "You've gained some experience with the "+pool.get(itemKey).getProperty("name")+".";
 				break;

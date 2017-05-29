@@ -522,53 +522,72 @@ public class MainPageUpdateService extends Service
 	
 	public String updateInBannerOverlayLinks()
 	{
-		loadPathCache();
-		
 		StringBuilder newHtml = new StringBuilder();
-		for(int i = 0; i<paths.size(); i++)
+		if (CommonChecks.checkCharacterIsInCombat(character)==false)
 		{
-			CachedEntity path = paths.get(i);
-			CachedEntity destLocation = destLocations.get(i);
-			Integer pathEnd = pathEnds.get(i);
+			loadPathCache();
+			
+			for(int i = 0; i<paths.size(); i++)
+			{
+				CachedEntity path = paths.get(i);
+				CachedEntity destLocation = destLocations.get(i);
+				Integer pathEnd = pathEnds.get(i);
+					
+				String destLocationName = (String)destLocation.getProperty("name");
+	
+				String overlayCoordinates = (String)path.getProperty("location"+pathEnd+"OverlayCoordinates");
+				if (overlayCoordinates==null || overlayCoordinates.matches("\\d+x\\d+")==false)
+					continue;
+				String top = "";
+				String left = "";
+				String[] split = overlayCoordinates.split("x");
+				left = split[0];
+				top = split[1];
 				
-			String destLocationName = (String)destLocation.getProperty("name");
+				// Convert to percentage coordinates
+				double topDbl = Double.parseDouble(top);
+				double leftDbl = Double.parseDouble(left);
+				int topInt = new Double(topDbl/211d*100).intValue();
+				int leftInt = new Double(leftDbl/728d*100).intValue();
+		
 
-			String overlayCoordinates = (String)path.getProperty("location"+pathEnd+"OverlayCoordinates");
-			if (overlayCoordinates==null || overlayCoordinates.matches("\\d+x\\d+")==false)
-				continue;
-			String top = "";
-			String left = "";
-			String[] split = overlayCoordinates.split("x");
-			left = split[0];
-			top = split[1];
+				String buttonCaption = "Head towards "+destLocationName;
+				String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
+				String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
+				if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
+					buttonCaption = buttonCaptionOverride;
+				if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
+					buttonCaption = overlayCaptionOverride;
+				
+				
+				Long travelTime = (Long)path.getProperty("travelTime");
+				String onclick = "doGoto(event, "+path.getKey().getId()+", true)";				
+				if (travelTime==null || travelTime>0)
+					onclick = "popupPermanentOverlay_Walking(\""+destLocationName+"\")";
+				
+				newHtml.append(getHtmlForInBannerLink(topInt, leftInt, buttonCaption, onclick));
+			}
+		}
+		else
+		{
+			// We're in combat, lets throw up some handy buttons
+			List<CachedEntity> weapons = db.getEntities((Key)character.getProperty("equipmentLeftHand"), (Key)character.getProperty("equipmentRightHand"));
+			String leftIcon = GameUtils.getResourceUrl(weapons.get(0).getProperty(GameUtils.getItemIconToUseFor("equipmentLeftHand", weapons.get(0))));
+			String rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
 			
-			// Conver to percentage coordinates
-			double topInt = Double.parseDouble(top);
-			double leftInt = Double.parseDouble(left);
-			top = new Double(topInt/211d*100).intValue()+"";
-			left = new Double(leftInt/728d*100).intValue()+"";
-			
-			String buttonCaption = "Head towards "+destLocationName;
-			String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
-			String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
-			if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
-				buttonCaption = buttonCaptionOverride;
-			if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
-				buttonCaption = overlayCaptionOverride;
-			
-			
-			Long travelTime = (Long)path.getProperty("travelTime");
-			String onclick = "";
-			if (travelTime==null || travelTime>0)
-				onclick = "onclick='popupPermanentOverlay_Walking(\""+destLocationName+"\")'";
-			
-	
-			newHtml.append("<a onclick='doGoto(event, "+path.getKey().getId()+", true)' class='path-overlay-link' style='top:"+top+"%;left: "+left+"%;' "+onclick+">"+buttonCaption+"</a>");
-	
+			newHtml.append(getHtmlForInBannerLink(50, 40, "<img src='"+leftIcon+"' alt='Left Hand' style='max-width:32px; max-height:32px;padding:5px;'/>", "doCombatAttackLeftHand(event)"));
+			newHtml.append(getHtmlForInBannerLink(50, 60, "<img src='"+rightIcon+"' alt='Right Hand' style='max-width:32px; max-height:32px;padding:5px;'/>", "doCombatAttackRightHand(event)"));
+			newHtml.append(getHtmlForInBannerLink(90, 50, "<span style='padding:5px;'>RUN!</span>", "doCombatEscape(event)"));
 		}
 		
 		
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
+	}
+	
+	private String getHtmlForInBannerLink(double top, double left, String buttonCaption, String onclickJs)
+	{
+		return "<a onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='top:"+top+"%;left: "+left+"%;'>"+buttonCaption+"</a>";
+		
 	}
 
 	public String updateButtonList(CombatService cs, boolean showHidden){

@@ -53,9 +53,15 @@ public class CommandDogeCoinsCollectFromCharacter extends TransactionCommand {
 		if(GameUtils.isPlayerIncapacitated(collectFromCharacter)==false)
 			throw new UserErrorMessage("Cannot collect coins from a living character");
 		
+		if(GameUtils.isPlayerIncapacitated(character))
+			throw new UserErrorMessage("Cannot collect coins when incapacitated.");
+		
 		// If character we collect from has no coins, we don't need to do anything.
 		if(collectFromCharacter.getProperty("dogecoins").equals(0L))
 			return;
+		
+		if (GameUtils.equals(collectFromCharacter.getKey(), character.getKey()))
+			throw new UserErrorMessage("You cannot collect coins from yourself.");
 		
 		ContainerService cs = new ContainerService(db);
 		

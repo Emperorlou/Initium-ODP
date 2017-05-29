@@ -145,8 +145,8 @@ public class LongOperationBeginPrototype extends LongOperation
 		CachedEntity item = inventionService.doCreateConstructItemPrototype(idea, itemRequirementsToItems, pool, repetitionCount);
 
 		// Now add to the knowledge we gain
-		knowledgeService.increaseKnowledgeFor(idea, 2);
-		knowledgeService.increaseKnowledgeFor(item, 1);
+		knowledgeService.increaseKnowledgeFor(idea, 2, 100);
+		knowledgeService.increaseKnowledgeFor(item, 1, 100);
 		
 		
 		// Give the player a message that points to the skill and the new item he made

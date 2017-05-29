@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -68,6 +69,28 @@ public class CombatService extends Service
 			return false;
 	}
 
+	public boolean isInCombatWith(CachedEntity character, CachedEntity opponent, CachedEntity location)
+	{
+		if (CommonChecks.checkCharacterIsInCombat(character)==false) return false;
+		Key characterCombatant = (Key)character.getProperty("combatant");
+		Key opponentCombatant = (Key)opponent.getProperty("combatant");
+		
+		boolean isCombatSite = CommonChecks.checkLocationIsCombatSite(location);
+		
+		if (isCombatSite)
+		{
+			return GameUtils.equals(characterCombatant, opponent.getKey());
+		}
+		else
+		{
+			if (GameUtils.equals(characterCombatant, opponent.getKey()) && GameUtils.equals(opponentCombatant, character.getKey()))
+				return true;
+			else
+				return false;
+		}
+		
+	}
+	
 	public boolean isInDefenseStructure(CachedEntity character, CachedEntity location)
 	{
 		Key defenceStructure = (Key)location.getProperty("defenceStructure");

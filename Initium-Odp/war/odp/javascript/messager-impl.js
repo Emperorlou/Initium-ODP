@@ -66,7 +66,8 @@ messager.onNotificationMessage = function(message)
 
 messager.onChatMessage = function(chatMessage)
 {
-
+	var doNotNotifyNewMessage = false;
+	
 	if (!isCharNotMuted(chatMessage.characterId))
 		return; //We quit the function if message is muted
 
@@ -153,6 +154,13 @@ messager.onChatMessage = function(chatMessage)
 		{
 			// Ignore errors if there are any
 		}
+		
+		// Also add the message to the currently active tab
+		if (messager.firstGet==false && messager.channel!="GameMessages")
+		{
+			$("#chat_messages_"+messager.channel).prepend(html+"</div>");
+			doNotNotifyNewMessage = true;
+		}
 	}
 	else if (chatMessage.mode==null)
 	{
@@ -190,7 +198,8 @@ messager.onChatMessage = function(chatMessage)
 	html+="</div>";
 	$("#chat_messages_"+chatMessage.code).prepend(html);
 
-	notifyNewMessage(chatMessage.code);
+	if (doNotNotifyNewMessage==false)
+		notifyNewMessage(chatMessage.code);
 };
 
 messager.checkClientSideChatCommands = function(chatMessage)
