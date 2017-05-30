@@ -152,8 +152,8 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		CachedEntity item = inventionService.doConstructItemSkill(skill, itemRequirementsToItems, pool, repetitionCount);
 		
 		// Now add to the knowledge we gain
-		knowledgeService.increaseKnowledgeFor(skill, 1);
-		knowledgeService.increaseKnowledgeFor(item, 1);
+		knowledgeService.increaseKnowledgeFor(skill, 1, 100);
+		knowledgeService.increaseKnowledgeFor(item, 1, 100);
 		
 		// Give the player a message that points to the skill and the new item he made
 		setUserMessage("You created an item: "+GameUtils.renderItem(item));

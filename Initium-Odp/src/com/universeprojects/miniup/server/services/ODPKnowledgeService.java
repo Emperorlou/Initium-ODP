@@ -72,7 +72,7 @@ public abstract class ODPKnowledgeService extends Service
 	 * @param amount The number of experience points to add to each knowledge entity found associated with
 	 * @return Returns true if the increase was successful, false if it wasn't. It will only return false if the entity is not properly configured for learning (like if there is no itemClass specified on an Item).
 	 */	
-	public boolean increaseKnowledgeFor(CachedEntity entity, int amount)
+	public boolean increaseKnowledgeFor(CachedEntity entity, int amount, double percentageCap)
 	{
 		return false;
 	}

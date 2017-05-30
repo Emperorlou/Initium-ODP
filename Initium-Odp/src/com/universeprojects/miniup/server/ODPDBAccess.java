@@ -3701,6 +3701,8 @@ public class ODPDBAccess
 	private class AttackResult
 	{
 		public int damage = 0;
+		public boolean hit = false;
+		public int damageBlocked = 0;
 		public String status = "";
 	}
 	public String doCharacterAttemptAttack(ODPAuthenticator auth, CachedEntity user, CachedEntity sourceCharacter, CachedEntity weapon, CachedEntity targetCharacter)
@@ -3763,7 +3765,7 @@ public class ODPDBAccess
         		if ("PC".equals(sourceCharacter.getProperty("type")))
         		{
         			ODPKnowledgeService knowledgeService = getKnowledgeService(sourceCharacter.getKey());
-        			knowledgeService.increaseKnowledgeFor(weapon, 1);
+        			knowledgeService.increaseKnowledgeFor(weapon, 1, 100);
         		}
         		
         		// If the weapon we're attacking with is in the right hand, the "otherWeapon" should be whatever is in the left hand
@@ -3852,7 +3854,7 @@ public class ODPDBAccess
                     status+=" The battle is over, you won!";
                     if (loot!=null)
                     {
-                        status=loot+"<br>"+status;
+                        status=status+"<br><br>"+loot;
                     }
                     return status;
                 }
