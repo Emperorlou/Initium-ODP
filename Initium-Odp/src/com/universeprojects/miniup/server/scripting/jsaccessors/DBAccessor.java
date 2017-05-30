@@ -165,22 +165,19 @@ public class DBAccessor {
 			throw new RuntimeException("Invalid kind specified for CachedEntity!");
 		
 		CachedDatastoreService ds = db.getDB();
-		EntityWrapper wrapped = null;
 		if((uniqueName == null || uniqueName.isEmpty())==false)
 		{
 			List<CachedEntity> entList = db.getFilteredList(kind, "name", uniqueName);
 			if(!entList.isEmpty())
 			{
-				wrapped = ScriptService.wrapEntity(entList.get(0), db);
+				ScriptService.log.log(Level.SEVERE, "Entity " + kind + " with unique name " + uniqueName + " already exists!");
+				throw new RuntimeException("Unable to create new entity!");
 			}
 		}
 		
-		if(wrapped == null)
-		{
-			CachedEntity newEnt = new CachedEntity(kind, ds);
-			wrapped = ScriptService.wrapEntity(newEnt, db);
-			wrapped.isNewEntity = true;
-		}
+		CachedEntity newEnt = new CachedEntity(kind, ds);
+		EntityWrapper wrapped = ScriptService.wrapEntity(newEnt, db);
+		wrapped.isNewEntity = true;
 		return wrapped;
 	}
 	
