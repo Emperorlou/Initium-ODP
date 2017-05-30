@@ -9,11 +9,16 @@ import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.GlobalEvent;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
+import com.universeprojects.miniup.server.scripting.wrappers.BaseWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
@@ -52,7 +57,7 @@ public class DBAccessor {
 			throw new RuntimeException("Duplicate scripts detected: " + scriptName);
 		if(scripts.size() == 0)
 		{
-			ScriptService.log.log(Level.ALL, "Script with internal name " + scriptName + " not found.");
+			ScriptService.log.log(Level.WARNING, "Script with internal name " + scriptName + " not found.");
 			return false;
 		}
 		CachedEntity script = scripts.get(0);
@@ -111,8 +116,8 @@ public class DBAccessor {
 	public boolean transferGold(Long amount, EntityWrapper fromCharacter, EntityWrapper toCharacter)
 	{
 		if(amount == null || amount < 0) return false;
-		CachedEntity fromChar = fromCharacter.wrappedEntity;
-		CachedEntity toChar = toCharacter.wrappedEntity;
+		CachedEntity fromChar = ((BaseWrapper)fromCharacter).getEntity();
+		CachedEntity toChar = ((BaseWrapper)toCharacter).getEntity();
 		
 		Long fromCoins = (Long)fromChar.getProperty("dogecoins");
 		if(fromCoins == null) fromCoins = 0L;
@@ -136,12 +141,48 @@ public class DBAccessor {
 	
 	public void moveItem(EntityWrapper currentCharacter, EntityWrapper item, EntityWrapper newContainer) throws UserErrorMessage 
 	{
-		db.doMoveItem(null, currentCharacter.wrappedEntity, item.wrappedEntity, newContainer.wrappedEntity);
+		db.doMoveItem(null, ((BaseWrapper)currentCharacter).getEntity(), ((BaseWrapper)item).getEntity(), ((BaseWrapper)newContainer).getEntity());
 	}
 	
 	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)
 	{
-		db.doDestroyEquipment(null, currentCharacter.wrappedEntity, item.wrappedEntity);
+		db.doDestroyEquipment(null, ((BaseWrapper)currentCharacter).getEntity(), ((BaseWrapper)item).getEntity());
 		return true;
+	}
+	
+	/**
+	 * Creates a blank entity to work with in script context. This is to be used with
+	 * caution, and should ONLY be used when creating an item (not modifying existing
+	 * items). If uniqueName is omitted, will allow duplicates to be created.
+	 * @param kind Only "Item" and "Location" are currently allowed.
+	 * @param uniqueName Distinct name, to ensure only 1 of this item EVER gets created.
+	 * @return The EntityWrapper item we want to create. Keep in mind that the only way
+	 * to get the raw entity in script context is if it's a new entity.
+	 */
+	public EntityWrapper createEntity(String kind, String uniqueName)
+	{
+		if(!Arrays.asList("Item","Location").contains(kind))
+			throw new RuntimeException("Invalid kind specified for CachedEntity!");
+		
+		CachedDatastoreService ds = db.getDB();
+		if((uniqueName == null || uniqueName.isEmpty())==false)
+		{
+			List<CachedEntity> entList = db.getFilteredList(kind, "name", uniqueName);
+			if(!entList.isEmpty())
+			{
+				ScriptService.log.log(Level.SEVERE, "Entity " + kind + " with unique name " + uniqueName + " already exists!");
+				throw new RuntimeException("Unable to create new entity!");
+			}
+		}
+		
+		CachedEntity newEnt = new CachedEntity(kind, ds);
+		EntityWrapper wrapped = ScriptService.wrapEntity(newEnt, db);
+		wrapped.isNewEntity = true;
+		return wrapped;
+	}
+	
+	public double getServerDayNight()
+	{
+		return GameUtils.getDayNight();
 	}
 }

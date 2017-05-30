@@ -12,6 +12,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
+import com.universeprojects.miniup.server.scripting.wrappers.BaseWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.services.ScriptService;
 
@@ -48,9 +49,15 @@ public abstract class ScriptEvent extends OperationBase
 	public String descriptionText;
 	/**
 	 * Indicates that an error was encountered within the script, and should display
-	 * the error text to the user with a UserErrorMessage.
+	 * the error text to the user with a UserErrorMessage. Will prevent certain actions
+	 * from completing, as will cause the Command to return in an error state.
 	 */
 	public String errorText;
+	/**
+	 * Shows a pop up message on the front end. Uses UserErrorMessage with the isError
+	 * parameter set to false, indicating it's just an informational pop up.
+	 */
+	public String popupMessage;
 	/**
 	 * Setting this to true will immediately halt execution of the command. Keep in mind
 	 * that certain commands cannot be halted immediately.
@@ -144,10 +151,11 @@ public abstract class ScriptEvent extends OperationBase
 		ScriptService.log.log(Level.ALL, "SaveEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
-			if(!saveEntities.containsKey(entity.wrappedEntity.getKey())) 
+			BaseWrapper ent = (BaseWrapper)entity;
+			if(!saveEntities.containsKey(ent.getEntity().getKey()))
 			{
-				ScriptService.log.log(Level.ALL, "Saving " + entity.getKind() + ":"+ entity.wrappedEntity.getId() + " entity.");
-				saveEntities.put(entity.wrappedEntity.getKey(), entity);
+				ScriptService.log.log(Level.ALL, "Saving " + entity.getKind() + ":" + entity.getId() + " entity.");
+				saveEntities.put(ent.getEntity().getKey(), entity);
 			}
 		}
 	}
@@ -171,7 +179,7 @@ public abstract class ScriptEvent extends OperationBase
 							}
 
 							public CachedEntity next() {
-								return wrappers.next().wrappedEntity;
+								return ((BaseWrapper)wrappers.next()).getEntity();
 							}
 
 							public void remove() {
@@ -196,10 +204,11 @@ public abstract class ScriptEvent extends OperationBase
 		ScriptService.log.log(Level.ALL, "DeleteEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
-			if(!deleteEntities.containsKey(entity.wrappedEntity.getKey())) 
+			BaseWrapper ent = (BaseWrapper)entity;
+			if(!deleteEntities.containsKey(ent.getEntity().getKey())) 
 			{
-				ScriptService.log.log(Level.ALL, "Deleting " + entity.getKind() + ":"+ entity.wrappedEntity.getId() + " entity.");
-				deleteEntities.put(entity.wrappedEntity.getKey(), entity);
+				ScriptService.log.log(Level.ALL, "Deleting " + entity.getKind() + ":"+ entity.getId() + " entity.");
+				deleteEntities.put(ent.getEntity().getKey(), entity);
 			}
 		}
 	}
@@ -223,7 +232,7 @@ public abstract class ScriptEvent extends OperationBase
 					}
 
 					public CachedEntity next() {
-						return wrappers.next().wrappedEntity;
+						return ((BaseWrapper)wrappers.next()).getEntity();
 					}
 
 					public void remove() {

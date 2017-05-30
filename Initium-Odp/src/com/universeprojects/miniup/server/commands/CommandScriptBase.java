@@ -234,5 +234,9 @@ public abstract class CommandScriptBase extends Command {
 		{
 			throw new UserErrorMessage(event.errorText);
 		}
+		if(event.popupMessage != null && event.popupMessage.isEmpty() == false)
+		{
+			throw new UserErrorMessage(event.popupMessage, false);
+		}
 	}
 }
