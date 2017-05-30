@@ -9,8 +9,11 @@ import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.GlobalEvent;
@@ -162,9 +165,27 @@ public class DBAccessor {
 			throw new RuntimeException("Invalid kind specified for CachedEntity!");
 		
 		CachedDatastoreService ds = db.getDB();
-		CachedEntity newEnt = new CachedEntity(kind, ds);
-		EntityWrapper ent = ScriptService.wrapEntity(newEnt, db);
-		ent.isNewEntity = true;
-		return ent;
+		EntityWrapper wrapped = null;
+		if((uniqueName == null || uniqueName.isEmpty())==false)
+		{
+			List<CachedEntity> entList = db.getFilteredList(kind, "name", uniqueName);
+			if(!entList.isEmpty())
+			{
+				wrapped = ScriptService.wrapEntity(entList.get(0), db);
+			}
+		}
+		
+		if(wrapped == null)
+		{
+			CachedEntity newEnt = new CachedEntity(kind, ds);
+			wrapped = ScriptService.wrapEntity(newEnt, db);
+			wrapped.isNewEntity = true;
+		}
+		return wrapped;
+	}
+	
+	public double getServerDayNight()
+	{
+		return GameUtils.getDayNight();
 	}
 }
