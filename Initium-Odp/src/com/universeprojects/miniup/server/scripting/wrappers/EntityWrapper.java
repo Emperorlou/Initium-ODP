@@ -17,25 +17,16 @@ import com.universeprojects.miniup.server.ODPDBAccess;
  * 
  * @author spfiredrake
  */
-public abstract class EntityWrapper 
+public abstract class EntityWrapper extends BaseWrapper
 {
-	public CachedEntity wrappedEntity;
 	protected ODPDBAccess db;
+	public boolean isNewEntity = false;
 	
 	public EntityWrapper(CachedEntity entity, ODPDBAccess db)
 	{
 		this.db = db;
 		this.wrappedEntity = entity;
-	}
-
-	protected Object getProperty(String propertyName)
-	{
-		return wrappedEntity.hasProperty(propertyName) ? wrappedEntity.getProperty(propertyName) : null;
-	}
-	
-	protected void setProperty(String propertyName, Object propValue)
-	{
-		wrappedEntity.setProperty(propertyName, propValue);
+		this.isNewEntity = !entity.getKey().isComplete();
 	}
 	
 	public boolean hasCharges()
@@ -72,6 +63,11 @@ public abstract class EntityWrapper
 		return wrappedEntity.getKey();
 	}
 	
+	public Long getId()
+	{
+		return wrappedEntity.getId();
+	}
+	
 	public String getKind()
 	{
 		return wrappedEntity.getKind();
@@ -79,6 +75,17 @@ public abstract class EntityWrapper
 
 	public String getName() {
 		return (String) wrappedEntity.getProperty("name");
+	}
+	
+	@Override
+	public CachedEntity getEntity()
+	{
+		// Script context will only allow it if the entity is newly
+		// created and hasn't been saved to DB yet.
+		if(!isNewEntity)	
+			throw new RuntimeException("Security fault: Cannot access already saved raw entity!");
+		
+		return wrappedEntity;
 	}
 	
 	@SuppressWarnings("unchecked")
