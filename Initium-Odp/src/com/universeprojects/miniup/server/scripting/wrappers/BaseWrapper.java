@@ -16,16 +16,4 @@ public abstract class BaseWrapper {
 	{
 		wrappedEntity.setProperty(propertyName, propValue);
 	}
-
-	/**
-	 * Allows us to get the raw entity. Casting is only possible in Java context,
-	 * and the override on EntityWrapper only allows it in specific instances. This
-	 * lets us handle the raw entity in Java world, without giving access in Script
-	 * world.
-	 * @return
-	 */
-	public CachedEntity getEntity()
-	{
-		return wrappedEntity;
-	}
 }
