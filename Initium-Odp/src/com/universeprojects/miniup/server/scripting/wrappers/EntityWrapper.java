@@ -77,12 +77,11 @@ public abstract class EntityWrapper extends BaseWrapper
 		return (String) wrappedEntity.getProperty("name");
 	}
 	
-	@Override
 	public CachedEntity getEntity()
 	{
 		// Script context will only allow it if the entity is newly
 		// created and hasn't been saved to DB yet.
-		if(!isNewEntity)	
+		if(!isNewEntity)
 			throw new RuntimeException("Security fault: Cannot access already saved raw entity!");
 		
 		return wrappedEntity;
