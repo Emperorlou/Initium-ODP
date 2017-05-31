@@ -57,8 +57,8 @@ public abstract class EntityWrapper extends BaseWrapper
 		}
 		return false;
 	}
-	
-	protected Key getKey()
+
+	public Key getKey()
 	{
 		return wrappedEntity.getKey();
 	}

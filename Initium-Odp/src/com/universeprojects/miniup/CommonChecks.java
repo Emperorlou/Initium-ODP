@@ -246,7 +246,7 @@ public abstract class CommonChecks
 	 */
 	public static boolean checkLocationIsCombatSite(CachedEntity location)
 	{
-		if ("CombatSite".equals(location.getProperty("type")))
+		if (location != null && "CombatSite".equals(location.getProperty("type")))
 			return true;
 		
 		return false;

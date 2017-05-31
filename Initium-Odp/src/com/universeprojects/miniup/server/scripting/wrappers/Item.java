@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ScriptService;
@@ -42,6 +43,14 @@ public class Item extends EntityWrapper
 
 	public Key getContainerKey() {
 		return (Key) this.getProperty("containerKey");
+	}
+	
+	public boolean setContainer(EntityWrapper ent)
+	{
+		if(GameUtils.equals(getContainerKey(), ent.getKey()))
+			return false;
+		setProperty("containerKey", ent.getKey());
+		return true;
 	}
 	
 	public Long getDurability()

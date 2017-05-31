@@ -186,7 +186,7 @@ public class Character extends EntityWrapper
 	
 	public Buff addBuff(String buffDefName)
 	{
-		ScriptService.log.log(Level.FINE, "Adding BuffDef by name: " + buffDefName);
+		ScriptService.log.log(Level.INFO, "Adding BuffDef by name: " + buffDefName);
 		CachedEntity newBuff = db.awardBuffByDef(buffDefName, this.getKey());
 		if(newBuff != null)
 			return new Buff(newBuff, db, this);
@@ -284,4 +284,8 @@ public class Character extends EntityWrapper
 		return false;
 	}
 	
+	public boolean isInCombat()
+	{
+		return "COMBAT".equals(this.getProperty("mode"));
+	}
 }
