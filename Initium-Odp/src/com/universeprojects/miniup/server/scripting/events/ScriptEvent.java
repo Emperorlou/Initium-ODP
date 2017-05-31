@@ -148,13 +148,13 @@ public abstract class ScriptEvent extends OperationBase
 	 */
 	public void saveEntity(EntityWrapper... entities)
 	{
-		ScriptService.log.log(Level.ALL, "SaveEntity called with " + entities.length + " entities.");
+		ScriptService.log.log(Level.INFO, "SaveEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
 			BaseWrapper ent = (BaseWrapper)entity;
 			if(!saveEntities.containsKey(ent.getEntity().getKey()))
 			{
-				ScriptService.log.log(Level.ALL, "Saving " + entity.getKind() + ":" + entity.getId() + " entity.");
+				ScriptService.log.log(Level.INFO, "Saving " + entity.getKind() + ":" + entity.getId() + " entity.");
 				saveEntities.put(ent.getEntity().getKey(), entity);
 			}
 		}
@@ -201,13 +201,13 @@ public abstract class ScriptEvent extends OperationBase
 	 */
 	public void deleteEntity(EntityWrapper... entities)
 	{
-		ScriptService.log.log(Level.ALL, "DeleteEntity called with " + entities.length + " entities.");
+		ScriptService.log.log(Level.INFO, "DeleteEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
 			BaseWrapper ent = (BaseWrapper)entity;
 			if(!deleteEntities.containsKey(ent.getEntity().getKey())) 
 			{
-				ScriptService.log.log(Level.ALL, "Deleting " + entity.getKind() + ":"+ entity.getId() + " entity.");
+				ScriptService.log.log(Level.INFO, "Deleting " + entity.getKind() + ":"+ entity.getId() + " entity.");
 				deleteEntities.put(ent.getEntity().getKey(), entity);
 			}
 		}

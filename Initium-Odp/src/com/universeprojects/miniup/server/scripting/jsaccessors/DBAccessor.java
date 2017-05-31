@@ -14,6 +14,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.GlobalEvent;
@@ -23,6 +24,7 @@ import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
+import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -38,11 +40,13 @@ import com.universeprojects.miniup.server.services.ScriptService;
 public class DBAccessor {
 	private final ODPDBAccess db;
 	private final HttpServletRequest request;
+	private final CombatService cs;
 	
 	public DBAccessor(ODPDBAccess db, HttpServletRequest request)
 	{
 		this.db = db;
 		this.request = request;
+		this.cs = new CombatService(db);
 	}
 	
 	public EntityWrapper getCurrentCharacter()
@@ -181,8 +185,85 @@ public class DBAccessor {
 		return wrapped;
 	}
 	
+	public EntityWrapper createEntityFromDef(String defKind, String defName)
+	{
+		List<CachedEntity> defList = db.getFilteredList(defKind, "name", defName);
+		if(defList.size() != 1)
+		{
+			// <defKind>.name must be unique
+			return null; 
+		}
+		
+		return createEntityInternal(defList.get(0));
+	}
+	
+	public EntityWrapper createEntityFromID(String defKind, long defID)
+	{
+		CachedEntity defEntity = db.getEntity(defKind, defID);
+		return createEntityInternal(defEntity);
+	}
+	
+	private EntityWrapper createEntityInternal(CachedEntity def)
+	{
+		// Only Item or NPC are allowed (for now).
+		if(def == null || Arrays.asList("ItemDef","NPCDef").contains(def.getKind())==false) return null;
+		String entityKind = def.getKind().replace("Def", "").replace("NPC","Character");
+		CachedEntity newObj = db.generateNewObject(def, entityKind);
+		EntityWrapper ent = ScriptService.wrapEntity(newObj, db);
+		ent.isNewEntity = true;
+		return ent;
+	}
+	
 	public double getServerDayNight()
 	{
 		return GameUtils.getDayNight();
+	}
+	
+	public boolean setHometownKey(EntityWrapper character, Long locationId)
+	{
+		if(character == null || "Character".equals(character.getKind()) == false) return false;
+		
+		CachedEntity location = db.getEntity("Location", locationId);
+		if(location == null) return false;
+		((BaseWrapper)character).getEntity().setProperty("homeTownKey", location.getKey());
+		return true;
+	}
+	
+	/*################# COMBAT ###################*/
+	/**
+	 * Leaves combat, assuming the attacker and defender are in combat with
+	 * each other. True return indicates that a db save occurred.
+	 * @param attacker Attacking entity, typically the player
+	 * @param defender Defending entity, typically an NPC, though possibly another player in PCA
+	 * @return True if entities were in combat together and are no longer in combat. False otherwise.
+	 */
+	public boolean leaveCombat(Character attacker, Character defender)
+	{
+		CachedEntity attack = attacker.wrappedEntity;
+		CachedEntity defend = defender.wrappedEntity;
+		if(cs.isInCombatWith(attack, defend, null))
+		{
+			cs.leaveCombat(attack, defend);
+			return !cs.isInCombat(attack);
+		}
+		return false;
+	}
+	
+	/**
+	 * Puts character entities into combat with each other. True return
+	 * indicates a db save occurred. 
+	 * @param attacker Attacking entity, typically the player
+	 * @param defender Defending entity, typically an NPC, though possibly another player in PCA	 
+	 * @return True if entities enter combat with each other. False otherwise.
+	 */
+	public boolean enterCombat(Character attacker, Character defender)
+	{
+		CachedEntity attack = attacker.wrappedEntity;
+		CachedEntity defend = defender.wrappedEntity;
+		
+		if(cs.isInCombat(attack)) return false;
+		cs.enterCombat(attack, defend, false);
+		
+		return cs.isInCombatWith(attack, defend, null);
 	}
 }
