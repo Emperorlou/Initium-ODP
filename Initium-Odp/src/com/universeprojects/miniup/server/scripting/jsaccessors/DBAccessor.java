@@ -120,15 +120,13 @@ public class DBAccessor {
 	public boolean transferGold(Long amount, EntityWrapper fromCharacter, EntityWrapper toCharacter)
 	{
 		if(amount == null || amount < 0) return false;
-		CachedEntity fromChar = ((BaseWrapper)fromCharacter).getEntity();
-		CachedEntity toChar = ((BaseWrapper)toCharacter).getEntity();
 		
-		Long fromCoins = (Long)fromChar.getProperty("dogecoins");
+		Long fromCoins = (Long)fromCharacter.wrappedEntity.getProperty("dogecoins");
 		if(fromCoins == null) fromCoins = 0L;
 		
 		if(fromCoins > 0)
 		{
-			Long toCoins = (Long)toChar.getProperty("dogecoins");
+			Long toCoins = (Long)toCharacter.wrappedEntity.getProperty("dogecoins");
 			if(toCoins == null) toCoins = 0L;
 			
 			Long transferAmount = amount;
@@ -136,8 +134,8 @@ public class DBAccessor {
 			
 			fromCoins -= transferAmount;
 			toCoins += transferAmount;
-			fromChar.setProperty("dogecoins", fromCoins);
-			toChar.setProperty("dogecoins", toCoins);
+			fromCharacter.wrappedEntity.setProperty("dogecoins", fromCoins);
+			toCharacter.wrappedEntity.setProperty("dogecoins", toCoins);
 			return true;
 		}
 		return false;
@@ -145,12 +143,12 @@ public class DBAccessor {
 	
 	public void moveItem(EntityWrapper currentCharacter, EntityWrapper item, EntityWrapper newContainer) throws UserErrorMessage 
 	{
-		db.doMoveItem(null, ((BaseWrapper)currentCharacter).getEntity(), ((BaseWrapper)item).getEntity(), ((BaseWrapper)newContainer).getEntity());
+		db.doMoveItem(null, currentCharacter.wrappedEntity, item.wrappedEntity, newContainer.wrappedEntity);
 	}
 	
 	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)
 	{
-		db.doDestroyEquipment(null, ((BaseWrapper)currentCharacter).getEntity(), ((BaseWrapper)item).getEntity());
+		db.doDestroyEquipment(null, currentCharacter.wrappedEntity, item.wrappedEntity);
 		return true;
 	}
 	
@@ -225,7 +223,7 @@ public class DBAccessor {
 		
 		CachedEntity location = db.getEntity("Location", locationId);
 		if(location == null) return false;
-		((BaseWrapper)character).getEntity().setProperty("homeTownKey", location.getKey());
+		character.wrappedEntity.setProperty("homeTownKey", location.getKey());
 		return true;
 	}
 	

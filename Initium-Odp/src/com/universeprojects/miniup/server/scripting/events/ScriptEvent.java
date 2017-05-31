@@ -151,11 +151,10 @@ public abstract class ScriptEvent extends OperationBase
 		ScriptService.log.log(Level.INFO, "SaveEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
-			BaseWrapper ent = (BaseWrapper)entity;
-			if(!saveEntities.containsKey(ent.getEntity().getKey()))
+			if(!saveEntities.containsKey(entity.getKey()))
 			{
 				ScriptService.log.log(Level.INFO, "Saving " + entity.getKind() + ":" + entity.getId() + " entity.");
-				saveEntities.put(ent.getEntity().getKey(), entity);
+				saveEntities.put(entity.getKey(), entity);
 			}
 		}
 	}
@@ -179,7 +178,7 @@ public abstract class ScriptEvent extends OperationBase
 							}
 
 							public CachedEntity next() {
-								return ((BaseWrapper)wrappers.next()).getEntity();
+								return wrappers.next().wrappedEntity;
 							}
 
 							public void remove() {
@@ -204,11 +203,10 @@ public abstract class ScriptEvent extends OperationBase
 		ScriptService.log.log(Level.INFO, "DeleteEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
-			BaseWrapper ent = (BaseWrapper)entity;
-			if(!deleteEntities.containsKey(ent.getEntity().getKey())) 
+			if(!deleteEntities.containsKey(entity.getKey())) 
 			{
 				ScriptService.log.log(Level.INFO, "Deleting " + entity.getKind() + ":"+ entity.getId() + " entity.");
-				deleteEntities.put(ent.getEntity().getKey(), entity);
+				deleteEntities.put(entity.getKey(), entity);
 			}
 		}
 	}
@@ -232,7 +230,7 @@ public abstract class ScriptEvent extends OperationBase
 					}
 
 					public CachedEntity next() {
-						return ((BaseWrapper)wrappers.next()).getEntity();
+						return wrappers.next().wrappedEntity;
 					}
 
 					public void remove() {
