@@ -1328,7 +1328,12 @@ public class GameUtils
 		
 		
 		if (isSelf)
-			sb.append("<a class='clue' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
+		{
+			String minitip = GameUtils.formatNumber(character.getProperty("strength"), true) + "/" + 
+					GameUtils.formatNumber(character.getProperty("dexterity"), true) + "/" +
+					GameUtils.formatNumber(character.getProperty("intelligence"), true);
+			sb.append("<a class='clue' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"' minitip='" + minitip + "'>");
+		}
 		
 		String sizePrepend = "";
 		if (largeSize)
