@@ -1331,7 +1331,9 @@ public class GameUtils
 		{
 			String minitip = GameUtils.formatNumber(character.getProperty("strength"), true) + "/" + 
 					GameUtils.formatNumber(character.getProperty("dexterity"), true) + "/" +
-					GameUtils.formatNumber(character.getProperty("intelligence"), true);
+					GameUtils.formatNumber(character.getProperty("intelligence"), true) + "<br/>" + 
+					GameUtils.formatNumber(db.getCharacterCarryingWeight(character) / 1000, true) + "/" + 
+					GameUtils.formatNumber(db.getCharacterMaxCarryingWeight(character) / 1000, true) + "kg";
 			sb.append("<a class='clue' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"' minitip='" + minitip + "'>");
 		}
 		
