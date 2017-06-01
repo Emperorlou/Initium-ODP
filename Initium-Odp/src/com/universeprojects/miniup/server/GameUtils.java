@@ -1478,6 +1478,7 @@ public class GameUtils
 
     public static String getItemIconToUseFor(String equipmentSlot, CachedEntity itemInSlot)
     {
+    	if (itemInSlot==null) return null;
     	// If we only have 1 icon specified anyway, we'll just return that
     	if (itemInSlot.getProperty("icon2")==null)
     		return "icon";
