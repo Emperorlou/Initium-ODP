@@ -256,10 +256,9 @@ public class DBAccessor {
 	 */
 	public boolean enterCombat(Character attacker, Character defender)
 	{
+		if(attacker.isInCombat()) return false;
 		CachedEntity attack = attacker.wrappedEntity;
 		CachedEntity defend = defender.wrappedEntity;
-		
-		if(cs.isInCombat(attack)) return false;
 		cs.enterCombat(attack, defend, false);
 		
 		return cs.isInCombatWith(attack, defend, null);

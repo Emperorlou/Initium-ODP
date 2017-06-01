@@ -64,8 +64,12 @@ public abstract class ScriptEvent extends OperationBase
 	 */
 	public boolean haltExecution = false;
 	/**
+	 * This will allow the character widgets to be refreshed, in case of new buffs/HP.
+	 */
+	public boolean reloadWidgets = false;
+	/**
 	 * Allows scripts to save attributes across script calls utilizing the same event (combat,
-	 * movement, etc).
+	 * movement, etc). Also allows passing additional values (non-entities) to global scripts.
 	 */
 	protected Map<String, Object> attributes = new HashMap<String, Object>();
 	/**
@@ -140,6 +144,11 @@ public abstract class ScriptEvent extends OperationBase
 	public void setResponseClear()
 	{
 		jsResponse = JavascriptResponse.None;
+	}
+	
+	public boolean updatesGameState()
+	{
+		return jsResponse == JavascriptResponse.FullPageRefresh || reloadWidgets;
 	}
 	
 	/**

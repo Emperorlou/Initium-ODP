@@ -53,7 +53,7 @@ public class ScriptService extends Service
 			jsContext = Context.enter();
 			// This sandboxes the engine by preventing access to non-standard objects and some reflexion objects
 	    	// This is the simplest way to prevent access to top-level packages
-			jsScope = jsContext.initSafeStandardObjects();
+			jsScope = jsContext.initStandardObjects();
 			DBAccessor coreFunctions = new DBAccessor(db, request);
 			jsScope.put("core", jsScope, coreFunctions);
 			canExecute = true;
