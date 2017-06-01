@@ -2991,12 +2991,40 @@ body
 	max-width:100%;
 }
 
-.banner1 #banner-base
+#banner-base
 {
 	position:absolute;
 	top:0px;
 	width:100%;
 	height:100%;
+}
+
+#banner-fx
+{
+	position:absolute;
+	top:0px;
+	width:100%;
+	height:100%;
+}
+
+.flip-background-x
+{
+    -moz-transform: scaleX(-1);
+   	-o-transform: scaleX(-1);
+   	-webkit-transform: scaleX(-1);
+   	transform: scaleX(-1);
+   	filter: FlipH;
+   	-ms-filter: "FlipH";		
+}
+
+.flip-background-y
+{
+    -moz-transform: scaleY(-1);
+    -o-transform: scaleY(-1);
+    -webkit-transform: scaleY(-1);
+    transform: scaleY(-1);
+    filter: FlipV;
+    -ms-filter: "FlipV";
 }
 
 .banner1 #banner-base .travel-scene-container

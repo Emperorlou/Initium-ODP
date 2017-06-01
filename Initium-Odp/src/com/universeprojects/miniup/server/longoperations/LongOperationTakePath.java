@@ -189,6 +189,8 @@ public class LongOperationTakePath extends LongOperation {
 			Boolean attack = (Boolean)getDataProperty("attack");
 			if (attack==null) attack = false;
 		
+			if (path==null)
+				throw new UserErrorMessage("The path you were attempting to take no longer exists.");
 			
 			newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
 		}

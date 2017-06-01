@@ -156,7 +156,8 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		knowledgeService.increaseKnowledgeFor(item, 1, 100);
 		
 		// Give the player a message that points to the skill and the new item he made
-		setUserMessage("You created an item: "+GameUtils.renderItem(item));
+		String msg = "You created an item: "+GameUtils.renderItem(item);
+		setUserMessage(msg);
 		
 		// Delete all HTML of an item
 		if (inventionService.getDeletedEntities()!=null)
@@ -165,7 +166,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 					deleteHtml(".deletable-Item"+deletedKey.getId());
 		
 		
-		return "Skill complete.";
+		return "Skill complete. "+msg;
 	}
 
 	@Override

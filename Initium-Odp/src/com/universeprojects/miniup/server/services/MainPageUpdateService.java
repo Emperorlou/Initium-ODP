@@ -560,10 +560,7 @@ public class MainPageUpdateService extends Service
 					buttonCaption = overlayCaptionOverride;
 				
 				
-				Long travelTime = (Long)path.getProperty("travelTime");
-				String onclick = "doGoto(event, "+path.getKey().getId()+", true)";				
-				if (travelTime==null || travelTime>0)
-					onclick = "popupPermanentOverlay_Walking(\""+destLocationName+"\")";
+				String onclick = "doGoto(event, "+path.getKey().getId()+", true);";				
 				
 				newHtml.append(getHtmlForInBannerLink(topInt, leftInt, buttonCaption, onclick));
 			}
@@ -572,8 +569,13 @@ public class MainPageUpdateService extends Service
 		{
 			// We're in combat, lets throw up some handy buttons
 			List<CachedEntity> weapons = db.getEntities((Key)character.getProperty("equipmentLeftHand"), (Key)character.getProperty("equipmentRightHand"));
-			String leftIcon = GameUtils.getResourceUrl(weapons.get(0).getProperty(GameUtils.getItemIconToUseFor("equipmentLeftHand", weapons.get(0))));
-			String rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
+			String leftIcon = GameUtils.getResourceUrl("images/small/Pixel_Art-Weapons-Other-Natural-Natural2.png"); 
+			if (weapons.get(0)!=null)
+				leftIcon = GameUtils.getResourceUrl(weapons.get(0).getProperty(GameUtils.getItemIconToUseFor("equipmentLeftHand", weapons.get(0))));
+			
+			String rightIcon = GameUtils.getResourceUrl("images/small/Pixel_Art-Weapons-Other-Natural-Natural2.png");
+			if (weapons.get(1)!=null)
+				rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
 			
 			newHtml.append(getHtmlForInBannerLink(50, 40, "<img src='"+leftIcon+"' alt='Left Hand' style='max-width:32px; max-height:32px;padding:5px;'/>", "doCombatAttackLeftHand(event)"));
 			newHtml.append(getHtmlForInBannerLink(50, 60, "<img src='"+rightIcon+"' alt='Right Hand' style='max-width:32px; max-height:32px;padding:5px;'/>", "doCombatAttackRightHand(event)"));

@@ -2338,12 +2338,22 @@ function doCombatEscape(event)
 
 function doCombatAttackLeftHand(event)
 {
-	doCommand(event, "CombatAttack", {"hand":"LeftHand"});
+	doCommand(event, "CombatAttack", {"hand":"LeftHand"}, function(data, error){
+		if (error!=true)
+		{
+			playBannerFx("https://initium-resources.appspot.com/images/effects/weaponeffects1-b.gif", true);
+		}
+	});
 }
 
 function doCombatAttackRightHand(event)
 {
-	doCommand(event, "CombatAttack", {"hand":"RightHand"});
+	doCommand(event, "CombatAttack", {"hand":"RightHand"}, function(data, error){
+		if (error!=true)
+		{
+			playBannerFx("https://initium-resources.appspot.com/images/effects/weaponeffects1-b.gif");
+		}
+	});
 }
 
 function viewExchange()
@@ -3825,6 +3835,28 @@ function updateEnvironmentSoundEffectsVolume()
 	var vol = getSoundEffectsVolume();
 	vol = parseFloat(vol)/100;
 	createjs.Sound.volume = vol;
+}
+
+function playBannerFx(animationUrl, flipX, flipY)
+{
+	var divParent = $("#banner-fx");
+	var fxDiv = divParent.children();
+	
+	fxDiv.remove();
+
+	divParent.html("<img style='position:absolute; top:0px; width:100%; height:100%;' src='"+animationUrl+"'/>");
+		
+	fxDiv = divParent.children();
+
+ 	fxDiv.show().each(function() {
+            this.offsetHeight;
+        }).prop("src", animationUrl);	
+	
+	
+	if (flipX==true)
+		fxDiv.addClass("flip-background-x");
+	if (flipY==true)
+		fxDiv.addClass("flip-background-y");
 }
 
 ////////////////////////////////////////////////////////
