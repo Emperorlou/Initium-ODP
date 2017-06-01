@@ -144,13 +144,21 @@ public abstract class CommandScriptBase extends Command {
 					
 					this.mergeOperationUpdates(event);
 					
-					if(character != null && event.getJavascriptResponse()==JavascriptResponse.FullPageRefresh)
+					if(character != null && event.updatesGameState())
 					{
 						CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 						CachedEntity user = db.getCurrentUser();
 						MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
 						CombatService cs = new CombatService(db);
-						mpus.shortcut_fullPageUpdate(cs);
+						if(event.getJavascriptResponse()==JavascriptResponse.FullPageRefresh)
+						{
+							mpus.shortcut_fullPageUpdate(cs);
+						}
+						else if(event.reloadWidgets)
+						{
+							mpus.updateInBannerCharacterWidget();
+							mpus.updateInBannerCombatantWidget();
+						}
 					}
 					else
 						setJavascriptResponse(event.getJavascriptResponse());
