@@ -56,56 +56,56 @@ var audioDescriptorPresets =
 "LightForest":"" +
 		"wind1(100,15,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(0.2,5,false,clearday)&&" +
-		"bird3(0.2,5,false,clearday)&&" +
-		"bird4(0.2,5,false,clearday)&&" +
-		"bird9(0.2,5,false,clearday)&&" +
-		"bird10(0.2,5,false,clearday)&&" +
-		"bird11(0.2,5,false,clearday)&&" +
-		"squirrel1(0.1,5,false,clearday)&&" +
-		"squirrel2(0.1,5,false,clearday)&&" +
-		"squirrel3(0.1,5,false,clearday)&&" +
-		"crow1(0.1,5,false,clearday)" +
+		"bird2(0.65,5,false,clearday)&&" +
+		"bird3(0.65,5,false,clearday)&&" +
+		"bird4(0.65,5,false,clearday)&&" +
+		"bird9(0.65,5,false,clearday)&&" +
+		"bird10(0.65,5,false,clearday)&&" +
+		"bird11(0.65,5,false,clearday)&&" +
+		"squirrel1(0.35,5,false,clearday)&&" +
+		"squirrel2(0.35,5,false,clearday)&&" +
+		"squirrel3(0.35,5,false,clearday)&&" +
+		"crow1(0.35,5,false,clearday)" +
 		
 		// Below are the very ambient sounds..
-		"bird2(0.6,1,false,clearday)&&" +
-		"bird3(0.6,1,false,clearday)&&" +
-		"bird4(0.6,1,false,clearday)&&" +
-		"bird9(0.6,1,false,clearday)&&" +
-		"bird10(0.6,1,false,clearday)&&" +
-		"bird11(0.6,1,false,clearday)&&" +
-		"squirrel1(0.3,1,false,clearday)&&" +
-		"squirrel2(0.3,1,false,clearday)&&" +
-		"squirrel3(0.3,1,false,clearday)&&" +
-		"crow1(0.3,1,false,clearday)",
+		"bird2(2.4,1,false,clearday)&&" +
+		"bird3(2.4,1,false,clearday)&&" +
+		"bird4(2.4,1,false,clearday)&&" +
+		"bird9(2.4,1,false,clearday)&&" +
+		"bird10(2.4,1,false,clearday)&&" +
+		"bird11(2.4,1,false,clearday)&&" +
+		"squirrel1(1.2,1,false,clearday)&&" +
+		"squirrel2(1.2,1,false,clearday)&&" +
+		"squirrel3(1.2,1,false,clearday)&&" +
+		"crow1(1.2,1,false,clearday)",
 "DenseForest":"" +
 		"wind1(100,10,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(0.3,5,false,clearday)&&" +
-		"bird3(0.3,5,false,clearday)&&" +
-		"bird4(0.3,5,false,clearday)&&" +
-		"bird5(0.3,5,false,clearday)&&" +
-		"bird6(0.3,5,false,clearday)&&" +
-		"bird7(0.3,5,false,clearday)&&" +
-		"bird8(0.3,5,false,clearday)&&" +
-		"bird9(0.3,5,false,clearday)&&" +
-		"bird10(0.3,5,false,clearday)&&" +
-		"bird11(0.3,5,false,clearday)&&" +
-		"bird12(0.3,5,false,clearday)&&" +
-		"squirrel1(0.1,5,false,clearday)&&" +
-		"squirrel2(0.1,5,false,clearday)&&" +
-		"squirrel3(0.1,5,false,clearday)&&" +
-		"crow1(0.1,7,false,clearday)",
+		"bird2(1.2,5,false,clearday)&&" +
+		"bird3(1.2,5,false,clearday)&&" +
+		"bird4(1.2,5,false,clearday)&&" +
+		"bird5(1.2,5,false,clearday)&&" +
+		"bird6(1.2,5,false,clearday)&&" +
+		"bird7(1.2,5,false,clearday)&&" +
+		"bird8(1.2,5,false,clearday)&&" +
+		"bird9(1.2,5,false,clearday)&&" +
+		"bird10(1.2,5,false,clearday)&&" +
+		"bird11(1.2,5,false,clearday)&&" +
+		"bird12(1.2,5,false,clearday)&&" +
+		"squirrel1(0.35,5,false,clearday)&&" +
+		"squirrel2(0.35,5,false,clearday)&&" +
+		"squirrel3(0.35,5,false,clearday)&&" +
+		"crow1(0.35,7,false,clearday)",
 "GrassyPlains":"" +
 		"cicada1(100,10,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(0.2,5,false,clearday)&&" +
-		"bird3(0.2,5,false,clearday)&&" +
-		"bird6(0.2,5,false,clearday)&&" +
-		"bird7(0.2,5,false,clearday)&&" +
-		"bird11(0.2,5,false,clearday)&&" +
-		"bird12(0.2,5,false,clearday)&&" +
-		"crow1(0.1,5,false,clearday)",
+		"bird2(0.65,5,false,clearday)&&" +
+		"bird3(0.65,5,false,clearday)&&" +
+		"bird6(0.65,5,false,clearday)&&" +
+		"bird7(0.65,5,false,clearday)&&" +
+		"bird11(0.65,5,false,clearday)&&" +
+		"bird12(0.65,5,false,clearday)&&" +
+		"crow1(0.35,5,false,clearday)",
 "Mountains":"" +
 		"wind2(100,15,true)",
 "Ocean":"" +
@@ -125,16 +125,16 @@ var audioDescriptorPresets =
 		"stream1(100,30,true)&&" +
 		"wind1(100,20,true,clearday)&&" +
 		"crickets1(100,10,true,clearnight)&&" +
-		"bird2(0.3,5,false,clearday)&&" +
-		"bird4(0.3,5,false,clearday)&&" +
-		"bird6(0.3,5,false,clearday)&&" +
-		"bird8(0.3,5,false,clearday)&&" +
-		"bird10(0.3,5,false,clearday)&&" +
-		"bird12(0.3,5,false,clearday)&&" +
-		"squirrel1(0.1,5,false,clearday)&&" +
-		"squirrel2(0.1,5,false,clearday)&&" +
-		"squirrel3(0.1,5,false,clearday)&&" +
-		"crow1(0.1,5,false,clearday)",
+		"bird2(1.2,5,false,clearday)&&" +
+		"bird4(1.2,5,false,clearday)&&" +
+		"bird6(1.2,5,false,clearday)&&" +
+		"bird8(1.2,5,false,clearday)&&" +
+		"bird10(1.2,5,false,clearday)&&" +
+		"bird12(1.2,5,false,clearday)&&" +
+		"squirrel1(0.35,5,false,clearday)&&" +
+		"squirrel2(0.35,5,false,clearday)&&" +
+		"squirrel3(0.35,5,false,clearday)&&" +
+		"crow1(0.35,5,false,clearday)",
 "Windy":"" +
 		"wind1(100,20,true)&&"+
 		"wind3(100,40,true)",

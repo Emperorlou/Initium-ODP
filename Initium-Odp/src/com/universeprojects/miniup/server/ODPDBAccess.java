@@ -5302,6 +5302,7 @@ public class ODPDBAccess
 				resetInstanceRespawnTimer(destination);
 				setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
 				setPartiedField(party, character, "combatant", possibleNPC.getKey());
+				break;
 //				// If we've been interrupted, we'll just get out and not actually travel to the location, but ONLY
 //				// if we're not entering a CombatSite!
 //				if ("CombatSite".equals(destination.getProperty("type"))==false)

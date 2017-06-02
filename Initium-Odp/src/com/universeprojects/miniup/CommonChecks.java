@@ -328,4 +328,9 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+
+	public static boolean checkLocationIsInstance(CachedEntity location)
+	{
+		return "Instance".equals(location.getProperty("combatType")) || "PvP".equals(location.getProperty("combatType"));
+	}
 }

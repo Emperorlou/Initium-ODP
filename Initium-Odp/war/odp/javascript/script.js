@@ -1568,9 +1568,12 @@ function refreshInstanceRespawnWarning()
 //	});
 //}
 
-function giftPremium()
+function giftPremium(name)
 {
-	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", "", function(characterName){
+	closeAllTooltips();
+	
+	if (name==null) name = "";
+	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", name, function(characterName){
 		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
 			enforceSingleAction();
 			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
@@ -2338,22 +2341,12 @@ function doCombatEscape(event)
 
 function doCombatAttackLeftHand(event)
 {
-	doCommand(event, "CombatAttack", {"hand":"LeftHand"}, function(data, error){
-		if (error!=true)
-		{
-			playBannerFx("https://initium-resources.appspot.com/images/effects/weaponeffects1-b.gif", true);
-		}
-	});
+	doCommand(event, "CombatAttack", {"hand":"LeftHand"});
 }
 
 function doCombatAttackRightHand(event)
 {
-	doCommand(event, "CombatAttack", {"hand":"RightHand"}, function(data, error){
-		if (error!=true)
-		{
-			playBannerFx("https://initium-resources.appspot.com/images/effects/weaponeffects1-b.gif");
-		}
-	});
+	doCommand(event, "CombatAttack", {"hand":"RightHand"});
 }
 
 function viewExchange()
@@ -2571,6 +2564,10 @@ function ajaxUpdatePage(ajaxResponseData)
 			else if (htmlData.type==7)
 			{
 				$(htmlData.selector).append(htmlData.html);
+			}
+			else if (htmlData.type==8)
+			{
+				eval(htmlData.html);
 			}
 		}
 	}

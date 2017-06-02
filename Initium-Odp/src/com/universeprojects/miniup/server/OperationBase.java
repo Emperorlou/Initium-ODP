@@ -132,6 +132,11 @@ public abstract class OperationBase
 		addHtmlUpdate("7", jquerySelector, htmlContents);
 	}
 	
+	public void addJavascriptToResponse(String javascript)
+	{
+		addHtmlUpdate("8", null, javascript);
+	}
+	
 	private void addHtmlUpdate(String updateType, String jquerySelector, String htmlContents)
 	{
 		Map<String,String> htmlData = new HashMap<String,String>();

@@ -17,9 +17,12 @@ import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
+import com.universeprojects.miniup.server.services.OperationJSService;
 
 public class CommandCombatAttack extends Command 
 {
+
+	
 	public CommandCombatAttack(ODPDBAccess db, HttpServletRequest request,
 			HttpServletResponse response) 
 	{
@@ -57,7 +60,7 @@ public class CommandCombatAttack extends Command
 			mpus.shortcut_fullPageUpdate(cs);
 			return;
 		}
-		if (cs.isInCombatWith(character, targetCharacter, location)==false)
+		if (cs.isInCombatWith(character, targetCharacter, location)==false && CommonChecks.checkLocationIsInstance(location))
 		{
 			cs.leaveCombat(character, null);
 			mpus.shortcut_fullPageUpdate(cs);			
@@ -105,6 +108,8 @@ public class CommandCombatAttack extends Command
 		if (characterMissed)
 		{
 			summaryStatus.append("Your attack missed. ");
+			
+			doVisualEffect(hand, true, false, false);
 		}
 		else
 		{
@@ -113,9 +118,21 @@ public class CommandCombatAttack extends Command
 				hitType = "CRITICAL HIT";
 			
 			if (targetHp.equals(targetNewHp))
+			{
 				summaryStatus.append("You ").append(hitType).append(", but no damage was done. ");
+				
+				doVisualEffect(hand, false, true, false);
+			}
 			else
+			{
 				summaryStatus.append("You ").append(hitType).append("! ").append(GameUtils.formatNumber(targetHp-targetNewHp)).append(" damage was done. ");
+
+				if (characterCrit)
+					doVisualEffect(hand, false, false, true);
+				else
+					doVisualEffect(hand, false, false, false);
+					
+			}
 			
 			if (targetEquipmentDestroyed)
 				summaryStatus.append("<span class='equipment-destroyed-notice'>Equipment was destroyed. </span>");
@@ -214,6 +231,29 @@ public class CommandCombatAttack extends Command
 		}
 		
 		
+	}
+
+	
+	private void doVisualEffect(String hand, boolean miss, boolean fullyBlocked, boolean crit)
+	{
+		boolean flipX = false;
+		if (hand.contains("Left")) flipX = true;
+		
+		String effect = null;
+		if (miss) 
+			effect = "weaponeffects1-b-miss.gif";
+		else if (fullyBlocked)
+			effect = "weaponeffects1-b-blocked.gif";
+		else if (crit)
+		{
+			effect = "weaponeffects1-c.gif";
+			flipX = !flipX;
+		}
+		else
+			effect = "weaponeffects1-b.gif";
+		
+		OperationJSService js = new OperationJSService(this);
+		js.playBannerFx("images/effects/"+effect, flipX, false);
 	}
 	
 }
