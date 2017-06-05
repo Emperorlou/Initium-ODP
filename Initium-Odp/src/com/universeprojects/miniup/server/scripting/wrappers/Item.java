@@ -81,7 +81,7 @@ public class Item extends EntityWrapper
 	
 	public boolean isKeyItem()
 	{
-		return this.getProperty("lockCode") != null;
+		return this.getProperty("keyCode") != null;
 	}
 	
 	public boolean isValidKeyCode(Long keyCode)
