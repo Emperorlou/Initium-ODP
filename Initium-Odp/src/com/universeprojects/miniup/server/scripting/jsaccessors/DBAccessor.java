@@ -135,7 +135,9 @@ public class DBAccessor {
 			if(ent != null)
 				wrappedEntities.add(ScriptService.wrapEntity(ent, db));
 		}
-		return (EntityWrapper[])wrappedEntities.toArray();
+		
+		EntityWrapper[] wrapped = new EntityWrapper[wrappedEntities.size()];
+		return wrappedEntities.toArray(wrapped);
 	}
 	
 	public boolean transferGold(Long amount, EntityWrapper fromCharacter, EntityWrapper toCharacter)
