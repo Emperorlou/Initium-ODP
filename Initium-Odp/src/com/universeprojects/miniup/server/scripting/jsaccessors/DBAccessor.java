@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.scripting.jsaccessors;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -203,33 +204,61 @@ public class DBAccessor {
 		return wrapped;
 	}
 	
-	public EntityWrapper createEntityFromDef(String defKind, String defName)
+	/*################# CREATE MONSTER ###################*/
+	public EntityWrapper createMonsterFromID(Long defID, Location location)
 	{
-		List<CachedEntity> defList = db.getFilteredList(defKind, "name", defName);
+		CachedEntity defEntity = db.getEntity("NPCDef", defID);
+		return createMonsterInternal(defEntity, location);
+	}
+	
+	public EntityWrapper createMonsterFromDef(String defName, Location location)
+	{
+		List<CachedEntity> defList = db.getFilteredList("NPCDef", "name", defName);
 		if(defList.size() != 1)
 		{
 			// <defKind>.name must be unique
 			return null; 
 		}
 		
-		return createEntityInternal(defList.get(0));
+		return createMonsterInternal(defList.get(0), location);
 	}
 	
-	public EntityWrapper createEntityFromID(String defKind, long defID)
+	private EntityWrapper createMonsterInternal(CachedEntity npcDef, Location location)
 	{
-		CachedEntity defEntity = db.getEntity(defKind, defID);
-		return createEntityInternal(defEntity);
+		Key locationKey = null;
+		if(location != null) locationKey = location.getKey(); 
+		CachedEntity monster = db.doCreateMonster(npcDef, locationKey);
+		EntityWrapper newMonster = ScriptService.wrapEntity(monster, db);
+		newMonster.isNewEntity = true;
+		return newMonster;
 	}
 	
-	private EntityWrapper createEntityInternal(CachedEntity def)
+	/*################# CREATE ITEM ###################*/
+	public EntityWrapper createItemFromID(Long defID)
 	{
-		// Only Item or NPC are allowed (for now).
-		if(def == null || Arrays.asList("ItemDef","NPCDef").contains(def.getKind())==false) return null;
-		String entityKind = def.getKind().replace("Def", "").replace("NPC","Character");
-		CachedEntity newObj = db.generateNewObject(def, entityKind);
-		EntityWrapper ent = ScriptService.wrapEntity(newObj, db);
-		ent.isNewEntity = true;
-		return ent;
+		CachedEntity defEntity = db.getEntity("ItemDef", defID);
+		return createItemInternal(defEntity);
+	}
+	
+	public EntityWrapper createItemFromDef(String defName)
+	{
+		List<CachedEntity> defList = db.getFilteredList("ItemDef", "name", defName);
+		if(defList.size() != 1)
+		{
+			// <defKind>.name must be unique
+			return null; 
+		}
+		
+		return createItemInternal(defList.get(0));
+	}
+	
+	private EntityWrapper createItemInternal(CachedEntity itemDef)
+	{
+		CachedEntity item = db.generateNewObject(itemDef, "Item");
+		item.setProperty("maxDurability", item.getProperty("durability"));
+		EntityWrapper newItem = ScriptService.wrapEntity(item, db);
+		newItem.isNewEntity = true;
+		return newItem;
 	}
 	
 	public double getServerDayNight()
