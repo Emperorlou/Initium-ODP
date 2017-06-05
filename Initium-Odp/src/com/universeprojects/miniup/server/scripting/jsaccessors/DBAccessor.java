@@ -121,7 +121,7 @@ public class DBAccessor {
 		return new Item(db.getEntity("Item", itemId), db);
 	}
 	
-	public List<EntityWrapper> getEntities(String kind, Long... entityIds)
+	public EntityWrapper[] getEntities(String kind, Long... entityIds)
 	{
 		List<Key> entityKeys = new ArrayList<Key>();
 		for(Long id:entityIds)
@@ -135,7 +135,9 @@ public class DBAccessor {
 			if(ent != null)
 				wrappedEntities.add(ScriptService.wrapEntity(ent, db));
 		}
-		return wrappedEntities;
+		
+		EntityWrapper[] wrapped = new EntityWrapper[wrappedEntities.size()];
+		return wrappedEntities.toArray(wrapped);
 	}
 	
 	public boolean transferGold(Long amount, EntityWrapper fromCharacter, EntityWrapper toCharacter)
