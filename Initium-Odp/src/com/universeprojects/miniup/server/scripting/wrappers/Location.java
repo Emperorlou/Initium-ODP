@@ -32,7 +32,7 @@ public class Location extends EntityWrapper {
 	 * Returns back whether an instance timer is set on the location.
 	 * @return
 	 */
-	public boolean instanceTimerSet()
+	public boolean isInstanceTimerSet()
 	{
 		return isInstanceLocation && this.getProperty("instanceRespawnDate")!=null;
 	}
@@ -44,7 +44,31 @@ public class Location extends EntityWrapper {
 	 */
 	public boolean resetInstanceTimer()
 	{
+		if(isInstanceLocation == false) return false;
 		db.resetInstanceRespawnTimer(this.wrappedEntity);
-		return instanceTimerSet();
+		return isInstanceTimerSet();
+	}
+	
+	/**
+	 * Sets the instance timer at the location.
+	 * @param respawnTime
+	 * @return
+	 */
+	public boolean setInstanceTimer(Long respawnTime)
+	{
+		return setInstanceTimer(respawnTime, false);
+	}
+	
+	public boolean setInstanceTimer(Long respawnTime, boolean ignoreIfSet)
+	{
+		if(isInstanceLocation == false) return false;
+		if(ignoreIfSet && isInstanceTimerSet()) return false;
+		
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.add(Calendar.MINUTE, respawnTime.intValue());
+		
+		this.setProperty("instanceRespawnDate", cal.getTime());
+		
+		return isInstanceTimerSet();
 	}
 }
