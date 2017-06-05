@@ -121,7 +121,7 @@ public class DBAccessor {
 		return new Item(db.getEntity("Item", itemId), db);
 	}
 	
-	public List<EntityWrapper> getEntities(String kind, Long... entityIds)
+	public EntityWrapper[] getEntities(String kind, Long... entityIds)
 	{
 		List<Key> entityKeys = new ArrayList<Key>();
 		for(Long id:entityIds)
@@ -135,7 +135,7 @@ public class DBAccessor {
 			if(ent != null)
 				wrappedEntities.add(ScriptService.wrapEntity(ent, db));
 		}
-		return wrappedEntities;
+		return (EntityWrapper[])wrappedEntities.toArray();
 	}
 	
 	public boolean transferGold(Long amount, EntityWrapper fromCharacter, EntityWrapper toCharacter)
@@ -205,7 +205,7 @@ public class DBAccessor {
 	}
 	
 	/*################# CREATE MONSTER ###################*/
-	public EntityWrapper createMonsterFromID(Long defID, Location location)
+	public EntityWrapper createMonsterFromId(Long defID, Location location)
 	{
 		CachedEntity defEntity = db.getEntity("NPCDef", defID);
 		return createMonsterInternal(defEntity, location);
@@ -234,7 +234,7 @@ public class DBAccessor {
 	}
 	
 	/*################# CREATE ITEM ###################*/
-	public EntityWrapper createItemFromID(Long defID)
+	public EntityWrapper createItemFromId(Long defID)
 	{
 		CachedEntity defEntity = db.getEntity("ItemDef", defID);
 		return createItemInternal(defEntity);

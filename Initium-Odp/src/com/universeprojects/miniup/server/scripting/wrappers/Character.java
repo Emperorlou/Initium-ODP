@@ -163,16 +163,16 @@ public class Character extends EntityWrapper
 		return newHitpoints;
 	}
 	
-	public List<Buff> getBuffs()
+	public Buff[] getBuffs()
 	{
 		List<CachedEntity> playerBuffs = db.getBuffsFor(this.getKey());
 		List<Buff> buffs = new ArrayList<Buff>();
 		for(CachedEntity buff:playerBuffs)
 			buffs.add(new Buff(buff, this.db, this));
-		return buffs;
+		return (Buff[])buffs.toArray();
 	}
 	
-	public List<Buff> getBuffsOfType(String buffName)
+	public Buff[] getBuffsOfType(String buffName)
 	{
 		List<CachedEntity> playerBuffs = db.getBuffsFor(this.getKey());
 		List<Buff> buffs = new ArrayList<Buff>();
@@ -181,7 +181,7 @@ public class Character extends EntityWrapper
 			if(buff.getProperty("name").equals(buffName))
 				buffs.add(new Buff(buff, this.db, this));
 		}
-		return buffs;
+		return (Buff[])buffs.toArray();
 	}
 	
 	public Buff addBuff(String buffDefName)
@@ -253,18 +253,18 @@ public class Character extends EntityWrapper
 		return true;
 	}
 	
-	public boolean setLocationID(Long locationId)
+	public boolean setLocationId(Long locationId)
 	{
 		Key locKey = KeyFactory.createKey("Location", locationId);
 		return setLocationKey(locKey);
 	}
 	
-	public List<Item> findInInventory(String itemName)
+	public Item[] findInInventory(String itemName)
 	{
 		Map<String, List<Item>> invMap = getNamedInventory();
 		if(invMap.containsKey(itemName))
-			return invMap.get(itemName);
-		return new ArrayList<Item>();
+			return (Item[])invMap.get(itemName).toArray();
+		return new Item[0];
 	}
 	
 	public boolean isItemEquipped(Item checkItem)
