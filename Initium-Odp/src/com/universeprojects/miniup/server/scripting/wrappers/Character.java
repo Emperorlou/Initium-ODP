@@ -169,7 +169,8 @@ public class Character extends EntityWrapper
 		List<Buff> buffs = new ArrayList<Buff>();
 		for(CachedEntity buff:playerBuffs)
 			buffs.add(new Buff(buff, this.db, this));
-		return (Buff[])buffs.toArray();
+		Buff[] arrBuffs = new Buff[buffs.size()];
+		return buffs.toArray(arrBuffs);
 	}
 	
 	public Buff[] getBuffsOfType(String buffName)
@@ -181,7 +182,8 @@ public class Character extends EntityWrapper
 			if(buff.getProperty("name").equals(buffName))
 				buffs.add(new Buff(buff, this.db, this));
 		}
-		return (Buff[])buffs.toArray();
+		Buff[] arrBuffs = new Buff[buffs.size()];
+		return buffs.toArray(arrBuffs);
 	}
 	
 	public Buff addBuff(String buffDefName)
@@ -263,7 +265,10 @@ public class Character extends EntityWrapper
 	{
 		Map<String, List<Item>> invMap = getNamedInventory();
 		if(invMap.containsKey(itemName))
-			return (Item[])invMap.get(itemName).toArray();
+		{
+			Item[] invItems = new Item[invMap.get(itemName).size()];
+			return invMap.get(itemName).toArray(invItems);
+		}
 		return new Item[0];
 	}
 	
