@@ -78,4 +78,16 @@ public class Item extends EntityWrapper
 		this.setProperty("durability", Math.min(newDura, maxDura));
 		return newDura < 0;
 	}
+	
+	public boolean isKeyItem()
+	{
+		return this.getProperty("keyCode") != null;
+	}
+	
+	public boolean isValidKeyCode(Long keyCode)
+	{
+		if(keyCode == null) return false;
+		if(!isKeyItem()) return false;
+		return GameUtils.equals(this.getProperty("keyCode"), keyCode);
+	}
 }
