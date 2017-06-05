@@ -49,10 +49,12 @@ public abstract class EntityWrapper extends BaseWrapper
 	public boolean adjustCharges(Long addCharges, boolean allowEmpty)
 	{
 		Long newCharges = getCharges();
-		if(newCharges > -1 || (allowEmpty && newCharges > 0 && addCharges > 0))
+		// If it has charges, we can modify it. Otherwise, we explicitly
+		// indicate allowing reload (allowEmpty) and must be adding charges.
+		if(newCharges > 0 || (allowEmpty && newCharges > -1 && addCharges > 0))
 		{
 			newCharges += addCharges;
-			this.setProperty("charges", addCharges);
+			this.setProperty("charges", Math.max(newCharges, 0));
 			return true;
 		}
 		return false;

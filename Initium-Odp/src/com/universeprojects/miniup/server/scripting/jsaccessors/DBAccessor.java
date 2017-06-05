@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.scripting.jsaccessors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,10 +10,12 @@ import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -115,6 +118,23 @@ public class DBAccessor {
 	public Item getItemById(Long itemId)
 	{
 		return new Item(db.getEntity("Item", itemId), db);
+	}
+	
+	public List<EntityWrapper> getEntities(String kind, Long... entityIds)
+	{
+		List<Key> entityKeys = new ArrayList<Key>();
+		for(Long id:entityIds)
+			entityKeys.add(KeyFactory.createKey(kind, id));
+		
+		List<CachedEntity> entities = db.getEntities(entityKeys);
+		
+		List<EntityWrapper> wrappedEntities = new ArrayList<EntityWrapper>();
+		for(CachedEntity ent:entities)
+		{
+			if(ent != null)
+				wrappedEntities.add(ScriptService.wrapEntity(ent, db));
+		}
+		return wrappedEntities;
 	}
 	
 	public boolean transferGold(Long amount, EntityWrapper fromCharacter, EntityWrapper toCharacter)
@@ -256,11 +276,32 @@ public class DBAccessor {
 	 */
 	public boolean enterCombat(Character attacker, Character defender)
 	{
+		return enterCombat(attacker, defender, null);
+	}
+	
+	/**
+	 * Puts character entities into combat with each other, given a location. True return
+	 * indicates a db save occurred. 
+	 * @param attacker Attacking entity, typically the player
+	 * @param defender Defending entity, typically an NPC, though possibly another player in PCA
+	 * @param location Location where combat takes place. Necessary to determine auto attack.	 
+	 * @return True if entities enter combat with each other. False otherwise.
+	 */
+	public boolean enterCombat(Character attacker, Character defender, Location location)
+	{
 		if(attacker.isInCombat()) return false;
 		CachedEntity attack = attacker.wrappedEntity;
 		CachedEntity defend = defender.wrappedEntity;
-		cs.enterCombat(attack, defend, false);
+		CachedEntity locate = null;
+		boolean autoAttack = false;
 		
-		return cs.isInCombatWith(attack, defend, null);
+		if(location != null)
+		{
+			locate = location.wrappedEntity;
+			autoAttack = CommonChecks.checkLocationIsInstance(locate);
+		}
+		
+		cs.enterCombat(attack, defend, autoAttack);
+		return cs.isInCombatWith(attack, defend, locate);
 	}
 }
