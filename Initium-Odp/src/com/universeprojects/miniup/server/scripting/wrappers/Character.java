@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -252,6 +253,7 @@ public class Character extends EntityWrapper
 		CachedEntity location = db.getEntity(locationKey);
 		if(location == null) return false;
 		this.setProperty("locationKey", locationKey);
+		this.setProperty("locationEntryDatetime", new Date());
 		return true;
 	}
 	
@@ -292,5 +294,26 @@ public class Character extends EntityWrapper
 	public boolean isInCombat()
 	{
 		return "COMBAT".equals(this.getProperty("mode"));
+	}
+	
+	public boolean isInParty()
+	{
+		return GameUtils.isCharacterInParty(this.wrappedEntity);
+	}
+	
+	public Character[] getParty()
+	{
+		if(isInParty()==false) return new Character[0];
+		
+		List<CachedEntity> getParty = db.getParty(db.getDB(), this.wrappedEntity);
+		List<Character> partyChars = new ArrayList<Character>();
+		for(CachedEntity pChar:getParty)
+		{
+			if(pChar != null)
+				partyChars.add((Character)ScriptService.wrapEntity(pChar, db));
+		}
+		
+		Character[] chars = new Character[partyChars.size()];
+		return partyChars.toArray(chars);
 	}
 }
