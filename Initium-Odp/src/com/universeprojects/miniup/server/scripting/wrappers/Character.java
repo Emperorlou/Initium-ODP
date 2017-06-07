@@ -202,7 +202,11 @@ public class Character extends EntityWrapper
 			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
 	{
 		CachedEntity newBuff = db.awardBuff(null, this.getKey(), icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
-		return new Buff(newBuff, db, this);
+		if(newBuff != null)
+			return new Buff(newBuff, db, this);
+		else
+			ScriptService.log.log(Level.SEVERE, "Unable to create manual buff " + name + " for character " + this.getId());
+		return null;
 	}
 	
 	public String getType() 
