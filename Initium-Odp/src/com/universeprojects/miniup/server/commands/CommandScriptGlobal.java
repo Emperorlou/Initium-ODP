@@ -72,7 +72,8 @@ public class CommandScriptGlobal extends CommandScriptBase {
 		}
 		
 		GlobalEvent ge = new GlobalEvent(character, db);
-		return new GlobalEvent(db, wrappers);
+		ge.addArguments(db, wrappers);
+		return ge;
 	}
 
 }
