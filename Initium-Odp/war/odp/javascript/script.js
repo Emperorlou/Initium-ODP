@@ -2247,10 +2247,11 @@ function newCharacterFromDead()
 	location.href = "/ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
 }
 
-function switchCharacter(characterId)
+function switchCharacter(eventObject, characterId)
 {
-	enforceSingleAction();
-	location.href = "/ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function(data,error){
+		if (error) return;
+	});
 }
 
 function logout()
@@ -2328,7 +2329,7 @@ function doDeleteCharacter(eventObject,characterId,characterName)
 		confirmPopup("Delete Character","I mean, are you REALLY sure you want to delete " + characterName + "? You can't take it back!",function(){
 			doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
 				if(error) return;
-				$("a[onclick='switchCharacter(" + characterId +")']").parent("li").remove();
+				$("a[onclick='switchCharacter(eventObject, " + characterId +")']").parent("li").remove();
 			});
 		});
 	});
