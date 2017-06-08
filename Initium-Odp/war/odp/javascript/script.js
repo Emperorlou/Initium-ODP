@@ -2249,9 +2249,7 @@ function newCharacterFromDead()
 
 function switchCharacter(eventObject, characterId)
 {
-	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function(data,error){
-		if (error) return;
-	});
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId});
 }
 
 function logout()

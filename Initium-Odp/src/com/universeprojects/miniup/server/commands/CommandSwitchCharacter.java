@@ -5,11 +5,15 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.CombatService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
  * Allows the player to switch between owned characters
@@ -50,7 +54,7 @@ public class CommandSwitchCharacter extends Command {
 
 		// Compare userKey between current character and target character
 		CachedEntity character = db.getCurrentCharacter();
-		if (!character.getProperty("userKey").equals(targetCharacter.getProperty("userKey"))) {
+		if (!GameUtils.equals(character.getProperty("userKey"), targetCharacter.getProperty("userKey"))) {
 			throw new UserErrorMessage("The character you are trying to switch to does not belong to you.");
 		}
 
@@ -67,7 +71,12 @@ public class CommandSwitchCharacter extends Command {
 			throw new UserErrorMessage("Error while switching character: " + e.getMessage());
 		}
 
-		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+		// Consolidating this to quick refresh the page
+		CombatService cs = new CombatService(db);
+		CachedEntity location = ds.getIfExists((Key) character.getProperty("locationKey"));
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(),
+				location, this);
+		mpus.shortcut_fullPageUpdate(cs);
 
 	}
 }
