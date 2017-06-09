@@ -2251,7 +2251,9 @@ function newCharacterFromDead()
 
 function switchCharacter(eventObject, characterId)
 {
-	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId});
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function(){
+		closeAllTooltips();
+	});
 }
 
 function logout()
