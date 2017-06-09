@@ -98,6 +98,13 @@ public class ScriptService extends Service
 	 */
 	public boolean executeScript(ScriptEvent event, CachedEntity scriptEntity, CachedEntity entitySource)
 	{
+		if(scriptEntity == null && entitySource != null && "Script".equals(entitySource.getKind()))
+		{
+			// Entity is a global script. Go ahead and pass it here.
+			scriptEntity = entitySource;
+			entitySource = null;
+		}
+		
 		return executeScript(event, scriptEntity, ScriptService.wrapEntity(entitySource, this.db));
 	}
 	
