@@ -952,7 +952,7 @@ public class MainPageUpdateService extends Service
 			{
 				for(CachedEntity character:party)
 				{
-					CachedEntity partyUser = db.getEntity("User", (Long)character.getProperty("userKey"));
+					CachedEntity partyUser = db.getEntity((Key)character.getProperty("userKey"));
 					boolean isThisMemberTheLeader = false;
 					if ("TRUE".equals(character.getProperty("partyLeader")))
 						isThisMemberTheLeader = true;
