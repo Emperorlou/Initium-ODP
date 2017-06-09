@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.commands;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
@@ -66,7 +67,7 @@ public class CommandScriptGlobal extends CommandScriptBase {
 		}
 		
 		List<CachedEntity> entities = db.getEntities(entityFetch);
-		List<EntityWrapper> wrappers = new ArrayList<EntityWrapper>();
+		List<Object> wrappers = new ArrayList<Object>();
 		for(CachedEntity ent:entities)
 		{
 			try
@@ -75,10 +76,11 @@ public class CommandScriptGlobal extends CommandScriptBase {
 			}
 			catch(Exception ex)
 			{
-				throw new UserErrorMessage("Something went wrong... Try again later.");
+				wrappers.add(ent);
+				ScriptService.log.log(Level.WARNING, "Using a non-wrapped entity type!");
 			}
 		}
-		((GlobalEvent)event).addArguments(db, wrappers);
+		((GlobalEvent)event).addArguments(db, wrappers.toArray());
 	}
 
 }
