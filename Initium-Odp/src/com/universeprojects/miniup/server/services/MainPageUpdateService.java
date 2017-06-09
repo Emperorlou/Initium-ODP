@@ -637,8 +637,8 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<div class='main-buttonbox'>");
 		
 		
-		newHtml.append("<a class='main-button-icon' href='#' shortcut='87' onclick='doExplore(true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
-		newHtml.append("<a href='#' class='main-button' shortcut='69' onclick='doExplore(false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
+		newHtml.append("<a id='main-explore-ignorecombatsites' class='main-button-icon' href='#' shortcut='87' onclick='doExplore(true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
+		newHtml.append("<a id='main-explore' href='#' class='main-button' shortcut='69' onclick='doExplore(false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
 					
 		newHtml.append("<br>");
 		

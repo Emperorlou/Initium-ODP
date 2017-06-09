@@ -93,7 +93,7 @@ public class CommandCombatAttack extends Command
 		
 		String status = db.doCharacterAttemptAttack(auth, user, character, weapon, targetCharacter);
 
-		if (status!=null) characterCrit = status.contains("CRITICAL");
+		if (status!=null) characterCrit = status.contains("It's a critical hit!");
 		if (status!=null) targetEquipmentDestroyed = status.contains("equipment-destroyed-notice");
 		Double targetNewHp = (Double)targetCharacter.getProperty("hitpoints");
 		
@@ -169,7 +169,7 @@ public class CommandCombatAttack extends Command
 			
 			if (((Double)targetCharacter.getProperty("hitpoints"))>0)
 			{
-				if (counterAttackStatus!=null) characterCrit = counterAttackStatus.contains("CRITICAL");
+				if (counterAttackStatus!=null) characterCrit = counterAttackStatus.contains("It's a critical hit!");
 				if (counterAttackStatus!=null) targetEquipmentDestroyed = counterAttackStatus.contains("equipment-destroyed-notice");
 				Double characterNewHp = (Double)character.getProperty("hitpoints");
 				

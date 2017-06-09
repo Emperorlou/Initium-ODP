@@ -1454,6 +1454,7 @@ public class GameUtils
 			List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
 			if (buffs!=null && buffs.isEmpty()==false)
 			{
+				sb.append("<div></div>");	// Just to make sure the buff-pane is below the widget and not above
 				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
 				for(CachedEntity buff:buffs)
 				{

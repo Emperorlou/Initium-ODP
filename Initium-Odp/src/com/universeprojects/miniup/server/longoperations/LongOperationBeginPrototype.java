@@ -149,8 +149,10 @@ public class LongOperationBeginPrototype extends LongOperation
 		knowledgeService.increaseKnowledgeFor(item, 1, 100);
 		
 		
+		String itemHtml = "You created an item: "+GameUtils.renderItem(item);
+		
 		// Give the player a message that points to the skill and the new item he made
-		setUserMessage("You have a new skill! You successfully turned your idea of "+idea.getProperty("name")+" into a skill. A prototype of your skill is now in your inventory.<br><br>You created an item: "+GameUtils.renderItem(item));
+		setUserMessage("You have a new skill! You successfully turned your idea of "+idea.getProperty("name")+" into a skill. A prototype of your skill is now in your inventory.<br><br>"+itemHtml);
 		
 		// Delete all HTML of an item
 		if (inventionService.getDeletedEntities()!=null)
@@ -158,7 +160,7 @@ public class LongOperationBeginPrototype extends LongOperation
 				if (deletedKey.getKind().equals("Item"))
 					deleteHtml(".deletable-Item"+deletedKey.getId());
 		
-		return "Experimentation complete.";
+		return "Prototype complete. "+itemHtml;
 	}
 
 	private void doChecks(CachedEntity character, CachedEntity idea) throws UserErrorMessage

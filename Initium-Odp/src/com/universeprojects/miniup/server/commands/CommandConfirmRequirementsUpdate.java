@@ -30,6 +30,7 @@ public class CommandConfirmRequirementsUpdate extends Command
 	public void run(Map<String, String> parameters) throws UserErrorMessage
 	{
 		List<Key> gerKeyList = new ArrayList<Key>();
+		String slot = parameters.get("slot");
 		String gerKeyListRaw = parameters.get("gerKeyList");
 		for(String gerKeyString:gerKeyListRaw.split(","))
 			gerKeyList.add(KeyFactory.stringToKey(gerKeyString));
@@ -50,7 +51,7 @@ public class CommandConfirmRequirementsUpdate extends Command
 		html.append("<div class='list'>");
 		for(CachedEntity item:items)
 		{
-			html.append("<div onclick='selectItem(event, ").append(item.getId()).append(")' class='itemToSelect confirm-requirements-entry confirm-requirements-item-candidate ").append("deletable-Item").append(item.getId()).append("'><div class='selectarea'><div onclick='unselectItem(event)' class='X'>X</div></div>").append(GameUtils.renderItem(db, db.getCurrentCharacter(), item)).append("</div>");
+			html.append("<div onclick='selectItem(event, ").append(item.getId()).append(")' itemKey='"+KeyFactory.keyToString(item.getKey())+"' class='itemToSelect confirm-requirements-entry confirm-requirements-item-candidate ").append("deletable-Item").append(item.getId()).append("'><div class='selectarea'><div onclick='unselectItem(event)' class='X'>X</div></div>").append(GameUtils.renderItem(db, db.getCurrentCharacter(), item)).append("</div>");
 		}
 		html.append("</div>");
 		if (items.isEmpty())

@@ -5302,6 +5302,15 @@ public class ODPDBAccess
 				resetInstanceRespawnTimer(destination);
 				setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
 				setPartiedField(party, character, "combatant", possibleNPC.getKey());
+				
+				// For forced 1v1 combat, we also need to set the combatant on the monster
+				if (CommonChecks.checkLocationIsInstance(destination))
+				{
+					possibleNPC.setProperty("mode", CHARACTER_MODE_COMBAT);
+					possibleNPC.setProperty("combatant", character.getKey());
+					ds.put(possibleNPC);
+				}
+				
 				break;
 //				// If we've been interrupted, we'll just get out and not actually travel to the location, but ONLY
 //				// if we're not entering a CombatSite!

@@ -224,6 +224,11 @@ messager.checkClientSideChatCommands = function(chatMessage)
 			doCollectCharacter(null, null, characterName);
 			return true;
 		}
+		if (chatMessage.toLowerCase().startsWith("/tutorial"))
+		{
+			introTutorial.run();
+			return true;
+		}
 	}
 	return false;
 };
