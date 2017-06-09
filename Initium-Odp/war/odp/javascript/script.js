@@ -17,7 +17,7 @@ $(window).ready(function(e){
 	});
 	
 	$(window).resize(function() {
-		expandpopupMessage();
+		expandpopupMessage(); 
 	});
 
 	

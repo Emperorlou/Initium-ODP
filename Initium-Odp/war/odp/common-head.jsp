@@ -32,7 +32,7 @@
 <script type="text/javascript" src="/odp/javascript/vertx-eventbus.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=103"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=104"></script>
 
 <script type="text/javascript" src="/odp/javascript/messager.js?v=24"></script>
 
