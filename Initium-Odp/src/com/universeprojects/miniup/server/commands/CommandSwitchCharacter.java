@@ -76,6 +76,7 @@ public class CommandSwitchCharacter extends Command {
 		CachedEntity location = ds.getIfExists((Key) character.getProperty("locationKey"));
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter,
 				location, this);
+		mpus.updateVerifyCode();
 		mpus.shortcut_fullPageUpdate(cs);
 
 	}
