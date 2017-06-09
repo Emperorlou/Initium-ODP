@@ -213,6 +213,10 @@ public class GroupService extends Service {
 	{
 		if(this.isAdmin && this.isCharacterInSpecifiedGroup(mergeGroup) == false)
 		{
+			// Ensure the mergeGroup actually requested the merge
+			if (GameUtils.equals(mergeGroup.getProperty("pendingMergeGroupKey"), this.characterGroup.getKey())==false)
+				throw new UserErrorMessage("The group you're attempting to merge did not indicate they wish to merge with your group.");
+			
 			// Maintain list of entities we'll save.
 			List<CachedEntity> saveEntities = new ArrayList<CachedEntity>();
 			

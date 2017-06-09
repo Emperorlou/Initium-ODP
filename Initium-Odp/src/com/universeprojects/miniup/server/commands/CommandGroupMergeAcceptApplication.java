@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -29,11 +30,16 @@ public class CommandGroupMergeAcceptApplication extends Command {
 		Long groupID = parameters.containsKey("groupId") ? tryParseId(parameters, "groupId") : null;
 		if(groupID == null) throw new RuntimeException("Command missing parameter groupId");
 		
-		CachedEntity group = db.getEntity("Group", groupID);
+		CachedEntity groupToMerge = db.getEntity("Group", groupID);
+
+		// Ensure the mergeGroup actually requested the merge
+		if (GameUtils.equals(groupToMerge.getProperty("pendingMergeGroupKey"), character.getProperty("groupKey"))==false)
+			throw new UserErrorMessage("The group you're attempting to merge did not indicate they wish to merge with your group.");
+		
 		GroupService service = new GroupService(db, character);
 		try
 		{
-			if(service.acceptMergeApplicationFrom(ds, group))
+			if(service.acceptMergeApplicationFrom(ds, groupToMerge))
 				setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 			else
 				throw new UserErrorMessage("Unexpected issue merging groups!");
@@ -44,7 +50,7 @@ public class CommandGroupMergeAcceptApplication extends Command {
 				throw new UserErrorMessage("Character does not belong to a group!");
 			if(service.isCharacterGroupAdmin() == false)
 				throw new UserErrorMessage("Character is not an admin of the group!");
-			if(service.isCharacterInSpecifiedGroup(group))
+			if(service.isCharacterInSpecifiedGroup(groupToMerge))
 				throw new RuntimeException("Unable to merge identical groups!");
 			throw ex;
 		}

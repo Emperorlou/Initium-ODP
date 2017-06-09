@@ -86,7 +86,7 @@ function selectItem(event, itemId)
 	if ($(event.target).closest(".confirm-requirements-requirement").length>0)
 		return;
 	
-	unselectItem(null);
+	//unselectItem(null);
 	
 	
 	$("#"+crSelectedRequirementSlotIndex).val(itemId);
@@ -124,12 +124,29 @@ function confirmRequirements_collectChoices(event)
 	var result = {};
 	result.slots = {};
 	result.repetitionCount = null;
-	var inputBoxes = $(event.target).closest(".main-splitScreen").find(".itemForRequirementInput");
-	for(var i = 0; i<inputBoxes.length; i++)
+	var requirementsContainers = $(event.target).closest(".main-splitScreen").find(".confirm-requirements-entry");
+	for(var i = 0; i<requirementsContainers.length; i++)
 	{
-		var input = $(inputBoxes[i]);
-		
-		result.slots[input.attr("id")] = input.val();
+		var requirementsContainer = $(requirementsContainers[i]);
+
+		var itemsSelected = requirementsContainer.find(".itemToSelect");
+		if (itemsSelected.length>0)
+		{
+			var val = "";
+			var firstTime = true;
+			for(var ii = 0; ii<itemsSelected.length; ii++)
+			{
+				if (firstTime)
+					firstTime = false;
+				else
+					val+=",";
+				
+				val+=itemsSelected[ii].attr("itemKey");
+			}
+			
+			//TODO: Finish this. We need a new way of getting the slot ID
+			result.slots[input.attr("id")] = val;
+		}
 	}
 	
 	if ($("#repetitionCount").length>0)
@@ -147,7 +164,7 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 	<c:forEach var="requirement" items="${requirementCategory.list}">
 		<div class='hiddenTooltip' id='requirementHelp-${requirement.slotName }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
 		<div id='requirement-container-${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
-			<input type='hidden' class='itemForRequirementInput' id='${requirement.slotName}' name='${requirement.slotName}'/>
+			<input type='hidden' id='${requirement.slotName}' name='${requirement.slotName}'/>
 			<div class='hint questionmark' rel='#requirementHelp-${requirement.slotName}'>?</div><div><c:out value="${requirement.name}"/></div>
 			<div id='itemHtmlForRequirement${requirement.slotName}'></div>
 		</div>

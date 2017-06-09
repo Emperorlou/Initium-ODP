@@ -44,6 +44,8 @@ public abstract class CommandScriptBase extends Command {
 	
 	protected abstract ScriptEvent generateEvent(CachedEntity character, CachedEntity trigger, CachedEntity script, Map<String, String> parameters) throws UserErrorMessage;
 	
+	protected abstract void processParameters(ScriptEvent event, Map<String, String> parameters) throws UserErrorMessage; 
+	
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
 		// TODO Auto-generated method stub
@@ -62,7 +64,7 @@ public abstract class CommandScriptBase extends Command {
 		//// SECURITY CHECKS
 		if("Script".equals(entitySource.getKind()))
 		{
-			if(GameUtils.enumEquals(scriptSource.getProperty("type"), ScriptType.global)==false)
+			if(GameUtils.enumEquals(entitySource.getProperty("type"), ScriptType.global)==false)
 				throw new RuntimeException("Specified script is not a global type!");
 		}
 		else
@@ -92,6 +94,7 @@ public abstract class CommandScriptBase extends Command {
 				// ...as a global script. Script is responsible for validating "permission" to execute.
 				if(scriptSource != null)
 					throw new RuntimeException("CommandExecuteScript: Invalid parameters specified!");
+				break;
 			}
 			case("Character"):
 			{
@@ -126,6 +129,24 @@ public abstract class CommandScriptBase extends Command {
 		
 		// Implementing commands are responsible for their own event objects.
 		ScriptEvent event = generateEvent(character, entitySource, scriptSource, parameters);
+		
+		// Parse out the attributes, stored in "key:value;key:value" format.
+		if(parameters.containsKey("attributes"))
+		{
+			String[] attributes = parameters.get("attributes").split(";");
+			try
+			{
+				for(String attr:attributes)
+					event.setAttribute(attr.split(":")[0], attr.split(":")[1]);
+			}
+			catch(Exception ex)
+			{
+				ScriptService.log.log(Level.SEVERE, "Invalid parameters specified!", ex);
+			}
+		}
+		// Allow implementing Script commands to process any additional parameters
+		processParameters(event, parameters);
+		
 		try
 		{
 			ScriptService service = ScriptService.getScriptService(db);

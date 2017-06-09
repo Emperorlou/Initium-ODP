@@ -74,8 +74,13 @@ public class DBAccessor {
 			ScriptService.log.log(Level.SEVERE, "Cannot call non-global script through core.executeScript: " + scriptName);
 			return false;
 		}
+		
+		// Pass along the current character, if we have one.
+		CachedEntity currentChar = null;
+		if(currentEvent.currentCharacter != null) currentChar = currentEvent.currentCharacter.wrappedEntity;
+		GlobalEvent event = new GlobalEvent(db, currentChar);
+		event.addArguments(db, entities);
 		ScriptService service = ScriptService.getScriptService(db);
-		GlobalEvent event = new GlobalEvent(db, entities);
 		boolean executed = service.executeScript(event, script, (EntityWrapper)null);
 		if(executed)
 		{
@@ -85,8 +90,11 @@ public class DBAccessor {
 			for(EntityWrapper delete:event.getDeleteWrappers())
 				currentEvent.deleteEntity(delete);
 			currentEvent.haltExecution |= event.haltExecution;
+			currentEvent.reloadWidgets |= event.reloadWidgets;
+			// Should check for null here...
 			currentEvent.errorText += event.errorText;
 			currentEvent.descriptionText += event.descriptionText;
+			currentEvent.popupMessage += event.popupMessage;
 		}
 		return executed;
 	}
@@ -210,6 +218,7 @@ public class DBAccessor {
 	public EntityWrapper createMonsterFromId(Long defID, Location location)
 	{
 		CachedEntity defEntity = db.getEntity("NPCDef", defID);
+		if(defEntity == null) return null;
 		return createMonsterInternal(defEntity, location);
 	}
 	
@@ -239,6 +248,7 @@ public class DBAccessor {
 	public EntityWrapper createItemFromId(Long defID)
 	{
 		CachedEntity defEntity = db.getEntity("ItemDef", defID);
+		if(defEntity == null) return null;
 		return createItemInternal(defEntity);
 	}
 	
@@ -272,6 +282,7 @@ public class DBAccessor {
 	{
 		if(character == null || "Character".equals(character.getKind()) == false) return false;
 		
+		// Get the entity, so we can make sure it's a valid location.
 		CachedEntity location = db.getEntity("Location", locationId);
 		if(location == null) return false;
 		character.wrappedEntity.setProperty("homeTownKey", location.getKey());

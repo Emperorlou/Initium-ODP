@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
@@ -403,6 +404,7 @@ public class MainPageUpdateService extends Service
 	
 	public void shortcut_fullPageUpdate(CombatService combatService)
 	{
+		updateMoney();
 		updateInBannerOverlayLinks();
 		updateButtonList(combatService);
 		updateLocationJs();	
@@ -637,8 +639,8 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<div class='main-buttonbox'>");
 		
 		
-		newHtml.append("<a class='main-button-icon' href='#' shortcut='87' onclick='doExplore(true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
-		newHtml.append("<a href='#' class='main-button' shortcut='69' onclick='doExplore(false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
+		newHtml.append("<a id='main-explore-ignorecombatsites' class='main-button-icon' href='#' shortcut='87' onclick='doExplore(true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
+		newHtml.append("<a id='main-explore' href='#' class='main-button' shortcut='69' onclick='doExplore(false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
 					
 		newHtml.append("<br>");
 		
@@ -950,16 +952,36 @@ public class MainPageUpdateService extends Service
 			List<CachedEntity> party = getParty();
 			if (party!=null)
 			{
+				// Get Characters and Users
+				EntityPool pool = new EntityPool(db.getDB());
+
 				for(CachedEntity character:party)
 				{
+					pool.addToQueue((Key)character.getProperty("userKey"));
+				}
+				pool.loadEntities();
+
+				for(CachedEntity character:party)
+				{
+					CachedEntity partyUser = pool.get((Key)character.getProperty("userKey"));
 					boolean isThisMemberTheLeader = false;
 					if ("TRUE".equals(character.getProperty("partyLeader")))
 						isThisMemberTheLeader = true;
 					boolean dead = false;
 					if (((Double)character.getProperty("hitpoints"))<=0)
 						dead = true;
-					newHtml.append("<div class='main-splitScreen-2columns'>");
-					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+character.getProperty("name"));
+
+					newHtml.append("<div>");
+					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
+					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, character, partyUser, true));
+
+					if (!GameUtils.equals(db.getCurrentCharacter().getKey().getId(), character.getKey().getId()) &&
+							GameUtils.equals(db.getCurrentUser().getProperty("userKey"), character.getProperty("userKey"))) {
+						newHtml.append("<div class='main-item-controls' style='top:0px'>");
+						newHtml.append("<a onclick='switchCharacter(event, "+character.getKey().getId()+")'>Switch</a>");
+						newHtml.append("</div>");
+					}
+					
 					if (isThisMemberTheLeader)
 						newHtml.append("<div class='main-item-controls' style='top:0px;'>(Leader)</div>");
 					if (dead)

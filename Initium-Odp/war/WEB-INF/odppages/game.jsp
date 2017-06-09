@@ -371,6 +371,10 @@ $(function(){
 });
 </script>
 
+
+<script type='text/javascript' src='/odp/javascript/reveal-tutorial.js?v=14'></script>
+<script type='text/javascript' src='/odp/javascript/reveal-tutorial-impl.js?v=6'></script>
+
 </head>
 
 <!--

@@ -17,7 +17,7 @@ $(window).ready(function(e){
 	});
 	
 	$(window).resize(function() {
-		expandpopupMessage();
+		expandpopupMessage(); 
 	});
 
 	
@@ -787,7 +787,9 @@ function createCampsite()
 			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
 			localStorage.setItem("campsiteName", name);
 		}
-	});
+	}, 
+	null, 
+	true);
 }
 
 function depositDogecoinsToItem(itemId, event)
@@ -1287,16 +1289,16 @@ function destroyThrowaway()
 
 function popupPremiumReminder()
 {
-	if (window.isPremium==false)
-	{
-		$("body").append("<p id='premiumReminder' class='highlightbox-green' style='position:fixed; bottom:0px;z-index:19999999; left:0px;right:0px; background-color:#000000;'>" +
-				"When you donate at least 5 dollars, you get a premium account for life!<br>" +
-				"Premium member's characters always remember their house when they die, and " +
-				"their names show up as red in chat.<br>" +
-				"There are a lot more benefits coming for premium members <a onclick='viewProfile()'>" +
-				"so check out more details here!</a>" +
-				"</p>");
-	}
+//	if (window.isPremium==false)
+//	{
+//		$("body").append("<p id='premiumReminder' class='highlightbox-green' style='position:fixed; bottom:0px;z-index:19999999; left:0px;right:0px; background-color:#000000;'>" +
+//				"When you donate at least 5 dollars, you get a premium account for life!<br>" +
+//				"Premium member's characters always remember their house when they die, and " +
+//				"their names show up as red in chat.<br>" +
+//				"There are a lot more benefits coming for premium members <a onclick='viewProfile()'>" +
+//				"so check out more details here!</a>" +
+//				"</p>");
+//	}
 }
 
 function popupCharacterTransferService(currentCharacterId, currentCharacterName, characterNameToAccept)
@@ -2247,10 +2249,11 @@ function newCharacterFromDead()
 	location.href = "/ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
 }
 
-function switchCharacter(characterId)
+function switchCharacter(eventObject, characterId)
 {
-	enforceSingleAction();
-	location.href = "/ServletUserControl?type=switchCharacter&characterId="+characterId+""+"&v="+verifyCode;
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function(){
+		closeAllTooltips();
+	});
 }
 
 function logout()
@@ -2328,7 +2331,7 @@ function doDeleteCharacter(eventObject,characterId,characterName)
 		confirmPopup("Delete Character","I mean, are you REALLY sure you want to delete " + characterName + "? You can't take it back!",function(){
 			doCommand(eventObject,"UserDeleteCharacter",{"characterId":characterId},function(data,error){
 				if(error) return;
-				$("a[onclick='switchCharacter(" + characterId +")']").parent("li").remove();
+				$("a[onclick='switchCharacter(eventObject, " + characterId +")']").parent("li").remove();
 			});
 		});
 	});
@@ -3626,7 +3629,7 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
     $("#"+unique+"-no").click(promptNo);
 }
 
-function promptPopup(title, content, defaultText, yesFunction, noFunction)
+function promptPopup(title, content, defaultText, yesFunction, noFunction, doNotFocus)
 {
 	if (content!=null)
 		content = content.replace("\n", "<br>");
@@ -3656,8 +3659,11 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction)
     
     var inputText = $('#popup_prompt_input_'+unique);
     
-    inputText.focus();
-    inputText.select();
+    if (doNotFocus!=true)
+    {
+	    inputText.focus();
+	    inputText.select();
+    }
 
     inputText.keyup(function(e){
     	stopEventPropagation(e);

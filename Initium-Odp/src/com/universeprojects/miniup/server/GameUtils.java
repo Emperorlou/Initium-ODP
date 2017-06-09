@@ -1143,7 +1143,8 @@ public class GameUtils
     {
     	boolean isSelf = false;
     	String lowDurabilityClass = "";
-    	if (GameUtils.equals(db.getCurrentCharacterKey(), character.getKey()))
+    	if (GameUtils.equals(db.getCurrentCharacterKey(), character.getKey()) ||
+    			(selfUser!=null && GameUtils.equals(selfUser.getProperty("characterKey"), character.getKey())))
     		isSelf = true;
     	
     	boolean isCloaked = false;
@@ -1427,7 +1428,7 @@ public class GameUtils
 				for(CachedEntity c:characterList)
 				{
 					if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
-						sb.append("<li><a onclick='doDeleteCharacter(event,"+c.getId()+",\""+WebUtils.htmlSafe((String)c.getProperty("name"))+"\")'>X</a> <a onclick='switchCharacter("+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
+						sb.append("<li><a onclick='doDeleteCharacter(event,"+c.getId()+",\""+WebUtils.htmlSafe((String)c.getProperty("name"))+"\")'>X</a> <a onclick='switchCharacter(event, "+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
 				}
 				sb.append("</ul>");
 				sb.append("<p><a href='newcharacter.jsp'>Create a new character</a></p>");
@@ -1454,6 +1455,7 @@ public class GameUtils
 			List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
 			if (buffs!=null && buffs.isEmpty()==false)
 			{
+				sb.append("<div></div>");	// Just to make sure the buff-pane is below the widget and not above
 				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
 				for(CachedEntity buff:buffs)
 				{
