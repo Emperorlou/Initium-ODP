@@ -967,7 +967,7 @@ public class MainPageUpdateService extends Service
 					if (!isThisMemberTheLeader &&
 							GameUtils.equals(db.getCurrentUser().getProperty("userKey"), character.getProperty("userKey"))) {
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
-						newHtml.append("<a onclick='switchCharacter("+character.getKey().getId()+")'>Switch</a>");
+						newHtml.append("<a onclick='switchCharacter(event, "+character.getKey().getId()+")'>Switch</a>");
 						newHtml.append("</div>");
 					}
 					
