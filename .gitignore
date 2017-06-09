@@ -1,5 +1,7 @@
 /Initium-Odp/war/WEB-INF/classes
 /Initium-Odp/.settings
+/Initium-Odp/.classpath
+/Initium-Odp/.project
 /Initium-Odp/war/WEB-INF/lib/jsr107cache-1.1.jar
 /Initium-Odp/war/WEB-INF/lib/appengine-api-1.0-sdk-1.9.36.jar
 /Initium-Odp/war/WEB-INF/lib/appengine-api-labs.jar
