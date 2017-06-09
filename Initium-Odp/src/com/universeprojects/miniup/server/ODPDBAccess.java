@@ -4294,6 +4294,14 @@ public class ODPDBAccess
 					attackingCharacter.setProperty("combatType", null);
 					attackingCharacter.setProperty("locationEntryDatetime", new Date());
 	
+					// Make the attacking character party no longer in combat mode
+					List<CachedEntity> party = getParty(ds, attackingCharacterFinal);
+					if (party != null) {
+						setPartiedField(party, attackingCharacter, "mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
+						setPartiedField(party, attackingCharacter, "combatant", null);
+						setPartiedField(party, attackingCharacter, "combatType", null);
+						setPartiedField(party, attackingCharacter, "locationEntryDatetime", new Date());
+					}
 					
 					////////////////////////
 					// Now, depending on if the killed character is an NPC or not, and if the killer is an NPC or not, do some stuff...
@@ -4417,6 +4425,9 @@ public class ODPDBAccess
 					db.put(characterToDie);
 					db.put(dyingCharacterLocation);
 					db.put(attackingCharacter);
+					if (party != null) {
+						putPartyMembersToDB_SkipSelf(db, party, attackingCharacter);
+					}
 					
 					Map<String, Object> result = new HashMap<String, Object>();
 					
