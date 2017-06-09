@@ -322,5 +322,18 @@ public class User extends OdpDomain {
 	public Boolean getVerified() {
 		return (Boolean) getCachedEntity().getProperty("verified");
 	}
+	
+	/**
+	 * The achievements that this user holds.
+	 * @param achievementList
+	 */
+	public void setAchievementKeys(List<Key> achievement) {
+		getCachedEntity().setProperty("achievement", achievement);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Key> getAchievementKeys() {
+		return (List<Key>) getCachedEntity().getProperty("achievement");
+	}
 
 }
