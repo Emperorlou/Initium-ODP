@@ -37,7 +37,6 @@ public class CommandScriptCombat extends CommandScriptBase {
 	public CommandScriptCombat(ODPDBAccess db, HttpServletRequest request,
 			HttpServletResponse response) {
 		super(db, request, response);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -62,6 +61,11 @@ public class CommandScriptCombat extends CommandScriptBase {
 		
 		if(combatant == null) throw new RuntimeException("Character is in COMBAT mode, but combatant is null");
 		return new CombatEvent(db, character, trigger, combatant);
+	}
+
+	@Override
+	protected void processParameters(ScriptEvent event,
+			Map<String, String> parameters) throws UserErrorMessage {
 	}
 
 }

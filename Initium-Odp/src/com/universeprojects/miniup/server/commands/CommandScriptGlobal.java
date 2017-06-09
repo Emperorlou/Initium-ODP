@@ -41,6 +41,14 @@ public class CommandScriptGlobal extends CommandScriptBase {
 	@Override
 	protected ScriptEvent generateEvent(CachedEntity character,
 			CachedEntity trigger, CachedEntity script, Map<String, String> parameters) throws UserErrorMessage {
+		GlobalEvent ge = new GlobalEvent(character, db);
+		return ge;
+	}
+	
+	@Override
+	protected void processParameters(ScriptEvent event, Map<String, String> parameters)
+		throws UserErrorMessage 
+	{
 		String additionalEntities = parameters.get("entities");
 		List<Key> entityFetch = new ArrayList<Key>();
 		
@@ -70,10 +78,7 @@ public class CommandScriptGlobal extends CommandScriptBase {
 				throw new UserErrorMessage("Something went wrong... Try again later.");
 			}
 		}
-		
-		GlobalEvent ge = new GlobalEvent(character, db);
-		ge.addArguments(db, wrappers);
-		return ge;
+		((GlobalEvent)event).addArguments(db, wrappers);
 	}
 
 }
