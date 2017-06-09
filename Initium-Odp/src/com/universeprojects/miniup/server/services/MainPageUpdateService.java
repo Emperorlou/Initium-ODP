@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
@@ -951,9 +952,18 @@ public class MainPageUpdateService extends Service
 			List<CachedEntity> party = getParty();
 			if (party!=null)
 			{
+				// Get Characters and Users
+				EntityPool pool = new EntityPool(db.getDB());
+
 				for(CachedEntity character:party)
 				{
-					CachedEntity partyUser = db.getEntity("User", (Long)character.getProperty("userKey"));
+					pool.addToQueue((Key)character.getProperty("userKey"));
+				}
+				pool.loadEntities();
+
+				for(CachedEntity character:party)
+				{
+					CachedEntity partyUser = pool.get((Key)character.getProperty("userKey"));
 					boolean isThisMemberTheLeader = false;
 					if ("TRUE".equals(character.getProperty("partyLeader")))
 						isThisMemberTheLeader = true;
