@@ -912,6 +912,9 @@ public class MainPageUpdateService extends Service
 			{
 				for(CachedEntity script:directLocationScripts)
 				{
+					if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) 
+						continue;
+					
 					String caption = (String)script.getProperty("caption");
 					String id = script.getId().toString();
 					String description = (String)script.getProperty("description");

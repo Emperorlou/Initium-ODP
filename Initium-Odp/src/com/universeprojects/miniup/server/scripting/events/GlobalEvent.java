@@ -12,7 +12,7 @@ import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 public class GlobalEvent extends ScriptEvent {
-	public List<Object> arguments = new ArrayList<Object>();
+	public List<EntityWrapper> arguments = new ArrayList<EntityWrapper>();
 	public GlobalEvent(CachedEntity character, ODPDBAccess db) {
 		super(character, db);
 	}
@@ -38,17 +38,22 @@ public class GlobalEvent extends ScriptEvent {
 				try
 				{
 					EntityWrapper wrapped = ScriptService.wrapEntity((CachedEntity)obj, db);
-					arguments.add(wrapped);
+					if(wrapped != null)
+						arguments.add(wrapped);
 				}
 				catch(Exception ex)
 				{
 					ScriptService.log.log(Level.WARNING, "Unable to create script wrapper for CachedEntity. It is advisable that you do not use raw CachedEntity objects in script context.", ex);
-					arguments.add(obj);
+					arguments.add(new EntityWrapper((CachedEntity)obj, db));
 				}
+			}
+			else if(obj instanceof EntityWrapper)
+			{
+				arguments.add((EntityWrapper)obj);
 			}
 			else
 			{
-				arguments.add(obj);
+				ScriptService.log.log(Level.WARNING, "Unexpected object type in GlobalEvent script.");
 			}
 		}
 	}
