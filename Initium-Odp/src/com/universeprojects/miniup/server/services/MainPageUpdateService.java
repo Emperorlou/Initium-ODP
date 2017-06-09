@@ -13,6 +13,7 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.InitiumObject;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
@@ -404,6 +405,7 @@ public class MainPageUpdateService extends Service
 	
 	public void shortcut_fullPageUpdate(CombatService combatService)
 	{
+		updateVerifyCode();
 		updateMoney();
 		updateInBannerOverlayLinks();
 		updateButtonList(combatService);
@@ -425,6 +427,18 @@ public class MainPageUpdateService extends Service
 	}
 	
 	
+	public String updateVerifyCode(){
+		StringBuilder js = new StringBuilder();
+
+		try {
+			js.append("window.verifyCode = '" + db.getVerifyCode() + "';");
+		} catch (NotLoggedInException e) {
+			js.append("window.verifyCode = '';");
+		}
+
+		return updateJavascript("ajaxJs", js.toString());
+	}
+
 	/**
 	 * This updates the gold amount in the header bar.
 	 *
