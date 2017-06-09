@@ -413,6 +413,7 @@ public class MainPageUpdateService extends Service
 		updateButtonBar();
 		updateLocationName();
 		updateLocationDescription();
+		updateMonsterCountPanel();
 		updateTerritoryView();
 		updatePartyView();
 		updateCollectablesView();
