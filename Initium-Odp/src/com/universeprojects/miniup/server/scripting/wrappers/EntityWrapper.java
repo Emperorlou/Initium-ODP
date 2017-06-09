@@ -17,7 +17,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
  * 
  * @author spfiredrake
  */
-public abstract class EntityWrapper extends BaseWrapper
+public class EntityWrapper extends BaseWrapper
 {
 	protected ODPDBAccess db;
 	public boolean isNewEntity = false;
@@ -75,7 +75,8 @@ public abstract class EntityWrapper extends BaseWrapper
 		return wrappedEntity.getKind();
 	}
 
-	public String getName() {
+	public String getName() 
+	{
 		return (String) wrappedEntity.getProperty("name");
 	}
 	
