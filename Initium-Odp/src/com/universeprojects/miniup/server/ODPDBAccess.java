@@ -4297,10 +4297,10 @@ public class ODPDBAccess
 					// Make the attacking character party no longer in combat mode
 					List<CachedEntity> party = getParty(ds, attackingCharacterFinal);
 					if (party != null) {
-						setPartiedField(party, attackingCharacterFinal, "mode", CHARACTER_MODE_NORMAL);
-						setPartiedField(party, attackingCharacterFinal, "combatant", null);
-						setPartiedField(party, attackingCharacterFinal, "combatType", null);
-						setPartiedField(party, attackingCharacterFinal, "locationEntryDatetime", new Date());
+						setPartiedField(party, attackingCharacter, "mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
+						setPartiedField(party, attackingCharacter, "combatant", null);
+						setPartiedField(party, attackingCharacter, "combatType", null);
+						setPartiedField(party, attackingCharacter, "locationEntryDatetime", new Date());
 					}
 					
 					////////////////////////
