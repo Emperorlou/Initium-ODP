@@ -210,6 +210,7 @@ public class DBAccessor {
 	public EntityWrapper createMonsterFromId(Long defID, Location location)
 	{
 		CachedEntity defEntity = db.getEntity("NPCDef", defID);
+		if(defEntity == null) return null;
 		return createMonsterInternal(defEntity, location);
 	}
 	
@@ -239,6 +240,7 @@ public class DBAccessor {
 	public EntityWrapper createItemFromId(Long defID)
 	{
 		CachedEntity defEntity = db.getEntity("ItemDef", defID);
+		if(defEntity == null) return null;
 		return createItemInternal(defEntity);
 	}
 	
@@ -272,6 +274,7 @@ public class DBAccessor {
 	{
 		if(character == null || "Character".equals(character.getKind()) == false) return false;
 		
+		// Get the entity, so we can make sure it's a valid location.
 		CachedEntity location = db.getEntity("Location", locationId);
 		if(location == null) return false;
 		character.wrappedEntity.setProperty("homeTownKey", location.getKey());

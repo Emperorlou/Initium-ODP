@@ -77,4 +77,9 @@ public class CommandScriptLink extends CommandScriptBase {
 	{
 		return new SimpleEvent(character, getDB());
 	}
+
+	@Override
+	protected void processParameters(ScriptEvent event,
+			Map<String, String> parameters) throws UserErrorMessage {
+	}
 }
