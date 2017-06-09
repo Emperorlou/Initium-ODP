@@ -74,7 +74,7 @@ public class CommandSwitchCharacter extends Command {
 		// Consolidating this to quick refresh the page
 		CombatService cs = new CombatService(db);
 		CachedEntity location = ds.getIfExists((Key) character.getProperty("locationKey"));
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(),
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter,
 				location, this);
 		mpus.shortcut_fullPageUpdate(cs);
 
