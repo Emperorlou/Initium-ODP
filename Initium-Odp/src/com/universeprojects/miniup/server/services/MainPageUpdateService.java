@@ -13,6 +13,7 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.InitiumObject;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
@@ -423,8 +424,7 @@ public class MainPageUpdateService extends Service
 		updateMidMessagePanel();
 		updateLocationQuicklist();
 	}
-	
-	
+
 	/**
 	 * This updates the gold amount in the header bar.
 	 *

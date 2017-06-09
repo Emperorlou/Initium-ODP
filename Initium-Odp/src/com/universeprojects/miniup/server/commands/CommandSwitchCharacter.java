@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -77,6 +78,15 @@ public class CommandSwitchCharacter extends Command {
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter,
 				location, this);
 		mpus.shortcut_fullPageUpdate(cs);
+
+		// Update the verifyCode to the new character
+		StringBuilder js = new StringBuilder();
+		try {
+			js.append("window.verifyCode = '" + db.getVerifyCode() + "';");
+		} catch (NotLoggedInException e) {
+			js.append("window.verifyCode = '';");
+		}
+		updateJavascript("ajaxJs", js.toString());
 
 	}
 }
