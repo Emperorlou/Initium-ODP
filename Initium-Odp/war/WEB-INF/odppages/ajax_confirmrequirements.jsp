@@ -141,11 +141,10 @@ function confirmRequirements_collectChoices(event)
 				else
 					val+=",";
 				
-				val+=itemsSelected[ii].attr("itemKey");
+				val+=$(itemsSelected[ii]).attr("itemKey");
 			}
 			
-			//TODO: Finish this. We need a new way of getting the slot ID
-			result.slots[input.attr("id")] = val;
+			result.slots[requirementsContainer.attr("slotName")] = val;
 		}
 	}
 	
@@ -163,8 +162,7 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 	<h4><c:out value="${requirementCategory.name}"/></h4>
 	<c:forEach var="requirement" items="${requirementCategory.list}">
 		<div class='hiddenTooltip' id='requirementHelp-${requirement.slotName }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
-		<div id='requirement-container-${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
-			<input type='hidden' id='${requirement.slotName}' name='${requirement.slotName}'/>
+		<div id='requirement-container-${requirement.slotName}' slotName='${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
 			<div class='hint questionmark' rel='#requirementHelp-${requirement.slotName}'>?</div><div><c:out value="${requirement.name}"/></div>
 			<div id='itemHtmlForRequirement${requirement.slotName}'></div>
 		</div>

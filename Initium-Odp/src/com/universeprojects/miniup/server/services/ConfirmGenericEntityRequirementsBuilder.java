@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -72,13 +74,28 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 		Map<Object,Object> slots = (Map<Object,Object>)userResponse.get("slots");
 		for(Object key:slots.keySet())
 		{
-			String itemId = slots.get(key).toString();
+			String itemKeys = slots.get(key).toString();
 			String gerFieldNameAndSlotIndex = key.toString();
 	
-			if (itemId==null || itemId.length()==0)
+			if (itemKeys==null || itemKeys.length()==0)
 				result.slots.put(gerFieldNameAndSlotIndex, null);
 			else
-				result.slots.put(gerFieldNameAndSlotIndex, KeyFactory.createKey("Item", Long.parseLong(itemId)));
+			{
+				String[] keysArray = itemKeys.split(",");
+				Set<String> keySet = new HashSet<String>();
+				
+				List<Key> keys = new ArrayList<Key>(); 
+				for(String keyStr:keysArray)
+					if (keyStr!=null && keyStr.equals("")==false)
+					{
+						keyStr = keyStr.trim();
+						if (keySet.contains(keyStr)) throw new RuntimeException("Duplicate item keys found in the same slot.");
+						keySet.add(keyStr);
+						keys.add(KeyFactory.stringToKey(keyStr));
+					}
+				
+				result.slots.put(gerFieldNameAndSlotIndex, keys);
+			}
 		}
 		
 		try
@@ -131,7 +148,7 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 	public class GenericEntityRequirementResult implements Serializable
 	{
 		private static final long serialVersionUID = 5635978106621359645L;
-		public Map<String,Key> slots = new HashMap<>();
+		public Map<String,List<Key>> slots = new HashMap<>();
 		public Integer repetitionCount = null; 
 	}
 }

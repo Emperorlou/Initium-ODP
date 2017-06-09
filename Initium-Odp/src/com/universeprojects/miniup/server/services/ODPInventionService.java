@@ -199,7 +199,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public Map<Key, Key> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems, Integer repetitionCount) throws UserErrorMessage
+	public Map<Key, List<Key>> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, List<Key>> selectedItems, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		return null;
@@ -258,6 +258,12 @@ public abstract class ODPInventionService extends Service
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public int getTotalQuantity(List<CachedEntity> items)
+	{
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

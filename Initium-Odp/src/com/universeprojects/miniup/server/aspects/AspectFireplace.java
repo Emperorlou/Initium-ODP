@@ -459,10 +459,10 @@ public class AspectFireplace extends ItemAspect
 				List<String> slots = new ArrayList<String>(gerSlotsToItem.slots.keySet());
 				Collections.sort(slots);
 				
-				Key tinderKey = gerSlotsToItem.slots.get(slots.get(0));
-				Key kindlingKey = gerSlotsToItem.slots.get(slots.get(1));
-				Key firestarterKey = gerSlotsToItem.slots.get(slots.get(2));
-				Key additionalFirewoodKey = gerSlotsToItem.slots.get(slots.get(3));
+				List<Key> tinderKey = gerSlotsToItem.slots.get(slots.get(0));
+				List<Key> kindlingKey = gerSlotsToItem.slots.get(slots.get(1));
+				List<Key> firestarterKey = gerSlotsToItem.slots.get(slots.get(2));
+				List<Key> additionalFirewoodKey = gerSlotsToItem.slots.get(slots.get(3));
 				
 				EntityPool pool = new EntityPool(db.getDB());
 				
@@ -477,21 +477,22 @@ public class AspectFireplace extends ItemAspect
 				
 				pool.loadEntities();
 				
-				CachedEntity tinder = pool.get(tinderKey);
-				CachedEntity kindling = pool.get(kindlingKey);
-				CachedEntity firestarter = pool.get(firestarterKey);
-				CachedEntity additionalFirewood = pool.get(additionalFirewoodKey);
+				List<CachedEntity> tinder = pool.get(tinderKey);
+				List<CachedEntity> kindling = pool.get(kindlingKey);
+				List<CachedEntity> firestarter = pool.get(firestarterKey);
+				List<CachedEntity> additionalFirewood = pool.get(additionalFirewoodKey);
 				
 				if (tinder==null)
 					throw new UserErrorMessage("You need tinder to start a fire.");
 				
-				if (kindling==null || (Long)kindling.getProperty("quantity")<3)
+				if (inventionService.getTotalQuantity(kindling)<3)
 					throw new UserErrorMessage("You need at least 3 kindling to start a fire.");
 				
 				if (firestarter==null)
 					throw new UserErrorMessage("You need a firestarter to start a fire.");
 				
-				Map<Key, Key> gerToItems = inventionService.resolveGerSlotsToGers(pool, fireplaceLight, gerSlotsToItem.slots, 1);
+				
+				Map<Key, List<Key>> gerToItems = inventionService.resolveGerSlotsToGers(pool, fireplaceLight, gerSlotsToItem.slots, 1);
 				
 				inventionService.checkGersMatchItems(pool, gerToItems, 1);
 				
