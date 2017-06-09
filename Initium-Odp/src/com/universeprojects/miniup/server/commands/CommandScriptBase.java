@@ -53,14 +53,11 @@ public abstract class CommandScriptBase extends Command {
 		CachedEntity character = db.getCurrentCharacter();
 		validateCharacterState(character);
 		
-		// Safely fetch script and item entities
-		Long scriptId = tryParseId(parameters, "scriptId");
-		CachedEntity scriptSource = null;
-		
 		// Get the entity for which the script will run
 		Key entityKey = getSourceEntityKey(parameters);
 		CachedEntity entitySource = db.getEntity(entityKey);
-
+		
+		CachedEntity scriptSource = null;
 		//// SECURITY CHECKS
 		if("Script".equals(entitySource.getKind()))
 		{
@@ -69,6 +66,9 @@ public abstract class CommandScriptBase extends Command {
 		}
 		else
 		{
+			// Safely fetch script and item entities
+			Long scriptId = tryParseId(parameters, "scriptId");
+			
 			// If it's not a Script entity, allow it to go through.
 			@SuppressWarnings("unchecked")
 			List<Key> sourceScriptKeys = (List<Key>)entitySource.getProperty("scripts");
