@@ -62,7 +62,7 @@ public abstract class CommandScriptBase extends Command {
 		//// SECURITY CHECKS
 		if("Script".equals(entitySource.getKind()))
 		{
-			if(GameUtils.enumEquals(scriptSource.getProperty("type"), ScriptType.global)==false)
+			if(GameUtils.enumEquals(entitySource.getProperty("type"), ScriptType.global)==false)
 				throw new RuntimeException("Specified script is not a global type!");
 		}
 		else
