@@ -954,40 +954,39 @@ public class MainPageUpdateService extends Service
 			{
 				// Get Characters and Users
 				EntityPool pool = new EntityPool(db.getDB());
-
-				for(CachedEntity character:party)
+				for(CachedEntity partyCharacter:party)
 				{
-					pool.addToQueue((Key)character.getProperty("userKey"));
+					pool.addToQueue((Key)partyCharacter.getProperty("userKey"));
 				}
 				pool.loadEntities();
 
-				for(CachedEntity character:party)
+				for(CachedEntity partyCharacter:party)
 				{
-					CachedEntity partyUser = pool.get((Key)character.getProperty("userKey"));
+					CachedEntity partyUser = pool.get((Key)partyCharacter.getProperty("userKey"));
 					boolean isThisMemberTheLeader = false;
-					if ("TRUE".equals(character.getProperty("partyLeader")))
+					if ("TRUE".equals(partyCharacter.getProperty("partyLeader")))
 						isThisMemberTheLeader = true;
 					boolean dead = false;
-					if (((Double)character.getProperty("hitpoints"))<=0)
+					if (((Double)partyCharacter.getProperty("hitpoints"))<=0)
 						dead = true;
 
 					newHtml.append("<div>");
-					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
-					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, character, partyUser, true));
+					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+partyCharacter.getKey().getId()+"'>");
+					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true));
 
-					if (!GameUtils.equals(db.getCurrentCharacter().getKey(), character.getKey()) &&
-							GameUtils.equals(db.getCurrentUser().getKey(), character.getProperty("userKey"))) {
+					if (!GameUtils.equals(character.getKey(), partyCharacter.getKey()) &&
+							GameUtils.equals(user.getKey(), partyUser.getKey())) {
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
-						newHtml.append("<a onclick='switchCharacter(event, "+character.getKey().getId()+")'>Switch</a>");
+						newHtml.append("<a onclick='switchCharacter(event, "+partyCharacter.getKey().getId()+")'>Switch</a>");
 						newHtml.append("</div>");
 					}
-					
+
 					if (isThisMemberTheLeader)
 						newHtml.append("<div class='main-item-controls' style='top:0px;'>(Leader)</div>");
 					if (dead)
 					{
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
-						newHtml.append("<a onclick='collectDogecoinFromCharacter("+character.getKey().getId()+")'>Collect "+character.getProperty("dogecoins")+" gold</a>");
+						newHtml.append("<a onclick='collectDogecoinFromCharacter("+partyCharacter.getKey().getId()+")'>Collect "+partyCharacter.getProperty("dogecoins")+" gold</a>");
 						newHtml.append("</div>");
 					}
 					else
@@ -995,7 +994,7 @@ public class MainPageUpdateService extends Service
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
 						if (isThisMemberTheLeader == false && isPartyLeader())
-							newHtml.append("<a onclick='doSetLeader(event, " + character.getKey().getId() + ", \"" + character.getProperty("name") + "\")'>Make Leader</a>");
+							newHtml.append("<a onclick='doSetLeader(event, " + partyCharacter.getKey().getId() + ", \"" + partyCharacter.getProperty("name") + "\")'>Make Leader</a>");
 						newHtml.append("</div>");
 					}
 					newHtml.append("</a>");
