@@ -953,14 +953,25 @@ public class MainPageUpdateService extends Service
 			{
 				for(CachedEntity character:party)
 				{
+					CachedEntity partyUser = db.getEntity("User", (Long)character.getProperty("userKey"));
 					boolean isThisMemberTheLeader = false;
 					if ("TRUE".equals(character.getProperty("partyLeader")))
 						isThisMemberTheLeader = true;
 					boolean dead = false;
 					if (((Double)character.getProperty("hitpoints"))<=0)
 						dead = true;
-					newHtml.append("<div class='main-splitScreen-2columns'>");
-					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+character.getProperty("name"));
+
+					newHtml.append("<div>");
+					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
+					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, character, partyUser, true));
+
+					if (!GameUtils.equals(db.getCurrentCharacter().getKey().getId(), character.getKey().getId()) &&
+							GameUtils.equals(db.getCurrentUser().getProperty("userKey"), character.getProperty("userKey"))) {
+						newHtml.append("<div class='main-item-controls' style='top:0px'>");
+						newHtml.append("<a onclick='switchCharacter(event, "+character.getKey().getId()+")'>Switch</a>");
+						newHtml.append("</div>");
+					}
+					
 					if (isThisMemberTheLeader)
 						newHtml.append("<div class='main-item-controls' style='top:0px;'>(Leader)</div>");
 					if (dead)
