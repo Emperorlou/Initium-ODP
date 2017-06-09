@@ -403,6 +403,7 @@ public class MainPageUpdateService extends Service
 	
 	public void shortcut_fullPageUpdate(CombatService combatService)
 	{
+		updateMoney();
 		updateInBannerOverlayLinks();
 		updateButtonList(combatService);
 		updateLocationJs();	
