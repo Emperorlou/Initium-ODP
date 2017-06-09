@@ -975,8 +975,8 @@ public class MainPageUpdateService extends Service
 					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>");
 					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, character, partyUser, true));
 
-					if (!GameUtils.equals(db.getCurrentCharacter().getKey().getId(), character.getKey().getId()) &&
-							GameUtils.equals(db.getCurrentUser().getProperty("userKey"), character.getProperty("userKey"))) {
+					if (!GameUtils.equals(db.getCurrentCharacter().getKey(), character.getKey()) &&
+							GameUtils.equals(db.getCurrentUser().getKey(), character.getProperty("userKey"))) {
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						newHtml.append("<a onclick='switchCharacter(event, "+character.getKey().getId()+")'>Switch</a>");
 						newHtml.append("</div>");
