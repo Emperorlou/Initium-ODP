@@ -4425,6 +4425,9 @@ public class ODPDBAccess
 					db.put(characterToDie);
 					db.put(dyingCharacterLocation);
 					db.put(attackingCharacter);
+					if (party != null) {
+						putPartyMembersToDB_SkipSelf(db, party, attackingCharacter);
+					}
 					
 					Map<String, Object> result = new HashMap<String, Object>();
 					
