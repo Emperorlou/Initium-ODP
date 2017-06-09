@@ -424,19 +424,6 @@ public class MainPageUpdateService extends Service
 		updateMidMessagePanel();
 		updateLocationQuicklist();
 	}
-	
-	
-	public String updateVerifyCode(){
-		StringBuilder js = new StringBuilder();
-
-		try {
-			js.append("window.verifyCode = '" + db.getVerifyCode() + "';");
-		} catch (NotLoggedInException e) {
-			js.append("window.verifyCode = '';");
-		}
-
-		return updateJavascript("ajaxJs", js.toString());
-	}
 
 	/**
 	 * This updates the gold amount in the header bar.
