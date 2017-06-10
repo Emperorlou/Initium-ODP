@@ -1557,7 +1557,6 @@ public class GameUtils
 		return sb.toString();
     }
     
-    
     public static String renderSimpleBanner(String bannerUrl)
     {
     	return renderSimpleBanner(bannerUrl, null);
