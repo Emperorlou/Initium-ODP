@@ -205,7 +205,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public void poolGerSlotsAndSelectedItems(EntityPool pool, CachedEntity entity, Map<String, Key> selectedItems)
+	public void poolGerSlotsAndSelectedItems(EntityPool pool, CachedEntity entity, Map<String, List<Key>> selectedItems)
 	{
 		// TODO Auto-generated method stub
 		
