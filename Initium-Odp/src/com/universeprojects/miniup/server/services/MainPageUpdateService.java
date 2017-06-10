@@ -952,6 +952,9 @@ public class MainPageUpdateService extends Service
 			List<CachedEntity> party = getParty();
 			if (party!=null)
 			{
+				String mode = (String)character.getProperty("mode");
+				Boolean isCharacterBusy = (mode!=null && mode.equals("NORMAL")==false);
+
 				// Get Characters and Users
 				EntityPool pool = new EntityPool(db.getDB());
 				for(CachedEntity partyCharacter:party)
@@ -989,7 +992,7 @@ public class MainPageUpdateService extends Service
 						newHtml.append("<a onclick='collectDogecoinFromCharacter("+partyCharacter.getKey().getId()+")'>Collect "+partyCharacter.getProperty("dogecoins")+" gold</a>");
 						newHtml.append("</div>");
 					}
-					else
+					else if (!isCharacterBusy)
 					{
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
