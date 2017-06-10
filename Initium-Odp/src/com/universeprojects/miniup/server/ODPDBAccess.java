@@ -6263,9 +6263,4 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		return false;
 	}
-
-	public List<CachedEntity> getAchievementsFor(Key key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
