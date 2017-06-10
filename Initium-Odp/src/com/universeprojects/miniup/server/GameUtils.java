@@ -1297,7 +1297,7 @@ public class GameUtils
 		else
 			nameAndBars.append("	<a>"+characterName+"</a>");
 		nameAndBars.append("		<div id='hitpointsBar' style='position:relative; display:block; background-color:#777777; width:100px; height:12px;text-align:left'>");
-		nameAndBars.append("			<div style='position:absolute; display:inline-block; background-color:#FF0000; width:"+hitpointsPercentage+"px; height:12px;'>");
+		nameAndBars.append("			<div style='position:absolute; display:inline-block; background-color:#FF0000; max-width:100px;width:"+hitpointsPercentage+"px; height:12px;'>");
 		nameAndBars.append("			</div>");
 		if (leftSide)
 			nameAndBars.append("			<p style='margin:0px; padding:0px; width:100px; text-align:left; display:block; font-size:11px;position:absolute;font-family:Sans-serif;'>"+hitpoints+"/"+maxHitpoints+"</p>");

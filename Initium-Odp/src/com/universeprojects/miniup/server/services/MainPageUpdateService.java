@@ -24,7 +24,7 @@ public class MainPageUpdateService extends Service
 {
 	final protected CachedEntity user;
 	final protected CachedEntity character;
-	final protected CachedEntity location;
+	protected CachedEntity location;
 	final protected OperationBase operation;
 
 	protected CachedEntity group = null;
@@ -50,6 +50,16 @@ public class MainPageUpdateService extends Service
 		this.user = user;
 		this.character = character;
 		this.location = location;
+		if (character.getProperty("locationKey")==null)
+		{
+			this.location = db.getEntity((Key)db.getCurrentCharacter().getProperty("homeTownKey"));
+			if (this.location==null)
+				this.location = db.getEntity(db.getDefaultLocationKey());
+			db.getCurrentCharacter().setProperty("locationKey", location.getKey());
+			this.character.setProperty("locationKey", location.getKey());
+		}
+		
+		
 	}
 
 	protected String updateHtmlContents(String selector, String newHtml)
@@ -974,10 +984,10 @@ public class MainPageUpdateService extends Service
 					if (((Double)partyCharacter.getProperty("hitpoints"))<=0)
 						dead = true;
 
-					newHtml.append("<div>");
-					newHtml.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+partyCharacter.getKey().getId()+"'>");
+					newHtml.append("<div style='display:inline-block;vertical-align:top;'>");
+					newHtml.append("<a class='main-item clue' style='width:inherit;' rel='viewcharactermini.jsp?characterId="+partyCharacter.getKey().getId()+"'>");
 					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true));
-
+					newHtml.append("<br>");
 					if (!GameUtils.equals(character.getKey(), partyCharacter.getKey()) &&
 							GameUtils.equals(user.getKey(), partyUser.getKey())) {
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");

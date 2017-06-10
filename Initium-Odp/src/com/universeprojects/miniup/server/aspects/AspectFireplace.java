@@ -428,6 +428,9 @@ public class AspectFireplace extends ItemAspect
 			if (fireplace.isAspectPresent(AspectFireplace.class)==false)
 				throw new UserErrorMessage("You can only light a fire in a fireplace. The item you selected is not a fireplace.");
 
+			if (CommonChecks.checkItemIsAccessible(fireplace.getEntity(), db.getCurrentCharacter())==false)
+				throw new UserErrorMessage("You're not near this item.");
+
 			
 			CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
 			
@@ -555,6 +558,9 @@ public class AspectFireplace extends ItemAspect
 			
 			if (fireplace.isAspectPresent(AspectFireplace.class)==false)
 				throw new UserErrorMessage("You can only light a fire in a fireplace. The item you selected is not a fireplace.");
+			
+			if (CommonChecks.checkItemIsAccessible(fireplace.getEntity(), db.getCurrentCharacter())==false)
+				throw new UserErrorMessage("You're not near this item.");
 
 			AspectFireplace fireplaceAspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
 				
