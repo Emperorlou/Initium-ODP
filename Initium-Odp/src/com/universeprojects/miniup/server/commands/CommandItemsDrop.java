@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -41,6 +42,9 @@ public class CommandItemsDrop extends CommandItemsBase {
 			{
 				throw new UserErrorMessage("Item does not belong to character");
 			}
+			
+			if(CommonChecks.checkCharacterIsBusy(character))
+				throw new UserErrorMessage("Your character is currently busy and cannot drop items.");
 			
 			if(db.tryCharacterDropItem(character, dropItem, false))
 				saveEntities.add(dropItem);

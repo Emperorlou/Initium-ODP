@@ -72,13 +72,9 @@ public class CommandSwitchCharacter extends Command {
 			throw new UserErrorMessage("Error while switching character: " + e.getMessage());
 		}
 
-		// Consolidating this to quick refresh the page
-		CombatService cs = new CombatService(db);
-		CachedEntity location = ds.getIfExists((Key) character.getProperty("locationKey"));
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter,
-				location, this);
-		mpus.shortcut_fullPageUpdate(cs);
-
+		// Set the cached currentCharacter to target
+		request.setAttribute("characterEntity", targetCharacter);
+		
 		// Update the verifyCode to the new character
 		StringBuilder js = new StringBuilder();
 		try {
@@ -87,6 +83,12 @@ public class CommandSwitchCharacter extends Command {
 			js.append("window.verifyCode = '';");
 		}
 		updateJavascript("ajaxJs", js.toString());
-
+		
+		// Consolidating this to quick refresh the page
+		CombatService cs = new CombatService(db);
+		CachedEntity location = ds.getIfExists((Key) targetCharacter.getProperty("locationKey"));
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter,
+				location, this);
+		mpus.shortcut_fullPageUpdate(cs);
 	}
 }
