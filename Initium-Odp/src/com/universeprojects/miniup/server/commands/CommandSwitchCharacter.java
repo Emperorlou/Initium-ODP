@@ -82,6 +82,9 @@ public class CommandSwitchCharacter extends Command {
 		} catch (NotLoggedInException e) {
 			js.append("window.verifyCode = '';");
 		}
+
+		js.append("window.chatIdToken = '" + db.getChatIdToken(targetCharacter.getKey()) + "';");
+
 		updateJavascript("ajaxJs", js.toString());
 		
 		// Consolidating this to quick refresh the page
