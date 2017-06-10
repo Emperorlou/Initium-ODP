@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -52,6 +53,9 @@ public class CommandCharacterDropAll extends Command {
 				ignoreItems.add(equipmentInSlot.getId());
 			}
 		}
+		//Check if char is in current action
+		if(CommonChecks.checkCharacterIsBusy(character))
+			throw new UserErrorMessage("Your character is currently busy and cannot drop items.");
 		
 		// Find all sale items next. We don't care if itemKey references a destroyed item here
 		// since it's simply used to see if the item key from inv exists in the ignore list.
@@ -67,6 +71,7 @@ public class CommandCharacterDropAll extends Command {
 		for(CachedEntity dropItem:invItems)
 		{
 			if(ignoreItems.contains(dropItem.getKey().getId())) continue;
+			
 			
 			dropItem.setProperty("containerKey", characterLocationKey);
 			dropItem.setProperty("movedTimestamp", new Date());
