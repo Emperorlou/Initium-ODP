@@ -1139,7 +1139,7 @@ public class GameUtils
     }
     
     
-    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean largeSize, boolean showGroup)
+    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean showAchievements, boolean largeSize, boolean showGroup)
     {
     	boolean isSelf = false;
     	String lowDurabilityClass = "";
@@ -1470,6 +1470,28 @@ public class GameUtils
 				
 			}
 		}		
+		
+		// Show the achievements
+		if (showAchievements)
+		{
+			List<CachedEntity> achievements = db.getAchievementsFor(character.getKey());
+			if (achievements!=null && achievements.isEmpty()==false)
+			{
+				sb.append("<div></div>");
+				sb.append("<div class='achievement-pane hint' rel='#achievementDetails'>");
+				for(CachedEntity achievement:achievements)
+				{
+					sb.append("<img src='"+""+GameUtils.getResourceUrl(achievement.getProperty("imageUrl"))+"' border='0'>");
+				}
+				sb.append("</div>");
+				
+				sb.append("<div class='hiddenTooltip' id='achivementDetails'>");
+				sb.append("<h4 style='margin-top:0px;'>Your achievements</h4>");
+				sb.append(renderAchievementsList(achievements));
+				sb.append("</div>");
+				
+			}
+		}
 		sb.append("</div>");							
 		
 		
@@ -1553,6 +1575,26 @@ public class GameUtils
 			if (expiry!=null)
 				sb.append("<div class='buff-detail-expiry'>Expires in "+getTimePassedShortString(expiry)+"</div>");
 			sb.append("</div>");
+		}
+		return sb.toString();
+    }
+    
+    public static String renderAchievementsList(List<CachedEntity> achievements)
+    {
+    	StringBuilder sb = new StringBuilder();
+		for(CachedEntity achievement:achievements)
+		{
+			sb.append("<div class='achievement-detail'>");
+			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("imageUrl")+"' border='0'/>");
+			sb.append("<div class='achievement-detail-header'>");
+			sb.append("<h5>"+achievement.getProperty("title")+"</h5>");
+			String description = (String)achievement.getProperty("description");
+			if (description!=null)
+			{
+				sb.append("<div class='achievement-detail-description item-flavor-description'>");
+				sb.append(description);
+				sb.append("</div>");
+			}
 		}
 		return sb.toString();
     }
