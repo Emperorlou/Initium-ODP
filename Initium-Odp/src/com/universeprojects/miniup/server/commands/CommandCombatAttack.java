@@ -228,6 +228,7 @@ public class CommandCombatAttack extends Command
 			mpus.updateInBannerCharacterWidget();
 			mpus.updateInBannerCombatantWidget(targetCharacter);
 			mpus.updateButtonList(cs);
+			mpus.updatePartyView();
 		}
 		
 		
