@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.scripting.wrappers;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -78,6 +79,14 @@ public class EntityWrapper extends BaseWrapper
 	public String getName() 
 	{
 		return (String) wrappedEntity.getProperty("name");
+	}
+	
+	public String getInternalName()
+	{
+		String internalName = null;
+		if(wrappedEntity.hasProperty("internalName"))
+			internalName = (String)wrappedEntity.getProperty("internalName");
+		return internalName;
 	}
 	
 	public CachedEntity getEntity()
