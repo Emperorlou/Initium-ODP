@@ -1257,7 +1257,7 @@ public class GameUtils
 						for(CachedEntity script:directItemScripts)
 						{
 							if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) continue;
-							sb.append("	<a title='"+script.getProperty("description")+"' onclick='doTriggerItem(event,"+script.getId()+","+item.getId()+")'>"+script.getProperty("caption")+"</a>\r\n");
+							sb.append("	<a class='main-button-half' title='"+script.getProperty("description")+"' onclick='doTriggerItem(event,"+script.getId()+","+item.getId()+")'>"+script.getProperty("caption")+"</a>\r\n");
 						}
 					}
 				}
