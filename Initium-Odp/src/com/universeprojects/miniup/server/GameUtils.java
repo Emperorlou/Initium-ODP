@@ -1191,7 +1191,9 @@ public class GameUtils
 			sb.append("			<div " + (isComparisonItem ? "" : "name='maxWeight' ") + "class='item-popup-field' title='The amount of weight this item can carry.'>Storage weight: <div class='main-item-subnote'>"+result+"</div></div>\r\n");
 		}
 		
-		field = db.getItemWeight(item);
+		field=null;
+		if (item.getProperty("weight")!=null)
+			field = db.getItemWeight(item);
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
 			String result = "";
@@ -1207,7 +1209,9 @@ public class GameUtils
 			sb.append("			<div " + (isComparisonItem ? "" : "name='weight' ") + "class='item-popup-field' title='The item`s weight in grams.'>Weight:&nbsp;<div class='main-item-subnote'>"+result+"</div></div>\r\n");
 		}
 
-		field = item.getProperty("space");
+		field=null;
+		if (item.getProperty("space")!=null)
+			field = db.getItemSpace(item);
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
 			String result = "";
@@ -1231,9 +1235,12 @@ public class GameUtils
 		Object fieldMax = item.getProperty("maxDurability");
 		if (field!=null && field.toString().trim().equals("")==false)
 			sb.append("			<div " + (isComparisonItem ? "" : "name='durability' ") + "class='item-popup-field' title='The number of uses this item still has left. Once it reaches 0, the item is destroyed.'>Durability: <div class='main-item-subnote'>"+field+"/"+fieldMax+"</div></div>\r\n");
-			
+		
+		sb.append("		{{aspectList}}\r\n");
 		sb.append("		</div>\r\n");
 		sb.append("	<br/>\r\n");
+		
+		
 		
 		field = item.getProperty("description");
 		if (field!=null && field.toString().trim().equals("")==false)
@@ -1241,6 +1248,7 @@ public class GameUtils
 		
 		sb.append("	</div>\r\n");
 		
+		StringBuilder aspectList = new StringBuilder();
 		if(!isComparisonItem)
 		{
 			// Self user: scripts, owner only HTML, aspects, and premium token
@@ -1279,6 +1287,19 @@ public class GameUtils
 					if (initiumAspect instanceof ItemAspect)
 					{
 						ItemAspect itemAspect = (ItemAspect)initiumAspect;
+						
+						String popupTag = itemAspect.getPopupTag();
+						if (popupTag!=null)
+						{
+							if (aspectList.length()>0)
+							{
+								aspectList.append(", ");
+								aspectList.append(popupTag.toLowerCase());
+							}
+							else
+								aspectList.append(popupTag);
+						}
+						
 						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
 						if(curEntries != null)
 							itemPopupEntries.addAll(curEntries);
@@ -1292,9 +1313,16 @@ public class GameUtils
 						sb.append("		<p><a onclick=\""+WebUtils.jsSafe(entry.clickJavascript)+"\">" + entry.name + "</a><br/>"+entry.description+"</p>\r\n");
 					sb.append("	</div>\r\n");
 				}
+				
+				if(aspectList.length() > 0)
+				{
+					aspectList.insert(0, "<div class='simple-aspect-list'>");
+					aspectList.append("</div>");
+				}
 			}
 		}
 		
+		sb.replace(sb.indexOf("{{aspectList}}"), "{{aspectList}}".length(), aspectList.toString());
 		sb.append("</div>");
 		return sb.toString();
 	}

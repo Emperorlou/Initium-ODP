@@ -32,6 +32,7 @@
 	<p id='item-comparison-link'><a onclick='$("#item-comparisons").show(); $("#item-comparison-link").hide();'>Compare with existing equipment</a></p>
 	<div id='item-comparisons' style='display:none;'>
 		<c:forEach items="${comparisons}" var="comparison">
+		<hr/>
 		${comparison}
 		</c:forEach>
 	</div>
