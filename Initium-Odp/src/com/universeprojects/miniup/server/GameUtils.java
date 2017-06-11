@@ -1322,7 +1322,8 @@ public class GameUtils
 			}
 		}
 		
-		sb.replace(sb.indexOf("{{aspectList}}"), "{{aspectList}}".length(), aspectList.toString());
+		int aspectIndex = sb.indexOf("{{aspectList}}");
+		sb.replace(aspectIndex, aspectIndex+"{{aspectList}}".length(), aspectList.toString());
 		sb.append("</div>");
 		return sb.toString();
 	}
