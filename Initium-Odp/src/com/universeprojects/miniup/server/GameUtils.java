@@ -1016,9 +1016,9 @@ public class GameUtils
 		}
 		
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
 
 	public static String renderItemMini(ODPDBAccess db, CachedEntity currentChar, 
@@ -1233,13 +1233,13 @@ public class GameUtils
 			sb.append("			<div " + (isComparisonItem ? "" : "name='durability' ") + "class='item-popup-field' title='The number of uses this item still has left. Once it reaches 0, the item is destroyed.'>Durability: <div class='main-item-subnote'>"+field+"/"+fieldMax+"</div></div>\r\n");
 			
 		sb.append("		</div>\r\n");
-		sb.append("		<br/>\r\n");
+		sb.append("	<br/>\r\n");
 		
 		field = item.getProperty("description");
 		if (field!=null && field.toString().trim().equals("")==false)
-			sb.append("		<br/><div " + (isComparisonItem ? "" : "name='description' ") + "class='item-flavor-description'>"+field+"</div>\r\n");
+			sb.append("	<br/>\r\n	<div " + (isComparisonItem ? "" : "name='description' ") + "class='item-flavor-description'>"+field+"</div>\r\n");
 		
-		sb.append("		</div></div>\r\n");
+		sb.append("	</div>\r\n");
 		
 		if(!isComparisonItem)
 		{
@@ -1257,7 +1257,7 @@ public class GameUtils
 						for(CachedEntity script:directItemScripts)
 						{
 							if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) continue;
-							sb.append("	<a title='"+script.getProperty("description")+"' onclick='doTriggerItem(event,"+script.getId()+","+item.getId()+")'>"+script.getProperty("caption")+"</a>\r\n");
+							sb.append("	<a class='main-button-half' title='"+script.getProperty("description")+"' onclick='doTriggerItem(event,"+script.getId()+","+item.getId()+")'>"+script.getProperty("caption")+"</a>\r\n");
 						}
 					}
 				}
@@ -1368,9 +1368,9 @@ public class GameUtils
     		return "";
     	
     	if (popupEmbedded)
-    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     	else
-    		return "<a rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     }
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)

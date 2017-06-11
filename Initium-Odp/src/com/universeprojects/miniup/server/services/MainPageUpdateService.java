@@ -1086,7 +1086,7 @@ public class MainPageUpdateService extends Service
 					iconUrl = "https://"+iconUrl.substring(7);
 				else if (iconUrl!=null && iconUrl.startsWith("http")==false)
 					iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
-				html.append("<div class='clue' rel='/viewitemmini.jsp?itemId=").append(item.getKey().getId()).append("'>");
+				html.append("<div class='clue' rel='/odp/viewitemmini?itemId=").append(item.getKey().getId()).append("'>");
 				html.append("<img src='").append(iconUrl).append("' border=0/>");
 				html.append("</div>");
 				

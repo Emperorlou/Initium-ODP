@@ -641,10 +641,10 @@ function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, c
 	};
 	
 	if(typeof quantity === "undefined" || quantity === 1)
-		confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", yesFunction);
+		confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/odp/viewitemmini?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", yesFunction);
 	else{
 		var calcPrice = itemPrice.replace(/,/g,"");
-		rangePopup("Buy Item", "Please specify the number of <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> to purchase ("+itemPrice+" gold each):",0,quantity,
+		rangePopup("Buy Item", "Please specify the number of <a class='clue' rel='/odp/viewitemmini?itemId="+itemId+"'>"+itemName+"</a> to purchase ("+itemPrice+" gold each):",0,quantity,
 			function(qty) { // textFunction
 				return "Total cost: " + (qty*calcPrice);
 			},
