@@ -120,9 +120,9 @@ $(window).ready(function(e){
 	
 	// Set the correct image for the header mute button
 	if (isSoundEffectsEnabled())
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
+		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	else
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
+		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 		
 
 	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
