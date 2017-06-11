@@ -355,7 +355,7 @@ $(document).ready(function(){
     				alert("You cannot chat privately until you select a person to chat privately with. Click on their name and then click on Private Chat.");
     				return;
     			}
-                message.sendMessage(message, target);
+                messager.sendMessage(message, target);
     			$("#chat_input").val('');
                 return true;
             }
