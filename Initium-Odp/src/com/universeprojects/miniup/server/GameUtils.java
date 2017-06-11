@@ -1054,7 +1054,7 @@ public class GameUtils
 		String itemClass = (String)item.getProperty("itemClass");
 		if(itemClass == null) itemClass = "";
 		sb.append("			<span " + (isComparisonItem ? "" : "name='itemName' ") + "class='" + determineQuality(item.getProperties()) + "'>"+itemName+"</span>\r\n");
-		sb.append("			<div " + (isComparisonItem ? "" : "name='itemClass' ") + "class='main-highlight' style='font-size:14px'>"+itemClass+")</div>\r\n");
+		sb.append("			<div " + (isComparisonItem ? "" : "name='itemClass' ") + "class='main-highlight' style='font-size:14px'>"+itemClass+"</div>\r\n");
 		sb.append("		</div>\r\n");
 		sb.append("	</div>\r\n");
 		
