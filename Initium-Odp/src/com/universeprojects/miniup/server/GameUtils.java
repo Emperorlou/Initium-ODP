@@ -1322,7 +1322,7 @@ public class GameUtils
 			}
 		}
 		
-		sb.replace(sb.indexOf("{{aspectList}}"), "{{aspectList}}".length(), "<div class='simple-aspect-list'>"+aspectList.toString()+"</div>");
+		sb.replace(sb.indexOf("{{aspectList}}"), "{{aspectList}}".length(), aspectList.toString());
 		sb.append("</div>");
 		return sb.toString();
 	}
