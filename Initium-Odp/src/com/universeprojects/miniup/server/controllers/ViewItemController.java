@@ -28,7 +28,7 @@ import com.universeprojects.web.PageController;
 @Controller
 public class ViewItemController extends PageController {
 
-	public ViewItemController(String pageName) {
+	public ViewItemController() {
 		super("viewitemmini");
 	}
 
