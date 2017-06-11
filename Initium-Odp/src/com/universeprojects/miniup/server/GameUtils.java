@@ -1289,7 +1289,7 @@ public class GameUtils
 				{
 					sb.append("	<div>\r\n");
 					for(ItemPopupEntry entry:itemPopupEntries)
-						sb.append("		<p><a onclick='"+WebUtils.jsSafe(entry.clickJavascript)+"'>" + entry.name + "</a><br/>"+entry.description+"</p>\r\n");
+						sb.append("		<p><a onclick=\""+WebUtils.jsSafe(entry.clickJavascript)+"\">" + entry.name + "</a><br/>"+entry.description+"</p>\r\n");
 					sb.append("	</div>\r\n");
 				}
 			}
