@@ -1279,7 +1279,9 @@ public class GameUtils
 					if (initiumAspect instanceof ItemAspect)
 					{
 						ItemAspect itemAspect = (ItemAspect)initiumAspect;
-						itemPopupEntries.addAll(itemAspect.getItemPopupEntries());
+						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
+						if(curEntries != null)
+							itemPopupEntries.addAll(curEntries);
 					}
 				}
 				
