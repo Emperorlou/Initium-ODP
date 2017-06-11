@@ -284,6 +284,7 @@ function SocketMessager(url, token) {
                 eb.send('chat.party.in', {'contents':message});
                 break;
             case "PrivateChat":
+                eb.send('chat.private.in', {'contents':message, 'target': target});
                 break;
             case "Notifications":
                 break;

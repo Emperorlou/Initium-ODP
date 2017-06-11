@@ -1135,7 +1135,7 @@ public class GameUtils
     
     public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide)
     {
-    	return renderCharacterWidget(request, db, character, selfUser, null, leftSide, true, false, false);
+    	return renderCharacterWidget(request, db, character, selfUser, null, leftSide, true, false, false, false);
     }
     
     
