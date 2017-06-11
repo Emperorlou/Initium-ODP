@@ -352,9 +352,9 @@ public class ServletEventServer extends HttpServlet
 							// TODO: handle invalid target
 						}
 					}
-					
+					// TODO handle accountless characters
 					payload.put("message", "To " + target + " -> " + message);
-					respBody.put("id", toCharacter.getKey().getId() + "/" + character.getKey().getId());
+					respBody.put("id", toCharacter.getProperty("userKey") + "/" + accountKey);
 					payload.put("code", "PrivateChat");
 					respBody.put("success", true);
 					break;
