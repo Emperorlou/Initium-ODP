@@ -43,7 +43,6 @@ public class ViewItemController extends PageController {
 	    
 	    Long itemId = WebUtils.getLongParam(request, "itemId");
 		if (itemId==null) return null;
-		
 		Key itemKey = KeyFactory.createKey("Item", itemId);
 		CachedEntity item = db.getEntity(itemKey); 
 		if (item==null)
@@ -56,6 +55,8 @@ public class ViewItemController extends PageController {
 		{
 			return null;
 		}
+		
+		request.setAttribute("itemId", itemId);
 		
 		// This is a special case for premium tokens...
 		if (CommonChecks.checkItemIsPremiumToken(item))
