@@ -1,5 +1,6 @@
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <div class="item-popup">
+	<input type='hidden' id='popupItemId' value='${itemId}'/>
 	<c:if test="${isItemOwner}"><a href='#' onclick='customizeItemOrderPage(${itemId})' style='float:left'>Customize</a></c:if>
 	${itemHtml}
 	<c:if test="${showChippedTokenUI}">
