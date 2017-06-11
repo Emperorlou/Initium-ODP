@@ -3827,9 +3827,9 @@ function toggleEnvironmentSoundEffects(newState)
 	
 	// Set the correct image for the header mute button
 	if (enabled)
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
+		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 	else
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
+		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	
 }
 
