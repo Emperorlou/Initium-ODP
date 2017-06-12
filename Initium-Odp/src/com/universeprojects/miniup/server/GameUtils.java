@@ -1784,7 +1784,7 @@ public class GameUtils
 						sb.append("<div class='achievement-pane hint' rel='#achievementDetails'>");
 						for(CachedEntity achievement:achievements)
 						{
-							sb.append("<img src='"+""+GameUtils.getResourceUrl(achievement.getProperty("imageUrl"))+"' border='0'>");
+							sb.append("<img src='"+""+GameUtils.getResourceUrl(achievement.getProperty("icon"))+"' border='0'>");
 						}
 						sb.append("</div>");
 						
@@ -1887,7 +1887,7 @@ public class GameUtils
 		for(CachedEntity achievement:achievements)
 		{
 			sb.append("<div class='achievement-detail'>");
-			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("imageUrl")+"' border='0'/>");
+			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'/>");
 			sb.append("<div class='achievement-detail-header'>");
 			sb.append("<h5>"+achievement.getProperty("title")+"</h5>");
 			String description = (String)achievement.getProperty("description");
