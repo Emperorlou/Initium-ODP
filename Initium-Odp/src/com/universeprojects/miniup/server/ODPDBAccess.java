@@ -6268,4 +6268,18 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		return null;
 	}
+	public CachedEntity newAchievement(CachedDatastoreService db, String title, String description, String icon, Long pointValue)
+	{
+		if (db == null) db = getDB();
+
+		CachedEntity achievement = new CachedEntity("Achievement");
+		// Set the achievement fields
+		achievement.setProperty("title", title);
+		achievement.setProperty("description", description);
+		achievement.setProperty("icon", icon);
+		achievement.setProperty("pointValue", pointValue);
+
+		db.put(achievement);
+		return achievement;
+	}
 }
