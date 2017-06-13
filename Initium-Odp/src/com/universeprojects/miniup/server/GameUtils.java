@@ -1773,43 +1773,6 @@ public class GameUtils
 				
 			}
 		}	
-		// Show the achievements
-				if (showAchievements)
-				{
-					CachedEntity user = db.getCurrentUser();
-					List<CachedEntity> achievements = db.getEntities((Key)user.getProperty("achievements"));
-					if (achievements!=null && achievements.isEmpty()==false)
-					{
-						for (CachedEntity achievement:achievements)
-						{
-							if (achievement.getProperty("pointValue")==null)
-							{
-								achievement.setProperty("pointValue", 0);
-							}
-						}
-						Collections.sort(achievements, new Comparator<CachedEntity>()
-						{
-							@Override
-							public int compare(CachedEntity o1, CachedEntity o2)
-							{
-								return ((Long)o1.getProperty("pointValue")).compareTo((Long)o2.getProperty("pointValue"));
-							}
-						});
-						sb.append("<div></div>");	
-						sb.append("<div class='achievement-pane hint' rel='#achievementDetails'>");
-						for(CachedEntity achievement:achievements)
-						{
-							sb.append("<img src='"+""+GameUtils.getResourceUrl(achievement.getProperty("icon"))+"' border='0'>");
-						}
-						sb.append("</div>");
-						
-						sb.append("<div class='hiddenTooltip' id='achivementDetails'>");
-						sb.append("<h4 style='margin-top:0px;'>Your achievements</h4>");
-						sb.append(renderAchievementsList(achievements));
-						sb.append("</div>");
-						
-					}
-				}	
 		sb.append("</div>");							
 		
 		
@@ -1901,6 +1864,7 @@ public class GameUtils
     	StringBuilder sb = new StringBuilder();
 		for(CachedEntity achievement:achievements)
 		{
+			if (achievement==null) continue;
 			sb.append("<div class='achievement-detail'>");
 			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'/>");
 			sb.append("<div class='achievement-detail-header'>");
