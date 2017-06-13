@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.longoperations;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
@@ -88,7 +89,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		
 		// Now figure out which of the gers in each slot should actually be used
-		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots, itemRequirementSlotsToItems.repetitionCount);
+		Map<Key, List<Key>> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots, itemRequirementSlotsToItems.repetitionCount);
 		
 		
 		// This check will throw a UserErrorMessage if it finds anything off

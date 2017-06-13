@@ -77,35 +77,47 @@ public class AspectFireplace extends ItemAspect
 		return itemPopupEntries;
 	}
 	
-	public void addFuel(ODPInventionService inventionService, CachedEntity firewoodEntity) throws UserErrorMessage
+	public void addFuel(ODPInventionService inventionService, List<CachedEntity> firewoodEntities, String gerName) throws UserErrorMessage
 	{
-		addFuel(inventionService, firewoodEntity, null);
+		addFuel(inventionService, firewoodEntities, null, gerName);
 	}
 	
-	public void addFuel(ODPInventionService inventionService, CachedEntity firewoodEntity, Integer quantityLimit) throws UserErrorMessage
+	public void addFuel(ODPInventionService inventionService, List<CachedEntity> firewoodEntities, Integer quantityLimit, String gerName) throws UserErrorMessage
 	{
 		if (isFireActive(System.currentTimeMillis())==false)
 			throw new UserErrorMessage("You can only add fuel to a fire that is already started.");
 		
-		InitiumObject firewood = new InitiumObject(db, firewoodEntity);
-		if (CommonChecks.checkItemIsClass(firewoodEntity, "Firewood")==false && firewood.isAspectPresent(AspectFlammable.class)==false)
-			throw new UserErrorMessage("The item you chose to add to the fire is not valid fuel.");
+		List<InitiumObject> firewoods = InitiumObject.wrap(db, firewoodEntities);
+		
+		for(InitiumObject firewood:firewoods)
+			if (CommonChecks.checkItemIsClass(firewood.getEntity(), "Firewood")==false && firewood.isAspectPresent(AspectFlammable.class)==false)
+				throw new UserErrorMessage("The item you chose to add to the fire is not valid fuel.");
 	
-		Long firewoodQuantity = (Long)firewoodEntity.getProperty("quantity");
-		Long fuelSpace = db.getItemSpace(firewoodEntity);
-		Long fuelWeight = db.getItemWeight(firewoodEntity);
+		Long firewoodQuantity = inventionService.getTotalQuantity(firewoodEntities);
+		Long fuelSpace = 0L;
+		Long fuelWeight = 0L; 
+		for(InitiumObject firewood:firewoods)
+		{
+			fuelSpace+=db.getItemSpace(firewood.getEntity());			
+			fuelWeight = db.getItemWeight(firewood.getEntity());
+		}
+		
 		Long depletionDate = getFuelDepletionDate().getTime();
+		
+		
+		
 		
 		// Reduce fuelWeight to match the quantity we're actually going to burn (if applicable)
 		if (quantityLimit!=null && firewoodQuantity!=null)
 		{
 			if (firewoodQuantity<quantityLimit)
-				throw new UserErrorMessage("You don't have enough '"+firewoodEntity.getProperty("name")+"'. You have "+firewoodQuantity+" but require "+quantityLimit+".");
+				throw new UserErrorMessage("You don't have enough '"+firewoodEntities.get(0).getProperty("name")+"'. You have "+firewoodQuantity+" but require "+quantityLimit+".");
+
 			
-			fuelWeight = (Long)firewoodEntity.getProperty("weight");
+			fuelWeight = (Long)firewoodEntities.get(0).getProperty("weight");
 			fuelWeight*=quantityLimit;
 			
-			fuelSpace = (Long)firewoodEntity.getProperty("space");
+			fuelSpace = (Long)firewoodEntities.get(0).getProperty("space");
 			fuelSpace*=quantityLimit;
 		}
 		
