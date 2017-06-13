@@ -128,6 +128,21 @@ public class DBAccessor {
 	{
 		return new Item(db.getEntity("Item", itemId), db);
 	}
+
+	public boolean setInternalName(EntityWrapper wrapper, String newInternalName)
+	{
+		if(wrapper.wrappedEntity.hasProperty("internalName") == false)
+			return false;
+		
+		String oldInternalName = wrapper.getInternalName();
+		
+		if(oldInternalName == null || "".equals(oldInternalName))
+			oldInternalName = "(null)";
+		
+		wrapper.wrappedEntity.setProperty("internalName", newInternalName);
+		ScriptService.log.log(Level.WARNING, "Updating " + wrapper.getKind() + "(" + wrapper.getId() + ") internal name: " + oldInternalName + " to " + newInternalName);
+		return true;
+	}
 	
 	public EntityWrapper[] getEntities(String kind, Long... entityIds)
 	{

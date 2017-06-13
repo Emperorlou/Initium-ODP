@@ -120,9 +120,9 @@ $(window).ready(function(e){
 	
 	// Set the correct image for the header mute button
 	if (isSoundEffectsEnabled())
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
+		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	else
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
+		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 		
 
 	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
@@ -641,10 +641,10 @@ function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, c
 	};
 	
 	if(typeof quantity === "undefined" || quantity === 1)
-		confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", yesFunction);
+		confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/odp/viewitemmini?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", yesFunction);
 	else{
 		var calcPrice = itemPrice.replace(/,/g,"");
-		rangePopup("Buy Item", "Please specify the number of <a class='clue' rel='/viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> to purchase ("+itemPrice+" gold each):",0,quantity,
+		rangePopup("Buy Item", "Please specify the number of <a class='clue' rel='/odp/viewitemmini?itemId="+itemId+"'>"+itemName+"</a> to purchase ("+itemPrice+" gold each):",0,quantity,
 			function(qty) { // textFunction
 				return "Total cost: " + (qty*calcPrice);
 			},
@@ -3827,9 +3827,9 @@ function toggleEnvironmentSoundEffects(newState)
 	
 	// Set the correct image for the header mute button
 	if (enabled)
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
+		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 	else
-		$("#header-mute").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
+		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 	
 }
 

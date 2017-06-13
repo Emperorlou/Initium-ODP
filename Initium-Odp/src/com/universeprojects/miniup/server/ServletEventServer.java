@@ -110,6 +110,7 @@ public class ServletEventServer extends HttpServlet
 				String accountId = (String) body.get("accountId");
 				String contents = (String) body.get("contents");
 				String channel = (String) body.get("channel");
+				String target = (String) body.get("target");
 
 				Key accountKey = GameUtils.parseKey(accountId);
 				CachedEntity character = null;
@@ -327,7 +328,35 @@ public class ServletEventServer extends HttpServlet
 					}
 					break;
 				case "private":
-					// TODO resolve an Alt name to an account ID
+					CachedEntity toCharacter = null;
+					// Handle sending to Character ID or Name
+					if (target.startsWith("#"))
+					{
+						try
+						{
+							toCharacter = db.getCharacterById(Long.parseLong(target.substring(1)));
+							target = (String)toCharacter.getProperty("name");
+						}
+						catch(Exception e)
+						{
+							//ignore exceptions here
+						}
+						if (toCharacter==null) {
+							// TODO: handle invalid target
+						}
+					}
+					else
+					{
+						toCharacter = db.getCharacterByName(target);
+						if (toCharacter==null) {
+							// TODO: handle invalid target
+						}
+					}
+					// TODO handle accountless characters
+					payload.put("message", "To " + target + " -> " + message);
+					respBody.put("id", toCharacter.getProperty("userKey") + "/" + accountKey);
+					payload.put("code", "PrivateChat");
+					respBody.put("success", true);
 					break;
 				default:
 					// TODO decide if we need a default case

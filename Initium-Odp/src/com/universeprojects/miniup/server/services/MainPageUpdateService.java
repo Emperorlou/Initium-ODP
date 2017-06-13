@@ -50,13 +50,15 @@ public class MainPageUpdateService extends Service
 		this.user = user;
 		this.character = character;
 		this.location = location;
+
+		// If the character's location is null, time to send them to their home town or default location
 		if (character.getProperty("locationKey")==null)
 		{
 			this.location = db.getEntity((Key)db.getCurrentCharacter().getProperty("homeTownKey"));
 			if (this.location==null)
 				this.location = db.getEntity(db.getDefaultLocationKey());
-			db.getCurrentCharacter().setProperty("locationKey", location.getKey());
-			this.character.setProperty("locationKey", location.getKey());
+			db.getCurrentCharacter().setProperty("locationKey", this.location.getKey());	// Not sure why this was throwing an NPE sometimes. Added a null check that shouldn't happen.
+			this.character.setProperty("locationKey", this.location.getKey());
 		}
 		
 		
@@ -966,6 +968,9 @@ public class MainPageUpdateService extends Service
 			List<CachedEntity> party = getParty();
 			if (party!=null)
 			{
+				String mode = (String)character.getProperty("mode");
+				Boolean isCharacterBusy = (mode!=null && mode.equals("NORMAL")==false);
+
 				// Get Characters and Users
 				EntityPool pool = new EntityPool(db.getDB());
 				for(CachedEntity partyCharacter:party)
@@ -1003,7 +1008,7 @@ public class MainPageUpdateService extends Service
 						newHtml.append("<a onclick='collectDogecoinFromCharacter("+partyCharacter.getKey().getId()+")'>Collect "+partyCharacter.getProperty("dogecoins")+" gold</a>");
 						newHtml.append("</div>");
 					}
-					else
+					else if (!isCharacterBusy)
 					{
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
@@ -1083,7 +1088,7 @@ public class MainPageUpdateService extends Service
 					iconUrl = "https://"+iconUrl.substring(7);
 				else if (iconUrl!=null && iconUrl.startsWith("http")==false)
 					iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
-				html.append("<div class='clue' rel='/viewitemmini.jsp?itemId=").append(item.getKey().getId()).append("'>");
+				html.append("<div class='clue' rel='/odp/viewitemmini?itemId=").append(item.getKey().getId()).append("'>");
 				html.append("<img src='").append(iconUrl).append("' border=0/>");
 				html.append("</div>");
 				

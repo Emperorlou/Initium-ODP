@@ -207,7 +207,7 @@ function updateDayNightCycle(forceRefresh)
 			var diffG = getDifference(previousG, g);
 			var diffB = getDifference(previousB, b);
 			var diffA = getDifference(previousA, amount);
-			if (diffR<1 && diffG<1 && diffB<1 && diffA<0.01)
+			if (diffR<0.1 && diffG<0.1 && diffB<0.1 && diffA<0.01)
 				return;
 			
 		}

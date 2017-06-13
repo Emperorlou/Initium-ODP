@@ -70,6 +70,7 @@ public abstract class ODPKnowledgeService extends Service
 	 * 
 	 * @param entity Currently this must be an Item entity but this will likely be expanded.
 	 * @param amount The number of experience points to add to each knowledge entity found associated with
+	 * @param percentageCap The max knowledge you can gain from this particular increase (out of 100).
 	 * @return Returns true if the increase was successful, false if it wasn't. It will only return false if the entity is not properly configured for learning (like if there is no itemClass specified on an Item).
 	 */	
 	public boolean increaseKnowledgeFor(CachedEntity entity, int amount, double percentageCap)

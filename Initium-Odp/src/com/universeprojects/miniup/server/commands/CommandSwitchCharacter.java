@@ -82,13 +82,16 @@ public class CommandSwitchCharacter extends Command {
 		} catch (NotLoggedInException e) {
 			js.append("window.verifyCode = '';");
 		}
-		updateJavascript("ajaxJs", js.toString());
+
+		js.append("window.chatIdToken = '" + db.getChatIdToken(targetCharacter.getKey()) + "';");
+		js.append("window.messager.idToken = window.chatIdToken;");
+
+		addJavascriptToResponse(js.toString());
 		
 		// Consolidating this to quick refresh the page
 		CombatService cs = new CombatService(db);
 		CachedEntity location = ds.getIfExists((Key) targetCharacter.getProperty("locationKey"));
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter,
-				location, this);
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter, location, this);
 		mpus.shortcut_fullPageUpdate(cs);
 	}
 }

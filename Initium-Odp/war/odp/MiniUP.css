@@ -1687,6 +1687,32 @@ a.range-increment {
 	float: right;
 }
 
+.item-popup-header
+{
+	font-size: 20px;
+}
+
+.item-popup-header > div
+{
+	display: inline-block;
+}
+
+.icon
+{
+    min-width: 34px;
+    min-height: 34px;
+    text-align: center;
+    vertical-align: top;
+}
+
+.icon > img
+{
+    position: relative;
+    vertical-align: top;
+/*    max-width: 90%;
+    max-height: 300px;*/
+}
+
 .item-popup-field
 {
 	display: inline-block;
@@ -1694,6 +1720,7 @@ a.range-increment {
 	font-size:17px;
 	margin-bottom:0px;
 }
+
 .item-popup-field-summary
 {
 	display: inline-block;
@@ -1704,6 +1731,10 @@ a.range-increment {
 	font-style:italic;
 }
 
+.item-popup-stats
+{
+	margin-left: 12px;
+}
 
 .item-value-comparison
 {

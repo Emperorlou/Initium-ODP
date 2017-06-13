@@ -185,7 +185,7 @@ public class HtmlComponents {
         if (item!=null)
         {
             itemName = (String)item.getProperty("name");
-            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+" ' rel='viewitemmini.jsp?itemId="+item.getKey().getId()+"'";
+            itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+" ' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'";
             itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
         }
 

@@ -30,6 +30,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
+import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ODPInventionService.GenericAffectorResult;
@@ -1015,14 +1016,316 @@ public class GameUtils
 		}
 		
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/viewitemmini.jsp?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
     }
 
-	public static String renderItemMini(CachedEntity equipment, boolean isComparisonItem) {
-		// TODO Auto-generated method stub
-		return null;
+	public static String renderItemMini(ODPDBAccess db, CachedEntity currentChar, 
+			CachedEntity item, boolean isComparisonItem) 
+	{
+		if(item == null) return "";
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div class='normal-container'>\r\n");
+		sb.append("	<a onclick='shareItem("+item.getId()+")' style='float:right' title='Clicking this will show the item in chat in the location you`re currently in.'>Share</a>\r\n");
+		sb.append("	<br/><br/>\r\n");
+		
+		boolean selfUser = GameUtils.equals(currentChar.getKey(), item.getProperty("containerKey"));
+		if(selfUser && GameUtils.isStorageItem(item))
+			sb.append("	<p class='main-item-controls' style='display:block;margin:5px;'><a onclick='doSetLabel(event, " + item.getId() + ")' style='font-size:13px;'>Rename</a></p>\r\n");
+		
+		sb.append("	<div class='item-popup-header'>\r\n");
+		
+		String iconUrl = (String)item.getProperty("icon");
+		if (iconUrl!=null && iconUrl.startsWith("http://"))
+			iconUrl = "https://"+iconUrl.substring(7);
+		else if (iconUrl!=null && iconUrl.startsWith("http")==false)
+			iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
+		
+		sb.append("		<div class='icon'>");
+		if (item.getProperty("quantity")!=null)
+			sb.append("<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+GameUtils.formatNumber((Long)item.getProperty("quantity"))+"</div></div>");
+		sb.append("<img src='" + iconUrl + "' border='0'/></div>\r\n");
+		sb.append("		<div style='width:230px'>\r\n");
+		
+		String itemName = (String)item.getProperty("name");
+		if(itemName == null) itemName = "(null)";
+		String itemClass = (String)item.getProperty("itemClass");
+		if(itemClass == null) itemClass = "";
+		sb.append("			<span " + (isComparisonItem ? "" : "name='itemName' ") + "class='" + determineQuality(item.getProperties()) + "'>"+itemName+"</span>\r\n");
+		sb.append("			<div " + (isComparisonItem ? "" : "name='itemClass' ") + "class='main-highlight' style='font-size:14px'>"+itemClass+"</div>\r\n");
+		sb.append("		</div>\r\n");
+		sb.append("	</div>\r\n");
+		
+		String itemSlot = (String)item.getProperty("equipSlot");
+		String itemType = (String)item.getProperty("itemType");
+		if(itemType == null) itemType = "";
+		// If itemSlot is null, then we only want to use itemType, otherwise use both.
+		if(itemSlot == null || "".equals(itemSlot)) itemSlot = itemType;
+		else if("".equals(itemType) == false) itemSlot = itemSlot + " " + itemType; 
+		sb.append("	<div><p>" + itemSlot + "</p>\r\n");
+		sb.append("		<div class='item-popup-stats'>\r\n");	
+		
+		boolean requirements = false;
+		Object field = item.getProperty("dexterityPenalty");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+			sb.append("			<div " + (isComparisonItem ? "" : "name='dexterityPenalty' ") + "class='item-popup-field' title='This is the percentage that the wearer`s dexterity will be reduced when making dexterity based rolls. Dexterity penalties stack.'>Dexterity penalty: <div class='main-item-subnote'>"+field+"%</div></div>\r\n");
+		}
+
+		field = item.getProperty("strengthRequirement");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+			sb.append("			<div " + (isComparisonItem ? "" : "name='strengthRequirement' ") + "class='item-popup-field' title='This is the strength the wearer is required to have in order to equip this item.'>Strength requirement: <div class='main-item-subnote'>"+GameUtils.formatNumber(field)+"</div></div>\r\n");
+		}
+
+		if (requirements)
+			sb.append("			<br/><br/>\r\n");
+		
+		// For Weapons
+		field = item.getProperty("weaponDamage");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			sb.append("			<div " + (isComparisonItem ? "" : "name='weaponDamage' ") + "class='item-popup-field'>Weapon damage: <div class='main-item-subnote'>"+field.toString().substring(2)+"</div></div>\r\n");
+		}
+		
+		field = item.getProperty("weaponDamageCriticalChance");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			Double critChance = Double.parseDouble(field.toString());
+			if (currentChar!=null && currentChar.getProperty("intelligence") instanceof Double)
+				critChance += (db.getCharacterIntelligence(currentChar)-4d)*2.5d; 
+			sb.append("			<div " + (isComparisonItem ? "" : "name='weaponDamageCriticalChance' ") + "class='item-popup-field'> - Critical chance: <div class='main-item-subnote'>"+GameUtils.formatNumber(Double.parseDouble(field.toString()))+"% <span title='This is the total crit chance after your character`s crit chance has been taken into account.'>("+GameUtils.formatNumber(critChance)+"%)</span></div></div>\r\n");
+		}
+		
+		field = item.getProperty("weaponDamageCriticalMultiplier");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			sb.append("			<div " + (isComparisonItem ? "" : "name='weaponDamageCriticalMultiplier' ") + "class='item-popup-field'> - Critical hit multiplier: <div class='main-item-subnote'>"+Double.parseDouble(field.toString())+"x</div></div>\r\n");
+		}
+		
+		field = item.getProperty("weaponDamageType");
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("			<div " + (isComparisonItem ? "" : "name='weaponDamageType' ") + "class='item-popup-field'> - Damage Type: <div class='main-item-subnote'>"+field.toString()+"</div></div>\r\n");
+		
+		
+		if (item.getProperty("weaponDamage")!=null && item.getProperty("weaponDamage").toString().length()>3)
+		{
+			Double weaponAverageDamage = GameUtils.getWeaponAverageDamage(item);
+			Double weaponMaxDamage = GameUtils.getWeaponMaxDamage(item);
+			
+			sb.append("			<div " + (isComparisonItem ? "" : "name='weaponDamageSummary' ") + "class='item-popup-field-summary' title='This handy summary shows you the max damage that the weapon is capable of, and the average damage the weapon will do over time.'> - ("+GameUtils.formatNumber(weaponMaxDamage)+" max dmg, "+GameUtils.formatNumber(weaponAverageDamage)+" avg dmg)</div>\r\n");
+		}
+		
+		// For armors
+		field = item.getProperty("blockChance");
+		Long blockChance = (Long)field;
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("			<div " + (isComparisonItem ? "" : "name='blockChance' ") + "class='item-popup-field' title='This is the odds of this armor blocking a hit on the body part that the armor is meant to protect.'>Block chance: <div class='main-item-subnote'>"+field+"%</div></div>\r\n");
+		
+		// If there is a block chance AND the damage reduction is null/blank, default DR is 10
+		if (blockChance != null && (item.getProperty("damageReduction")==null || field.toString().trim().equals("")))
+			field = 10l;
+		else
+			field = item.getProperty("damageReduction");
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("			<div " + (isComparisonItem ? "" : "name='damageReduction' ") + "class='item-popup-field' title='This is the maximum amount of damage that this armor will absorb if it successfully blocks a hit.'> - Damage reduction: <div class='main-item-subnote'>"+field+"</div></div>\r\n");
+		
+		// If there is a block chance AND the damage reduction is null/blank, default DR is 10
+		if (blockChance != null && (item.getProperty("blockBludgeoningCapability")==null || field.toString().trim().equals("")))
+			field = "Average";
+		else
+			field = item.getProperty("blockBludgeoningCapability");
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("			<div " + (isComparisonItem ? "" : "name='blockBludgeoningCapability' ") + "class='item-popup-field' title='This describes this armor`s ability to block bludgeoning attacks. Excellent increases the damage reduction by x2.'> - Block bludgeoning: <div class='main-item-subnote'>"+field+"</div></div>\r\n");
+
+		// If there is a block chance AND the damage reduction is null/blank, default DR is 10
+		if (blockChance != null && (item.getProperty("blockPiercingCapability")==null || field.toString().trim().equals("")))
+			field = "Average";
+		else
+			field = item.getProperty("blockPiercingCapability");
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("			<div " + (isComparisonItem ? "" : "name='blockPiercingCapability' ") + "class='item-popup-field' title='This describes this armor`s ability to block piercing attacks. Excellent increases the damage reduction by x2.'> - Block piercing: <div class='main-item-subnote'>"+field+"</div></div>\r\n");
+		
+		// If there is a block chance AND the damage reduction is null/blank, default DR is 10
+		if (blockChance != null && (item.getProperty("blockSlashingCapability")==null || field.toString().trim().equals("")))
+			field = "Average";
+		else
+			field = item.getProperty("blockSlashingCapability");
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("			<div " + (isComparisonItem ? "" : "name='blockSlashingCapability' ") + "class='item-popup-field' title='This describes this armor`s ability to block slashing attacks. Excellent increases the damage reduction by x2.'> - Block slashing: <div class='main-item-subnote'>"+field+"</div></div>\r\n");
+		
+		// For storage items
+		field = item.getProperty("maxSpace");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			String result = "";
+			Long maxSpace = (Long)field;
+			if (maxSpace>=28316.8)
+			{
+				result = GameUtils.formatNumber(maxSpace/28316.8d)+" ft&#179;";
+			}
+			else
+			{
+				result = GameUtils.formatNumber(maxSpace)+" cc";
+			}
+			sb.append("			<div " + (isComparisonItem ? "" : "name='maxSpace' ") + "class='item-popup-field' title='The amount of space inside this item for storing things.'>Storage space: <div class='main-item-subnote'>"+result+"</div></div>\r\n");
+		}
+		
+		field = item.getProperty("maxWeight");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			String result = "";
+			Long maxWeight = (Long)field;
+			if (maxWeight>=1000)
+			{
+				result = GameUtils.formatNumber(maxWeight/1000d)+" kg";
+			}
+			else
+			{
+				result = GameUtils.formatNumber(maxWeight)+" g";
+			}
+			sb.append("			<div " + (isComparisonItem ? "" : "name='maxWeight' ") + "class='item-popup-field' title='The amount of weight this item can carry.'>Storage weight: <div class='main-item-subnote'>"+result+"</div></div>\r\n");
+		}
+		
+		field=null;
+		if (item.getProperty("weight")!=null)
+			field = db.getItemWeight(item);
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			String result = "";
+			Long weight = (Long)field;
+			if (weight>=1000)
+			{
+				result = GameUtils.formatNumber(weight/1000d)+"&nbsp;kg";
+			}
+			else
+			{
+				result = GameUtils.formatNumber(weight)+"&nbsp;g";
+			}
+			sb.append("			<div " + (isComparisonItem ? "" : "name='weight' ") + "class='item-popup-field' title='The item`s weight in grams.'>Weight:&nbsp;<div class='main-item-subnote'>"+result+"</div></div>\r\n");
+		}
+
+		field=null;
+		if (item.getProperty("space")!=null)
+			field = db.getItemSpace(item);
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			String result = "";
+			Long space = (Long)field;
+			if (space>=28316.8)
+			{
+				result = GameUtils.formatNumber(space/28316.8d)+"&nbsp;ft&#179;";
+			}
+			else
+			{
+				result = GameUtils.formatNumber(space)+"&nbsp;cc";
+			}
+			sb.append("			<div " + (isComparisonItem ? "" : "name='space' ") + "class='item-popup-field' title='The amount of space this item roughtly takes up when placed in a box in cubic centimeters.'>Space:&nbsp;<div class='main-item-subnote'>"+result+"</div></div>\r\n");
+		}
+		
+		field = item.getProperty("warmth");
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("			<div " + (isComparisonItem ? "" : "name='warmth' ") + "class='item-popup-field' title='The amount of warmth this item provides the wearer.'>Warmth: <div class='main-item-subnote'>"+field+" units</div></div>\r\n");
+		
+		field = item.getProperty("durability");
+		Object fieldMax = item.getProperty("maxDurability");
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("			<div " + (isComparisonItem ? "" : "name='durability' ") + "class='item-popup-field' title='The number of uses this item still has left. Once it reaches 0, the item is destroyed.'>Durability: <div class='main-item-subnote'>"+field+"/"+fieldMax+"</div></div>\r\n");
+		
+		sb.append("		{{aspectList}}\r\n");
+		sb.append("		</div>\r\n");
+		sb.append("	<br/>\r\n");
+		
+		
+		
+		field = item.getProperty("description");
+		if (field!=null && field.toString().trim().equals("")==false)
+			sb.append("	<br/>\r\n	<div " + (isComparisonItem ? "" : "name='description' ") + "class='item-flavor-description'>"+field+"</div>\r\n");
+		
+		sb.append("	</div>\r\n");
+		
+		StringBuilder aspectList = new StringBuilder();
+		if(!isComparisonItem)
+		{
+			// Self user: scripts, owner only HTML, aspects, and premium token
+			if(selfUser)
+			{
+				// Get all the directItem scripts on this item 
+				@SuppressWarnings("unchecked")
+				List<Key> scriptKeys = (List<Key>)item.getProperty("scripts");
+				if (scriptKeys!=null && scriptKeys.isEmpty()==false)
+				{
+					List<CachedEntity> directItemScripts = db.getScriptsOfType(scriptKeys, ODPDBAccess.ScriptType.directItem);
+					if (directItemScripts!=null && directItemScripts.isEmpty()==false)
+					{
+						for(CachedEntity script:directItemScripts)
+						{
+							if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) continue;
+							sb.append("	<a class='main-button-half' title='"+script.getProperty("description")+"' onclick='doTriggerItem(event,"+script.getId()+","+item.getId()+")'>"+script.getProperty("caption")+"</a>\r\n");
+						}
+					}
+				}
+				
+				// Owner only HTML
+				field = item.getProperty("ownerOnlyHtml");
+				if(field != null && "".equals(field)==false)
+					sb.append("	<div>"+field+"</div>");
+			}
+			
+			// Aspects
+			InitiumObject iObject = new InitiumObject(db, item);
+			if (iObject.hasAspects())
+			{
+				List<ItemPopupEntry> itemPopupEntries = new ArrayList<ItemPopupEntry>();
+				// Go through the aspects on this item and include any special links that it may have
+				for(InitiumAspect initiumAspect:iObject.getAspects())
+				{
+					if (initiumAspect instanceof ItemAspect)
+					{
+						ItemAspect itemAspect = (ItemAspect)initiumAspect;
+						
+						String popupTag = itemAspect.getPopupTag();
+						if (popupTag!=null)
+						{
+							if (aspectList.length()>0)
+							{
+								aspectList.append(", ");
+								aspectList.append(popupTag.toLowerCase());
+							}
+							else
+								aspectList.append(popupTag);
+						}
+						
+						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
+						if(curEntries != null)
+							itemPopupEntries.addAll(curEntries);
+					}
+				}
+				
+				if(itemPopupEntries.isEmpty()==false)
+				{
+					sb.append("	<div>\r\n");
+					for(ItemPopupEntry entry:itemPopupEntries)
+						sb.append("		<p><a onclick=\""+WebUtils.jsSafe(entry.clickJavascript)+"\">" + entry.name + "</a><br/>"+entry.description+"</p>\r\n");
+					sb.append("	</div>\r\n");
+				}
+				
+				if(aspectList.length() > 0)
+				{
+					aspectList.insert(0, "<div class='simple-aspect-list'>");
+					aspectList.append("</div>");
+				}
+			}
+		}
+		
+		int aspectIndex = sb.indexOf("{{aspectList}}");
+		sb.replace(aspectIndex, aspectIndex+"{{aspectList}}".length(), aspectList.toString());
+		sb.append("</div>");
+		return sb.toString();
 	}
     
     public static String renderEquipSlot(CachedEntity item)
@@ -1096,9 +1399,9 @@ public class GameUtils
     		return "";
     	
     	if (popupEmbedded)
-    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     	else
-    		return "<a rel='/viewitemmini.jsp?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     }
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)
@@ -1135,11 +1438,11 @@ public class GameUtils
     
     public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide)
     {
-    	return renderCharacterWidget(request, db, character, selfUser, null, leftSide, true, false, false);
+    	return renderCharacterWidget(request, db, character, selfUser, null, leftSide, true, false, false, false);
     }
     
     
-    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean largeSize, boolean showGroup)
+    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean showAchievements, boolean largeSize, boolean showGroup)
     {
     	boolean isSelf = false;
     	String lowDurabilityClass = "";
@@ -1469,7 +1772,7 @@ public class GameUtils
 				sb.append("</div>");
 				
 			}
-		}		
+		}	
 		sb.append("</div>");							
 		
 		
@@ -1556,7 +1859,28 @@ public class GameUtils
 		}
 		return sb.toString();
     }
-    
+    public static String renderAchievementsList(List<CachedEntity> achievements)
+    {
+    	StringBuilder sb = new StringBuilder();
+		for(CachedEntity achievement:achievements)
+		{
+			if (achievement==null) continue;
+			sb.append("<div class='achievement-detail'>");
+			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'/>");
+			sb.append("<div class='achievement-detail-header'>");
+			sb.append("<h5>"+achievement.getProperty("title")+"</h5>");
+			String description = (String)achievement.getProperty("description");
+			if (description!=null)
+			{
+				sb.append("<div class='achievement-detail-description item-flavor-description'>");
+				sb.append(description);
+				sb.append("</div>");
+			}
+			sb.append("</div>");
+			sb.append("</div>");
+		}
+		return sb.toString();
+    }
     public static String renderSimpleBanner(String bannerUrl)
     {
     	return renderSimpleBanner(bannerUrl, null);

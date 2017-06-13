@@ -9,7 +9,7 @@ It's possible to get things working using a different IDE and other different va
 ## Download and install JDK 1.7
 You should be able to find what you need here:
 http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html
-You’ll want to download the “Java SE Development Kit 7u80” (It’s possible that you’ll be prompted to create an Oracle account)
+You’ll want to download the “Java SE Development Kit 7u80” (It’s possible that you’ll be prompted to create an Oracle account) 
 
 ## Download Eclipse JUNO
 Pick the first download labelled **Eclipse IDE for Java EE Developers**
