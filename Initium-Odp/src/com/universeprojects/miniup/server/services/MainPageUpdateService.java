@@ -50,12 +50,14 @@ public class MainPageUpdateService extends Service
 		this.user = user;
 		this.character = character;
 		this.location = location;
+
+		// If the character's location is null, time to send them to their home town or default location
 		if (character.getProperty("locationKey")==null)
 		{
 			this.location = db.getEntity((Key)db.getCurrentCharacter().getProperty("homeTownKey"));
 			if (this.location==null)
 				this.location = db.getEntity(db.getDefaultLocationKey());
-			db.getCurrentCharacter().setProperty("locationKey", location.getKey());
+			if (db.getCurrentCharacter()!=null) db.getCurrentCharacter().setProperty("locationKey", location.getKey());	// Not sure why this was throwing an NPE sometimes. Added a null check that shouldn't happen.
 			this.character.setProperty("locationKey", location.getKey());
 		}
 		
