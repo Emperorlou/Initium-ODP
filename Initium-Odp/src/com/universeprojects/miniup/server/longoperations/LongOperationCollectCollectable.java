@@ -131,16 +131,19 @@ public class LongOperationCollectCollectable extends LongOperation {
 		
 		CachedEntity item = db.generateNewObject(itemDef, "Item");
 
+		ODPKnowledgeService knowledgeService = db.getKnowledgeService(db.getCurrentCharacterKey());
+		ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), knowledgeService);
 		if (collectableDef.getProperty("toolsRequired")!=null || collectableDef.getProperty("toolsOptional")!=null)
 		{
-			ODPKnowledgeService knowledgeService = db.getKnowledgeService(db.getCurrentCharacterKey());
-			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), knowledgeService);
 			EntityPool pool = new EntityPool(db.getDB());
 			
 			inventionService.poolItemRequirementsToItems(pool, tools);
 
 			inventionService.processCollectableResult(pool, collectableDef, tools, item, 1);
+
+			
 		}		
+		knowledgeService.increaseKnowledgeFor(item, 1, 5);
 
 		// Finish off some of those properties..
 
@@ -158,6 +161,9 @@ public class LongOperationCollectCollectable extends LongOperation {
 			item.setProperty("containerKey", db.getCurrentCharacter().getKey());
 		
 		item.setProperty("movedTimestamp", new Date());
+		
+		
+		
 		ds.put(item);
 		
 		if (onGround)
