@@ -6264,10 +6264,6 @@ public class ODPDBAccess
 		return false;
 	}
 
-	public List<CachedEntity> getAchievementsFor(Object property) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	public CachedEntity newAchievement(CachedDatastoreService db, String title, String description, String icon, Long pointValue)
 	{
 		if (db == null) db = getDB();
