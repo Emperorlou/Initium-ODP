@@ -57,8 +57,8 @@ public class MainPageUpdateService extends Service
 			this.location = db.getEntity((Key)db.getCurrentCharacter().getProperty("homeTownKey"));
 			if (this.location==null)
 				this.location = db.getEntity(db.getDefaultLocationKey());
-			if (db.getCurrentCharacter()!=null) db.getCurrentCharacter().setProperty("locationKey", location.getKey());	// Not sure why this was throwing an NPE sometimes. Added a null check that shouldn't happen.
-			this.character.setProperty("locationKey", location.getKey());
+			db.getCurrentCharacter().setProperty("locationKey", this.location.getKey());	// Not sure why this was throwing an NPE sometimes. Added a null check that shouldn't happen.
+			this.character.setProperty("locationKey", this.location.getKey());
 		}
 		
 		
