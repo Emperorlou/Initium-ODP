@@ -1778,6 +1778,21 @@ public class GameUtils
 				{
 					CachedEntity user = db.getCurrentUser();
 					List<CachedEntity> achievements = db.getAchievementsFor(user.getProperty("achievements"));
+					for (CachedEntity achievement:achievements)
+					{
+						if (achievement.getProperty("pointValue").equals(null))
+						{
+							achievement.setProperty("pointValue", 0);
+						}
+					}
+					Collections.sort(achievements, new Comparator<CachedEntity>()
+					{
+						@Override
+						public int compare(CachedEntity o1, CachedEntity o2)
+						{
+							return ((Long)o1.getProperty("pointValue")).compareTo((Long)o2.getProperty("pointValue"));
+						}
+					});
 					if (achievements!=null && achievements.isEmpty()==false)
 					{
 						sb.append("<div></div>");	
