@@ -1777,7 +1777,7 @@ public class GameUtils
 				if (showAchievements)
 				{
 					CachedEntity user = db.getCurrentUser();
-					List<CachedEntity> achievements = db.getAchievementsFor(user.getProperty("achievements"));
+					List<CachedEntity> achievements = db.getEntities((Key)user.getProperty("achievements"));
 					for (CachedEntity achievement:achievements)
 					{
 						if (achievement.getProperty("pointValue").equals(null))
