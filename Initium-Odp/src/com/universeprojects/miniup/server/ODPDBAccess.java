@@ -4477,10 +4477,6 @@ public class ODPDBAccess
 		}
 		
 		
-		
-		
-		
-		
 		// First, move all items in his inventory to the ground...
 		List<CachedEntity> items = getFilteredList("Item", "containerKey", characterToDie.getKey());
 		
@@ -4535,6 +4531,13 @@ public class ODPDBAccess
 			}
 		}
 		
+		// Now drop all the carried characters.
+		List<CachedEntity> carriedChars = getFilteredList("Character", "locationKey", characterToDie.getKey());
+		for(CachedEntity chars:carriedChars)
+		{
+			chars.setProperty("locationKey", location.getKey());
+			db.put(chars);
+		}
 		
 		
 		if (loot.equals(""))

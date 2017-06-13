@@ -33,6 +33,7 @@ import com.universeprojects.cacheddatastore.ShardedCounterService;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.ODPInventionService.GenericAffectorResult;
 
 
@@ -1032,8 +1033,13 @@ public class GameUtils
 		sb.append("	<br/><br/>\r\n");
 		
 		boolean selfUser = GameUtils.equals(currentChar.getKey(), item.getProperty("containerKey"));
-		if(selfUser && GameUtils.isStorageItem(item))
-			sb.append("	<p class='main-item-controls' style='display:block;margin:5px;'><a onclick='doSetLabel(event, " + item.getId() + ")' style='font-size:13px;'>Rename</a></p>\r\n");
+		
+		if(GameUtils.isStorageItem(item))
+		{
+			ContainerService cs = new ContainerService(db);
+			if(cs.checkContainerAccessAllowed(currentChar, item))
+				sb.append("	<p class='main-item-controls' style='display:block;margin:5px;'><a onclick='doSetLabel(event, " + item.getId() + ")' style='font-size:13px;'>Rename</a></p>\r\n");
+		}
 		
 		sb.append("	<div class='item-popup-header'>\r\n");
 		
