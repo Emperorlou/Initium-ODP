@@ -1897,6 +1897,8 @@ public class GameUtils
 				sb.append(description);
 				sb.append("</div>");
 			}
+			sb.append("</div>");
+			sb.append("</div>");
 		}
 		return sb.toString();
     }
