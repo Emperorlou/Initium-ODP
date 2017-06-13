@@ -1777,12 +1777,12 @@ public class GameUtils
 				if (showAchievements)
 				{
 					CachedEntity user = db.getCurrentUser();
-					List<CachedEntity> achievements = db.getAchievementsFor(user.getProperty("achievements"));
-					if (achievements!=null)
+					List<CachedEntity> achievements = db.getEntities((Key)user.getProperty("achievements"));
+					if (achievements!=null && achievements.isEmpty()==false)
 					{
 						for (CachedEntity achievement:achievements)
 						{
-							if (achievement.getProperty("pointValue").equals(null))
+							if (achievement.getProperty("pointValue")==null)
 							{
 								achievement.setProperty("pointValue", 0);
 							}
@@ -1795,9 +1795,6 @@ public class GameUtils
 								return ((Long)o1.getProperty("pointValue")).compareTo((Long)o2.getProperty("pointValue"));
 							}
 						});
-					}
-					if (achievements!=null && achievements.isEmpty()==false)
-					{
 						sb.append("<div></div>");	
 						sb.append("<div class='achievement-pane hint' rel='#achievementDetails'>");
 						for(CachedEntity achievement:achievements)
