@@ -723,8 +723,6 @@ public class MainPageUpdateService extends Service
 			String buttonCaption = "Head towards "+destLocationName;
 			if("Script".equals(destLocation.getKind()))
 			{
-				if(GameUtils.booleanEquals(destLocation.getProperty("hidden"), true)) 
-					continue;
 				destLocationName = (String)destLocation.getProperty("caption");
 				buttonCaption = destLocationName;
 			}
