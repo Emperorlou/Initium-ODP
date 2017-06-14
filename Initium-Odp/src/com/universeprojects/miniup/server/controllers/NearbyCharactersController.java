@@ -2,6 +2,9 @@ package com.universeprojects.miniup.server.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -44,6 +47,14 @@ public class NearbyCharactersController extends PageController {
 			return null;
 		
 		List<CachedEntity> charactersHere = db.getFilteredList("Character", 51, "locationKey", FilterOperator.EQUAL, locationKey);
+		Collections.sort(charactersHere, new Comparator<CachedEntity>()
+			{
+				@Override
+				public int compare(CachedEntity o1, CachedEntity o2)
+				{
+				return ((Date)o1.getProperty("locationEntryDatetime")).compareTo((Date)o2.getProperty("locationEntryDatetime"));
+				}
+			});
 	    int charCount = charactersHere.size();
 	    
 	    request.setAttribute("charCount", charCount <= 50 ? charCount-1 : "50+");
