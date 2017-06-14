@@ -281,7 +281,10 @@ public class Character extends EntityWrapper
 	public boolean isItemEquipped(Item checkItem)
 	{
 		Map<String, Item> equipItems = getEquippedInventory();
-		return equipItems.containsKey(checkItem.getKey());
+		for(Item itm:equipItems.values())
+			if(GameUtils.equals(itm.getKey(), checkItem.getKey()))
+				return true;
+		return false;
 	}
 	
 	public boolean isItemEquippedByName(String itemName)
@@ -293,6 +296,13 @@ public class Character extends EntityWrapper
 				return true;
 		}
 		return false;
+	}
+	
+	public Item getEquipmentSlot(String slotName)
+	{
+		Map<String, Item> equipItems = getEquippedInventory();
+		// Returns null if not found.
+		return equipItems.get(slotName);
 	}
 	
 	public boolean isInCombat()

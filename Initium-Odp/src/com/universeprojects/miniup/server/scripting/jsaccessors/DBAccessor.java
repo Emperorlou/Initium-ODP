@@ -166,7 +166,7 @@ public class DBAccessor {
 	public boolean transferGold(Long amount, EntityWrapper fromCharacter, EntityWrapper toCharacter)
 	{
 		if(amount == null || amount < 0) return false;
-		
+		if(GameUtils.equals(fromCharacter.getKey(), toCharacter.getKey())) return false;
 		Long fromCoins = (Long)fromCharacter.wrappedEntity.getProperty("dogecoins");
 		if(fromCoins == null) fromCoins = 0L;
 		
@@ -195,6 +195,7 @@ public class DBAccessor {
 	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)
 	{
 		db.doDestroyEquipment(null, currentCharacter.wrappedEntity, item.wrappedEntity);
+		db.sendGameMessage(db.getDB(), currentCharacter.wrappedEntity, "<div class='equipment-destroyed-notice'>"+currentCharacter.getName()+"'s "+item.getName()+" was so badly damaged it has been destroyed. </div>");
 		return true;
 	}
 	
