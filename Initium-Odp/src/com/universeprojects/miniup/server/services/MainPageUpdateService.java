@@ -723,8 +723,6 @@ public class MainPageUpdateService extends Service
 			String buttonCaption = "Head towards "+destLocationName;
 			if("Script".equals(destLocation.getKind()))
 			{
-				if(GameUtils.booleanEquals(destLocation.getProperty("hidden"), true)) 
-					continue;
 				destLocationName = (String)destLocation.getProperty("caption");
 				buttonCaption = destLocationName;
 			}
@@ -764,7 +762,7 @@ public class MainPageUpdateService extends Service
 			if("Script".equals(destLocation.getKind()))
 			{
 				// Direct location is only thing we support right now, in terms of paths.
-				if("directLocation".equals(destLocation.getProperty("type")))
+				if(GameUtils.enumEquals(destLocation.getProperty("type"), ScriptType.directLocation))
 				{
 					String title = (String)destLocation.getProperty("description");
 					if(title != null && title.length() > 0) title = "title='" + WebUtils.htmlSafe(title) + "'";
