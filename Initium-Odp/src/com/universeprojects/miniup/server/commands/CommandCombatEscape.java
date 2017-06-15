@@ -37,14 +37,14 @@ public class CommandCombatEscape extends Command {
 		if (targetCharacter==null)
 		{
 			cs.leaveCombat(character, null);
-			mpus.shortcut_fullPageUpdate(cs);
+			mpus.shortcut_fullPageUpdate();
 			return;
 		}
 		
 		if (cs.isInCombatWith(character, targetCharacter, location)==false)
 		{
 			cs.leaveCombat(character, null);
-			mpus.shortcut_fullPageUpdate(cs);			
+			mpus.shortcut_fullPageUpdate();			
 			throw new UserErrorMessage("You're not in combat with this opponent, someone else is. This can happen if someone else entered combat around the same time as you.");
 		}
 		
@@ -90,7 +90,7 @@ public class CommandCombatEscape extends Command {
 		if (cs.isInCombat(character)==false || GameUtils.isPlayerIncapacitated(character))
 		{
 			// We're done with combat
-			mpus.shortcut_fullPageUpdate(cs);
+			mpus.shortcut_fullPageUpdate();
 			return;
 		}
 		else

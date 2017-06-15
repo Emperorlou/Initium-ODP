@@ -5304,8 +5304,6 @@ public class ODPDBAccess
 					resetInstanceRespawnTimer(destination);
 					CachedEntity curMember = party.get(partyIdx++);
 					
-					curMember.setProperty("mode", CHARACTER_MODE_COMBAT);
-					curMember.setProperty("combatant", possibleNPC.getKey());
 					possibleNPC.setProperty("mode", CHARACTER_MODE_COMBAT);
 					// For forced 1v1 combat, we also need to set the combatant on the monster
 					if (CommonChecks.checkLocationIsInstance(destination))
@@ -5314,8 +5312,24 @@ public class ODPDBAccess
 					}
 					ds.put(possibleNPC);
 					
+					if(isCombatSite)
+					{
+						// In combat sites, every member fights the same mob.
+						partyIdx = party.size();
+						setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
+						setPartiedField(party, character, "combatant", possibleNPC.getKey());
+					}
+					else
+					{
+						// Otherwise, each individual member gets a combatant,
+						// since the explore has moved all members and there might
+						// be a combatant for them to fight.
+						curMember.setProperty("mode", CHARACTER_MODE_COMBAT);
+						curMember.setProperty("combatant", possibleNPC.getKey());
+					}
+					
 					if(partyIdx >= party.size())
-						break;		
+						break;
 				}
 			
 			// Here we're going to take a list we got from the opponentResult stuff and reuse it for performance reasons...
@@ -5379,6 +5393,15 @@ public class ODPDBAccess
 		
 		if (destination.isUnsaved())
 			ds.put(destination);
+		
+		// Send main-page update for all party members but the leader.
+		List<Key> keys = new ArrayList<Key>();
+		for(CachedEntity chars:party)
+			if(GameUtils.equals(chars.getKey(), character.getKey())==false)
+				keys.add(chars.getKey());
+		
+		if(keys.isEmpty()==false)
+			sendMainPageUpdateForCharacters(db, keys, "shortcut_fullPageUpdate");
 		
 		return destination;
 	}

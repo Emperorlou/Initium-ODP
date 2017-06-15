@@ -170,10 +170,9 @@ public abstract class CommandScriptBase extends Command {
 						CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 						CachedEntity user = db.getCurrentUser();
 						MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
-						CombatService cs = new CombatService(db);
 						if(event.getJavascriptResponse()==JavascriptResponse.FullPageRefresh)
 						{
-							mpus.shortcut_fullPageUpdate(cs);
+							mpus.shortcut_fullPageUpdate();
 						}
 						else if(event.reloadWidgets)
 						{

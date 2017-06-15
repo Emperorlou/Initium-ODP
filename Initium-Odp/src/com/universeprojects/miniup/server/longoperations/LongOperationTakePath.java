@@ -233,9 +233,8 @@ public class LongOperationTakePath extends LongOperation {
 //			db.getDB().commitBulkWrite();
 		}
 
-		CombatService cs = new CombatService(db);
 		MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
-		update.shortcut_fullPageUpdate(cs);
+		update.shortcut_fullPageUpdate();
 
 //		setFullRefresh(true);
 		
