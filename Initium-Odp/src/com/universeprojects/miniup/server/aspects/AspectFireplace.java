@@ -82,7 +82,7 @@ public class AspectFireplace extends ItemAspect
 		addFuel(inventionService, firewoodEntities, null, gerName);
 	}
 	
-	public void addFuel(ODPInventionService inventionService, List<CachedEntity> firewoodEntities, Integer quantityLimit, String gerName) throws UserErrorMessage
+	public void addFuel(ODPInventionService inventionService, List<CachedEntity> firewoodEntities, Long quantityLimit, String gerName) throws UserErrorMessage
 	{
 		if (isFireActive(System.currentTimeMillis())==false)
 			throw new UserErrorMessage("You can only add fuel to a fire that is already started.");
@@ -111,7 +111,7 @@ public class AspectFireplace extends ItemAspect
 		if (quantityLimit!=null && firewoodQuantity!=null)
 		{
 			if (firewoodQuantity<quantityLimit)
-				throw new UserErrorMessage("You don't have enough '"+firewoodEntities.get(0).getProperty("name")+"'. You have "+firewoodQuantity+" but require "+quantityLimit+".");
+				throw new UserErrorMessage("You don't have enough '"+gerName+"'. You have "+firewoodQuantity+" but require "+quantityLimit+".");
 
 			
 			fuelWeight = (Long)firewoodEntities.get(0).getProperty("weight");
@@ -126,11 +126,16 @@ public class AspectFireplace extends ItemAspect
 			throw new UserErrorMessage("There is not enough room to put all of this into the fire.");
 		
 		// Now adjust the fuel weight by how much is flammable (if applicable)
-		Long percentFlammable = (Long)firewoodEntity.getProperty("Flammable:percentOfFlammableMaterial");
-		if (percentFlammable!=null)
-		{
-			fuelWeight=new Double(Math.round(fuelWeight.doubleValue()*(percentFlammable.doubleValue()/100d))).longValue();
-		}
+		if (quantityLimit!=null && firewoodQuantity!=null)
+			for(CachedEntity firewoodEntity:firewoodEntities)
+			{
+				Long percentFlammable = (Long)firewoodEntity.getProperty("Flammable:percentOfFlammableMaterial");
+				if (percentFlammable!=null)
+				{
+					Long entityWeight = (Long)firewoodEntity.getProperty("weight");
+					fuelWeight += new Double(Math.round(entityWeight.doubleValue()*(percentFlammable.doubleValue()/100d))).longValue()-entityWeight;
+				}
+			}
 		
 		int burnTime = getBurnTime(fuelWeight, fuelSpace);
 		
@@ -140,8 +145,8 @@ public class AspectFireplace extends ItemAspect
 		setFuelDepletionDate(new Date(depletionDate));
 		setSpace(getSpace()+fuelSpace);
 
-		if (quantityLimit==null) quantityLimit = 1;
-		inventionService.consumeItems(firewoodEntity, quantityLimit);
+		if (quantityLimit==null) quantityLimit = 1L;
+		inventionService.consumeItems(firewoodEntities, quantityLimit, gerName);
 	}
 	
 	public void updateFireProgress()
@@ -497,13 +502,13 @@ public class AspectFireplace extends ItemAspect
 				List<CachedEntity> firestarter = pool.get(firestarterKey);
 				List<CachedEntity> additionalFirewood = pool.get(additionalFirewoodKey);
 				
-				if (tinder==null)
+				if (tinder==null || tinder.isEmpty())
 					throw new UserErrorMessage("You need tinder to start a fire.");
 				
 				if (inventionService.getTotalQuantity(kindling)<3)
 					throw new UserErrorMessage("You need at least 3 kindling to start a fire.");
 				
-				if (firestarter==null)
+				if (firestarter==null || firestarter.isEmpty())
 					throw new UserErrorMessage("You need a firestarter to start a fire.");
 				
 				
@@ -517,25 +522,13 @@ public class AspectFireplace extends ItemAspect
 				fireplaceAspect.setFuelDepletionDate(new Date(System.currentTimeMillis()+1000));	// The spark that lasts 1 second
 				fireplaceAspect.setIconPostfix();
 				
-				fireplaceAspect.addFuel(inventionService, tinder, 1);
-				fireplaceAspect.addFuel(inventionService, kindling, 3);
+				fireplaceAspect.addFuel(inventionService, tinder, 1L, "Tinder");
+				fireplaceAspect.addFuel(inventionService, kindling, 3L, "Kindling");
 				if (additionalFirewood!=null)
-					fireplaceAspect.addFuel(inventionService, additionalFirewood);
+					fireplaceAspect.addFuel(inventionService, additionalFirewood, "Flammable material");
 				
 				// Also use the firestarter
-				Long durability = (Long)firestarter.getProperty("durability");
-				if (durability!=null)
-				{
-					long newDurability = durability-1;
-					
-					// If the quantity we need is less than the amount available, then only consume what we need
-					firestarter.setProperty("durability", newDurability);
-	
-					if (newDurability<1)
-						ds.delete(firestarter);
-					else
-						ds.put(firestarter);
-				}
+				inventionService.useItem(firestarter.get(0), 1L);
 				
 				ds.put(fireplace.getEntity());
 
@@ -595,13 +588,13 @@ public class AspectFireplace extends ItemAspect
 				.addGenericEntityRequirements("Material", "genericEntityRequirements1")
 				.go();
 				
-				Collection<Key> fuelList = gerSlotsToItem.slots.values();
-				Key fuelKey = fuelList.iterator().next();
+				Collection<List<Key>> fuelList = gerSlotsToItem.slots.values();
+				List<Key> fuelKey = fuelList.iterator().next();
 				
 				
-				CachedEntity fuel = db.getEntity(fuelKey);
+				List<CachedEntity> fuel = db.getEntities(fuelKey);
 
-				fireplaceAspect.addFuel(inventionService, fuel);
+				fireplaceAspect.addFuel(inventionService, fuel, "Flammable material");
 				
 				
 				ds.put(fireplace.getEntity());

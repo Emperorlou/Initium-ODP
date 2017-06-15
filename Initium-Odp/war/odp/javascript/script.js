@@ -2878,6 +2878,9 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 	$.post(url, parameters)
 	.done(function(data)
 	{
+		if (clickedElement!=null)
+			clickedElement.html(originalText);
+		
 		if (data.captcha==true)
 		{
 			antiBotQuestionPopup();
@@ -2948,8 +2951,6 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			startLongOperationCountdown(data.timeLeft);
 		}
 		
-		if (clickedElement!=null)
-			clickedElement.html(originalText);
 		
 		lastLongOperationEventObject = null;
 	})
@@ -3064,20 +3065,43 @@ function doExperiment(event)
 }
 
 
+function repeatConfirmRequirementsButton(repsUniqueId)
+{
+//	How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}' uniqueId='${repsUniqueId}'/>
+	var input = $("input[uniqueId="+repsUniqueId+"]");
+	var repCount = input.val();
+	if (isNaN(repCount)==false)
+	{
+		if (parseInt(repCount)>0)
+		{
+			repCount--;
+			input.val(repCount);
+			$("#confirmRequirementsButton-"+repsUniqueId).click();
+			return true;
+		}
+	}
+	return false;
+}
 
-
-function doCreatePrototype(event, ideaId, ideaName, userRequestId)
+function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId)
 {
 	
-	longOperation(event, "BeginPrototype", {ideaName:ideaName,ideaId:ideaId}, 
+	longOperation(event, "BeginPrototype", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
 			function(action) // responseFunction
 			{
 				showBannerLoadingIcon();
 				if (action.isComplete)
 				{
-					clearPopupPermanentOverlay(); 
-					playAudio("complete1");
-					doSimpleDesktopNotification(ideaName+" prototyping complete.", "");
+					if (repeatConfirmRequirementsButton(repsUniqueId))
+					{
+						// do nothing I guess
+					}
+					else
+					{
+						clearPopupPermanentOverlay(); 
+						playAudio("complete1");
+						doSimpleDesktopNotification(ideaName+" prototyping complete.", "");
+					}
 				}
 				else
 				{
@@ -3086,25 +3110,32 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId)
 			},
 			function()	// recallFunction
 			{
-				doCreatePrototype(event, ideaId, ideaName);
+				doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId);
 			}, 
 			userRequestId);
 	
 }
 
-function doConstructItemSkill(event, skillId, skillName, userRequestId)
+function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId)
 {
 	closeAllTooltips();
 	
-	longOperation(event, "DoSkillConstructItem", {skillName:skillName, skillId:skillId}, 
+	longOperation(event, "DoSkillConstructItem", {skillName:skillName, skillId:skillId,repsUniqueId:repsUniqueId}, 
 			function(action) // responseFunction
 			{
 				showBannerLoadingIcon();
 				if (action.isComplete)
 				{
-					clearPopupPermanentOverlay();
-					playAudio("complete1");
-					doSimpleDesktopNotification(skillName+" skill complete.", "");
+					if (repeatConfirmRequirementsButton(repsUniqueId))
+					{
+						// do nothing I guess
+					}
+					else
+					{
+						clearPopupPermanentOverlay();
+						playAudio("complete1");
+						doSimpleDesktopNotification(skillName+" skill complete.", "");
+					}
 				}
 				else
 				{
@@ -3113,7 +3144,7 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId)
 			},
 			function()	// recallFunction
 			{
-				doConstructItemSkill(event, skillId, skillName);
+				doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId);
 			}, 
 			userRequestId);
 	
@@ -3189,7 +3220,7 @@ function doRest()
 				{
 					hideBannerLoadingIcon();
 					setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
-					setBannerOverlayText("Resting..", action.description);
+					setBannerOverlayText("Resting..", action.description+"<br><span id='long-operation-timeleft'></span>");
 				}
 			},
 			function()	// recallFunction

@@ -248,11 +248,6 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
-	public void consumeItems(List<CachedEntity> item, long quantityToConsume) throws UserErrorMessage
-	{
-		// TODO Auto-generated method stub
-		
-	}
 
 	public Collection<Key> getDeletedEntities()
 	{
@@ -265,5 +260,18 @@ public abstract class ODPInventionService extends Service
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	public void consumeItems(List<CachedEntity> selectedItems, Long quantityRequired, String gerName) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void useItem(CachedEntity selectedItem, Long durabilityToLose)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

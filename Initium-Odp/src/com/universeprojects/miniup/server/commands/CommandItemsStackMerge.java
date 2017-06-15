@@ -39,9 +39,11 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		boolean appendToEnd;
 		String itemName;
 		Long quantity;
+		int mergesRemaining = 20;
 		ds.beginTransaction();
 		try {
 			for (CachedEntity mergeItem : batchItems) {
+				if (mergesRemaining==0) break;
 				if (GameUtils.equals(mergeItem.getProperty("containerKey"), character.getKey()) == false) {
 					throw new UserErrorMessage("Item does not belong to character.");
 				}
@@ -57,6 +59,8 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 							appendToEnd = true;
 							for (CachedEntity checkEntity : sameNameList) {
 								if (canStack(checkEntity, mergeItem)) {
+									mergesRemaining--;
+									if (mergesRemaining==0) break;
 									checkEntity.setProperty("quantity",
 											(long) checkEntity.getProperty("quantity") + quantity);
 									needsDelete.add(mergeItem);
@@ -95,6 +99,10 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		} finally {
 			ds.rollbackIfActive();
 		}
+		
+		if (mergesRemaining==0)
+			setPopupMessage("There were too many items to merge. Only ~20 can be merged at once. You can try merging again though!");
+		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 

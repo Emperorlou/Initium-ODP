@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -68,6 +69,8 @@ public class ConfirmRequirementsController extends PageController
 		request.setAttribute("type", type.toString());
 		if (request.getParameter("maxReps")!=null && request.getParameter("maxReps").length()>0)
 			request.setAttribute("maxReps", request.getParameter("maxReps"));
+		
+		request.setAttribute("repsUniqueId", new Random().nextLong());
 		
 	    return "/WEB-INF/odppages/ajax_confirmrequirements.jsp";
 	}

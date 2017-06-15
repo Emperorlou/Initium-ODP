@@ -155,7 +155,7 @@ function confirmRequirements_collectChoices(event)
 }
 </script>
 <c:if test="${maxReps!=null}">
-How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}'/> 
+How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}' uniqueId='${repsUniqueId}'/> 
 </c:if>
 <div class='main-splitScreen'>
 <c:forEach var="requirementCategory" items="${formattedRequirements}">
@@ -171,19 +171,19 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 <br>
 <div class='center'>
 	<c:if test="${type=='IdeaToPrototype'}">
-		<a onclick='doCreatePrototype(event, ${ideaId}, "${ideaName}", "${userRequestId}")' class='big-link'>Start Prototyping</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCreatePrototype(event, ${ideaId}, "${ideaName}", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Start Prototyping</a>
 	</c:if>
 	<c:if test="${type=='ConstructItemSkill'}">
-		<a onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}")' class='big-link'>Begin</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>
 	</c:if>
 	<c:if test="${type=='CollectCollectable'}">
-		<a onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}")' class='big-link'>Begin</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>
 	</c:if>
 	<c:if test="${type=='GenericCommand'}">
-		<a onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}")' class='big-link'>Okay</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Okay</a>
 	</c:if>
 	<c:if test="${type=='GenericLongOperation'}">
-		<a onclick='longOperation(event, "${longOperationUrl}", null, null, "${userRequestId}")' class='big-link'>Okay</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='longOperation(event, "${longOperationUrl}", null, null, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Okay</a>
 	</c:if>
 </div>
 

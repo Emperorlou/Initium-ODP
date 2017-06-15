@@ -16,7 +16,8 @@ var messageCodes = [
              "Notifications"
              ];
 var messager;
-if(window.isTestServer) {
+if(window.isTestServer && localStorage.getItem("userNewChat")==true) 
+{
     messager = new SocketMessager("http://www.derekabenson.com:6969/eventbus", newChatIdToken);
 } else {
     messager = new Messager(5000, 10000, 30, "https://chat-dot-playinitium.appspot.com", chatIdToken);
@@ -216,6 +217,11 @@ messager.checkClientSideChatCommands = function(chatMessage)
 		}
 		if (chatMessage.toLowerCase().startsWith("/party")) {
 			var characterName = chatMessage.slice(7);
+			joinPartyCharacterName(null, characterName);
+			return true;
+		}
+		if (chatMessage.toLowerCase().startsWith("/join")) {
+			var characterName = chatMessage.slice(6);
 			joinPartyCharacterName(null, characterName);
 			return true;
 		}
