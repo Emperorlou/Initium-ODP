@@ -1542,7 +1542,6 @@ public class ODPDBAccess
 	{
 		Double hitpoints = (Double) character.getProperty("maxHitpoints");
 		if ((Double) character.getProperty("hitpoints") < hitpoints)
-		;
 		{
 			character.setProperty("hitpoints", hitpoints);
 

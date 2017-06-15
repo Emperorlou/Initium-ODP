@@ -3183,7 +3183,8 @@ function doRest()
 			{
 				if (action.isComplete)
 				{
-					fullpageRefresh();
+					clearPopupPermanentOverlay();
+					//fullpageRefresh();
 				}
 				else
 				{
