@@ -89,9 +89,8 @@ public class CommandSwitchCharacter extends Command {
 		addJavascriptToResponse(js.toString());
 		
 		// Consolidating this to quick refresh the page
-		CombatService cs = new CombatService(db);
 		CachedEntity location = ds.getIfExists((Key) targetCharacter.getProperty("locationKey"));
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter, location, this);
-		mpus.shortcut_fullPageUpdate(cs);
+		mpus.shortcut_fullPageUpdate();
 	}
 }

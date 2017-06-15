@@ -11,6 +11,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -42,16 +43,25 @@ public class CommandForgetAllCombatSites extends Command {
 		List<Long> forgettableCombatSiteList = tryParseStringToLongList(parameters, "forgettableCombatSiteArray", ",");
 		//The location the command is being called from
 		Key characterLocationKey = (Key)character.getProperty("locationKey");
-		try {
+		try 
+		{
 			for(Long forgettableCombatSite : forgettableCombatSiteList) {
 				if(System.currentTimeMillis() - startTime >= MAX_MILLISECONDS_TO_SPEND)
-					throw new UserErrorMessage("The bulk forgetting of sites has stopped due to it taking a while.  A total of "+numberOfSitesForgotten+" sites were forgotten.");
+					throw new UserErrorMessage("The bulk forgetting of sites has stopped due to it taking a while.  A total of "+numberOfSitesForgotten+" sites were forgotten.", false);
 				db.doDeleteCombatSite(ds, character, KeyFactory.createKey("Location", forgettableCombatSite), true, false);
 				numberOfSitesForgotten++;
 			}
-		} catch (UserErrorMessage e) {
-			throw e;
-		} finally {
+		} 
+		catch (UserErrorMessage e) 
+		{
+			// Only throw if it's an error, since it clears any ajax updates from the command.
+			if(e.isError())
+				throw e;
+			else
+				GameUtils.setPopupMessage(request, e.getMessage());
+		} 
+		finally 
+		{
 			ds.commitBulkWrite();
 			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(characterLocationKey.getId()), this);
 			mpus.updateButtonList(new CombatService(db));

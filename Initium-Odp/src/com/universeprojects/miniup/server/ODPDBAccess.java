@@ -43,6 +43,7 @@ import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
+import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MovementService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
@@ -5139,13 +5140,16 @@ public class ODPDBAccess
 	
 	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack) throws UserErrorMessage
 	{
+		return doCharacterTakePath(db, character, path, allowAttack, false);
+	}
+	
+	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, boolean allowAttack, boolean isExplore) throws UserErrorMessage
+	{
 		if (db==null)
 			db = getDB();
 
 		if (CHARACTER_MODE_COMBAT.equals(character.getProperty("mode")))
 			throw new UserErrorMessage("You cannot move while you're in combat.");
-		
-		
 		
 		CachedEntity destination = null;
 		Key destinationKey = null;
@@ -5175,19 +5179,18 @@ public class ODPDBAccess
 
 		String partyCode = (String) character.getProperty("partyCode");
 		boolean isInParty = partyCode != null && !"".equals(partyCode);
-
+		List<CachedEntity> party = getParty(db, character);
+		// We use the party collection for non-partied character as well.
+		if (party == null) party = Collections.singletonList(character);
 		MovementService movementService = new MovementService(this);
 
 		Key ownerKey = (Key) destination.getProperty("ownerKey");
 		if (ownerKey != null) {
 			// Check to see if all members of the party have access to enter owned housing.
-			List<CachedEntity> partyMembers = getParty(db, character);
-			if (partyMembers == null) partyMembers = Collections.singletonList(character); // You are the only party member
-
 			if("Group".equals(ownerKey.getKind())){
 				Set<String> groupKeySet = new HashSet<String>(); // Sets guarantee one and only one entry per unique value
 				List<String> isActiveInGroupStatusList = Arrays.asList(GroupStatus.Admin.name(), GroupStatus.Member.name()); // Wish we had streaming to build this appropriately
-				for(CachedEntity partyMember: partyMembers) {
+				for(CachedEntity partyMember: party) {
 					//Removes those who have just applied or have been kicked
 					boolean belongstoGroup = isActiveInGroupStatusList.contains(partyMember.getProperty("groupStatus"));
 					Key groupKey = (Key) partyMember.getProperty("groupKey"); // This should always be here if they belong to a group
@@ -5196,14 +5199,14 @@ public class ODPDBAccess
 				}
 
 				if(!groupKeySet.contains(ownerKey.toString()) || groupKeySet.size() != 1) { // Check for non-matching keys
-					throw new UserErrorMessage(String.format("You cannot enter a group owned house unless %s.", partyMembers.size() > 1 ? "all members of your party are members of the group" : "you are a member of the group"));
+					throw new UserErrorMessage(String.format("You cannot enter a group owned house unless %s.", party.size() > 1 ? "all members of your party are members of the group" : "you are a member of the group"));
 				}
 			} else if("User".equals(ownerKey.getKind())) {
 				Key pathOwner = (Key) path.getProperty("ownerKey");
-				for (CachedEntity partyMember : partyMembers) {
+				for (CachedEntity partyMember : party) {
 					boolean isPathOwner = GameUtils.equals(pathOwner, partyMember.getProperty("userKey"));
 					if (!isPathOwner && !movementService.isPathDiscovered(partyMember.getKey(), path.getKey())) {
-						throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", partyMembers.size() > 1 ? "every character already has been given access" : "you already have been given access"));
+						throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", party.size() > 1 ? "every character already has been given access" : "you already have been given access"));
 					}
 				}
 			} else {
@@ -5214,8 +5217,15 @@ public class ODPDBAccess
 		// Check if this property is locked and if so, if we have the key to enter it...
 		movementService.checkForLocks(character, path, destinationKey);
 
+		// If this destination is a town, then we will want to change the homeTownKey now
+		if ("Town".equals(destination.getProperty("type")))
+			character.setProperty("homeTownKey", destinationKey);
+
+		// Blockade needs to happen on TakePath
+		BlockadeService bs = new BlockadeService(this);
 		// Check if we're being blocked by the blockade
-		CachedEntity blockadeStructure = getBlockadeFor(character, destination);
+		EngageBlockadeOpponentResult opponentResult = null; 
+		CachedEntity blockadeStructure = bs.getBlockadeFor(character, destination);
 		
 		if (isInParty && blockadeStructure!=null)
 			throw new UserErrorMessage("You are approaching a defensive structure but you cannot attack as a party. Disband your party before attacking the defensive structure.");
@@ -5224,14 +5234,7 @@ public class ODPDBAccess
 			throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
 		
 		if (allowAttack==false && blockadeStructure!=null)
-			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a href='ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"&attack=true'>Click here to attack!</a>", false);
-
-
-		
-		
-		
-		List<CachedEntity> party = null;
-		EngageBlockadeOpponentResult opponentResult = null; 
+			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here to attack!</a>", false);
 		
 		// Set the character's new location AND all party members if applicable...
 		if (isInParty==false)
@@ -5239,7 +5242,7 @@ public class ODPDBAccess
 			// Here is where we'll check if we're entering combat with a defending player...
 			System.out.println("");
 			if (blockadeStructure!=null)
-				opponentResult = engageBlockadeOpponent(db, character.getKey(), currentLocationKey, destination, (Key)blockadeStructure.getProperty("locationKey"), blockadeStructure);
+				opponentResult = bs.engageBlockadeOpponent(character.getKey(), currentLocationKey, destination, (Key)blockadeStructure.getProperty("locationKey"), blockadeStructure);
 			
 			if (opponentResult==null || opponentResult.freeToPass)
 			{
@@ -5263,12 +5266,9 @@ public class ODPDBAccess
 			}
 			else
 				throw new RuntimeException("Unhandled situation exception.");
-			
-			
 		}
 		else
 		{
-			party = getParty(db, character);
 			if ("TRUE".equals(character.getProperty("partyLeader"))==false)
 				throw new UserErrorMessage("You cannot move the party because you're not the party leader.");
 			
@@ -5283,53 +5283,53 @@ public class ODPDBAccess
 						
 						sendNotification(db, member.getKey(), NotificationType.fullpageRefresh);
 					}
-			
-//			character.setProperty("locationKey", destination.getKey());
-//			party = getParty(db, character);
-//			if (party!=null)
-//				for(CachedEntity member:party)
-//					if (member.getKey().getId()!=character.getKey().getId())
-//					{
-//						member.setProperty("locationKey", destination.getKey());
-//						doCharacterDiscoverEntity(db, member, path);
-//						
-//						db.put(member);
-//					}
 		}
-
-		// If this destination is a town, then we will want to change the homeTownKey now
-		if ("Town".equals(destination.getProperty("type")))
-			character.setProperty("homeTownKey", destinationKey);
 		
-		
+		// Only engage if it's done via explore.
+		if(isExplore)
+		{
+			// Now determine if the path contains an NPC that the character would immediately enter battle with...
+			QueryHelper qh = new QueryHelper(ds);
+			List<CachedEntity> npcsInTheArea = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, destinationKey, "type", FilterOperator.EQUAL, "NPC");
+			npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
 
-		// Now determine if the path contains an NPC that the character would immediately enter battle with...
-		List<CachedEntity> npcsInTheArea = getFilteredList("Character", 300, "locationKey", FilterOperator.EQUAL, destinationKey);
-		npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
-
-		shuffleCharactersByAttackOrder(npcsInTheArea);
-		
-		for(CachedEntity possibleNPC:npcsInTheArea)
-			if ("NPC".equals(possibleNPC.getProperty("type")) && (Double)possibleNPC.getProperty("hitpoints")>0d)
-			{
-				resetInstanceRespawnTimer(destination);
-				setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
-				setPartiedField(party, character, "combatant", possibleNPC.getKey());
-				
-				// For forced 1v1 combat, we also need to set the combatant on the monster
-				if (CommonChecks.checkLocationIsInstance(destination))
+			shuffleCharactersByAttackOrder(npcsInTheArea);
+			boolean isCombatSite = CommonChecks.checkLocationIsCombatSite(destination);
+			int partyIdx = 0;
+			for(CachedEntity possibleNPC:npcsInTheArea)
+				if ((isCombatSite || possibleNPC.getProperty("mode") == null || CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode"))) && 
+						(Double)possibleNPC.getProperty("hitpoints")>0d)
 				{
+					resetInstanceRespawnTimer(destination);
+					CachedEntity curMember = party.get(partyIdx++);
+					
 					possibleNPC.setProperty("mode", CHARACTER_MODE_COMBAT);
-					possibleNPC.setProperty("combatant", character.getKey());
+					// For forced 1v1 combat, we also need to set the combatant on the monster
+					if (CommonChecks.checkLocationIsInstance(destination))
+						possibleNPC.setProperty("combatant", character.getKey());
+					
 					ds.put(possibleNPC);
+					
+					if(isCombatSite)
+					{
+						// In combat sites, every member fights the same mob.
+						partyIdx = party.size();
+						setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
+						setPartiedField(party, character, "combatant", possibleNPC.getKey());
+					}
+					else
+					{
+						// Otherwise, each individual member gets a combatant,
+						// since the explore has moved all members and there might
+						// be a combatant for them to fight.
+						curMember.setProperty("mode", CHARACTER_MODE_COMBAT);
+						curMember.setProperty("combatant", possibleNPC.getKey());
+					}
+					
+					if(partyIdx >= party.size())
+						break;
 				}
-				
-				break;
-//				// If we've been interrupted, we'll just get out and not actually travel to the location, but ONLY
-//				// if we're not entering a CombatSite!
-//				if ("CombatSite".equals(destination.getProperty("type"))==false)
-//					return;		
-			}
+		}
 		
 		// Now check if we have a discovery for this path we just took...
 		CachedEntity discovery = getDiscoveryByEntity(character.getKey(), path.getKey()); 
@@ -5361,14 +5361,6 @@ public class ODPDBAccess
 				// Note: The destination location gets saved later
 			}
 		}
-
-		// Lets just go ahead and reset the status field for the character here (this relates to defence structures)
-		//character.setProperty("status", null);
-		
-		doCharacterTimeRefresh(db, character);	// This is saving the character so no need to save after this
-		
-		putPartyMembersToDB_SkipSelf(db, party, character);
-		
 		
 		// Here we're going to take a list we got from the opponentResult stuff and reuse it for performance reasons...
 		// We're going to determine if we should refresh the leader on the defence structure we just arrived at or left from
@@ -5388,15 +5380,29 @@ public class ODPDBAccess
 			{
 				refreshDefenceStructureLeader(db, blockadeStructure, opponentResult.charactersInBlockade);
 			}
-			
 		}
+
+		// Lets just go ahead and reset the status field for the character here (this relates to defence structures)
+		//character.setProperty("status", null);
+		
+		doCharacterTimeRefresh(db, character);	// This is saving the character so no need to save after this
+		
+		putPartyMembersToDB_SkipSelf(db, party, character);
 		
 		if (destination.isUnsaved())
 			ds.put(destination);
 		
+		// Send main-page update for all party members but the leader.
+		List<Key> partyKeys = new ArrayList<Key>();
+		for(CachedEntity chars:party)
+			if(GameUtils.equals(chars.getKey(), character.getKey())==false)
+				partyKeys.add(chars.getKey());
+		
+		if(partyKeys.isEmpty()==false)
+			sendMainPageUpdateForCharacters(db, partyKeys, "shortcut_fullPageUpdate");
+		
 		return destination;
 	}
-	
 	
 	public class EngageBlockadeOpponentResult
 	{

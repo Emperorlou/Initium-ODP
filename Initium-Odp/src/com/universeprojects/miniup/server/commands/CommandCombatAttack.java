@@ -44,7 +44,7 @@ public class CommandCombatAttack extends Command
 		
 		if (GameUtils.isPlayerIncapacitated(character))
 		{
-			mpus.shortcut_fullPageUpdate(cs);
+			mpus.shortcut_fullPageUpdate();
 			setPopupMessage("You are incapacitated and cannot attack.");
 			return;
 		}
@@ -57,13 +57,13 @@ public class CommandCombatAttack extends Command
 		if (targetCharacter==null)
 		{
 			cs.leaveCombat(character, null);
-			mpus.shortcut_fullPageUpdate(cs);
+			mpus.shortcut_fullPageUpdate();
 			return;
 		}
 		if (cs.isInCombatWith(character, targetCharacter, location)==false && CommonChecks.checkLocationIsInstance(location))
 		{
 			cs.leaveCombat(character, null);
-			mpus.shortcut_fullPageUpdate(cs);			
+			mpus.shortcut_fullPageUpdate();			
 			throw new UserErrorMessage("You're not in combat with this opponent, someone else is. This can happen if someone else entered combat around the same time as you.");
 		}
 		
@@ -217,9 +217,8 @@ public class CommandCombatAttack extends Command
 		{
 			if (CommonChecks.checkLocationIsCombatSite(location)) location = ds.refetch(location);
 			// We're done with combat
-			cs = new CombatService(db);
 			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
-			mpus.shortcut_fullPageUpdate(cs);
+			mpus.shortcut_fullPageUpdate();
 			return;
 		}
 		else
