@@ -721,6 +721,12 @@ public class MainPageUpdateService extends Service
 			String destLocationName = (String)destLocation.getProperty("name");
 			
 			String buttonCaption = "Head towards "+destLocationName;
+			if("Script".equals(destLocation.getKind()))
+			{
+				destLocationName = (String)destLocation.getProperty("caption");
+				buttonCaption = destLocationName;
+			}
+			
 			String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
 			if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
 				buttonCaption = buttonCaptionOverride;
@@ -753,8 +759,19 @@ public class MainPageUpdateService extends Service
 
 
 			
+			if("Script".equals(destLocation.getKind()))
+			{
+				// Direct location is only thing we support right now, in terms of paths.
+				if(GameUtils.enumEquals(destLocation.getProperty("type"), ScriptType.directLocation))
+				{
+					String title = (String)destLocation.getProperty("description");
+					if(title != null && title.length() > 0) title = "title='" + WebUtils.htmlSafe(title) + "'";
+					else title = "";
 
-			if ("CombatSite".equals(location.getProperty("type")) && "CombatSite".equals(destLocation.getProperty("type"))==false)
+					newHtml.append("<a href='#' onclick='doTriggerLocation(event, "+destLocation.getId()+", " + location.getId() + ")' class='main-button' " + title + " "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");					
+				}
+			}
+			else if ("CombatSite".equals(location.getProperty("type")) && "CombatSite".equals(destLocation.getProperty("type"))==false)
 			{
 				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 				newHtml.append("<br>");
