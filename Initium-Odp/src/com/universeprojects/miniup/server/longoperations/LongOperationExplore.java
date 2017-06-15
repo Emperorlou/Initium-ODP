@@ -323,7 +323,7 @@ public class LongOperationExplore extends LongOperation {
 		db.newDiscovery(ds, db.getCurrentCharacter(), path);
 		
 		String mode = (String)db.getCurrentCharacter().getProperty("mode");
-		db.doCharacterTakePath(ds, db.getCurrentCharacter(), path);
+		db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, false, true);
 	}
 	
 }

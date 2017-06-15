@@ -5395,13 +5395,13 @@ public class ODPDBAccess
 			ds.put(destination);
 		
 		// Send main-page update for all party members but the leader.
-		List<Key> keys = new ArrayList<Key>();
+		List<Key> partyKeys = new ArrayList<Key>();
 		for(CachedEntity chars:party)
 			if(GameUtils.equals(chars.getKey(), character.getKey())==false)
-				keys.add(chars.getKey());
+				partyKeys.add(chars.getKey());
 		
-		if(keys.isEmpty()==false)
-			sendMainPageUpdateForCharacters(db, keys, "shortcut_fullPageUpdate");
+		if(partyKeys.isEmpty()==false)
+			sendMainPageUpdateForCharacters(db, partyKeys, "shortcut_fullPageUpdate");
 		
 		return destination;
 	}
