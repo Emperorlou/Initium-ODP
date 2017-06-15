@@ -141,11 +141,10 @@ function confirmRequirements_collectChoices(event)
 				else
 					val+=",";
 				
-				val+=itemsSelected[ii].attr("itemKey");
+				val+=$(itemsSelected[ii]).attr("itemKey");
 			}
 			
-			//TODO: Finish this. We need a new way of getting the slot ID
-			result.slots[input.attr("id")] = val;
+			result.slots[requirementsContainer.attr("slotName")] = val;
 		}
 	}
 	
@@ -156,15 +155,14 @@ function confirmRequirements_collectChoices(event)
 }
 </script>
 <c:if test="${maxReps!=null}">
-How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}'/> 
+How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}' uniqueId='${repsUniqueId}'/> 
 </c:if>
 <div class='main-splitScreen'>
 <c:forEach var="requirementCategory" items="${formattedRequirements}">
 	<h4><c:out value="${requirementCategory.name}"/></h4>
 	<c:forEach var="requirement" items="${requirementCategory.list}">
 		<div class='hiddenTooltip' id='requirementHelp-${requirement.slotName }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
-		<div id='requirement-container-${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
-			<input type='hidden' id='${requirement.slotName}' name='${requirement.slotName}'/>
+		<div id='requirement-container-${requirement.slotName}' slotName='${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
 			<div class='hint questionmark' rel='#requirementHelp-${requirement.slotName}'>?</div><div><c:out value="${requirement.name}"/></div>
 			<div id='itemHtmlForRequirement${requirement.slotName}'></div>
 		</div>
@@ -173,19 +171,19 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 <br>
 <div class='center'>
 	<c:if test="${type=='IdeaToPrototype'}">
-		<a onclick='doCreatePrototype(event, ${ideaId}, "${ideaName}", "${userRequestId}")' class='big-link'>Start Prototyping</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCreatePrototype(event, ${ideaId}, "${ideaName}", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Start Prototyping</a>
 	</c:if>
 	<c:if test="${type=='ConstructItemSkill'}">
-		<a onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}")' class='big-link'>Begin</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>
 	</c:if>
 	<c:if test="${type=='CollectCollectable'}">
-		<a onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}")' class='big-link'>Begin</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>
 	</c:if>
 	<c:if test="${type=='GenericCommand'}">
-		<a onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}")' class='big-link'>Okay</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Okay</a>
 	</c:if>
 	<c:if test="${type=='GenericLongOperation'}">
-		<a onclick='longOperation(event, "${longOperationUrl}", null, null, "${userRequestId}")' class='big-link'>Okay</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='longOperation(event, "${longOperationUrl}", null, null, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Okay</a>
 	</c:if>
 </div>
 

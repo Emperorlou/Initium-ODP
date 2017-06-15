@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -39,6 +40,16 @@ public class InitiumObject
 		{
 			this.aspects = null;
 		}
+	}
+	
+	public static List<InitiumObject> wrap(ODPDBAccess db, List<CachedEntity> entities)
+	{
+		List<InitiumObject> result = new ArrayList<InitiumObject>();
+		
+		for(CachedEntity entity:entities)
+			result.add(new InitiumObject(db, entity));
+		
+		return result;
 	}
 	
 	public CachedEntity getEntity()

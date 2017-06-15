@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.longoperations;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
@@ -78,7 +79,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 			inventionService.poolGerSlotsAndSelectedItems(pool, collectableDef, itemRequirementSlotsToItems.slots);
 			pool.loadEntities();
 			
-			Map<Key, Key> tools = inventionService.resolveGerSlotsToGers(pool, collectableDef, itemRequirementSlotsToItems.slots, 1);
+			Map<Key, List<Key>> tools = inventionService.resolveGerSlotsToGers(pool, collectableDef, itemRequirementSlotsToItems.slots, 1);
 			
 			Map<String,Object> processVariables = new HashMap<>();
 			processVariables.put("speed",  seconds);
@@ -106,7 +107,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 		CachedEntity collectable = db.getEntity("Collectable", collectableId);
 		CachedEntity collectableDef = db.getEntity((Key)collectable.getProperty("_definitionKey"));
 
-		Map<Key, Key> tools = (Map<Key, Key>)getDataProperty("tools");
+		Map<Key, List<Key>> tools = (Map<Key, List<Key>>)getDataProperty("tools");
 		
 		// Now update the collectable..
 		Long collectionCount = (Long)collectable.getProperty("collectionCount");

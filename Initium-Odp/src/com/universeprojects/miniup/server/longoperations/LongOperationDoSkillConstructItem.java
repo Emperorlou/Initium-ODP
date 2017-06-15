@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.longoperations;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
@@ -12,10 +13,10 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 import com.universeprojects.miniup.server.services.ConfirmSkillRequirementsBuilder;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
-import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 
 public class LongOperationDoSkillConstructItem extends LongOperation
 {
@@ -40,6 +41,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		doChecks(character, skill);
 
+		setDataProperty("repsUniqueId", parameters.get("repsUniqueId"));
 		setDataProperty("skillId", skillId);
 		setDataProperty("skillName", skill.getProperty("name"));
 		
@@ -55,9 +57,9 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
 		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
 		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
-		.setRepetitionCount(maxRepCount)
+		.setRepetitionCount(30)
 		.go();
-		if (itemRequirementSlotsToItems.repetitionCount==null)
+//		if (itemRequirementSlotsToItems.repetitionCount==null)
 			itemRequirementSlotsToItems.repetitionCount = 1; 
 		
 
@@ -78,11 +80,12 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		
 		// Now figure out which of the gers in each slot should actually be used
-		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots, itemRequirementSlotsToItems.repetitionCount);
+		Map<Key, List<Key>> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots, 1);
 		
 
+		
 		// This check will throw a UserErrorMessage if it finds anything off
-		inventionService.checkSkillWithSelectedItems(pool, skill, itemRequirementsToItems, itemRequirementSlotsToItems.repetitionCount);
+		inventionService.checkSkillWithSelectedItems(pool, skill, itemRequirementsToItems, 1);
 
 		Map<String,Object> processVariables = new HashMap<String,Object>();
 		Long seconds = 5L;
@@ -92,9 +95,6 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		processVariables.put("speed", seconds);
 
-		// Add in the repetitions...
-		if (itemRequirementSlotsToItems.repetitionCount!=null)
-			seconds*=itemRequirementSlotsToItems.repetitionCount;
 		
 		inventionService.processConstructItemSkillForProcessVariables(skill, itemRequirementsToItems, processVariables, pool);
 		
@@ -124,7 +124,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 	String doComplete() throws UserErrorMessage, UserRequestIncompleteException
 	{
 		@SuppressWarnings("unchecked")
-		Map<Key, Key> itemRequirementsToItems = (Map<Key, Key>)getDataProperty("selectedItems");
+		Map<Key, List<Key>> itemRequirementsToItems = (Map<Key, List<Key>>)getDataProperty("selectedItems");
 		Integer repetitionCount = (Integer)getDataProperty("repetitionCount");
 		
 		CachedEntity character = db.getCurrentCharacter();
@@ -141,7 +141,9 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		// Pooling entities...
 		pool.addEntityDirectly(ideaDef);
 		inventionService.poolConstructItemSkill(pool, skill);
-		pool.addToQueue(itemRequirementsToItems.keySet(), itemRequirementsToItems.values());
+		pool.addToQueue(itemRequirementsToItems.keySet());
+		for(List<Key> keyList:itemRequirementsToItems.values())
+			pool.addToQueue(keyList);
 		
 		pool.loadEntities();
 		
@@ -149,7 +151,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		// We're ready to create the final prototype and skill
 		
 		// Create the skill so we can use it again
-		CachedEntity item = inventionService.doConstructItemSkill(skill, itemRequirementsToItems, pool, repetitionCount);
+		CachedEntity item = inventionService.doConstructItemSkill(skill, itemRequirementsToItems, pool, 1);
 		
 		// Now add to the knowledge we gain
 		knowledgeService.increaseKnowledgeFor(skill, 1, 100);
@@ -157,7 +159,8 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		// Give the player a message that points to the skill and the new item he made
 		String msg = "You created an item: "+GameUtils.renderItem(item);
-		setUserMessage(msg);
+		if (repetitionCount>1)
+			setUserMessage(msg);
 		
 		// Delete all HTML of an item
 		if (inventionService.getDeletedEntities()!=null)
@@ -173,7 +176,8 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 	public String getPageRefreshJavascriptCall() {
 		Long skillId = (Long)getDataProperty("skillId");
 		String skillName = ((String)getDataProperty("skillName")).replace("'", "\\'");
-		return "doConstructItemSkill(null, "+skillId+", '"+skillName+"');"; 
+		String repsUniqueId = (String)getDataProperty("repsUniqueId");
+		return "doConstructItemSkill(null, "+skillId+", '"+skillName+"', null, "+repsUniqueId+");"; 
 	}
 
 	

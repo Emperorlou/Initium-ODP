@@ -1,6 +1,8 @@
 package com.universeprojects.miniup.server.longoperations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
@@ -34,7 +36,8 @@ public class LongOperationBeginPrototype extends LongOperation
 	public String getPageRefreshJavascriptCall() {
 		Long ideaId = (Long)getDataProperty("ideaId");
 		String ideaName = ((String)getDataProperty("ideaName")).replace("'", "\\'");
-		return "doCreatePrototype(null, "+ideaId+", '"+ideaName+"');"; 
+		String repsUniqueId = (String)getDataProperty("repsUniqueId");
+		return "doCreatePrototype(null, "+ideaId+", '"+ideaName+"', null, "+repsUniqueId+");"; 
 	}
 	
 	
@@ -88,7 +91,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		
 		// Now figure out which of the gers in each slot should actually be used
-		Map<Key, Key> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots, itemRequirementSlotsToItems.repetitionCount);
+		Map<Key, List<Key>> itemRequirementsToItems = inventionService.resolveGerSlotsToGers(pool, ideaDef, itemRequirementSlotsToItems.slots, itemRequirementSlotsToItems.repetitionCount);
 		
 		
 		// This check will throw a UserErrorMessage if it finds anything off
@@ -124,7 +127,7 @@ public class LongOperationBeginPrototype extends LongOperation
 	{
 		@SuppressWarnings("unchecked")
 		CachedEntity character = db.getCurrentCharacter();
-		Map<Key,Key> itemRequirementsToItems = (Map<Key, Key>)getDataProperty("selectedItems");
+		Map<Key, List<Key>> itemRequirementsToItems = (Map<Key, List<Key>>)getDataProperty("selectedItems");
 		Integer repetitionCount = (Integer)getDataProperty("repetitionCount");
 		
 		CachedEntity idea = db.getEntity("ConstructItemIdea", (Long)getDataProperty("ideaId"));
@@ -136,7 +139,9 @@ public class LongOperationBeginPrototype extends LongOperation
 		EntityPool pool = new EntityPool(ds);
 		
 		// Pooling entities...
-		pool.addToQueue(itemRequirementsToItems.keySet(), itemRequirementsToItems.values());
+		pool.addToQueue(itemRequirementsToItems.keySet());
+		for(List<Key> keyList:itemRequirementsToItems.values())
+			pool.addToQueue(keyList);
 		
 		
 		// We're ready to create the final prototype and skill
@@ -184,9 +189,9 @@ public class LongOperationBeginPrototype extends LongOperation
 	}
 	
 
-	private Map<Key, Key> getSelectedItems(String rawParameter)
+	private Map<Key, List<Key>> getSelectedItems(String rawParameter)
 	{
-		Map<Key, Key> result = new HashMap<Key,Key>();
+		Map<Key, List<Key>> result = new HashMap<Key, List<Key>>();
 		
 		JSONObject selectedItems = null;
 		JSONServerParser jsonParser = JSONParserFactory.getServerParser();
@@ -210,8 +215,16 @@ public class LongOperationBeginPrototype extends LongOperation
 				result.put(KeyFactory.createKey("GenericEntityRequirement", entityRequirementId), null);
 				continue;
 			}
-			Long itemId = Long.parseLong(selectedItemIdStr);
-			result.put(KeyFactory.createKey("GenericEntityRequirement", entityRequirementId), KeyFactory.createKey("Item",itemId));
+			
+			String[] selectedItemIdsStr = selectedItemIdStr.split(",");
+			List<Key> selectedItemKeys = new ArrayList<Key>();
+			for(String idStr:selectedItemIdsStr)
+			{
+				Long itemId = Long.parseLong(idStr);
+				Key k = KeyFactory.createKey("Item",itemId);
+				selectedItemKeys.add(k);
+			}
+			result.put(KeyFactory.createKey("GenericEntityRequirement", entityRequirementId), selectedItemKeys);
 		}
 		
 		return result;
