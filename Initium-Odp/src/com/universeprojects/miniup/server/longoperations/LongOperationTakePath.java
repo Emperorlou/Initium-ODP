@@ -1,17 +1,28 @@
 package com.universeprojects.miniup.server.longoperations;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.universeprojects.cacheddatastore.AbortTransactionException;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumTransaction;
+import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
+import com.universeprojects.miniup.server.ODPDBAccess.CombatType;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.WarnPlayerException;
+import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.TerritoryService;
@@ -48,23 +59,24 @@ public class LongOperationTakePath extends LongOperation {
 		if (path==null)
 			throw new UserErrorMessage("Unable to take path. The path does not exist.");
 		
+		CachedEntity character = db.getCurrentCharacter();
 		String forceOneWay = (String)path.getProperty("forceOneWay");
-		if ("FromLocation1Only".equals(forceOneWay) && GameUtils.equals(db.getCurrentCharacter().getProperty("locationKey"), path.getProperty("location2Key")))
+		if ("FromLocation1Only".equals(forceOneWay) && GameUtils.equals(character.getProperty("locationKey"), path.getProperty("location2Key")))
 			throw new UserErrorMessage("You cannot take this path.");
-		if ("FromLocation2Only".equals(forceOneWay) && GameUtils.equals(db.getCurrentCharacter().getProperty("locationKey"), path.getProperty("location1Key")))
+		if ("FromLocation2Only".equals(forceOneWay) && GameUtils.equals(character.getProperty("locationKey"), path.getProperty("location1Key")))
 			throw new UserErrorMessage("You cannot take this path.");		
 		
 		
-		if (ODPDBAccess.CHARACTER_MODE_COMBAT.equals(db.getCurrentCharacter().getProperty("mode")))
+		if (ODPDBAccess.CHARACTER_MODE_COMBAT.equals(character.getProperty("mode")))
 		{
 			// TODO: Double check that the combat mode is legitimate
 			throw new UserErrorMessage("You cannot move right now because you are currently in combat.");
 		}
-		if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(db.getCurrentCharacter().getProperty("mode")))
+		if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(character.getProperty("mode")))
 			throw new UserErrorMessage("You cannot move right now because you are currently vending.");
-		if (ODPDBAccess.CHARACTER_MODE_TRADING.equals(db.getCurrentCharacter().getProperty("mode")))
+		if (ODPDBAccess.CHARACTER_MODE_TRADING.equals(character.getProperty("mode")))
 			throw new UserErrorMessage("You cannot move right now because you are currently trading.");
-		if (db.getCurrentCharacter().getProperty("mode")==null || "".equals(db.getCurrentCharacter().getProperty("mode")) || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(db.getCurrentCharacter().getProperty("mode")))
+		if (character.getProperty("mode")==null || "".equals(character.getProperty("mode")) || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(character.getProperty("mode")))
 		{/*We're in normal mode and so we can actually move*/}
 		else
 			throw new UserErrorMessage("You cannot move right now because you are busy.");
@@ -72,7 +84,7 @@ public class LongOperationTakePath extends LongOperation {
 		CachedEntity destination = null;
 		Key destinationKey = null;
 		// First get the character's current location
-		Key currentLocationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
+		Key currentLocationKey = (Key)character.getProperty("locationKey");
 		
 		// Then determine which location the character will end up on.
 		// If we find that the character isn't on either end of the path, we'll throw.
@@ -87,20 +99,17 @@ public class LongOperationTakePath extends LongOperation {
 		destination = db.getEntity(destinationKey);
 
 		boolean isInParty = true;
-		if (db.getCurrentCharacter().getProperty("partyCode")==null || db.getCurrentCharacter().getProperty("partyCode").equals(""))
+		if (character.getProperty("partyCode")==null || character.getProperty("partyCode").equals(""))
 			isInParty = false;
 		
-		if(isInParty && GameUtils.isCharacterPartyLeader(db.getCurrentCharacter()) == false)
+		if(isInParty && GameUtils.isCharacterPartyLeader(character) == false)
 			throw new UserErrorMessage("You cannot move your party because you are not the leader.");
 		
-		if(isInParty && db.getParty(ds, db.getCurrentCharacter()).size() > 4)
+		if(isInParty && db.getParty(ds, character).size() > 4)
 			throw new UserErrorMessage("You have too many members in your party!");
 		
 		// Do the territory interruption now
 		doTerritoryInterruption(destination, path, allowAttack, isInParty);
-		
-		// Check if we're being blocked by the blockade
-		CachedEntity blockadeStructure = db.getBlockadeFor(db.getCurrentCharacter(), destination);
 		
 		// Check if we're going to enter combat from Instance
 		if ("Instance".equals(destination.getProperty("combatType")))
@@ -108,54 +117,78 @@ public class LongOperationTakePath extends LongOperation {
 			if(isInParty)
 				throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
 			
-			CachedEntity monster = db.getCombatantFor(db.getCurrentCharacter(), destination);
+			CachedEntity monster = db.getCombatantFor(character, destination);
 			if (monster!=null)
 			{
-				ds.beginBulkWriteMode();
+				final CombatService instanceCS = new CombatService(db);
+				final CachedEntity instanceMonster = ds.refetch(monster);
+				final CachedEntity instanceChar = ds.refetch(character);
+				final CachedEntity instanceLoc = ds.refetch(destination);
+				Map<String, Object> result = null;
+				try
+				{
+					new InitiumTransaction<Map<String, Object>>(ds) 
+						{
+							@Override
+							public Map<String, Object> doTransaction(CachedDatastoreService ds) 
+							{
+								Map<String, Object> result = new HashMap<String, Object>();
+								if(instanceMonster.getProperty("combatant") != null && 
+										GameUtils.equals(instanceChar.getKey(), instanceMonster.getProperty("combatant"))==false)
+									return result;
+								
+								// Sets combatants, combat type, and puts to DB.
+								instanceCS.enterCombat(instanceChar, instanceMonster, true);
+								
+								db.resetInstanceRespawnTimer(instanceLoc);
+								if(instanceLoc.isUnsaved())
+									ds.put(instanceLoc);
+								
+								result.put("monster", instanceMonster.getProperty("name"));
+								
+								return result;
+							}
+						}.run();
+				}
+				catch (AbortTransactionException e) 
+				{
+					throw new RuntimeException(e.getMessage());
+				}
 				
-				ds.put(monster);
-				ds.put(db.getCurrentCharacter());
-				
-				db.resetInstanceRespawnTimer(destination);
-				if(destination.isUnsaved())
-					ds.put(destination);
-				
-				ds.commitBulkWrite();
-				throw new GameStateChangeException("A "+monster.getProperty("name")+" stands in your way.");
+				// This should only happen if combatant was set in this transaction.
+				// Otherwise we fall through and let them take the path.
+				if(result.containsKey("monster"))
+					throw new GameStateChangeException("A " + result.get("monster") + " stands in your way.");
 			}
 		}
 		else if ("CombatSite".equals(destination.getProperty("type"))==false)	// However, for non-instances... (and not combat sites)
 		{
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
-			List<CachedEntity> npcsInTheArea = db.getFilteredList("Character", 300, "locationKey", FilterOperator.EQUAL, destinationKey);
+			QueryHelper qh = new QueryHelper(ds);
+			List<CachedEntity> npcsInTheArea = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, destinationKey, "type", FilterOperator.EQUAL, "NPC");
 			npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
 	
 			if (npcsInTheArea.isEmpty()==false)
 			{
 				db.shuffleCharactersByAttackOrder(npcsInTheArea);
 				for(CachedEntity possibleNPC:npcsInTheArea)
-					if ("NPC".equals(possibleNPC.getProperty("type")) && (Double)possibleNPC.getProperty("hitpoints")>0d)
+					if ((possibleNPC.getProperty("mode") == null || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode"))) && 
+							(Double)possibleNPC.getProperty("hitpoints")>0d)
 					{
-						List<CachedEntity> party = db.getParty(ds, db.getCurrentCharacter());
-						db.setPartiedField(party, db.getCurrentCharacter(), "mode", ODPDBAccess.CHARACTER_MODE_COMBAT);
-						db.setPartiedField(party, db.getCurrentCharacter(), "combatant", possibleNPC.getKey());
-						db.putPartyMembersToDB_SkipSelf(ds, party, db.getCurrentCharacter());
-						
-						combatService.enterCombat(db.getCurrentCharacter(), possibleNPC, false);
+						// We do not set partied field on NPC block.
+						combatService.enterCombat(character, possibleNPC, false);
 						
 						throw new GameStateChangeException("A "+possibleNPC.getProperty("name")+" stands in your way."); // If we've been interrupted, we'll just get out and not actually travel to the location
 					}
 			}
 		}
 		
-		
+		BlockadeService bs = new BlockadeService(db);
+		// Check if we're being blocked by the blockade
+		CachedEntity blockadeStructure = bs.getBlockadeFor(db.getCurrentCharacter(), destination);
 		
 		if (isInParty && blockadeStructure!=null)
 			throw new UserErrorMessage("You are approaching a defensive structure but you cannot attack as a party. Disband your party before attacking the defensive structure.");
-
-		if (isInParty && "Instance".equals(destination.getProperty("combatType")))
-			throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
-		
 		
 		if (allowAttack==false && blockadeStructure!=null)
 			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here to attack!</a>", false);
