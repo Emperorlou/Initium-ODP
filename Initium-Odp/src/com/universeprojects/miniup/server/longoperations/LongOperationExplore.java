@@ -81,6 +81,7 @@ public class LongOperationExplore extends LongOperation {
 		{
 			result = "You found yourself a monster! He doesn't look too happy..";
 			location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
+			hasUpdate = true;
 		}
 		else
 		{
