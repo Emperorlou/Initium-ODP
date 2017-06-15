@@ -7,6 +7,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 public class LongOperationRest extends LongOperation {
 
@@ -51,6 +52,16 @@ public class LongOperationRest extends LongOperation {
 		{
 			db.awardBuff_WellRested(ds, db.getCurrentCharacter());
 		}
+		
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+		// Update character widget
+		mpus.updateInBannerCharacterWidget();
+		
+		// Camp site might have been destroyed while resting, 
+		// so update location banner, description, and monster count.
+		mpus.updateLocationJs();
+		mpus.updateLocationDescription();
+		mpus.updateMonsterCountPanel();
 		
 		return "You are fully rested!";
 	}

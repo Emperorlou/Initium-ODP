@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.longoperations;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -46,6 +47,21 @@ public class LongOperationExplore extends LongOperation {
 		setDataProperty("ignoreCombatSites", ignoreCombatSites);
 		setDataProperty("locationName", location.getProperty("name"));
 		
+		// Attempt to interrupt the explore. 
+		Double discoverAnythingChance = (Double)location.getProperty("discoverAnythingChance");
+		if (discoverAnythingChance!=null && GameUtils.roll(discoverAnythingChance))
+ 		{
+			setDataProperty("discovered", true);
+			// First try to find a monster
+			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location))
+			{
+				// Found a monster. Interrupt between 0-3 seconds.
+				setDataProperty("interrupted", true);
+				Random rnd = new Random();
+				return rnd.nextInt(3);
+			}
+ 		}
+		
 //		if ((db.getCurrentCharacter().getProperty("mode")!=null && db.getCurrentCharacter().getProperty("mode").equals(GameFunctions.CHARACTER_MODE_COMBAT)) || result==PrefixCodes.EXPLORERESULT_MONSTER)
 //			WebUtils.forceRedirectClientTo("combat.jsp?pre="+result, request, response);
 //		else
@@ -57,23 +73,37 @@ public class LongOperationExplore extends LongOperation {
 	@Override
 	String doComplete() throws UserErrorMessage 
 	{
-		Boolean ignoreCombatSites = (Boolean)getDataProperty("ignoreCombatSites");
-		if (ignoreCombatSites==null) ignoreCombatSites = false;
+		String result = null;
+		CachedEntity location = null;
+		boolean hasUpdate = false;
 		
-		Object oldLocaiton = db.getCurrentCharacter().getProperty("locationKey");
-		Object oldCombatant = db.getCurrentCharacter().getProperty("combatant");
-		
-		String result = explore(db, ignoreCombatSites);
-		
-		Object newLocation = db.getCurrentCharacter().getProperty("locationKey");
-		Object newCombatant = db.getCurrentCharacter().getProperty("combatant");
-		
-		if (GameUtils.equals(oldLocaiton, newLocation)==false || GameUtils.equals(oldCombatant, newCombatant)==false)
+		if(GameUtils.booleanEquals((Boolean)getDataProperty("interrupted"), true))
+		{
+			result = "You found yourself a monster! He doesn't look too happy..";
+			location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
+			hasUpdate = true;
+		}
+		else
+		{
+			Boolean ignoreCombatSites = (Boolean)getDataProperty("ignoreCombatSites");
+			if (ignoreCombatSites==null) ignoreCombatSites = false;
+			
+			Object oldLocaiton = db.getCurrentCharacter().getProperty("locationKey");
+			Object oldCombatant = db.getCurrentCharacter().getProperty("combatant");
+			
+			result = explore(db, ignoreCombatSites, GameUtils.booleanEquals((Boolean)getDataProperty("discovered"), true));
+			
+			Object newCombatant = db.getCurrentCharacter().getProperty("combatant");
+			Object newLocation = db.getCurrentCharacter().getProperty("locationKey");
+			hasUpdate = GameUtils.equals(oldLocaiton, newLocation)==false || GameUtils.equals(oldCombatant, newCombatant)==false;
+			location = db.getEntity((Key)newLocation);
+		}
+
+		if (hasUpdate)
 		{
 			CombatService cs = new CombatService(db);
-			MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getEntity((Key)newLocation), this);
+			MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			update.shortcut_fullPageUpdate(cs);
-			
 		}
 		else
 		{
@@ -100,43 +130,47 @@ public class LongOperationExplore extends LongOperation {
 		return result;
 	}
 
-	public String explore(ODPDBAccess db, boolean ignoreCombatSites) throws UserErrorMessage
+	public String explore(ODPDBAccess db, boolean ignoreCombatSites, boolean discovered) throws UserErrorMessage
 	{
-		ds.beginBulkWriteMode();
-		try
+		// We've already determined whether anything was "discovered" based on
+		// discover anything chance. If we haven't, then don't bother checking anything.
+		if(discovered)
 		{
-			Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
-			CachedEntity location = db.getEntity(locationKey);
+			ds.beginBulkWriteMode();
+			try
+			{
 			
-			// First get all the things that can be discovered at the character's current location
-			List<CachedEntity> discoverablePaths_PermanentOnly = db.getPathsByLocation_PermanentOnly(locationKey);
-			
-			List<CachedEntity> discoverablePaths_CampsAndBlockades = db.getPathsByLocationAndType(locationKey, "CampSite");
-			List<CachedEntity> discoverablePaths_BlockadesOnly = db.getPathsByLocationAndType(locationKey, "BlockadeSite");
-			discoverablePaths_CampsAndBlockades.addAll(discoverablePaths_BlockadesOnly);
-			
-			List<CachedEntity> discoverablePaths = db.getPathsByLocation(locationKey);
-			
-			// And get all the things the character has discovered...
-			List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacter().getKey(), locationKey, true);
-			
-			
-	//		Logger.getLogger("ServletCharacterControl").log(Level.WARNING, 
-	//				"Discoverable path count (no combat sites): "+discoverablePaths_PermanentOnly.size()+
-	//				" Discoverable path count (combat sites included): "+discoverablePaths.size()+
-	//				" Discoveries: "+discoveries.size()+" " +
-	//						"Discover anything diff:  "+common.getLocationDiscoverAnythingChance());
-			
-			
-			// Try to discover something...
-			Double discoverAnythingChance = (Double)location.getProperty("discoverAnythingChance");
-			if (discoverAnythingChance!=null && GameUtils.roll(discoverAnythingChance))
-	 		{
+				Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
+				CachedEntity location = db.getEntity(locationKey);
+				
+				// First get all the things that can be discovered at the character's current location
+				List<CachedEntity> discoverablePaths_PermanentOnly = db.getPathsByLocation_PermanentOnly(locationKey);
+				
+				List<CachedEntity> discoverablePaths_CampsAndBlockades = db.getPathsByLocationAndType(locationKey, "CampSite");
+				List<CachedEntity> discoverablePaths_BlockadesOnly = db.getPathsByLocationAndType(locationKey, "BlockadeSite");
+				discoverablePaths_CampsAndBlockades.addAll(discoverablePaths_BlockadesOnly);
+				
+				List<CachedEntity> discoverablePaths = db.getPathsByLocation(locationKey);
+				
+				// And get all the things the character has discovered...
+				List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacter().getKey(), locationKey, true);
+				
+				
+		//		Logger.getLogger("ServletCharacterControl").log(Level.WARNING, 
+		//				"Discoverable path count (no combat sites): "+discoverablePaths_PermanentOnly.size()+
+		//				" Discoverable path count (combat sites included): "+discoverablePaths.size()+
+		//				" Discoveries: "+discoveries.size()+" " +
+		//						"Discover anything diff:  "+common.getLocationDiscoverAnythingChance());
+				
+				
+				// Try to discover something...
+				
 				// First try to find a monster
-				if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location))
-				{
-					return "You found yourself a monster! He doesn't look too happy.."; 
-				}
+				// We've already done this BEFORE the explore.
+				//if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location))
+				//{
+				//	return "You found yourself a monster! He doesn't look too happy.."; 
+				//}
 				
 				// Now try to discover campsites...
 				for(CachedEntity path:discoverablePaths_CampsAndBlockades)
@@ -308,10 +342,10 @@ public class LongOperationExplore extends LongOperation {
 					}
 				}
 			}
-		}
-		finally
-		{
-			ds.commitBulkWrite();
+			finally
+			{
+				ds.commitBulkWrite();
+			}
 		}
 		
 		return "After some exhausting searching you failed to find anything. That doesn't necessarily mean there is nothing to be found though..";
