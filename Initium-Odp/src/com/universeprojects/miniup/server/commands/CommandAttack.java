@@ -75,20 +75,30 @@ public class CommandAttack extends Command {
 		if (GameUtils.isPlayerIncapacitated(monster))
 			throw new UserErrorMessage("This monster is already dead!");
 		
-		// All future checks are instance only, so exit if not in one
-		// instanceModeEnabled doesn't catch the hybrid setup, so test manually 
-		Key defenceStructure = (Key)location.getProperty("defenceStructure");
-		if (defenceStructure==null && "Instance".equals(location.getProperty("combatType"))==false)
-			return;
-
-		// Instance only: Check if monster is in combat
-		if ("COMBAT".equals(monster.getProperty("mode")))
-			throw new UserErrorMessage("This monster is already in combat.");
+		if("Instance".equals(location.getProperty("combatType"))==false)
+		{
+			if("CombatSite".equals(location.getProperty("type"))==false && monster.getProperty("combatant") != null)
+				throw new UserErrorMessage("This monster is already in combat.");
+			
+			// All future checks are instance only, so exit if not in one
+			// instanceModeEnabled doesn't catch the hybrid setup, so test manually 
+			Key defenceStructure = (Key)location.getProperty("defenceStructure");
+			if (defenceStructure==null)
+				return;
+		}
+		else
+		{
+			// Instance only: Check if monster is in combat
+			if ("COMBAT".equals(monster.getProperty("mode")))
+				throw new UserErrorMessage("This monster is already in combat.");
+			
+			// Instance only: Check for party
+			String partyCode = (String)character.getProperty("partyCode");
+			if (partyCode!=null && partyCode.trim().equals("")==false)
+				throw new UserErrorMessage("You're not able to party up here.");
+		}
 		
-		// Instance only: Check for party
-		String partyCode = (String)character.getProperty("partyCode");
-		if (partyCode!=null && partyCode.trim().equals("")==false)
-			throw new UserErrorMessage("You're not able to party up here.");
+		
 	}
 	
 	@Override
