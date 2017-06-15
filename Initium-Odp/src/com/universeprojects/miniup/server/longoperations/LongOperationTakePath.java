@@ -117,45 +117,20 @@ public class LongOperationTakePath extends LongOperation {
 			if(isInParty)
 				throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
 			
-			CachedEntity monster = db.getCombatantFor(character, destination);
+			CachedEntity monster = db.getCombatantFor(db.getCurrentCharacter(), destination);
 			if (monster!=null)
 			{
-				final CombatService instanceCS = new CombatService(db);
-				final CachedEntity instanceMonster = ds.refetch(monster);
-				final CachedEntity instanceChar = ds.refetch(character);
-				final CachedEntity instanceLoc = ds.refetch(destination);
-				String result = null;
-				try
-				{
-					result = new InitiumTransaction<String>(ds) 
-						{
-							@Override
-							public String doTransaction(CachedDatastoreService ds) 
-							{
-								if(instanceMonster.getProperty("combatant") != null && 
-										GameUtils.equals(instanceChar.getKey(), instanceMonster.getProperty("combatant"))==false)
-									return null;
-								
-								// Sets combatants, combat type, and puts to DB.
-								instanceCS.enterCombat(instanceChar, instanceMonster, true);
-								
-								db.resetInstanceRespawnTimer(instanceLoc);
-								if(instanceLoc.isUnsaved())
-									ds.put(instanceLoc);
-								
-								return (String)instanceMonster.getProperty("name");
-							}
-						}.run();
-				}
-				catch (AbortTransactionException e) 
-				{
-					throw new RuntimeException(e.getMessage());
-				}
+				ds.beginBulkWriteMode();
 				
-				// This should only happen if combatant was set in this transaction.
-				// Otherwise we fall through and let them take the path.
-				if(result != null)
-					throw new GameStateChangeException("A " + result + " stands in your way.");
+				ds.put(monster);
+				ds.put(db.getCurrentCharacter());
+				
+				db.resetInstanceRespawnTimer(destination);
+				if(destination.isUnsaved())
+					ds.put(destination);
+				
+				ds.commitBulkWrite();
+				throw new GameStateChangeException("A "+monster.getProperty("name")+" stands in your way.");
 			}
 		}
 		else if ("CombatSite".equals(destination.getProperty("type"))==false)	// However, for non-instances... (and not combat sites)
