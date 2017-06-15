@@ -124,18 +124,17 @@ public class LongOperationTakePath extends LongOperation {
 				final CachedEntity instanceMonster = ds.refetch(monster);
 				final CachedEntity instanceChar = ds.refetch(character);
 				final CachedEntity instanceLoc = ds.refetch(destination);
-				Map<String, Object> result = null;
+				String result = null;
 				try
 				{
-					new InitiumTransaction<Map<String, Object>>(ds) 
+					result = new InitiumTransaction<String>(ds) 
 						{
 							@Override
-							public Map<String, Object> doTransaction(CachedDatastoreService ds) 
+							public String doTransaction(CachedDatastoreService ds) 
 							{
-								Map<String, Object> result = new HashMap<String, Object>();
 								if(instanceMonster.getProperty("combatant") != null && 
 										GameUtils.equals(instanceChar.getKey(), instanceMonster.getProperty("combatant"))==false)
-									return result;
+									return null;
 								
 								// Sets combatants, combat type, and puts to DB.
 								instanceCS.enterCombat(instanceChar, instanceMonster, true);
@@ -144,9 +143,7 @@ public class LongOperationTakePath extends LongOperation {
 								if(instanceLoc.isUnsaved())
 									ds.put(instanceLoc);
 								
-								result.put("monster", instanceMonster.getProperty("name"));
-								
-								return result;
+								return (String)instanceMonster.getProperty("name");
 							}
 						}.run();
 				}
@@ -157,8 +154,8 @@ public class LongOperationTakePath extends LongOperation {
 				
 				// This should only happen if combatant was set in this transaction.
 				// Otherwise we fall through and let them take the path.
-				if(result.containsKey("monster"))
-					throw new GameStateChangeException("A " + result.get("monster") + " stands in your way.");
+				if(result != null)
+					throw new GameStateChangeException("A " + result + " stands in your way.");
 			}
 		}
 		else if ("CombatSite".equals(destination.getProperty("type"))==false)	// However, for non-instances... (and not combat sites)
@@ -192,7 +189,6 @@ public class LongOperationTakePath extends LongOperation {
 		
 		if (allowAttack==false && blockadeStructure!=null)
 			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here to attack!</a>", false);
-		
 		
 		// Ok, lets begin then...
 		setDataProperty("locationName", destination.getProperty("name"));

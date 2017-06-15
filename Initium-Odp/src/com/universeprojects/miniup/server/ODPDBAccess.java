@@ -5221,74 +5221,73 @@ public class ODPDBAccess
 		if ("Town".equals(destination.getProperty("type")))
 			character.setProperty("homeTownKey", destinationKey);
 
-		// We've already checked this when performing the TakePath
-		// long operation. Only should check this when exploring
-		if(isExplore)
+		// Blockade needs to happen on TakePath
+		BlockadeService bs = new BlockadeService(this);
+		// Check if we're being blocked by the blockade
+		EngageBlockadeOpponentResult opponentResult = null; 
+		CachedEntity blockadeStructure = bs.getBlockadeFor(character, destination);
+		
+		if (isInParty && blockadeStructure!=null)
+			throw new UserErrorMessage("You are approaching a defensive structure but you cannot attack as a party. Disband your party before attacking the defensive structure.");
+		
+		if (isInParty && "Instance".equals(destination.getProperty("combatType")))
+			throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
+		
+		if (allowAttack==false && blockadeStructure!=null)
+			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here to attack!</a>", false);
+		
+		// Set the character's new location AND all party members if applicable...
+		if (isInParty==false)
 		{
-			BlockadeService bs = new BlockadeService(this);
-			// Check if we're being blocked by the blockade
-			CachedEntity blockadeStructure = bs.getBlockadeFor(character, destination);
+			// Here is where we'll check if we're entering combat with a defending player...
+			System.out.println("");
+			if (blockadeStructure!=null)
+				opponentResult = bs.engageBlockadeOpponent(character.getKey(), currentLocationKey, destination, (Key)blockadeStructure.getProperty("locationKey"), blockadeStructure);
 			
-			if (isInParty && blockadeStructure!=null)
-				throw new UserErrorMessage("You are approaching a defensive structure but you cannot attack as a party. Disband your party before attacking the defensive structure.");
-			
-			if (isInParty && "Instance".equals(destination.getProperty("combatType")))
-				throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
-			
-			if (allowAttack==false && blockadeStructure!=null)
-				throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here to attack!</a>", false);
-
-			EngageBlockadeOpponentResult opponentResult = null; 
-			
-			// Set the character's new location AND all party members if applicable...
-			if (isInParty==false)
+			if (opponentResult==null || opponentResult.freeToPass)
 			{
-				// Here is where we'll check if we're entering combat with a defending player...
-				System.out.println("");
-				if (blockadeStructure!=null)
-					opponentResult = bs.engageBlockadeOpponent(character.getKey(), currentLocationKey, destination, (Key)blockadeStructure.getProperty("locationKey"), blockadeStructure);
-				
-				if (opponentResult==null || opponentResult.freeToPass)
-				{
-					// There are no opponents at all so allow the player to advance
-					character.setProperty("locationKey", destination.getKey());
-				}
-				else if (opponentResult.defender!=null)
-				{
-					// We're engaging the enemy! We need to get out of here
-					return null;
-				}
-				else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==true)
-				{
-					// There are no opponents available AND all opponents are NPC opponents, so we will let the player pass
-					character.setProperty("locationKey", destination.getKey());
-				}
-				else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==false)
-				{
-					// This situation occurs when all the defenders are busy, the player has to wait for combat
-					throw new UserErrorMessage("There is active combat going on at this site but you have no room to engage and cannot pass. Try again later.", false);
-				}
-				else
-					throw new RuntimeException("Unhandled situation exception.");
+				// There are no opponents at all so allow the player to advance
+				character.setProperty("locationKey", destination.getKey());
+			}
+			else if (opponentResult.defender!=null)
+			{
+				// We're engaging the enemy! We need to get out of here
+				return null;
+			}
+			else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==true)
+			{
+				// There are no opponents available AND all opponents are NPC opponents, so we will let the player pass
+				character.setProperty("locationKey", destination.getKey());
+			}
+			else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==false)
+			{
+				// This situation occurs when all the defenders are busy, the player has to wait for combat
+				throw new UserErrorMessage("There is active combat going on at this site but you have no room to engage and cannot pass. Try again later.", false);
 			}
 			else
-			{
-				if ("TRUE".equals(character.getProperty("partyLeader"))==false)
-					throw new UserErrorMessage("You cannot move the party because you're not the party leader.");
-				
-				setPartiedField(party, character, "locationKey", destination.getKey());
-				
-				// Discover the path the party is taking if we haven't already discovered it..
-				if (party!=null)
-					for(CachedEntity member:party)
-						if (member.getKey().getId()!=character.getKey().getId())
-						{
-							doCharacterDiscoverEntity(db, member, path);
-							
-							sendNotification(db, member.getKey(), NotificationType.fullpageRefresh);
-						}
-			}
-
+				throw new RuntimeException("Unhandled situation exception.");
+		}
+		else
+		{
+			if ("TRUE".equals(character.getProperty("partyLeader"))==false)
+				throw new UserErrorMessage("You cannot move the party because you're not the party leader.");
+			
+			setPartiedField(party, character, "locationKey", destination.getKey());
+			
+			// Discover the path the party is taking if we haven't already discovered it..
+			if (party!=null)
+				for(CachedEntity member:party)
+					if (member.getKey().getId()!=character.getKey().getId())
+					{
+						doCharacterDiscoverEntity(db, member, path);
+						
+						sendNotification(db, member.getKey(), NotificationType.fullpageRefresh);
+					}
+		}
+		
+		// Only engage if it's done via explore.
+		if(isExplore)
+		{
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
 			QueryHelper qh = new QueryHelper(ds);
 			List<CachedEntity> npcsInTheArea = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, destinationKey, "type", FilterOperator.EQUAL, "NPC");
@@ -5307,9 +5306,8 @@ public class ODPDBAccess
 					possibleNPC.setProperty("mode", CHARACTER_MODE_COMBAT);
 					// For forced 1v1 combat, we also need to set the combatant on the monster
 					if (CommonChecks.checkLocationIsInstance(destination))
-					{
 						possibleNPC.setProperty("combatant", character.getKey());
-					}
+					
 					ds.put(possibleNPC);
 					
 					if(isCombatSite)
@@ -5331,26 +5329,6 @@ public class ODPDBAccess
 					if(partyIdx >= party.size())
 						break;
 				}
-			
-			// Here we're going to take a list we got from the opponentResult stuff and reuse it for performance reasons...
-			// We're going to determine if we should refresh the leader on the defence structure we just arrived at or left from
-			if (opponentResult!=null && opponentResult.charactersInBlockade!=null)
-			{
-				for(int i = 0; i<opponentResult.charactersInBlockade.size(); i++)
-				{
-					if (opponentResult.charactersInBlockade.get(i).getKey().getId() == character.getKey().getId())
-					{
-						opponentResult.charactersInBlockade.set(i, character);
-						break;
-					}
-				}
-				
-				// Check if we are entering a defence structure location
-				if (blockadeStructure != null)
-				{
-					refreshDefenceStructureLeader(db, blockadeStructure, opponentResult.charactersInBlockade);
-				}
-			}
 		}
 		
 		// Now check if we have a discovery for this path we just took...
@@ -5381,6 +5359,26 @@ public class ODPDBAccess
 				
 				db.put(path);
 				// Note: The destination location gets saved later
+			}
+		}
+		
+		// Here we're going to take a list we got from the opponentResult stuff and reuse it for performance reasons...
+		// We're going to determine if we should refresh the leader on the defence structure we just arrived at or left from
+		if (opponentResult!=null && opponentResult.charactersInBlockade!=null)
+		{
+			for(int i = 0; i<opponentResult.charactersInBlockade.size(); i++)
+			{
+				if (opponentResult.charactersInBlockade.get(i).getKey().getId() == character.getKey().getId())
+				{
+					opponentResult.charactersInBlockade.set(i, character);
+					break;
+				}
+			}
+			
+			// Check if we are entering a defence structure location
+			if (blockadeStructure != null)
+			{
+				refreshDefenceStructureLeader(db, blockadeStructure, opponentResult.charactersInBlockade);
 			}
 		}
 
