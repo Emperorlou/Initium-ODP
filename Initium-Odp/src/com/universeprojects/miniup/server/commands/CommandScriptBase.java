@@ -172,7 +172,7 @@ public abstract class CommandScriptBase extends Command {
 						MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
 						if(event.getJavascriptResponse()==JavascriptResponse.FullPageRefresh)
 						{
-							mpus.shortcut_fullPageUpdate();
+							mpus.updateFullPage_shortcut();
 						}
 						else if(event.reloadWidgets)
 						{
