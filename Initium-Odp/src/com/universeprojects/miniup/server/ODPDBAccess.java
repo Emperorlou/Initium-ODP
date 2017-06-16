@@ -5285,8 +5285,9 @@ public class ODPDBAccess
 					}
 		}
 		
-		// Only engage if it's done via explore.
-		if(isExplore)
+		boolean isCombatSite = CommonChecks.checkLocationIsCombatSite(destination);
+		// Only engage if it's done via explore or we're travelling to combat site
+		if(isExplore || isCombatSite)
 		{
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
 			QueryHelper qh = new QueryHelper(ds);
@@ -5294,7 +5295,6 @@ public class ODPDBAccess
 			npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
 
 			shuffleCharactersByAttackOrder(npcsInTheArea);
-			boolean isCombatSite = CommonChecks.checkLocationIsCombatSite(destination);
 			int partyIdx = 0;
 			for(CachedEntity possibleNPC:npcsInTheArea)
 				if ((isCombatSite || possibleNPC.getProperty("mode") == null || CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode"))) && 
@@ -5313,9 +5313,9 @@ public class ODPDBAccess
 					if(isCombatSite)
 					{
 						// In combat sites, every member fights the same mob.
-						partyIdx = party.size();
 						setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
 						setPartiedField(party, character, "combatant", possibleNPC.getKey());
+						break;
 					}
 					else
 					{
