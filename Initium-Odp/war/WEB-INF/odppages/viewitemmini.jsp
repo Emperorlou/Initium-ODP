@@ -32,7 +32,7 @@
 				<!-- Defense -->
 				<c:if test="${item.blockChance != null}"><div name='blockChance' class='item-popup-field' title='This is the odds of this armor blocking a hit on the body part that the armor is meant to protect.'>Block chance: <div class='main-item-subnote'>${item.blockChance}%</div></div></c:if>
 				<c:if test="${item.damageReduction != null}"><div name='damageReduction' class='item-popup-field' title='This is the maximum amount of damage that this armor will absorb if it successfully blocks a hit.'> - Damage reduction: <div class='main-item-subnote'>${item.damageReduction}</div></div></c:if>
-				<c:if test="${item.blockBludgeoningCapability != null}"><div name='blockBludgeoningCapability' class='item-popup-field' title='This describes this armor`s ability to block bludgeoning attacks. Excellent increases the damage reduction by x2.'> - Block bludgeoning: <div class='main-item-subnote'>${item.blockBludgeoningCapability}</div></div></c:if>
+				<c:if test="${item.blockBludgeoningCapability != null}"><div name='blockBludgeoningCapability' class='item-popup-field' title='This describes this armor`s ability to block bludgeoning attacks. Excellent increases the damage reduction by x2.'> - Block bludgeon: <div class='main-item-subnote'>${item.blockBludgeoningCapability}</div></div></c:if>
 				<c:if test="${item.blockPiercingCapability != null}"><div name='blockPiercingCapability' class='item-popup-field' title='This describes this armor`s ability to block piercing attacks. Excellent increases the damage reduction by x2.'> - Block piercing: <div class='main-item-subnote'>${item.blockPiercingCapability}</div></div></c:if>
 				<c:if test="${item.blockSlashingCapability != null}"><div name='blockSlashingCapability' class='item-popup-field' title='This describes this armor`s ability to block slashing attacks. Excellent increases the damage reduction by x2.'> - Block slashing: <div class='main-item-subnote'>${item.blockSlashingCapability}</div></div></c:if>
 				<!-- Misc -->
@@ -51,7 +51,7 @@
 		<c:if test="${item.ownerOnlyHtml != null}"><div>${item.ownerOnlyHtml}</div></c:if>
 		
 		<c:if test="${item.popupEntries != null}">
-		<c:forEach var="entry" items="${popupEntries}">
+		<c:forEach items="${item.popupEntries}" var="entry">
 		<p>
 			<a onclick='<c:out value="${entry.clickJavascript}"/>'>${entry.name}</a> 
 			<br/>
