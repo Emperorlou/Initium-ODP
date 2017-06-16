@@ -5399,7 +5399,7 @@ public class ODPDBAccess
 				partyKeys.add(chars.getKey());
 		
 		if(partyKeys.isEmpty()==false)
-			sendMainPageUpdateForCharacters(db, partyKeys, "shortcut_fullPageUpdate");
+			sendMainPageUpdateForCharacters(db, partyKeys, "updateFullPage_shortcut");
 		
 		return destination;
 	}
