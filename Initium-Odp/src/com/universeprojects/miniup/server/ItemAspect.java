@@ -14,7 +14,7 @@ public abstract class ItemAspect extends InitiumAspect
 
 	public abstract String getPopupTag();
 	
-	public class ItemPopupEntry
+	public static class ItemPopupEntry
 	{
 		public String name;
 		public String description;
