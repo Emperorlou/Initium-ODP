@@ -71,7 +71,7 @@ public class LongOperationExplore extends LongOperation {
 		if (GameUtils.equals(oldLocaiton, newLocation)==false || GameUtils.equals(oldCombatant, newCombatant)==false)
 		{
 			MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getEntity((Key)newLocation), this);
-			update.shortcut_fullPageUpdate();
+			update.updateFullPage_shortcut();
 			
 		}
 		else

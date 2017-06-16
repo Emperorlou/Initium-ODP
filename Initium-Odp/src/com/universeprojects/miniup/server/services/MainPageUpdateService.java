@@ -414,7 +414,7 @@ public class MainPageUpdateService extends Service
 		return "TRUE".equals(character.getProperty("partyLeader"));
 	}
 	
-	public void shortcut_fullPageUpdate()
+	public void updateFullPage_shortcut()
 	{
 		CombatService combatService = new CombatService(db);
 		updateMoney();
