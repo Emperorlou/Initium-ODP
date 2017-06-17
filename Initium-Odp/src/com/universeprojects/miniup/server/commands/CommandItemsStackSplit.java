@@ -44,10 +44,10 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 			if (splitItemQuantity < 2) {
 				throw new UserErrorMessage("You can only split stacks of two or more items.");
 			}
-			String stackSizeString = parameters.get("stackSize");
-			long stackSize;
+			
+			Long stackSize;
 			try {
-				stackSize = Integer.parseInt(stackSizeString);
+				stackSize = tryParseId(parameters, "stackSize");
 			} catch (NumberFormatException e) {
 				throw new UserErrorMessage("Please input an integer value.");
 			}
@@ -60,11 +60,12 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 			}
 			long newStackSize = splitItemQuantity - stackSize;
 
-			CachedEntity newItemStack = new CachedEntity(splitItem.getKind());
+			ds.preallocateIdsFor(splitItem.getKind(), 1);
+			CachedEntity newItemStack = new CachedEntity(splitItem.getKind(), ds.getPreallocatedIdFor(splitItem.getKind()));
 			CachedDatastoreService.copyFieldValues(splitItem, newItemStack);
-			splitItem.setProperty("quantity", stackSize);
+			splitItem.setProperty("quantity", newStackSize);
 			ds.put(splitItem);
-			newItemStack.setProperty("quantity", newStackSize);
+			newItemStack.setProperty("quantity", stackSize);
 			ds.put(newItemStack);
 			
 			ds.commit();

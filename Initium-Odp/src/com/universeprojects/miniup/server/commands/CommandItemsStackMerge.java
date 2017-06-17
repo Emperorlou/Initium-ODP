@@ -115,6 +115,7 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		Set<String> allKeys = new HashSet<String>(entity1Props.keySet());
 		allKeys.addAll(entity2Props.keySet());
 		allKeys.remove("movedTimestamp");
+		allKeys.remove("movedDate");
 		allKeys.remove("quantity");
 		// If a field doesn't exist on one entity, then will resolve to null when checking the property
 		for (String checking : allKeys) {
