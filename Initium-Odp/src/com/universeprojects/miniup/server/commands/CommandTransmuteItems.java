@@ -118,7 +118,7 @@ public class CommandTransmuteItems extends Command {
 						
 						// put the item(s) in character's transmute box
 						resultItem.setProperty("containerKey", containerKey);
-						resultItem.setProperty("movedDate", new Date());
+						resultItem.setProperty("movedTimestamp", new Date());
 						if(resultItem.getProperty("durability") != null)
 							resultItem.setProperty("maxDurability", resultItem.getProperty("durability"));
 						
@@ -130,7 +130,7 @@ public class CommandTransmuteItems extends Command {
 						CachedEntity rfItem = refetch(item);
 						
 						rfItem.setProperty("containerKey", null);
-						rfItem.setProperty("movedDate", new Date());
+						rfItem.setProperty("movedTimestamp", new Date());
 						
 						ds.put(rfItem);
 						}

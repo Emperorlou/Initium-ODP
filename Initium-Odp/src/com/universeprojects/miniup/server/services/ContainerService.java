@@ -33,7 +33,7 @@ public class ContainerService extends Service {
 			
 			for (CachedEntity item:items) {
 				item.setProperty("containerKey", parentContainer.getKey());
-				item.setProperty("movedDate", new Date());
+				item.setProperty("movedTimestamp", new Date());
 				
 				ds.put(item);
 			}
