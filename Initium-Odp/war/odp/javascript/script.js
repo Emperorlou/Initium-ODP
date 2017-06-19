@@ -2900,8 +2900,10 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			hideBannerLoadingIcon();
 			popupMessage("System Message", data.error, false);
 			if (data.refresh==true)
+			{
 				fullpageRefresh();
-			return;
+				return;
+			}
 		}
 		if (data.silentError==true)
 		{
@@ -2929,6 +2931,10 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		
 		if (responseFunction!=null)
 			responseFunction(data);
+
+		if (data.error!=undefined)
+			return;
+		
 		
 		if (data.isComplete==false)
 		{

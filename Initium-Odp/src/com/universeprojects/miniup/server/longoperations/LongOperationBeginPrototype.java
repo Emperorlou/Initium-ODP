@@ -72,9 +72,9 @@ public class LongOperationBeginPrototype extends LongOperation
 		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
 		.addGenericEntityRequirements("Required Tools/Equipment", "prototypeItemsRequired")
 		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
+		.setRepetitionCount(100)
 		.go();
-		if (itemRequirementSlotsToItems.repetitionCount==null)
-			itemRequirementSlotsToItems.repetitionCount = 1; 
+		itemRequirementSlotsToItems.repetitionCount = 1; 
 		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());
 		ODPInventionService inventionService = db.getInventionService(character, knowledgeService);

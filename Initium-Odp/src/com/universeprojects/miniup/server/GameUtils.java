@@ -1007,9 +1007,9 @@ public class GameUtils
 		String quantityDiv = "";
 		if (quantity!=null)
 		{
-			if (quantity>10000L && smallMode)
+			if (quantity>=10000L && smallMode)
 				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+noDigitFormat.format(quantity.doubleValue()/1000D)+" k</div></div>";
-			else if (quantity>1000L && smallMode)
+			else if (quantity>=1000L && smallMode)
 				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+singleDigitFormat.format(quantity.doubleValue()/1000D)+" k</div></div>";
 			else
 				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div></div>";

@@ -57,7 +57,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		.addGenericEntityRequirements("Optional Materials", "skillMaterialsOptional")
 		.addGenericEntityRequirements("Required Tools/Equipment", "skillToolsRequired")
 		.addGenericEntityRequirements("Optional Tools/Equipment", "skillToolsOptional")
-		.setRepetitionCount(30)
+		.setRepetitionCount(100)
 		.go();
 //		if (itemRequirementSlotsToItems.repetitionCount==null)
 			itemRequirementSlotsToItems.repetitionCount = 1; 
