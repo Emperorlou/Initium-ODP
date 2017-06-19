@@ -3021,9 +3021,9 @@ function doGoto(event, pathId, attack)
 		attack = false;
 	showBannerLoadingIcon();
 	longOperation(event, "TakePath", {pathId:pathId,attack:attack}, 
-			function(action, error) // responseFunction
+			function(action) // responseFunction
 			{
-				if(error)
+				if(action.error !== undefined)
 				{
 					clearPopupPermanentOverlay(); 
 				}
@@ -3195,9 +3195,9 @@ function doExplore(ignoreCombatSites)
 		ignoreCombatSites = false;
 	showBannerLoadingIcon();
 	longOperation(null, "Explore", {ignoreCombatSites:ignoreCombatSites}, 
-			function(action, error) // responseFunction
+			function(action) // responseFunction
 			{
-				if (action.isComplete || error)
+				if (action.isComplete || action.error !== undefined)
 				{
 					clearPopupPermanentOverlay();
 					//fullpageRefresh();
