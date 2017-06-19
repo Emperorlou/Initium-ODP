@@ -3232,6 +3232,16 @@ public class ODPDBAccess
 			return null;
 		}
 		
+		// Clear out any dead characters from the party.
+		for(int i = result.size()-1; i >= 0; i--)
+			if(GameUtils.equals(selfCharacter.getKey(), result.get(i).getKey())==false &&
+					CommonChecks.checkCharacterIsDead(result.get(i)))
+			{
+				result.get(i).setProperty("partyCode", null);
+				ds.put(result.get(i));
+				result.remove(i);
+			}
+		
 		return result;
 	}
 
@@ -3250,6 +3260,16 @@ public class ODPDBAccess
 			ds.put(result.get(0));
 			return null;
 		}
+		
+		// Clear out any dead characters from the party.
+		for(int i = result.size()-1; i >= 0; i--)
+			if(GameUtils.equals(getCurrentCharacterKey(), result.get(i).getKey())==false &&
+					CommonChecks.checkCharacterIsDead(result.get(i)))
+			{
+				result.get(i).setProperty("partyCode", null);
+				ds.put(result.get(i));
+				result.remove(i);
+			}
 		
 		return result;
 	}
