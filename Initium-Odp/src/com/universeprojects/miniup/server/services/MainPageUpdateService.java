@@ -919,7 +919,7 @@ public class MainPageUpdateService extends Service
 	
 	public String updateButtonBar()
 	{
-		return updateHtmlContents("#buttonBar", HtmlComponents.generateButtonBar(character));
+		return updateHtmlContents("#buttonbar", HtmlComponents.generateButtonBar(character));
 	}
 
 	public String updateLocationDescription()
