@@ -3015,9 +3015,13 @@ function doGoto(event, pathId, attack)
 		attack = false;
 	showBannerLoadingIcon();
 	longOperation(event, "TakePath", {pathId:pathId,attack:attack}, 
-			function(action) // responseFunction
+			function(action, error) // responseFunction
 			{
-				if (action.isComplete)
+				if(error)
+				{
+					clearPopupPermanentOverlay(); 
+				}
+				else if (action.isComplete)
 				{
 					updateBannerWeatherSystem();
 					setAudioDescriptor(locationAudioDescriptor, locationAudioDescriptorPreset, isOutside);
@@ -3185,9 +3189,9 @@ function doExplore(ignoreCombatSites)
 		ignoreCombatSites = false;
 	showBannerLoadingIcon();
 	longOperation(null, "Explore", {ignoreCombatSites:ignoreCombatSites}, 
-			function(action) // responseFunction
+			function(action, error) // responseFunction
 			{
-				if (action.isComplete)
+				if (action.isComplete || error)
 				{
 					clearPopupPermanentOverlay();
 					//fullpageRefresh();

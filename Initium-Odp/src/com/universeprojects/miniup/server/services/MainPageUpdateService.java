@@ -1002,9 +1002,7 @@ public class MainPageUpdateService extends Service
 					boolean isThisMemberTheLeader = false;
 					if ("TRUE".equals(partyCharacter.getProperty("partyLeader")))
 						isThisMemberTheLeader = true;
-					boolean dead = false;
-					if (((Double)partyCharacter.getProperty("hitpoints"))<=0)
-						dead = true;
+					boolean dead = CommonChecks.checkCharacterIsUnconscious(partyCharacter);
 
 					newHtml.append("<div style='display:inline-block;vertical-align:top;'>");
 					newHtml.append("<a class='main-item clue' style='width:inherit;' rel='viewcharactermini.jsp?characterId="+partyCharacter.getKey().getId()+"'>");
@@ -1019,7 +1017,7 @@ public class MainPageUpdateService extends Service
 
 					if (isThisMemberTheLeader)
 						newHtml.append("<div class='main-item-controls' style='top:0px;'>(Leader)</div>");
-					if (dead)
+					else if (dead && GameUtils.equals(character.getProperty("locationKey"), partyCharacter.getProperty("locationKey")))
 					{
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						newHtml.append("<a onclick='collectDogecoinFromCharacter("+partyCharacter.getKey().getId()+")'>Collect "+partyCharacter.getProperty("dogecoins")+" gold</a>");
