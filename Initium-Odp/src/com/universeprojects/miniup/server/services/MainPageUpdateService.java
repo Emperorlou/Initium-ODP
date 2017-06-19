@@ -1017,11 +1017,14 @@ public class MainPageUpdateService extends Service
 
 					if (isThisMemberTheLeader)
 						newHtml.append("<div class='main-item-controls' style='top:0px;'>(Leader)</div>");
-					else if (dead && GameUtils.equals(character.getProperty("locationKey"), partyCharacter.getProperty("locationKey")))
+					else if (dead)
 					{
-						newHtml.append("<div class='main-item-controls' style='top:0px'>");
-						newHtml.append("<a onclick='collectDogecoinFromCharacter("+partyCharacter.getKey().getId()+")'>Collect "+partyCharacter.getProperty("dogecoins")+" gold</a>");
-						newHtml.append("</div>");
+						if(GameUtils.equals(character.getProperty("locationKey"), partyCharacter.getProperty("locationKey")))
+						{
+							newHtml.append("<div class='main-item-controls' style='top:0px'>");
+							newHtml.append("<a onclick='collectDogecoinFromCharacter("+partyCharacter.getKey().getId()+")'>Collect "+partyCharacter.getProperty("dogecoins")+" gold</a>");
+							newHtml.append("</div>");
+						}
 					}
 					else if (!isCharacterBusy)
 					{

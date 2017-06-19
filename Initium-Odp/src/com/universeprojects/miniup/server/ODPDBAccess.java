@@ -3216,6 +3216,9 @@ public class ODPDBAccess
 		if (partyCode==null || partyCode.equals(""))
 			return null;
 		
+		if (ds==null)
+			ds = getDB();
+		
 		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
 		
 		// Replace the newly fetched self character with the entity we already have
@@ -3226,8 +3229,6 @@ public class ODPDBAccess
 		if (result.size() == 1)
 		{
 			selfCharacter.setProperty("partyCode", null);
-			if (ds==null)
-				ds = getDB();
 			ds.put(selfCharacter);
 			return null;
 		}
@@ -3250,13 +3251,14 @@ public class ODPDBAccess
 		if (partyCode==null || partyCode.equals(""))
 			return null;
 		
+		if (ds==null)
+			ds = getDB();
+		
 		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
 	
 		if (result.size()==1)
 		{
 			result.get(0).setProperty("partyCode", null);
-			if (ds==null)
-				ds = getDB();
 			ds.put(result.get(0));
 			return null;
 		}
