@@ -3226,13 +3226,6 @@ public class ODPDBAccess
 			if (GameUtils.equals(selfCharacter.getKey(), result.get(i).getKey()))
 				result.set(i, selfCharacter);
 	
-		if (result.size() == 1)
-		{
-			selfCharacter.setProperty("partyCode", null);
-			ds.put(selfCharacter);
-			return null;
-		}
-		
 		// Clear out any dead characters from the party.
 		for(int i = result.size()-1; i >= 0; i--)
 			if(GameUtils.equals(selfCharacter.getKey(), result.get(i).getKey())==false &&
@@ -3243,6 +3236,13 @@ public class ODPDBAccess
 				result.remove(i);
 			}
 		
+		if (result.size() == 1)
+		{
+			selfCharacter.setProperty("partyCode", null);
+			ds.put(selfCharacter);
+			return null;
+		}
+
 		return result;
 	}
 
@@ -3256,13 +3256,6 @@ public class ODPDBAccess
 		
 		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
 	
-		if (result.size()==1)
-		{
-			result.get(0).setProperty("partyCode", null);
-			ds.put(result.get(0));
-			return null;
-		}
-		
 		// Clear out any dead characters from the party.
 		for(int i = result.size()-1; i >= 0; i--)
 			if(GameUtils.equals(getCurrentCharacterKey(), result.get(i).getKey())==false &&
@@ -3272,6 +3265,13 @@ public class ODPDBAccess
 				ds.put(result.get(i));
 				result.remove(i);
 			}
+				
+		if (result.size()==1)
+		{
+			result.get(0).setProperty("partyCode", null);
+			ds.put(result.get(0));
+			return null;
+		}
 		
 		return result;
 	}
