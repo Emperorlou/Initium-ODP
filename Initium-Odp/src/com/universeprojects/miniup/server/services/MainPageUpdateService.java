@@ -980,7 +980,7 @@ public class MainPageUpdateService extends Service
 		if (isInParty())
 		{
 			newHtml.append("<div class='boldbox'>");
-			newHtml.append("<a onclick='leaveParty(event)' style='float:right'>Leave Party</a>");
+			newHtml.append("<a onclick='doLeaveParty(event)' style='float:right'>Leave Party</a>");
 			newHtml.append("<h4>Your party</h4>");
 			List<CachedEntity> party = getParty();
 			if (party!=null)

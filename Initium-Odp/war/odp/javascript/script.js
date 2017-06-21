@@ -1938,7 +1938,7 @@ function doAttack(eventObject, charId)
     doCommand(eventObject,"Attack",{"charId":charId});
 }
 
-function leaveParty(eventObject) {
+function doLeaveParty(eventObject) {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
 		doCommand(eventObject, "LeaveParty");
 	});
