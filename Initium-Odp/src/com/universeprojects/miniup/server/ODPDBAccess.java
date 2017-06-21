@@ -5204,6 +5204,11 @@ public class ODPDBAccess
 		List<CachedEntity> party = getParty(db, character);
 		// We use the party collection for non-partied character as well.
 		if (party == null) party = Collections.singletonList(character);
+		List<Key> partyKeys = new ArrayList<Key>();
+		for(CachedEntity member:party)
+			if(member != null && GameUtils.equals(member.getKey(), character.getKey())==false)
+				partyKeys.add(member.getKey());
+		
 		MovementService movementService = new MovementService(this);
 
 		Key ownerKey = (Key) destination.getProperty("ownerKey");
@@ -5297,14 +5302,10 @@ public class ODPDBAccess
 			setPartiedField(party, character, "locationKey", destination.getKey());
 			
 			// Discover the path the party is taking if we haven't already discovered it..
-			if (party!=null)
+			if (party.size() > 1)
 				for(CachedEntity member:party)
-					if (member.getKey().getId()!=character.getKey().getId())
-					{
+					if (GameUtils.equals(member.getKey(), character.getKey())==false)
 						doCharacterDiscoverEntity(db, member, path);
-						
-						sendNotification(db, member.getKey(), NotificationType.fullpageRefresh);
-					}
 		}
 		
 		boolean isCombatSite = CommonChecks.checkLocationIsCombatSite(destination);
@@ -5415,11 +5416,6 @@ public class ODPDBAccess
 			ds.put(destination);
 		
 		// Send main-page update for all party members but the leader.
-		List<Key> partyKeys = new ArrayList<Key>();
-		for(CachedEntity chars:party)
-			if(GameUtils.equals(chars.getKey(), character.getKey())==false)
-				partyKeys.add(chars.getKey());
-		
 		if(partyKeys.isEmpty()==false)
 			sendMainPageUpdateForCharacters(db, partyKeys, "updateFullPage_shortcut");
 		

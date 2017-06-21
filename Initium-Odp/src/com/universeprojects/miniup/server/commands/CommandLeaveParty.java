@@ -51,11 +51,13 @@ public class CommandLeaveParty extends Command {
 			throw new UserErrorMessage("You are currently the party leader! In order to leave make someone else the party leader!");
 		}
 		
-		db.doLeaveParty(ds, character);
+		db.doRequestLeaveParty(ds, character);
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		mpus.updatePartyView();
 		
+		// Use already retrieved keys here. Leaving party might have cleared it completely,
+		// but we still need to update all the old members.
 		List<Key> partyKeys = new ArrayList<Key>();
 		for(CachedEntity member:party)
 			if(member != null && GameUtils.equals(character.getKey(), member.getKey())==false)
