@@ -21,9 +21,9 @@ import com.universeprojects.miniup.server.services.MainPageUpdateService;
  * @author dylan
  * Allows a player to leave a party, if they are apart of one, and are if they are not the party leader while there are >= 3 party members.
  */
-public class CommandLeaveParty extends Command {
+public class CommandPartyLeave extends Command {
 	
-	public CommandLeaveParty(ODPDBAccess db, HttpServletRequest request,
+	public CommandPartyLeave(ODPDBAccess db, HttpServletRequest request,
 			HttpServletResponse response) {
 		super(db, request, response);
 	}
@@ -55,6 +55,7 @@ public class CommandLeaveParty extends Command {
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		mpus.updatePartyView();
+		mpus.updateButtonBar(); // Also sets the allow party join bit, so update button bar.
 		
 		// Use already retrieved keys here. Leaving party might have cleared it completely,
 		// but we still need to update all the old members.
