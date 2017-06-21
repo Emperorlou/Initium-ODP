@@ -31,6 +31,6 @@ public class CommandShowHiddenSites extends Command {
 		CachedEntity character = db.getCurrentCharacter();
 
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(((Key) character.getProperty("locationKey")).getId()), this);
-		mpus.updateButtonList(new CombatService(db), true);
+		mpus.updateButtonList(true);
 	}
 }
