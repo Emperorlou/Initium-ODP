@@ -53,6 +53,9 @@ public class CommandCharacterEquipItem extends Command {
 		if(CommonChecks.checkCharacterIsBusy(character))
 			throw new UserErrorMessage("Your character is currently busy and cannot change equipment.");
 		
+		if(db.checkCharacterHasItemEquipped(character, item.getKey()))
+			throw new UserErrorMessage("Item is already equipped.");
+		
 		// Keep track of old slots, so we can update the necessary slots in equipment list.
 		Map<String,Key> oldEquips = new HashMap<String,Key>();
 		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)

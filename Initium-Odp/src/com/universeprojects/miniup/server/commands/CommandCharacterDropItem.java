@@ -42,7 +42,7 @@ public class CommandCharacterDropItem extends Command {
 		
 		db.doCharacterDropItem(character, dropItem);
 		// Should simply empty out the inventory item, save an unnecessary get.
-		updateHtml(".invItem[ref='"+itemId+"']", "");
+		deleteHtml(".invItem[ref='"+itemId+"']");
 	}
 
 }

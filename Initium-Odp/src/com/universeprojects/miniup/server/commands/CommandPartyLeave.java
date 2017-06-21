@@ -34,6 +34,9 @@ public class CommandPartyLeave extends Command {
 		CachedDatastoreService ds = getDS();
 
 		CachedEntity character = db.getCurrentCharacter();
+		if(character == null)
+			throw new RuntimeException("Character is null in command");
+		
 		String partyCode = (String) character.getProperty("partyCode");
 		if (partyCode == null || partyCode.trim().equals("")) {
 			throw new UserErrorMessage("You are not currently in a party!");
@@ -44,7 +47,7 @@ public class CommandPartyLeave extends Command {
 		}
 		
 		List<CachedEntity> party = db.getParty(ds, character);
-		if (character.getProperty("partyLeader").equals("TRUE") && !(party == null || party.size() <= 2)) { 
+		if (GameUtils.booleanEquals(character.getProperty("partyLeader"), true) && !(party == null || party.size() <= 2)) { 
 			//Check if getParty is null to see if they were the last member in the party, 
 			//if they were the last member in the party, then they can leave without promoting new leader. or if the party is comprised 
 			//with just two people, a new party leader is also not needed.
