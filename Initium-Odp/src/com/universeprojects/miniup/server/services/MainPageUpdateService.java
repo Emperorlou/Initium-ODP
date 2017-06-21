@@ -920,7 +920,7 @@ public class MainPageUpdateService extends Service
 	
 	public String updateButtonBar()
 	{
-		if(cs.isInCombat(character)) return "";
+		if(cs.isInCombat(character)) return updateHtmlContents("#buttonbar", "");
 		return updateHtmlContents("#buttonbar", HtmlComponents.generateButtonBar(character));
 	}
 
