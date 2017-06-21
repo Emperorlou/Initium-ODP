@@ -426,6 +426,7 @@ public class MainPageUpdateService extends Service
 		updateButtonBar();
 		updateLocationName();
 		updateLocationDescription();
+		updateCampsPanel();
 		updateMonsterCountPanel();
 		updateTerritoryView();
 		updatePartyView();
@@ -1140,11 +1141,30 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#immovablesPanel", html.toString());
 	}
+	
+	public String updateCampsPanel()
+	{
+		if(cs.isInCombat(character))
+			return updateHtmlContents("#campsPanel", "");
+		
+		StringBuilder html = new StringBuilder();
+		html.append("<div class='main-description'>");
+		if(location != null && db.isCharacterAbleToCreateCampsite(ds, character, location))
+			html.append("This location could host up to " + location.getProperty("supportsCamps") + " camps.");
+		else
+			html.append("This location is not suitable for a camp.");
+		html.append("</div>");
+		
+		return updateHtmlContents("#campsPanel", html.toString());
+	}
 
 	public String updateMonsterCountPanel()
 	{
-		StringBuilder html = new StringBuilder();
+		if(cs.isInCombat(character))
+			return updateHtmlContents("#monsterCountPanel", "");
 
+		StringBuilder html = new StringBuilder();
+		
 		Double monsterCount = db.getMonsterCountForLocation(ds, location);
 		Double maxMonsterCount = (Double)location.getProperty("maxMonsterCount");
 		
