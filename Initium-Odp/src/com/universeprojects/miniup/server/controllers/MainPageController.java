@@ -94,7 +94,6 @@ public class MainPageController extends PageController {
 		
 		
 		
-		CombatService combatService = new CombatService(db);
 
 		MainPageUpdateService updateService = new MainPageUpdateService(db, db.getCurrentUser(), character, location, null);
 		
@@ -102,7 +101,7 @@ public class MainPageController extends PageController {
 		request.setAttribute("inBannerCharacterWidget", updateService.updateInBannerCharacterWidget());
 		request.setAttribute("locationId", location.getKey().getId());
 		request.setAttribute("mainGoldIndicator", updateService.updateMoney());
-		request.setAttribute("mainButtonList", updateService.updateButtonList(combatService));
+		request.setAttribute("mainButtonList", updateService.updateButtonList());
 		request.setAttribute("bannerJs", updateService.updateLocationJs());	
 		request.setAttribute("activePlayers", updateService.updateActivePlayerCount());
 		request.setAttribute("buttonBar", updateService.updateButtonBar());

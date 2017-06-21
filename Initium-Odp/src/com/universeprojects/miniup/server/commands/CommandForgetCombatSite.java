@@ -37,6 +37,6 @@ public class CommandForgetCombatSite extends Command {
 		db.doDeleteCombatSite(null, character, KeyFactory.createKey("Location", locationId), true, false);		
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(((Key) character.getProperty("locationKey")).getId()), this);
-		mpus.updateButtonList(new CombatService(db));
+		mpus.updateButtonList();
 	}
 }

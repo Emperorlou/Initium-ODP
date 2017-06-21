@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -47,8 +48,7 @@ public class CommandPlayerReadMap extends Command {
 		if(GameUtils.equals(item.getProperty("containerKey"), character.getKey()) == false)
 			throw new UserErrorMessage("You are not currently in possession of this map!");
 		
-		CombatService cs = new CombatService(db);
-		if(cs.isInCombat(character))
+		if(CommonChecks.checkCharacterIsInCombat(character))
 			throw new UserErrorMessage("You cannot read the map while in combat!");
 		
 		// Always handle durability. 
@@ -78,7 +78,7 @@ public class CommandPlayerReadMap extends Command {
 				GameUtils.equals(location.getKey(), path.getProperty("location2Key")))
 		{
 			MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
-			mpus.updateButtonList(cs);
+			mpus.updateButtonList();
 		}
 	}
 

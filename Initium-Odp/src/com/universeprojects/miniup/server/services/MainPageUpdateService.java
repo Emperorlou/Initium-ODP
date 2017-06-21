@@ -26,6 +26,7 @@ public class MainPageUpdateService extends Service
 	final protected CachedEntity character;
 	protected CachedEntity location;
 	final protected OperationBase operation;
+	final protected CombatService cs;
 
 	protected CachedEntity group = null;
 	
@@ -50,6 +51,7 @@ public class MainPageUpdateService extends Service
 		this.user = user;
 		this.character = character;
 		this.location = location;
+		this.cs = new CombatService(db);
 
 		// If the character's location is null, time to send them to their home town or default location
 		if (character.getProperty("locationKey")==null)
@@ -416,10 +418,9 @@ public class MainPageUpdateService extends Service
 	
 	public void updateFullPage_shortcut()
 	{
-		CombatService combatService = new CombatService(db);
 		updateMoney();
 		updateInBannerOverlayLinks();
-		updateButtonList(combatService);
+		updateButtonList();
 		updateLocationJs();	
 		updateActivePlayerCount();
 		updateButtonBar();
@@ -607,7 +608,7 @@ public class MainPageUpdateService extends Service
 		
 	}
 
-	public String updateButtonList(CombatService cs, boolean showHidden){
+	public String updateButtonList(boolean showHidden){
 		
 		if (cs.isInCombat(character))
 			return updateButtonList_CombatMode();
@@ -618,9 +619,9 @@ public class MainPageUpdateService extends Service
 		}
 	}
 	
-	public String updateButtonList(CombatService cs)
+	public String updateButtonList()
 	{
-		return updateButtonList(cs, false);
+		return updateButtonList(false);
 	}
 	
 	protected String updateButtonList_NormalMode()
@@ -919,6 +920,7 @@ public class MainPageUpdateService extends Service
 	
 	public String updateButtonBar()
 	{
+		if(cs.isInCombat(character)) return "";
 		return updateHtmlContents("#buttonbar", HtmlComponents.generateButtonBar(character));
 	}
 
