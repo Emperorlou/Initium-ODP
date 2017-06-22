@@ -1381,7 +1381,10 @@ public class ODPDBAccess
 	{
 		if (db==null)
 			db = getDB();
-
+		
+		if (equipment==null)
+			throw new IllegalArgumentException("Equipment cannot be null.");
+		
 		// Get all the equip slots that this item can fit into and decide which one to use
 		String equipSlotRaw = (String)equipment.getProperty("equipSlot");
 		
@@ -1422,10 +1425,6 @@ public class ODPDBAccess
 		
 		if (character==null)
 			throw new IllegalArgumentException("Character cannot be null.");
-		if (equipment==null)
-			throw new IllegalArgumentException("Equipment cannot be null.");
-		if (destinationSlot==null)
-			throw new IllegalArgumentException("destinationSlot cannot be null.");
 
 		ContainerService cs = new ContainerService(this);
 		if (!character.getKey().equals(equipment.getProperty("containerKey")))
@@ -2205,7 +2204,7 @@ public class ODPDBAccess
 	 */
 	public List<CachedEntity> getItemContentsFor(Key container, boolean inOwnedHouse)
 	{
-		if (container.getKind().equals("Location") && inOwnedHouse == false)
+		if ("Location".equals(container.getKind()) && inOwnedHouse == false)
 		{
 			return getItemsListSortedForLocation(null, container);
 		}

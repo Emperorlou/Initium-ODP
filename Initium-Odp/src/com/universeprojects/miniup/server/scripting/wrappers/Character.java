@@ -30,6 +30,7 @@ public class Character extends EntityWrapper
 	private Map<String, List<Item>> namedInventory = null;
 	private Map<Key, Item> keyedInventory = null;
 	private Map<String, Item> equippedInventory = null;
+	private List<Character> carriedCharacters = null;
 	
 	public Character(CachedEntity character, ODPDBAccess db) 
 	{
@@ -74,10 +75,10 @@ public class Character extends EntityWrapper
 	
 	private void populateInventory()
 	{
-		inventory = new ArrayList<Item>();
-		namedInventory = new HashMap<String, List<Item>>();
-		keyedInventory = new HashMap<Key, Item>();
-		equippedInventory = new HashMap<String, Item>();
+		inventory = inventory == null ? new ArrayList<Item>() : inventory;
+		namedInventory = namedInventory == null ? new HashMap<String, List<Item>>() : namedInventory;
+		keyedInventory = keyedInventory == null ? new HashMap<Key, Item>() : keyedInventory;
+		equippedInventory = equippedInventory == null ? new HashMap<String, Item>() : equippedInventory;
 		
 		Map<Key, String> equipKeys = new HashMap<Key, String>();
 		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
@@ -99,6 +100,20 @@ public class Character extends EntityWrapper
 				keyedInventory.put(newItem.getKey(), newItem);
 				if(equipKeys.containsKey(item.getKey()))
 					equippedInventory.put(equipKeys.get(item.getKey()), newItem);
+			}
+		}
+	}
+	
+	private void populateCarriedCharacters()
+	{
+		List<CachedEntity> chars = db.getFilteredList("Character", "containerKey", this.getKey());
+		carriedCharacters = carriedCharacters == null ? new ArrayList<Character>() : carriedCharacters;
+		for(CachedEntity carried:chars)
+		{
+			if(carried != null)
+			{
+				Character newChar = new Character(carried, db);
+				carriedCharacters.add(newChar);
 			}
 		}
 	}
@@ -329,5 +344,14 @@ public class Character extends EntityWrapper
 		
 		Character[] chars = new Character[partyChars.size()];
 		return partyChars.toArray(chars);
+	}
+	
+	public Character[] getCarriedCharacters()
+	{
+		if(carriedCharacters == null)
+			populateCarriedCharacters();
+		
+		Character[] chars = new Character[carriedCharacters.size()];
+		return carriedCharacters.toArray(chars);
 	}
 }

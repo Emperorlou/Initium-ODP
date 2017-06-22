@@ -1,29 +1,24 @@
 package com.universeprojects.miniup.server.scripting.jsaccessors;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
-import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.GlobalEvent;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
-import com.universeprojects.miniup.server.scripting.wrappers.BaseWrapper;
+import com.universeprojects.miniup.server.scripting.wrappers.Buff;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
@@ -287,6 +282,24 @@ public class DBAccessor {
 		EntityWrapper newItem = ScriptService.wrapEntity(item, db);
 		newItem.isNewEntity = true;
 		return newItem;
+	}
+	
+	public boolean clearBuffFromCache(Buff buff)
+	{
+		if(buff.parentEntityKey() == null) return false;
+		List<CachedEntity> buffList = db.buffsCache.get(buff.parentEntityKey());
+		if(buffList == null) return false;
+		
+		for(int i = 0; i < buffList.size(); i++)
+			if(buffList.get(i) != null && GameUtils.equals(buff.getKey(), buffList.get(i).getKey()))
+				return buffList.remove(i) != null;
+		
+		return false;
+	}
+	
+	public void clearBuffsCache()
+	{
+		db.buffsCache = new HashMap<Key, List<CachedEntity>>();
 	}
 	
 	public double getServerDayNight()
