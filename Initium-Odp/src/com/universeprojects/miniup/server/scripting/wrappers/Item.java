@@ -91,4 +91,16 @@ public class Item extends EntityWrapper
 		if(!isKeyItem()) return false;
 		return GameUtils.equals(this.getProperty("keyCode"), keyCode);
 	}
+	
+	public Date getCreatedDate()
+	{
+		return (Date)this.getProperty("createdDate");
+	}
+	
+	public String renderItem()
+	{
+		EntityWrapper owner = this.container();
+		CachedEntity ownerEntity = owner == null ? db.getCurrentCharacter() : owner.wrappedEntity;
+		return GameUtils.renderItem(this.db, ownerEntity, this.wrappedEntity);
+	}
 }

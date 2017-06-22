@@ -84,6 +84,11 @@ public class Buff extends EntityWrapper {
 		return this.parentEntity;
 	}
 	
+	public Key parentEntityKey()
+	{
+		return (Key)this.getProperty("parentKey");
+	}
+	
 	// This does NOT actually delete the buff, and it shouldn't. That should be handled by the ODP.
 	public boolean inEffect()
 	{
