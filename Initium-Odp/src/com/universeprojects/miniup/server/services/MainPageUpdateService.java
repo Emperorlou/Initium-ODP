@@ -594,9 +594,9 @@ public class MainPageUpdateService extends Service
 			if (weapons.get(1)!=null)
 				rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
 			
-			newHtml.append(getHtmlForInBannerLink(50, 40, "<img src='"+leftIcon+"' alt='Left Hand' style='max-width:32px; max-height:32px;padding:5px;'/>", "doCombatAttackLeftHand(event)"));
-			newHtml.append(getHtmlForInBannerLink(50, 60, "<img src='"+rightIcon+"' alt='Right Hand' style='max-width:32px; max-height:32px;padding:5px;'/>", "doCombatAttackRightHand(event)"));
-			newHtml.append(getHtmlForInBannerLink(90, 50, "<span style='padding:5px;'>RUN!</span>", "doCombatEscape(event)"));
+			newHtml.append(getHtmlForInBannerLink(50, 40, "<img src='"+leftIcon+"' alt='Left Hand' style='max-width:32px; max-height:32px;padding:5px;z-index:2000002;'/>", "doCombatAttackLeftHand(event)"));
+			newHtml.append(getHtmlForInBannerLink(50, 60, "<img src='"+rightIcon+"' alt='Right Hand' style='max-width:32px; max-height:32px;padding:5px;z-index:2000002;'/>", "doCombatAttackRightHand(event)"));
+			newHtml.append(getHtmlForInBannerLink(90, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)"));
 		}
 		
 		

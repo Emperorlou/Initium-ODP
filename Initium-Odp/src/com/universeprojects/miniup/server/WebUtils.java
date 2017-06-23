@@ -33,6 +33,13 @@ public class WebUtils
 	public static SimpleDateFormat dateParser_LR = new SimpleDateFormat("HH:mm:ss MMM dd, yyyy z");
 	public static SimpleDateFormat dateParser_Simple = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+	public static boolean isUrl(String text)
+	{
+		if (text==null) return false;
+		
+		return text.matches("(((?<!')https?):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)");		
+	}
+	
 	public static String getFullURL(HttpServletRequest request) {
 		StringBuffer requestURL = request.getRequestURL();
 		String queryString = request.getQueryString();
