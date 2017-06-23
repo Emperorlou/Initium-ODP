@@ -3275,7 +3275,6 @@ function doCampCreate(campName)
 			else
 			{
 				hideBannerLoadingIcon();
-				setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
 				setBannerOverlayText("Creating a new campsite...", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
 			}
 		},
