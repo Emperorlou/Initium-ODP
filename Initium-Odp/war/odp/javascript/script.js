@@ -3220,7 +3220,7 @@ function doRest()
 	longOperation(null, "Rest", null, 
 			function(action) // responseFunction
 			{
-				if (action.isComplete)
+				if (action.isComplete || action.error !== undefined)
 				{
 					clearPopupPermanentOverlay();
 					//fullpageRefresh();
@@ -3244,7 +3244,7 @@ function doCampDefend()
 	longOperation(null, "CampDefend", null, 
 			function(action) // responseFunction
 			{
-				if (action.isComplete)
+				if (action.isComplete || action.error !== undefined)
 				{
 					clearPopupPermanentOverlay();
 				}
