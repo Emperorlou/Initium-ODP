@@ -3245,7 +3245,7 @@ function doCampDefend()
 	longOperation(null, "CampDefend", null, 
 			function(action) // responseFunction
 			{
-				if (action.isComplete || action.error !== undefined)
+				if (action.isComplete)
 				{
 					clearPopupPermanentOverlay();
 				}
@@ -3258,7 +3258,7 @@ function doCampDefend()
 			},
 			function()	// recallFunction
 			{
-				doDefendCamp();
+				doCampDefend();
 			});
 }
 
