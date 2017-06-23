@@ -11,6 +11,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.PropertiesService;
 
 public class CommandBuyHouse extends Command {
@@ -32,6 +33,8 @@ public class CommandBuyHouse extends Command {
 		
 		new PropertiesService(db).buyHouse(db, ds, user, character, currentLocation, houseName, DOGECOIN_COST);
 
-		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, null, this);
+		mpus.updateFullPage_shortcut();
+		db.sendGameMessage(ds, character, "You have purchased a house!");
 	}
 }

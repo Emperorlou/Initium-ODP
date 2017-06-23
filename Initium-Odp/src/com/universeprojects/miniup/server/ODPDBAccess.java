@@ -897,7 +897,8 @@ public class ODPDBAccess
 	{
 		if (db == null) db = getDB();
 
-		CachedEntity path = new CachedEntity("Path");
+		db.preallocateIdsFor("Path", 1);
+		CachedEntity path = new CachedEntity("Path", db.getPreallocatedIdFor("Path"));
 		// Set the starting attributes
 		path.setProperty("name", internalName);
 		path.setProperty("location1Key", location1Key);

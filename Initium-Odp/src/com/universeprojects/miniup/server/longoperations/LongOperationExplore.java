@@ -77,7 +77,7 @@ public class LongOperationExplore extends LongOperation {
 		else
 		{
 			MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), null, this);
-			update.updateActivePlayerCount();
+			update.updateMonsterCountPanel();
 			update.updateMidMessagePanel();
 		}
 		
