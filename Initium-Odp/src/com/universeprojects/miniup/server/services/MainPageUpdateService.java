@@ -662,7 +662,7 @@ public class MainPageUpdateService extends Service
 		
 		if ("CampSite".equals(location.getProperty("type")))
 		{
-			newHtml.append("<a onclick='campsiteDefend()' class='main-button' shortcut='68' onclick='popupPermanentOverlay(\"Defending...\", \"You are looking out for threats to your camp.\")'><span class='shortcut-key'>(D)</span>Defend</a>");
+			newHtml.append("<a href='#' onclick='doCampDefend()' class='main-button' shortcut='68' onclick='popupPermanentOverlay(\"Defending...\", \"You are looking out for threats to your camp.\")'><span class='shortcut-key'>(D)</span>Defend</a>");
 			newHtml.append("<br>");
 		}
 
