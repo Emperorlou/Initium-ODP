@@ -3268,7 +3268,7 @@ function doCampCreate(campName)
 	longOperation(null, "CampCreate", {"name":campName}, 
 		function(action) // responseFunction
 		{
-			if (action.isComplete)
+			if (action.isComplete || action.error !== undefined)
 			{
 				clearPopupPermanentOverlay();
 			}
