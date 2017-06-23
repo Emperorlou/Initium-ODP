@@ -2897,6 +2897,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		if (data.error!=undefined)
 		{
 			hideBannerLoadingIcon();
+			clearPopupPermanentOverlay();
 			popupMessage("System Message", data.error, false);
 			if (data.refresh==true)
 			{
