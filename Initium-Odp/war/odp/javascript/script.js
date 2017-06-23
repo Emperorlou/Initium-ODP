@@ -783,9 +783,8 @@ function createCampsite()
 	promptPopup("New Campsite", "Provide a new name for your campsite:", lastNameUsed, function(name){
 		if (name!=null && name!="")
 		{
-			window.location.href='/ServletCharacterControl?type=createCampsite&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
-			popupPermanentOverlay("Creating a new campsite..", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
 			localStorage.setItem("campsiteName", name);
+			doCampCreate(name);
 		}
 	}, 
 	null, 
@@ -3215,7 +3214,6 @@ function doExplore(ignoreCombatSites)
 			});
 }
 
-
 function doRest()
 {
 	showBannerLoadingIcon();
@@ -3240,7 +3238,52 @@ function doRest()
 			});
 }
 
+function doCampDefend()
+{
+	showBannerLoadingIcon();
+	longOperation(null, "CampDefend", null, 
+			function(action) // responseFunction
+			{
+				if (action.isComplete)
+				{
+					clearPopupPermanentOverlay();
+				}
+				else
+				{
+					hideBannerLoadingIcon();
+					setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
+					setBannerOverlayText("Defending", "Protect the camp!");
+				}
+			},
+			function()	// recallFunction
+			{
+				doDefendCamp();
+			});
+}
 
+function doCampCreate(campName)
+{
+	showBannerLoadingIcon();
+	
+	longOperation(null, "CampCreate", {"name":campName}, 
+		function(action) // responseFunction
+		{
+			if (action.isComplete)
+			{
+				clearPopupPermanentOverlay();
+			}
+			else
+			{
+				hideBannerLoadingIcon();
+				setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
+				setBannerOverlayText("Creating a new campsite...", "You are hard at work setting up a new camp. Make sure you defend it or it won't last long!");
+			}
+		},
+		function()	// recallFunction
+		{
+			doCampCreate(campName);
+		});
+}
 
 function handleUserRequest(data)
 {

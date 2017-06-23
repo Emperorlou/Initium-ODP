@@ -62,6 +62,7 @@ public class PropertiesService extends Service {
 			
 			// Finally subtract the money from the player's character
 			character.setProperty("dogecoins", dogecoins - cost);
+			character.setProperty("locationKey", playerHouse.getKey());
 			ds.put(character);
 
 			ds.commit();
