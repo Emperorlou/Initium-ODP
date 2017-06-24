@@ -15,7 +15,7 @@ public class PropertiesService extends Service {
 		super(db);
 	}
 	
-	public void buyHouse(ODPDBAccess db, CachedDatastoreService ds, CachedEntity user, CachedEntity character, CachedEntity currentLocation, String houseName, long cost) throws UserErrorMessage {
+	public CachedEntity buyHouse(ODPDBAccess db, CachedDatastoreService ds, CachedEntity user, CachedEntity character, CachedEntity currentLocation, String houseName, long cost) throws UserErrorMessage {
 
 		if (!houseName.matches("[A-Za-z0-9, ]+")) {
 			throw new UserErrorMessage("A property name can only have letters, numbers, commas, and spaces in its name.");
@@ -74,13 +74,13 @@ public class PropertiesService extends Service {
 				// If discovery already exists, nothing happens
 				db.doCharacterDiscoverEntity(ds, characterEntity, pathToHouse);
 			}
-			
 		} catch (Exception e) {
 			throw e;
 		} finally {
 			ds.rollbackIfActive();
 		}
 		
+		return playerHouse;
 	}
 	
 	public void rediscoverHouses(CachedEntity user)
