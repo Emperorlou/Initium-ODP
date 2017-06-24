@@ -31,10 +31,13 @@ public class CommandBuyHouse extends Command {
 		CachedEntity currentLocation = db.getEntity((Key) character.getProperty("locationKey"));
 		String houseName = db.cleanCharacterName(parameters.get("houseName"));
 		
-		new PropertiesService(db).buyHouse(db, ds, user, character, currentLocation, houseName, DOGECOIN_COST);
-
-		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, null, this);
-		mpus.updateFullPage_shortcut();
-		db.sendGameMessage(ds, character, "You have purchased a house!");
+		PropertiesService ps = new PropertiesService(db);
+		CachedEntity newHouse = ps.buyHouse(db, ds, user, character, currentLocation, houseName, DOGECOIN_COST);
+		if(newHouse != null)
+		{
+			MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, newHouse, this);
+			mpus.updateFullPage_shortcut();
+			db.sendGameMessage(ds, character, "You have purchased a house!");
+		}
 	}
 }
