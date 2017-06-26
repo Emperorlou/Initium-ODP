@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -122,9 +123,7 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		// Merge the keysets, so that newly added fields also get considered
 		Set<String> allKeys = new HashSet<String>(entity1Props.keySet());
 		allKeys.addAll(entity2Props.keySet());
-		allKeys.remove("movedTimestamp");
-		allKeys.remove("movedDate");
-		allKeys.remove("quantity");
+		allKeys.removeAll(Arrays.asList("movedTimestamp", "movedDate", "quantity", "createdDate"));
 		// If a field doesn't exist on one entity, then will resolve to null when checking the property
 		for (String checking : allKeys) {
 			if (!GameUtils.equals(entity1Props.get(checking), entity2Props.get(checking))) {
