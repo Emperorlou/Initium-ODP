@@ -3809,7 +3809,7 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
 function resetChat()
 {
 	$(".chat_messages").html(""); 
-	messager.markers = [null, null, null, null, null, null];
+	messager.markers = [null, null, null, null, null, getItem("NotificationsMarker")];
 }
 
 function isMusicEnabled()
