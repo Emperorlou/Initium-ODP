@@ -13,7 +13,7 @@ function openMap()
 	var pagePopupId = "page-popup"+stackIndex;
 	var mapId = pagePopupId+"-map";
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><center><h3>Player-Made Game Map</h3><br/><span>Last updated: January 13, 2017</span></center><div id='"+mapId+"' class='page-popup-map'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><center><h3>Player-Made Game Map</h3><br/><span>Last updated: June 26, 2017</span></center><div id='"+mapId+"' class='page-popup-map'></div></div>");
 	createLocalMapViewer(mapId);
 }
 
