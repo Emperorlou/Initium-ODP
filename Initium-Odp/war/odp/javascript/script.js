@@ -3806,7 +3806,11 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
 
 ////////////////////////////////////////////////////////
 // Game Settings
-
+function resetChat()
+{
+	$(".chat_messages").html(""); 
+	messager.markers = [null, null, null, null, null, null];
+}
 
 function isMusicEnabled()
 {
