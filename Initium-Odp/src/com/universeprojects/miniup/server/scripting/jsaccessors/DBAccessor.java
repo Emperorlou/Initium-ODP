@@ -23,6 +23,7 @@ import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
+import com.universeprojects.miniup.server.scripting.wrappers.Path;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.ScriptService;
 
@@ -122,6 +123,21 @@ public class DBAccessor {
 	public Item getItemById(Long itemId)
 	{
 		return new Item(db.getEntity("Item", itemId), db);
+	}
+
+	public Path getPathByKey(Key pathKey)
+	{
+		return new Path(db.getEntity(pathKey), db);
+	}
+	
+	public Path getPathById(Long pathId)
+	{
+		return new Path(db.getEntity("Path", pathId), db);
+	}
+	
+	public Key getKey(String kind, Long id)
+	{
+		return KeyFactory.createKey(kind, id);
 	}
 
 	public boolean setInternalName(EntityWrapper wrapper, String newInternalName)
