@@ -1104,7 +1104,8 @@ public class MainPageUpdateService extends Service
 		{
 			for(CachedEntity item:immovables)
 			{
-				String iconUrl = (String)item.getProperty("icon");
+				String iconUrl = (String)item.getProperty("icon2");
+				if (iconUrl==null || iconUrl.trim().length()==0) iconUrl = (String)item.getProperty("icon");
 				if (iconUrl!=null && iconUrl.startsWith("http://"))
 					iconUrl = "https://"+iconUrl.substring(7);
 				else if (iconUrl!=null && iconUrl.startsWith("http")==false)
