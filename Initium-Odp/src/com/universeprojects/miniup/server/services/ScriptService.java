@@ -25,6 +25,7 @@ import com.universeprojects.miniup.server.scripting.wrappers.Item;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
+import com.universeprojects.miniup.server.scripting.wrappers.Path;
 
 public class ScriptService extends Service 
 {
@@ -85,6 +86,8 @@ public class ScriptService extends Service
 				return new Location(entity, db);
 			case "Buff":
 				return new Buff(entity, db);
+			case "Path":
+				return new Path(entity, db);
 			default: 
 				throw new RuntimeException("Entity does not support scripting.");
 		}
