@@ -58,7 +58,7 @@ public class CommandForgetAllCombatSites extends Command {
 			if(e.isError())
 				throw e;
 			else
-				GameUtils.setPopupMessage(request, e.getMessage());
+				setPopupMessage(e.getMessage());
 		} 
 		finally 
 		{
