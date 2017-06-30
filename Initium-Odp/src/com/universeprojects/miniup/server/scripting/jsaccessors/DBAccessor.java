@@ -381,14 +381,19 @@ public class DBAccessor {
 		CachedEntity defend = defender.wrappedEntity;
 		CachedEntity locate = null;
 		boolean autoAttack = false;
+		boolean clearCombatant = false;
 		
 		if(location != null)
 		{
 			locate = location.wrappedEntity;
 			autoAttack = CommonChecks.checkLocationIsInstance(locate);
+			clearCombatant = CommonChecks.checkLocationIsCombatSite(locate);
 		}
 		
 		cs.enterCombat(attack, defend, autoAttack);
+		if(clearCombatant)
+			defend.setProperty("combatant", null);
+		
 		return cs.isInCombatWith(attack, defend, locate);
 	}
 }
