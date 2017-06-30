@@ -64,6 +64,13 @@ public class Item extends EntityWrapper
 		return (Long)this.getProperty("maxDurability");
 	}
 	
+	public boolean setDurability(Long newDura)
+	{
+		if(GameUtils.equals(getDurability(), newDura)) return false;
+		this.setProperty("durability", newDura);
+		return true;
+	}
+	
 	/**
 	 * Adjusts the durability by the specified amount.
 	 * @param addDura Amount to add (or subtract) from durability.
