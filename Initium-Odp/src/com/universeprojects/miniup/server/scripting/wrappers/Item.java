@@ -50,7 +50,7 @@ public class Item extends EntityWrapper
 		if(GameUtils.equals(getContainerKey(), ent.getKey()))
 			return false;
 		setProperty("containerKey", ent.getKey());
-		setProperty("movedTimeStamp", new Date());
+		setProperty("movedTimestamp", new Date());
 		return true;
 	}
 	
