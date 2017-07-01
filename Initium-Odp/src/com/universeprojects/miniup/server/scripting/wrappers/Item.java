@@ -49,6 +49,7 @@ public class Item extends EntityWrapper
 	{
 		if(GameUtils.equals(getContainerKey(), ent.getKey()))
 			return false;
+		this.containerEntity = ent;
 		setProperty("containerKey", ent.getKey());
 		setProperty("movedTimestamp", new Date());
 		return true;
