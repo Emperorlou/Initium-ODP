@@ -49,9 +49,32 @@ public class Item extends EntityWrapper
 	{
 		if(GameUtils.equals(getContainerKey(), ent.getKey()))
 			return false;
+		this.containerEntity = ent;
 		setProperty("containerKey", ent.getKey());
-		setProperty("movedTimeStamp", new Date());
+		setProperty("movedTimestamp", new Date());
 		return true;
+	}
+	
+	public Long getQuantity()
+	{
+		return (Long)this.getProperty("quantity");
+	}
+	
+	public boolean setQuantity(Long newQuantity)
+	{
+		Long oldQuantity = this.getQuantity();
+		if(GameUtils.equals(oldQuantity, newQuantity) || newQuantity < 1) return false;
+		this.setProperty("quantity", newQuantity);
+		return true;
+	}
+	
+	public boolean adjustQuantity(Long addQty)
+	{
+		Long newQty = this.getQuantity();
+		if(newQty == null) return false;
+		newQty += addQty;
+		this.setProperty("quantity", newQty);
+		return newQty < 1;
 	}
 	
 	public Long getDurability()
