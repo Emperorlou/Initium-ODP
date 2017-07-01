@@ -54,6 +54,28 @@ public class Item extends EntityWrapper
 		return true;
 	}
 	
+	public Long getQuantity()
+	{
+		return (Long)this.getProperty("quantity");
+	}
+	
+	public boolean setQuantity(Long newQuantity)
+	{
+		Long oldQuantity = this.getQuantity();
+		if(GameUtils.equals(oldQuantity, newQuantity) || newQuantity < 1) return false;
+		this.setProperty("quantity", newQuantity);
+		return true;
+	}
+	
+	public boolean adjustQuantity(Long addQty)
+	{
+		Long newQty = this.getQuantity();
+		if(newQty == null) return false;
+		newQty += addQty;
+		this.setProperty("quantity", newQty);
+		return newQty < 1;
+	}
+	
 	public Long getDurability()
 	{
 		return (Long)this.getProperty("durability");
