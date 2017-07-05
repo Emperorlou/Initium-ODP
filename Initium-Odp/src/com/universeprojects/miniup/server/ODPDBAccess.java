@@ -5320,7 +5320,7 @@ public class ODPDBAccess
 			shuffleCharactersByAttackOrder(npcsInTheArea);
 			int partyIdx = 0;
 			for(CachedEntity possibleNPC:npcsInTheArea)
-				if ((isCombatSite || possibleNPC.getProperty("mode") == null || CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode"))) && 
+				if ((isCombatSite || possibleNPC.getProperty("mode") == null || CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode")) || CommonChecks.checkCharacterIsRaidBoss(possibleNPC)) && 
 						(Double)possibleNPC.getProperty("hitpoints")>0d)
 				{
 					resetInstanceRespawnTimer(destination);
@@ -5333,11 +5333,26 @@ public class ODPDBAccess
 					
 					ds.put(possibleNPC);
 					
-					if(isCombatSite)
+					if(isCombatSite || CommonChecks.checkCharacterIsRaidBoss(possibleNPC))
 					{
-						// In combat sites, every member fights the same mob.
-						setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
-						setPartiedField(party, character, "combatant", possibleNPC.getKey());
+						if(partyIdx > 1)
+						{
+							// At least 1 party member is in combat with a non-raidboss mob.
+							// Only set the remaining party members.
+							partyIdx--;
+							while(partyIdx < party.size())
+							{
+								curMember = party.get(partyIdx++);
+								curMember.setProperty("mode", CHARACTER_MODE_COMBAT);
+								curMember.setProperty("combatant", possibleNPC.getKey());
+							}
+						}
+						else
+						{
+							// In combat sites, every member fights the same mob.
+							setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
+							setPartiedField(party, character, "combatant", possibleNPC.getKey());
+						}
 						break;
 					}
 					else

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -77,7 +78,9 @@ public class CommandAttack extends Command {
 		
 		if("Instance".equals(location.getProperty("combatType"))==false)
 		{
-			if("CombatSite".equals(location.getProperty("type"))==false && monster.getProperty("combatant") != null)
+			if(CommonChecks.checkCharacterIsRaidBoss(monster)==false && 
+					"CombatSite".equals(location.getProperty("type"))==false && 
+					monster.getProperty("combatant") != null)
 				throw new UserErrorMessage("This monster is already in combat.");
 			
 			// All future checks are instance only, so exit if not in one

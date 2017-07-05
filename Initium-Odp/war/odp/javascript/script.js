@@ -1819,6 +1819,20 @@ function viewMap()
 	openMap();
 }
 
+function viewContainer(containerId, title, closePopups)
+{
+	if(closePopups)
+	{
+		closeAllPopups();
+		closeAllTooltips();
+	}
+	
+	if(containerId == null)
+		pagePopup("/odp/ajax_moveitems.jsp?preset=location", null, title ?? "Nearby Items");
+	else
+		pagePopup("/odp/ajax_moveitems.jsp?selfSide=Character_"+window.characterId+"&otherSide=Item_"+containerId, null, title);
+}
+
 function renameCharacter(eventObject, currentCharName)
 {
 	promptPopup("Rename Character", "Ok, what will you call your character?", currentCharName, function(name){
