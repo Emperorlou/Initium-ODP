@@ -144,7 +144,7 @@ public class LongOperationTakePath extends LongOperation {
 			{
 				db.shuffleCharactersByAttackOrder(npcsInTheArea);
 				for(CachedEntity possibleNPC:npcsInTheArea)
-					if ((possibleNPC.getProperty("mode") == null || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode"))) && 
+					if ((possibleNPC.getProperty("mode") == null || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode")) || CommonChecks.checkCharacterIsRaidBoss(possibleNPC)) && 
 							(Double)possibleNPC.getProperty("hitpoints")>0d)
 					{
 						// We do not set partied field on NPC block.

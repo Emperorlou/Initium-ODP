@@ -40,8 +40,11 @@ public class CombatService extends Service
 		attacker.setProperty("combatant", defender.getKey());
 		attacker.setProperty("mode", "COMBAT");
 		
-		defender.setProperty("combatant", attacker.getKey());
 		defender.setProperty("mode", "COMBAT");
+		if(CommonChecks.checkCharacterIsRaidBoss(defender)==false)
+			defender.setProperty("combatant", attacker.getKey());
+		else
+			autoAttack = true;
 		
 		attacker.setProperty("combatType", null);
 		defender.setProperty("combatType", null);
@@ -53,7 +56,6 @@ public class CombatService extends Service
 			attacker.setProperty("combatType", "DefenceStructureAttack");
 			db.flagCharacterCombatAction(db.getDB(), attacker);
 		}
-		
 		
 		ds.put(attacker);
 		ds.put(defender);

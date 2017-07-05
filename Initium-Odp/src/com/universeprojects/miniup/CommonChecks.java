@@ -105,6 +105,19 @@ public abstract class CommonChecks
 	}
 	
 	/**
+	 * Checks if the character entity has RaidBoss status, to allow multiple combatants
+	 * @param character Character entity of the mob.
+	 * @return
+	 */
+	public static boolean checkCharacterIsRaidBoss(CachedEntity character)
+	{
+		if("RaidBoss".equals(character.getProperty("status")))
+			return true;
+		
+		return false;
+	}
+	
+	/**
 	 * Checks if the given item is a valid premium membership token.
 	 * 
 	 * @param item

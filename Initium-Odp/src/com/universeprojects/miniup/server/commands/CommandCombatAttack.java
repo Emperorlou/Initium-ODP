@@ -60,7 +60,13 @@ public class CommandCombatAttack extends Command
 			mpus.updateFullPage_shortcut();
 			return;
 		}
-		if (cs.isInCombatWith(character, targetCharacter, location)==false && CommonChecks.checkLocationIsInstance(location))
+		
+		// Raid boss could possibly be in instance, so check for it
+		// explicitly even though isInCombatWith handles non-instance
+		// already.
+		if (cs.isInCombatWith(character, targetCharacter, location)==false && 
+				CommonChecks.checkLocationIsInstance(location) &&
+				CommonChecks.checkCharacterIsRaidBoss(targetCharacter)==false)
 		{
 			cs.leaveCombat(character, null);
 			mpus.updateFullPage_shortcut();			
