@@ -5843,9 +5843,7 @@ public class ODPDBAccess
 			Random rnd = new Random();
 			if (rnd.nextDouble()*characterDex>rnd.nextDouble()*monsterDex)
 			{
-				// When running from RaidBoss, still want to 
-				boolean defenceStructureAttack = "DefenceStructureAttack".equals(character.getProperty("combatType")) && 
-						CommonChecks.checkCharacterIsRaidBoss(monster) == false;
+				boolean defenceStructureAttack = "DefenceStructureAttack".equals(character.getProperty("combatType"));
 				List<CachedEntity> party = getParty(db, character);
 				
 				
@@ -5870,8 +5868,8 @@ public class ODPDBAccess
 				if (monsterLocation.getProperty("territoryKey")!=null || characterLocation.getProperty("territoryKey")!=null)
 					isTerritoryCombat = true;
 				
-				
-				if (monsterLocation!=null && (defenceStructureAttack || isTerritoryCombat))
+				// When running from RaidBoss, don't want them to heal.
+				if (monsterLocation!=null && CommonChecks.checkCharacterIsRaidBoss(monster) == false && (defenceStructureAttack || isTerritoryCombat))
 				{
 					Double hitpoints = (Double)monster.getProperty("hitpoints");
 					Double maxHitpoints = (Double)monster.getProperty("maxHitpoints");
