@@ -1828,7 +1828,7 @@ function viewContainer(containerId, title, closePopups)
 	}
 	
 	if(containerId == null)
-		pagePopup("/odp/ajax_moveitems.jsp?preset=location", null, title ?? "Nearby Items");
+		pagePopup("/odp/ajax_moveitems.jsp?preset=location", null, title || "Nearby Items");
 	else
 		pagePopup("/odp/ajax_moveitems.jsp?selfSide=Character_"+window.characterId+"&otherSide=Item_"+containerId, null, title);
 }
