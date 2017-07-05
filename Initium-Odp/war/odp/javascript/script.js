@@ -846,6 +846,8 @@ function doCollectCharacter(event, characterId, characterName)
 
 function toggleFullscreenChat()
 {
+	closeAllPagePopups();
+	closeAllPopups();
 	$(".chat_box").toggleClass("fullscreenChat-old");
 	$(".chat-container").toggleClass("fullscreenChat");
 }
