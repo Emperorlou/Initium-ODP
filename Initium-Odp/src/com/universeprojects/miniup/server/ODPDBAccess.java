@@ -5843,7 +5843,9 @@ public class ODPDBAccess
 			Random rnd = new Random();
 			if (rnd.nextDouble()*characterDex>rnd.nextDouble()*monsterDex)
 			{
-				boolean defenceStructureAttack = "DefenceStructureAttack".equals(character.getProperty("combatType"));
+				// When running from RaidBoss, still want to 
+				boolean defenceStructureAttack = "DefenceStructureAttack".equals(character.getProperty("combatType")) && 
+						CommonChecks.checkCharacterIsRaidBoss(monster) == false;
 				List<CachedEntity> party = getParty(db, character);
 				
 				
