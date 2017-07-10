@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPAuthenticator;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -34,7 +35,7 @@ public class CommandCombatEscape extends Command {
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		
 		CachedEntity targetCharacter = db.getCharacterCombatant(character);
-		if (targetCharacter==null)
+		if (targetCharacter==null || CommonChecks.checkCharacterIsDead(targetCharacter))
 		{
 			cs.leaveCombat(character, null);
 			mpus.updateFullPage_shortcut();
