@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,10 @@ public class CommandPartyJoin extends Command {
 		mpus.updatePartyView();
 		
 		List<CachedEntity> party = db.getParty(ds, character);
+		// Not sure how this happens. Just create a new list with the two chars
+		if(party == null)
+			party = Arrays.asList(character, partyCharacter);
+		
 		List<Key> partyKeys = new ArrayList<Key>();
 		for(CachedEntity member:party)
 			if(member != null && GameUtils.equals(character.getKey(), member.getKey())==false)
