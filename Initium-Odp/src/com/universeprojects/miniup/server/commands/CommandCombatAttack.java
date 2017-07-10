@@ -54,7 +54,7 @@ public class CommandCombatAttack extends Command
 		
 		
 		CachedEntity targetCharacter = db.getCharacterCombatant(character);
-		if (targetCharacter==null || CommonChecks.checkCharacterIsDead(targetCharacter))
+		if (targetCharacter==null || GameUtils.isPlayerIncapacitated(targetCharacter))
 		{
 			cs.leaveCombat(character, null);
 			mpus.updateFullPage_shortcut();

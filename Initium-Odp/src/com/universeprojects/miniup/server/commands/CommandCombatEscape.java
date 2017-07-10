@@ -35,7 +35,7 @@ public class CommandCombatEscape extends Command {
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		
 		CachedEntity targetCharacter = db.getCharacterCombatant(character);
-		if (targetCharacter==null || CommonChecks.checkCharacterIsDead(targetCharacter))
+		if (targetCharacter==null || GameUtils.isPlayerIncapacitated(targetCharacter))
 		{
 			cs.leaveCombat(character, null);
 			mpus.updateFullPage_shortcut();
