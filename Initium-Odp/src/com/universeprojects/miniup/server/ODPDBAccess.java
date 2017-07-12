@@ -6319,4 +6319,16 @@ public class ODPDBAccess
 		db.put(achievement);
 		return achievement;
 	}
+
+	public Map<String, String> getValue_StringStringMap(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setValue_StringStringMap(CachedEntity entity, String fieldName, Map<String, String> value)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
