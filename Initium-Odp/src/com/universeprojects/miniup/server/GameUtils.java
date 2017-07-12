@@ -150,9 +150,9 @@ public class GameUtils
 	 * 
 	 * @param seconds
 	 */
-	public static void timePasses(int seconds) 
+	public static void timePasses(int ms) 
 	{
-		if (seconds<=0)
+		if (ms<=0)
 			return;
 		Object waiter = new Object();
 		
@@ -160,7 +160,7 @@ public class GameUtils
 		{
 			synchronized(waiter)
 			{
-				waiter.wait(seconds*1000);
+				waiter.wait(ms);
 			}
 		} 
 		catch (InterruptedException e) 
@@ -1016,10 +1016,15 @@ public class GameUtils
 				
 		}
 		
+		String result = null;
 		if (popupEmbedded)
-			return "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			return "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+		
+		if (result.toLowerCase().contains("<script") || result.toLowerCase().contains("javascript:")) throw new RuntimeException("CODENK1 Item("+item.getId()+")");
+		
+		return result;
     }
 
 	public static String renderItemMini(ODPDBAccess db, CachedEntity currentChar, 
@@ -1407,7 +1412,7 @@ public class GameUtils
     	if (popupEmbedded)
     		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     	else
-    		return "<a rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' style='max-width:32px; max-height:32px;' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     }
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)

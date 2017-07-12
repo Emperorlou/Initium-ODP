@@ -2843,6 +2843,11 @@ a.range-increment {
 		margin-top:0px;
 	}
 		
+	.character-display-box
+	{
+		transform: scale(0.8);
+		transform-origin: top left;
+	}
 }
 
 

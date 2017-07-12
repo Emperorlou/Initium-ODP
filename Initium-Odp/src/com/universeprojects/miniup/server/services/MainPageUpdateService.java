@@ -581,6 +581,26 @@ public class MainPageUpdateService extends Service
 				
 				newHtml.append(getHtmlForInBannerLink(topInt, leftInt, buttonCaption, onclick));
 			}
+
+			if (CommonChecks.checkLocationIsCombatSite(location)==false)
+				newHtml.append(getHtmlForInBannerLink(70, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore()"));
+			else
+			{
+				newHtml.append(getHtmlForInBannerLink(70, 47, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Exit</span>", "window.btnLeaveAndForget.click()"));
+				String js = 
+						"<script type='text/javascript'>" +
+						"setTimeout(function(){" +
+						"window.btnLeaveAndForget = $('.main-button[shortcut=70]');" +
+						"if (window.btnLeaveAndForget.length>0)" +
+						"{" +
+						"	$('#leaveAndForgetBannerButton').show();" +
+						"	if (window.btnLeaveAndForget.length>1) window.btnLeaveAndForget = $(window.btnLeaveAndForget[0]);" +
+						"}" +
+						"}, 500);" +
+						"</script>";
+				newHtml.append(js);
+			}
+			
 		}
 		else
 		{
@@ -596,7 +616,7 @@ public class MainPageUpdateService extends Service
 			
 			newHtml.append(getHtmlForInBannerLink(50, 40, "<img src='"+leftIcon+"' alt='Left Hand' style='max-width:32px; max-height:32px;padding:5px;z-index:2000002;'/>", "doCombatAttackLeftHand(event)"));
 			newHtml.append(getHtmlForInBannerLink(50, 60, "<img src='"+rightIcon+"' alt='Right Hand' style='max-width:32px; max-height:32px;padding:5px;z-index:2000002;'/>", "doCombatAttackRightHand(event)"));
-			newHtml.append(getHtmlForInBannerLink(90, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)"));
+			newHtml.append(getHtmlForInBannerLink(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)"));
 		}
 		
 		

@@ -68,7 +68,7 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 			channel:this.channel,
 			markers:this._getMarkersCombined(),
 			message:message,
-			"idToken":this.idToken
+			"idToken2":this.idToken
 		});
 
 		a.done(function(data){
@@ -152,7 +152,7 @@ function Messager(delay, idleDelay, secondsToIdle, chatServerUrl, idToken)
 
 		var a = $.ajax(
 		{
-			url: this.chatServer + "/messager?markers=" + this._getMarkersCombined()+"&idToken="+this.idToken
+			url: this.chatServer + "/messager?markers=" + this._getMarkersCombined()+"&idToken2="+encodeURIComponent(this.idToken)
 
 		});
 

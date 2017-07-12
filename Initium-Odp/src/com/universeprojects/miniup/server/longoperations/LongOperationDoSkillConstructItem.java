@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.longoperations;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 import com.universeprojects.miniup.server.services.ConfirmSkillRequirementsBuilder;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -38,6 +40,10 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 			throw new UserErrorMessage("Invalid skill specified.");
 		
 		CachedEntity character = db.getCurrentCharacter();
+		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
+
+		if (GameUtils.isPlayerIncapacitated(db.getCurrentCharacter()))
+			throw new UserErrorMessage("You're incapacitated, you can't do this right now.");
 		
 		doChecks(character, skill);
 
@@ -94,6 +100,8 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		
 		processVariables.put("speed", seconds);
+		processVariables.put("locationType", location.getProperty("type"));
+		processVariables.put("locationSupportsCampfires", location.getProperty("supportsCampfires"));
 
 		
 		inventionService.processConstructItemSkillForProcessVariables(skill, itemRequirementsToItems, processVariables, pool);
@@ -123,6 +131,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 	@Override
 	String doComplete() throws UserErrorMessage, UserRequestIncompleteException
 	{
+		
 		@SuppressWarnings("unchecked")
 		Map<Key, List<Key>> itemRequirementsToItems = (Map<Key, List<Key>>)getDataProperty("selectedItems");
 		Integer repetitionCount = (Integer)getDataProperty("repetitionCount");
@@ -153,6 +162,13 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		// Create the skill so we can use it again
 		CachedEntity item = inventionService.doConstructItemSkill(skill, itemRequirementsToItems, pool, 1);
 		
+		if (CommonChecks.isItemImmovable(item))
+		{
+			item.setProperty("movedTimestamp", new Date(3000, 1, 1));
+			item.setProperty("containerKey", character.getProperty("locationKey"));
+			ds.put(item);
+		}
+		
 		// Now add to the knowledge we gain
 		knowledgeService.increaseKnowledgeFor(skill, 1, 100);
 		knowledgeService.increaseKnowledgeFor(item, 1, 100);
@@ -167,7 +183,13 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 			for(Key deletedKey:inventionService.getDeletedEntities())
 				if (deletedKey.getKind().equals("Item"))
 					deleteHtml(".deletable-Item"+deletedKey.getId());
-		
+	
+		if (CommonChecks.checkItemIsMovable(item)==false)
+		{
+			CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
+			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			mpus.updateImmovablesPanel(item);
+		}
 		
 		return "Skill complete. "+msg;
 	}

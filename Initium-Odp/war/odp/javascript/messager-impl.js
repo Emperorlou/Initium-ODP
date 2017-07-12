@@ -232,7 +232,7 @@ messager.checkClientSideChatCommands = function(chatMessage)
 		}
 		if (chatMessage.toLowerCase().startsWith("/tutorial"))
 		{
-			introTutorial.run();
+			uiTutorial.run();
 			return true;
 		}
 	}

@@ -2882,7 +2882,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 	}
 	
 	var selectedItems = null;
-	if (userRequestId!=null)
+	if (userRequestId!=null && eventObject!=null)
 	{
 		selectedItems = confirmRequirements_collectChoices(eventObject);
 		if (selectedItems==null) selectedItems = {};
@@ -3186,12 +3186,11 @@ function doCollectCollectable(event, collectableId, userRequestId)
 				if (action.isComplete)
 				{
 					clearPopupPermanentOverlay(); 
-//					fullpageRefresh();
+					hideBannerLoadingIcon();
 				}
 				else
 				{
-					setBannerImage(action.bannerUrl);
-					setBannerOverlayText("Collecting", "This process will take "+action.secondsToWait+" seconds.<br><span id='long-operation-timeleft'></span>");
+					popupPermanentOverlay_Experiment("Collect Resource", "<span id='long-operation-timeleft'></span>");
 					hideBannerLoadingIcon();
 				}
 			},

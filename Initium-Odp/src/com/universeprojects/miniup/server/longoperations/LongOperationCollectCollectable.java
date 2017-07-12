@@ -8,12 +8,14 @@ import java.util.Map;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -40,6 +42,8 @@ public class LongOperationCollectCollectable extends LongOperation {
 		else
 			throw new UserErrorMessage("You cannot collect stuff right now because you are busy.");
 		
+		if (GameUtils.isPlayerIncapacitated(db.getCurrentCharacter()))
+			throw new UserErrorMessage("You're incapacitated, you can't do this right now.");
 		
 		
 		String collectableIdStr = parameters.get("collectableId");
@@ -108,6 +112,9 @@ public class LongOperationCollectCollectable extends LongOperation {
 		CachedEntity collectableDef = db.getEntity((Key)collectable.getProperty("_definitionKey"));
 
 		Map<Key, List<Key>> tools = (Map<Key, List<Key>>)getDataProperty("tools");
+
+		CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
+		
 		
 		// Now update the collectable..
 		Long collectionCount = (Long)collectable.getProperty("collectionCount");
@@ -163,11 +170,27 @@ public class LongOperationCollectCollectable extends LongOperation {
 		
 		item.setProperty("movedTimestamp", new Date());
 		
+
+		if (CommonChecks.isItemImmovable(item))
+		{
+			item.setProperty("movedTimestamp", new Date(3000, 1, 1));
+			item.setProperty("containerKey", location.getKey());
+		}
+		
 		
 		
 		ds.put(item);
 		
-		if (onGround)
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+		mpus.updateCollectablesView();
+		mpus.updateLocationQuicklist();
+		
+		if (CommonChecks.isItemImmovable(item))
+		{
+			mpus.updateImmovablesPanel(item);
+			return "You collected "+GameUtils.renderItem(item)+". It is now in the location where you are standing.";
+		}
+		else if (onGround)
 			return "You got "+GameUtils.renderItem(item)+" however it was too heavy to hold and it is laying on the ground where you stand.";
 		else
 			return "You collected "+GameUtils.renderItem(item)+".";
@@ -177,7 +200,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 	@Override
 	public String getPageRefreshJavascriptCall() {
 		Long collectableId = (Long)getDataProperty("collectableId");
-		return "doCollectCollectable(null, "+collectableId+");";
+		return "doCollectCollectable(null, "+collectableId+", '1');";
 	}
 
 	@Override

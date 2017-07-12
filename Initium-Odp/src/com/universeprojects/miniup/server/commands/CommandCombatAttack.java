@@ -218,8 +218,11 @@ public class CommandCombatAttack extends Command
 			db.sendGameMessage(db.getDB(), character, html);
 		}
 		
-		
-		if (GameUtils.isPlayerIncapacitated(character) || GameUtils.isPlayerIncapacitated(targetCharacter))
+		if (GameUtils.isPlayerIncapacitated(character))
+		{
+			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+		}
+		else if (GameUtils.isPlayerIncapacitated(targetCharacter))
 		{
 			if (CommonChecks.checkLocationIsCombatSite(location)) location = ds.refetch(location);
 			// We're done with combat

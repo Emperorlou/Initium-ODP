@@ -102,6 +102,92 @@ public class ViewItemController extends PageController {
 		itemMap.put("itemId", item.getId());
 		
 		boolean selfUser = GameUtils.equals(currentChar.getKey(), item.getProperty("containerKey"));
+		Object field = null;
+		if(!isComparisonItem)
+		{
+			List<ItemPopupEntry> itemPopupEntries = new ArrayList<ItemPopupEntry>();
+			StringBuilder aspectList = new StringBuilder();
+			
+			// Self user: scripts, owner only HTML, aspects, and premium token
+			if(selfUser)
+			{
+				// Get all the directItem scripts on this item 
+				@SuppressWarnings("unchecked")
+				List<Key> scriptKeys = (List<Key>)item.getProperty("scripts");
+				if (scriptKeys!=null && scriptKeys.isEmpty()==false)
+				{
+					List<CachedEntity> directItemScripts = db.getScriptsOfType(scriptKeys, ODPDBAccess.ScriptType.directItem);
+					if (directItemScripts!=null && directItemScripts.isEmpty()==false)
+					{
+						for(CachedEntity script:directItemScripts)
+						{
+							if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) continue;
+							ItemPopupEntry scriptEntry = new ItemPopupEntry(
+									(String)script.getProperty("caption"), 
+									(String)script.getProperty("description"), 
+									"doTriggerItem(event,"+script.getId()+","+item.getId()+")");
+							
+							itemPopupEntries.add(scriptEntry);
+						}
+					}
+				}
+				
+				// Owner only HTML
+				field = item.getProperty("ownerOnlyHtml");
+				if(field != null && "".equals(field)==false)
+					itemMap.put("ownerOnlyHtml", field.toString());
+			}
+			
+			// Aspects
+			InitiumObject iObject = new InitiumObject(db, item);
+			if (iObject.hasAspects())
+			{
+				// Go through the aspects on this item and include any special links that it may have
+				for(InitiumAspect initiumAspect:iObject.getAspects())
+				{
+					if (initiumAspect instanceof ItemAspect)
+					{
+						ItemAspect itemAspect = (ItemAspect)initiumAspect;
+						
+						String popupTag = itemAspect.getPopupTag();
+						if (popupTag!=null)
+						{
+							if (aspectList.length()>0)
+							{
+								aspectList.append(", ");
+								aspectList.append(popupTag.toLowerCase());
+							}
+							else
+								aspectList.append(popupTag);
+						}
+						
+						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
+						if(curEntries != null)
+							itemPopupEntries.addAll(curEntries);
+					}
+				}
+				
+				if(aspectList.length() > 0)
+					itemMap.put("aspectList", aspectList.toString());
+			}
+			
+			// Here, since this can technically contain both directItem scripts and
+			// ItemAspect popup entries.
+			if(itemPopupEntries.isEmpty()==false)
+			{
+				List<Map<String,String>> popupEntries = new ArrayList<Map<String,String>>();
+				for(ItemPopupEntry entry:itemPopupEntries)
+				{
+					Map<String, String> formattedEntry = new HashMap<String, String>();
+					formattedEntry.put("name", entry.name);
+					formattedEntry.put("description", entry.description);
+					formattedEntry.put("clickJavascript", entry.clickJavascript);
+					popupEntries.add(formattedEntry);
+				}
+				itemMap.put("popupEntries", popupEntries);
+			}
+		}
+		
 		
 		if(GameUtils.isStorageItem(item))
 		{
@@ -110,6 +196,7 @@ public class ViewItemController extends PageController {
 		}
 		else
 			itemMap.put("isContainer", false);
+
 		
 		String iconUrl = (String)item.getProperty("icon");
 		if (iconUrl!=null && iconUrl.startsWith("http://"))
@@ -140,7 +227,7 @@ public class ViewItemController extends PageController {
 		itemMap.put("itemSlot", itemSlot);
 		
 		boolean requirements = false;
-		Object field = item.getProperty("dexterityPenalty");
+		field = item.getProperty("dexterityPenalty");
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
 			requirements=true;
@@ -314,90 +401,6 @@ public class ViewItemController extends PageController {
 		if (field!=null && field.toString().trim().equals("")==false)
 			itemMap.put("description", field.toString());
 		
-		if(!isComparisonItem)
-		{
-			List<ItemPopupEntry> itemPopupEntries = new ArrayList<ItemPopupEntry>();
-			StringBuilder aspectList = new StringBuilder();
-			
-			// Self user: scripts, owner only HTML, aspects, and premium token
-			if(selfUser)
-			{
-				// Get all the directItem scripts on this item 
-				@SuppressWarnings("unchecked")
-				List<Key> scriptKeys = (List<Key>)item.getProperty("scripts");
-				if (scriptKeys!=null && scriptKeys.isEmpty()==false)
-				{
-					List<CachedEntity> directItemScripts = db.getScriptsOfType(scriptKeys, ODPDBAccess.ScriptType.directItem);
-					if (directItemScripts!=null && directItemScripts.isEmpty()==false)
-					{
-						for(CachedEntity script:directItemScripts)
-						{
-							if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) continue;
-							ItemPopupEntry scriptEntry = new ItemPopupEntry(
-									(String)script.getProperty("caption"), 
-									(String)script.getProperty("description"), 
-									"doTriggerItem(event,"+script.getId()+","+item.getId()+")");
-							
-							itemPopupEntries.add(scriptEntry);
-						}
-					}
-				}
-				
-				// Owner only HTML
-				field = item.getProperty("ownerOnlyHtml");
-				if(field != null && "".equals(field)==false)
-					itemMap.put("ownerOnlyHtml", field.toString());
-			}
-			
-			// Aspects
-			InitiumObject iObject = new InitiumObject(db, item);
-			if (iObject.hasAspects())
-			{
-				// Go through the aspects on this item and include any special links that it may have
-				for(InitiumAspect initiumAspect:iObject.getAspects())
-				{
-					if (initiumAspect instanceof ItemAspect)
-					{
-						ItemAspect itemAspect = (ItemAspect)initiumAspect;
-						
-						String popupTag = itemAspect.getPopupTag();
-						if (popupTag!=null)
-						{
-							if (aspectList.length()>0)
-							{
-								aspectList.append(", ");
-								aspectList.append(popupTag.toLowerCase());
-							}
-							else
-								aspectList.append(popupTag);
-						}
-						
-						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
-						if(curEntries != null)
-							itemPopupEntries.addAll(curEntries);
-					}
-				}
-				
-				if(aspectList.length() > 0)
-					itemMap.put("aspectList", aspectList.toString());
-			}
-			
-			// Here, since this can technically contain both directItem scripts and
-			// ItemAspect popup entries.
-			if(itemPopupEntries.isEmpty()==false)
-			{
-				List<Map<String,String>> popupEntries = new ArrayList<Map<String,String>>();
-				for(ItemPopupEntry entry:itemPopupEntries)
-				{
-					Map<String, String> formattedEntry = new HashMap<String, String>();
-					formattedEntry.put("name", entry.name);
-					formattedEntry.put("description", entry.description);
-					formattedEntry.put("clickJavascript", entry.clickJavascript);
-					popupEntries.add(formattedEntry);
-				}
-				itemMap.put("popupEntries", popupEntries);
-			}
-		}
 		
 		return itemMap;
 	}

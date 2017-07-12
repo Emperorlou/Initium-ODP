@@ -346,4 +346,15 @@ public abstract class CommonChecks
 	{
 		return "Instance".equals(location.getProperty("combatType"));
 	}
+
+	public static boolean checkLocationIsOutside(CachedEntity location)
+	{
+		if (location.getProperty("isOutside")==null) return true;
+		return "TRUE".equals(location.getProperty("isOutside"));
+	}
+
+	public static boolean isItemImmovable(CachedEntity item)
+	{
+		return Boolean.TRUE.equals(item.getProperty("immovable"));
+	}
 }

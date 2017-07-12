@@ -454,7 +454,7 @@ public class AspectFireplace extends ItemAspect
 			if (CommonChecks.checkIsRaining(location))
 				throw new UserErrorMessage("You cannot light a fire while it's raining.");
 			
-			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), null);
+			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), db.getKnowledgeService(db.getCurrentCharacterKey()));
 			AspectFireplace fireplaceAspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
 
 			CachedDatastoreService ds = db.getDB();
@@ -479,10 +479,10 @@ public class AspectFireplace extends ItemAspect
 				List<String> slots = new ArrayList<String>(gerSlotsToItem.slots.keySet());
 				Collections.sort(slots);
 				
-				List<Key> tinderKey = gerSlotsToItem.slots.get(slots.get(0));
-				List<Key> kindlingKey = gerSlotsToItem.slots.get(slots.get(1));
-				List<Key> firestarterKey = gerSlotsToItem.slots.get(slots.get(2));
-				List<Key> additionalFirewoodKey = gerSlotsToItem.slots.get(slots.get(3));
+				List<Key> tinderKey = gerSlotsToItem.slots.get("genericEntityRequirements1:0");
+				List<Key> kindlingKey = gerSlotsToItem.slots.get("genericEntityRequirements1:1");
+				List<Key> firestarterKey = gerSlotsToItem.slots.get("genericEntityRequirements1:2");
+				List<Key> additionalFirewoodKey = gerSlotsToItem.slots.get("genericEntityRequirements2:0");
 				
 				EntityPool pool = new EntityPool(db.getDB());
 				
@@ -571,7 +571,7 @@ public class AspectFireplace extends ItemAspect
 			AspectFireplace fireplaceAspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
 				
 			CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
-			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), null);
+			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), db.getKnowledgeService(db.getCurrentCharacterKey()));
 			
 			CachedDatastoreService ds = db.getDB();
 			ds.beginBulkWriteMode();

@@ -273,5 +273,11 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
+	public void processPrototypeItemSkillForProcessVariables(CachedEntity ideaDef, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

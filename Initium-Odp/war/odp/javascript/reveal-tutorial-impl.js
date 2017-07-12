@@ -1,4 +1,30 @@
-var introTutorial = new RevealTutorial();
+var tutorialMenu = new RevealTutorial();
+
+var chapter1 = new RevealTutorialChapter("chapter1");
+
+chapter1.addHiddenElement("#newui-progress-link");
+chapter1.addHiddenElement(".chat_box");
+chapter1.addHiddenElement("#buttonbar");
+chapter1.addHiddenElement(".main-bottomhalf");
+
+chapter1.addStep(null, "Welcome to Initium!", "Here are a list of quick and easy to follow tutorials to get you started in the game. At any time you can skip a tutorial by simply pressing the Exit button.<br><br><strong>Pro tip: You can also tap anywhere on the screen to continue instead of hitting next.</strong>" +
+		"<h5>Tutorials</h5>" +
+		"<p>" +
+		"<a onclick=''>Initium Controls Walkthrough</a>" +
+		"<br>This one will show you all the areas of the game screen and give you an idea of what each button does." +
+		"<br><br>" +
+		"<a onclick='popupMessage(\"SYSTEM MESSAGE\", \"Not yet implemented\")'>Walkthrough: Combat - Fighting Monsters</a>" +
+		"<br>This one will walk you through combat and give you some helpful hints to help keep you alive!" +
+		"<br><br>" +
+		"<a onclick='popupMessage(\"SYSTEM MESSAGE\", \"Not yet implemented\")'>Walkthrough: Invention/Crafting</a>" +
+		"<br>Here you will be directed in creating your first item construction skill." +
+		"<br><br>" +
+		"</p>");
+
+tutorialMenu.addChapter(chapter1);
+
+
+var uiTutorial = new RevealTutorial();
 
 var chapter1 = new RevealTutorialChapter("chapter1");
 
@@ -31,7 +57,7 @@ chapter1.addStep("a[rel=#profile]", "Your profile and other options", "Clicking 
 chapter1.addStep("a[rel=#profile]", "Player group membership", "You will also find options for managing your membership with a player group here.");
 chapter1.addStep("#immovablesPanel", "Special items", "This area will show interactive icons for special items in the area. These are usually items that are permanent or semi-permanent fixtures for the location, like a firepit.");
 
-introTutorial.addChapter(chapter1);
+uiTutorial.addChapter(chapter1);
 
 
 
@@ -53,7 +79,7 @@ chapter2.addStep("#PrivateChat_tab", "Private chat", "This tab is for private 1 
 chapter2.addStep(".chat_tab_help_button", "Chat commands help", "This will give you a list of the available chat commands. They can be quite handy.");
 chapter2.addStep("#ignore-players", "Ignore player management", "If certain players are spamming the chat, you can ignore and unignore them with the options here. Furthermore, type /ignore charactername in chat in order to put up a handy link for ignoring that player with one click. You can also click on a character's name and then click the Ignore link at the top to ignore that player.");
 
-introTutorial.addChapter(chapter2);
+uiTutorial.addChapter(chapter2);
 
 
 
@@ -71,7 +97,7 @@ chapter3.addStep("#togglePartyJoin img", "Enable/disable party joins", "This is 
 chapter3.addStep("#toggleDuel img", "Enable/disable duel requests", "This button allows you to control whether or not you are accepting duel requests. When enabled, other players are able to request to duel with you. You will be given the option to accept a duel request or deny it. When you accept, you will be whisked away into a special arena where you and the other player will engage in battle. More information on the different types of duels and how they work can be found in the game mechanics page. Type /mechanics in chat to get that link.");
 chapter3.addStep("#toggleCloak img", "Enable/disable your cloak", "This button will not allow other players to see your character stats, referral stats, or equipment. It can be an important tool in PvP to hide your equipment so other players are less prepared to attack you since they do not know what you're weak to. However if you're not planning on doing PvP any time soon, keeping this option off makes it easier for people to see what you have and to help you - or just to show off your great gear.");
 
-introTutorial.addChapter(chapter3);
+uiTutorial.addChapter(chapter3);
 
 
 
@@ -92,4 +118,4 @@ chapter4.addStep(null, "What to do next?", "First thing you're going to want to 
 		"your first good chunk of gold. It is recommended to buy a house at the Town Hall in Aera as soon as possible and storing some spare equipment there for when you inevitably die in this harsh game, so be prepared!.<br><br>" +
 		"If you would like a more extensive guide, type /guide in chat to bring up the player-made starter guide for new players. Enjoy the game and be careful out there!");
 
-introTutorial.addChapter(chapter4);
+uiTutorial.addChapter(chapter4);

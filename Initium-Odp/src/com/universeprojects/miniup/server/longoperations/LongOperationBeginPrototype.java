@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.longoperations;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -52,6 +54,8 @@ public class LongOperationBeginPrototype extends LongOperation
 			throw new UserErrorMessage("Invalid idea specified.");
 
 		CachedEntity character = db.getCurrentCharacter();
+		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
+		
 		
 		setDataProperty("ideaId", ideaId);
 		setDataProperty("ideaName", idea.getProperty("name"));
@@ -96,11 +100,23 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		// This check will throw a UserErrorMessage if it finds anything off
 		inventionService.checkIdeaWithSelectedItems(pool, ideaDef, itemRequirementsToItems);
+
+		Map<String,Object> processVariables = new HashMap<String,Object>();
+		long seconds = 5L;
+		if (ideaDef.getProperty("prototypeConstructionSpeed")!=null)
+			seconds = (Long)ideaDef.getProperty("prototypeConstructionSpeed");
+		
+		
+		processVariables.put("speed", seconds);
+		processVariables.put("locationType", location.getProperty("type"));
+		processVariables.put("locationSupportsCampfires", location.getProperty("supportsCampfires"));
+
+		
+		inventionService.processPrototypeItemSkillForProcessVariables(ideaDef, itemRequirementsToItems, processVariables, pool);
+		
 		
 		setDataProperty("selectedItems", itemRequirementsToItems);
 		setDataProperty("repetitionCount", itemRequirementSlotsToItems.repetitionCount);
-		
-		int seconds = 5;
 		
 		if (ideaDef.getProperty("prototypeConstructionSpeed")!=null)
 			seconds = ((Long)ideaDef.getProperty("prototypeConstructionSpeed")).intValue();
@@ -117,7 +133,7 @@ public class LongOperationBeginPrototype extends LongOperation
 			db.sendSoundEffectToLocation(ds, (Key)character.getProperty("locationKey"), (String)ideaDef.getProperty("executionSoundeffect"));
 		}
 		
-		return seconds;
+		return (int)seconds;
 	}
 
 
@@ -149,6 +165,14 @@ public class LongOperationBeginPrototype extends LongOperation
 		// Create the skill so we can use it again
 		CachedEntity item = inventionService.doCreateConstructItemPrototype(idea, itemRequirementsToItems, pool, repetitionCount);
 
+		if (CommonChecks.isItemImmovable(item))
+		{
+			item.setProperty("movedTimestamp", new Date(3000, 1, 1));
+			item.setProperty("containerKey", character.getProperty("locationKey"));
+			ds.put(item);
+		}
+		
+		
 		// Now add to the knowledge we gain
 		knowledgeService.increaseKnowledgeFor(idea, 2, 100);
 		knowledgeService.increaseKnowledgeFor(item, 1, 100);
@@ -164,6 +188,13 @@ public class LongOperationBeginPrototype extends LongOperation
 			for(Key deletedKey:inventionService.getDeletedEntities())
 				if (deletedKey.getKind().equals("Item"))
 					deleteHtml(".deletable-Item"+deletedKey.getId());
+		
+		if (CommonChecks.checkItemIsMovable(item)==false)
+		{
+			CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
+			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			mpus.updateImmovablesPanel(item);
+		}
 		
 		return "Prototype complete. "+itemHtml;
 	}
@@ -186,6 +217,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		if (CommonChecks.checkIdeaIsCharacters(idea, character.getKey())==false)
 			throw new UserErrorMessage("The idea you tried to turn into a prototype is stored in another character's brain. Nice try.");
+		
 	}
 	
 
