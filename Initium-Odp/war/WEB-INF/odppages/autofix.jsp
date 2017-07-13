@@ -24,6 +24,12 @@
 		<h2>Character Fixes</h2>
 		<div>
 			<div class='autofix-entry'>
+				<a class="big-link" onclick='cancelLongOperations(event)'> Everything Causes an Error</a>
+			</div>
+			<div class='paragraph'>Use this if every action causes a server error, due to an invalid/incomplete long operation.</div>
+		</div>
+		<div>
+			<div class='autofix-entry'>
 				<a class="big-link" onclick='autofixStuckInLocation(event)'> Stuck In Location</a>
 			</div>
 			<div class='paragraph'>Use this if you're stuck with no discoverable paths out of your current location.</div>
