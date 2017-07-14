@@ -1,11 +1,17 @@
 package com.universeprojects.miniup.server.longoperations;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.aspects.AspectFireplace;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
@@ -34,33 +40,33 @@ public class LongOperationRest extends LongOperation {
 			throw new UserErrorMessage("You don't need to rest, you're already at full health! NOW GET OUT THERE AND KICK SOME ASS!");
 		
 		// Check, if it's night time and we're outside, that we have a fire going
-//		if (GameUtils.getDayNight()>0.9 && CommonChecks.checkLocationIsOutside(location))
-//		{
-//			QueryHelper query = new QueryHelper(ds);
-//			List<CachedEntity> entities = query.getFilteredList("Item", 50, null, "containerKey", FilterOperator.EQUAL, locationKey, "_aspects", FilterOperator.EQUAL, "Fireplace");
-//			List<InitiumObject> fireplaces = InitiumObject.wrap(db, entities);
-//			long currentTime = System.currentTimeMillis();
-//			boolean fireIsActive = false;
-//			long bestMinutesRemaining = 0l;
-//			for(InitiumObject fireplace:fireplaces)
-//			{
-//				AspectFireplace aspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
-//				if (aspect.isFireActive(currentTime))
-//				{
-//					long minutesRemaining = aspect.getMinutesUntilExpired(currentTime);
-//					if (minutesRemaining>bestMinutesRemaining)
-//						bestMinutesRemaining = minutesRemaining;
-//					fireIsActive = true;
-//					break;
-//				}
-//			}
-//			
-//			if (bestMinutesRemaining<45)
-//				throw new UserErrorMessage("The fire is not strong enough, add more fuel to it. You cannot rest at night unless there is an active fire going.");
-//			
-//			if (fireIsActive==false)
-//				throw new UserErrorMessage("It's night time but there is no campfire. You cannot rest at night unless there is an active fire going.");
-//		}
+		if (GameUtils.getDayNight()>0.9 && CommonChecks.checkLocationIsOutside(location))
+		{
+			QueryHelper query = new QueryHelper(ds);
+			List<CachedEntity> entities = query.getFilteredList("Item", 50, null, "containerKey", FilterOperator.EQUAL, locationKey, "_aspects", FilterOperator.EQUAL, "Fireplace");
+			List<InitiumObject> fireplaces = InitiumObject.wrap(db, entities);
+			long currentTime = System.currentTimeMillis();
+			boolean fireIsActive = false;
+			long bestMinutesRemaining = 0l;
+			for(InitiumObject fireplace:fireplaces)
+			{
+				AspectFireplace aspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
+				if (aspect.isFireActive(currentTime))
+				{
+					long minutesRemaining = aspect.getMinutesUntilExpired(currentTime);
+					if (minutesRemaining>bestMinutesRemaining)
+						bestMinutesRemaining = minutesRemaining;
+					fireIsActive = true;
+					break;
+				}
+			}
+			
+			if (bestMinutesRemaining<45)
+				throw new UserErrorMessage("The fire is not strong enough, add more fuel to it. You cannot rest at night unless there is an active fire going.");
+			
+			if (fireIsActive==false)
+				throw new UserErrorMessage("It's night time but there is no campfire. You cannot rest at night unless there is an active fire going.");
+		}
 		
 		
 		setDataProperty("description", "It will take "+hitpointsToRegain.intValue()+" seconds to regain your health.");
@@ -81,6 +87,31 @@ public class LongOperationRest extends LongOperation {
 				location.getProperty("ownerKey")!=null)
 		{
 			db.awardBuff_WellRested(ds, db.getCurrentCharacter());
+		}
+		else
+		{
+			// Check if there is an active campfire, if so we can award the well rested buff (temporarily until camps can be upgraded to forts at least and other things)
+			QueryHelper query = new QueryHelper(ds);
+			List<CachedEntity> entities = query.getFilteredList("Item", 50, null, "containerKey", FilterOperator.EQUAL, location.getKey(), "_aspects", FilterOperator.EQUAL, "Fireplace");
+			List<InitiumObject> fireplaces = InitiumObject.wrap(db, entities);
+			long currentTime = System.currentTimeMillis();
+			long bestMinutesRemaining = 0l;
+			for(InitiumObject fireplace:fireplaces)
+			{
+				AspectFireplace aspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
+				if (aspect.isFireActive(currentTime))
+				{
+					long minutesRemaining = aspect.getMinutesUntilExpired(currentTime);
+					if (minutesRemaining>bestMinutesRemaining)
+						bestMinutesRemaining = minutesRemaining;
+					break;
+				}
+			}
+			
+			if (bestMinutesRemaining>=45)
+			{
+				db.awardBuff_WellRested(ds, db.getCurrentCharacter());
+			}
 		}
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
@@ -111,6 +142,6 @@ public class LongOperationRest extends LongOperation {
 		return stateData;
 	}
 
-	
+
 	
 }

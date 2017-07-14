@@ -67,6 +67,9 @@ public class LongOperationBeginPrototype extends LongOperation
 		
 		CachedEntity ideaDef = db.getEntity((Key)idea.getProperty("_definitionKey"));
 
+		if (CommonChecks.checkIdeaIsLive(db, ideaDef)==false)
+			throw new UserErrorMessage("This idea/skill is currently disabled.");
+		
 		
 		GenericEntityRequirementResult itemRequirementSlotsToItems = new ConfirmGenericEntityRequirementsBuilder("1", db, this, getPageRefreshJavascriptCall(), ideaDef)
 		.addGenericEntityRequirements("", "skillItemFocus")

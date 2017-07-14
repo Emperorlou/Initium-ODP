@@ -1,4 +1,4 @@
-var rainStrength = 1;
+var rainStrength = 0;
 var night = 0;
 var pageLoadTime = new Date().getTime();
 
@@ -104,7 +104,7 @@ function updateDayNightCycle(forceRefresh)
 	
 	var banner = $(".banner-shadowbox, .banner1");
 	
-	if (Modernizr.backgroundblendmode==false || Modernizr.multiplebgs==false)
+	if (Modernizr.backgroundblendmode==false)
 	{
 		banner.css("background", "url('"+bannerUrl+"') no-repeat center center");
 		banner.css("background-size", "cover");

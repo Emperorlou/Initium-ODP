@@ -53,6 +53,9 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		
 		CachedEntity ideaDef = db.getEntity((Key)skill.getProperty("_definitionKey"));
 
+		if (CommonChecks.checkIdeaIsLive(db, ideaDef)==false)
+			throw new UserErrorMessage("This idea/skill is currently disabled.");
+		
 		Integer maxRepCount = null;
 		if (ideaDef.getProperty("skillMaxRepeat")!=null)
 			maxRepCount = ((Long)ideaDef.getProperty("skillMaxRepeat")).intValue();
