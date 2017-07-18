@@ -50,8 +50,20 @@ public class PropertiesService extends Service {
 			}
 
 			// House = Location, so create that here, with the city as the parent location
-			playerHouse = db.newLocation(ds, "https://initium-resources.appspot.com/images/special-house2.jpg", houseName, "This is " + character.getProperty("name") + "'s property called '" + houseName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!", -1d, "RestSite", cityLocation, user.getKey());
+			playerHouse = new CachedEntity("Location");
+			// Set the starting attributes
+			playerHouse.setProperty("banner", "https://initium-resources.appspot.com/images/special-house2.jpg");
+			playerHouse.setProperty("name", houseName);
+			playerHouse.setProperty("description", "This is " + character.getProperty("name") + "'s property called '" + houseName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!");
+			playerHouse.setProperty("discoverAnythingChance", -1d);
+			playerHouse.setProperty("type", "RestSite");
+			playerHouse.setProperty("parentLocationKey", cityLocation);
+			playerHouse.setProperty("ownerKey", user.getKey());
+			playerHouse.setProperty("isOutside", "FALSE");
+			playerHouse.setProperty("supportsCampfires", 1L);
 
+			ds.put(playerHouse);
+			
 			// Connect a path from the house to the city where we bought it
 			CachedEntity pathToHouse = db.newPath(ds, "Path to house - " + houseName, playerHouse.getKey(), "Leave " + houseName, cityLocation, "Go to " + houseName, 0d, 0l, "PlayerHouse");
 			pathToHouse.setProperty("ownerKey", user.getKey());

@@ -187,7 +187,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public void processConstructItemSkillForProcessVariables(CachedEntity skill, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool)
+	public void processConstructItemSkillForProcessVariables(CachedEntity skill, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
@@ -230,7 +230,7 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
-	public void beginCollectableProcess(CachedEntity collectableDef, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool)
+	public void beginCollectableProcess(CachedEntity collectableDef, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
@@ -273,7 +273,7 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
-	public void processPrototypeItemSkillForProcessVariables(CachedEntity ideaDef, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool)
+	public void processPrototypeItemSkillForProcessVariables(CachedEntity ideaDef, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		

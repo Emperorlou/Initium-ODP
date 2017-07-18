@@ -3073,7 +3073,11 @@ function doExperiment(event)
 	longOperation(event, "Experiment", null, 
 			function(action) // responseFunction
 			{
-				if (action.isComplete)
+				if(action.error !== undefined)
+				{
+					clearPopupPermanentOverlay(); 
+				}
+				else if (action.isComplete)
 				{
 					clearPopupPermanentOverlay(); 
 					reloadPagePopup(false);
@@ -3111,12 +3115,15 @@ function repeatConfirmRequirementsButton(repsUniqueId)
 
 function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId)
 {
-	
+	showBannerLoadingIcon();
 	longOperation(event, "BeginPrototype", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
 			function(action) // responseFunction
 			{
-				showBannerLoadingIcon();
-				if (action.isComplete)
+				if(action.error !== undefined)
+				{
+					clearPopupPermanentOverlay(); 
+				}
+				else if (action.isComplete)
 				{
 					if (repeatConfirmRequirementsButton(repsUniqueId))
 					{
@@ -3146,11 +3153,15 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 {
 	closeAllTooltips();
 	
+	showBannerLoadingIcon();
 	longOperation(event, "DoSkillConstructItem", {skillName:skillName, skillId:skillId,repsUniqueId:repsUniqueId}, 
 			function(action) // responseFunction
 			{
-				showBannerLoadingIcon();
-				if (action.isComplete)
+				if(action.error !== undefined)
+				{
+					clearPopupPermanentOverlay(); 
+				}
+				else if (action.isComplete)
 				{
 					if (repeatConfirmRequirementsButton(repsUniqueId))
 					{
@@ -3183,7 +3194,11 @@ function doCollectCollectable(event, collectableId, userRequestId)
 	longOperation(event, "CollectCollectable", {collectableId:collectableId},  
 			function(action) // responseFunction
 			{
-				if (action.isComplete)
+				if(action.error !== undefined)
+				{
+					clearPopupPermanentOverlay(); 
+				}
+				else if (action.isComplete)
 				{
 					clearPopupPermanentOverlay(); 
 					hideBannerLoadingIcon();
@@ -3212,7 +3227,11 @@ function doExplore(ignoreCombatSites)
 	longOperation(null, "Explore", {ignoreCombatSites:ignoreCombatSites}, 
 			function(action) // responseFunction
 			{
-				if (action.isComplete || action.error !== undefined)
+				if(action.error !== undefined)
+				{
+					clearPopupPermanentOverlay(); 
+				}
+				else if (action.isComplete)
 				{
 					clearPopupPermanentOverlay();
 					//fullpageRefresh();
@@ -3236,7 +3255,11 @@ function doRest()
 	longOperation(null, "Rest", null, 
 			function(action) // responseFunction
 			{
-				if (action.isComplete || action.error !== undefined)
+				if(action.error !== undefined)
+				{
+					clearPopupPermanentOverlay(); 
+				}
+				else if (action.isComplete)
 				{
 					clearPopupPermanentOverlay();
 					//fullpageRefresh();
@@ -3284,7 +3307,11 @@ function doCampCreate(campName)
 	longOperation(null, "CampCreate", {"name":campName}, 
 		function(action) // responseFunction
 		{
-			if (action.isComplete || action.error !== undefined)
+			if(action.error !== undefined)
+			{
+				clearPopupPermanentOverlay(); 
+			}
+			else if (action.isComplete)
 			{
 				clearPopupPermanentOverlay();
 			}
@@ -3312,7 +3339,12 @@ function handleUserRequest(data)
 	
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup(data.pagePopupUrl, null, data.pagePopupTitle);
+	pagePopup(data.pagePopupUrl, 
+	function ()
+	{
+		hideBannerLoadingIcon();
+	}, 
+	data.pagePopupTitle);
 }
 
 /*

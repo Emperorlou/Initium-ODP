@@ -100,6 +100,7 @@ public class LongOperationCampCreate extends LongOperation
 		campsite.setProperty("decayRate", 100l);
 		campsite.setProperty("parentLocationKey", parentLocation.getKey());
 		campsite.setProperty("isOutside", "TRUE");
+		campsite.setProperty("supportsCampfires", 1L);
 		campsite.setProperty("maxMonsterCount", parentLocation.getProperty("maxMonsterCount"));
 		campsite.setProperty("monsterRegenerationRate", parentLocation.getProperty("monsterRegenerationRate"));
 		ds.put(campsite);

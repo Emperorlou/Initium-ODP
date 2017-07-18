@@ -293,6 +293,7 @@ public class AspectFireplace extends ItemAspect
 		burnTime*=units;
 		burnTime*=density;
 		burnTime*=intensityMultiplier;
+		burnTime*=2; // Make them last longer
 		
 		return (int)burnTime;
 		
@@ -449,10 +450,10 @@ public class AspectFireplace extends ItemAspect
 				throw new UserErrorMessage("You're not near this item.");
 
 			
-			CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
+//			CachedEntity location = db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey"));
 			
-			if (CommonChecks.checkIsRaining(location))
-				throw new UserErrorMessage("You cannot light a fire while it's raining.");
+//			if (CommonChecks.checkIsRaining(location))
+//				throw new UserErrorMessage("You cannot light a fire while it's raining.");
 			
 			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), db.getKnowledgeService(db.getCurrentCharacterKey()));
 			AspectFireplace fireplaceAspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");

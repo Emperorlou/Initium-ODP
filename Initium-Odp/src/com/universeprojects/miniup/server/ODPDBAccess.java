@@ -5399,6 +5399,14 @@ public class ODPDBAccess
 				// Note: The destination location gets saved later
 			}
 		}
+		// HACK: We didn't always set the player house to be indoors and include the ability to make a fire. Now we do.
+		if ("PlayerHouse".equals(path.getProperty("type")) && 
+				"FALSE".equals(destination.getProperty("isOutside"))==false &&
+				"RestSite".equals(destination.getProperty("type")))
+		{
+			destination.setProperty("isOutside", "FALSE");
+			destination.setProperty("supportsCampfires", 1L);
+		}
 		
 		// Here we're going to take a list we got from the opponentResult stuff and reuse it for performance reasons...
 		// We're going to determine if we should refresh the leader on the defence structure we just arrived at or left from
