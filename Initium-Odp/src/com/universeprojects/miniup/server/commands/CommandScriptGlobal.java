@@ -68,6 +68,7 @@ public class CommandScriptGlobal extends CommandScriptBase {
 		
 		List<CachedEntity> entities = db.getEntities(entityFetch);
 		List<Object> wrappers = new ArrayList<Object>();
+		// Add null fetched entities. It is a valid state, but script must check it.
 		for(CachedEntity ent:entities)
 		{
 			try
