@@ -1927,22 +1927,29 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 	});
 }
 
-function doTriggerLocation(event, effectId, locationId)
+function doTriggerGlobal(event, globalId, attributes, entities)
 {
-	doTriggerEffect(event, "Link", effectId, "location", locationId);
+	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities)
 }
 
-function doTriggerItem(event, effectId, itemId)
+function doTriggerLocation(event, effectId, locationId, attributes)
 {
-	doTriggerEffect(event, "Link", effectId, "item", itemId);
+	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes);
 }
 
-function doTriggerEffect(event, effectType, effectId, sourceType, sourceId)
+function doTriggerItem(event, effectId, itemId, attributes)
+{
+	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes);
+}
+
+function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities)
 {
 	closeAllTooltips();
-	
-	var params = {"scriptId": effectId };
+	var params = {};
 	params[sourceType + "Id"] = sourceId;
+	if(effectId) params["scriptId"] = effectId;
+	if(attributes) params["attributes"] = attributes;
+	if(entities) params["entities"] = entities;
 	doCommand(event, "Script"+effectType, params);
 }
 
