@@ -45,6 +45,12 @@ public class CommandAutofixStuckInLocation extends Command {
 			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 			return;
 		}
+		
+		if(GameUtils.isPlayerIncapacitated(character))
+		{
+			throw new UserErrorMessage("You are incapacitated right now and can't use this feature.");
+		}
+		
 		//grab the parent location of the character's current locationKey
 		Key parentLocation = db.getParentLocationKey(ds, currentLocation);
 		
