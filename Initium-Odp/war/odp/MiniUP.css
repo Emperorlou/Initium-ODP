@@ -1,7 +1,12 @@
 
 @font-face {
     font-family: DOS;
-    src: url(DOS.ttf);
+    src: url(FRIZQUAD.TTF);
+}
+
+@font-face {
+    font-family: CHAT;
+    src: url(arial-narrow-2.ttf);
 }
 
 
@@ -19,6 +24,7 @@ body
 	font-family: DOS, Monospace;
 	color:#DDDDDD;
 	margin:0px;
+	font-size:87%;
 }
 
 a
@@ -207,6 +213,7 @@ hr:after {
 	text-align:left;
 	vertical-align: middle;
 	position:absolute;
+	width:65%;
 }
 .header-stats
 {
@@ -228,11 +235,13 @@ hr:after {
 .header-stats-caption
 {
 	display:inline-block;
+	font-size:13px;
 }
 
 .header-stats-caption-alwayson
 {
 	display:inline-block;
+	font-size:13px;
 }
 
 
@@ -376,7 +385,7 @@ hr:after {
 	position:absolute; 
 	display:inline-block;	
 	text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
-	
+	font-size:13px;
 }
 
 
@@ -935,11 +944,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	height: 38px;
 	margin: 0 auto;
 	text-align: center;
-	font-size: 24px;
+	font-size: 19px;
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
 	padding-top: 14px;
 	cursor: pointer;
-	margin-bottom: 15px;
+	margin-bottom: 0px;
 	display:block;
 	color:#FFFFFF;
 	text-decoration: none;
@@ -956,11 +965,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	height: 38px;
 	margin: 0 auto;
 	text-align: center;
-	font-size: 24px;
+	font-size: 21px;
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
 	padding-top: 14px;
 	cursor: pointer;
-	margin-bottom: 15px;
+	margin-bottom: 0px;
 	display:block;
 	color:#FFFFFF;
 	text-decoration: none;
@@ -1228,9 +1237,9 @@ a.range-increment {
 .chat_tab_footer
 {
 	background-color:#222222;
-	font-family:sans-serif;
-	font-size:10px;
-	font-style:italic;
+	font-family:CHAT,Arial;
+	font-size:12px;
+	font-style:inherit;
 	color:#999999;
 	padding:2px;
 	text-align:right;
@@ -1276,9 +1285,11 @@ a.range-increment {
 
 .chat_messages
 {
+	font-family:CHAT,Arial;
 	overflow-y: scroll;
 	height:150px;
 	background-color: #0e0b06;
+	font-size:16px;
 }
 .chat_form_input
 {
@@ -1290,10 +1301,17 @@ a.range-increment {
 {
 	display:table-cell;
 	width:0px;
+	font-family:DOS;
+}
+.chat_form_submit input
+{
+	font-family:DOS;
 }
 .chat_form_input input
 {
 	width:100%;
+	font-family:CHAT,Arial;
+	font-size:16px;
 }
 
 
@@ -1399,6 +1417,7 @@ a.range-increment {
 
 .chat-embedded-item
 {
+	font-family:DOS;
 	display:inline;
 }
 .chat-embedded-item a img
@@ -1432,6 +1451,8 @@ a.range-increment {
        -moz-hyphens: auto;
         -ms-hyphens: auto;
             hyphens: auto;
+            
+	letter-spacing: 0.4px;            
 }
 
 /* EQUIPMENT AVATAR STYLES 32PX */
@@ -1709,8 +1730,8 @@ a.range-increment {
 {
     position: relative;
     vertical-align: top;
-/*    max-width: 90%;
-    max-height: 300px;*/
+    max-width: 90%;
+    max-height: 300px;
 }
 
 .item-popup-field
@@ -2330,8 +2351,8 @@ a.range-increment {
     padding:8px;
     border-radius:8px;
     color:#EEEEEE;
-    font-size:medium;
     z-index:1000;
+    font-size:15px;
 }
 
 .move-items-column .main-item
@@ -3597,7 +3618,7 @@ body
 	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-middle.png");
 	height:21px;
 	max-height:21px;
-	padding-top:5px;
+	padding-top:2px;
 	padding-left:9px;
 	padding-right:7px;
 	
@@ -3823,7 +3844,7 @@ body
 	
 	.header1-button
 	{
-		padding-top:7px;
+		padding-top:5px;
 		font-size:12px;
 		
 		height:19px;

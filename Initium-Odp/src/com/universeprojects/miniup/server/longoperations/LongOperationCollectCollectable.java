@@ -177,8 +177,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 			item.setProperty("containerKey", location.getKey());
 		}
 		
-		
-		
+		item = db.combineStackedItemWithFirstStack(item, db.getCurrentCharacter().getKey());
 		ds.put(item);
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);

@@ -41,6 +41,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.BlockadeService;
@@ -6338,5 +6339,27 @@ public class ODPDBAccess
 	{
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public CachedEntity combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
+	{
+		if (stackedItem.getProperty("quantity")==null) return stackedItem;
+		
+		QueryHelper q = new QueryHelper(ds);
+		List<CachedEntity> inventory = q.getFilteredList("Item", "containerKey", characterKey);
+		for(CachedEntity item:inventory)
+		{
+			if (CommandItemsStackMerge.canStack(stackedItem, item))
+			{
+				Long quantity = (Long)item.getProperty("quantity");
+				quantity+=(Long)stackedItem.getProperty("quantity");
+				item.setProperty("quantity", quantity);
+				if (stackedItem.getKey().isComplete())
+					ds.delete(stackedItem);
+				ds.put(item);
+				return item;
+			}
+		}		
+		return stackedItem;
 	}
 }

@@ -159,6 +159,9 @@ messager.onChatMessage = function(chatMessage)
 		// Also add the message to the currently active tab
 		if (messager.firstGet==false && messager.channel!="GameMessages")
 		{
+			// First remove any previous messages so we don't clutter chat
+			$("#chat_messages_"+messager.channel).find(".gameMessage-text").parent().remove();
+			
 			$("#chat_messages_"+messager.channel).prepend(html+"</div>");
 			doNotNotifyNewMessage = true;
 		}

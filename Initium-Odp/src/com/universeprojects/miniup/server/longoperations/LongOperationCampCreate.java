@@ -61,7 +61,7 @@ public class LongOperationCampCreate extends LongOperation
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		location = doAttemptCreateCampsite(db, character, location, campName);
 		
-		String description = "While you were working on your camp you were interrupted by an attacker! Building a camp takes quite some time and the fire often attracts monsters in the area. You might want to try bring the activity in the area down before building a camp. Though, depending on how much activity there is here, it could require a group effort.";
+		String description = "While you were working on your camp you were interrupted by an attacker!"; //Building a camp takes quite some time and the fire often attracts monsters in the area. You might want to try bring the activity in the area down before building a camp. Though, depending on how much activity there is here, it could require a group effort.
 		// Null location indicates monster was encountered.
 		if(location != null)
 			description = "Your camp has been created. Make sure to defend it and perhaps get others to help!";

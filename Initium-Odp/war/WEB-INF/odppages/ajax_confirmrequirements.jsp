@@ -155,7 +155,7 @@ function confirmRequirements_collectChoices(event)
 }
 </script>
 <c:if test="${maxReps!=null}">
-How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}' uniqueId='${repsUniqueId}'/> 
+How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}' uniqueId='${repsUniqueId}'/><br> 
 </c:if>
 <div class='main-splitScreen'>
 <c:forEach var="requirementCategory" items="${formattedRequirements}">

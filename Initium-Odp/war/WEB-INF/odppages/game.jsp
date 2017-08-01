@@ -215,9 +215,6 @@
 </script>
 
 <script type='text/javascript' src='/odp/javascript/banner-weather.js?v=8'></script>
-<script id='ajaxJs' type='text/javascript'>
-${bannerJs}
-</script>
 
 
 
@@ -260,6 +257,10 @@ ${bannerJs}
 	$(document).ready(function(){
 		setAudioDescriptor("${locationAudioDescriptor}", "${locationAudioDescriptorPreset}", <c:out value="${isOutside}"/>);
 	});
+</script>
+
+<script id='ajaxJs' type='text/javascript'>
+${bannerJs}
 </script>
 
 <script type='text/javascript'>

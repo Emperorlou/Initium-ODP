@@ -117,7 +117,7 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 	 *            - Second entity
 	 * @return true if they can stack", else false
 	 */
-	protected boolean canStack(CachedEntity entity1, CachedEntity entity2) {
+	public static boolean canStack(CachedEntity entity1, CachedEntity entity2) {
 		Map<String, Object> entity1Props = entity1.getProperties();
 		Map<String, Object> entity2Props = entity2.getProperties();
 		// Merge the keysets, so that newly added fields also get considered

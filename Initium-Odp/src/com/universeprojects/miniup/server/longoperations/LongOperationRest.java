@@ -40,33 +40,33 @@ public class LongOperationRest extends LongOperation {
 			throw new UserErrorMessage("You don't need to rest, you're already at full health! NOW GET OUT THERE AND KICK SOME ASS!");
 		
 		// Check, if it's night time and we're outside, that we have a fire going
-		if (GameUtils.getDayNight()>0.9 && CommonChecks.checkLocationIsOutside(location))
-		{
-			QueryHelper query = new QueryHelper(ds);
-			List<CachedEntity> entities = query.getFilteredList("Item", 50, null, "containerKey", FilterOperator.EQUAL, locationKey, "_aspects", FilterOperator.EQUAL, "Fireplace");
-			List<InitiumObject> fireplaces = InitiumObject.wrap(db, entities);
-			long currentTime = System.currentTimeMillis();
-			boolean fireIsActive = false;
-			long bestMinutesRemaining = 0l;
-			for(InitiumObject fireplace:fireplaces)
-			{
-				AspectFireplace aspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
-				if (aspect.isFireActive(currentTime))
-				{
-					long minutesRemaining = aspect.getMinutesUntilExpired(currentTime);
-					if (minutesRemaining>bestMinutesRemaining)
-						bestMinutesRemaining = minutesRemaining;
-					fireIsActive = true;
-					break;
-				}
-			}
-			
-			if (bestMinutesRemaining<45)
-				throw new UserErrorMessage("The fire is not strong enough, add more fuel to it. You cannot rest at night unless there is an active fire going.");
-			
-			if (fireIsActive==false)
-				throw new UserErrorMessage("It's night time but there is no campfire. You cannot rest at night unless there is an active fire going.");
-		}
+//		if (GameUtils.getDayNight()>0.9 && CommonChecks.checkLocationIsOutside(location))
+//		{
+//			QueryHelper query = new QueryHelper(ds);
+//			List<CachedEntity> entities = query.getFilteredList("Item", 50, null, "containerKey", FilterOperator.EQUAL, locationKey, "_aspects", FilterOperator.EQUAL, "Fireplace");
+//			List<InitiumObject> fireplaces = InitiumObject.wrap(db, entities);
+//			long currentTime = System.currentTimeMillis();
+//			boolean fireIsActive = false;
+//			long bestMinutesRemaining = 0l;
+//			for(InitiumObject fireplace:fireplaces)
+//			{
+//				AspectFireplace aspect = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
+//				if (aspect.isFireActive(currentTime))
+//				{
+//					long minutesRemaining = aspect.getMinutesUntilExpired(currentTime);
+//					if (minutesRemaining>bestMinutesRemaining)
+//						bestMinutesRemaining = minutesRemaining;
+//					fireIsActive = true;
+//					break;
+//				}
+//			}
+//			
+//			if (bestMinutesRemaining<45)
+//				throw new UserErrorMessage("The fire is not strong enough, add more fuel to it. You cannot rest at night unless there is an active fire going.");
+//			
+//			if (fireIsActive==false)
+//				throw new UserErrorMessage("It's night time but there is no campfire. You cannot rest at night unless there is an active fire going.");
+//		}
 		
 		
 		setDataProperty("description", "It will take "+hitpointsToRegain.intValue()+" seconds to regain your health.");

@@ -167,6 +167,7 @@ function flagUnreadMessages()
 //Pop up Message
 function popupPermanentOverlay(title, content, popupClassOverride) 
 {
+	$("#banner-text-overlay").hide();
 	if (popupClassOverride==null)
 		popupClassOverride = "popup backdrop1c";
 	closeAllPopups();
@@ -288,6 +289,7 @@ function random(start, end)
 
 function clearPopupPermanentOverlay()
 {
+	$("#banner-text-overlay").show();
 	$("#banner-base").html("");
 	if (window.previousBannerUrl!=null)
 	{
@@ -298,7 +300,9 @@ function clearPopupPermanentOverlay()
 
 function popupPermanentOverlay_Experiment(title, text)
 {
-	window.previousBannerUrl = bannerUrl;
+	$("#banner-text-overlay").hide();
+	if (window.previousBannerUrl!=bannerUrl)
+		window.previousBannerUrl = bannerUrl;
 	setBannerImage("http://initium-resources.appspot.com/images/animated/invention1.gif");
 	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 
@@ -308,17 +312,21 @@ function popupPermanentOverlay_Experiment(title, text)
 
 function popupPermanentOverlay_Searching(locationName)
 {
-	window.previousBannerUrl = bannerUrl;
+	$("#banner-text-overlay").hide();
+	if (window.previousBannerUrl!=bannerUrl)
+		window.previousBannerUrl = bannerUrl;
 	popupPermanentOverlay_WalkingBase("Exploring "+locationName, "You are wandering around, looking for anything of interest...");
 }
 
 function popupPermanentOverlay_Walking(locationName)
 {
-	window.previousBannerUrl = bannerUrl;
+	if (window.previousBannerUrl!=bannerUrl)
+		window.previousBannerUrl = bannerUrl;
 	popupPermanentOverlay_WalkingBase("Walking to "+locationName);
 }
 
 function popupPermanentOverlay_WalkingBase(title, text) {
+	$("#banner-text-overlay").hide();
 	var biome = window.biome;
 	if (biome==null) biome = "Temperate";
 	var windowWidth = $(".main-banner").width();
@@ -3052,6 +3060,7 @@ function doGoto(event, pathId, attack)
 				}
 				else if (action.isComplete)
 				{
+					clearPopupPermanentOverlay(); 
 					updateBannerWeatherSystem();
 					setAudioDescriptor(locationAudioDescriptor, locationAudioDescriptorPreset, isOutside);
 					clearLoopedSounds();
