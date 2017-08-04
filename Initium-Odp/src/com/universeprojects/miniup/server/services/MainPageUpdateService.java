@@ -419,8 +419,8 @@ public class MainPageUpdateService extends Service
 	public void updateFullPage_shortcut()
 	{
 		updateMoney();
-		updateInBannerOverlayLinks();
 		updateButtonList();
+		updateInBannerOverlayLinks();
 		updateLocationJs();	
 		updateActivePlayerCount();
 		updateButtonBar();
@@ -797,7 +797,7 @@ public class MainPageUpdateService extends Service
 			{
 				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 				newHtml.append("<br>");
-				newHtml.append("<a href='#' onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
+				newHtml.append("<a href='#' onclick='doLeaveAndForgetCombatSite(event, "+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
 				newHtml.append("<br>");
 			}
 			else if ("CombatSite".equals(destLocation.getProperty("type"))) {
@@ -811,7 +811,7 @@ public class MainPageUpdateService extends Service
 			else if ("CollectionSite".equals(location.getProperty("type")))
 			{
 				newHtml.append("<br>");
-				newHtml.append("<a href='#' onclick='leaveAndForgetCombatSite("+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
+				newHtml.append("<a href='#' onclick='doLeaveAndForgetCombatSite(event, "+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
 			}
 			// If we're looking at a player-house path, but we're not actually INSIDE the player house currently
 			else if (GameUtils.equals(location.getProperty("ownerKey"), null) && "PlayerHouse".equals(path.getProperty("type")))

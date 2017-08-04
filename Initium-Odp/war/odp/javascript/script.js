@@ -1867,6 +1867,11 @@ function doDrinkBeer(eventObject)
 	doCommand(eventObject,"DrinkBeer");
 }
 
+function doLeaveAndForgetCombatSite(eventObject, pathId)
+{
+	doCommand(eventObject, "LeaveAndForgetCombatSite", {"pathId" : pathId});
+}
+
 /**
  * Calls the command to forget the combat site
  * @param eventObject
