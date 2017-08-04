@@ -1869,7 +1869,8 @@ function doDrinkBeer(eventObject)
 
 function doLeaveAndForgetCombatSite(eventObject, pathId)
 {
-	doCommand(eventObject, "LeaveAndForgetCombatSite", {"pathId" : pathId});
+	showBannerLoadingIcon();
+	doCommand(eventObject, "LeaveAndForgetCombatSite", {"pathId" : pathId}, clearPopupPermanentOverlay);
 }
 
 /**
