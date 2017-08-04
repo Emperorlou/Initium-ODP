@@ -58,7 +58,7 @@ public class CommandLeaveAndForgetCombatSite extends Command {
 		
 		try
 		{
-			db.doDeleteCombatSite(ds, character, location.getKey());
+			db.doDeleteCombatSite(ds, character, location.getKey(), true, false);
 		}
 		catch(Exception ex)
 		{
