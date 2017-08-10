@@ -2216,7 +2216,7 @@ public class ODPDBAccess
 		}
 	}
 	
-	public boolean tryMoveItem(CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
+	public boolean tryMoveItem(CachedEntity character, CachedEntity item, CachedEntity newContainer, Long requestQuantity) throws UserErrorMessage
 	{
 		CachedDatastoreService ds = getDB();
 		
@@ -2242,8 +2242,24 @@ public class ODPDBAccess
 			throw new UserErrorMessage("Hey!");
 		if (cs.checkContainerAccessAllowed(character, newContainer)==false)
 			throw new UserErrorMessage("Hey!");
-		
-		
+
+		Long itemQuantity = (Long)item.getProperty("quantity");
+		if (itemQuantity==null) itemQuantity = 1L;
+
+		// We fetch these values to use later in case of partial pickups
+		Long itemSingleWeight = (Long)item.getProperty("weight");
+		Long itemSingleSpace = (Long)item.getProperty("space");
+		if (itemSingleWeight==null) itemSingleWeight = 0L;
+		if (itemSingleSpace==null) itemSingleSpace = 0L;
+
+		// A couple sanity checks
+		if (requestQuantity != null && requestQuantity > itemQuantity) requestQuantity = itemQuantity;
+		if (requestQuantity != null && requestQuantity < 1L) requestQuantity = 1L;
+
+		// Declaring these here so we can use them at the end for a message
+		boolean stackTooHeavy = false;
+		boolean stackTooLarge = false;
+
 		boolean handled = false;
 
 		if (startKind.equals("Character"))
@@ -2281,23 +2297,43 @@ public class ODPDBAccess
 				Long maxSpace = (Long)newContainer.getProperty("maxSpace");
 				if (maxWeight==null || maxSpace==null)
 					throw new UserErrorMessage("This item cannot contain other items.");
-				
-				Long itemWeight = getItemWeight(item);
-				Long itemSpace = (Long)item.getProperty("space");
+
+				// If quantity is specified, measure for specified quantity rather than whole stack
+				Long itemWeight = (requestQuantity != null) ? requestQuantity*itemSingleWeight : getItemWeight(item);
+				Long itemSpace = (requestQuantity != null) ? requestQuantity*itemSingleSpace : getItemSpace(item);
+
+				// Is this check necessary? I'm pretty sure the lines above handle it, but I'm leaving it just in case I've missed something
 				if (itemWeight==null) itemWeight = 0L;
 				if (itemSpace==null) itemSpace = 0L;
 				
 				List<CachedEntity> containerInventory = getItemContentsFor(newContainer.getKey());
 				
-				Long containerCarryingWeight = getItemCarryingWeight(newContainer, containerInventory);
-				Long containerCarryingSpace = getItemCarryingSpace(newContainer, containerInventory);
-				
-				if (containerCarryingWeight+itemWeight>maxWeight)
-					throw new UserErrorMessage("The container cannot accept this item. It is too heavy.");
-				
-				if (containerCarryingSpace+itemSpace>maxSpace)
-					throw new UserErrorMessage("This item will not fit. There is not enough space.");
-				
+				Long containerAvailableWeight = maxWeight - getItemCarryingWeight(newContainer, containerInventory);
+				Long containerAvailableSpace = maxSpace - getItemCarryingSpace(newContainer, containerInventory);
+
+				// If the item is dimensionless, we skip the following checks altogether
+				stackTooHeavy = ((containerAvailableWeight < itemWeight) && (itemSingleWeight>0L));
+				stackTooLarge = ((containerAvailableSpace < itemSpace) && (itemSingleSpace>0L));
+
+				if (stackTooHeavy && stackTooLarge)
+				{
+					requestQuantity = Math.min((containerAvailableWeight / itemSingleWeight), (containerAvailableSpace / itemSingleSpace));
+					if (requestQuantity==0L)
+						throw new UserErrorMessage("Container is completely full. Have you ever seen the show Hoarders?");
+				}
+				else if (stackTooHeavy)
+				{
+					requestQuantity = containerAvailableWeight / itemSingleWeight;
+					if (requestQuantity==0L)
+						throw new UserErrorMessage("The container cannot accept this item. It is too heavy.");
+				}
+				else if (stackTooLarge)
+				{
+					requestQuantity = containerAvailableSpace / itemSingleSpace;
+					if(requestQuantity==0L)
+						throw new UserErrorMessage("This item will not fit. There is not enough space.");
+				}
+
 				// Now we'll reduce the durability of the container
 				if (itemWeight>=1000)
 					cs.doUse(ds, newContainer, 1);
@@ -2320,24 +2356,30 @@ public class ODPDBAccess
 					throw new UserErrorMessage("You are not near this item, you cannot pick it up.");
 				
 				// Check if the character can actually carry something else or if its all too heavy...
-				Long itemWeight = getItemWeight(item);
+				// And if quantity is specified, measure for specified quantity rather than whole stack
+				Long itemWeight = (requestQuantity != null) ? requestQuantity*itemSingleWeight : getItemWeight(item);
+
+				// Again, not sure if this check is necessary, but leaving it for now
 				if (itemWeight==null) itemWeight = 0L;
+
 				// If the item has a maxWeight, we will treat it as a container and include it's contents in the weight calculation..
 				if (item.getProperty("maxWeight")!=null)
 				{
 					Long itemCarryingWeight = getItemCarryingWeight(item);
 					itemWeight+=itemCarryingWeight;
 				}
-				
-				if (itemWeight>0L)
+
+				Long characterAvailableWeight = (Long)getCharacterMaxCarryingWeight(character) - getCharacterCarryingWeight(character);
+
+				// If the item is weightless, we skip the following check
+				stackTooHeavy = ((characterAvailableWeight < itemWeight) && (itemSingleWeight>0L));
+
+				if (stackTooHeavy)
 				{
-					long carrying = getCharacterCarryingWeight(character);
-					long maxCarrying = getCharacterMaxCarryingWeight(character);
-					
-					if (carrying+itemWeight>maxCarrying)
-						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying "+GameUtils.formatNumber(carrying)+" grams and can carry a maximum of "+GameUtils.formatNumber(maxCarrying)+" grams.");
+					requestQuantity = characterAvailableWeight / itemSingleWeight;
+					if (requestQuantity==0L)
+						throw new UserErrorMessage("You try to pick it up, but it's too heavy! You can only carry "+GameUtils.formatNumber(characterAvailableWeight)+" grams more.");
 				}
-				
 			}
 			
 		}
@@ -2359,44 +2401,110 @@ public class ODPDBAccess
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
 				
 				// Check if the character can actually carry something else or if its all too heavy...
-				Long itemWeight = getItemWeight(item);
+				// And if quantity is specified, measure for specified quantity rather than whole stack
+				Long itemWeight = (requestQuantity != null) ? requestQuantity*itemSingleWeight : getItemWeight(item);
+
+				// Again, not sure if this check is necessary, but leaving it for now
 				if (itemWeight==null) itemWeight = 0L;
+
 				// If the item has a maxWeight, we will treat it as a container and include it's contents in the weight calculation..
 				if (item.getProperty("maxWeight")!=null)
 				{
 					Long itemCarryingWeight = getItemCarryingWeight(item);
 					itemWeight+=itemCarryingWeight;
 				}
-				
-				if (itemWeight>0L)
+
+				Long characterAvailableWeight = (Long)getCharacterMaxCarryingWeight(character) - getCharacterCarryingWeight(character);
+
+				// If the item is weightless, we skip the following check
+				stackTooHeavy = ((characterAvailableWeight < itemWeight) && (itemSingleWeight>0L));
+
+				if (stackTooHeavy)
 				{
-					long carrying = getCharacterCarryingWeight(character);
-					long maxCarrying = getCharacterMaxCarryingWeight(character);
-					
-					if (carrying+itemWeight>maxCarrying)
-						throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying "+GameUtils.formatNumber(carrying)+" grams and can carry a maximum of "+GameUtils.formatNumber(maxCarrying)+" grams.");
+					requestQuantity = characterAvailableWeight / itemSingleWeight;
+					if (requestQuantity==0L)
+						throw new UserErrorMessage("You try to pick it up, but it's too heavy! You can only carry "+GameUtils.formatNumber(characterAvailableWeight)+" grams more.");
 				}
-				
 			}
 		}
-		
-		
 		
 		if (handled==false)
 			throw new UserErrorMessage("Unable to move this item. It is probably no longer there. Try hitting the refresh button at the top of this popup?");
 
+		// With earlier checks, requestQuantity must be either null or greater than zero
+		// If not null, then either the user request passed container checks or request was lowered meet container capacity
+		if (requestQuantity != null && requestQuantity < itemQuantity)
+		{
+			final Key itemKey = item.getKey();
+			final String itemKind = item.getKind();
+			final Long oldQuantity = itemQuantity;
+			final Long newQuantity = requestQuantity;
+
+			try {
+				item = (CachedEntity) new Transaction<CachedEntity>(ds) {
+
+					@Override
+					public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
+
+						CachedEntity item = getEntity(itemKey);
+
+						ds.preallocateIdsFor(itemKind, 1);
+						CachedEntity newItem = new CachedEntity(itemKind, ds.getPreallocatedIdFor(itemKind));
+
+						CachedDatastoreService.copyFieldValues(item, newItem);
+
+						newItem.setProperty("quantity", oldQuantity - newQuantity);
+
+						item.setProperty("quantity", newQuantity);
+
+						ds.put(newItem);
+
+						return item;
+					}
+				}.run();
+			}
+			catch (AbortTransactionException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
 		item.setProperty("containerKey", newContainer.getKey());
 		item.setProperty("movedTimestamp", new Date());
+
+		// This call moved here from doMoveItem()
+		ds.put(item);
+
+		if (stackTooLarge)
+		{
+			throw new UserErrorMessage("Container was only able to fit "+requestQuantity+" of the items.");
+		}
+		else if (stackTooHeavy)
+		{
+			if ("Item".equals(newContainer.getKind()))
+			{
+				throw new UserErrorMessage("Container was only able to fit "+requestQuantity+" of the items.");
+			}
+			else if ("Character".equals(newContainer.getKind()))
+			{
+				throw new UserErrorMessage("You could only pick up "+requestQuantity+" of the items.");
+			}
+		}
 		
 		return handled;
 	}
 
+	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer, Long quantity) throws UserErrorMessage
+	{
+		// Throws if unsuccessful.
+		tryMoveItem(character, item, newContainer, quantity);
+
+		// Moved this to tryMoveItem() for messaging purposes
+		/* ds.put(item); */
+	}
+
 	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
 	{
-		if(ds == null) ds = getDB();
-		// Throws if unsuccessful.
-		tryMoveItem(character, item, newContainer);
-		ds.put(item);
+		doMoveItem(ds, character, item, newContainer, null);
 	}
 
 	public void doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
