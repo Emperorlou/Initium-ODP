@@ -60,10 +60,11 @@
 	Double storeSale = (Double)common.getCharacter().getProperty("storeSale");
 	if (storeSale==null) storeSale = 100d;
 	request.setAttribute("storeSale", storeSale);
+	request.setAttribute("storeName", WebUtils.jsSafe((String)common.getCharacter().getProperty("storeName")));
 	
 %>
 
-		<h4 style='cursor:pointer'onclick='storeRenameNew(event, "<%=WebUtils.jsSafe((String)common.getCharacter().getProperty("storeName"))%>")'>Store name: <%=common.getCharacter().getProperty("storeName")%></h4>
+		<h4 style='cursor:pointer'onclick='storeRenameNew(event, "<c:out value="${storeName}"/>")'>Store name: <%=common.getCharacter().getProperty("storeName")%></h4>
 		<br><br>
 		<div>Store-wide price is currently: ${storeSale}%</div>
 		<a onclick='storeSetSaleNew(event)' title='Use this feature to set a store-wide sale on all items (or even a store-wide price hike)'>Click here to change your store sale/adjustment value</a>
