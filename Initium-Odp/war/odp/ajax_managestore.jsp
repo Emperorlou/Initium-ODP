@@ -60,7 +60,7 @@
 	Double storeSale = (Double)common.getCharacter().getProperty("storeSale");
 	if (storeSale==null) storeSale = 100d;
 	request.setAttribute("storeSale", storeSale);
-	request.setAttribute("storeName", WebUtils.jsSafe((String)common.getCharacter().getProperty("storeName")));
+	request.setAttribute("storeName", ((String)common.getCharacter().getProperty("storeName")).replaceAll("'","\\\\'"));
 	
 %>
 
