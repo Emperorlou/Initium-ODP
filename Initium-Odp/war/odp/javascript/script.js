@@ -700,7 +700,7 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 
 function storeRenameNew(eventObject, oldName)
 {
-	promptPopup("Rename Storefront", "Provide a new name for your store:", oldName, function(name){
+	promptPopup("Rename Storefront", "Provide a new name for your store:", oldName.replace(/'/,"&apos;"), function(name){
 		if (name!=null && name!="")
 		{
 			doCommand(eventObject,"StoreRename",{"name":name});
