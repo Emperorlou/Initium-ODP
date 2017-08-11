@@ -60,7 +60,9 @@
 	Double storeSale = (Double)common.getCharacter().getProperty("storeSale");
 	if (storeSale==null) storeSale = 100d;
 	request.setAttribute("storeSale", storeSale);
-	request.setAttribute("storeName", ((String)common.getCharacter().getProperty("storeName")).replaceAll("'","\\\\'"));
+	String storeName = (String)common.getCharacter().getProperty("storeName");
+	if(storeName != null) storeName = storeName.replaceAll("'","\\\\'");
+	request.setAttribute("storeName", storeName);
 	
 %>
 
