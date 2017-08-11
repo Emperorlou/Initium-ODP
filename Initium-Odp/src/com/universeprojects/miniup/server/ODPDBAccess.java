@@ -2437,7 +2437,7 @@ public class ODPDBAccess
 					@Override
 					public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
 
-						CachedEntity item = getEntity(itemKey);
+						CachedEntity item = ds.refetch(itemKey);
 
 						CachedEntity newItem = new CachedEntity(itemKind);
 
