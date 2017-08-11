@@ -2220,7 +2220,7 @@ public class ODPDBAccess
 	public boolean tryMoveItem(CachedEntity character, CachedEntity item, CachedEntity newContainer, Long requestQuantity) throws UserErrorMessage
 	{
 		CachedDatastoreService ds = getDB();
-		
+
 		if (CommonChecks.checkItemIsMovable(item)==false)
 			throw new UserErrorMessage("You cannot move this item.");
 		
@@ -2302,10 +2302,6 @@ public class ODPDBAccess
 				// If quantity is specified, measure for specified quantity rather than whole stack
 				Long itemWeight = (requestQuantity != null) ? requestQuantity*itemSingleWeight : getItemWeight(item);
 				Long itemSpace = (requestQuantity != null) ? requestQuantity*itemSingleSpace : getItemSpace(item);
-
-				// Is this check necessary? I'm pretty sure the lines above handle it, but I'm leaving it just in case I've missed something
-				if (itemWeight==null) itemWeight = 0L;
-				if (itemSpace==null) itemSpace = 0L;
 				
 				List<CachedEntity> containerInventory = getItemContentsFor(newContainer.getKey());
 				
@@ -2360,9 +2356,6 @@ public class ODPDBAccess
 				// And if quantity is specified, measure for specified quantity rather than whole stack
 				Long itemWeight = (requestQuantity != null) ? requestQuantity*itemSingleWeight : getItemWeight(item);
 
-				// Again, not sure if this check is necessary, but leaving it for now
-				if (itemWeight==null) itemWeight = 0L;
-
 				// If the item has a maxWeight, we will treat it as a container and include it's contents in the weight calculation..
 				if (item.getProperty("maxWeight")!=null)
 				{
@@ -2405,9 +2398,6 @@ public class ODPDBAccess
 				// And if quantity is specified, measure for specified quantity rather than whole stack
 				Long itemWeight = (requestQuantity != null) ? requestQuantity*itemSingleWeight : getItemWeight(item);
 
-				// Again, not sure if this check is necessary, but leaving it for now
-				if (itemWeight==null) itemWeight = 0L;
-
 				// If the item has a maxWeight, we will treat it as a container and include it's contents in the weight calculation..
 				if (item.getProperty("maxWeight")!=null)
 				{
@@ -2449,8 +2439,7 @@ public class ODPDBAccess
 
 						CachedEntity item = getEntity(itemKey);
 
-						ds.preallocateIdsFor(itemKind, 1);
-						CachedEntity newItem = new CachedEntity(itemKind, ds.getPreallocatedIdFor(itemKind));
+						CachedEntity newItem = new CachedEntity(itemKind);
 
 						CachedDatastoreService.copyFieldValues(item, newItem);
 
