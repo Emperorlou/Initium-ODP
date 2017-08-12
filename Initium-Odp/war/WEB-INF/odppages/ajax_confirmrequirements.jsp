@@ -171,10 +171,10 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 <br>
 <div class='center'>
 	<c:if test="${type=='IdeaToPrototype'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCreatePrototype(event, ${ideaId}, "${ideaName}", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Start Prototyping</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCreatePrototype(event, ${ideaId}, "<c:out value="${ideaName}"/>", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Start Prototyping</a>
 	</c:if>
 	<c:if test="${type=='ConstructItemSkill'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doConstructItemSkill(event, ${skillId}, "${skillName}", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doConstructItemSkill(event, ${skillId}, "<c:out value="${skillName}"/>", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>
 	</c:if>
 	<c:if test="${type=='CollectCollectable'}">
 		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>

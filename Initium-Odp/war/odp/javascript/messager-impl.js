@@ -1,9 +1,11 @@
 function encode_utf8( s ) {
-  return unescape( encodeURIComponent( s ) );
+	if (s==null) return null;
+	return unescape( encodeURIComponent( s ) );
 }
 
 function decode_utf8( s ) {
-  return decodeURIComponent( escape( s ) );
+	if (s==null) return null;
+	return decodeURIComponent( escape( s ) );
 }
 
 var messageCodes = [

@@ -92,51 +92,62 @@ public class AspectFireplace extends ItemAspect
 		for(InitiumObject firewood:firewoods)
 			if (CommonChecks.checkItemIsClass(firewood.getEntity(), "Firewood")==false && firewood.isAspectPresent(AspectFlammable.class)==false)
 				throw new UserErrorMessage("The item you chose to add to the fire is not valid fuel.");
-	
-		Long firewoodQuantity = inventionService.getTotalQuantity(firewoodEntities);
+
+		// If there is a quantity requirement then just deal with the first stack of firewood instead of all of the selected ones in the list. It's just simpler this way. I tried, but it was too complicated and not worth it for now.
+		//TODO: Rework the code under this new assumption. Only stackable items can meet a quantity requirement... for now.
+		if (quantityLimit!=null)
+		{
+			CachedEntity firewoodEntity = firewoodEntities.get(0);
+			firewoodEntities.clear();
+			firewoodEntities.add(firewoodEntity);
+		}
+		
 		Long fuelSpace = 0L;
 		Long fuelWeight = 0L; 
 		for(InitiumObject firewood:firewoods)
 		{
 			fuelSpace+=db.getItemSpace(firewood.getEntity());			
-			fuelWeight = db.getItemWeight(firewood.getEntity());
+
+			
+			Long weightToAdd = db.getItemWeight(firewood.getEntity());
+			Long percentFlammable = (Long)firewood.getEntity().getProperty("Flammable:percentOfFlammableMaterial");
+			if (percentFlammable!=null)
+			{
+				weightToAdd = new Double(Math.round(weightToAdd.doubleValue()*(percentFlammable.doubleValue()/100d))).longValue();
+			}
+			
+			fuelWeight += weightToAdd;
 		}
 		
 		Long depletionDate = getFuelDepletionDate().getTime();
 		
 		
-		
-		
-		// Reduce fuelWeight to match the quantity we're actually going to burn (if applicable)
-		if (quantityLimit!=null && firewoodQuantity!=null)
+		// Now adjust the fuel weight by how much is flammable (if applicable)
+		if (quantityLimit!=null)
 		{
+			Long firewoodQuantity = inventionService.getTotalQuantity(firewoodEntities);
+			
+			// Reduce fuelWeight to match the quantity we're actually going to burn (if applicable)
 			if (firewoodQuantity<quantityLimit)
 				throw new UserErrorMessage("You don't have enough '"+gerName+"'. You have "+firewoodQuantity+" but require "+quantityLimit+".");
 
 			
-			fuelWeight = (Long)firewoodEntities.get(0).getProperty("weight");
-			fuelWeight*=quantityLimit;
-			
 			fuelSpace = (Long)firewoodEntities.get(0).getProperty("space");
 			fuelSpace*=quantityLimit;
-		}
-		
-		
-		if (getSpace()+fuelSpace>getMaxSpace())
-			throw new UserErrorMessage("There is not enough room to put all of this into the fire.");
-		
-		// Now adjust the fuel weight by how much is flammable (if applicable)
-		if (quantityLimit!=null && firewoodQuantity!=null)
-			for(CachedEntity firewoodEntity:firewoodEntities)
+			
+			if (getSpace()+fuelSpace>getMaxSpace())
+				throw new UserErrorMessage("There is not enough room to put all of this into the fire.");
+			
+
+			// Now calculate how much fuel weight is going to be used...
+			CachedEntity firewoodEntity = firewoodEntities.get(0);
+			Long percentFlammable = (Long)firewoodEntity.getProperty("Flammable:percentOfFlammableMaterial");
+			if (percentFlammable!=null)
 			{
-				Long percentFlammable = (Long)firewoodEntity.getProperty("Flammable:percentOfFlammableMaterial");
-				if (percentFlammable!=null)
-				{
-					Long entityWeight = (Long)firewoodEntity.getProperty("weight");
-					fuelWeight += new Double(Math.round(entityWeight.doubleValue()*(percentFlammable.doubleValue()/100d))).longValue()-entityWeight;
-				}
+				Long entityWeight = (Long)firewoodEntity.getProperty("weight");
+				fuelWeight += new Double(Math.round(entityWeight.doubleValue()*(percentFlammable.doubleValue()/100d))).longValue()-entityWeight;
 			}
-		
+		}
 		int burnTime = getBurnTime(fuelWeight, fuelSpace);
 		
 		depletionDate += (burnTime*1000);
@@ -145,7 +156,6 @@ public class AspectFireplace extends ItemAspect
 		setFuelDepletionDate(new Date(depletionDate));
 		setSpace(getSpace()+fuelSpace);
 
-		if (quantityLimit==null) quantityLimit = 1L;
 		inventionService.consumeItems(firewoodEntities, quantityLimit, gerName);
 	}
 	

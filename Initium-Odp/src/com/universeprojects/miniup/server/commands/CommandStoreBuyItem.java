@@ -18,6 +18,7 @@ import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 public class CommandStoreBuyItem extends Command {
 	
@@ -161,6 +162,9 @@ public class CommandStoreBuyItem extends Command {
 			db.sendMainPageUpdateForCharacter(ds, sellingCharacter.getKey(), "updateMoney");
 			db.sendSoundEffectToCharacter(ds, sellingCharacter.getKey(), "coins1");
 			db.sendGameMessage(ds, storeCharacter, "You sold "+buyQuantity+" "+item.getProperty("name")+" to "+character.getProperty("name")+" for "+cost+" gold.");
+			
+			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+			mpus.updateMoney();
 		}
 		finally
 		{

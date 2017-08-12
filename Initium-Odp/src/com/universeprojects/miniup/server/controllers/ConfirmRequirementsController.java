@@ -19,6 +19,7 @@ import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.json.shared.JSONObject;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
@@ -220,7 +221,7 @@ public class ConfirmRequirementsController extends PageController
 		addGenericEntityRequirements(request, db, pool, "Optional Tools/Equipment", ideaDef, "skillToolsOptional");
 		
 		request.setAttribute("skillId", skillId);
-		request.setAttribute("skillName", skill.getProperty("name"));
+		request.setAttribute("skillName", WebUtils.jsSafe((String)skill.getProperty("name")));
 	}
 	
 	

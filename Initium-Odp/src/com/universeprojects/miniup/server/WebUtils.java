@@ -281,9 +281,9 @@ public class WebUtils
 	public static String jsSafe(String promptText)
 	{
 		if (promptText==null) return "";
-		promptText = promptText.replaceAll("'", "\\'");
-		promptText = promptText.replaceAll("\"", "\\\"");
-		promptText = promptText.replaceAll("\n", "\\\\n");
+		promptText = promptText.replace("'", "\\'");
+		promptText = promptText.replace("\"", "\\\"");
+		promptText = promptText.replace("\n", "\\\\n");
 		return promptText;
 
 	}

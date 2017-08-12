@@ -13,6 +13,7 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 import com.universeprojects.miniup.server.services.ConfirmSkillRequirementsBuilder;
@@ -202,7 +203,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		Long skillId = (Long)getDataProperty("skillId");
 		String skillName = ((String)getDataProperty("skillName")).replace("'", "\\'");
 		String repsUniqueId = (String)getDataProperty("repsUniqueId");
-		return "doConstructItemSkill(null, "+skillId+", '"+skillName+"', null, "+repsUniqueId+");"; 
+		return "doConstructItemSkill(null, "+skillId+", '"+WebUtils.jsSafe(skillName)+"', null, "+repsUniqueId+");"; 
 	}
 
 	

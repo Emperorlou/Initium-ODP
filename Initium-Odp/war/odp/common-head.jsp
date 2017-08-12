@@ -15,7 +15,7 @@
 %>
     
 <meta charset="UTF-8">    
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/> 
 <!-- <meta name="viewport" content="minimum-scale=0.3, maximum-scale=1"/> -->
 <meta name="keywords" content="initium, game, web game, video game, free to play, mmorpg, mmo">
@@ -32,7 +32,7 @@
 <script type="text/javascript" src="/odp/javascript/vertx-eventbus.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=111"></script>
+<script type="text/javascript" src="/odp/javascript/script.js?v=112"></script>
 
 <script type="text/javascript" src="/odp/javascript/messager.js?v=27"></script>
 

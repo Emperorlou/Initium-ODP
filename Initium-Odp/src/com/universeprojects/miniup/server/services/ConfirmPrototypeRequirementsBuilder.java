@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.services;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.longoperations.LongOperation;
 
 public class ConfirmPrototypeRequirementsBuilder extends ConfirmGenericEntityRequirementsBuilder
@@ -11,7 +12,7 @@ public class ConfirmPrototypeRequirementsBuilder extends ConfirmGenericEntityReq
 	
 	public ConfirmPrototypeRequirementsBuilder(String uniqueId, ODPDBAccess db, OperationBase command, CachedEntity ideaDef, CachedEntity idea)
 	{
-		super(uniqueId, db, command, "doCreatePrototype(null, "+idea.getId()+", "+idea.getProperty("name")+", '"+uniqueId+"', "+((LongOperation)command).getDataProperty("repsUniqueId")+")", ideaDef);
+		super(uniqueId, db, command, "doCreatePrototype(null, "+idea.getId()+", "+WebUtils.jsSafe((String)idea.getProperty("name"))+", '"+uniqueId+"', "+((LongOperation)command).getDataProperty("repsUniqueId")+")", ideaDef);
 		this.idea = idea;
 	}
 	
