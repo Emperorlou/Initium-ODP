@@ -2326,13 +2326,13 @@ public class ODPDBAccess
 				}
 				else if (stackTooHeavy)
 				{
-					requestQuantity = containerAvailableWeight / itemSingleWeight;
+					requestQuantity = Math.min(itemQuantity, (containerAvailableWeight / itemSingleWeight));
 					if (requestQuantity<=0L)
 						throw new UserErrorMessage("The container cannot accept this item. It is too heavy.");
 				}
 				else if (stackTooLarge)
 				{
-					requestQuantity = containerAvailableSpace / itemSingleSpace;
+					requestQuantity = Math.min(itemQuantity, (containerAvailableSpace / itemSingleSpace));
 					if (requestQuantity<=0L)
 						throw new UserErrorMessage("This item will not fit. There is not enough space.");
 				}
@@ -2380,7 +2380,7 @@ public class ODPDBAccess
 
 				if (stackTooHeavy)
 				{
-					requestQuantity = characterAvailableWeight / itemSingleWeight;
+					requestQuantity = Math.min(itemQuantity, (characterAvailableWeight / itemSingleWeight));
 					if (requestQuantity<=0L)
 						throw new UserErrorMessage("You try to pick it up, but it's too heavy! You can only carry "+GameUtils.formatNumber(characterAvailableWeight)+" grams more.");
 				}
@@ -2426,7 +2426,7 @@ public class ODPDBAccess
 
 				if (stackTooHeavy)
 				{
-					requestQuantity = characterAvailableWeight / itemSingleWeight;
+					requestQuantity = Math.min(itemQuantity, (characterAvailableWeight / itemSingleWeight));
 					if (requestQuantity<=0L)
 						throw new UserErrorMessage("You try to pick it up, but it's too heavy! You can only carry "+GameUtils.formatNumber(characterAvailableWeight)+" grams more.");
 				}
