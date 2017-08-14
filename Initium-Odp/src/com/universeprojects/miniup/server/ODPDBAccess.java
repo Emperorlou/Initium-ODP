@@ -2438,7 +2438,7 @@ public class ODPDBAccess
 
 		// With earlier checks, requestQuantity must be either null or greater than zero
 		// If not null, then either the user request passed container checks or request was lowered meet container capacity
-		if (requestQuantity != null && requestQuantity < itemQuantity && item.getProperty("quantity") != null)
+		if (requestQuantity != null && item.getProperty("quantity") != null && requestQuantity < itemQuantity)
 		{
 			final Key itemKey = item.getKey();
 			final String itemKind = item.getKind();
@@ -2456,21 +2456,10 @@ public class ODPDBAccess
 						CachedEntity newItem = new CachedEntity(itemKind);
 
 						CachedDatastoreService.copyFieldValues(item, newItem);
+						
+						item.setProperty("quantity", newQuantity);
 
-						// Single items should have quantity null
-						if (oldQuantity - newQuantity > 1L)
-						{
-							newItem.setProperty("quantity", oldQuantity - newQuantity);
-						}
-						else
-							newItem.setProperty("quantity", null);
-
-						if (newQuantity > 1L)
-						{
-							item.setProperty("quantity", newQuantity);
-						}
-						else
-							item.setProperty("quantity", null);
+						newItem.setProperty("quantity", oldQuantity - newQuantity);
 
 						newItem.setProperty("createdDate", new Date());
 
