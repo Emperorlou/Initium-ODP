@@ -2308,6 +2308,12 @@ public class ODPDBAccess
 				Long containerAvailableWeight = maxWeight - getItemCarryingWeight(newContainer, containerInventory);
 				Long containerAvailableSpace = maxSpace - getItemCarryingSpace(newContainer, containerInventory);
 
+				// Skip checks below if encumbered and item has weight or space at all
+				if (containerAvailableWeight < 0L && itemSingleWeight > 0L)
+					throw new UserErrorMessage("The container cannot accept this item. It is too heavy.");
+				if (containerAvailableSpace < 0L && itemSingleSpace > 0L)
+					throw new UserErrorMessage("This item will not fit. There is not enough space.");
+
 				// If the item is dimensionless, we skip the following checks altogether
 				stackTooHeavy = ((containerAvailableWeight < itemWeight) && (itemSingleWeight>0L));
 				stackTooLarge = ((containerAvailableSpace < itemSpace) && (itemSingleSpace>0L));
@@ -2315,19 +2321,19 @@ public class ODPDBAccess
 				if (stackTooHeavy && stackTooLarge)
 				{
 					requestQuantity = Math.min((containerAvailableWeight / itemSingleWeight), (containerAvailableSpace / itemSingleSpace));
-					if (requestQuantity==0L)
+					if (requestQuantity<=0L)
 						throw new UserErrorMessage("Container is completely full. Have you ever seen the show Hoarders?");
 				}
 				else if (stackTooHeavy)
 				{
-					requestQuantity = containerAvailableWeight / itemSingleWeight;
-					if (requestQuantity==0L)
+					requestQuantity = Math.min(itemQuantity, (containerAvailableWeight / itemSingleWeight));
+					if (requestQuantity<=0L)
 						throw new UserErrorMessage("The container cannot accept this item. It is too heavy.");
 				}
 				else if (stackTooLarge)
 				{
-					requestQuantity = containerAvailableSpace / itemSingleSpace;
-					if(requestQuantity==0L)
+					requestQuantity = Math.min(itemQuantity, (containerAvailableSpace / itemSingleSpace));
+					if (requestQuantity<=0L)
 						throw new UserErrorMessage("This item will not fit. There is not enough space.");
 				}
 
@@ -2365,13 +2371,17 @@ public class ODPDBAccess
 
 				Long characterAvailableWeight = (Long)getCharacterMaxCarryingWeight(character) - getCharacterCarryingWeight(character);
 
+				// Skip checks below if encumbered and item has weight at all
+				if (characterAvailableWeight < 0L && itemSingleWeight > 0L)
+					throw new UserErrorMessage("You try to pick it up, but it's too heavy!");
+
 				// If the item is weightless, we skip the following check
 				stackTooHeavy = ((characterAvailableWeight < itemWeight) && (itemSingleWeight>0L));
 
 				if (stackTooHeavy)
 				{
-					requestQuantity = characterAvailableWeight / itemSingleWeight;
-					if (requestQuantity==0L)
+					requestQuantity = Math.min(itemQuantity, (characterAvailableWeight / itemSingleWeight));
+					if (requestQuantity<=0L)
 						throw new UserErrorMessage("You try to pick it up, but it's too heavy! You can only carry "+GameUtils.formatNumber(characterAvailableWeight)+" grams more.");
 				}
 			}
@@ -2407,13 +2417,17 @@ public class ODPDBAccess
 
 				Long characterAvailableWeight = (Long)getCharacterMaxCarryingWeight(character) - getCharacterCarryingWeight(character);
 
+				// Skip checks below if encumbered and item has weight at all
+				if (characterAvailableWeight < 0L && itemSingleWeight > 0L)
+					throw new UserErrorMessage("You try to pick it up, but it's too heavy!");
+
 				// If the item is weightless, we skip the following check
 				stackTooHeavy = ((characterAvailableWeight < itemWeight) && (itemSingleWeight>0L));
 
 				if (stackTooHeavy)
 				{
-					requestQuantity = characterAvailableWeight / itemSingleWeight;
-					if (requestQuantity==0L)
+					requestQuantity = Math.min(itemQuantity, (characterAvailableWeight / itemSingleWeight));
+					if (requestQuantity<=0L)
 						throw new UserErrorMessage("You try to pick it up, but it's too heavy! You can only carry "+GameUtils.formatNumber(characterAvailableWeight)+" grams more.");
 				}
 			}
@@ -2424,7 +2438,7 @@ public class ODPDBAccess
 
 		// With earlier checks, requestQuantity must be either null or greater than zero
 		// If not null, then either the user request passed container checks or request was lowered meet container capacity
-		if (requestQuantity != null && requestQuantity < itemQuantity)
+		if (requestQuantity != null && item.getProperty("quantity") != null && requestQuantity < itemQuantity)
 		{
 			final Key itemKey = item.getKey();
 			final String itemKind = item.getKind();
@@ -2442,10 +2456,12 @@ public class ODPDBAccess
 						CachedEntity newItem = new CachedEntity(itemKind);
 
 						CachedDatastoreService.copyFieldValues(item, newItem);
+						
+						item.setProperty("quantity", newQuantity);
 
 						newItem.setProperty("quantity", oldQuantity - newQuantity);
 
-						item.setProperty("quantity", newQuantity);
+						newItem.setProperty("createdDate", new Date());
 
 						ds.put(newItem);
 
