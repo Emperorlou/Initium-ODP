@@ -1857,7 +1857,8 @@ function deleteAndRecreateCharacter(event, currentCharName)
 			currentCharName = "";
 		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
 			showBannerLoadingIcon();
-			doCommand(event, "DeleteAndRecreate", {"name":name}, clearPopupPermanentOverlay());
+			closeAllPagePopups(true);
+			doCommand(event, "DeleteAndRecreate", {"name":name}, clearPopupPermanentOverlay);
 		});
 	});
 }
