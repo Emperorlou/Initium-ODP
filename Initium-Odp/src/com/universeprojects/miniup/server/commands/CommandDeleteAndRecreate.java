@@ -71,7 +71,7 @@ public class CommandDeleteAndRecreate extends Command {
 				public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
 
 					CachedEntity oldChar = ds.refetch(characterKey);
-					db.doDeleteCharacter(characterKey);
+					ds.delete(characterKey);
 			        
 			        CachedEntity newChar = db.newPlayerCharacter(null, auth, user, newName, oldChar);
 
@@ -87,10 +87,11 @@ public class CommandDeleteAndRecreate extends Command {
         
         if(user != null)
         {
-	        // Now discover the paths that belong to this user automatically
-        	// Let it fail silently, but log the exception.
+	        // Delete old discoveries and discover the paths that belong to this 
+        	// user automatically. Let it fail silently, but log the exception.
 	        try
 	        {
+	        	db.doDeleteCharacterDiscoveries(ds, characterKey);
 	            db.discoverAllPropertiesFor(ds, user, newChar);
 	        }
 	        catch(Exception ex)

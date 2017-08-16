@@ -6481,6 +6481,15 @@ public class ODPDBAccess
 	{
 		CachedDatastoreService db = getDB();
 		
+		doDeleteCharacterDiscoveries(db, key);
+		
+		db.delete(key);
+	}
+	
+	public void doDeleteCharacterDiscoveries(CachedDatastoreService db, Key key)
+	{
+		if(db == null) db = getDB();
+
 		Query q = new Query("Discovery").setFilter(new FilterPredicate("characterKey", FilterOperator.EQUAL, key)).setKeysOnly();
 		Iterable<CachedEntity> entities = db.fetchAsIterable(q);
 		
@@ -6490,8 +6499,6 @@ public class ODPDBAccess
 				discoveryKeys.add(entity.getKey());
 		
 		db.delete(discoveryKeys);
-
-		db.delete(key);
 	}
 	
     public CachedEntity newPlayerCharacter(CachedDatastoreService ds, ODPAuthenticator auth, CachedEntity user, String name, CachedEntity oldCharacter)
