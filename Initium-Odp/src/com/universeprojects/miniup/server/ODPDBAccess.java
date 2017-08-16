@@ -6481,16 +6481,15 @@ public class ODPDBAccess
 	{
 		CachedDatastoreService db = getDB();
 		
-		// Only clear discoveries 5 times. Could become a bottleneck for large
-		// amount of character discoveries.
-		int attempts = 5;
-		List<CachedEntity> entities = getDiscoveriesForCharacter_KeysOnly(key);
-		while(entities != null && entities.isEmpty()==false && attempts < 5)
-		{
-			attempts++;
-			db.deleteByCachedEntities(entities);
-			entities = getDiscoveriesForCharacter_KeysOnly(key);
-		}
+		Query q = new Query("Discovery").setFilter(new FilterPredicate("characterKey", FilterOperator.EQUAL, key)).setKeysOnly();
+		Iterable<CachedEntity> entities = db.fetchAsIterable(q);
+		
+		List<Key> discoveryKeys = new ArrayList<Key>();
+		if(entities != null)
+			for(CachedEntity entity:entities)
+				discoveryKeys.add(entity.getKey());
+		
+		db.delete(discoveryKeys);
 
 		db.delete(key);
 	}
