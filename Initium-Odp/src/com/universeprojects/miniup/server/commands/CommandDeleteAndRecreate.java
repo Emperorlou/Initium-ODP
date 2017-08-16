@@ -59,9 +59,9 @@ public class CommandDeleteAndRecreate extends Command {
         db.doLeaveParty(ds, currentChar);
         
         final Key characterKey = currentChar.getKey();
+        final Key userKey = (Key)currentChar.getProperty("userKey");
         final ODPAuthenticator auth = this.getAuthenticator();
         final String newName = name;
-        final CachedEntity user = db.getCurrentUser();
         CachedEntity newChar = null;
         
         try {
@@ -71,9 +71,12 @@ public class CommandDeleteAndRecreate extends Command {
 				public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
 
 					CachedEntity oldChar = ds.refetch(characterKey);
+					CachedEntity curUser = null; 
+					if(userKey != null) curUser = ds.refetch(userKey);
+					
 					ds.delete(characterKey);
 			        
-			        CachedEntity newChar = db.newPlayerCharacter(null, auth, user, newName, oldChar);
+			        CachedEntity newChar = db.newPlayerCharacter(null, auth, curUser, newName, oldChar);
 
 					ds.put(newChar);
 
@@ -85,6 +88,7 @@ public class CommandDeleteAndRecreate extends Command {
 			throw new RuntimeException(e);
 		}
         
+        CachedEntity user = ds.getIfExists(userKey);
         if(user != null)
         {
 	        // Delete old discoveries and discover the paths that belong to this 
