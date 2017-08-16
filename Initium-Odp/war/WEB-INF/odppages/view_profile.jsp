@@ -174,7 +174,7 @@
 </c:if>
 
 <p>
-	<br> <br> <a class='big-link' href='#' onclick='deleteAndRecreateCharacter("${charName}")' id='btnNewCharacter'>Delete your character and recreate</a>
+	<br> <br> <a class='big-link' href='#' onclick='deleteAndRecreateCharacter(event, "${charName}")' id='btnNewCharacter'>Delete your character and recreate</a>
 </p>
 
 <c:if test="${premium==true}">

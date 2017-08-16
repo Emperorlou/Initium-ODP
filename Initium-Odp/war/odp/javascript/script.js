@@ -1850,14 +1850,13 @@ function renameCharacter(eventObject, currentCharName)
 	});
 }
 
-function deleteAndRecreateCharacter(currentCharName)
+function deleteAndRecreateCharacter(event, currentCharName)
 {
 	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
 		if (currentCharName==null)
 			currentCharName = "";
 		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
-			enforceSingleAction();
-			window.location.href = "/ServletCharacterControl?type=startOver&name="+encodeURIComponent(name)+"&v="+window.verifyCode;
+			doCommand("DeleteAndRecreate", {"name":name});
 		});
 	});
 }

@@ -85,6 +85,7 @@ public class CommandSwitchCharacter extends Command {
 
 		js.append("window.chatIdToken = '" + db.getChatIdToken(targetCharacter.getKey()) + "';");
 		js.append("window.messager.idToken = window.chatIdToken;");
+		js.append("window.characterId = " + targetCharacter.getId() + ";");
 
 		addJavascriptToResponse(js.toString());
 		

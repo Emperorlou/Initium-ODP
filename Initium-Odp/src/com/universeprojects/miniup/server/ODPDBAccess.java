@@ -6476,4 +6476,117 @@ public class ODPDBAccess
 		}		
 		return stackedItem;
 	}
+	
+	public void doDeleteCharacter(Key key)
+	{
+		CachedDatastoreService db = getDB();
+		
+		List<CachedEntity> entities = getDiscoveriesForCharacter_KeysOnly(key);
+		while(entities != null && entities.isEmpty()==false)
+		{
+			db.deleteByCachedEntities(entities);
+			entities = getDiscoveriesForCharacter_KeysOnly(key);
+		}
+
+		db.delete(key);
+	}
+	
+    public CachedEntity newPlayerCharacter(CachedDatastoreService ds, ODPAuthenticator auth, CachedEntity user, String name, CachedEntity oldCharacter)
+    {
+        if (ds==null)
+            ds = getDB();
+        
+        CachedEntity group = null;
+        
+        name = name.replace("  ", " ");
+        
+        Key homeTownKey = null;
+        
+        CachedEntity newCharacter = new CachedEntity("Character");
+        // Set the starting attributes
+        newCharacter.setProperty("name", name);
+        newCharacter.setProperty("homeTownKey", homeTownKey);
+
+        // Set some default attributes
+        if (homeTownKey==null)
+            newCharacter.setProperty("locationKey", getDefaultLocationKey());
+        else
+            newCharacter.setProperty("locationKey", homeTownKey);
+        newCharacter.setProperty("dogecoins", 0l);
+        newCharacter.setProperty("mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
+        newCharacter.setProperty("type", "PC");
+
+        Double dex = 5d;
+        Double str = 5d;
+        Double intel = 5d;
+        
+        Double hp = calculateHitpoints(str);
+        
+        newCharacter.setProperty("strength", str);
+        newCharacter.setProperty("dexterity", dex);
+        newCharacter.setProperty("intelligence", intel);
+        newCharacter.setProperty("hitpoints", hp);
+        newCharacter.setProperty("maxHitpoints", hp);
+        
+        newCharacter.setProperty("createdDate", new Date());
+        newCharacter.setProperty("locationEntryDatetime", new Date());
+        if (user!=null)
+        {
+            if (user.getKey().isComplete()==false)
+                ds.put(user);
+            newCharacter.setProperty("userKey", user.getKey());
+        }
+
+        boolean characterSaved = false;
+        // If there is a previous character, copy over some things from him
+        if (oldCharacter!=null)
+        {
+            Key groupKey = (Key)oldCharacter.getProperty("groupKey");
+            group = getEntity(groupKey);
+            if (group!=null)
+            {
+                newCharacter.setProperty("groupKey", oldCharacter.getProperty("groupKey"));
+                newCharacter.setProperty("groupRank", oldCharacter.getProperty("groupRank"));
+                newCharacter.setProperty("groupStatus", oldCharacter.getProperty("groupStatus"));
+                newCharacter.setProperty("leaveGroupDate", oldCharacter.getProperty("leaveGroupDate"));
+                
+                ds.put(newCharacter);    // Do an initial put so we generate a proper key when doing the group/party stuff below...
+                characterSaved=true;
+                
+                // ok he was in a group, we'll need to copy some stuff over to the new char
+                // If the dead character is the creator of the group, copy over creator status...
+                if (((Key)group.getProperty("creatorKey")).getId()==oldCharacter.getKey().getId())
+                {
+                    // He was the creator, make the new guy the creator now...
+                    group.setProperty("creatorKey", newCharacter.getKey());
+                    ds.put(group);
+                }
+                
+            }
+        }
+        else
+        {
+            // If the new character is null, lets put the new guy through the tutorial
+//            newCharacter.setProperty("locationKey", KeyFactory.createKey("Location", 6073730381905920L));
+//            newCharacter.setProperty("dogecoins", 1L);
+        }
+
+        
+        if (characterSaved==false)
+            ds.put(newCharacter);
+        
+        if (user!=null)
+        {
+            user.setProperty("characterKey", newCharacter.getKey());
+            
+            ds.put(user);
+        }
+        else
+        {
+            auth.login(newCharacter); 
+        }
+        
+        return newCharacter;
+    }
+
 }
