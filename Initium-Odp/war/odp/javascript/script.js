@@ -3303,12 +3303,14 @@ function doRest()
 function doCampDefend()
 {
 	showBannerLoadingIcon();
+	if (window.previousBannerUrl!=bannerUrl)
+		window.previousBannerUrl = bannerUrl;
 	longOperation(null, "CampDefend", null, 
 			function(action) // responseFunction
 			{
-				if (action.isComplete)
+				if(action.error !== undefined || action.isComplete)
 				{
-					clearPopupPermanentOverlay();
+					clearPopupPermanentOverlay(); 
 				}
 				else
 				{
@@ -3326,7 +3328,8 @@ function doCampDefend()
 function doCampCreate(campName)
 {
 	showBannerLoadingIcon();
-	
+	if (window.previousBannerUrl!=bannerUrl)
+		window.previousBannerUrl = bannerUrl;
 	longOperation(null, "CampCreate", {"name":campName}, 
 		function(action) // responseFunction
 		{
