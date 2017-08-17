@@ -222,26 +222,38 @@ public class MainPageUpdateService extends Service
 				
 			}
 			
-
-			
-			// Get all discovered paths...
+			// Fetch the paths all at once, then combine.
+			List<Key> pathsToFetch = new ArrayList<Key>();
 			for(CachedEntity discovery:discoveries)
 			{
+				// We allow null entityKey. Need to maintain ordinality.
+				if(discovery != null)
+					pathsToFetch.add((Key)discovery.getProperty("entityKey"));
+				else
+					pathsToFetch.add(null);
+			}
+					
+			List<CachedEntity> discoveryEntities = db.getEntities(pathsToFetch);
+			List<Key> keysToDelete = new ArrayList<Key>();
+			// Get all discovered paths...
+			for(int i = 0; i < discoveries.size(); i++)
+			{
+				CachedEntity discovery = discoveries.get(i);
 				if (discovery==null) continue;	// Why would it be null I have no idea. Maybe just a race condition when deleting and this fetch took place.
 				
 				if ("Path".equals(discovery.getProperty("kind")))
 				{
-					CachedEntity path = db.getPathById(((Key)discovery.getProperty("entityKey")).getId());
+					CachedEntity path = discoveryEntities.get(i);
 					if (path==null)
 					{
 						// If we get here, it's because the path was deleted. Lets remove the discovery for future and skip this one for now
-						db.getDB().delete(discovery.getKey());
+						keysToDelete.add(discovery.getKey());
 						continue;
 					}
 					
 					if (paths.contains(path))
 						continue;
-				
+					
 					Key destination = null;
 					// First get the character's current location
 					Key currentLocationKey = location.getKey();
@@ -288,7 +300,6 @@ public class MainPageUpdateService extends Service
 				}
 			}
 			
-			
 			// Now that we have a list of destLocations to load, we will load them in now and delete any that ended up being null..
 			destLocations = db.getEntities(destLocationsToLoad);
 //			List<Key> entitiesToDelete = new ArrayList<Key>();
@@ -304,6 +315,7 @@ public class MainPageUpdateService extends Service
 				}
 			}
 			
+			ds.delete(keysToDelete);
 		}
 	}
 	
