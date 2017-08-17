@@ -2758,7 +2758,7 @@ function doSetLeader(eventObject, charId, charName)
 	closeAllPopups();
 	closeAllTooltips();
 	confirmPopup("Set new leader", "Are you sure you want set " + charName + " to be the leader of your party?", function(){
-		doCommand(eventObject,"SetLeader",{"charId":charId});
+		doCommand(eventObject,"PartySetLeader",{"charId":charId});
 	});
 }
 

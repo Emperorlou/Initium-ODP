@@ -1,16 +1,21 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 
 /**
@@ -25,9 +30,9 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  * @author NJ
  *
  */
-public class CommandSetLeader extends Command {
+public class CommandPartySetLeader extends Command {
 
-	public CommandSetLeader(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
+	public CommandPartySetLeader(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) 
 	{
 		super(db, request, response);
 	}
@@ -75,12 +80,28 @@ public class CommandSetLeader extends Command {
 			CachedDatastoreService ds = getDS();
 			ds.put(character);
 			ds.put(member);
+			
+			List<CachedEntity> party = db.getParty(null, character);
+			if(party == null) party = Arrays.asList(character, member);
+			CachedEntity location = ds.getIfExists((Key)character.getProperty("locationKey"));
+			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, location, this);
+			mpus.updatePartyView();
+			mpus.updateButtonBar(); // Also sets the allow party join bit, so update button bar.
+			
+			List<Key> partyKeys = new ArrayList<Key>();
+			for(CachedEntity partyMember:party)
+			{
+				db.sendGameMessage(ds, character, member.getProperty("name") + " is now the party leader.");
+				if(partyMember != null && GameUtils.equals(character.getKey(), partyMember.getKey())==false)
+					partyKeys.add(partyMember.getKey());
+			}
+			
+			if(partyKeys.isEmpty()==false)
+				db.sendMainPageUpdateForCharacters(ds, partyKeys, "updatePartyView");
 		}
 		catch(Exception e){
 			throw new UserErrorMessage("Error while switching leader: "+e.getMessage());
 		}
-		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
-		
 	}
 
 }
