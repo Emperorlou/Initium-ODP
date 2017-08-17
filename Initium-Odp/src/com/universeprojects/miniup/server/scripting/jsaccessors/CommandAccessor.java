@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.CommandSetLabel;
-import com.universeprojects.miniup.server.commands.CommandSetLeader;
+import com.universeprojects.miniup.server.commands.CommandPartySetLeader;
 import com.universeprojects.miniup.server.commands.framework.Command;
 
 interface Dispatcher
@@ -35,10 +35,10 @@ public class CommandAccessor {
 				return new CommandSetLabel(dbFinal, request, response);
 			}});
 		// Set Leader
-		commands.put("SetLeader", new Dispatcher() {
+		commands.put("PartySetLeader", new Dispatcher() {
 			@Override
 			public Command dispatch(HttpServletRequest request, HttpServletResponse response) {
-				return new CommandSetLeader(dbFinal, request, response);
+				return new CommandPartySetLeader(dbFinal, request, response);
 			}});
 	}
 

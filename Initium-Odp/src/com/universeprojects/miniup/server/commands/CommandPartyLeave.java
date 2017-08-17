@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -38,25 +39,17 @@ public class CommandPartyLeave extends Command {
 			throw new RuntimeException("Character is null in command");
 		
 		String partyCode = (String) character.getProperty("partyCode");
-		if (partyCode == null || partyCode.trim().equals("")) {
+		if (GameUtils.isCharacterInParty(character)==false) 
 			throw new UserErrorMessage("You are not currently in a party!");
-		}
-		
-		if (character.getProperty("mode").equals("COMBAT")) {
-			throw new UserErrorMessage("You cannot leave a party while in combat!");
-		}
 		
 		List<CachedEntity> party = db.getParty(ds, character);
-		if (GameUtils.booleanEquals(character.getProperty("partyLeader"), true) && !(party == null || party.size() <= 2)) { 
-			//Check if getParty is null to see if they were the last member in the party, 
-			//if they were the last member in the party, then they can leave without promoting new leader. or if the party is comprised 
-			//with just two people, a new party leader is also not needed.
-			throw new UserErrorMessage("You are currently the party leader! In order to leave make someone else the party leader!");
-		}
+		// If party.size() == 1, then null is returned, so we can assume there are
+		// other members in the party.
+		if(party != null)
+			db.doRequestLeaveParty(ds, character);
 		
-		db.doRequestLeaveParty(ds, character);
-		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		CachedEntity location = ds.getIfExists((Key)character.getProperty("locationKey"));
+		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, location, this);
 		mpus.updatePartyView();
 		mpus.updateButtonBar(); // Also sets the allow party join bit, so update button bar.
 		
