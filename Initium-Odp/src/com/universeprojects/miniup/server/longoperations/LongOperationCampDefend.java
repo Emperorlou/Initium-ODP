@@ -36,7 +36,7 @@ public class LongOperationCampDefend extends LongOperation
 			throw new UserErrorMessage("You are not the party leader and cannot defend camps.");
 		
 		Double monsterCount = db.getMonsterCountForLocation(ds, location);
-		if(monsterCount < 1)
+		if(monsterCount == null || monsterCount < 1)
 			throw new UserErrorMessage("There is no monster activity threatening this camp. You can rest easy.");
 		
 		return 1;
