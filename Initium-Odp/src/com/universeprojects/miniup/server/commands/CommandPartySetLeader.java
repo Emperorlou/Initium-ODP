@@ -91,7 +91,7 @@ public class CommandPartySetLeader extends Command {
 			List<Key> partyKeys = new ArrayList<Key>();
 			for(CachedEntity partyMember:party)
 			{
-				db.sendGameMessage(ds, character, member.getProperty("name") + " is now the party leader.");
+				db.sendGameMessage(ds, partyMember, member.getProperty("name") + " is now the party leader.");
 				if(partyMember != null && GameUtils.equals(character.getKey(), partyMember.getKey())==false)
 					partyKeys.add(partyMember.getKey());
 			}
