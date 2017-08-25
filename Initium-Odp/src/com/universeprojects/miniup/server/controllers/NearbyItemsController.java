@@ -35,7 +35,9 @@ public class NearbyItemsController extends PageController
 		if(locationKey == null)
 			throw new RuntimeException("Invalid game state. Character location null");
 		
-		if(CommonChecks.checkCharacterIsInCombat(character))
+		if("Character".equals(locationKey.getKind()) ||
+				CommonChecks.checkCharacterIsInCombat(character) ||
+				GameUtils.isPlayerIncapacitated(character))
 			return null;
 		
 		List<CachedEntity> itemsHere = db.getItemsListSortedForLocation(null, locationKey);
