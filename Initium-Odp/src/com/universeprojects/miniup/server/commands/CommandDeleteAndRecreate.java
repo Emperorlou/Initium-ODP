@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +13,7 @@ import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.Transaction;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPAuthenticator;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -47,6 +49,10 @@ public class CommandDeleteAndRecreate extends Command {
         if (name.equals(currentChar.getProperty("name"))==false && db.checkCharacterExistsByName(name))
             throw new UserErrorMessage("Character name is already in use.");
         
+        // Cannot be in combat.
+        if(CommonChecks.checkCharacterIsBusy(currentChar))
+        	throw new UserErrorMessage("Character is currently busy.");
+        
         // Check if this user has changed names too many times in the past 10 minutes (only 1 name change in 10 mins allowed)
         String ip = WebUtils.getClientIpAddr(request);
         if (name.equals(currentChar.getProperty("name"))==false)
@@ -57,6 +63,27 @@ public class CommandDeleteAndRecreate extends Command {
 
         // Being in a party seems to mess things up, so leave the party first.
         db.doLeaveParty(ds, currentChar);
+        
+        // Drop all characters.
+        List<CachedEntity> carryingChars = db.getFilteredList("Character", "locationKey", currentChar.getKey());
+        if(carryingChars != null && carryingChars.isEmpty() == false)
+        {
+        	CachedEntity location = ds.getIfExists((Key)currentChar.getProperty("locationKey"));
+        	ds.beginBulkWriteMode();
+        	for(CachedEntity carried:carryingChars)
+        	{
+        		try
+        		{
+        			db.doCharacterDropCharacter(location, currentChar, carried);
+        		}
+        		catch(Exception ex)
+        		{
+        			carried.setProperty("locationKey", location.getKey());
+        			ds.put(carried);
+        		}
+        	}
+        	ds.commitBulkWrite();
+        }
         
         final Key characterKey = currentChar.getKey();
         final Key userKey = (Key)currentChar.getProperty("userKey");
