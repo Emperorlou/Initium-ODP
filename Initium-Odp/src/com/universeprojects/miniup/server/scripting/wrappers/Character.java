@@ -16,6 +16,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
+import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ScriptService;
 
@@ -31,6 +32,7 @@ public class Character extends EntityWrapper
 	private Map<Key, Item> keyedInventory = null;
 	private Map<String, Item> equippedInventory = null;
 	private List<Character> carriedCharacters = null;
+	private Group characterGroup = null;
 	
 	public Character(CachedEntity character, ODPDBAccess db) 
 	{
@@ -282,6 +284,13 @@ public class Character extends EntityWrapper
 		return setLocationKey(locKey);
 	}
 	
+	public Item[] getAllInventory()
+	{
+		List<Item> inv = getInventory();
+		Item[] invItems = new Item[inv.size()];
+		return inv.toArray(invItems);
+	}
+	
 	public Item[] findInInventory(String itemName)
 	{
 		Map<String, List<Item>> invMap = getNamedInventory();
@@ -353,5 +362,25 @@ public class Character extends EntityWrapper
 		
 		Character[] chars = new Character[carriedCharacters.size()];
 		return carriedCharacters.toArray(chars);
+	}
+	
+	/*################# GROUPS ###################*/
+	public Group getGroup()
+	{
+		if(characterGroup != null)
+		{
+			return characterGroup;
+		}
+		
+		if(this.getProperty("groupKey")==null || GameUtils.enumEquals(this.getProperty("groupStatus"), GroupStatus.Applied))
+			return null;
+		
+		CachedEntity group = db.getEntity((Key)this.getProperty("groupKey"));
+		if(group != null)
+		{
+			characterGroup = new Group(group, db);
+		}
+		
+		return characterGroup;
 	}
 }

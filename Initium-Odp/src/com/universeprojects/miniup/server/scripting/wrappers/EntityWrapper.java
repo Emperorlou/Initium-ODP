@@ -37,6 +37,7 @@ public class EntityWrapper extends BaseWrapper
 	
 	public Long getCharges()
 	{
+		if(this.wrappedEntity.hasProperty("charges")==false) return -1l;
 		Long charges = (Long)this.getProperty("charges");
 		if(charges == null) charges = -1l;
 		return charges;
@@ -59,6 +60,11 @@ public class EntityWrapper extends BaseWrapper
 			return true;
 		}
 		return false;
+	}
+	
+	public String getKeyName()
+	{
+		return getKind() + "(" + getId() + ")";
 	}
 
 	public Key getKey()
@@ -102,6 +108,7 @@ public class EntityWrapper extends BaseWrapper
 	@SuppressWarnings("unchecked")
 	public boolean removeScript(String scriptName)
 	{
+		if(this.wrappedEntity.hasProperty("scripts")==false) return false;
 		List<CachedEntity> scriptList = db.getFilteredList("Script", "name", scriptName);
 		if(scriptList.size() > 0)
 		{
@@ -135,6 +142,7 @@ public class EntityWrapper extends BaseWrapper
 	@SuppressWarnings("unchecked")
 	public boolean hasScript(String scriptName)
 	{
+		if(this.wrappedEntity.hasProperty("scripts")==false) return false;
 		List<CachedEntity> searchScripts = db.getFilteredList("Script", "name", scriptName);
 		List<Key> entityScripts = (List<Key>)this.getProperty("scripts");
 		for(CachedEntity script:searchScripts)
@@ -152,6 +160,7 @@ public class EntityWrapper extends BaseWrapper
 	@SuppressWarnings("unchecked")
 	public boolean addScript(String scriptName)
 	{
+		if(this.wrappedEntity.hasProperty("scripts")==false) return false;
 		List<CachedEntity> addScripts = db.getFilteredList("Script", "name", scriptName);
 		if(!addScripts.isEmpty())
 		{
