@@ -12,6 +12,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -97,42 +98,81 @@ public class DBAccessor {
 	
 	public Character getCharacterByKey(Key characterKey)
 	{
-		return new Character(db.getEntity(characterKey), db);
+		CachedEntity ent = db.getEntity(characterKey);
+		if(ent == null) return null;
+		return new Character(ent, db);
 	}
 	
 	public Character getCharacterById(Long charId)
 	{
-		return new Character(db.getEntity("Character", charId), db);
+		CachedEntity ent = db.getEntity("Character", charId);
+		if(ent == null) return null;
+		return new Character(ent, db);
+	}
+	
+	public Character getCharacterByName(String characterName)
+	{
+		CachedEntity ent = db.getCharacterByName(characterName);
+		if(ent == null) return null;
+		return new Character(ent, db);
+	}
+	
+	public Character[] getCharactersByName(String characterName)
+	{
+		List<CachedEntity> ents = db.getCharactersByName(characterName);
+		if(ents == null) return new Character[0];
+		
+		List<Character> chars = new ArrayList<Character>();
+		for(CachedEntity charEnt:ents)
+		{
+			if(charEnt != null)
+				chars.add(new Character(charEnt, db));
+		}
+		
+		Character[] retChars = new Character[chars.size()];
+		return chars.toArray(retChars);
 	}
 	
 	public Location getLocationByKey(Key locationKey)
 	{
-		return new Location(db.getEntity(locationKey), db);
+		CachedEntity ent = db.getEntity(locationKey);
+		if(ent == null) return null;
+		return new Location(ent, db);
 	}
 	
 	public Location getLocationById(Long locationId)
 	{
-		return new Location(db.getEntity("Location", locationId), db);
+		CachedEntity ent = db.getEntity("Location", locationId);
+		if(ent == null) return null;
+		return new Location(ent, db);
 	}
 	
 	public Item getItemByKey(Key itemKey)
 	{
-		return new Item(db.getEntity(itemKey), db);
+		CachedEntity ent = db.getEntity(itemKey);
+		if(ent == null) return null;
+		return new Item(ent, db);
 	}
 	
 	public Item getItemById(Long itemId)
 	{
-		return new Item(db.getEntity("Item", itemId), db);
+		CachedEntity ent = db.getEntity("Item", itemId);
+		if(ent == null) return null;
+		return new Item(ent, db);
 	}
 
 	public Path getPathByKey(Key pathKey)
 	{
-		return new Path(db.getEntity(pathKey), db);
+		CachedEntity ent = db.getEntity(pathKey);
+		if(ent == null) return null;
+		return new Path(ent, db);
 	}
 	
 	public Path getPathById(Long pathId)
 	{
-		return new Path(db.getEntity("Path", pathId), db);
+		CachedEntity ent = db.getEntity("Path", pathId);
+		if(ent == null) return null;
+		return new Path(ent, db);
 	}
 	
 	public Key getKey(String kind, Long id)
@@ -151,7 +191,7 @@ public class DBAccessor {
 			oldInternalName = "(null)";
 		
 		wrapper.wrappedEntity.setProperty("internalName", newInternalName);
-		ScriptService.log.log(Level.WARNING, "Updating " + wrapper.getKind() + "(" + wrapper.getId() + ") internal name: " + oldInternalName + " to " + newInternalName);
+		ScriptService.log.log(Level.WARNING, "Updating " + wrapper.getKeyName() + " internal name: " + oldInternalName + " to " + newInternalName);
 		return true;
 	}
 	
@@ -206,7 +246,7 @@ public class DBAccessor {
 	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)
 	{
 		db.doDestroyEquipment(null, currentCharacter.wrappedEntity, item.wrappedEntity);
-		db.sendGameMessage(db.getDB(), currentCharacter.wrappedEntity, "<div class='equipment-destroyed-notice'>"+currentCharacter.getName()+"'s "+item.getName()+" was so badly damaged it has been destroyed. </div>");
+		db.sendGameMessage(db.getDB(), currentCharacter.wrappedEntity, "<div class='equipment-destroyed-notice'>"+currentCharacter.getName()+"'s "+item.getName()+" was so badly damaged it has been destroyed.</div>");
 		return true;
 	}
 	
