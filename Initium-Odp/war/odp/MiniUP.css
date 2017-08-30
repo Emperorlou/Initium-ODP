@@ -5,10 +5,29 @@
 }
 
 @font-face {
+    font-family: QUEST;
+    src: url(MORPHEUS.TTF);
+}
+
+@font-face {
     font-family: CHAT;
     src: url(arial-narrow-2.ttf);
 }
 
+#mix-blending-fix
+{
+    background-color: #0e0b06;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
+#contents
+{
+	display:none;
+}
 
 strong
 {
@@ -1120,7 +1139,7 @@ hr.items-separator {
     left:0px;
     right:0px;
     z-index: 1500000;
-	background-color: rgba(14,11,6,0.96);
+	background-color: initial;
 }
 .popupWrapper 
 {
@@ -2030,6 +2049,7 @@ a.range-increment {
 	margin-top:0px;
 }
 
+/*
 .page-popup::before
 {
   position:absolute;
@@ -2041,6 +2061,7 @@ a.range-increment {
   
   content:" ";
 }
+*/
 
 .page-popup-title
 {
@@ -2049,7 +2070,8 @@ a.range-increment {
     top: -45px;
     width: 80%;
     margin: 0 auto;
-    margin-bottom: -35px;
+    margin-bottom: -55px;
+    
 }
 .page-popup-title h4
 {
@@ -2063,6 +2085,20 @@ a.range-increment {
     border-color: rgb(103, 81, 52);
     border-style: solid;
     border-radius: 4px;
+
+
+    /* V3 */
+	background-image: url(http://imgur.com/3cHFnJW.png);
+    width: 351px;
+    height: 48px;
+    margin: 0px;
+    padding: 0px;
+    margin-top: 0px;
+    position: relative;
+    top: -30px;
+    background-color: inherit;
+    border: none;
+    padding-top: 10px;    
 }
 
 .page-popup-description
@@ -2078,9 +2114,8 @@ a.range-increment {
 	max-width:750px;
 	margin: 0 auto;
 	position:relative;
-	background-image:url('https://initium-resources.appspot.com/images/ui/large-popup-middle.jpg');
+	background-color: #181716;
   	background-position:center;
-	width:100%;
 	color:#FFFFFF;
 	margin-top:13px;
 	margin-bottom:61px;
@@ -2096,6 +2131,7 @@ a.range-increment {
 	z-index:1000000;
 }
 
+/*
 .page-popup::after
 {
   background-image:url('https://initium-resources.appspot.com/images/ui/large-popup-bottom.jpg');
@@ -2107,6 +2143,7 @@ a.range-increment {
   bottom:-19px;
   left:0px;
 }
+*/
 
 .page-popup-glass
 {
@@ -2136,22 +2173,36 @@ a.range-increment {
 }
 
 .page-popup-X {
-   position: absolute;
-   top: -12px;
-   right: 0px;
-   z-index: 1100001;
-   font-family: Arial;
-   font-size: 39px;
-  }
+position: absolute;
+    background-image: url(http://imgur.com/hyJy2JE.png);
+    color: #e2b766;
+    width: 61px;
+    height: 46px;
+    text-align: center;
+    padding-top: 13px;
+    padding-left: 1px;
+    top: -12px;
+    right: -4px;
+    z-index: 1100001;
+    font-family: dos;
+    font-size: 26px;
+}
 
 .page-popup-Reload
 {
-   position: absolute;
-   top: -18px;
-   left: 0px;
-   z-index: 1100001;
-   font-family: Lucida Sans;
-   font-size: 50px;
+    position: absolute;
+    top: -12px;
+    left: -4px;
+    z-index: 1100001;
+    font-family: Lucida Sans;
+    font-size: 32px;
+    background-image: url(http://imgur.com/hyJy2JE.png);
+    width: 61px;
+    height: 48px;
+    text-align: center;
+    padding-top: 11px;
+    padding-left: 1px;
+    color: #e2b766;
 }
 
 .changelog-more
@@ -2576,7 +2627,7 @@ a.range-increment {
 /* - Opera running on high DPI Macs, PCs and mobile devices   */
 /*                                                            */
 /* Please note that that this code assumes you'll swap a      */
-/* 2× version of your images. If you'd like to supply         */
+/* 2Ã— version of your images. If you'd like to supply         */
 /* finer increments, other thresholds might be appropriate.   */
 /*                                                            */
 /* A test for CSS pixel densites can be found here:           */
@@ -2586,8 +2637,13 @@ a.range-increment {
 /*                                                            */
 /* ---------------------------------------------------------- */
  
-@media (max-width:775px)
+@media (max-width:735px)
 {
+	#mix-blending-fix
+	{
+		display:none;
+	}
+	
 	body
 		{
 			margin:0px;
@@ -2828,7 +2884,6 @@ a.range-increment {
 	
 		.page-popup
 		{
-			width:100%;
 			background-position: center;
 			padding-left: 0px;
 			padding-right: 0px;
@@ -2860,7 +2915,7 @@ a.range-increment {
 	
 	#buttonbar img
 	{
-		max-width:24px;
+		max-width:23px;
 		margin-top:0px;
 	}
 		
@@ -2869,6 +2924,16 @@ a.range-increment {
 		transform: scale(0.8);
 		transform-origin: top left;
 	}
+	
+	.page-popup-title h4
+	{
+	    width: 200px;
+	    height: 29px;
+	    background-size: 100%;
+	    padding-top: 4px;
+	    margin-bottom: -8px;
+	    top: -18px;
+    }
 }
 
 
@@ -3495,7 +3560,7 @@ body
 
 .cluetip-rounded .cluetip-outer
 {
-	margin:7px;
+	/*margin:7px;*/
 }
 
 
@@ -3747,6 +3812,210 @@ body
 {
 	filter:blur(12px);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+  _    _ _____    ____                 _           _ _        ____  
+ | |  | |_   _|  / __ \               | |         | | |      |___ \ 
+ | |  | | | |   | |  | |_   _____ _ __| |__   __ _| | | __   ____) |
+ | |  | | | |   | |  | \ \ / / _ \ '__| '_ \ / _` | | | \ \ / /__ < 
+ | |__| |_| |_  | |__| |\ V /  __/ |  | | | | (_| | | |  \ V /___) |
+  \____/|_____|  \____/  \_/ \___|_|  |_| |_|\__,_|_|_|   \_/|____/ 
+                                                                    
+                                                                    
+*/
+
+
+.v3-window1
+{
+	border-style: solid;
+	border-width: 30px;
+	-moz-border-image: url(https://imgur.com/jMtwAbT.png) 30 repeat;
+	-webkit-border-image: url(https://imgur.com/jMtwAbT.png) 30 repeat;
+	-o-border-image: url(https://imgur.com/jMtwAbT.png) 30 repeat;
+	border-image: url(https://imgur.com/jMtwAbT.png) 30 fill repeat;
+}
+
+.v3-window1b
+{
+	border-style: solid;
+	border-width: 30px;
+	-moz-border-image: url(https://imgur.com/WCYlDGy.png) 30 repeat;
+	-webkit-border-image: url(https://imgur.com/WCYlDGy.png) 30 repeat;
+	-o-border-image: url(https://imgur.com/WCYlDGy.png) 30 repeat;
+	border-image: url(https://imgur.com/WCYlDGy.png) 30 fill repeat;
+}
+
+
+.v3-window2
+{
+	border-style: solid;
+	border-width: 72px 91px 90px 99px;
+	-moz-border-image: url(https://imgur.com/puY6NSa.png) 72 91 90 99 round repeat;
+	-webkit-border-image: url(https://imgur.com/puY6NSa.png) 72 91 90 99 round repeat;
+	-o-border-image: url(https://imgur.com/puY6NSa.png) 72 91 90 99 round repeat;
+	border-image: url(https://imgur.com/puY6NSa.png) 72 91 90 99 fill round repeat;
+}
+
+
+.quest-window-container
+{
+	position:fixed;
+	width:100%;
+	height:100%;
+	top:0px;
+	z-index: 10000000;
+}
+.quest-window
+{
+	border-style: solid;
+	border-width: 72px 91px 90px 99px;
+	-moz-border-image: url(https://imgur.com/puY6NSa.png) 72 91 90 99 round repeat;
+	-webkit-border-image: url(https://imgur.com/puY6NSa.png) 72 91 90 99 round repeat;
+	-o-border-image: url(https://imgur.com/puY6NSa.png) 72 91 90 99 round repeat;
+	border-image: url(https://imgur.com/puY6NSa.png) 72 91 90 99 fill round repeat;
+	
+    position: relative;
+    left: 50%;
+    margin-left: -160px;
+    top: 10%;	
+	width:123px;
+	height:50%;
+}
+
+.quest-window-internal
+{
+    color: #614f33;	
+	margin: -60px;
+    margin-top: -39px;
+    padding-bottom: 64px;
+
+    overflow-y: auto;
+    height: 100%;
+    position: absolute;
+	font-family: DOS;
+}
+
+.quest-window-internal h1
+{
+	text-align:center;
+}
+.quest-window-internal h1, .quest-window-internal h2, .quest-window-internal h3, .quest-window-internal h4, .quest-window-internal h5
+{
+	font-family: QUEST;
+	text-shadow:none;
+    color: #614f33;
+}
+
+.quest-window-bottombutton-container
+{
+	width: 0px;
+    left: 50%;
+    position: absolute;
+    bottom: 0px;
+}
+
+
+.quest-window-bottombutton
+{
+	background-image: url(http://imgur.com/uzmrqe1.png);
+    bottom: -115px;
+    width: 155px;
+    height: 40px;
+    text-align: center;
+    color: #CCCCCC;
+    text-shadow: #000000 1px 1px 1px;
+    padding-top: 19px;
+    position: absolute;
+    display: inline-block;
+    left: -78px;
+    cursor: pointer;
+}
+
+.quest-window-bottombutton:hover
+{
+	-webkit-stroke-width: 5.3px;
+    -webkit-stroke-color: #FFFFFF;
+    -webkit-fill-color: #FFFFFF;
+    color:#DDDDDD;
+    text-shadow: 0px 0px 20px yellow;
+}
+
+.quest-container
+{
+	position:relative;
+	margin-left:9px;
+}
+
+
+.quest-complete a:before
+{
+    content: '\2713 ';
+    font-size: 200%;
+    float: left;
+    text-shadow: 0px 0px 11px #44FF44;
+    color: #44FF44;
+    position: absolute;
+    top: -12px;
+    left: -18px;
+}
+
+#quest-complete-label
+{
+	position:absolute;
+	bottom:-50px;
+	color: #fffedb;
+	text-align: center;
+	text-shadow: 0px 0px 7px #ffffff;
+	font-family: dos;	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

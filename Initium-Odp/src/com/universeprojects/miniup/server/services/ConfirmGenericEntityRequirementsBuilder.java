@@ -141,7 +141,7 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 	@Override
 	protected String getPagePopupTitle()
 	{
-		return "Select the tools/materials to use";
+		return "Tools/materials to use";
 	}
 
 	

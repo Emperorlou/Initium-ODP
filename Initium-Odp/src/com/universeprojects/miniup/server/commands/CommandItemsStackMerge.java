@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -44,6 +45,7 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		ds.beginTransaction();
 		try {
 			for (CachedEntity mergeItem : batchItems) {
+				if (CommonChecks.isItemCustom(mergeItem)) continue;
 				if (mergesRemaining==0) break;
 				if (GameUtils.equals(mergeItem.getProperty("containerKey"), character.getKey()) == false) {
 					throw new UserErrorMessage("Item does not belong to character.");

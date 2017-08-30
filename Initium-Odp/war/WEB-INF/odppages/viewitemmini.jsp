@@ -45,8 +45,8 @@
 				<c:if test="${item.aspectList != null}"><div class='simple-aspect-list'>${item.aspectList}</div></c:if>
 			</div>
 			<br/>
-			<c:if test="${item.description != null}"><br/>
-			<div name='description' class='item-flavor-description'>${item.description}</div></c:if>
+			<br/>
+			<div name='description' class='item-flavor-description'>${item.description}</div>
 		</div>
 		<c:if test="${item.ownerOnlyHtml != null}"><div>${item.ownerOnlyHtml}</div></c:if>
 		

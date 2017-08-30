@@ -305,25 +305,28 @@ public class HtmlComponents {
 	 * @return 
 	 * 	Formatted HTML of the generated button
 	 */
-	private static String generateButtonBarItem(String buttonId, String title, String onClick, String imgSource)
+	private static String generateButtonBarItem(String buttonId, String minitip, String onClick, String imgSource)
 	{
-		return "<a id='"+buttonId+"' onclick='"+onClick+"' title='"+title+"'><img src='"+imgSource+"' border=0 /></a>";
+		if (minitip!=null && minitip.equals("")==false)
+			return "<a id='"+buttonId+"' onclick='"+onClick+"' minitip='"+minitip+"'><img src='"+imgSource+"' border=0 /></a>";
+		else
+			return "<a id='"+buttonId+"' onclick='"+onClick+"'><img src='"+imgSource+"' border=0 /></a>";
 	}
 
 	public static String generateManageStoreButton()
 	{
-		return generateButtonBarItem("manageStore", "Opens your storefront management page so you can setup items for sale", "viewManageStore()", "https://initium-resources.appspot.com/images/ui/manageStore.png");
+		return generateButtonBarItem("manageStore", "Manage your store", "viewManageStore()", "https://initium-resources.appspot.com/images/ui/manageStore.png");
 	}
 	
 	public static String generateToggleStorefront(CachedEntity character)
 	{
 		if("MERCHANT".equals(character.getProperty("mode")))
 		{
-			return generateButtonBarItem("toggleStorefront", "Clicking here will DISABLE your storefront so other players cannot buy your goods.", "storeDisabledNew(event)", "https://initium-resources.appspot.com/images/ui/storefrontEnabled.png");
+			return generateButtonBarItem("toggleStorefront", "Disable your store", "storeDisabledNew(event)", "https://initium-resources.appspot.com/images/ui/storefrontEnabled.png");
 		}
 		else
 		{
-			return generateButtonBarItem("toggleStorefront", "Clicking here will ENABLE your storefront so other players can buy your goods.", "storeEnabledNew(event)", "https://initium-resources.appspot.com/images/ui/storefrontDisabled.png");
+			return generateButtonBarItem("toggleStorefront", "Enable your store", "storeEnabledNew(event)", "https://initium-resources.appspot.com/images/ui/storefrontDisabled.png");
 		}
 	}
 	
@@ -331,17 +334,17 @@ public class HtmlComponents {
 	{
 		if("TRUE".equals(character.getProperty("partyJoinsAllowed")))
 		{
-			return generateButtonBarItem("togglePartyJoin", "Clicking here will DISALLOW other players from joining your party.", "togglePartyJoins(event)", "https://initium-resources.appspot.com/images/ui/partyJoinsAllowed.png");
+			return generateButtonBarItem("togglePartyJoin", "Disable party joins", "togglePartyJoins(event)", "https://initium-resources.appspot.com/images/ui/partyJoinsAllowed.png");
 		}
 		else
 		{
-			return generateButtonBarItem("togglePartyJoin", "Clicking here will ALLOW other players to join your party.", "togglePartyJoins(event)", "https://initium-resources.appspot.com/images/ui/partyJoinsDisallowed.png");
+			return generateButtonBarItem("togglePartyJoin", "Allow party joins", "togglePartyJoins(event)", "https://initium-resources.appspot.com/images/ui/partyJoinsDisallowed.png");
 		}
 	}
 	
 	public static String generateToggleDuel(CachedEntity character)
 	{
-		return generateButtonBarItem("toggleDuel", "Clicking here will ENABLE duel requests. This would allow other players to request a duel with you.", "allowDuelRequests()", "https://initium-resources.appspot.com/images/ui/duelRequestsDisallowed.png");
+		return generateButtonBarItem("toggleDuel", "Allow players to duel you", "allowDuelRequests()", "https://initium-resources.appspot.com/images/ui/duelRequestsDisallowed.png");
 		/*
 		if("TRUE".equals(character.getProperty("duelRequestsAllowed")))
 		{
@@ -358,17 +361,22 @@ public class HtmlComponents {
 	{
 		if(Boolean.TRUE.equals(character.getProperty("cloaked")))
 		{
-			return generateButtonBarItem("toggleCloak", "Clicking here will SHOW your equipment and stats to other players.", "toggleCloaked(event)", "https://initium-resources.appspot.com/images/ui/cloakedEnabled.png");
+			return generateButtonBarItem("toggleCloak", "Show your equipment/stats publicly", "toggleCloaked(event)", "https://initium-resources.appspot.com/images/ui/cloakedEnabled.png");
 		}
 		else
 		{
-			return generateButtonBarItem("toggleCloak", "Clicking here will HIDE your equipment and stats from other players.", "toggleCloaked(event)", "https://initium-resources.appspot.com/images/ui/cloakedDisabled.png");
+			return generateButtonBarItem("toggleCloak", "Hide your equipment/stats from the public", "toggleCloaked(event)", "https://initium-resources.appspot.com/images/ui/cloakedDisabled.png");
 		}
 	}
 	
 	public static String generateInventionButton()
 	{
-		return generateButtonBarItem("inventionButton", "Clicking will open the invention page.", "viewInvention(event)", "https://initium-resources.appspot.com/images/ui/invention1.png");
+		return generateButtonBarItem("inventionButton", "Open your invention page", "viewInvention(event)", "https://initium-resources.appspot.com/images/ui/invention1.png");
+	}
+	
+	public static String generateQuestButton()
+	{
+		return generateButtonBarItem("questButton", "Open your quests page", "viewQuests(event)", "https://initium-resources.appspot.com/images/ui/quest1.png");
 	}
 	
 	public static String generateButtonBar(CachedEntity character)
@@ -376,6 +384,7 @@ public class HtmlComponents {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id='buttonbar-main'>");
 		// Buttons
+		sb.append("<span>" + generateQuestButton() + "</span>");
 		sb.append("<span>" + generateInventionButton() + "</span>");
 		sb.append("<span>" + generateManageStoreButton() + "</span>");
 		sb.append("<span>" + generateToggleStorefront(character) + "</span>");

@@ -21,6 +21,7 @@ import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.Transaction;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -62,6 +63,10 @@ public class CommandTransmuteItems extends Command {
 		List<Key> materialsKeys = new ArrayList<Key>();
 		
 		for (CachedEntity material:materials) {
+			// While we're here, check if any of the mats are a custom item
+			if (CommonChecks.isItemCustom(material))
+				throw new UserErrorMessage("You cannot use custom items as materials.");
+			
 			if (GameUtils.equals(material.getProperty("quantity"), null))
 				materialsKeys.add((Key) material.getProperty("_definitionKey"));
 			else {

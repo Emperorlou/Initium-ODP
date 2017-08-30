@@ -279,5 +279,11 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
+	public boolean doIfExpressionCheck(String value1, String operator, Object value2)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 }

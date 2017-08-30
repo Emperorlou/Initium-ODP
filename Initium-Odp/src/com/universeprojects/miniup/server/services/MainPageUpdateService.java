@@ -20,7 +20,7 @@ import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.aspects.AspectFireplace;
 
-public class MainPageUpdateService extends Service
+public class MainPageUpdateService extends Service 
 {
 	final protected CachedEntity user;
 	final protected CachedEntity character;
@@ -595,7 +595,7 @@ public class MainPageUpdateService extends Service
 			}
 
 			if (CommonChecks.checkLocationIsCombatSite(location)==false)
-				newHtml.append(getHtmlForInBannerLink(70, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore()"));
+				newHtml.append(getHtmlForInBannerLink(70, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore(event)"));
 			else
 			{
 				newHtml.append(getHtmlForInBannerLink(70, 47, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Exit</span>", "window.btnLeaveAndForget.click()"));
@@ -686,8 +686,8 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<div class='main-buttonbox'>");
 		
 		
-		newHtml.append("<a id='main-explore-ignorecombatsites' class='main-button-icon' href='#' shortcut='87' onclick='doExplore(true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
-		newHtml.append("<a id='main-explore' href='#' class='main-button' shortcut='69' onclick='doExplore(false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
+		newHtml.append("<a id='main-explore-ignorecombatsites' class='main-button-icon' href='#' shortcut='87' onclick='doExplore(event, true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
+		newHtml.append("<a id='main-explore' href='#' class='main-button' shortcut='69' onclick='doExplore(event, false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
 					
 		newHtml.append("<br>");
 		

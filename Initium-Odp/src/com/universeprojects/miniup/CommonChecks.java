@@ -357,4 +357,16 @@ public abstract class CommonChecks
 	{
 		return Boolean.TRUE.equals(item.getProperty("immovable"));
 	}
+
+	public static boolean isItemCustom(CachedEntity material)
+	{
+		if (material==null) return false;
+		return GameUtils.equals("Custom", material.getProperty("forcedItemQuality"));
+	}
+
+	public static boolean checkUserIsSubscribed(CachedEntity user)
+	{
+		if (user==null) return false;
+		return GameUtils.equals(Boolean.TRUE, user.getProperty("subscribe"));
+	}
 }

@@ -653,6 +653,29 @@ public class ODPDBAccess
 		return getDB().fetchAsList(q, 1000, cursor);
 	}
 
+	public List<CachedEntity> getFilteredORList(String kind, String fieldName, Object equalToValue, String fieldName2, Object equalToValue2)
+	{
+		FilterPredicate f1 = new FilterPredicate(fieldName, FilterOperator.EQUAL, equalToValue);
+		FilterPredicate f2 = new FilterPredicate(fieldName2, FilterOperator.EQUAL, equalToValue2);
+		Filter filter = CompositeFilterOperator.or(f1, f2);
+		Query q = new Query(kind);
+		q.setFilter(filter);
+
+		return getDB().fetchAsList(q, 1000);
+	}
+
+	public List<CachedEntity> getFilteredORList(String kind, String fieldName, Object equalToValue, String fieldName2, Object equalToValue2, String fieldName3, Object equalToValue3)
+	{
+		FilterPredicate f1 = new FilterPredicate(fieldName, FilterOperator.EQUAL, equalToValue);
+		FilterPredicate f2 = new FilterPredicate(fieldName2, FilterOperator.EQUAL, equalToValue2);
+		FilterPredicate f3 = new FilterPredicate(fieldName3, FilterOperator.EQUAL, equalToValue3);
+		Filter filter = CompositeFilterOperator.or(f1, f2, f3);
+		Query q = new Query(kind);
+		q.setFilter(filter);
+
+		return getDB().fetchAsList(q, 1000);
+	}
+
 	public CachedEntity getUserById(long id)
 	{
 		try
@@ -2864,11 +2887,20 @@ public class ODPDBAccess
 		{
 			character1 = getEntity(tradeObject.getOtherCharacter(character.getKey()));
 			character2 = character;
+			
+			// Here is a special feature where we automatically make the other character ready if the traders are the same user
+			if (GameUtils.equals(character1.getProperty("userKey"), character2.getProperty("userKey")))
+				tradeObject.flagReady(ds, character1, tradeObject.isReady(ds, character));
+			
 		}
 		else if (GameUtils.equals(tradeObject.character1Key, character.getKey()))
 		{
 			character1 = character;
 			character2 = getEntity(tradeObject.getOtherCharacter(character.getKey()));
+
+			// Here is a special feature where we automatically make the other character ready if the traders are the same user
+			if (GameUtils.equals(character1.getProperty("userKey"), character2.getProperty("userKey")))
+				tradeObject.flagReady(ds, character2, tradeObject.isReady(ds, character));
 		}
 
 		if (((Key)character1.getProperty("locationKey")).getId() != ((Key)character2.getProperty("locationKey")).getId())
@@ -6598,5 +6630,29 @@ public class ODPDBAccess
         
         return newCharacter;
     }
+
+	public List<List<String>> getValueFromFieldTypeFieldFilter2DCollection(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean validateFieldFilter(CachedEntity entityWithFilterValue, String fieldFilterFieldName, CachedEntity entityToValidate)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public CachedEntity newCustomOrder(CachedEntity finalUser, CachedEntity finalCharacter, CachedEntity finalEntity, Key typeKey, String description, boolean instant) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setOrderComplete(ODPAuthenticator auth, Long orderId) throws UserErrorMessage
+	{
+		// TODO Auto-generated method stub
+		
+	}
 
 }

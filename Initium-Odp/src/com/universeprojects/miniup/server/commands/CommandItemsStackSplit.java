@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -28,6 +29,9 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 		ds.beginTransaction();
 		try {
 			CachedEntity splitItem = batchItems.get(0);
+			
+			if (CommonChecks.isItemCustom(splitItem)) 
+				throw new UserErrorMessage("You cannot split a custom item.");
 			
 			splitItem = db.getDB().refetch(splitItem);
 			

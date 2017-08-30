@@ -26,7 +26,7 @@ public class ConfirmPrototypeRequirementsBuilder extends ConfirmGenericEntityReq
 	@Override
 	protected String getPagePopupTitle()
 	{
-		return "Select the tools/materials to use";
+		return "Tools/materials to use";
 	}
 
 }

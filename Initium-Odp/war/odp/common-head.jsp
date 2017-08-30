@@ -30,9 +30,13 @@
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/sockjs.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/vertx-eventbus.js"></script>
-
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=112"></script>
+
+
+<script type="text/javascript" src="/odp/javascript/script.js?v=139"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=119">
+
+
 
 <script type="text/javascript" src="/odp/javascript/messager.js?v=27"></script>
 
@@ -44,7 +48,6 @@
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=87">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="javascript/rangeslider/rangeslider.min.js"></script>
@@ -63,6 +66,11 @@
   ga('create', 'UA-62104245-1', 'auto');
   ga('send', 'pageview');
 
+  var loc = window.parent.location.toString();
+  if (loc.indexOf("RemoteRunner.html")!=-1) {
+    document.location="about:blank";
+  }
+  
 </script>
 
 

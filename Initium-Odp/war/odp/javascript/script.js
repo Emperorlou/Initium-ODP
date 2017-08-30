@@ -26,7 +26,7 @@ $(window).ready(function(e){
 	});
 	
 	// For all inputs under the body: If a text box is selected, don't allow shortcut keys to process (prevent default)
-	$("body").on("keyup", "input", function(event){
+	$("body").on("keyup", "input,textarea", function(event){
 		event.stopPropagation();
 	});
 	
@@ -169,7 +169,7 @@ function popupPermanentOverlay(title, content, popupClassOverride)
 {
 	$("#banner-text-overlay").hide();
 	if (popupClassOverride==null)
-		popupClassOverride = "popup backdrop1c";
+		popupClassOverride = "popup backdrop1c v3-window1";
 	closeAllPopups();
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -193,7 +193,7 @@ function popupMessage(title, content, noBackground)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup backdrop1c" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><div class="paragraph">' + content + '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup backdrop1c v3-window1" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><div class="paragraph">' + content + '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
     expandpopupMessage();
     enterPopupClose();
    }
@@ -1677,7 +1677,7 @@ function pagePopup(url, closeCallback, title)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><div class='page-popup-title'><h4>"+title+"</h4></div><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><div class='page-popup-title'><h4>"+title+"</h4></div><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	
 	if (closeCallback!=null)
@@ -1942,9 +1942,16 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 	});
 }
 
+function orderInstantNameFlavorCustomization(eventObject, itemId, itemName, flavor)
+{
+	confirmPopup("Are you sure?", "Do you want to order this item customization? It will occur automatically and if you make a mistake it might take some time to get it fixed by a dev.", function(){
+		doCommand(eventObject, "CustomizationNameFlavor", {itemId:itemId, itemName:itemName, flavor:flavor});
+	});
+}
+
 function doTriggerGlobal(event, globalId, attributes, entities)
 {
-	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities)
+	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities);
 }
 
 function doTriggerLocation(event, effectId, locationId, attributes)
@@ -2394,6 +2401,113 @@ function viewExchange()
 	pagePopup("/odp/ajax_exchange", null, "Exchange");
 }
 
+function viewQuests()
+{
+	pagePopup("/odp/questlist", null, "Available Quests");
+}
+
+function viewQuest(keyString)
+{
+	createQuestWindow("<div id='quest-id-"+keyString+"'><div style='text-align:center'><img src='/javascript/images/wait.gif' border=0/></div></div>");
+	
+	$("#quest-id-"+keyString).load("/odp/quest?key="+keyString);
+}
+
+function createQuestWindow(html) 
+{
+	$(".popupBlurrable").addClass("blur");
+    window.popupsNum++;
+    window.popupsOpen++;
+    window.popupsArray[popupsNum-1] = "yes";
+    $("#popups").show();
+    currentPopups = $("#popups").html();
+	
+	
+	
+	var windowHtml = "";
+	windowHtml += 
+			"<div class='quest-window-container'>" +
+			"<div class='quest-window'>" +
+			"<div class='quest-window-internal'>";
+	
+	windowHtml+=html;
+	
+	windowHtml+=
+			"</div>";
+	
+	windowHtml+=
+			"<div class='quest-window-bottombutton-container'>"+
+            "<div class='quest-window-bottombutton' onclick='closepopupMessage(" + popupsNum +")'>"+
+            "Okay"+
+            "</div>"+
+            "</div>"+
+            
+			"</div>"+
+			"</div>";
+
+	
+	
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper">'+windowHtml+'</div></div>');
+    expandpopupMessage();
+    enterPopupClose();
+}
+
+
+
+function createWelcomeWindow() 
+{
+	$(".popupBlurrable").addClass("blur");
+    window.popupsNum++;
+    window.popupsOpen++;
+    window.popupsArray[popupsNum-1] = "yes";
+    $("#popups").show();
+    currentPopups = $("#popups").html();
+	
+	
+	
+	var windowHtml = "";
+	windowHtml += 
+			"<div class='quest-window-container'>" +
+			"<div class='quest-window'>" +
+			"<div class='quest-window-internal'>";
+	
+	windowHtml+="<h2>Welcome to Initium!</h2>" +
+			"<p>You're about to begin playing the game by following a short series of quests. This is highly recommended for new players as it is a fun and engaging way to learn " +
+			"how to play the game. If you have any questions, feel free to speak up in <b>Global</b> chat, our community can be a bit weird but they're generally very helpful!</p>" +
+			"<p>The quests page can be accessed by clicking on the following icon in the button bar: " +
+			"<br><img src='http://imgur.com/g8zcyeO.png'/><br>" +
+			"Go to the quests page to complete a quest and to review instructions for quests you haven't yet completed.</p>" +
+			"";
+	
+	windowHtml+=
+			"</div>";
+	
+	windowHtml+="" +
+			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
+			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
+			"Click here to disable sounds" +
+			"</a>";
+	
+	windowHtml+=
+			"<div class='quest-window-bottombutton-container'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +")'>"+
+            "Skip"+
+            "</div>"+
+            "<div class='quest-window-bottombutton' style='left:0px' onclick='closepopupMessage(" + popupsNum +");viewQuest(\"ag1zfnBsYXlpbml0aXVtchULEghRdWVzdERlZhiAgJD-ncrKCQw\");'>"+
+            "Okay"+
+            "</div>"+
+            "</div>"+
+            
+			"</div>"+
+			"</div>";
+
+	
+	
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper">'+windowHtml+'</div></div>');
+    expandpopupMessage();
+    enterPopupClose();
+}
+
 function viewInvention()
 {
 	pagePopup("/odp/invention", null, "Invention");
@@ -2500,7 +2614,10 @@ function playSoundsFromNotification(soundList)
 		playAudio(sounds[i], 0.3);
 }
 
-
+function restartNoobQuests()
+{
+	doCommand(event, "RestartNoobQuests");
+}
 
 
 
@@ -2644,6 +2761,7 @@ function activateWaitGif(eventObject)
 
 function doCommand(eventObject, commandName, parameters, callback, userRequestId)
 {
+	
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
 		parameters = {"v":verifyCode};
@@ -2653,7 +2771,6 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "/cmd?cmd="+commandName;
 	
-	ga('send', 'pageview', url);	
 	
 	var clickedElement = null;
 	var originalText = null;
@@ -2665,6 +2782,8 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
 		}
 	}
+	
+	ga('send', 'pageview', url);
 	
 	var selectedItems = null;
 	if (userRequestId!=null)
@@ -2890,7 +3009,6 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "/longoperation?cmd="+commandName;
 	
-	ga('send', 'pageview', url);	
 	
 	var clickedElement = null;
 	var originalText = null;
@@ -2902,6 +3020,8 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
 		}
 	}
+
+	ga('send', 'pageview', url);	
 	
 	var selectedItems = null;
 	if (userRequestId!=null && eventObject!=null)
@@ -3242,12 +3362,12 @@ function doCollectCollectable(event, collectableId, userRequestId)
 
 
 
-function doExplore(ignoreCombatSites)
+function doExplore(event, ignoreCombatSites)
 {
 	if (ignoreCombatSites == null)
 		ignoreCombatSites = false;
 	showBannerLoadingIcon();
-	longOperation(null, "Explore", {ignoreCombatSites:ignoreCombatSites}, 
+	longOperation(event, "Explore", {ignoreCombatSites:ignoreCombatSites}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
@@ -3613,7 +3733,7 @@ function confirmCancelPopup(title, content, showCancel, yesFunction, noFunction)
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
-		popupClassOverride = "popup backdrop1c";
+		popupClassOverride = "popup backdrop1c v3-window1";
 	closeAllPopups();
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -3687,7 +3807,7 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
-		popupClassOverride = "popup backdrop1c";
+		popupClassOverride = "popup backdrop1c v3-window1";
 	closeAllPopups();
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -3803,7 +3923,7 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
-		popupClassOverride = "popup backdrop1c";
+		popupClassOverride = "popup backdrop1c v3-window1";
 	closeAllPopups();
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;

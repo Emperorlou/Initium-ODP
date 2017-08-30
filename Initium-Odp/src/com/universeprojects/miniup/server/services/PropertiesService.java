@@ -33,6 +33,7 @@ public class PropertiesService extends Service {
 		ds.beginTransaction();
 		CachedEntity playerHouse = null;
 		try {
+			character.refetch(ds);
 			// Get the path from the city hall, we will create the house branching from the other end of it...
 			List<CachedEntity> paths = db.getPathsByLocation(currentLocation.getKey());
 			if (paths.isEmpty())

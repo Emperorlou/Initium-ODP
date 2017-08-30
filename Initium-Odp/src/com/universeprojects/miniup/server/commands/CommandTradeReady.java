@@ -38,6 +38,7 @@ public class CommandTradeReady extends Command {
 			throw new UserErrorMessage("Trade is already complete.");
 		
 		db.setTradeReady(ds, tradeObject, db.getCurrentCharacter(), version);
+		
     	db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
     	if (tradeObject.isComplete() == true)
     	{
