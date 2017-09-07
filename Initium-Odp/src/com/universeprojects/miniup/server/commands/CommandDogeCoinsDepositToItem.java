@@ -49,7 +49,7 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 		if(item == null)
 			throw new UserErrorMessage("Item does not exist");
 		
-		long depositAmount = tryParseId(parameters, "amount");
+		long depositAmount = Long.parseLong(parameters.get("amount").replace(",", ""));
 		if(depositAmount < 0)
 			throw new UserErrorMessage("Cannot deposit a negative amount");
 

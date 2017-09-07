@@ -69,7 +69,7 @@
 <c:if test="${inGroup == false}">
 	<div class='main-buttonbox'>
 		<a onclick='groupRequestJoin(event, ${groupId})'
-			class='main-button'>Request to join this group</a>
+			class='v3-main-button'>Request to join this group</a>
 	</div>
 </c:if>
 
@@ -100,7 +100,7 @@
 <c:if test="${inGroup == false}">
 	<div class='main-buttonbox'>
 		<a onclick='groupRequestJoin(event, ${groupId})'
-			class='main-button'>Request to join this group</a>
+			class='v3-main-button'>Request to join this group</a>
 	</div>
 </c:if>
 

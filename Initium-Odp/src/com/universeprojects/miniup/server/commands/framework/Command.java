@@ -23,6 +23,7 @@ public abstract class Command extends OperationBase
 		ReloadPagePopup
 	}
 	protected final ODPDBAccess db;
+	protected final CachedDatastoreService ds;
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
 	
@@ -36,6 +37,7 @@ public abstract class Command extends OperationBase
 		this.response = response;
 		
 		this.db = db;
+		this.ds = db.getDB();
 	}
 	
 	protected ODPDBAccess getDB()

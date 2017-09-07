@@ -257,7 +257,7 @@ return;
 			<p>Will be reworked with new combat system</p>
 			
 			<br>
-			<a href='login.jsp' class='main-button'>Login or signup
+			<a href='login.jsp' class='v3-main-button'>Login or signup
 			to play right now</a>
 			<br>
 		</div>

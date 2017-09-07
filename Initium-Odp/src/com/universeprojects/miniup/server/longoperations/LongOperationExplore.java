@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.longoperations;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,16 +47,11 @@ public class LongOperationExplore extends LongOperation {
 		setDataProperty("ignoreCombatSites", ignoreCombatSites);
 		setDataProperty("locationName", location.getProperty("name"));
 		
-//		if ((db.getCurrentCharacter().getProperty("mode")!=null && db.getCurrentCharacter().getProperty("mode").equals(GameFunctions.CHARACTER_MODE_COMBAT)) || result==PrefixCodes.EXPLORERESULT_MONSTER)
-//			WebUtils.forceRedirectClientTo("combat.jsp?pre="+result, request, response);
-//		else
-//			WebUtils.forceRedirectClientTo("main.jsp?pre="+result, request, response);
-
-		return 3;
+		return 6;
 	}
 
 	@Override
-	String doComplete() throws UserErrorMessage 
+	String doComplete() throws UserErrorMessage, ContinuationException 
 	{
 		Boolean ignoreCombatSites = (Boolean)getDataProperty("ignoreCombatSites");
 		if (ignoreCombatSites==null) ignoreCombatSites = false;
@@ -64,6 +60,18 @@ public class LongOperationExplore extends LongOperation {
 		Object oldCombatant = db.getCurrentCharacter().getProperty("combatant");
 		
 		String result = explore(db, ignoreCombatSites);
+		if (result.equals("After some exhausting searching you failed to find anything. That doesn't necessarily mean there is nothing to be found though.."))
+		{
+			Integer continuationCount = (Integer)getDataProperty("continuationCount");
+			if (continuationCount==null) continuationCount = 0;
+			continuationCount++;
+			
+			if (continuationCount<20)	// Maximum number of continuations
+			{
+				setDataProperty("continuationCount", continuationCount);
+				throw new ContinuationException(6);
+			}
+		}
 		
 		Object newLocation = db.getCurrentCharacter().getProperty("locationKey");
 		Object newCombatant = db.getCurrentCharacter().getProperty("combatant");
@@ -110,12 +118,15 @@ public class LongOperationExplore extends LongOperation {
 			
 			// First get all the things that can be discovered at the character's current location
 			List<CachedEntity> discoverablePaths_PermanentOnly = db.getPathsByLocation_PermanentOnly(locationKey);
+			Collections.shuffle(discoverablePaths_PermanentOnly);
 			
 			List<CachedEntity> discoverablePaths_CampsAndBlockades = db.getPathsByLocationAndType(locationKey, "CampSite");
 			List<CachedEntity> discoverablePaths_BlockadesOnly = db.getPathsByLocationAndType(locationKey, "BlockadeSite");
 			discoverablePaths_CampsAndBlockades.addAll(discoverablePaths_BlockadesOnly);
+			Collections.shuffle(discoverablePaths_CampsAndBlockades);
 			
 			List<CachedEntity> discoverablePaths = db.getPathsByLocation(locationKey);
+			Collections.shuffle(discoverablePaths);
 			
 			// And get all the things the character has discovered...
 			List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacter().getKey(), locationKey, true);

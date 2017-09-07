@@ -12,7 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/add-on/jplayer.playlist.min.js" integrity="sha256-UjXdMG9nbF2ZmDKNlSt8Y9WToEHCRNTZfp1g5XCiOxQ=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/add-on/jquery.jplayer.inspector.min.js" integrity="sha256-pMpIiMchFwrWYxZMq5zJkGrKGE4aKYFZVFnTnPG+EOU=" crossorigin="anonymous"></script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/skin/blue.monday/css/jplayer.blue.monday.min.css" integrity="sha256-K33UYwMg11wyxTCSX4C2k9nfMVE5yrJc6PD48+lzlOE=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/skin/pink.flag/css/jplayer.pink.flag.css" integrity="sha256-zha0/QWidlbw6pW0mFxmdJmFHWOPdTxJA62rO/zY+7E=" crossorigin="anonymous" />
 
 <script type='text/javascript'>
 $(document).ready(function(){
@@ -55,16 +55,17 @@ var myPlaylist = new jPlayerPlaylist({
 
 	@font-face {
 	    font-family: DOS;
-	    src: url(DOS.ttf);
+	    src: url(FRIZQUAD.TTF);
 	}
 	
 	
 	body
 	{
 		font-family: DOS, Monospace;
-		color:#333333;
+		color:#CCCCCC;
 		margin:0px;
-		background-color: #757161;
+		background-color: #111111;
+		background-image:url("https://initium-resources.appspot.com/images/ui3/background1.jpg");
 	}
 	
 	a
@@ -91,6 +92,7 @@ var myPlaylist = new jPlayerPlaylist({
 	{
 		margin-top:5px;
 		font-size:1.5em;
+		text-shadow: 0px 4px 5px #000;
 	}
 	.footer
 	{
@@ -168,51 +170,44 @@ var myPlaylist = new jPlayerPlaylist({
 		max-height:27px;
 	}
 	
-	.jp-video-270p
+	.v3-main-button
 	{
-		max-width:480px !important;
-		width:inherit !important;
+		border-style: solid;
+		border-width: 17px 32px 17px 31px;
+		-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+		-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+		-o-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+		border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 fill repeat stretch;
+		text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
+		max-height:56px;
+		display:inline-block;
+		margin:3px;
+		position:relative;
+		cursor:pointer;
+		color:#FFFFFF;
+		
+		box-shadow: 0px 5px 24px #000;		
+		
 	}
-	.jp-controls-holder
+	.v3-main-button:hover
 	{
-		width:inherit !important;
-		max-width:440px;
+		text-shadow: 0px 0px 20px yellow;
 	}
-	.jp-controls 
+	
+	.jp-type-playlist
 	{
-		margin-left:inherit !important;
-		max-width:134px;
-		width:inherit !important;
-		margin-top:10px !important;
+		box-shadow: 0px 5px 24px #000;
 	}
-	.jp-volume-controls
-	{
-		margin-left:inherit !important;
-		margin-top:10px;
-		left:inherit !important;
-		right:-100px;
-		margin-top:21px;
-	}
-	.jp-toggles
-	{
-		margin-top:7px !important;
-		right:0px !important;
-	}
+	
 	
 </style>
 </head>
 <body>
-<div class='footer'>
-	<div class='header1-spacer' style='position:absolute; left:0px; top:0px;'></div>
-	<div style='margin:0 auto;display:table;'>
-		<div class='header1-spacer'></div>
-		<a class='header1-button' href='https://www.playinitium.com'>Play the game</a>
-		<div class='header1-spacer'></div>
-	</div>
-	<div class='header1-spacer' style='position:absolute; right:0px; top:0px;'></div>
+<div style='margin:0 auto;display:table;'>
+	<a class='v3-main-button' href='https://www.playinitium.com'>Play the game</a>
 </div>
 <div class='header'>
-	<img src='https://initium-resources.appspot.com/images/ui/initium-logo2.png' border=0/>
+	<img src='https://initium-resources.appspot.com/images/ui3/logo3.png' border=0/>
 	<div class='subtitle'>Official Soundtrack</div>
 </div>
 <div id="jp_container_N" class="jp-video jp-video-270p center" role="application" aria-label="media player">

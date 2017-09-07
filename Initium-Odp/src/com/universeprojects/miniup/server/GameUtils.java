@@ -1394,7 +1394,7 @@ public class GameUtils
     	}
     	
     	return "<a onclick='doCombatAttack" 
-    		+ (leftHand ? "Left" : "Right") + "Hand(event)' class='main-button' shortcut='" 
+    		+ (leftHand ? "Left" : "Right") + "Hand(event)' class='v3-main-button' shortcut='" 
     		+ (leftHand ? "49" : "50") + "'><span class='shortcut-key'>(" 
     		+ (leftHand ? "1" : "2") + ")</span>" + attackText + "</a>";
     }
@@ -1603,9 +1603,9 @@ public class GameUtils
 		int hitpoints = ((Double)character.getProperty("hitpoints")).intValue();
 		int maxHitpoints = ((Double)character.getProperty("maxHitpoints")).intValue();
 		if (leftSide)
-			nameAndBars.append("<div style='display:inline-block; max-width:230px'>");
+			nameAndBars.append("<div class='character-display-box-info'>");
 		else
-			nameAndBars.append("<div style='display:inline-block; text-align:right;max-width:100px; overflow: hidden;'>");
+			nameAndBars.append("<div class='character-display-box-info' style='text-align:right;max-width:100px; overflow: hidden;'>");
 		if (isSelf)
 			nameAndBars.append("	<a class='hint' rel='#profile' style='cursor:pointer'>"+characterName+"</a>");
 		else
@@ -1658,7 +1658,7 @@ public class GameUtils
 				
 		if (isCloaked==false)
 		{
-			sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+" backdrop3d' style='background-color:none;'>");
+			sb.append("<div class='"+lowDurabilityClass+"avatar-equip-backing"+sizePrepend+" v3-window3' style='background-color:none;border-width:6px;'>");
 
 			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/ui/newui/avatar-silhouette-male1.png\")'></div>");
 			

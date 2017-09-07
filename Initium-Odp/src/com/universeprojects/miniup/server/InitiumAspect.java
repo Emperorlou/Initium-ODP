@@ -25,7 +25,10 @@ public abstract class InitiumAspect
 	 * This method is called when the aspect class is instantiated. Use this to set
 	 * default field values.
 	 */
-	protected abstract void initialize();
+	protected void initialize()
+	{
+		
+	}
 
 	public void setProperty(String fieldName, Object value)
 	{

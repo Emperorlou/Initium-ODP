@@ -142,12 +142,12 @@
         </div>
         
         <div class='main-buttonbox' style="margin-top: 20px">
-            <a onclick='tradeReadyNew(event)' class='main-button'>Accept Trade</a>
+            <a onclick='tradeReadyNew(event)' class='v3-main-button'>Accept Trade</a>
         </div>
         <br>
         <br>
         <div class='main-buttonbox'>
-            <a onclick='closePagePopup()' class='main-button'>Cancel</a>
+            <a onclick='closePagePopup()' class='v3-main-button'>Cancel</a>
         </div>
         <br>
         <div class='main-splitScreen'>

@@ -7,8 +7,8 @@
 <style>
 .setting-entry
 {
-	height: 38px;
-	font-size: 24px;
+	height: 28px;
+	font-size: 18px;
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
 	padding-top: 14px;
 	display:block;

@@ -95,7 +95,11 @@ $(window).ready(function(e){
 	// Handlers for the minitip overlays
 	$('body').on("mouseover", "[minitip]", function(event) {
 		if (!isTouchEvent) {
-			$(this).append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
+			var elem = $(this);
+			elem.append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
+			var elemPos = elem.position();
+			$(".minitip").css("top", (elemPos.bottom+10)+"px");
+			$(".minitip").css("left", elemPos.left+"px");
 		};
 	});
 	
@@ -177,7 +181,7 @@ function popupPermanentOverlay(title, content, popupClassOverride)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text">' + content + '</div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"></div></div></div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text">' + content + '</div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"></div></div></div></div>');
     expandpopupMessage();
 }
 
@@ -193,7 +197,7 @@ function popupMessage(title, content, noBackground)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="popup backdrop1c v3-window1" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><div class="paragraph">' + content + '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();"><div id="popup_' + popupsNum + '" class="popup backdrop1c v3-window1" '+noBackgroundHtml+'><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><div class="paragraph">' + content + '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><div id="popup_footer_okay_' + popupsNum + '" class="popup_message_okay" unselectable="on" onClick="closepopupMessage(' + popupsNum + ')" title="okay">Okay</div></div></div></div></div>');
     expandpopupMessage();
     enterPopupClose();
    }
@@ -784,6 +788,8 @@ function transmuteItems(eventObject, containerId)
 
 function createCampsite()
 {
+	clearMakeIntoPopup();
+	
 	var lastNameUsed = localStorage.getItem("campsiteName");
 	if (lastNameUsed==null)
 		lastNameUsed = "";
@@ -1653,6 +1659,7 @@ function decrementStackIndex()
 	currentPopupStackIndex--;
 	if (currentPopupStackIndex==0)
 	{
+		location.href = "#";
 		$("#page-popup-root").empty();
 		$(".page-popup-newui").remove();
 		$(document).unbind("keydown", popupKeydownHandler);
@@ -1667,6 +1674,8 @@ function decrementStackIndex()
 
 function pagePopup(url, closeCallback, title)
 {
+	location.href = "#buttonbar";
+	
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
 	else
@@ -2447,7 +2456,7 @@ function createQuestWindow(html)
 
 	
 	
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper">'+windowHtml+'</div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
 }
@@ -2503,7 +2512,7 @@ function createWelcomeWindow()
 
 	
 	
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper">'+windowHtml+'</div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
 }
@@ -2619,7 +2628,25 @@ function restartNoobQuests()
 	doCommand(event, "RestartNoobQuests");
 }
 
+function loadRelatedSkills(itemKey)
+{
+	doCommand(event, "RelatedSkillsUpdate", {itemKey:itemKey});
+}
 
+function makeIntoPopup(jquerySelector)
+{
+	clearMakeIntoPopup();
+	
+	window.scrollTo(0,0);
+	$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	$(jquerySelector).addClass("make-popup");
+}
+
+function clearMakeIntoPopup()
+{
+	$(".make-popup").removeClass("make-popup");
+	$(".make-popup-underlay").remove();
+}
 
 
 
@@ -3175,6 +3202,8 @@ function hideBannerLoadingIcon()
 
 function doGoto(event, pathId, attack)
 {
+	clearMakeIntoPopup();
+	
 	if (attack == null)
 		attack = false;
 	showBannerLoadingIcon();
@@ -3364,6 +3393,8 @@ function doCollectCollectable(event, collectableId, userRequestId)
 
 function doExplore(event, ignoreCombatSites)
 {
+	clearMakeIntoPopup();
+	
 	if (ignoreCombatSites == null)
 		ignoreCombatSites = false;
 	showBannerLoadingIcon();
@@ -3527,6 +3558,7 @@ function updateMinimizeBox(buttonElement, selector)
 
 function toggleMinimizeBox(event, selector)
 {
+	
 	if (isBoxMinimized(selector) == "true")
 		maximizeBox(event, selector);
 	else
@@ -3535,16 +3567,13 @@ function toggleMinimizeBox(event, selector)
 
 function minimizeBox(event, selector)
 {
-	var height = $(event.target).height();
-	$(selector).height(height+6);
-	$(selector).css("overflow", "hidden");
+	$(selector).addClass("minimized-chat");
 	localStorage.setItem("minimizeBox"+selector, "true");
 }
 
 function maximizeBox(event, selector)
 {
-	$(selector).height("auto");
-	$(selector).css("overflow", "");
+	$(selector).removeClass("minimized-chat");
 	localStorage.setItem("minimizeBox"+selector, "false");
 }
 
@@ -3741,7 +3770,7 @@ function confirmCancelPopup(title, content, showCancel, yesFunction, noFunction)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div tabindex="0" id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p><br></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option confirm_yes">Yes</a><a id="'+unique+'-no"  class="popup_confirm_option confirm_no">No</a>' + (showCancel ? '<a id="'+unique+'-cancel"  class="popup_confirm_option confirm_cancel">Cancel</a>' : '') + '</div></div></div></div>');
+    $("#popups").html(currentPopups + '<div tabindex="0" id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p><br></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option confirm_yes">Yes</a><a id="'+unique+'-no"  class="popup_confirm_option confirm_no">No</a>' + (showCancel ? '<a id="'+unique+'-cancel"  class="popup_confirm_option confirm_cancel">Cancel</a>' : '') + '</div></div></div></div>');
     expandpopupMessage();
     
     var popupRoot = $('#popupWrapperBackground_' + popupsNum).focus();
@@ -3827,8 +3856,8 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 		$("#"+displayId).text(newText);
 	};
 	var newPopup = 
-		'<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground">' +
-		'<div id="popupWrapper_' + popupsNum + '" class="popupWrapper">'+
+		'<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')">' +
+		'<div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+
 		'<div id="popup_' + popupsNum + '" class="'+popupClassOverride+'">'+
 		'<div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div>'+
 		'<div id="popup_body_' + popupsNum + '" class="popup_body">'+
@@ -3931,7 +3960,7 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p style="margin:0px">' + content + '</p><br><div style="text-align:center"><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/></div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option confirm_okay">Okay</a><a id="'+unique+'-no" class="popup_confirm_option confirm_cancel">Cancel</a></div></div></div></div>');
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p style="margin:0px">' + content + '</p><br><div style="text-align:center"><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/></div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option confirm_okay">Okay</a><a id="'+unique+'-no" class="popup_confirm_option confirm_cancel">Cancel</a></div></div></div></div>');
     //$("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="page-popup"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><p>' + content + '</p><br><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div>');
     expandpopupMessage();
     

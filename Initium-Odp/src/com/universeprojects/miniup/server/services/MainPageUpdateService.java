@@ -459,10 +459,18 @@ public class MainPageUpdateService extends Service
 	 */
 	public String updateMoney()
 	{
+		Long availableDonations = (Long)user.getProperty("totalDonations");
+		if (availableDonations==null) availableDonations = 0L;
+		Double donationsDbl = availableDonations.doubleValue()/100;
+		String donationsFormatted = GameUtils.formatNumber(donationsDbl);
+		
 		Long gold = (Long)character.getProperty("dogecoins");
 		String goldFormatted = GameUtils.formatNumber(gold);
 		
-		return updateHtmlContents("#mainGoldIndicator", goldFormatted);
+		String html = "<div class='top-section'>Gold: <span>"+goldFormatted+"</span></div>\r\n" + 
+				"<div class='top-section' style='color: #a29852;'>Credit: $"+donationsFormatted+"</span></div>\r\n";
+		
+		return updateHtmlContents("#mainMoneyIndicator", html);
 	}
 	
 	public String updateLocationName()
@@ -554,6 +562,10 @@ public class MainPageUpdateService extends Service
 		StringBuilder newHtml = new StringBuilder();
 		if (CommonChecks.checkCharacterIsInCombat(character)==false)
 		{
+			
+			newHtml.append("<a class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>");			
+			newHtml.append("<a class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img src='https://initium-resources.appspot.com/images/ui/compass1.png'></a>");			
+			
 			loadPathCache();
 			
 			for(int i = 0; i<paths.size(); i++)
@@ -595,14 +607,16 @@ public class MainPageUpdateService extends Service
 			}
 
 			if (CommonChecks.checkLocationIsCombatSite(location)==false)
-				newHtml.append(getHtmlForInBannerLink(70, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore(event)"));
+			{
+				//	newHtml.append(getHtmlForInBannerLink(50, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore(event)"));
+			}
 			else
 			{
-				newHtml.append(getHtmlForInBannerLink(70, 47, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Exit</span>", "window.btnLeaveAndForget.click()"));
+				newHtml.append(getHtmlForInBannerLink(50, 47, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Exit</span>", "window.btnLeaveAndForget.click()"));
 				String js = 
 						"<script type='text/javascript'>" +
 						"setTimeout(function(){" +
-						"window.btnLeaveAndForget = $('.main-button[shortcut=70]');" +
+						"window.btnLeaveAndForget = $('.v3-main-button[shortcut=70]');" +
 						"if (window.btnLeaveAndForget.length>0)" +
 						"{" +
 						"	$('#leaveAndForgetBannerButton').show();" +
@@ -661,82 +675,82 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder newHtml = new StringBuilder();
 
-		newHtml.append("<div class='main-splitScreen'>");
-		newHtml.append("<div id='main-merchantlist'>");
-		newHtml.append("<div class='main-button-half' onclick='loadLocationMerchants()' shortcut='83'>");
-		newHtml.append("<span class='shortcut-key'> (S)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby stores");
+		newHtml.append("<div class='main-buttonbox' style='display:block'>");
+		newHtml.append("<div class='v3-main-button-half' onclick='loadLocationMerchants()' shortcut='83'>");
+		newHtml.append("<span class='shortcut-key'> (S)</span>Nearby stores");
 		newHtml.append("</div>");
+
+		newHtml.append("<div class='v3-main-button-half' onclick='loadLocationItems()' shortcut='86'>");
+		newHtml.append("<span class='shortcut-key'> (V)</span>Nearby items");
 		newHtml.append("</div>");
-		newHtml.append("</div>");
-		newHtml.append("<div></div>");
-		newHtml.append("<div class='main-splitScreen'>");
-		newHtml.append("<div id='main-itemlist'>");
-		newHtml.append("<div class='main-button-half' onclick='loadLocationItems()' shortcut='86'>");
-		newHtml.append("<span class='shortcut-key'> (V)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby items");
-		newHtml.append("</div>");
-		newHtml.append("</div>");
-		newHtml.append("</div>");
-		newHtml.append("<div class='main-splitScreen'>");
-		newHtml.append("<div id='main-characterlist'>");
-		newHtml.append("<div class='main-button-half' onclick='loadLocationCharacters()' shortcut='66'>");
-		newHtml.append("<span class='shortcut-key'> (B)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby characters");
-		newHtml.append("</div>");
-		newHtml.append("</div>");
-		newHtml.append("</div>");
-		newHtml.append("<div class='main-buttonbox'>");
 		
+		newHtml.append("<div class='v3-main-button-half' onclick='loadLocationCharacters()' shortcut='66'>");
+		newHtml.append("<span class='shortcut-key'> (B)</span>Nearby characters");
+		newHtml.append("</div>");
 		
-		newHtml.append("<a id='main-explore-ignorecombatsites' class='main-button-icon' href='#' shortcut='87' onclick='doExplore(event, true)'><img src='https://initium-resources.appspot.com/images/ui/ignore-combat-sites.png' title='This button allows you to explore while ignoring combat sites. The shortcut key for this is W.' border=0/></a>");
-		newHtml.append("<a id='main-explore' href='#' class='main-button' shortcut='69' onclick='doExplore(event, false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
+		newHtml.append("<div class='v3-main-button-half'>");
+		newHtml.append("<span class='shortcut-key'> </span>Nearby territory");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		
+		newHtml.append("<div class='main-buttonbox v3-window3 this-location-box'>");
+		newHtml.append("<h4>This Location</h4>");
+		
+		newHtml.append("<a id='main-explore' href='#' class='v3-main-button' shortcut='69' onclick='doExplore(event, false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
+		newHtml.append("<br>");
+		newHtml.append("<a id='main-explore-ignorecombatsites' class='v3-main-button' href='#' shortcut='87' onclick='doExplore(event, true)'><span class='shortcut-key'>(W)</span>Explore (no old sites)</a>");
 					
 		newHtml.append("<br>");
 		
 		
 		if ("CampSite".equals(location.getProperty("type")))
 		{
-			newHtml.append("<a href='#' onclick='doCampDefend()' class='main-button' shortcut='68'><span class='shortcut-key'>(D)</span>Defend</a>");
+			newHtml.append("<a href='#' onclick='doCampDefend()' class='v3-main-button' shortcut='68'><span class='shortcut-key'>(D)</span>Defend</a>");
 			newHtml.append("<br>");
 		}
 
 		if ("RestSite".equals(location.getProperty("type")) || "CampSite".equals(location.getProperty("type")))
 		{
-			newHtml.append("<a href='#' class='main-button' shortcut='82' onclick='doRest()'><span class='shortcut-key'>(R)</span>Rest</a>");
+			newHtml.append("<a href='#' class='v3-main-button' shortcut='82' onclick='doRest()'><span class='shortcut-key'>(R)</span>Rest</a>");
 			newHtml.append("<br>");
 		}
 
 		if (location.getProperty("name").toString().equals("Aera Inn"))
 		{
-			newHtml.append("<a class='main-button' onclick='doDrinkBeer(event)'>Drink Beer</a>");
+			newHtml.append("<a class='v3-main-button' onclick='doDrinkBeer(event)'>Drink Beer</a>");
 			newHtml.append("<br>");
 		}
 
 		if (getGroup()!=null && location.getProperty("ownerKey")!=null && ((Key)location.getProperty("ownerKey")).getId() == user.getKey().getId())
 		{
-			newHtml.append("<a href='#' class='main-button' onclick='giveHouseToGroup()'>Give this property to your group</a>");
+			newHtml.append("<a href='#' class='v3-main-button' onclick='giveHouseToGroup()'>Give this property to your group</a>");
 			newHtml.append("<br>");
 		}
 		
 		if (db.isCharacterAbleToCreateCampsite(db.getDB(), character, location))
 		{
 			if("RestSite".equals(location.getProperty("type")))
-				newHtml.append("<a href='#' class='main-button' onclick='createCampsite()'>Create a campsite here</a>");
+				newHtml.append("<a href='#' class='v3-main-button' onclick='createCampsite()'>Create a campsite here</a>");
 			else
-				newHtml.append("<a href='#' class='main-button' shortcut='82' onclick='createCampsite()'><span class='shortcut-key'>(R)</span>Create a campsite here</a>");
+				newHtml.append("<a href='#' class='v3-main-button' shortcut='82' onclick='createCampsite()'><span class='shortcut-key'>(R)</span>Create a campsite here</a>");
 			newHtml.append("<br>");
 		}
 
 		if ("CityHall".equals(location.getProperty("type")))
 		{
-			newHtml.append("<a href='#' class='main-button' onclick='buyHouse(event)'>Buy a new house</a>");
+			newHtml.append("<a href='#' class='v3-main-button' onclick='buyHouse(event)'>Buy a new house</a>");
 			newHtml.append("<br>");
 		}
 		
 		if (user!=null && GameUtils.equals(location.getProperty("ownerKey"), user.getKey()))
 		{
-			newHtml.append("<a onclick='createMapToHouse(event)' class='main-button'>Create map to this house</a><br/>");
-			newHtml.append("<a onclick='renamePlayerHouse(event)' class='main-button'>Rename this house</a>");
+			newHtml.append("<a onclick='createMapToHouse(event)' class='v3-main-button'>Create map to this house</a><br/>");
+			newHtml.append("<a onclick='renamePlayerHouse(event)' class='v3-main-button'>Rename this house</a>");
 		}
-		
+
+		newHtml.append("</div>");
+		newHtml.append("<div class='main-buttonbox v3-window3 navigation-box'>");
+		newHtml.append("<h4>Navigation</h4>");
 
 		int shortcutStart = 49;
 		int shortcutNumber = 1;
@@ -802,42 +816,43 @@ public class MainPageUpdateService extends Service
 					if(title != null && title.length() > 0) title = "title='" + WebUtils.htmlSafe(title) + "'";
 					else title = "";
 
-					newHtml.append("<a href='#' onclick='doTriggerLocation(event, "+destLocation.getId()+", " + location.getId() + ")' class='main-button' " + title + " "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");					
+					newHtml.append("<a href='#' onclick='doTriggerLocation(event, "+destLocation.getId()+", " + location.getId() + ")' class='v3-main-button' " + title + " "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");					
 				}
 			}
 			else if ("CombatSite".equals(location.getProperty("type")) && "CombatSite".equals(destLocation.getProperty("type"))==false)
 			{
-				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='v3-main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 				newHtml.append("<br>");
-				newHtml.append("<a href='#' onclick='doLeaveAndForgetCombatSite(event, "+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
+				newHtml.append("<a href='#' onclick='doLeaveAndForgetCombatSite(event, "+path.getKey().getId()+")' class='v3-main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
 				newHtml.append("<br>");
 			}
 			else if ("CombatSite".equals(destLocation.getProperty("type"))) {
-				newHtml.append("<a class='main-forgetPath' onclick='doForgetCombatSite(event,"+destLocation.getKey().getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<a class='main-forgetPath' onclick='doForgetCombatSite(event,"+destLocation.getKey().getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='v3-main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 				forgettableCombatSites++;
 				String destLocationKeyId = String.valueOf(destLocation.getKey().getId());
 				forgettableCombatSiteList.append(destLocationKeyId+",");
 			}
 			else if ("BlockadeSite".equals(destLocation.getProperty("type")) || defensiveStructureAllowed)
-				newHtml.append("<a href='#' class='main-button-icon' onclick='doGoto(event, "+path.getKey().getId()+", true)'><img src='https://initium-resources.appspot.com/images/ui/attack1.png' title='This button allows you to travel to this location with the intent to attack any player-made defences without a confirmation' border=0/></a><a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<a href='#' class='main-button-icon' onclick='doGoto(event, "+path.getKey().getId()+", true)'><img src='https://initium-resources.appspot.com/images/ui/attack1.png' title='This button allows you to travel to this location with the intent to attack any player-made defences without a confirmation' border=0/></a><a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='v3-main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 			else if ("CollectionSite".equals(location.getProperty("type")))
 			{
 				newHtml.append("<br>");
-				newHtml.append("<a href='#' onclick='doLeaveAndForgetCombatSite(event, "+path.getKey().getId()+")' class='main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
+				newHtml.append("<a href='#' onclick='doLeaveAndForgetCombatSite(event, "+path.getKey().getId()+")' class='v3-main-button' shortcut='70' "+onclick+"><span class='shortcut-key'>(F)</span>Leave this site and forget about it</a>");
 			}
 			// If we're looking at a player-house path, but we're not actually INSIDE the player house currently
 			else if (GameUtils.equals(location.getProperty("ownerKey"), null) && "PlayerHouse".equals(path.getProperty("type")))
 			{
-				newHtml.append("<a href='#' class='main-forgetPath' onclick='deletePlayerHouse(event, "+path.getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<a href='#' class='main-forgetPath' onclick='deletePlayerHouse(event, "+path.getId()+")'>X</a><a onclick='doGoto(event, "+path.getKey().getId()+")' class='v3-main-button' "+shortcutPart+" "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 			}
 			else
-				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
-	//		newHtml.append("<a href='ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"' class='main-button' "+shortcutPart+"  "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='v3-main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+	//		newHtml.append("<a href='ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"' class='v3-main-button' "+shortcutPart+"  "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+			newHtml.append("<br>");
 
 		}
 		
 		if (location.getProperty("defenceStructure")!=null)
-			newHtml.append("<a onclick='attackStructure()' shortcut='65' class='main-button'><span class='shortcut-key'>(A)</span>Attack this structure's defenders</a>");
+			newHtml.append("<a onclick='attackStructure()' shortcut='65' class='v3-main-button'><span class='shortcut-key'>(A)</span>Attack this structure's defenders</a>");
 			
 
 		
@@ -861,7 +876,7 @@ public class MainPageUpdateService extends Service
 		List<CachedEntity> weapons = db.getEntities((Key)character.getProperty("equipmentLeftHand"), (Key)character.getProperty("equipmentRightHand"));
 		newHtml.append(GameUtils.renderWeaponCommand(weapons.get(0), true));
 		newHtml.append(GameUtils.renderWeaponCommand(weapons.get(1), false));
-		newHtml.append("<a onclick='doCombatEscape(event)' class='main-button' shortcut='51'><span class='shortcut-key'>(3)</span>Try to run away</a>");
+		newHtml.append("<a onclick='doCombatEscape(event)' class='v3-main-button' shortcut='51'><span class='shortcut-key'>(3)</span>Try to run away</a>");
 		
 		return updateHtmlContents("#main-button-list", newHtml.toString());
 	}

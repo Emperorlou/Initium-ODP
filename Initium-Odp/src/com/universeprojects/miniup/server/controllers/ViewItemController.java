@@ -65,9 +65,15 @@ public class ViewItemController extends PageController {
 		
 		if (CommonChecks.checkItemIsChippedToken(item))
 			request.setAttribute("showChippedTokenUI", true);
+
+		
+		
+		if (CommonChecks.checkItemIsAccessible(item, character))
+			request.setAttribute("showRelatedSkills", true);
 		
 		request.setAttribute("isItemOwner", GameUtils.equals(item.getProperty("containerKey"), character.getKey()));
 		request.setAttribute("item", getItemStats(db, character, item, false));
+		request.setAttribute("itemKey", KeyFactory.keyToString(item.getKey()));
 		
 		List<Map<String,Object>> comparisons = new ArrayList<Map<String,Object>>();
 		String equipSlot = (String)item.getProperty("equipSlot");

@@ -285,5 +285,11 @@ public abstract class ODPInventionService extends Service
 		return false;
 	}
 
+	public List<CachedEntity> getRelatedSkills(EntityPool pool, CachedEntity materialTool)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

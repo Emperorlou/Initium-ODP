@@ -209,7 +209,7 @@ public abstract class LongOperation extends OperationBase
 	}
 	
 	
-	public String complete() throws UserErrorMessage, UserRequestIncompleteException
+	public String complete() throws UserErrorMessage, UserRequestIncompleteException, ContinuationException
 	{
 		setDataProperty("finished", true);
 		return doComplete();
@@ -239,7 +239,7 @@ public abstract class LongOperation extends OperationBase
 	 * @return Text output that the player will see after completing this operation.
 	 * @throws UserErrorMessage
 	 */
-	abstract String doComplete() throws UserErrorMessage, UserRequestIncompleteException;
+	abstract String doComplete() throws UserErrorMessage, UserRequestIncompleteException, ContinuationException;
 	
 	
 	public Map<String, Object> getStateData()
@@ -314,6 +314,25 @@ public abstract class LongOperation extends OperationBase
 			out.close();
 			cancelLongOperations(db, db.getCurrentCharacterKey());
 			return;
+		}
+		catch(ContinuationException e)
+		{
+			if (e.reason!=null)
+				db.sendGameMessage(db.getDB(), db.getCurrentCharacter(), e.getMessage());
+				
+			Calendar endTime = new GregorianCalendar();
+			endTime.add(Calendar.SECOND, e.seconds);
+			setDataProperty("endTime", endTime.getTime());
+			
+			
+			result.put("continuation", e.seconds);
+			result.putAll(getStateData());
+//			response.setContentType("application/json");
+//			PrintWriter out = response.getWriter();
+//			result = new JSONObject();
+//			out.print(result.toJSONString());
+//			out.flush();
+//			out.close();
 		}
 		catch(UserRequestIncompleteException e)
 		{

@@ -85,9 +85,19 @@
 		</p>
 	</div>
 	</c:if>
+	<c:if test="${showRelatedSkills}">
+	<div id='related-skills' class='normal-container'>
+	</div>
+	</c:if>
+	
+	<div style='text-align:center'>
+		<a onclick='loadRelatedSkills("${itemKey}")' minitip='Show skills that you have that related to this item'><img src='https://initium-resources.appspot.com/images/ui/invention1.png'/></a>
+		<c:if test="${comparisons != null}">
+			<span id='item-comparison-link'><a onclick='$("#item-comparisons").show(); $("#item-comparison-link").hide();' minitip='Compare with existing equipment'><img src='https://initium-resources.appspot.com/images/ui/compare-equipment1.png'/></a></span>
+		</c:if>		
+	</div>
 	
 	<c:if test="${comparisons != null}">
-	<p id='item-comparison-link'><a onclick='$("#item-comparisons").show(); $("#item-comparison-link").hide();'>Compare with existing equipment</a></p>
 	<div id='item-comparisons' style='display:none;'>
 		<c:forEach items="${comparisons}" var="comparison">
 		<hr/>
