@@ -33,8 +33,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		Long amount = Long.parseLong(parameters.get("amount"));
 		Long itemId = Long.parseLong(parameters.get("itemId"));
 		
-		if (amount<0)
-			throw new UserErrorMessage("You cannot sell an item for less than 0 gold.");
+		
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
@@ -56,6 +55,11 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 			throw new UserErrorMessage("You are already selling that item. If you want to change the price, remove the existing entry first.");
 		
 		CachedEntity saleItem = db.newSaleItem(ds, character, item, amount);
+		if (amount == null || amount<0)
+		{
+			setPopupMessage("This item will not be sold but displayed in store.");
+			saleItem.setProperty("status", "Museum");
+		}
 
 		// This is a special case
 		if (CommonChecks.checkItemIsPremiumToken(item))
