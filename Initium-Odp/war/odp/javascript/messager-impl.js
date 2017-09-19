@@ -235,11 +235,6 @@ messager.checkClientSideChatCommands = function(chatMessage)
 			doCollectCharacter(null, null, characterName);
 			return true;
 		}
-		if (chatMessage.toLowerCase().startsWith("/tutorial"))
-		{
-			uiTutorial.run();
-			return true;
-		}
 	}
 	return false;
 };

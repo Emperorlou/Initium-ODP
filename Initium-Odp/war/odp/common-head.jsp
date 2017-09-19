@@ -26,15 +26,18 @@
 
 <script type="text/javascript" src="javascript/modernizr.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/sockjs.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/vertx-eventbus.js"></script>
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
+<script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=166"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=146">
+<script type="text/javascript" src="/odp/javascript/script.js?v=186"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=166">
 
 
 
@@ -45,8 +48,6 @@
 
 
 
-<script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
-<link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>

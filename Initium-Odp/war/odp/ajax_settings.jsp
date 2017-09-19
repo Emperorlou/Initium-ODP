@@ -67,6 +67,12 @@ input[type='checkbox']
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableWeather'> Disable weather effects</div>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableTravelAnimations'> Disable travel animations</div>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxUseLowResolutionMap'> Use low resolution map</div>
+		
+		<h2>Nitpicky Buggers</h2>
+		<div class='setting-entry setting-entry-slider'>Max screen width (for desktop)
+			<input type="range" id='sliderMaxScreenWidth' min='400' max='1280'>
+		</div>
+		
 	</div>
 	
 	<center><p><a onclick='fullpageRefresh()' style='font-size:24px'>Apply Changes</a></p></center>
@@ -90,13 +96,17 @@ input[type='checkbox']
 		}
 
 		var rangeIds = ["sliderMusicVolume", 
-		                   "sliderSoundEffectsVolume"];
+		                "sliderSoundEffectsVolume",
+		                "sliderMaxScreenWidth"];
+		var rangeDefaults = [100, 
+		                     100, 
+		                     1280];
 		for(var i = 0; i<rangeIds.length; i++)
 		{
 			var rangeId = rangeIds[i];
 			var currentSetting = localStorage.getItem(rangeId);
 			if (currentSetting==null)
-				currentSetting = "100";
+				currentSetting = ""+rangeDefaults[i];
 			$("#"+rangeId).prop("value", currentSetting);
 		}
 		
@@ -132,6 +142,9 @@ input[type='checkbox']
 		*/
 		$("#sliderSoundEffectsVolume").change(function(){
 			updateEnvironmentSoundEffectsVolume();
+		});
+		$("#sliderMaxScreenWidth").change(function(){
+			modifyMaxScreenWidth();
 		});
 
 	</script>

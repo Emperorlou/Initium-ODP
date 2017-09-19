@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -29,12 +31,12 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ContainerService;
-import com.universeprojects.miniup.server.services.ODPInventionService.GenericAffectorResult;
 
 
 public class GameUtils 
@@ -1449,11 +1451,15 @@ public class GameUtils
     
     public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide)
     {
-    	return renderCharacterWidget(request, db, character, selfUser, null, leftSide, true, false, false, false);
+    	return renderCharacterWidget(null, request, db, character, selfUser, null, leftSide, true, false, false, false);
     }
     
+    public static String renderCharacterWidget(EntityPool pool, HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, boolean leftSide)
+    {
+    	return renderCharacterWidget(pool, request, db, character, selfUser, null, leftSide, true, false, false, false);
+    }
     
-    public static String renderCharacterWidget(HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean showAchievements, boolean largeSize, boolean showGroup)
+    public static String renderCharacterWidget(EntityPool pool, HttpServletRequest request, ODPDBAccess db, CachedEntity character, CachedEntity selfUser, CachedEntity group, boolean leftSide, boolean showBuffs, boolean showAchievements, boolean largeSize, boolean showGroup)
     {
     	boolean isSelf = false;
     	String lowDurabilityClass = "";
@@ -1464,15 +1470,20 @@ public class GameUtils
     	boolean isCloaked = false;
     	if (GameUtils.equals(character.getProperty("cloaked"), true))
     		isCloaked = true;
+    
+    	if (pool==null) pool = new EntityPool(db.getDB());
+    	List<Key> equipmentKeys = Arrays.asList((Key)character.getProperty("equipmentHelmet"),
+						(Key)character.getProperty("equipmentChest"),
+						(Key)character.getProperty("equipmentLegs"),
+						(Key)character.getProperty("equipmentBoots"),
+						(Key)character.getProperty("equipmentGloves"),
+						(Key)character.getProperty("equipmentLeftHand"),
+						(Key)character.getProperty("equipmentRightHand"),
+						(Key)character.getProperty("equipmentShirt"));
+    	pool.addToQueue(equipmentKeys);
+    	pool.loadEntities();
     	
-    	List<CachedEntity> equipment = db.getEntity((Key)character.getProperty("equipmentHelmet"),
-    												(Key)character.getProperty("equipmentChest"),
-    												(Key)character.getProperty("equipmentLegs"),
-    												(Key)character.getProperty("equipmentBoots"),
-    												(Key)character.getProperty("equipmentGloves"),
-    												(Key)character.getProperty("equipmentLeftHand"),
-    												(Key)character.getProperty("equipmentRightHand"),
-    												(Key)character.getProperty("equipmentShirt"));
+    	List<CachedEntity> equipment = pool.get(equipmentKeys);
     	
     	boolean hasInvalidEquipment = false;
     	
@@ -1607,7 +1618,7 @@ public class GameUtils
 		else
 			nameAndBars.append("<div class='character-display-box-info' style='text-align:right;max-width:100px; overflow: hidden;'>");
 		if (isSelf)
-			nameAndBars.append("	<a class='hint' rel='#profile' style='cursor:pointer'>"+characterName+"</a>");
+			nameAndBars.append("	<a id='character-switcher' class='' onclick='viewCharacterSwitcher()' style='cursor:pointer'>"+characterName+"</a>");
 		else
 			nameAndBars.append("	<a>"+characterName+"</a>");
 		nameAndBars.append("		<div id='hitpointsBar' style='position:relative; display:block; background-color:#777777; width:100px; height:12px;text-align:left'>");
@@ -1692,7 +1703,7 @@ public class GameUtils
 		}
 		else
 		{
-			sb.append("<div class='avatar-equip-backing"+sizePrepend+" backdrop3d' style='background-color:none;'>");
+			sb.append("<div class='avatar-equip-backing"+sizePrepend+" v3-window3' style='background-color:none;'>");
 
 			sb.append("<div class='avatar-equip-cloak"+sizePrepend+"' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
 			
@@ -1701,61 +1712,6 @@ public class GameUtils
 		if (isSelf)
 			sb.append("</a>");
 		
-		if (isSelf && selfUser!=null)
-		{
-			ShardedCounterService cs = ShardedCounterService.getInstance(db.getDB());
-			Long referralViews = cs.readCounter(selfUser.getKey(), "referralViews");
-			Long referralSignups = cs.readCounter(selfUser.getKey(), "referralSignups");
-			Long referralDonations = cs.readCounter(selfUser.getKey(), "referralDonations");
-			if (referralViews==null) referralViews = 0L;
-			if (referralSignups==null) referralSignups = 0L;
-			if (referralDonations==null) referralDonations = 0L;
-			
-			sb.append("<div class='hiddenTooltip' id='profile'>");
-			sb.append("<h5 style='margin-top:0px;'>Your Referrals</h5>");
-			sb.append("<p><a href='"+determineReferralUrl(selfUser)+"' title='Share this link online and with your friends'>Your referral link (share this!)</a></p>");
-			sb.append("<div style='margin-left:10px'>");
-			sb.append("<p>Referral views: "+referralViews+"<br>");
-			sb.append("Referral signups: "+referralSignups+"<br>");
-			sb.append("Referral donations: $"+GameUtils.formatNumber(referralDonations.doubleValue()/100d, true)+"</p>");
-			sb.append("</div>");
-			sb.append("<br>");
-			sb.append("<h5 style='margin-top:0px;'>"+character.getProperty("name")+"'s Options</h5>");
-			sb.append("<p><a onclick='viewProfile()'>View "+character.getProperty("name")+"'s profile</a></p>");
-			sb.append("<p><a onclick='popupCharacterTransferService("+character.getKey().getId()+", \""+character.getProperty("name")+"\", \""+request.getAttribute("characterToTransfer")+"\")' style='cursor:pointer'>Open the Character Transfer Service</a></p>");
-			sb.append("<p><a onclick='viewAutofix()'>Help! Something's Wrong!</a></p>");
-			sb.append("<p><a onclick='logout()'>Logout</a></p>");
-			if (request.getAttribute("characterList")!=null)
-			{
-				sb.append("<h5>Switch Characters</h5>");
-				sb.append("<ul class='switch-characters-list'>");
-				
-				List<CachedEntity> characterList = (List<CachedEntity>)request.getAttribute("characterList");
-				Collections.sort(characterList, new Comparator<CachedEntity>()
-				{
-					@Override
-					public int compare(CachedEntity o1, CachedEntity o2)
-					{
-						return ((String)o1.getProperty("name")).compareTo((String)o2.getProperty("name"));
-					}
-				});
-				for(CachedEntity c:characterList)
-				{
-					if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
-						sb.append("<li><a onclick='doDeleteCharacter(event,"+c.getId()+",\""+WebUtils.htmlSafe((String)c.getProperty("name"))+"\")'>X</a> <a onclick='switchCharacter(event, "+c.getKey().getId()+")'>"+c.getProperty("name")+"</a></li>");	
-				}
-				sb.append("</ul>");
-				sb.append("<p><a href='newcharacter.jsp'>Create a new character</a></p>");
-			}
-			else
-			{
-				sb.append("<p>To enable multiple character support, <a onclick='viewProfile()'>upgrade to premium!</a></p>");
-			}
-			
-			
-			
-			sb.append("</div>");
-		}
 
 		if (leftSide)
 		{
@@ -1791,6 +1747,9 @@ public class GameUtils
 		
 		return sb.toString();
     }
+    
+    
+    
 
     public static String getItemIconToUseFor(String equipmentSlot, CachedEntity itemInSlot)
     {
@@ -1902,17 +1861,18 @@ public class GameUtils
     	if (bannerUrl==null)
     		return "";
     	StringBuilder sb = new StringBuilder();
-    	
+    
+    	sb.append("<div style='text-align:center'>");
 		sb.append("<img class='main-page-banner-image' src='https://initium-resources.appspot.com/images/banner-backing.jpg' border=0 />");
-		sb.append("<div class='main-banner-container' style='z-index:1000100'>");
-		sb.append("	<img class='main-page-banner-image' src='https://initium-resources.appspot.com/images/banner-backing.jpg' border=0 />");
-		sb.append("	<div class='main-banner'>");
-		sb.append("		<img class='main-page-banner-image' src='"+bannerUrl+"' border=0 />");
-		sb.append("		<div class='banner-shadowbox' style=\"background: url('"+bannerUrl+"') no-repeat center / contain;\">");
+//		sb.append("<div class='main-banner-container' style='z-index:1000100'>");
+//		sb.append("	<img class='main-page-banner-image' src='https://initium-resources.appspot.com/images/banner-backing.jpg' border=0 />");
+//		sb.append("	<div class='main-banner'>");
+//		sb.append("		<img class='main-page-banner-image' src='"+bannerUrl+"' border=0 />");
+//		sb.append("		<div class='banner-shadowbox' style=\"background: url('"+bannerUrl+"') no-repeat center / contain;\">");
 		if (titleText!=null)
 			sb.append("   <h1 style='text-align: center; font-size:60px'>"+titleText+"</h1>");
-		sb.append("		</div>");
-		sb.append("	</div>");
+//		sb.append("		</div>");
+//		sb.append("	</div>");
 		sb.append("</div>");
     	
 		return sb.toString();

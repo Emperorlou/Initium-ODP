@@ -875,6 +875,7 @@ function exitFullscreenChat()
 
 function loadLocationItems()
 {
+	clearMakeIntoPopup();
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
@@ -887,6 +888,7 @@ function loadLocationItems()
 
 function loadLocationCharacters()
 {
+	clearMakeIntoPopup();
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
@@ -898,6 +900,7 @@ function loadLocationCharacters()
 
 function loadLocationMerchants()
 {
+	clearMakeIntoPopup();
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
@@ -1592,11 +1595,9 @@ function giftPremium(name)
 	if (name==null) name = "";
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", name, function(characterName){
 		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
-			enforceSingleAction();
-			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=true&v="+window.verifyCode;
+			doCommand(null, "PremiumGift", {characterName:characterName, anonymous:true});
 		}, function(){
-			enforceSingleAction();
-			location.href = "/ServletUserControl?type=giftPremium&characterName="+characterName+"&anonymous=false&v="+window.verifyCode;
+			doCommand(null, "PremiumGift", {characterName:characterName, anonymous:false});
 		});
 	});
 }
@@ -1659,7 +1660,7 @@ function decrementStackIndex()
 	currentPopupStackIndex--;
 	if (currentPopupStackIndex==0)
 	{
-		location.href = "#";
+		window.scrollTo(0,0);
 		$("#page-popup-root").empty();
 		$(".page-popup-newui").remove();
 		$(document).unbind("keydown", popupKeydownHandler);
@@ -1674,7 +1675,6 @@ function decrementStackIndex()
 
 function pagePopup(url, closeCallback, title)
 {
-	location.href = "#buttonbar";
 	
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
@@ -1688,6 +1688,7 @@ function pagePopup(url, closeCallback, title)
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><div class='page-popup-title'><h4>"+title+"</h4></div><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
+	$("body").scrollTo("#buttonbar");
 	
 	if (closeCallback!=null)
 		popupStackCloseCallbackHandlers.push(closeCallback);
@@ -1744,6 +1745,7 @@ function closeAllPopupsTooltips(doNotCallback)
     closeAllPagePopups(doNotCallback);
     closeAllPopups();
     closeAllTooltips();
+    clearMakeIntoPopup();
 }
 
 
@@ -1804,38 +1806,35 @@ function loadInlineCollectables()
 
 function inventory()
 {
-    closeAllPopupsTooltips();
 	pagePopup("/odp/ajax_inventory.jsp", null, "Your Inventory");
 }
 
 function viewChangelog()
 {
-    closeAllPopupsTooltips();
 	pagePopup("/ajax_changelog.jsp", null, "Change Log");
 }
 
 function viewSettings()
 {
-    closeAllPopupsTooltips();
 	pagePopup("/odp/ajax_settings.jsp", null, "Game Settings");
 }
 
 function viewProfile()
 {
-    closeAllPopupsTooltips();
 	pagePopup("/odp/view_profile", null, "Your Profile");
 }
 
 function viewAutofix()
 {
-    closeAllPopupsTooltips();
 	pagePopup("/odp/autofix", null, "Autofix Tools");
 }
 
 function viewMap()
 {
+	exitFullscreenChat();
     closeAllPopupsTooltips();
 	openMap();
+	$("body").scrollTo("#buttonbar");
 }
 
 function viewContainer(containerId, title, closePopups)
@@ -2306,6 +2305,7 @@ function switchCharacter(eventObject, characterId)
 {
 	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function(){
 		closeAllTooltips();
+		clearMakeIntoPopup();
 	});
 }
 
@@ -2517,6 +2517,173 @@ function createWelcomeWindow()
     enterPopupClose();
 }
 
+/*
+<form action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_top'>
+<input type='hidden' name='custom' value='5299602559336448'> 
+<input type='hidden' name='cmd' value='_donations'> 
+<input type='hidden' name='business' value='narmstrong@playinitium.com'>
+<input type='hidden' name='amount' value='5.00'>
+<input type='hidden' name='currency_code' value='USD'>
+<input type='hidden' name='item_name' value='Initium Development'>
+<input type='hidden' name='tax' value='0'>
+<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'> 
+<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>
+</form>
+*/
+
+function createDonationWindow() 
+{
+	$(".popupBlurrable").addClass("blur");
+    window.popupsNum++;
+    window.popupsOpen++;
+    window.popupsArray[popupsNum-1] = "yes";
+    $("#popups").show();
+    currentPopups = $("#popups").html();
+	
+	
+	
+	var windowHtml = "";
+	windowHtml += 
+			"<div class='quest-window-container'>" +
+			"<div class='quest-window'>" +
+			"<div class='quest-window-internal'>";
+	
+	windowHtml+="<h2 style='text-align:center;'>The cost of a full account will soon increase!</h2>" +
+			"<p>Currently, while Initium is still in development, you can get a full premium account for only <b>$5.00</b> however the cost for a premium account will " +
+			"increase once the game is officially launched. Take advantage of this pre-launch price by donating at least 5 dollars.</p>" +
+			"<p>" +
+			"Premium account features include:" +
+			"<ul>" +
+			"<li>The ability to be rescued from death</li>" +
+			"<li>Multiple characters on the same account</li>" +
+			"<li>Your characters will not forget their houses when they die</li>" +
+			"</ul>" +
+			"</p>" +
+			"<p>Getting a premium account now will ensure your account will be grandfathered in when the price structure changes!</p>" +
+			"<p>" +
+			"<center>" +
+			"<form id='donatequick' action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank' onsubmit='setTimeout(function(){closepopupMessage(" + popupsNum +"); createWelcomeWindow();}, 1000)'>" +
+			"<input type='hidden' name='custom' value='5299602559336448'> " +
+			"<input type='hidden' name='cmd' value='_donations'> " +
+			"<input type='hidden' name='business' value='narmstrong@playinitium.com'>" +
+			"<input type='hidden' name='amount' value='5.00'>" +
+			"<input type='hidden' name='currency_code' value='USD'>" +
+			"<input type='hidden' name='item_name' value='Initium Development'>" +
+			"<input type='hidden' name='tax' value='0'>" +
+			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!'>" + 
+			"<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>" +
+			"</form>" +
+			"</center>" +
+			"</p>";
+	
+	windowHtml+=
+			"</div>";
+	
+	windowHtml+="" +
+			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
+			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
+			"Click here to disable sounds" +
+			"</a>";
+	
+	windowHtml+=
+			"<div class='quest-window-bottombutton-container'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
+            "Skip"+
+            "</div>"+
+            "<div class='quest-window-bottombutton' style='left:0px' onclick='$(\"#donatequick\").submit(); closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
+            "Okay"+
+            "</div>"+
+            "</div>"+
+            
+			"</div>"+
+			"</div>";
+
+	
+	
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
+    expandpopupMessage();
+    enterPopupClose();
+}
+
+
+function createUpgradeToPremiumWindow() 
+{
+	$(".popupBlurrable").addClass("blur");
+    window.popupsNum++;
+    window.popupsOpen++;
+    window.popupsArray[popupsNum-1] = "yes";
+    $("#popups").show();
+    currentPopups = $("#popups").html();
+	
+	
+	
+	var windowHtml = "";
+	windowHtml += 
+			"<div class='quest-window-container'>" +
+			"<div class='quest-window'>" +
+			"<div class='quest-window-internal'>";
+	
+	windowHtml+="<h4>Upgrade to premium for $5.00</h4>" +
+			"<p><b>The cost of a full account will soon increase!</b></p>" +
+			"<p>Currently, while Initium is still in development, you can get a full premium account for only <b>$5.00</b> however the cost for a premium account will " +
+			"increase once the game is officially launched. Take advantage of this pre-launch price by donating at least 5 dollars.</p>" +
+			"<p>" +
+			"Premium account features include:" +
+			"<ul>" +
+			"<li>The ability to be rescued from death</li>" +
+			"<li>Multiple characters on the same account</li>" +
+			"<li>Your characters will not forget their houses when they die</li>" +
+			"</ul>" +
+			"</p>" +
+			"<p>Getting a premium account now will ensure your account will be grandfathered in when the price structure changes!</p>" +
+			"<p>" +
+			"<center>" +
+			"<form id='donatequick' action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank' onsubmit='setTimeout(function(){closepopupMessage(" + popupsNum +"); }, 1000)'>" +
+			"<input type='hidden' name='custom' value='5299602559336448'> " +
+			"<input type='hidden' name='cmd' value='_donations'> " +
+			"<input type='hidden' name='business' value='narmstrong@playinitium.com'>" +
+			"<input type='hidden' name='amount' value='5.00'>" +
+			"<input type='hidden' name='currency_code' value='USD'>" +
+			"<input type='hidden' name='item_name' value='Initium Development'>" +
+			"<input type='hidden' name='tax' value='0'>" +
+			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!'>" + 
+			"<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>" +
+			"</form>" +
+			"</center>" +
+			"</p>";
+	
+	windowHtml+=
+			"</div>";
+	
+	windowHtml+="" +
+			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
+			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
+			"Click here to disable sounds" +
+			"</a>";
+	
+	windowHtml+=
+			"<div class='quest-window-bottombutton-container'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +"); '>"+
+            "Skip"+
+            "</div>"+
+            "<div class='quest-window-bottombutton' style='left:0px' onclick='$(\"#donatequick\").submit(); closepopupMessage(" + popupsNum +"); '>"+
+            "Okay"+
+            "</div>"+
+            "</div>"+
+            
+			"</div>"+
+			"</div>";
+
+	
+	
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
+    expandpopupMessage();
+    enterPopupClose();
+}
+
+
+
+
 function viewInvention()
 {
 	pagePopup("/odp/invention", null, "Invention");
@@ -2639,20 +2806,58 @@ function makeIntoPopup(jquerySelector)
 	
 	window.scrollTo(0,0);
 	$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
-	$(jquerySelector).addClass("make-popup");
+	$(jquerySelector).addClass("make-popup").prepend("<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>");
 }
 
 function clearMakeIntoPopup()
 {
 	$(".make-popup").removeClass("make-popup");
 	$(".make-popup-underlay").remove();
+	$(".make-popup-X").remove();
+	$(".make-popup-removable").remove();
 }
 
+function viewCharacterSwitcher()
+{
+	$("body").append("" +
+			"<div id='characterswitcher-container' class='main-buttonbox v3-window3 make-popup make-popup-removable'>" +
+			"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+			"	<h4>Switch Characters</h4>" +
+			"	<div id='characterswitcher'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>" +
+			"</div>" +
+			"<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	$("#characterswitcher").load("/odp/characterswitcher");
+}
 
+function createNewCharacter(event)
+{
+	clearMakeIntoPopup();
+	
+	promptPopup("New Character", "Give your new character a name:", "", function(name){
+		doCommand(event, "NewCharacter", {name:name}, function(){
+			clearMakeIntoPopup();
+			$("#characterswitcher-container").remove();
+		});
+	});
+}
 
-
-
-
+function toggleMainPullout()
+{
+	var mainPullout = $("#main-pullout");
+	
+	if ($("#main-pullout:visible").length>0)
+	{
+		// It's visible, make it invisible
+		mainPullout.hide();
+		$(".hiddenPullout-underlay").remove();
+	}
+	else
+	{
+		// It's NOT visible, make it visible
+		mainPullout.before("<div class='hiddenPullout-underlay' onclick='toggleMainPullout()'></div>");
+		mainPullout.show();
+	}
+}
 
 
 
@@ -3157,7 +3362,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		lastLongOperationEventObject = null;
 	});
 	
-	if (eventObject!=null)
+	if (eventObject!=null && eventObject.stopPropagation)
 		eventObject.stopPropagation();
 }
 
@@ -4108,6 +4313,13 @@ function getMusicVolume()
 {
 	var setting = localStorage.getItem("sliderMusicVolume");
 	if (setting==null) return 100;
+	return parseInt(setting);
+}
+
+function getMaxScreenWidth()
+{
+	var setting = localStorage.getItem("sliderMaxScreenWidth");
+	if (setting==null) return 1280;
 	return parseInt(setting);
 }
 

@@ -82,7 +82,7 @@ public class GuardSetting extends InitiumEntityBase
 
 	public Set<GuardType> getSettings()
 	{
-		String raw = (String)entity.getProperty("exclude");
+		String raw = (String)entity.getProperty("settings");
 		if (raw==null) return new HashSet<>();
 		String[] rawValues = raw.split(",");
 		

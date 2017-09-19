@@ -706,8 +706,9 @@ public class ODPDBAccess
 	public CachedEntity getUserByCharacterName(String characterName)
 	{
 		CachedEntity character = getCharacterByName(characterName);
-		Query q = new Query("User").setFilter(new FilterPredicate("characterKey", FilterOperator.EQUAL, character.getKey()));
-		return getDB().fetchSingleEntity(q);
+		if (character==null) return null;
+		Key userKey = (Key)character.getProperty("userKey");
+		return getEntity(userKey);
 	}
 
 	public CachedEntity getUserByCharacterKey(Key characterKey)
@@ -4642,6 +4643,10 @@ public class ODPDBAccess
 			{
 				loot+="<div class='highlightbox-red'>You are overburdened so the following loot has been dropped at your feet where other players could potentially take it.</div>";
 				overburdened=true;
+				
+				// If a player was the one that lived and he is overburdened, then send him a game message to that effect
+				if (GameUtils.equals(getCurrentCharacter(), attackingCharacter))
+					sendGameMessage(db, attackingCharacter, "You are overburdened! Some loot is on the floor where your enemy has fallen.");
 			}
 		}
 		
@@ -6654,5 +6659,6 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }

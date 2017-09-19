@@ -43,6 +43,7 @@ public class NPCArmyService extends Service
 
 	public long getPropagationCount()
 	{
+		if (npcArmy.getProperty("propagationCount")==null) return 0L;
 		return (Long)npcArmy.getProperty("propagationCount");
 	}
 
@@ -53,6 +54,7 @@ public class NPCArmyService extends Service
 
 	public double getSpawnsPerTick()
 	{
+		if (npcArmy.getProperty("spawnsPerTick")==null) return 0L;
 		return (Double)npcArmy.getProperty("spawnsPerTick");
 	}
 
@@ -103,6 +105,7 @@ public class NPCArmyService extends Service
 
 	public long getMaxSpawnCount()
 	{
+		if (npcArmy.getProperty("maxSpawnCount")==null) return 0L;
 		return (Long)npcArmy.getProperty("maxSpawnCount");
 	}
 	
@@ -135,7 +138,7 @@ public class NPCArmyService extends Service
 				"_definitionKey", getNpcDefKey());
 		
 		for(int i = npcs.size()-1; i>=0; i--)
-			if ((Double)npcs.get(i).getProperty("hitpoints")<1d)
+			if (npcs.get(i)==null || npcs.get(i).getProperty("hitpoints")==null || (Double)npcs.get(i).getProperty("hitpoints")<1d)
 				npcs.remove(i);
 		
 		return npcs;

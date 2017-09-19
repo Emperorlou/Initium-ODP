@@ -66,6 +66,9 @@ public class LongOperationExplore extends LongOperation {
 			if (continuationCount==null) continuationCount = 0;
 			continuationCount++;
 			
+			if (continuationCount==1)
+				db.sendGameMessage(ds, db.getCurrentCharacter(), "You're still searching. You will continue to explore until you find something interesting (up to 2 minutes).");
+			
 			if (continuationCount<20)	// Maximum number of continuations
 			{
 				setDataProperty("continuationCount", continuationCount);

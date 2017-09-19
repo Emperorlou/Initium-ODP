@@ -459,7 +459,10 @@ public class MainPageUpdateService extends Service
 	 */
 	public String updateMoney()
 	{
-		Long availableDonations = (Long)user.getProperty("totalDonations");
+		
+		Long availableDonations = null;
+		if (user!=null)
+			availableDonations = (Long)user.getProperty("totalDonations");
 		if (availableDonations==null) availableDonations = 0L;
 		Double donationsDbl = availableDonations.doubleValue()/100;
 		String donationsFormatted = GameUtils.formatNumber(donationsDbl);
@@ -484,11 +487,11 @@ public class MainPageUpdateService extends Service
 	 */
 	public String updateInBannerCharacterWidget()
 	{
-		if(user != null && Boolean.TRUE.equals(user.getProperty("premium")) && db.getRequest().getAttribute("characterList") == null)
-		{
-			List<CachedEntity> characterList = db.getFilteredList("Character", "userKey", user.getKey());
-			db.getRequest().setAttribute("characterList", characterList);  
-		}
+//		if(user != null && Boolean.TRUE.equals(user.getProperty("premium")) && db.getRequest().getAttribute("characterList") == null)
+//		{
+//			List<CachedEntity> characterList = db.getFilteredList("Character", "userKey", user.getKey());
+//			db.getRequest().setAttribute("characterList", characterList);  
+//		}
 		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, character, user, true);
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
@@ -563,8 +566,8 @@ public class MainPageUpdateService extends Service
 		if (CommonChecks.checkCharacterIsInCombat(character)==false)
 		{
 			
-			newHtml.append("<a class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>");			
-			newHtml.append("<a class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img src='https://initium-resources.appspot.com/images/ui/compass1.png'></a>");			
+			newHtml.append("<a id='thisLocation-button' class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>");			
+			newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img src='https://initium-resources.appspot.com/images/ui/compass1.png'></a>");			
 			
 			loadPathCache();
 			
@@ -675,23 +678,8 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder newHtml = new StringBuilder();
 
-		newHtml.append("<div class='main-buttonbox' style='display:block'>");
-		newHtml.append("<div class='v3-main-button-half' onclick='loadLocationMerchants()' shortcut='83'>");
-		newHtml.append("<span class='shortcut-key'> (S)</span>Nearby stores");
-		newHtml.append("</div>");
-
-		newHtml.append("<div class='v3-main-button-half' onclick='loadLocationItems()' shortcut='86'>");
-		newHtml.append("<span class='shortcut-key'> (V)</span>Nearby items");
-		newHtml.append("</div>");
-		
-		newHtml.append("<div class='v3-main-button-half' onclick='loadLocationCharacters()' shortcut='66'>");
-		newHtml.append("<span class='shortcut-key'> (B)</span>Nearby characters");
-		newHtml.append("</div>");
-		
-		newHtml.append("<div class='v3-main-button-half'>");
-		newHtml.append("<span class='shortcut-key'> </span>Nearby territory");
-		newHtml.append("</div>");
-		newHtml.append("</div>");
+//		newHtml.append("<div class='main-buttonbox' style='display:block'>");
+//		newHtml.append("</div>");
 		
 		newHtml.append("<div class='main-buttonbox v3-window3 this-location-box'>");
 		newHtml.append("<h4>This Location</h4>");
@@ -699,6 +687,24 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<a id='main-explore' href='#' class='v3-main-button' shortcut='69' onclick='doExplore(event, false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
 		newHtml.append("<br>");
 		newHtml.append("<a id='main-explore-ignorecombatsites' class='v3-main-button' href='#' shortcut='87' onclick='doExplore(event, true)'><span class='shortcut-key'>(W)</span>Explore (no old sites)</a>");
+		
+		newHtml.append("<br>");
+		newHtml.append("<div id='main-merchantlist' class='v3-main-button-half' onclick='loadLocationMerchants()' shortcut='83'>");
+		newHtml.append("<span class='shortcut-key'> (S)</span>Nearby stores");
+		newHtml.append("</div>");
+
+		newHtml.append("<div id='main-itemlist' class='v3-main-button-half' onclick='loadLocationItems()' shortcut='86'>");
+		newHtml.append("<span class='shortcut-key'> (V)</span>Nearby items");
+		newHtml.append("</div>");
+		
+		newHtml.append("<br>");
+		newHtml.append("<div id='main-characterlist' class='v3-main-button-half' onclick='loadLocationCharacters()' shortcut='66'>");
+		newHtml.append("<span class='shortcut-key'> (B)</span>Nearby characters");
+		newHtml.append("</div>");
+		
+		newHtml.append("<div class='v3-main-button-half'>");
+		newHtml.append("<span class='shortcut-key'> </span>Nearby territory");
+		newHtml.append("</div>");
 					
 		newHtml.append("<br>");
 		
@@ -1058,7 +1064,7 @@ public class MainPageUpdateService extends Service
 					newHtml.append("<a class='main-item clue' style='width:inherit;' rel='viewcharactermini.jsp?characterId="+partyCharacter.getKey().getId()+"'>");
 					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true));
 					newHtml.append("<br>");
-					if (!GameUtils.equals(character.getKey(), partyCharacter.getKey()) &&
+					if (!GameUtils.equals(character.getKey(), partyCharacter.getKey()) && user!=null && 
 							GameUtils.equals(user.getKey(), partyUser.getKey())) {
 						newHtml.append("<div class='main-item-controls' style='top:0px'>");
 						newHtml.append("<a onclick='switchCharacter(event, "+partyCharacter.getKey().getId()+")'>Switch</a>");

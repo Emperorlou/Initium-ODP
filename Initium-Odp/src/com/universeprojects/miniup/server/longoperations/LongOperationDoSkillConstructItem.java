@@ -135,7 +135,6 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 	@Override
 	String doComplete() throws UserErrorMessage, UserRequestIncompleteException
 	{
-		
 		@SuppressWarnings("unchecked")
 		Map<Key, List<Key>> itemRequirementsToItems = (Map<Key, List<Key>>)getDataProperty("selectedItems");
 		Integer repetitionCount = (Integer)getDataProperty("repetitionCount");
@@ -196,6 +195,7 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		}
 		
 		return "Skill complete. "+msg;
+		
 	}
 
 	@Override

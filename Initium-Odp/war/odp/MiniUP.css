@@ -459,16 +459,15 @@ hr:after {
 	background-color:#222222;
 	padding:14px;	
 	font-size:16px;
-	margin:-11px;
 }
 
 .mini-window-header-split
 {
-	width: 165px;
+	vertical-align:top;
+	width: 142px;
 	margin: 0px;
 	padding: 0px;
 	display:inline-block;
-	display:table-cell;
 }
 
 
@@ -922,18 +921,21 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 fill repeat;
 }
 
+.boldbox-green:before
+{
+	content:' ';
+	position:absolute;
+	top:0px;
+	bottom:0px;
+	left:0px;
+	right:0px;
+	background-color:rgba(0,255,0,0.2);
+	margin:-10px
+}
 .boldbox-green
 {
-	background: #2c862e; /* Old browsers */
-	background: -moz-linear-gradient(top,  #2c862e 0%, #1d651e 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2c862e), color-stop(100%,#1d651e)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #2c862e 0%,#1d651e 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #2c862e 0%,#1d651e 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #2c862e 0%,#1d651e 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #2c862e 0%,#1d651e 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2c862e', endColorstr='#1d651e',GradientType=0 ); /* IE6-9 */
+	position:relative;
 }
-
 
 .boldbox h4
 {
@@ -965,13 +967,31 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 }
 .make-popup
 {
-    max-width: 300px;
+    max-width: 600px;
     width:300px;
     z-index: 10000000;
 	position: absolute;
 	top: 5%;
-	left: 50%;
+	left: 44.6%;
 	margin-left:-143px !important;
+}
+
+.make-popup-X
+{
+	position: absolute;
+    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    color: #e2b766;
+    width: 57px;
+    height: 46px;
+    text-align: center;
+    padding-top: 13px;
+    padding-left: 1px;
+    z-index: 1100001;
+    font-family: dos;
+    font-size: 26px;
+    top: -22px;
+    right: -18px;
+    transform: scale(0.7);
 }
 
 .main-buttonbox
@@ -987,6 +1007,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
     background-color: #292929;
     padding: 6px;
     margin-bottom: 5px;
+    text-align:center;
 }
 
 
@@ -1259,7 +1280,7 @@ hr.items-separator {
     bottom:0px;
     left:0px;
     right:0px;
-    z-index: 1500000;
+    z-index: 15000000;
 	background-color: initial;
 }
 .popupWrapper 
@@ -1682,6 +1703,7 @@ a.range-increment {
     -webkit-border-radius: 6px;
     -moz-border-radius: 6px;
     border-radius: 6px;
+    
 	
 }
 .avatar-equip-cloak-64px
@@ -1832,6 +1854,7 @@ a.range-increment {
 	vertical-align:top;
 	margin-left:5px;
 	margin-right:5px;
+	border-width: 6px!important;
 }
 
 .character-display-box 
@@ -1841,6 +1864,22 @@ a.range-increment {
 	z-index:1000;
 	display:inline-block;
 	image-rendering: auto;
+}
+.character-display-box-overlay
+{
+	position:absolute;
+	top:0px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	margin-right:20px;
+}
+.character-display-box-overlay:hover
+{
+    border: 3px solid #00FF00;
+    border-radius: 8px;
+    background-color: rgba(0,255,0,0.2);
+    filter:opacity(0.3);
 }
 .character-display-box-info
 {
@@ -1983,6 +2022,35 @@ a.range-increment {
 {
 	font-size:16px;
 	color:#00FF00;
+}
+
+.hiddenPullout
+{
+	display:none;
+	max-width:75%;
+	position: fixed;
+    background-color: #111111;
+    top: 0px;
+    bottom: 0px;
+    z-index: 10000000;
+    padding: 10px;
+    	
+}
+
+.hiddenPullout-underlay
+{
+	position:fixed;
+	top:0px;
+	bottom:0px;
+	left:0px;
+	right:0px;
+	background-color:rgba(0,0,0,0.75);
+	z-index: 9999999;
+}
+
+.hiddenPullout-content
+{
+    z-index: 10000000;	
 }
 
 
@@ -3031,6 +3099,14 @@ position: absolute;
 		font-size:11px;
 		width: 35%;
 	}
+	
+	
+	.make-popup
+	{
+	    max-width: 300px;
+	    width: 300px;
+	}
+
 
 }
 @media (max-width:480px)
@@ -3138,9 +3214,10 @@ position: absolute;
     
     .quest-window
     {
-		width:123px;
-	    margin-left: -160px;
+		width: 123px !important;
+	    margin-left: -160px !important;
 	}
+	
 }
 
 

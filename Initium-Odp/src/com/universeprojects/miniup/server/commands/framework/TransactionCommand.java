@@ -14,7 +14,8 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 
 public abstract class TransactionCommand extends Command
 {
-
+	
+	
 	public TransactionCommand(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
 		super(db, request, response);
@@ -53,11 +54,17 @@ public abstract class TransactionCommand extends Command
 		runAfterTransaction(parameters);
 	}
 	
-	public abstract void runBeforeTransaction(Map<String, String> parameters) throws UserErrorMessage;
+	public void runBeforeTransaction(Map<String, String> parameters) throws UserErrorMessage
+	{
+		
+	}
 
 	public abstract void runInsideTransaction(Map<String, String> parameters) throws UserErrorMessage;
 
-	public abstract void runAfterTransaction(Map<String, String> parameters) throws UserErrorMessage;
+	public void runAfterTransaction(Map<String, String> parameters) throws UserErrorMessage
+	{
+		
+	}
 	
 	protected void refetch(CachedEntity entity)
 	{

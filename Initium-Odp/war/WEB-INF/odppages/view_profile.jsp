@@ -44,7 +44,11 @@
 <h4>Account options</h4>
 <p>
 	<a onclick='changeEmailAddress("${userEmail}")'>Change your account's email address</a>
-	<br>
+</p>
+<p>
+	<a href='resetpassword.jsp'>Reset password</a>
+</p>
+<p>
 	<a onclick='toggleHideUserActivity(event)' id="toggleHideUserActivity">
 		<c:if test="${hideUserActivity!=true}">
 			Click here to hide your online status from your friends.

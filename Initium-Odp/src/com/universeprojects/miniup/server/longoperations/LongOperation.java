@@ -212,7 +212,19 @@ public abstract class LongOperation extends OperationBase
 	public String complete() throws UserErrorMessage, UserRequestIncompleteException, ContinuationException
 	{
 		setDataProperty("finished", true);
-		return doComplete();
+		try
+		{
+			return doComplete();
+		}
+		catch(UserErrorMessage | UserRequestIncompleteException | ContinuationException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			cancelLongOperations(db, db.getCurrentCharacterKey());
+			throw e;
+		}
 	}
 	
 	

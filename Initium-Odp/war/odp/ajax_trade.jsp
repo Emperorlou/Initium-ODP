@@ -1,7 +1,7 @@
+<%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <%@page import="com.universeprojects.miniup.server.HtmlComponents"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
-<%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <%@page import="com.universeprojects.cacheddatastore.CachedDatastoreService"%>
 <%@page import="com.universeprojects.miniup.server.WebUtils"%>
 <%@page import="com.universeprojects.miniup.server.TradeObject"%>
@@ -62,6 +62,7 @@
     CachedEntity otherCharacter = db.getEntity(tradeObject.getOtherCharacter(character.getKey()));
     request.setAttribute("otherCharacterName", otherCharacter.getProperty("name"));
     
+    request.setAttribute("isSelfReady", tradeObject.isReady(ds, character));
     if (tradeObject.isReady(ds, character))
         request.setAttribute("characterTradeWindowClass", "boldbox boldbox-green");
     else
@@ -114,7 +115,16 @@
         
         
         
-        <div class="trade-boxes" style="margin-top: 30px;">
+        <div class='main-buttonbox' style="margin:0px; margin-top: 10px; width:100%; text-align:center;">
+        	<c:if test="${isSelfReady==true}">
+	            <a onclick='tradeReadyNew(event)' class='v3-main-button-half'>Unready Trade</a>
+        	</c:if>
+        	<c:if test="${isSelfReady==false}">
+            	<a onclick='tradeReadyNew(event)' class='v3-main-button-half'>Accept Trade</a>
+            </c:if>
+            <a onclick='closePagePopup()' class='v3-main-button-half'>Close Trade</a>
+        </div>
+        <div class="trade-boxes">
         <div class='main-splitScreen'>
         <div class='${characterTradeWindowClass}'><h4>Your offer</h4>
         <h4><a onclick='tradeSetGoldNew(event,<%=+tradeObject.getDogecoinsFor(character.getKey())%>, "<%=GameUtils.formatNumber(character.getProperty("dogecoins"))%>")'>Gold: <span id='myTradeGoldAmount'><%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(character.getKey())) %></span></a></h4>
@@ -129,7 +139,7 @@
         </div>
         </div>
         <div class='main-splitScreen'> 
-        <div class='${otherCharacterTradeWindowClass}'><h4><c:out value="${otherCharacterName}"/>'s offer</h4>
+        <div class='${otherCharacterTradeWindowClass}'><h4><c:out value="${otherCharacterName}"/>"s offer</h4>
         <h4>Gold: <%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(otherCharacter.getKey())) %></h4>
         <%
             for(CachedEntity item:tradeObject.getItemsFor(otherCharacter.getKey()))
@@ -141,15 +151,6 @@
         </div>
         </div>
         
-        <div class='main-buttonbox' style="margin-top: 20px">
-            <a onclick='tradeReadyNew(event)' class='v3-main-button'>Accept Trade</a>
-        </div>
-        <br>
-        <br>
-        <div class='main-buttonbox'>
-            <a onclick='closePagePopup()' class='v3-main-button'>Cancel</a>
-        </div>
-        <br>
         <div class='main-splitScreen'>
         <span class="paragraph boldbox-right-link"><a onclick="tradeAddAllItemsNew()" title="This will put the whole inventory into the trade window.">Trade All</a></span>
         <div class='boldbox selection-root'>

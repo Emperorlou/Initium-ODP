@@ -366,7 +366,7 @@
 			
 			if (otherSide.getKey().getKind().equals("Item") && cs.containsEquippable(otherSide, otherSideList))
 			{
-				out.println("<div class='main-item-controls' style='display:block;text-align:right'>");
+				out.println("<div class='main-item-controls' style='display:block;text-align:right; float:right;margin-top:10px;'>");
 				out.println("<a onclick='characterEquipSet(event, "+otherSide.getKey().getId()+")' title='If you have equipment in this container, this command will automatically unequip everything you have and put it in the container, and then equip your character with the most recently placed equipment in this box.'>Quick auto-equip</a>");
 				out.println("</div>");
 			}
