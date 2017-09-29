@@ -152,6 +152,7 @@ public class MainPageUpdateService extends Service
 		if (paths==null)
 		{
 			discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), location.getKey(), showHidden);
+//			discoveries = new ArrayList<>(); // <-- when debugging locally
 			
 			// Order discoveries by createdDate of discovery entity
 			Collections.sort(discoveries, new Comparator<CachedEntity>()

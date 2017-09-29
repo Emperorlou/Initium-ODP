@@ -307,7 +307,7 @@ function popupPermanentOverlay_Experiment(title, text)
 	$("#banner-text-overlay").hide();
 	if (window.previousBannerUrl!=bannerUrl)
 		window.previousBannerUrl = bannerUrl;
-	setBannerImage("http://initium-resources.appspot.com/images/animated/invention1.gif");
+	setBannerImage("https://initium-resources.appspot.com/images/animated/invention1.gif");
 	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 
 	$("#banner-base").html(content);
@@ -3284,6 +3284,16 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			messager.getMessages(true);
 		}
 		
+		if (data.cancelled)
+		{
+			clearPopupPermanentOverlay();
+			if (lastLongOperationTimer!=null)
+			{
+				clearTimeout(lastLongOperationTimer);
+				lastLongOperationTimer = null;
+			}
+		}
+		
 		if (data.error!=undefined)
 		{
 			hideBannerLoadingIcon();
@@ -3298,6 +3308,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		if (data.silentError==true)
 		{
 			hideBannerLoadingIcon();
+			clearPopupPermanentOverlay();
 			return;
 		}
 		
@@ -3351,6 +3362,8 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		lastLongOperationEventObject = null;
 	})
 	.fail(function(xhr, textStatus, errorThrown){
+		hideBannerLoadingIcon();
+		clearPopupPermanentOverlay();
 		if (errorThrown=="Internal Server Error")
 			popupMessage(errorThrown, "There was an error when trying to perform the action. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
 		else

@@ -8,6 +8,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +28,6 @@ import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.CaptchaService;
-import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 
@@ -119,7 +120,7 @@ public abstract class LongOperation extends OperationBase
 	public static String getLongOperationRecall(ODPDBAccess db, Key characterKey) throws ServletException, IOException
 	{
 		Map<String,Object> data = getLongOperationData(db, characterKey);
-		
+			
 		if (data==null) return null;
 		
 		String js = (String)data.get("pageRefreshJavascriptCall");
@@ -151,7 +152,22 @@ public abstract class LongOperation extends OperationBase
 		else
 			longOperationDataEntity.setProperty("data", DBUtils.serializeObjectToString(data));
 		
+		Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING, "Putting long operation: "+longOperationDataEntity.getKey());
 		db.getDB().put(longOperationDataEntity);
+	}
+	
+	public void cancelLongOperation(ODPDBAccess db, Key characterKey)
+	{
+		if (longOperationDataEntity==null) return;
+		Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING, "Cancelling long operation: "+longOperationDataEntity.getKey());
+		longOperationDataEntity.setProperty("data", null);
+		
+		setDataProperty("cancelled", true);
+		
+		db.getDB().delete(longOperationDataEntity);
+		if (db.getDB().isBulkWriteModeOn())
+			db.getDB().commitBulkWrite();
+		longOperationDataEntity = null;
 	}
 	
 	public static void cancelLongOperations(ODPDBAccess db, Key characterKey)
@@ -160,7 +176,9 @@ public abstract class LongOperation extends OperationBase
 		if (dataEntity==null) return;
 		dataEntity.setProperty("data", null);
 		
-		db.getDB().put(dataEntity);
+		db.getDB().delete(dataEntity);
+		if (db.getDB().isBulkWriteModeOn())
+			db.getDB().commitBulkWrite();
 	}
 	
 	public boolean isComplete()
@@ -222,7 +240,7 @@ public abstract class LongOperation extends OperationBase
 		}
 		catch(Exception e)
 		{
-			cancelLongOperations(db, db.getCurrentCharacterKey());
+			cancelLongOperation(db, db.getCurrentCharacterKey());
 			throw e;
 		}
 	}
@@ -321,6 +339,7 @@ public abstract class LongOperation extends OperationBase
 			result = new JSONObject();
 			result.put("hasNewGameMessages", db.hasNewGameMessages());
 			result.put("error", e.getMessage());
+			result.put("cancelled", true);
 			out.print(result.toJSONString());
 			out.flush();
 			out.close();
@@ -355,7 +374,7 @@ public abstract class LongOperation extends OperationBase
 		{
 			db.sendGameMessage(db.getDB(), db.getCurrentCharacter(), e.getMessage());
 //			sendErrorMessageAndFullRefresh(response, null);
-			cancelLongOperations(db, db.getCurrentCharacterKey());
+			cancelLongOperation(db, db.getCurrentCharacterKey());
 			
 			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey")), this);
 			mpus.updateFullPage_shortcut();
