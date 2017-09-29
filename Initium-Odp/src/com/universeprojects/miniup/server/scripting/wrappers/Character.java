@@ -101,7 +101,27 @@ public class Character extends EntityWrapper
 				namedInventory.get(itemName).add(newItem);
 				keyedInventory.put(newItem.getKey(), newItem);
 				if(equipKeys.containsKey(item.getKey()))
+				{
 					equippedInventory.put(equipKeys.get(item.getKey()), newItem);
+					equipKeys.remove(item.getKey());
+				}
+			}
+		}
+		
+		if(equipKeys.isEmpty()==false)
+		{
+			// Ghosted/destroyed gear.
+			List<Key> remainingKeys = new ArrayList<Key>(equipKeys.keySet());
+			items = db.getEntities(remainingKeys);
+			for(int i = 0; i < remainingKeys.size(); i++)
+			{
+				Key curKey = remainingKeys.get(i);
+				// If item exists, it's ghosted, add to equippedInventory.
+				// Otherwise, remove the key.
+				if(items.get(i) != null)
+					equippedInventory.put(equipKeys.get(curKey), new Item(items.get(i), db));
+				else
+					this.setProperty("equip" + equipKeys.get(curKey), null);
 			}
 		}
 	}
@@ -291,6 +311,13 @@ public class Character extends EntityWrapper
 		return inv.toArray(invItems);
 	}
 	
+	public Item[] getAllEquipped()
+	{
+		List<Item> inv = new ArrayList<Item>(getEquippedInventory().values());
+		Item[] invItems = new Item[inv.size()];
+		return inv.toArray(invItems);
+	}
+	
 	public Item[] findInInventory(String itemName)
 	{
 		Map<String, List<Item>> invMap = getNamedInventory();
@@ -300,6 +327,16 @@ public class Character extends EntityWrapper
 			return invMap.get(itemName).toArray(invItems);
 		}
 		return new Item[0];
+	}
+	
+	public boolean isItemInInventory(Item checkItem)
+	{
+		Map<Key, Item> items = getKeyedInventory();
+		for(Item item:items.values())
+			if(GameUtils.equals(item.getKey(), checkItem.getKey()))
+				return true;
+		
+		return false;
 	}
 	
 	public boolean isItemEquipped(Item checkItem)
@@ -327,6 +364,11 @@ public class Character extends EntityWrapper
 		Map<String, Item> equipItems = getEquippedInventory();
 		// Returns null if not found.
 		return equipItems.get(slotName);
+	}
+	
+	public Key getEquipmentKey(String slotName)
+	{
+		return (Key)this.getProperty("equipment" + slotName);
 	}
 	
 	public boolean isInCombat()
