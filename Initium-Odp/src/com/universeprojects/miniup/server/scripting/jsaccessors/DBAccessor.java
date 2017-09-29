@@ -252,6 +252,25 @@ public class DBAccessor {
 		return true;
 	}
 	
+	public boolean unequipItem(EntityWrapper item, EntityWrapper currentCharacter)
+	{
+		if(item == null || currentCharacter == null) return false;
+		
+		boolean removed = false;
+		CachedEntity charEntity = currentCharacter.wrappedEntity;
+		for (String slot : ODPDBAccess.EQUIPMENT_SLOTS)
+		{
+			if (charEntity.getProperty("equipment" + slot) != null 
+					&& GameUtils.equals(item.getKey(), charEntity.getProperty("equipment"+slot)))
+			{
+				charEntity.setProperty("equipment" + slot, null);
+				removed = true;
+			}
+		}
+		
+		return removed;
+	}
+	
 	/**
 	 * Creates a blank entity to work with in script context. This is to be used with
 	 * caution, and should ONLY be used when creating an item (not modifying existing
