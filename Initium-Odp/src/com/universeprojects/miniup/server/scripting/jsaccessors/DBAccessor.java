@@ -43,6 +43,8 @@ public class DBAccessor {
 	private final HttpServletRequest request;
 	private final CombatService cs;
 	
+	public final String[] EquipSlots = ODPDBAccess.EQUIPMENT_SLOTS;
+	
 	public DBAccessor(ODPDBAccess db, HttpServletRequest request)
 	{
 		this.db = db;
