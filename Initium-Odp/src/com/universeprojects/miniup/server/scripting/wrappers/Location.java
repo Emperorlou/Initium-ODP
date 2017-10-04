@@ -1,12 +1,15 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 
@@ -94,5 +97,57 @@ public class Location extends EntityWrapper {
 			_itemsHere = items.toArray(_itemsHere);
 		}
 		return _itemsHere;
+	}
+	
+	private Character[] _charactersHere = null;
+	private Character[] getCharactersHere()
+	{
+		if(_charactersHere == null)
+		{
+			List<Character> chars = new ArrayList<Character>();
+			QueryHelper qh = new QueryHelper(db.getDB());
+			List<CachedEntity> dbChars = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, this.getKey());
+			for(CachedEntity charEnt:dbChars)
+			{
+				if(charEnt != null)
+				{
+					chars.add(new Character(charEnt, this.db));
+				}
+			}
+			
+			_charactersHere = new Character[chars.size()];
+			_charactersHere = chars.toArray(_charactersHere);
+		}
+		
+		return _charactersHere;
+	}
+	
+	public Character[] charactersHere()
+	{
+		return getCharactersHere();
+	}
+	
+	public Character[] monstersHere()
+	{
+		List<Character> chars = new ArrayList<Character>();
+		for(Character charHere:getCharactersHere())
+		{
+			if(charHere.isPlayerCharacter()==false)
+				chars.add(charHere);
+		}
+		
+		return chars.toArray(new Character[chars.size()]);
+	}
+	
+	public Character[] playersHere()
+	{
+		List<Character> chars = new ArrayList<Character>();
+		for(Character charHere:getCharactersHere())
+		{
+			if(charHere.isPlayerCharacter())
+				chars.add(charHere);
+		}
+		
+		return chars.toArray(new Character[chars.size()]);
 	}
 }
