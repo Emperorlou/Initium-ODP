@@ -77,7 +77,7 @@ public class CombatService extends Service
 		Key characterCombatant = (Key)character.getProperty("combatant");
 		Key opponentCombatant = (Key)opponent.getProperty("combatant");
 		
-		if (CommonChecks.checkLocationIsInstance(location))
+		if (location != null && CommonChecks.checkLocationIsInstance(location) && "RaidBoss".equals(opponent.getProperty("status"))==false)
 		{
 			if (GameUtils.equals(characterCombatant, opponent.getKey()) && GameUtils.equals(opponentCombatant, character.getKey()))
 				return true;

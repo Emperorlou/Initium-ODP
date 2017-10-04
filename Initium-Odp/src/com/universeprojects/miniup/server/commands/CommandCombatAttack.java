@@ -40,7 +40,7 @@ public class CommandCombatAttack extends Command
 		CachedEntity location = ds.getIfExists((Key)character.getProperty("locationKey"));
 
 		CombatService cs = new CombatService(db);
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
 		
 		if (GameUtils.isPlayerIncapacitated(character))
 		{
@@ -61,16 +61,18 @@ public class CommandCombatAttack extends Command
 			return;
 		}
 		
+		CachedEntity targetLocation = ds.getIfExists((Key)targetCharacter.getProperty("locationKey"));
 		// Raid boss could possibly be in instance, so check for it
 		// explicitly even though isInCombatWith handles non-instance
 		// already.
-		if (cs.isInCombatWith(character, targetCharacter, location)==false && 
-				CommonChecks.checkLocationIsInstance(location) &&
+		if (cs.isInCombatWith(character, targetCharacter, targetLocation)==false && 
+				CommonChecks.checkLocationIsInstance(targetLocation) &&
 				CommonChecks.checkCharacterIsRaidBoss(targetCharacter)==false)
 		{
 			cs.leaveCombat(character, null);
-			mpus.updateFullPage_shortcut();			
-			throw new UserErrorMessage("You're not in combat with this opponent, someone else is. This can happen if someone else entered combat around the same time as you.");
+			mpus.updateFullPage_shortcut();
+			setPopupMessage("You're not in combat with this opponent, someone else is. This can happen if someone else entered combat around the same time as you.");
+			return;
 		}
 		
 		if ("NPC".equals(targetCharacter.getProperty("type"))==false && db.isCharacterDefending(location, character))
