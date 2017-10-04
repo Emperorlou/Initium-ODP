@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.longoperations;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,7 @@ public class LongOperationRest extends LongOperation {
 
 	@Override
 	String doComplete() throws UserErrorMessage {
+		db.setValue_StringStringMap(db.getCurrentCharacter(), "combatStatsDamageMap", new HashMap<String,String>());
 		db.doCharacterRestFully(db.getCurrentCharacter());
 		
 		Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
