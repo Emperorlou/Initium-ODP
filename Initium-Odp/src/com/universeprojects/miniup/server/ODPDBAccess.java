@@ -3928,7 +3928,7 @@ public class ODPDBAccess
             	Map<String, String> damageMap = getValue_StringStringMap(targetCharacter, "combatStatsDamageMap");
             	if(damageMap == null) damageMap = new HashMap<String, String>();
             	
-            	String charKey = KeyFactory.keyToString(sourceCharacter.getKey());
+            	String charKey = sourceCharacter.getKey().toString();
             	String damageString = damageMap.get(charKey);
             	Integer priorDamage = 0;
             	try
