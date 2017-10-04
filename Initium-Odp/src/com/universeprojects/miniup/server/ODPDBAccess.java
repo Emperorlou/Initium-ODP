@@ -3928,14 +3928,16 @@ public class ODPDBAccess
             	Map<String, String> damageMap = getValue_StringStringMap(targetCharacter, "combatStatsDamageMap");
             	if(damageMap == null) damageMap = new HashMap<String, String>();
             	
-            	String damageString = damageMap.get(sourceCharacter.getId().toString());
-            	Double priorDamage = 0d;
+            	String charKey = KeyFactory.keyToString(sourceCharacter.getKey());
+            	String damageString = damageMap.get(charKey);
+            	Integer priorDamage = 0;
             	try
             	{
-        			priorDamage = Double.parseDouble(damageString);
+        			priorDamage = Integer.parseInt(damageString);
+        			priorDamage += damage;
             	}
-            	catch(Exception ex) {}
-            	damageMap.put(sourceCharacter.getId().toString(), "" +(priorDamage + damage));
+            	catch(Exception ex) { priorDamage = damage; }
+            	damageMap.put(charKey, priorDamage.toString());
             	setValue_StringStringMap(targetCharacter, "combatStatsDamageMap", damageMap);
             }
             
