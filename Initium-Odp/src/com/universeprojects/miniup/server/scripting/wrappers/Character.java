@@ -359,6 +359,12 @@ public class Character extends EntityWrapper
 		return false;
 	}
 	
+	public boolean isPlayerCharacter()
+	{
+		String pcType = (String)this.getProperty("type");
+		return pcType == null || pcType.length() == 0 || "PC".equals(pcType);
+	}
+	
 	public Item getEquipmentSlot(String slotName)
 	{
 		Map<String, Item> equipItems = getEquippedInventory();
