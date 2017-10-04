@@ -42,11 +42,14 @@ public class CommandCombatEscape extends Command {
 			return;
 		}
 		
-		if (cs.isInCombatWith(character, targetCharacter, location)==false)
+		// Combat check depends on the opponent's location, not the character's.
+		CachedEntity targetLocation = ds.getIfExists((Key)targetCharacter.getProperty("locationKey"));
+		if (cs.isInCombatWith(character, targetCharacter, targetLocation)==false)
 		{
 			cs.leaveCombat(character, null);
 			mpus.updateFullPage_shortcut();			
-			throw new UserErrorMessage("You're not in combat with this opponent, someone else is. This can happen if someone else entered combat around the same time as you.");
+			setPopupMessage("You're not in combat with this opponent, someone else is. This can happen if someone else entered combat around the same time as you.");
+			return;
 		}
 		
 		
