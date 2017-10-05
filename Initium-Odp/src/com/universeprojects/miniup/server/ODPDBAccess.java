@@ -3922,25 +3922,6 @@ public class ODPDBAccess
             String status = attackResult.status;
             int damage = attackResult.damage;
 
-            // Track damage done.
-            if(damage > 0)
-            {
-            	Map<String, String> damageMap = getValue_StringStringMap(targetCharacter, "combatStatsDamageMap");
-            	if(damageMap == null) damageMap = new HashMap<String, String>();
-            	
-            	String charKey = sourceCharacter.getKey().toString();
-            	String damageString = damageMap.get(charKey);
-            	Integer priorDamage = 0;
-            	try
-            	{
-        			priorDamage = Integer.parseInt(damageString);
-        			priorDamage += damage;
-            	}
-            	catch(Exception ex) { priorDamage = damage; }
-            	damageMap.put(charKey, priorDamage.toString());
-            	setValue_StringStringMap(targetCharacter, "combatStatsDamageMap", damageMap);
-            }
-            
             // If we are dual wielding weapons, use the random crit chance to determine if we get a free second hit
             // with our second weapon...
             
@@ -4005,7 +3986,24 @@ public class ODPDBAccess
         	}
             
     		
-            
+        	// Track damage done.
+            if(damage > 0)
+            {
+            	Map<String, String> damageMap = getValue_StringStringMap(targetCharacter, "combatStatsDamageMap");
+            	if(damageMap == null) damageMap = new HashMap<String, String>();
+            	
+            	String charKey = sourceCharacter.getKey().toString();
+            	String damageString = damageMap.get(charKey);
+            	Integer priorDamage = 0;
+            	try
+            	{
+        			priorDamage = Integer.parseInt(damageString);
+        			priorDamage += damage;
+            	}
+            	catch(Exception ex) { priorDamage = damage; }
+            	damageMap.put(charKey, priorDamage.toString());
+            	setValue_StringStringMap(targetCharacter, "combatStatsDamageMap", damageMap);
+            }
             
             
             Double targetHitpoints = (Double)targetCharacter.getProperty("hitpoints");
