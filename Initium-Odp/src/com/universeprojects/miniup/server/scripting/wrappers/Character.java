@@ -97,6 +97,7 @@ public class Character extends EntityWrapper
 			{
 				Item newItem = new Item(item, db);
 				String itemName = newItem.getName();
+				inventory.add(newItem);
 				if(!namedInventory.containsKey(itemName)) namedInventory.put(itemName, new ArrayList<Item>());
 				namedInventory.get(itemName).add(newItem);
 				keyedInventory.put(newItem.getKey(), newItem);
