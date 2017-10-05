@@ -3637,7 +3637,7 @@ function doExplore(event, ignoreCombatSites)
 			},
 			function()	// recallFunction
 			{
-				doExplore(ignoreCombatSites, window.biome);
+				doExplore(null, ignoreCombatSites);
 			});
 }
 
