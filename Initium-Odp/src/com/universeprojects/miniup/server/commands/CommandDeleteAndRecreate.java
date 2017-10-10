@@ -39,12 +39,17 @@ public class CommandDeleteAndRecreate extends Command {
         String name = parameters.get("name");
         if (name==null) throw new UserErrorMessage("Character name cannot be blank.");
         
-        name = db.cleanCharacterName(name);
-        if (name.length()<1 || name.length()>30 || !name.matches("[A-Za-z ]+"))
-            throw new UserErrorMessage("Character name must contain only letters and spaces, and must be between 1 and 40 characters long.");
-
         CachedEntity currentChar = db.getCurrentCharacter();
         if(currentChar == null) throw new RuntimeException("Current character entity is null");
+        
+        // Only sanitize if character name differs.
+        if(name.equals(currentChar.getProperty("name"))==false)
+        {
+	        name = db.cleanCharacterName(name);
+	        if (name.length()<1 || name.length()>30 || !name.matches("[A-Za-z ]+"))
+	            throw new UserErrorMessage("Character name must contain only letters and spaces, and must be between 1 and 40 characters long.");
+        }
+
         // Check if the name is already in use
         if (name.equals(currentChar.getProperty("name"))==false && db.checkCharacterExistsByName(name))
             throw new UserErrorMessage("Character name is already in use.");
