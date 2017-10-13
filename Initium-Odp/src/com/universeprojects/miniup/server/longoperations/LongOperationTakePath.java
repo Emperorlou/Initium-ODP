@@ -116,6 +116,14 @@ public class LongOperationTakePath extends LongOperation {
 		{
 			if(isInParty)
 				throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
+
+			// ALWAYS RESET INSTANCE TIMER ON TRAVEL TO INSTANCE.
+			// Encounter doesn't matter, should always reset when traveling,
+			// since we can have partial spawns from the spawners now (which
+			// would require the timer to be set in order to tick).
+			db.resetInstanceRespawnTimer(destination);
+			if(destination.isUnsaved())
+				ds.put(destination);
 			
 			CachedEntity monster = db.getCombatantFor(db.getCurrentCharacter(), destination);
 			if (monster!=null)
@@ -125,19 +133,77 @@ public class LongOperationTakePath extends LongOperation {
 				ds.put(monster);
 				ds.put(db.getCurrentCharacter());
 				
-				db.resetInstanceRespawnTimer(destination);
-				if(destination.isUnsaved())
-					ds.put(destination);
-				
 				ds.commitBulkWrite();
 				throw new GameStateChangeException("A "+monster.getProperty("name")+" stands in your way.");
+			}
+			
+			// Getting here means we need to check if any spawners have available monsters.
+			final List<CachedEntity> instanceSpawners = db.getInstanceSpawnersForLocation(currentLocationKey, destinationKey);
+			if(instanceSpawners.isEmpty() == false)
+			{
+				final CachedEntity finalChar = db.getCurrentCharacter(); 
+				final CachedEntity location = destination; 
+				String mobName = null;
+				try 
+				{
+					mobName = new InitiumTransaction<String>(ds) 
+					{
+						@Override
+						public String doTransaction(CachedDatastoreService ds) 
+						{
+							finalChar.refetch(ds);
+							location.refetch(ds);
+							for(CachedEntity curSpawner:instanceSpawners)
+							{
+								curSpawner.refetch(ds);
+								
+								Double availableSpawn = (Double)curSpawner.getProperty("availableMonsterCount");
+								if(availableSpawn == null || availableSpawn.intValue() < 1) continue;
+								
+								CachedEntity npcDef = ds.getIfExists((Key)curSpawner.getProperty("npcDefKey"));
+								if(npcDef != null)
+								{
+									CachedEntity monster = db.doCreateMonster(npcDef, location.getKey());
+									if(monster != null)
+									{
+										// Don't allow negative spawner amounts.
+										availableSpawn = Math.max(0.0d, availableSpawn-1.0d);
+										curSpawner.setProperty("availableMonsterCount", availableSpawn - 1.0d);
+										
+										// Set combatants and modes.
+										finalChar.setProperty("combatant", monster.getKey());
+										finalChar.setProperty("combatType", "DefenceStructureAttack");
+										finalChar.setProperty("mode", ODPDBAccess.CHARACTER_MODE_COMBAT);
+										db.flagCharacterCombatAction(ds, finalChar);
+										
+										monster.setProperty("combatant", finalChar.getKey());
+										monster.setProperty("mode", ODPDBAccess.CHARACTER_MODE_COMBAT);
+										
+										ds.put(curSpawner, finalChar, monster);
+										
+										return (String)monster.getProperty("name");
+									}
+								}
+							}
+							// Null indicates nothing spawned. Fall through.
+							return null;
+						}
+					}.run();
+				} 
+				catch (AbortTransactionException e) 
+				{
+					throw new RuntimeException(e.getMessage());
+				}
+				
+				if(mobName != null && mobName.length() > 0)
+					throw new GameStateChangeException("A " + mobName + " stands in your way.");
 			}
 		}
 		else if ("CombatSite".equals(destination.getProperty("type"))==false)	// However, for non-instances... (and not combat sites)
 		{
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
 			QueryHelper qh = new QueryHelper(ds);
-			List<CachedEntity> npcsInTheArea = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, destinationKey, "type", FilterOperator.EQUAL, "NPC");
+			List<CachedEntity> npcsInTheArea = qh.getFilteredList("Character", "locationKey", destinationKey, "type", "NPC");
 			npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
 	
 			if (npcsInTheArea.isEmpty()==false)
@@ -171,9 +237,13 @@ public class LongOperationTakePath extends LongOperation {
 		Long travelTime = (Long)path.getProperty("travelTime");
 		if (travelTime==null)
 			travelTime = 6L;
-		setDataProperty("secondsToWait", travelTime);
 		
-		return travelTime.intValue();
+		Long buffedTravel = db.getLongBuffableValue(character, "movementSpeed", travelTime);
+		// Movement speed is inverse property. Increase speed means decrease in time.
+		buffedTravel = Math.max(travelTime - (buffedTravel - travelTime), 0);
+		setDataProperty("secondsToWait", buffedTravel);
+		
+		return buffedTravel.intValue();
 	}
 
 	@Override

@@ -3832,6 +3832,46 @@ public class ODPDBAccess
 		return null;
 	}
 	
+	public List<CachedEntity> getInstanceSpawnersForLocation(final Key originKey, Key destinationKey)
+	{
+		QueryHelper qh = new QueryHelper(getDB());
+		List<CachedEntity> spawners = qh.getFilteredORList(null, "MonsterSpawner", "locationKey", originKey, "locationKey", destinationKey);
+		List<CachedEntity> foundSpawners = new ArrayList<CachedEntity>();
+		for(CachedEntity spawn:spawners)
+		{
+			// If it's not an instance spawner, or NPC is null, do not add spawner.
+			if(GameUtils.booleanEquals(spawn.getProperty("instanceModeEnabled"), false) ||
+					spawn.getProperty("npcDefKey") == null) continue;
+			
+			Double availableSpawns = (Double)spawn.getProperty("availableMonsterCount");
+			if(availableSpawns == null || availableSpawns.intValue() < 1) continue;
+			
+			foundSpawners.add(spawn);
+		}
+		
+		Collections.shuffle(foundSpawners);	// We first shuffle so that characters with the same status will be randomized
+		Collections.sort(foundSpawners, new Comparator<CachedEntity>(){
+
+			@Override
+			public int compare(CachedEntity o1, CachedEntity o2) {
+				if(GameUtils.equals(o1.getProperty("locationKey"), o2.getProperty("locationKey")))
+				{
+					String o1Status = (String)o1.getProperty("status");
+					String o2Status = (String)o2.getProperty("status");
+					if (o1Status==null) o1Status = "Normal";
+					if (o2Status==null) o2Status = "Normal";
+					return o1Status.compareTo(o2Status);
+				}
+				else if(GameUtils.equals(originKey, o1.getProperty("locationKey")))
+					return -1;
+				else
+					return 1;
+			}
+		});
+		
+		return foundSpawners;
+	}
+	
 	/**
 	 * Method stub. This is actually implemented in the primary repo because the secret key is there.
 	 * 
