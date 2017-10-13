@@ -6677,5 +6677,9 @@ public class ODPDBAccess
 		
 	}
 
+	public String getChatToken()
+	{
+		return null;
+	}
 
 }

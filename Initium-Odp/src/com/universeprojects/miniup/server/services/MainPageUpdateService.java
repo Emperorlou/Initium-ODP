@@ -13,7 +13,6 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.InitiumObject;
-import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
@@ -453,6 +452,14 @@ public class MainPageUpdateService extends Service
 		updateLocationQuicklist();
 	}
 
+	public void updateFullPage_shortcut(boolean refreshChat)
+	{
+		updateFullPage_shortcut();
+		
+		if (refreshChat==true)
+			updateLocationJs(refreshChat);	
+	}
+
 	/**
 	 * This updates the gold amount in the header bar.
 	 *
@@ -532,28 +539,50 @@ public class MainPageUpdateService extends Service
 	{
 		if (db.isTestServer()) {
 			StringBuilder newHtml = new StringBuilder();
+
+//			newHtml.append("<input type='hidden' id='chat_token' value='"+db.getChatToken()+"'/>");
+//			newHtml.append("<div id='chat_tab'>");
+//			newHtml.append("<input type='hidden' id='chatroomId' value='GLOBAL'>");
+//			
+//			newHtml.append("<div id='chat_form_wrapper'>");
+//			newHtml.append("<form id='chat_form'>");
+//			newHtml.append("<div class='chat_form_input'>");
+//			newHtml.append("<input id='chat_input' type='text' autocomplete='off'>");
+//			newHtml.append("</div>");
+//			newHtml.append("<div class='chat_form_submit'>");
+//			newHtml.append("<input id='chat_submit' type='button' onclick='submitMessage(event)'>");
+//			newHtml.append("</div>");
+//			newHtml.append("</form>");
+//			newHtml.append("</div>");
+//			
+//			
+//			newHtml.append("<div id='chat_messages' style='height:150px; max-height:150px'></div>");
+//			newHtml.append("</div>");
+//
+//			newHtml.append("<script type='text/javascript' src='/odp/javascript/newchat.js?v=2'></script>");
 			
-			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
-			newHtml.append("<div id=\"menu\" class=\"menuContainer\" style=\"visibility: hidden;\"></div>");
-			newHtml.append("<div id=\"viewport\" class=\"vp\">");
-			newHtml.append("<div id=\"grid\" class=\"grid\">");
-			newHtml.append("<div id=\"ui-layer\" class=\"uiLayer\"></div>");
-			newHtml.append("<div id=\"cell-layer\" class=\"cellLayer\"></div>");
-			newHtml.append("<div id=\"ground-layer\" class=\"groundLayer\"></div>");
-			newHtml.append("<div id=\"object-layer\" class=\"objectLayer\"></div>");
-			newHtml.append("</div>");
-			newHtml.append("</div>");
-			newHtml.append("</div>");
-			newHtml.append("<button type=\"button\" onclick=\"openMenu()\">Menu</button>");
-			newHtml.append("<button type=\"button\" onclick=\"mapPlow(event)\">Plow</button>");
-			newHtml.append("<button type=\"button\" onclick=\"mapPlaceHouse(event)\" style=\"position:relative\">Place House</button>");
-			newHtml.append("<button type=\"button\" onclick=\"mapPlaceCity(event)\" style=\"position:relative\">Place City</button>");
-			newHtml.append("<center><p id=\"selectedObjects\" class=\"selectedObjectList\"></p></center>");
-			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
-			newHtml.append("<script>");
-			newHtml.append("var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2).toString() + "';");
-			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() { pressedButton(); });");
-			newHtml.append("</script>");
+			/// The 2D Map...
+//			newHtml.append("<div id=\"viewportcontainer\" class=\"vpcontainer\">");
+//			newHtml.append("<div id=\"menu\" class=\"menuContainer\" style=\"visibility: hidden;\"></div>");
+//			newHtml.append("<div id=\"viewport\" class=\"vp\">");
+//			newHtml.append("<div id=\"grid\" class=\"grid\">");
+//			newHtml.append("<div id=\"ui-layer\" class=\"uiLayer\"></div>");
+//			newHtml.append("<div id=\"cell-layer\" class=\"cellLayer\"></div>");
+//			newHtml.append("<div id=\"ground-layer\" class=\"groundLayer\"></div>");
+//			newHtml.append("<div id=\"object-layer\" class=\"objectLayer\"></div>");
+//			newHtml.append("</div>");
+//			newHtml.append("</div>");
+//			newHtml.append("</div>");
+//			newHtml.append("<button type=\"button\" onclick=\"openMenu()\">Menu</button>");
+//			newHtml.append("<button type=\"button\" onclick=\"mapPlow(event)\">Plow</button>");
+//			newHtml.append("<button type=\"button\" onclick=\"mapPlaceHouse(event)\" style=\"position:relative\">Place House</button>");
+//			newHtml.append("<button type=\"button\" onclick=\"mapPlaceCity(event)\" style=\"position:relative\">Place City</button>");
+//			newHtml.append("<center><p id=\"selectedObjects\" class=\"selectedObjectList\"></p></center>");
+//			newHtml.append("<script type=\"text/javascript\" src=\"/odp/javascript/Sandbox.js\"></script>");
+//			newHtml.append("<script>");
+//			newHtml.append("var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2).toString() + "';");
+//			newHtml.append("$(document).on(\"click\", \"#somebutton\", function() { pressedButton(); });");
+//			newHtml.append("</script>");
 			
 			return updateHtmlContents("#test-panel", newHtml.toString());
 		}
@@ -909,14 +938,31 @@ public class MainPageUpdateService extends Service
 //		// game state for first pass, which will be refresh.
 //		return csb.toString();
 //	}
-	
 	public String updateLocationJs()
+	{
+		return updateLocationJs(false);
+	}	
+	
+	public String updateLocationJs(boolean refreshChat)
 	{
 		StringBuilder js = new StringBuilder();
 		
 		
 		js.append("window.bannerUrl = '"+getLocationBanner()+"';");
 		js.append("window.previousBannerUrl = null;");
+		
+		if (refreshChat==false)
+		{
+			js.append("if (window.newChatIdToken!='"+db.getChatToken()+"')");
+			js.append("{");
+			
+		}
+		js.append("		window.newChatIdToken= '"+db.getChatToken()+"';");
+		js.append("		messager.reconnect();");
+		js.append("		$('.chat_messages').html('');");
+		
+		if (refreshChat==false)
+			js.append("}");
 
 		js.append("if (isAnimatedBannersEnabled()==false && bannerUrl.indexOf('.gif')>0)");
 		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");

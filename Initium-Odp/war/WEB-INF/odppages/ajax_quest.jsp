@@ -15,7 +15,7 @@ function doQuestCompleteEffect()
 	$("#quest-complete-label").remove();
 	clearQuestCompleteEffect();
 	
-	var html = "<div id='questCompleteEffect' style='position: fixed;overflow: visible;mix-blend-mode: color-dodge;width: 0px;height: 0px;left: 50%;top: 30%;z-index: 10000000;'>"+
+	var html = "<div id='questCompleteEffect' style='position: fixed;overflow: visible;mix-blend-mode: color-dodge;width: 0px;height: 0px;left: 50%;top: 30%;z-index: 1000000000;'>"+
 	"<img src='https://initium-resources.appspot.com/images/ui3/complete-effect.gif' style='position:absolute;margin-left: -250px;margin-top: 0px;float: left;pointer-events: none;transform: scale(2);'>"+
 	"</div>";
 	$("body").prepend(html);

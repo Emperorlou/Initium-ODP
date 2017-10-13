@@ -205,9 +205,8 @@ public class LongOperationTakePath extends LongOperation {
 		}
 
 		MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
-		update.updateFullPage_shortcut();
+		update.updateFullPage_shortcut(true);
 
-//		setFullRefresh(true);
 		
 		return "You have arrived at "+newLocation.getProperty("name")+".";
 	}

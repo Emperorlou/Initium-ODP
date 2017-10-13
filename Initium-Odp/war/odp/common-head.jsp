@@ -1,3 +1,4 @@
+<%@page import="com.universeprojects.miniup.server.Authenticator"%>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <%@page import="com.google.appengine.api.datastore.Key"%>
 <%@page import="com.google.appengine.api.datastore.Entity"%>
@@ -6,12 +7,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%
+	Authenticator auth = Authenticator.getInstance(request);
+	
 	response.addHeader("Access-Control-Allow-Origin", "*");
 
 	long serverTime = System.currentTimeMillis();
 	request.setAttribute("serverTime", serverTime);
 	
 	request.setAttribute("isTestServer", GameUtils.isTestServer(request));
+	
+	request.setAttribute("userId", auth.getAuthenticatedUserId());
 %>
     
 <meta charset="UTF-8">    
@@ -36,12 +41,12 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=189"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=169">
+<script type="text/javascript" src="/odp/javascript/script.js?v=191"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=171">
 
 
 
-<script type="text/javascript" src="/odp/javascript/messager.js?v=27"></script>
+<script type="text/javascript" src="/odp/javascript/messager.js?v=38"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
 <script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
@@ -76,15 +81,16 @@
 
 
 <script type="text/javascript">
-<c:if test='${chatIdToken!=null}'>
-window.chatIdToken = "${chatIdToken}";
-</c:if>
-<c:if test='${characterId!=null}'>
-window.characterId = ${characterId};
-</c:if>
-<c:if test='${newChatIdToken!=null}'>
-window.newChatIdToken = "${newChatIdToken}";
-</c:if>
+	<c:if test='${chatIdToken!=null}'>
+	window.chatIdToken = "${chatIdToken}";
+	</c:if>
+	<c:if test='${characterId!=null}'>
+	window.characterId = ${characterId};
+	</c:if>
+	<c:if test='${newChatIdToken!=null}'>
+	window.newChatIdToken = "${newChatIdToken}";
+	</c:if>
+	window.userId = ${userId};
 	window.isTestServer = ${isTestServer};
 	window.verifyCode = "${verifyCode}";
 	window.serverTime=<c:out value="${serverTime}"/>;

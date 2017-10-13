@@ -2563,7 +2563,7 @@ function createDonationWindow()
 			"<p>" +
 			"<center>" +
 			"<form id='donatequick' action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank' onsubmit='setTimeout(function(){closepopupMessage(" + popupsNum +"); createWelcomeWindow();}, 1000)'>" +
-			"<input type='hidden' name='custom' value='5299602559336448'> " +
+			"<input type='hidden' name='custom' value='"+window.userId+"'> " +
 			"<input type='hidden' name='cmd' value='_donations'> " +
 			"<input type='hidden' name='business' value='narmstrong@playinitium.com'>" +
 			"<input type='hidden' name='amount' value='5.00'>" +
@@ -2639,7 +2639,7 @@ function createUpgradeToPremiumWindow()
 			"<p>" +
 			"<center>" +
 			"<form id='donatequick' action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank' onsubmit='setTimeout(function(){closepopupMessage(" + popupsNum +"); }, 1000)'>" +
-			"<input type='hidden' name='custom' value='5299602559336448'> " +
+			"<input type='hidden' name='custom' value='"+window.userId+"'> " +
 			"<input type='hidden' name='cmd' value='_donations'> " +
 			"<input type='hidden' name='business' value='narmstrong@playinitium.com'>" +
 			"<input type='hidden' name='amount' value='5.00'>" +

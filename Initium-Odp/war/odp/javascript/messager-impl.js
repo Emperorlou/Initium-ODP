@@ -5,7 +5,14 @@ function encode_utf8( s ) {
 
 function decode_utf8( s ) {
 	if (s==null) return null;
-	return decodeURIComponent( escape( s ) );
+	try
+	{
+		return decodeURIComponent( escape( s ) );
+	}
+	catch(e)
+	{
+		return escape(s);
+	}
 }
 
 var messageCodes = [
@@ -18,12 +25,12 @@ var messageCodes = [
              "Notifications"
              ];
 var messager;
-if(window.isTestServer && localStorage.getItem("userNewChat")==true) 
-{
-    messager = new SocketMessager("http://www.derekabenson.com:6969/eventbus", newChatIdToken);
-} else {
-    messager = new Messager(5000, 10000, 30, "https://chat-dot-playinitium.appspot.com", chatIdToken);
-}
+//if(window.isTestServer && localStorage.getItem("userNewChat")=="true") 
+//{
+    messager = new EventServerMessager("http://www.derekabenson.com:6969/eventbus", newChatIdToken);
+//} else {
+//    messager = new Messager(5000, 10000, 30, "https://chat-dot-playinitium.appspot.com", chatIdToken);
+//}
 
 // Here we're overriding the default markers array to include the notifications marker because it is a special flower. Basically, we
 // need to make sure we never execute the same notifications twice, so we'll always remember where we left off.
@@ -66,6 +73,16 @@ messager.onNotificationMessage = function(message)
 };
 
 
+/* 
+ * Old Message object:
+ * 	message.characterId
+ * 	message.message
+ * 	message.createdDate
+ * 	message.code
+ * 	message.nickname
+ * 	message.nicknameStyled
+ * 	message.mode
+ */
 
 messager.onChatMessage = function(chatMessage)
 {

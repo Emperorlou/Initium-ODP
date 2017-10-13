@@ -263,7 +263,7 @@ function updateDayNightCycle(forceRefresh)
 		if (previousA!=null)
 		{
 			var diff = getDifference(previousA, amount);
-			if (diff<0.02)
+			if (diff<0.001)
 				return;
 			
 		}
