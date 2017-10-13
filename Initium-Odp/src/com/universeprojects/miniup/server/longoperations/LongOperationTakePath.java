@@ -183,7 +183,7 @@ public class LongOperationTakePath extends LongOperation {
 					if(npcDef != null)
 					{
 						ds.beginBulkWriteMode();
-						monster = db.doCreateMonster(mobSpawner, (Key)mobSpawner.getProperty("locationKey"));
+						monster = db.doCreateMonster(npcDef, (Key)mobSpawner.getProperty("locationKey"));
 						
 						// Set combatants and modes.
 						finalChar.setProperty("combatant", monster.getKey());
