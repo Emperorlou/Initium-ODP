@@ -168,7 +168,7 @@ public class LongOperationTakePath extends LongOperation {
 									{
 										// Don't allow negative spawner amounts.
 										availableSpawn = Math.max(0.0d, availableSpawn-1.0d);
-										curSpawner.setProperty("availableMonsterCount", availableSpawn - 1.0d);
+										curSpawner.setProperty("availableMonsterCount", availableSpawn);
 										
 										// Set combatants and modes.
 										finalChar.setProperty("combatant", monster.getKey());
