@@ -3856,8 +3856,8 @@ public class ODPDBAccess
 			public int compare(CachedEntity o1, CachedEntity o2) {
 				if(GameUtils.equals(o1.getProperty("locationKey"), o2.getProperty("locationKey")))
 				{
-					String o1Status = (String)o1.getProperty("status");
-					String o2Status = (String)o2.getProperty("status");
+					String o1Status = (String)o1.getProperty("instanceMonsterStatus");
+					String o2Status = (String)o2.getProperty("instanceMonsterStatus");
 					if (o1Status==null) o1Status = "Normal";
 					if (o2Status==null) o2Status = "Normal";
 					return o1Status.compareTo(o2Status);
