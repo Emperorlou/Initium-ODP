@@ -142,17 +142,15 @@ public class LongOperationTakePath extends LongOperation {
 			if(instanceSpawners.isEmpty() == false)
 			{
 				final CachedEntity finalChar = db.getCurrentCharacter(); 
-				final CachedEntity location = destination; 
-				String mobName = null;
+				CachedEntity mobSpawner = null;
 				try 
 				{
-					mobName = new InitiumTransaction<String>(ds) 
+					mobSpawner = new InitiumTransaction<CachedEntity>(ds) 
 					{
 						@Override
-						public String doTransaction(CachedDatastoreService ds) 
+						public CachedEntity doTransaction(CachedDatastoreService ds) 
 						{
 							finalChar.refetch(ds);
-							location.refetch(ds);
 							for(CachedEntity curSpawner:instanceSpawners)
 							{
 								curSpawner.refetch(ds);
@@ -160,32 +158,13 @@ public class LongOperationTakePath extends LongOperation {
 								Double availableSpawn = (Double)curSpawner.getProperty("availableMonsterCount");
 								if(availableSpawn == null || availableSpawn.intValue() < 1) continue;
 								
-								CachedEntity npcDef = ds.getIfExists((Key)curSpawner.getProperty("npcDefKey"));
-								if(npcDef != null)
+								if(curSpawner.getProperty("npcDefKey") != null)
 								{
-									CachedEntity monster = db.doCreateMonster(npcDef, location.getKey());
-									if(monster != null)
-									{
-										// Don't allow negative spawner amounts.
-										availableSpawn = Math.max(0.0d, availableSpawn-1.0d);
-										curSpawner.setProperty("availableMonsterCount", availableSpawn);
-										
-										// Set combatants and modes.
-										finalChar.setProperty("combatant", monster.getKey());
-										finalChar.setProperty("combatType", "DefenceStructureAttack");
-										finalChar.setProperty("mode", ODPDBAccess.CHARACTER_MODE_COMBAT);
-										db.flagCharacterCombatAction(ds, finalChar);
-										
-										monster.setProperty("combatant", finalChar.getKey());
-										monster.setProperty("mode", ODPDBAccess.CHARACTER_MODE_COMBAT);
-										String status = (String)curSpawner.getProperty("instanceMonsterStatus");
-										if(status == null) status = "Normal";
-										monster.setProperty("status", status);
-										
-										ds.put(curSpawner, finalChar, monster);
-										
-										return (String)monster.getProperty("name");
-									}
+									availableSpawn = Math.max(0.0d, availableSpawn-1.0d);
+									curSpawner.setProperty("availableMonsterCount", availableSpawn);
+									
+									ds.put(curSpawner);
+									return curSpawner;
 								}
 							}
 							// Null indicates nothing spawned. Fall through.
@@ -198,8 +177,33 @@ public class LongOperationTakePath extends LongOperation {
 					throw new RuntimeException(e.getMessage());
 				}
 				
-				if(mobName != null && mobName.length() > 0)
-					throw new GameStateChangeException("A " + mobName + " stands in your way.");
+				if(mobSpawner != null)
+				{
+					CachedEntity npcDef = ds.getIfExists((Key)mobSpawner.getProperty("npcDefKey"));
+					if(npcDef != null)
+					{
+						ds.beginBulkWriteMode();
+						monster = db.doCreateMonster(mobSpawner, (Key)mobSpawner.getProperty("locationKey"));
+						
+						// Set combatants and modes.
+						finalChar.setProperty("combatant", monster.getKey());
+						finalChar.setProperty("combatType", "DefenceStructureAttack");
+						finalChar.setProperty("mode", ODPDBAccess.CHARACTER_MODE_COMBAT);
+						db.flagCharacterCombatAction(ds, finalChar);
+						
+						monster.setProperty("combatant", finalChar.getKey());
+						monster.setProperty("mode", ODPDBAccess.CHARACTER_MODE_COMBAT);
+						String status = (String)mobSpawner.getProperty("instanceMonsterStatus");
+						if(status == null) status = "Normal";
+						monster.setProperty("status", status);
+						
+						ds.put(finalChar, monster);
+						
+						ds.commitBulkWrite();
+						
+						throw new GameStateChangeException("A "+monster.getProperty("name")+" stands in your way.");
+					}
+				}
 			}
 		}
 		else if ("CombatSite".equals(destination.getProperty("type"))==false)	// However, for non-instances... (and not combat sites)
