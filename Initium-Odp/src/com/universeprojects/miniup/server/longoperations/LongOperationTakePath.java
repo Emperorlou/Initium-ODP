@@ -178,6 +178,9 @@ public class LongOperationTakePath extends LongOperation {
 										
 										monster.setProperty("combatant", finalChar.getKey());
 										monster.setProperty("mode", ODPDBAccess.CHARACTER_MODE_COMBAT);
+										String status = (String)curSpawner.getProperty("instanceMonsterStatus");
+										if(status == null) status = "Normal";
+										monster.setProperty("status", status);
 										
 										ds.put(curSpawner, finalChar, monster);
 										
