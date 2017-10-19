@@ -196,6 +196,7 @@ public class LongOperationTakePath extends LongOperation {
 						String status = (String)mobSpawner.getProperty("instanceMonsterStatus");
 						if(status == null) status = "Normal";
 						monster.setProperty("status", status);
+						monster.setProperty("monsterSpawnerKey", mobSpawner.getKey());
 						
 						ds.put(finalChar, monster);
 						
