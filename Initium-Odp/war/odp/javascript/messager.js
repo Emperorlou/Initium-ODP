@@ -33,6 +33,8 @@ function EventServerMessager(chatServerUrl, idToken)
 
 	this.sendMessage = function(message)
 	{
+		ga('send', 'pageview', 'ServletChat');
+		
 		if(this.checkClientSideChatCommands!=null){
 			if(this.checkClientSideChatCommands(message))
 				return;
@@ -146,6 +148,8 @@ function EventServerMessager(chatServerUrl, idToken)
 	
 	this._connect = function()
 	{
+        if (that.onConnectionStateChange!=null)
+        	that.onConnectionStateChange("connecting");
 		if (that.socket!=null)
 		{
 			try
@@ -162,6 +166,7 @@ function EventServerMessager(chatServerUrl, idToken)
 	    that.socket = new SockJS(url, null, options);
 	    that.socket.onopen = function(event) 
 	    {
+	    	that.firstGet = true;
 	        console.log("connected: "+JSON.stringify(event));
 	        that.sockJsConnected = true;
 
@@ -170,8 +175,11 @@ function EventServerMessager(chatServerUrl, idToken)
 		        clearInterval(that.reconnectTimer);
 		        that.reconnectTimer = null;
 	        }
+	        if (that.onConnectionStateChange!=null)
+	        	that.onConnectionStateChange("connected");
 	    };
 	    that.socket.onclose = function (event) {
+	    	
 	        console.log("close: "+JSON.stringify(event));
 	        that.sockJsConnected = false;
 	        
@@ -180,14 +188,17 @@ function EventServerMessager(chatServerUrl, idToken)
 	        	console.log("Auto-retrying connection every 3 seconds starting now...");
 	        	that.reconnectTimer = setInterval(that._connect, 3000);
 	        }
+	        if (that.onConnectionStateChange!=null)
+	        	that.onConnectionStateChange("disconnected");
 	    };
 	    that.socket.onerror = function (event) {
 	        console.log("error: "+JSON.stringify(event));
 	    };
 	    that.socket.onmessage = function (event) {
 	        var data = JSON.parse(event.data);
+	        if (data.messages.length>0 && data.messages[0].additionalData.__history!=true)
+	        	that.firstGet = false;
 	        that._processMessage(data.messages);
-	        that.firstGet = false;
 	    };
 	    window.onbeforeunload = function () {
 	        if(that.sockJsConnected) {

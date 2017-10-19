@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
@@ -26,6 +27,7 @@ public abstract class Command extends OperationBase
 	protected final CachedDatastoreService ds;
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
+	protected QueryHelper query;
 	
 	private String popupMessage;
 	private JavascriptResponse jsResponse = JavascriptResponse.None;
@@ -38,6 +40,7 @@ public abstract class Command extends OperationBase
 		
 		this.db = db;
 		this.ds = db.getDB();
+		this.query = new QueryHelper(ds);
 	}
 	
 	protected ODPDBAccess getDB()

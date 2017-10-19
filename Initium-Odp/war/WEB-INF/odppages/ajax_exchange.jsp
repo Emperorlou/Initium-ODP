@@ -10,14 +10,35 @@
 			<div id='chipped-token-tab' class='tab-row-tab' onclick='focusChippedToken()' style='height:inherit; width:inherit;'>Chipped Tokens</div>
 		</div>
 		<div id='premium-membership-token-pane'>
+		<div class='main-splitScreen'>
+		<h2>Buyers</h2>
+		<c:forEach var="item" items="${premiumTokensBuyOrders}">
+			${item}
+		</c:forEach>
+		</div>
+		<div class='main-splitScreen'>
+		<h2>Sellers</h2>
 		<c:forEach var="item" items="${premiumTokens}">
 			${item}
 		</c:forEach>
 		</div>
+		</div>
 		<div id='chipped-token-pane' style='display:none;'>
+
+		<div class='main-splitScreen'>
+		<h2>Buyers</h2>
+		<c:forEach var="item" items="${chippedTokensBuyOrders}">
+			${item}
+		</c:forEach>
+		</div>
+
+		<div class='main-splitScreen'>
+		<h2>Sellers</h2>
 		<c:forEach var="item" items="${chippedTokens}">
 			${item}
 		</c:forEach>
+		</div>
+
 		</div>
 	</div>		
 </div>

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 
@@ -151,6 +152,7 @@ public class HtmlComponents {
    	   return result;
 	}
 	
+	
 	public static String generateStoreItemHtml(ODPDBAccess db, CachedEntity selfCharacter, CachedEntity storeCharacter, CachedEntity item, CachedEntity saleItem, HttpServletRequest request)
 	{
 
@@ -210,6 +212,45 @@ public class HtmlComponents {
    	    	result+= GameUtils.renderItem(item) + " - <div class='saleItem-sold'>SOLD</div>";
        	result+="</span>";
     	result+="</div>";
+       	result+="</div>";
+       	result+="<br>";
+		
+		return result;
+	}
+
+	
+	public static String generateManageStoreBuyOrderHtml(ODPDBAccess db, CachedEntity buyItem, HttpServletRequest request) 
+	{
+		String quantity = "&#8734";
+		if (buyItem.getProperty("quantity")!=null)
+			quantity = GameUtils.formatNumber(buyItem.getProperty("quantity")).toString();
+		Long keyId = buyItem.getKey().getId();
+		
+		String result = "";
+			   result+="<div class='buyOrder' ref='"+keyId+"'>";
+		   	   result+="<div class='main-item'>";
+		   	   result+=" ";
+		   	   result+="<div class='buy-item-container'>";
+		   	   result+="<input style='display:table-cell; margin:0px; position:inherit; float:none;' type='checkbox'>";
+		   	   result+=" <div style='display:table-cell; width:100%;'>"+quantity + " x "+ buyItem.getProperty("name") + " for "+GameUtils.formatNumber(buyItem.getProperty("value"))+" each</div><a style='display:table-cell' onclick='storeDeleteBuyOrder(event,"+keyId+")' class='list-item-X'>X</a>";
+		   	   result+="</div>";
+		   	   result+="</div>";
+		   	   result+="</div>";
+		   	   
+   	   return result;
+	}
+	
+	public static String generateBuyOrderHtml(ODPDBAccess db, CachedEntity buyItem, HttpServletRequest request)
+	{
+		String quantity = "&#8734";
+		if (buyItem.getProperty("quantity")!=null)
+			quantity = GameUtils.formatNumber(buyItem.getProperty("quantity")).toString();
+		Long keyId = buyItem.getKey().getId();
+		Long valueEach = (Long)buyItem.getProperty("value");
+		
+        String result ="";
+		result+="<div class='buy-item-container' ref='"+keyId+"'>";
+	   	result+="<a style='color:#999999' onclick='viewBuyOrderOptions(event, "+keyId+", "+valueEach+")'>"+quantity + " x "+ buyItem.getProperty("name") + " for "+GameUtils.formatNumber(buyItem.getProperty("value"))+"g each</a>";
        	result+="</div>";
        	result+="<br>";
 		

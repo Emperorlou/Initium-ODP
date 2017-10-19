@@ -2859,11 +2859,50 @@ function toggleMainPullout()
 	}
 }
 
+function storeNewBuyOrder(event)
+{
+	promptPopup("New Buy Order", "Provide the name of the item you want to buy", "", function(itemName){
+		promptPopup("New Buy Order", "How many do you want to buy? Leave this blank if there is no limit.", "1", function(quantity){
+			promptPopup("New Buy Order", "How much will you buy each unit for?", "", function(gold){
+				doCommand(event, "StoreNewBuyOrder", {itemName:itemName,quantity:quantity,value:gold}, function(data){
+					 $("#buyOrders").prepend(data.createBuyOrder);
+				});
+			}, function(){return;});
+		}, function(){return;});
+	}, function(){return;});
+}
 
+function storeBuyOrderExecute(event, buyOrderId, itemId)
+{
+	confirmPopup("Sell your stuff", "Are you sure you want to sell all of this item? <br>(If you want to sell only a partial amount, you will have to split the stack first in your inventory)", function(){
+		doCommand(event, "StoreBuyOrderExecute", {buyOrderId:buyOrderId, itemId:itemId}, function(data){
+			// Refresh the popup so we can sell another
+			$("#buyordercompatibleitemslist-container").html(
+					"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+					"	<h4>Item picker</h4>" +
+					"	<div id='buyordercompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>");
+			$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId);
+		});
+	});
+}
 
+function viewBuyOrderOptions(event, buyOrderId)
+{
+	$("body").append("" +
+			"<div id='buyordercompatibleitemslist-container' class='main-buttonbox v3-window3 make-popup make-popup-removable'>" +
+			"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+			"	<h4>Item picker</h4>" +
+			"	<div id='buyordercompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>" +
+			"</div>" +
+			"<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId);
+}
 
-
-
+function storeDeleteBuyOrder(event, buyOrderId)
+{
+	doCommand(event, "StoreDeleteBuyOrder", {buyOrderId:buyOrderId});
+	
+}
 
 
 
@@ -4046,7 +4085,7 @@ function confirmPopup(title, content, yesFunction, noFunction)
 	confirmCancelPopup(title, content, false, yesFunction, noFunction);
 }
 
-function rangePopup(title, content, minValue, maxValue, valueFunction, yesFunction, noFunction)
+function rangePopup(title, content, minValue, maxValue, valueFunction, yesFunction, noFunction, doNotFocus)
 {
 	if (content!=null)
 		content = content.replace("\n", "<br>");
@@ -4098,6 +4137,15 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
     $("#popups").html(currentPopups + newPopup);
 	$("#popup_"+popupsNum).on("change", "#"+rangeId+",#"+numberId, changeText);
     expandpopupMessage();
+    
+    var inputText = $('#'+numberId);
+    
+    if (doNotFocus!=true)
+    {
+	    inputText.focus();
+    }
+
+    
     
 	// Use range, since that limits the acceptable values.
     var inputRange = $('#'+rangeId);
@@ -4493,4 +4541,19 @@ function toggle2DGrid() {
 	} else {
 		vpc.style.display = "none";
 	}
+}
+
+
+function changeGenericTab(event, tabId)
+{
+	var element = $(event.target);
+	var id = element.attr("id");
+	var code = id.substring(0, id.indexOf("-"));
+	
+	$("."+tabId+".tab-selected").removeClass("tab-selected");
+	element.addClass("tab-selected");
+	
+	$("."+tabId+".tab-content-selected").removeClass("tab-content-selected").addClass("tab-content");
+	$("."+tabId+"."+code+"-content").addClass("tab-content-selected").removeClass("tab-content");
+	console.log(code);
 }

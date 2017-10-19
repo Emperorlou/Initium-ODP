@@ -123,6 +123,14 @@ a:HOVER
 	text-decoration: underline;	
 }
 
+.list-item-X
+{
+	margin-top: 10px;
+	font-size: 20px;
+	color: #AA0000; 
+	cursor:pointer;	
+}
+
 hr {
     padding: 0;
     border: none;
@@ -179,6 +187,10 @@ hr:after {
 	top:20%;	
 
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
+}
+#ping
+{
+	text-shadow:0px 0px 5px;
 }
 
 .clue
@@ -1094,6 +1106,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .v3-main-button
 {
+	background-color: #414d63;
 	border-style: solid;
 	border-width: 17px 32px 17px 31px;
 	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
@@ -1396,6 +1409,40 @@ a.range-increment {
 /* Chatroom styles */
 
 
+#chat_submit
+{
+	background-color:#181715;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
+    -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
+    -moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
+    border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 fill repeat;
+    color: white;
+    border-style: solid;
+    border-width: 4px;
+    height: 25px;
+    position: relative;
+    top: 0px;
+    right: -1px;
+    cursor:pointer;
+}
+#chat_submit:hover
+{
+	text-shadow: 0px 0px 9px yellow;
+}
+
+
+#chat_input
+{
+	background-color:#181715;
+    -webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
+    -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
+    -moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
+    border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 fill repeat;
+    color: #f4f4f4;
+    border-width: 4px;
+    height: 15px;	
+}
+
 .chat_tab_footer
 {
 	background-color:#222222;
@@ -1413,7 +1460,7 @@ a.range-increment {
     padding: 3px;
     padding-top:4px;
     padding-right: 6px;	
-    border-right: 1px #FFFFFF solid;
+    border-right: 1px #33343b solid;
     padding-left: 8px;
 }
 .chat_tab_help_button
@@ -1421,12 +1468,29 @@ a.range-increment {
     float: right;
     padding: 3px;
     padding-right: 6px;	
-    border-left: 1px #FFFFFF solid;
+    border-left: 1px #33343b solid;
     padding-left: 8px;
 }
+.chat_tab_help_button:hover
+{
+	text-decoration: none;
+	text-shadow: 0px 0px 9px yellow;
+}
+.fullscreenChatButton
+{
+    border-top: 1px #33343b solid;
+	padding-left:3px;
+	padding-right:3px;
+}
+.fullscreenChatButton:hover
+{
+	text-decoration: none;
+	text-shadow: 0px 0px 9px yellow;
+}
+
 .chat_tab_container
 {
-	border-bottom: 1px solid #CCCCCC;	
+	/*border-bottom: 1px solid #CCCCCC;*/	
 }
 
 .chat_tab_button_container
@@ -1434,9 +1498,19 @@ a.range-increment {
 	position:relative;
 }
 
+.chat_tab_button_container a:hover
+{
+	text-decoration: none;
+	text-shadow: 0px 0px 9px yellow;
+}
+
 .chat_tab
 {
-	display:inline-block; padding:3px; padding-right:7px; padding-left:7px; border-right: 1px solid #CCCCCC;
+	display:inline-block; 
+	padding:3px; 
+	padding-right:7px; 
+	padding-left:7px; 
+	border-right: 1px solid #33343b;
 }
 
 .chat_tab_selected
@@ -1457,6 +1531,7 @@ a.range-increment {
 {
 	display:table-cell;
 	width:100%;
+	padding-right:5px;
 }
 
 .chat_form_submit
@@ -2756,8 +2831,16 @@ position: absolute;
 	50% {transform: translateY(-10px);}
 }
 
-
-
+/*
+	BUY ORDERS TABLE
+*/
+.buy-item-container
+{
+	color:#999999;
+	font-size:15px;
+	display:table-row;
+	width:100%;
+}
 
 
 

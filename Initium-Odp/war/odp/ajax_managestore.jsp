@@ -64,15 +64,27 @@
 	if(storeName != null) storeName = storeName.replaceAll("'","\\\\'");
 	request.setAttribute("storeName", storeName);
 	
+	
+	List<CachedEntity> buyOrders = db.getFilteredList("BuyItem", "characterKey", common.getCharacter().getKey());
+	List<String> buyOrdersFormatted = new ArrayList<String>();
+	for(CachedEntity buyOrder:buyOrders)
+	{
+		buyOrdersFormatted.add(HtmlComponents.generateManageStoreBuyOrderHtml(db, buyOrder, request));
+	}
+	
+	request.setAttribute("buyOrders", buyOrdersFormatted);
+	request.setAttribute("hasBuyOrders", !buyOrdersFormatted.isEmpty());
 %>
 
-		<h4 style="cursor:pointer" onclick="storeRenameNew(event, '${storeName}')">Store name: <%=common.getCharacter().getProperty("storeName")%></h4>
+		<div class='main-splitScreen'>
+		<div class='boldbox'>
+		<div style="cursor:pointer" onclick="storeRenameNew(event, '${storeName}')">Store name: <%=common.getCharacter().getProperty("storeName")%></div>
 		<br><br>
 		<div>Store-wide price is currently: ${storeSale}%</div>
 		<div>
 		<a onclick='storeSetSaleNew(event)' title='Use this feature to set a store-wide sale on all items (or even a store-wide price hike)'>Click here to change your store sale/adjustment value</a>
 		</div>
-		<div class='main-splitScreen'>
+		</div>
 		<div class='boldbox selection-root'>
 			<div class="inventory-main-header">
 				<h4>Your Inventory</h4>
@@ -117,7 +129,33 @@
 		</div>
 		
 		<div class='main-splitScreen'>
-		<div class='boldbox selection-root'>
+			<div class='boldbox tab-row'>
+				<div id='sellorders-tab' class='tab-row-tab tab-selected manageStoreTabs' style='width:auto; height:auto;' onclick='changeGenericTab(event, "manageStoreTabs")'>Sell Orders</div>
+				<div id='buyorders-tab' class='tab-row-tab manageStoreTabs' style='width:auto; height:auto;' onclick='changeGenericTab(event, "manageStoreTabs")'>Buy Orders</div>
+			</div>
+			
+			<div class='boldbox selection-root buyorders-content manageStoreTabs tab-content'>
+			<div class='inventory-main-header'>
+				<h4>Your Buy Orders</h4>
+				<div class='inventory-main-commands'>
+					<div class='command-row'>
+						<label class='command-cell' title='Adds a new buy order to your store.'><a onclick='storeNewBuyOrder(event)'>New Buy Order</a></label>
+					</div>
+				</div>
+			</div>
+		
+			
+			<div id='buyOrders' class='selection-list'>
+			<c:forEach var="order" items="${buyOrders}">
+				${order}
+			</c:forEach>
+			<c:if test='${hasBuyOrders==false }'>
+				You have not setup any buy orders.
+			</c:if>
+			</div>
+		</div>		
+		
+		<div class='boldbox selection-root sellorders-content manageStoreTabs tab-content-selected'>
 			<div class='inventory-main-header'>
 				<h4>Your Storefront</h4>
 				<div class='main-item-filter'>

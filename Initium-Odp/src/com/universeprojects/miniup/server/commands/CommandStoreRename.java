@@ -8,10 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 /** 
  * 
  * Rename your store!
@@ -38,8 +36,8 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		if (db.checkStoreNameUnique(storeName)==false)
 			throw new UserErrorMessage("The store name '"+storeName+"' is already in use. Please choose another.");
 		
-		if (storeName.length()>80)
-			throw new UserErrorMessage("The store name cannot be more than 80 characters long.");
+		if (storeName.length()>160)
+			throw new UserErrorMessage("The store name cannot be more than 160 characters long.");
 		
 		
 		character.setProperty("storeName", storeName);

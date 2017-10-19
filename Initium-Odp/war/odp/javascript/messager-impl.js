@@ -38,10 +38,10 @@ messager.markers = [null, null, null, null, null, getItem("NotificationsMarker")
 
 messager.onMessagesChecked = function()
 {
-	if (messager.ping==null)
-		$("#ping").text("??");
-	else
-		$("#ping").text(messager.ping);
+//	if (messager.ping==null)
+//		$("#ping").text("??");
+//	else
+//		$("#ping").text(messager.ping);
 };
 
 messager.onError = function(xhr, textStatus, error)
@@ -49,6 +49,15 @@ messager.onError = function(xhr, textStatus, error)
 	$("#chat_messages").prepend("<div style='color:red'>"+textStatus+": "+error+"</div>");
 };
 
+messager.onConnectionStateChange = function(state)
+{
+	if (state=="connecting" || state=="disconnected")
+		state = "<span style='color:#FF0000'>&#9679;</span>";
+	else
+		state = "<span style='color:#00FF00'>&#9679;</span>";
+	
+	$("#ping").html(state);
+};
 
 
 messager.onNotificationMessage = function(message)

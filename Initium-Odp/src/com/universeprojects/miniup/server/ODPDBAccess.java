@@ -3521,12 +3521,13 @@ public class ODPDBAccess
 		if (character!=null)
 		{
 			
-			Date currentDate = (Date)character.getProperty("locationEntryDatetime");
-			if (currentDate==null || currentDate.getTime()+(1000*300)<System.currentTimeMillis())
-			{
-				character.setProperty("locationEntryDatetime", new Date());
-				ds.put(character);
-			}
+//			Date currentDate = (Date)character.getProperty("locationEntryDatetime");
+//			if (currentDate==null || currentDate.getTime()+(1000*300)<System.currentTimeMillis())
+//			{
+//				character.refetch(getDB());
+//				character.setProperty("locationEntryDatetime", new Date());
+//				ds.put(character);
+//			}
 		}
 	}
 	
@@ -6720,6 +6721,12 @@ public class ODPDBAccess
 	public String getChatToken()
 	{
 		return null;
+	}
+
+	public void setValue_FieldTypeFieldFilter2DCollection(CachedEntity entity, String fieldName, List<List<String>> value)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -369,4 +369,21 @@ public abstract class CommonChecks
 		if (user==null) return false;
 		return GameUtils.equals(Boolean.TRUE, user.getProperty("subscribe"));
 	}
+
+	public static boolean checkItemIsCustomized(CachedEntity item)
+	{
+		return "Custom".equals(item.getProperty("forcedItemQuality"));
+	}
+
+	public static boolean checkItemIsEquipped(Key itemKey, CachedEntity character)
+	{
+		for (int i = 0; i < ODPDBAccess.EQUIPMENT_SLOTS.length; i++)
+		{
+			Key equipmentInSlot = (Key) character.getProperty("equipment" + ODPDBAccess.EQUIPMENT_SLOTS[i]);
+			if (GameUtils.equals(itemKey, equipmentInSlot)) 
+				return true;
+		}
+
+		return false;
+	}
 }

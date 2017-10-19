@@ -1,3 +1,4 @@
+<%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <%@page import="com.universeprojects.miniup.server.DDOSProtectionException"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -125,18 +126,45 @@
     request.setAttribute("storeSale", storeSale);
     
     // TODO: Check if all saleItems are sold, if so, take the player out of store mode
+    
+    
+    
+	List<CachedEntity> buyOrders = db.getFilteredList("BuyItem", "characterKey", storeCharacter.getKey());
+	List<String> buyOrdersFormatted = new ArrayList<String>();
+	for(CachedEntity buyOrder:buyOrders)
+	{
+		buyOrdersFormatted.add(HtmlComponents.generateBuyOrderHtml(db, buyOrder, request));
+	}
+	
+	request.setAttribute("buyOrders", buyOrdersFormatted);
+	request.setAttribute("hasBuyOrders", !buyOrdersFormatted.isEmpty());
+    
 %>
 
 
 
 
 <div class='normal-container'>
-	<h4><%=storeCharacter.getProperty("name")%>'s Storefront</h4> 
-	<p><%=storeCharacter.getProperty("storeName")%></p>
+	<div style='background-color:#222222; padding:10px'>
+		<h5><%=storeCharacter.getProperty("storeName")%></h5> 
+		<div class='main-item-subtext'>Owned by <%=storeCharacter.getProperty("name")%></p>
+	</div>
+</div>
+<c:if test='${hasBuyOrders==true}'>
+	<div class='main-splitScreen'>
+		<h3>Buy Orders</h3>
+		<c:forEach var="order" items="${buyOrders}">
+			${order}
+		</c:forEach>
+	</div>
+</c:if>
+<c:if test='${hasBuyOrders}'>
+<div class='main-splitScreen'>
+<h3>Sell Orders</h3>
+</c:if>
 	<div class="main-item-filter">
 		<input class="main-item-filter-input" id="filter_saleItem" type="text" placeholder="Filter store items...">
 	</div>
-</div>
 <div class='normal-container'>
 	<%
 	String currentCategory = "";
@@ -155,3 +183,6 @@
 	%>
 	<center><a onclick="closePagePopup()" class="big-link">Leave Store</a></center>
 </div>
+<c:if test='${hasBuyOrders}'>
+</div>
+</c:if>

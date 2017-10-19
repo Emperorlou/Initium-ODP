@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
@@ -38,13 +40,20 @@ public class ExchangeController extends PageController {
 	    CachedEntity character = db.getCurrentCharacter(); 
 	    
 	    CachedDatastoreService ds = db.getDB();
-	    List<CachedEntity> saleItems = db.getFilteredList("SaleItem", 
+	    QueryHelper query = new QueryHelper(ds);
+
+	    List<CachedEntity> buyOrdersPT = query.getFilteredList("BuyItem", 
+	    		"specialId", "Initium Premium Membership");	    
+	    
+	    List<CachedEntity> buyOrdersCT = query.getFilteredList("BuyItem", 
+	    		"specialId", "Chipped Token");	    
+	    
+	    List<CachedEntity> saleItems = query.getFilteredList("SaleItem", 
 	    		"specialId", "Initium Premium Membership",
 	    		"status", "Selling");
 
 	    // First go through each sale item and extract the item keys for each
 	    List<Key> itemKeys = new ArrayList<Key>();
-	    Map<Key,CachedEntity> sellingCharacters = new HashMap<Key,CachedEntity>();
 	    List<Key> sellingCharacterKeys = new ArrayList<Key>();
 	    for(CachedEntity saleItem:saleItems)
 	    {
@@ -52,13 +61,24 @@ public class ExchangeController extends PageController {
 	    	sellingCharacterKeys.add((Key)saleItem.getProperty("characterKey"));
 	    }
 	    
+	    for(CachedEntity buyOrder:buyOrdersPT)
+	    	sellingCharacterKeys.add((Key)buyOrder.getProperty("characterKey"));
+	    
+	    for(CachedEntity buyOrder:buyOrdersCT)
+	    	sellingCharacterKeys.add((Key)buyOrder.getProperty("characterKey"));
+	    
+	    
+	    
 	    // Now batch get all the characters that sell these things
-	    List<CachedEntity> sellingCharactersList = ds.fetchEntitiesFromKeys(sellingCharacterKeys);
-	    for(CachedEntity c:sellingCharactersList)
-	    	sellingCharacters.put(c.getKey(), c);
+	    EntityPool pool = new EntityPool(ds);
+	    pool.addToQueue(sellingCharacterKeys);
+	    pool.addToQueue(itemKeys);
+	    
+	    pool.loadEntities();
+	    
+	    List<CachedEntity> items = pool.get(itemKeys);
 
 	    // Now fetch the full item list (they will come back in the same order which we definitely want to take advantage of)
-	    List<CachedEntity> items = ds.fetchEntitiesFromKeys(itemKeys);
 	    Map<CachedEntity, CachedEntity> itemToSaleItemMap = new HashMap<CachedEntity, CachedEntity>();
 	    
 	    
@@ -66,8 +86,8 @@ public class ExchangeController extends PageController {
 	    for(int i = saleItems.size()-1; i>=0; i--)
 	    {
 	    	CachedEntity saleItem = saleItems.get(i);
-			CachedEntity item = items.get(i);
-	    	CachedEntity sellingCharacter = sellingCharacters.get((Key)saleItem.getProperty("characterKey"));	
+			CachedEntity item = pool.get((Key)saleItem.getProperty("itemKey"));
+	    	CachedEntity sellingCharacter = pool.get((Key)saleItem.getProperty("characterKey"));	
 	        
 	        // If the item being sold was not found in the database, then we'll delete the sale item while we're at it
 	        // OR
@@ -106,14 +126,35 @@ public class ExchangeController extends PageController {
         {
         	CachedEntity saleItem = itemToSaleItemMap.get(item);
         	if (CommonChecks.checkItemIsPremiumToken(item))
-        		formattedPremiumTokens.add(HtmlComponents.generateStoreItemHtml(db,character, sellingCharacters.get(saleItem.getProperty("characterKey")),item,saleItem,request));
+        		formattedPremiumTokens.add(HtmlComponents.generateStoreItemHtml(db,character, pool.get((Key)saleItem.getProperty("characterKey")),item,saleItem,request));
         	else if (CommonChecks.checkItemIsChippedToken(item))
-        		formattedChippedTokens.add(HtmlComponents.generateStoreItemHtml(db,character, sellingCharacters.get(saleItem.getProperty("characterKey")),item,saleItem,request));
+        		formattedChippedTokens.add(HtmlComponents.generateStoreItemHtml(db,character, pool.get((Key)saleItem.getProperty("characterKey")),item,saleItem,request));
         		
         }
 	    
 	    request.setAttribute("premiumTokens", formattedPremiumTokens);
 	    request.setAttribute("chippedTokens", formattedChippedTokens);
+
+	    
+	    
+	    
+	    
+	    // Do buy orders now...
+
+	    
+	    List<String> formattedPremiumTokenBuyOrders = new ArrayList<>();
+	    List<String> formattedChippedTokenBuyOrders = new ArrayList<>();
+	    
+	    for(int i = 0; i<buyOrdersPT.size(); i++)
+	    	formattedPremiumTokenBuyOrders.add(HtmlComponents.generateManageStoreBuyOrderHtml(db, buyOrdersPT.get(i), request));
+	    
+	    for(int i = 0; i<buyOrdersCT.size(); i++)
+	    	formattedChippedTokenBuyOrders.add(HtmlComponents.generateManageStoreBuyOrderHtml(db, buyOrdersCT.get(i), request));
+	    
+	    
+	    request.setAttribute("premiumTokenBuyOrders", formattedPremiumTokenBuyOrders);
+	    request.setAttribute("chippedTokenBuyOrders", formattedChippedTokenBuyOrders);
+	    
 	    
 	    return "/WEB-INF/odppages/ajax_exchange.jsp";
 	}

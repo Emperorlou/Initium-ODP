@@ -22,7 +22,7 @@
 </style>
 <c:forEach var="character" items="${characters}">
 	<div class='selectable'>
-		<div style='float: right;margin-top: 10px;font-size: 20px;color: #AA0000; cursor:pointer;' onclick='doDeleteCharacter(event,${character.id},"${character.name}")'>X</div>
+		<div class='list-item-X' onclick='doDeleteCharacter(event,${character.id},"${character.name}")'>X</div>
 		<div>
 			${character.html}
 		</div>
