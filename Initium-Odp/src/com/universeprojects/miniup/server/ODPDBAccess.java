@@ -5518,6 +5518,9 @@ public class ODPDBAccess
 						doCharacterDiscoverEntity(db, member, path);
 		}
 		
+		if(CommonChecks.checkLocationIsInstance(destination))
+			resetInstanceRespawnTimer(destination);
+		
 		boolean isCombatSite = CommonChecks.checkLocationIsCombatSite(destination);
 		// Only engage if it's done via explore or we're travelling to combat site
 		if(isExplore || isCombatSite)
@@ -5533,7 +5536,7 @@ public class ODPDBAccess
 				if ((isCombatSite || possibleNPC.getProperty("mode") == null || CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode")) || CommonChecks.checkCharacterIsRaidBoss(possibleNPC)) && 
 						(Double)possibleNPC.getProperty("hitpoints")>0d)
 				{
-					resetInstanceRespawnTimer(destination);
+					
 					CachedEntity curMember = party.get(partyIdx++);
 					
 					possibleNPC.setProperty("mode", CHARACTER_MODE_COMBAT);

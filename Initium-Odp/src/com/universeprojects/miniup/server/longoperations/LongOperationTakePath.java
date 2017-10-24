@@ -76,6 +76,8 @@ public class LongOperationTakePath extends LongOperation {
 			throw new UserErrorMessage("You cannot move right now because you are currently vending.");
 		if (ODPDBAccess.CHARACTER_MODE_TRADING.equals(character.getProperty("mode")))
 			throw new UserErrorMessage("You cannot move right now because you are currently trading.");
+		if (GameUtils.isPlayerIncapacitated(character))
+			throw new UserErrorMessage("You are currently knocked out and cannot move.");
 		if (character.getProperty("mode")==null || "".equals(character.getProperty("mode")) || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(character.getProperty("mode")))
 		{/*We're in normal mode and so we can actually move*/}
 		else
@@ -117,13 +119,7 @@ public class LongOperationTakePath extends LongOperation {
 			if(isInParty)
 				throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
 
-			// ALWAYS RESET INSTANCE TIMER ON TRAVEL TO INSTANCE.
-			// Encounter doesn't matter, should always reset when traveling,
-			// since we can have partial spawns from the spawners now (which
-			// would require the timer to be set in order to tick).
 			db.resetInstanceRespawnTimer(destination);
-			if(destination.isUnsaved())
-				ds.put(destination);
 			
 			CachedEntity monster = db.getCombatantFor(db.getCurrentCharacter(), destination);
 			if (monster!=null)
@@ -132,6 +128,9 @@ public class LongOperationTakePath extends LongOperation {
 				
 				ds.put(monster);
 				ds.put(db.getCurrentCharacter());
+				
+				if(destination.isUnsaved())
+					ds.put(destination);
 				
 				ds.commitBulkWrite();
 				throw new GameStateChangeException("A "+monster.getProperty("name")+" stands in your way.");
@@ -199,6 +198,9 @@ public class LongOperationTakePath extends LongOperation {
 						monster.setProperty("monsterSpawnerKey", mobSpawner.getKey());
 						
 						ds.put(finalChar, monster);
+						
+						if(destination.isUnsaved())
+							ds.put(destination);
 						
 						ds.commitBulkWrite();
 						
