@@ -12,7 +12,7 @@
 		<div id='premium-membership-token-pane'>
 		<div class='main-splitScreen'>
 		<h2>Buyers</h2>
-		<c:forEach var="item" items="${premiumTokensBuyOrders}">
+		<c:forEach var="item" items="${premiumTokenBuyOrders}">
 			${item}
 		</c:forEach>
 		</div>
@@ -27,7 +27,7 @@
 
 		<div class='main-splitScreen'>
 		<h2>Buyers</h2>
-		<c:forEach var="item" items="${chippedTokensBuyOrders}">
+		<c:forEach var="item" items="${chippedTokenBuyOrders}">
 			${item}
 		</c:forEach>
 		</div>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -116,11 +117,16 @@ public class GroupController extends PageController {
 					if (status.equals("Admin"))
 						return 2;
 					if (status.equals("Member"))
-						return 3;
+					{
+						if (isOnline(e))
+							return 3;
+						else
+							return 4;
+					}
 					if (e.getProperty("leaveGroupDate") != null)
-						return 4;
-					if (status.equals("Kicked"))
 						return 5;
+					if (status.equals("Kicked"))
+						return 6;
 	
 					return 1000;
 				}
@@ -133,6 +139,8 @@ public class GroupController extends PageController {
 			for(CachedEntity member:members)
 			{
 				String output = HtmlComponents.generateGroupMember(character, member, group, inGroup, canDeleteGroup);
+				if (isOnline(member))
+					output = "<span style='float:left; text-shadow:0px 0px 5px;' title='This indicates whether or not you&quot;re connected to the chat server'><span style='color:#00FF00'>&#9679;</span></span>" + output;
 				memberOutput.add(output);
 			}
 			request.setAttribute("groupMembers", memberOutput);
@@ -295,4 +303,18 @@ public class GroupController extends PageController {
 		return "/WEB-INF/odppages/ajax_group.jsp";
 	}
 
+	
+	private boolean isOnline(CachedEntity character)
+	{
+		Date timestamp = (Date)character.getProperty("locationEntryDatetime");
+		if (timestamp!=null)
+		{
+			long timestampMs = timestamp.getTime();
+			long msPassed = System.currentTimeMillis()-timestampMs;
+			if (msPassed<1000*60*60*3)	// 3 hours
+				 return true;
+		}
+		
+		return false;
+	}
 }

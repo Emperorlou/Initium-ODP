@@ -136,6 +136,11 @@ $(window).ready(function(e){
 	
 });
 
+function scrollTo(position)
+{
+	window.scrollTo(0,position);
+}
+
 /**
  * This removes the * from the title, (and by extension the 'unread messages' symbol on chrome browsers).
  *  

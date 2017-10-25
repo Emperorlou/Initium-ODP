@@ -6732,4 +6732,10 @@ public class ODPDBAccess
 		
 	}
 
+	public String getChatToken(Key key)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

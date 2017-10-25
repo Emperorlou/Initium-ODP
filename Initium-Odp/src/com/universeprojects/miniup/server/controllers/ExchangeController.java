@@ -2,6 +2,8 @@ package com.universeprojects.miniup.server.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +45,10 @@ public class ExchangeController extends PageController {
 	    QueryHelper query = new QueryHelper(ds);
 
 	    List<CachedEntity> buyOrdersPT = query.getFilteredList("BuyItem", 
-	    		"specialId", "Initium Premium Membership");	    
+	    		"specialId", "premiumToken");	    
 	    
 	    List<CachedEntity> buyOrdersCT = query.getFilteredList("BuyItem", 
-	    		"specialId", "Chipped Token");	    
+	    		"specialId", "chippedToken");	    
 	    
 	    List<CachedEntity> saleItems = query.getFilteredList("SaleItem", 
 	    		"specialId", "Initium Premium Membership",
@@ -141,15 +143,33 @@ public class ExchangeController extends PageController {
 	    
 	    // Do buy orders now...
 
+	    sortBuyOrders(buyOrdersPT);
+	    sortBuyOrders(buyOrdersCT);
 	    
 	    List<String> formattedPremiumTokenBuyOrders = new ArrayList<>();
 	    List<String> formattedChippedTokenBuyOrders = new ArrayList<>();
 	    
 	    for(int i = 0; i<buyOrdersPT.size(); i++)
-	    	formattedPremiumTokenBuyOrders.add(HtmlComponents.generateManageStoreBuyOrderHtml(db, buyOrdersPT.get(i), request));
+	    {
+	    	CachedEntity sellingCharacter = pool.get((Key)buyOrdersPT.get(i).getProperty("characterKey"));	
+	        
+			// If the character isn't currently vending, then don't sell
+			if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(sellingCharacter.getProperty("mode"))==false)
+				continue;
+	    	
+	    	formattedPremiumTokenBuyOrders.add(HtmlComponents.generateBuyOrderHtml(db, buyOrdersPT.get(i), request));
+	    }
 	    
 	    for(int i = 0; i<buyOrdersCT.size(); i++)
-	    	formattedChippedTokenBuyOrders.add(HtmlComponents.generateManageStoreBuyOrderHtml(db, buyOrdersCT.get(i), request));
+	    {
+	    	CachedEntity sellingCharacter = pool.get((Key)buyOrdersCT.get(i).getProperty("characterKey"));	
+	        
+			// If the character isn't currently vending, then don't sell
+			if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(sellingCharacter.getProperty("mode"))==false)
+				continue;
+			
+	    	formattedChippedTokenBuyOrders.add(HtmlComponents.generateBuyOrderHtml(db, buyOrdersCT.get(i), request));
+	    }
 	    
 	    
 	    request.setAttribute("premiumTokenBuyOrders", formattedPremiumTokenBuyOrders);
@@ -157,5 +177,21 @@ public class ExchangeController extends PageController {
 	    
 	    
 	    return "/WEB-INF/odppages/ajax_exchange.jsp";
+	}
+	
+	
+	private void sortBuyOrders(List<CachedEntity> list)
+	{
+		Collections.sort(list, new Comparator<CachedEntity>(){
+
+			@Override
+			public int compare(CachedEntity o1, CachedEntity o2)
+			{
+				return ((Long)o1.getProperty("value")).compareTo(((Long)o2.getProperty("value")));
+			}
+			
+		});
+		
+		Collections.reverse(list);
 	}
 }

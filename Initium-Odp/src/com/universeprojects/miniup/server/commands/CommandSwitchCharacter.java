@@ -87,11 +87,18 @@ public class CommandSwitchCharacter extends Command {
 		js.append("window.messager.idToken = window.chatIdToken;");
 		js.append("window.characterId = " + targetCharacter.getId() + ";");
 
-		addJavascriptToResponse(js.toString());
+		
+		
 		
 		// Consolidating this to quick refresh the page
 		CachedEntity location = ds.getIfExists((Key) targetCharacter.getProperty("locationKey"));
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter, location, this);
 		mpus.updateFullPage_shortcut();
+		
+		js.append("window.newChatIdToken= '"+db.getChatToken(targetCharacter.getKey())+"';");
+		js.append("messager.reconnect();");
+		js.append("$('.chat_messages').html('');");
+		
+		addJavascriptToResponse(js.toString());
 	}
 }
