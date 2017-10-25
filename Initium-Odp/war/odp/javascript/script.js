@@ -680,6 +680,19 @@ function storeSellItemNew(eventObject,itemId)
 	});
 }
 
+function storeRepriceItem(eventObject,saleItemId)
+{
+	promptPopup("Reprice Item", "How much do you want to reprice this item for?<br/>For stacks of items, will be per item purchased.", "0", function(amount){
+		if (amount!=null && amount!="")
+		{
+			doCommand(eventObject,"StoreRepriceItem",{"saleItemId":saleItemId,"amount":amount},function(data,error){
+				if (error) return;
+				$(".saleItem[ref='"+saleItemId+"']").replaceWith(data.repriceItem);
+			});
+		}
+	});
+}
+
 function storeDeleteAllItemsNew(eventObject,characterKey)
 {
 	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
