@@ -83,6 +83,39 @@ public abstract class ScriptEvent extends OperationBase
 	public Map<Key, EntityWrapper> deleteEntities = new HashMap<Key, EntityWrapper>();
 	
 	/**
+	 * Used to track log entries through executions of the script. Will be compiled,
+	 * and executed upon script completion.
+	 */
+	public Map<Level, String> logEntries = new HashMap<Level, String>();
+	
+	//-----------LOGGING METHODS----------//
+	public void logFine(String log)
+	{
+		log(Level.FINE, log);
+	}
+	
+	public void logInfo(String log)
+	{
+		log(Level.INFO, log);
+	}
+	
+	public void logWarning(String log)
+	{
+		log(Level.WARNING, log);
+	}
+	
+	public void logSevere(String log)
+	{
+		log(Level.SEVERE, log);
+	}
+	
+	private void log(Level type, String log)
+	{
+		String currentLog = logEntries.get(type);
+		currentLog = currentLog == null ? log : (currentLog + "\r\n" + log);
+		logEntries.put(type, currentLog);
+	}
+	/**
 	 * Indicates the event type we're dealing with. Simply used for sanity purposes,
 	 * as a script has a single discrete type (onAttacking, itemLink, locationLink, etc). 
 	 * @return Event type we're dealing with.

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
@@ -162,6 +163,9 @@ public abstract class CommandScriptBase extends Command {
 						ds.delete(delEntity);
 					
 					ds.commitBulkWrite();
+					
+					for(Entry<Level, String> logs:event.logEntries.entrySet())
+						ScriptService.log.log(logs.getKey(), logs.getValue());
 					
 					this.mergeOperationUpdates(event);
 					
