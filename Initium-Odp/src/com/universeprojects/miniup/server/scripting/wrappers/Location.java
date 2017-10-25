@@ -106,7 +106,7 @@ public class Location extends EntityWrapper {
 		{
 			List<Character> chars = new ArrayList<Character>();
 			QueryHelper qh = new QueryHelper(db.getDB());
-			List<CachedEntity> dbChars = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, this.getKey());
+			List<CachedEntity> dbChars = qh.getFilteredList("Character", 1000, null, "locationKey", FilterOperator.EQUAL, this.getKey());
 			for(CachedEntity charEnt:dbChars)
 			{
 				if(charEnt != null)
