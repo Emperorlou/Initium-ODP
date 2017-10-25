@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 
 public class HtmlComponents {
 
@@ -119,6 +120,7 @@ public class HtmlComponents {
 			storeSale = 100.0;
 		}
 		
+		boolean isVending = CommonChecks.checkCharacterIsVending(db.getCurrentCharacter());
 		Long cost = (Long)saleItem.getProperty("dogecoins");
 		cost=Math.round(cost.doubleValue()*(storeSale/100));
 		String finalCost = cost.toString();
@@ -140,11 +142,12 @@ public class HtmlComponents {
 		   	   result+="<div class='main-item'>";
 		   	   result+="<input type='checkbox'>";
 		   	   result+=" ";
-		   	   result+="<div class='main-item-container'>";
-		   	   result+="<a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> " + GameUtils.renderItem(item) + " <div class='main-item-storefront-status'>(<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")</div>";
+		   	   result+="<div class='main-item-container'><a onclick='storeDeleteItemNew(event,"+saleItem.getKey().getId()+")' class='main-item-bigx'>X</a> " + GameUtils.renderItem(item) + " ";
+		   	   result+="<div class='main-item-storefront-status'>(<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' class='small-dogecoin-icon' border=0/>"+finalCost+" - "+statusText+")";
 //		   	   result+="<br>";
-//		   	   result+="<div class='main-item-controls'>";
-//		   	   result+="</div>";
+		   	   if(isVending==false)
+		   		   result+="<div class='main-item-controls'><a onclick='storeRepriceItem(event,"+saleItem.getId()+")'>Reprice</a></div>";
+		   	   result+="</div>";
 		   	   result+="</div>";
 		   	   result+="</div>";
 		   	   result+="</div>";
