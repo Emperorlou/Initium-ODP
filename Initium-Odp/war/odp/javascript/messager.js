@@ -85,6 +85,7 @@ function EventServerMessager(chatServerUrl, idToken)
 	 * 	message.additionalData.senderDisplayNameStyled = old.nicknameStyled
 	 * 	message.additionalData.mode = old.mode
 	 */
+	this.messagesReceived = [];	// Removing duplicates this way
 
 	this._processMessage = function(data)
 	{
@@ -96,12 +97,20 @@ function EventServerMessager(chatServerUrl, idToken)
 
 		var receivedMessage = false;
 		
+		
 		for(var ii = 0; ii<data.length; ii++)
 		{
 			var newDataType = data[ii];
 
 			receivedMessage = true;
 
+			// A hacky workaround method of removing duplicate messages
+			var uniqueId = newDataType.timestamp+newDataType.text+newDataType.details;
+			if (this.messagesReceived.indexOf(uniqueId)>=0)
+				continue;
+			this.messagesReceived.push(uniqueId);
+			// End hack
+			
 			if (newDataType.channel!="!Notifications")
 			{
 				var message = 
@@ -166,6 +175,7 @@ function EventServerMessager(chatServerUrl, idToken)
 	    that.socket = new SockJS(url, null, options);
 	    that.socket.onopen = function(event) 
 	    {
+	    	that.messagesReceived = [];	// Removing duplicates this way - Here we're clearing the unique messages we received so we don't accidentally ignore them when they are sent again
 	    	that.firstGet = true;
 	        console.log("connected: "+JSON.stringify(event));
 	        that.sockJsConnected = true;
