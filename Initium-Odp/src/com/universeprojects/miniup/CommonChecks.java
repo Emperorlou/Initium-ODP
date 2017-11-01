@@ -240,7 +240,8 @@ public abstract class CommonChecks
 		
 		if ("COMBAT".equals(character.getProperty("mode")))
 		{
-			if (character.getProperty("combatant")==null)
+			if (CommonChecks.checkCharacterIsRaidBoss(character) == false &&
+					character.getProperty("combatant")==null)
 			{
 				character.setProperty("mode", "NORMAL");
 				return false;

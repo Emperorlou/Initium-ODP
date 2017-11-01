@@ -267,11 +267,11 @@ public class Character extends EntityWrapper
 		return false;
 	}
 	
-	public Location getLocation()
+	public EntityWrapper getLocation()
 	{
 		Key locKey = getLocationKey();
 		CachedEntity location = db.getEntity(locKey);
-		return new Location(location, db);
+		return ScriptService.wrapEntity(location, db);
 	}
 	
 	/**
@@ -283,7 +283,10 @@ public class Character extends EntityWrapper
 	{
 		// TODO: Validate new location, or provide overload to force new location.
 		// Reasons to force: teleportation, phasing, trap doors, etc.
-		setLocationKey(newLocation.getKey());
+		if(newLocation == null || GameUtils.equals(newLocation.getKey(), this.getLocationKey()))
+			return false;
+		this.setProperty("locationKey", newLocation.getKey());
+		this.setProperty("locationEntryDatetime", new Date());
 		return true;
 	}
 
@@ -292,11 +295,9 @@ public class Character extends EntityWrapper
 	}
 
 	public boolean setLocationKey(Key locationKey) {
-		CachedEntity location = db.getEntity(locationKey);
+		Location location = (Location)ScriptService.wrapEntity(db.getEntity(locationKey), db);
 		if(location == null) return false;
-		this.setProperty("locationKey", locationKey);
-		this.setProperty("locationEntryDatetime", new Date());
-		return true;
+		return setLocation(location);
 	}
 	
 	public boolean setLocationId(Long locationId)
