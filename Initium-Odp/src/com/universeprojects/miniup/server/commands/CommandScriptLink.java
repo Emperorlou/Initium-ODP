@@ -45,6 +45,8 @@ public class CommandScriptLink extends CommandScriptBase {
 	@Override
 	protected void validateCharacterState(CachedEntity character) throws UserErrorMessage
 	{
+		if(GameUtils.isPlayerIncapacitated(character))
+			throw new UserErrorMessage("You are incapacitated and cannot trigger any effects!");
 		if(GameUtils.enumEquals(character.getProperty("mode"), CharacterMode.COMBAT))
 			throw new UserErrorMessage("You cannot trigger this effect in combat!");
 	}

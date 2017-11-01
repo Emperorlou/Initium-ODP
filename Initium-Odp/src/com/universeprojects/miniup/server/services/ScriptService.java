@@ -21,6 +21,7 @@ import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
 import com.universeprojects.miniup.server.scripting.wrappers.Buff;
+import com.universeprojects.miniup.server.scripting.wrappers.Discovery;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
@@ -88,6 +89,8 @@ public class ScriptService extends Service
 				return new Buff(entity, db);
 			case "Path":
 				return new Path(entity, db);
+			case "Discovery":
+				return new Discovery(entity, db);
 			default: 
 				throw new RuntimeException("Entity does not support scripting.");
 		}

@@ -8,10 +8,10 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.ScriptService;
 
-public class Path extends EntityWrapper {
-
-	private EntityWrapper location1Entity = null;
-	private EntityWrapper location2Entity = null;
+public class Path extends EntityWrapper 
+{
+	protected EntityWrapper location1Entity = null;
+	protected EntityWrapper location2Entity = null;
 	
 	public Path(CachedEntity entity, ODPDBAccess db) {
 		super(entity, db);
