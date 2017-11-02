@@ -5478,7 +5478,7 @@ public class ODPDBAccess
 		if (allowAttack==false && blockadeStructure!=null)
 			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here to attack!</a>", false);
 		
-		boolean playerSetLocation = isInParty;
+		boolean playerSetLocation = false;
 		if(isInParty == false)
 		{
 			// Here is where we'll check if we're entering combat with a defending player...
@@ -5548,6 +5548,9 @@ public class ODPDBAccess
 					}
 					ds.put(possibleNPC);
 				}
+			
+			if(playerSetLocation == false && CommonChecks.checkCharacterIsInCombat(character)==false)
+				playerSetLocation = true;
 		}
 		
 		if(playerSetLocation)
