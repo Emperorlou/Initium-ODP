@@ -1,8 +1,10 @@
 package com.universeprojects.miniup.server.longoperations;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -128,12 +130,20 @@ public class LongOperationExplore extends LongOperation {
 			discoverablePaths_CampsAndBlockades.addAll(discoverablePaths_BlockadesOnly);
 			Collections.shuffle(discoverablePaths_CampsAndBlockades);
 			
-			List<CachedEntity> discoverablePaths = db.getPathsByLocation(locationKey);
-			Collections.shuffle(discoverablePaths);
+			// Only when we're not ignoring old sites, otherwise don't get the paths.
+			List<CachedEntity> discoverablePaths = null;
+			if(ignoreCombatSites==false)
+			{
+				discoverablePaths = db.getPathsByLocation(locationKey);
+				Collections.shuffle(discoverablePaths);
+			}
 			
 			// And get all the things the character has discovered...
 			List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacter().getKey(), locationKey, true);
-			
+			Set<String> discoveredEntities = new HashSet<String>();
+			for(CachedEntity disco:discoveries)
+				if(disco != null)
+					discoveredEntities.add(((Key)disco.getProperty("entityKey")).toString());
 			
 	//		Logger.getLogger("ServletCharacterControl").log(Level.WARNING, 
 	//				"Discoverable path count (no combat sites): "+discoverablePaths_PermanentOnly.size()+
@@ -158,36 +168,18 @@ public class LongOperationExplore extends LongOperation {
 					Double discoveryChance = (Double)path.getProperty("discoveryChance");
 					if (discoveryChance!=null && discoveryChance==100d)
 						continue;
+					if (discoveredEntities.contains(path.getKey().toString()))
+						continue;
 					if (discoveryChance!=null && discoveryChance>0 && GameUtils.roll(discoveryChance))
 					{
-						boolean skipPath = false;
-						// First check if we have already discovered this. If so, just keep rolling for the rest of the stuff to discover
-						for(CachedEntity discovery:discoveries)
-							if (discovery.getProperty("kind").equals("Path") && ((Key)discovery.getProperty("entityKey")).getId() == path.getKey().getId())
-							{
-								skipPath=true;
-								break;
-							}
-						if (skipPath) continue;
-	
+						Key destinationKey = GameUtils.equals(path.getProperty("location1Key"), locationKey) ? 
+								(Key)path.getProperty("location2Key") : (Key)path.getProperty("location1Key");											
 						// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
-						if (((Key)path.getProperty("location1Key")).getId()==locationKey.getId())
+						if (ds.getIfExists(destinationKey)==null)
 						{
-							if (ds.getIfExists((Key)path.getProperty("location2Key"))==null)
-							{
-								ds.delete(path);
-								continue;
-							}
+							ds.delete(path);
+							continue;
 						}
-						else
-						{
-							if (ds.getIfExists((Key)path.getProperty("location1Key"))==null)
-							{
-								ds.delete(path);
-								continue;
-							}
-						}
-						
 							
 						discoverPath(ds, db, path);
 						
@@ -217,13 +209,15 @@ public class LongOperationExplore extends LongOperation {
 						ds.put(path);
 					}
 					
+					if (discoveredEntities.contains(path.getKey().toString()))
+						continue;
+					
 					Double discoveryChance = (Double)path.getProperty("discoveryChance");
 					if (discoveryChance!=null && discoveryChance==100d)
 						continue;
-	
 					
 					// Now include the day/night changes to the discovery chance...
-					if (discoveryChance!=null && location.getProperty("isOutside")!=null && location.getProperty("isOutside").equals("TRUE"))
+					if (discoveryChance!=null && GameUtils.booleanEquals(location.getProperty("isOutside"), true))
 					{
 						double daynight = GameUtils.getDayNight();
 						daynight*=45;
@@ -234,34 +228,15 @@ public class LongOperationExplore extends LongOperation {
 					
 					if (discoveryChance!=null && discoveryChance>0 && GameUtils.roll(discoveryChance))
 					{
-						boolean skipPath = false;
-						// First check if we have already discovered this. If so, just keep rolling for the rest of the stuff to discover
-						for(CachedEntity discovery:discoveries)
-							if (discovery.getProperty("kind").equals("Path") && ((Key)discovery.getProperty("entityKey")).getId() == path.getKey().getId())
-							{
-								skipPath=true;
-								break;
-							}
-						if (skipPath) continue;
-	
 						// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
-						if (GameUtils.equals(path.getProperty("location1Key"), db.getCurrentCharacter().getProperty("locationKey")))
+						Key destinationKey = GameUtils.equals(path.getProperty("location1Key"), locationKey) ? 
+								(Key)path.getProperty("location2Key") : (Key)path.getProperty("location1Key");											
+						// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
+						if (ds.getIfExists(destinationKey)==null)
 						{
-							if (ds.getIfExists((Key)path.getProperty("location2Key"))==null)
-							{
-								ds.delete(path);
-								continue;
-							}
+							ds.delete(path);
+							continue;
 						}
-						else
-						{
-							if (ds.getIfExists((Key)path.getProperty("location1Key"))==null)
-							{
-								ds.delete(path);
-								continue;
-							}
-						}
-						
 							
 						discoverPath(ds, db, path);
 						return "You found a new place! You've never been here before..";
@@ -275,46 +250,29 @@ public class LongOperationExplore extends LongOperation {
 					if ("CombatSite".equals(path.getProperty("type"))==false)
 						continue;
 					
-	
 					if (path.getProperty("discoveryChance") instanceof Long)
 					{
 						path.setProperty("discoveryChance", ((Long)path.getProperty("discoveryChance")).doubleValue());
 						ds.put(path);
 					}
 					
+					if (discoveredEntities.contains(path.getKey().toString()))
+						continue;
 					
 					Double discoveryChance = (Double)path.getProperty("discoveryChance");
 					if (discoveryChance!=null && discoveryChance==100d)
 						continue;
+					
 					if (discoveryChance!=null && discoveryChance>0 && GameUtils.roll(discoveryChance))
 					{
-						boolean skipPath = false;
-						// First check if we have already discovered this. If so, just keep rolling for the rest of the stuff to discover
-						for(CachedEntity discovery:discoveries)
-							if (discovery.getProperty("kind").equals("Path") && ((Key)discovery.getProperty("entityKey")).getId() == path.getKey().getId())
-							{
-								skipPath=true;
-								break;
-							}
-						if (skipPath) continue;
-	
-						
 						// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
-						if (GameUtils.equals(path.getProperty("location1Key"), db.getCurrentCharacter().getProperty("locationKey")))
+						Key destinationKey = GameUtils.equals(path.getProperty("location1Key"), locationKey) ? 
+								(Key)path.getProperty("location2Key") : (Key)path.getProperty("location1Key");											
+						// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
+						if (ds.getIfExists(destinationKey)==null)
 						{
-							if (ds.getIfExists((Key)path.getProperty("location2Key"))==null)
-							{
-								ds.delete(path);
-								continue;
-							}
-						}
-						else
-						{
-							if (ds.getIfExists((Key)path.getProperty("location1Key"))==null)
-							{
-								ds.delete(path);
-								continue;
-							}
+							ds.delete(path);
+							continue;
 						}
 							
 						discoverPath(ds, db, path);
@@ -334,7 +292,6 @@ public class LongOperationExplore extends LongOperation {
 	
 	public void discoverPath(CachedDatastoreService ds, ODPDBAccess db, CachedEntity path) throws UserErrorMessage
 	{
-		
 		db.newDiscovery(ds, db.getCurrentCharacter(), path);
 		
 		String mode = (String)db.getCurrentCharacter().getProperty("mode");
