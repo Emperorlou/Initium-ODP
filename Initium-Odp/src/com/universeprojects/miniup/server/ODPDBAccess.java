@@ -5517,8 +5517,6 @@ public class ODPDBAccess
 		// Only engage if it's done via explore or we're travelling to combat site
 		if(isExplore || isCombatSite)
 		{
-			if(isCombatSite) playerSetLocation = true;
-			
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
 			QueryHelper qh = new QueryHelper(ds);
 			List<CachedEntity> npcsInTheArea = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, destinationKey, "type", FilterOperator.EQUAL, "NPC");
@@ -5548,6 +5546,8 @@ public class ODPDBAccess
 					}
 					ds.put(possibleNPC);
 				}
+			
+			if(isCombatSite || CommonChecks.checkCharacterIsInCombat(character) == false) playerSetLocation = true;
 		}
 		else
 			playerSetLocation = true;
