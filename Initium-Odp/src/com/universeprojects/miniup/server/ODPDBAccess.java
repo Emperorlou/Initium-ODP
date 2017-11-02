@@ -5451,12 +5451,14 @@ public class ODPDBAccess
 			}
 		}
 
+		// Discover the path the party is taking if we haven't already discovered it..
+		if (party.size() > 1)
+			for(CachedEntity member:party)
+				if (GameUtils.equals(member.getKey(), character.getKey())==false)
+					doCharacterDiscoverEntity(db, member, path);
+		
 		// Check if this property is locked and if so, if we have the key to enter it...
 		movementService.checkForLocks(character, path, destinationKey);
-
-		// If this destination is a town, then we will want to change the homeTownKey now
-		if ("Town".equals(destination.getProperty("type")))
-			character.setProperty("homeTownKey", destinationKey);
 
 		// Blockade needs to happen on TakePath
 		BlockadeService bs = new BlockadeService(this);
@@ -5470,11 +5472,14 @@ public class ODPDBAccess
 		if (isInParty && "Instance".equals(destination.getProperty("combatType")))
 			throw new UserErrorMessage("You are approaching an instance but cannot attack as a party. Disband your party before attacking the instance (you can still do it together, just not using party mechanics).");
 		
+		if (isInParty && "TRUE".equals(character.getProperty("partyLeader"))==false)
+			throw new UserErrorMessage("You cannot move the party because you're not the party leader.");
+		
 		if (allowAttack==false && blockadeStructure!=null)
 			throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here to attack!</a>", false);
 		
-		// Set the character's new location AND all party members if applicable...
-		if (isInParty==false)
+		boolean playerSetLocation = isInParty;
+		if(isInParty == false)
 		{
 			// Here is where we'll check if we're entering combat with a defending player...
 			System.out.println("");
@@ -5484,7 +5489,7 @@ public class ODPDBAccess
 			if (opponentResult==null || opponentResult.freeToPass)
 			{
 				// There are no opponents at all so allow the player to advance
-				character.setProperty("locationKey", destination.getKey());
+				playerSetLocation = true;
 			}
 			else if (opponentResult.defender!=null)
 			{
@@ -5494,7 +5499,7 @@ public class ODPDBAccess
 			else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==true)
 			{
 				// There are no opponents available AND all opponents are NPC opponents, so we will let the player pass
-				character.setProperty("locationKey", destination.getKey());
+				playerSetLocation = true;
 			}
 			else if (opponentResult.defender==null && opponentResult.freeToPass==false && opponentResult.onlyNPCDefenders==false)
 			{
@@ -5504,19 +5509,6 @@ public class ODPDBAccess
 			else
 				throw new RuntimeException("Unhandled situation exception.");
 		}
-		else
-		{
-			if ("TRUE".equals(character.getProperty("partyLeader"))==false)
-				throw new UserErrorMessage("You cannot move the party because you're not the party leader.");
-			
-			setPartiedField(party, character, "locationKey", destination.getKey());
-			
-			// Discover the path the party is taking if we haven't already discovered it..
-			if (party.size() > 1)
-				for(CachedEntity member:party)
-					if (GameUtils.equals(member.getKey(), character.getKey())==false)
-						doCharacterDiscoverEntity(db, member, path);
-		}
 		
 		if(CommonChecks.checkLocationIsInstance(destination))
 			resetInstanceRespawnTimer(destination);
@@ -5525,61 +5517,44 @@ public class ODPDBAccess
 		// Only engage if it's done via explore or we're travelling to combat site
 		if(isExplore || isCombatSite)
 		{
+			if(isCombatSite) playerSetLocation = true;
+			
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
 			QueryHelper qh = new QueryHelper(ds);
 			List<CachedEntity> npcsInTheArea = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, destinationKey, "type", FilterOperator.EQUAL, "NPC");
 			npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
 
 			shuffleCharactersByAttackOrder(npcsInTheArea);
-			int partyIdx = 0;
 			for(CachedEntity possibleNPC:npcsInTheArea)
-				if ((isCombatSite || possibleNPC.getProperty("mode") == null || CHARACTER_MODE_NORMAL.equals(possibleNPC.getProperty("mode")) || CommonChecks.checkCharacterIsRaidBoss(possibleNPC)) && 
+				if ((isCombatSite || CommonChecks.checkCharacterIsRaidBoss(possibleNPC) || CommonChecks.checkCharacterIsInCombat(possibleNPC)==false) && 
 						(Double)possibleNPC.getProperty("hitpoints")>0d)
 				{
-					
-					CachedEntity curMember = party.get(partyIdx++);
-					
+					character.setProperty("mode", CHARACTER_MODE_COMBAT);
+					character.setProperty("combatant", possibleNPC.getKey());
 					possibleNPC.setProperty("mode", CHARACTER_MODE_COMBAT);
-					// For forced 1v1 combat, we also need to set the combatant on the monster
-					if (CommonChecks.checkLocationIsInstance(destination))
+					
+					if(isCombatSite)
+					{
+						// In combat sites, every member fights the same mob.
+						setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
+						setPartiedField(party, character, "combatant", possibleNPC.getKey());
+					}
+					else if(CommonChecks.checkCharacterIsRaidBoss(possibleNPC)==false)
+					{
+						// Otherwise, need to see if it's 1v1 combat.
+						// Non-combat site and non-raid boss is 1v1.
+						possibleNPC.setProperty("combatType", "DefenceStructureAttack");
 						possibleNPC.setProperty("combatant", character.getKey());
-					
+					}
 					ds.put(possibleNPC);
-					
-					if(isCombatSite || CommonChecks.checkCharacterIsRaidBoss(possibleNPC))
-					{
-						if(partyIdx > 1)
-						{
-							// At least 1 party member is in combat with a non-raidboss mob.
-							// Only set the remaining party members.
-							partyIdx--;
-							while(partyIdx < party.size())
-							{
-								curMember = party.get(partyIdx++);
-								curMember.setProperty("mode", CHARACTER_MODE_COMBAT);
-								curMember.setProperty("combatant", possibleNPC.getKey());
-							}
-						}
-						else
-						{
-							// In combat sites, every member fights the same mob.
-							setPartiedField(party, character, "mode", CHARACTER_MODE_COMBAT);
-							setPartiedField(party, character, "combatant", possibleNPC.getKey());
-						}
-						break;
-					}
-					else
-					{
-						// Otherwise, each individual member gets a combatant,
-						// since the explore has moved all members and there might
-						// be a combatant for them to fight.
-						curMember.setProperty("mode", CHARACTER_MODE_COMBAT);
-						curMember.setProperty("combatant", possibleNPC.getKey());
-					}
-					
-					if(partyIdx >= party.size())
-						break;
 				}
+		}
+		
+		if(playerSetLocation)
+		{
+			setPartiedField(party, character, "locationKey", destinationKey);
+			if("Town".equals(destination.getProperty("type")))
+				setPartiedField(party, character, "homeTownKey", destinationKey);
 		}
 		
 		// Now check if we have a discovery for this path we just took...
