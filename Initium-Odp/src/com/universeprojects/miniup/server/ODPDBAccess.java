@@ -5545,6 +5545,7 @@ public class ODPDBAccess
 						possibleNPC.setProperty("combatant", character.getKey());
 					}
 					ds.put(possibleNPC);
+					break;
 				}
 			
 			if(isCombatSite || CommonChecks.checkCharacterIsInCombat(character) == false) playerSetLocation = true;
