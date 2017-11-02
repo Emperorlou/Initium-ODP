@@ -5548,10 +5548,9 @@ public class ODPDBAccess
 					}
 					ds.put(possibleNPC);
 				}
-			
-			if(playerSetLocation == false && CommonChecks.checkCharacterIsInCombat(character)==false)
-				playerSetLocation = true;
 		}
+		else
+			playerSetLocation = true;
 		
 		if(playerSetLocation)
 		{
