@@ -5543,6 +5543,8 @@ public class ODPDBAccess
 						// Non-combat site and non-raid boss is 1v1.
 						possibleNPC.setProperty("combatType", "DefenceStructureAttack");
 						possibleNPC.setProperty("combatant", character.getKey());
+						// Also need to make sure we don't set the location.
+						playerSetLocation = false;
 					}
 					ds.put(possibleNPC);
 					break;
