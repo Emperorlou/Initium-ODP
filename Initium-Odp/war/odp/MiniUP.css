@@ -1408,6 +1408,10 @@ a.range-increment {
 
 /* Chatroom styles */
 
+.meModeNickname
+{
+	color:#AAAAAA;
+}
 
 #chat_submit
 {

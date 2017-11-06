@@ -38,6 +38,9 @@ public class CommandLeaveAndForgetCombatSite extends Command {
 		
 		if(location == null || GameUtils.isContainedInList("CombatSite,CollectionSite",(String)location.getProperty("type"))==false)
 			throw new UserErrorMessage("You can only leave and forget combat sites.");
+
+		if (GameUtils.isPlayerIncapacitated(character))
+			throw new UserErrorMessage("You cannot leave, you're incapacitated!");
 		
 		CachedEntity path = null;
 		try

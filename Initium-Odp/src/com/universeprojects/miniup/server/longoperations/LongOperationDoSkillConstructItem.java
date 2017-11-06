@@ -181,6 +181,8 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 		if (repetitionCount>1)
 			setUserMessage(msg);
 		
+		db.sendGameMessage(ds, character, msg);
+		
 		// Delete all HTML of an item
 		if (inventionService.getDeletedEntities()!=null)
 			for(Key deletedKey:inventionService.getDeletedEntities())

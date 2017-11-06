@@ -2302,7 +2302,6 @@ function duelRequest(characterId)
 
 function viewManageStore()
 {
-    closeAllPagePopups();
     closeAllPopups();
     closeAllTooltips();
     pagePopup("/odp/ajax_managestore.jsp", null, "Your Store");
@@ -2917,7 +2916,18 @@ function storeDeleteBuyOrder(event, buyOrderId)
 	
 }
 
+function closeClosableMessage(id)
+{
+	localStorage.setItem("closableMessage-"+id, true);
+	
+	$("#"+id).hide();
+}
 
+function initializeClosableMessage(id)
+{
+	if (localStorage.getItem("closableMessage-"+id)!=null)
+		$("#"+id).hide();
+}
 
 
 

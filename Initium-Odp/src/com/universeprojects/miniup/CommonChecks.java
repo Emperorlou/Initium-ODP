@@ -387,4 +387,18 @@ public abstract class CommonChecks
 
 		return false;
 	}
+
+	public static boolean checkCharacterIsAdminOfHisGroup(CachedEntity character)
+	{
+		String charGroupStatus = (String)character.getProperty("groupStatus");
+		if (charGroupStatus==null) return false;
+		
+		if(character.getProperty("groupKey") != null &&
+				(GameUtils.enumEquals(charGroupStatus, GroupStatus.Admin)))
+		{
+			return true;
+		}
+		
+		return false;
+	}
 }

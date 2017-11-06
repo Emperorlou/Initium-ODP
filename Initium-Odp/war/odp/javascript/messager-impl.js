@@ -203,7 +203,7 @@ messager.onChatMessage = function(chatMessage)
 		if (chatMessage.characterId!=null && meMode==false)
 			html+=chatMessage.nicknameStyled;
 		else if (chatMessage.characterId!=null && meMode==true)
-			html+=chatMessage.nicknameMeStyled;
+			html+="<a class='clue meModeNickname' rel='/viewcharactermini.jsp?characterId="+chatMessage.characterId+"'>"+chatMessage.nickname+"</a>";
 		else
 			html+="<span class='meModeNickname'>"+chatMessage.nicknameStyled+"</span>";
 		html+="</span>";
