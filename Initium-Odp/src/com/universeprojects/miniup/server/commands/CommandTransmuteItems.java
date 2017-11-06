@@ -109,7 +109,7 @@ public class CommandTransmuteItems extends Command {
 		}
 		else if (recipes.size() == 1) {
 			CachedEntity recipe = recipes.get(0);
-			final List<Key> results = (List<Key>) recipe.getProperty("results");
+			final List<CachedEntity> results = db.getEntities((List<Key>)recipe.getProperty("results"));
 			
 			try {
 				container = (CachedEntity) new Transaction<CachedEntity>(ds) {
@@ -118,26 +118,28 @@ public class CommandTransmuteItems extends Command {
 					public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
 						CachedEntity container = db.getEntity(containerKey);
 						
-						for (Key result:results) {
-						CachedEntity resultItem = db.generateNewObject(db.getEntity(result), "Item");
-						
-						// put the item(s) in character's transmute box
-						resultItem.setProperty("containerKey", containerKey);
-						resultItem.setProperty("movedTimestamp", new Date());
-						if(resultItem.getProperty("durability") != null)
-							resultItem.setProperty("maxDurability", resultItem.getProperty("durability"));
-						
-						ds.put(resultItem);
+						for (CachedEntity result:results) 
+						{
+							CachedEntity resultItem = db.generateNewObject(result, "Item");
+							
+							// put the item(s) in character's transmute box
+							resultItem.setProperty("containerKey", containerKey);
+							resultItem.setProperty("movedTimestamp", new Date());
+							if(resultItem.getProperty("durability") != null)
+								resultItem.setProperty("maxDurability", resultItem.getProperty("durability"));
+							
+							ds.put(resultItem);
 						}
 						
 						// now remove the transmuted materials from player
-						for (CachedEntity item:materials) {
-						CachedEntity rfItem = refetch(item);
-						
-						rfItem.setProperty("containerKey", null);
-						rfItem.setProperty("movedTimestamp", new Date());
-						
-						ds.put(rfItem);
+						for (CachedEntity item:materials) 
+						{
+							CachedEntity rfItem = refetch(item);
+							
+							rfItem.setProperty("containerKey", null);
+							rfItem.setProperty("movedTimestamp", new Date());
+							
+							ds.put(rfItem);
 						}
 						
 						return container;
