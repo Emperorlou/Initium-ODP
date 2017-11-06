@@ -129,7 +129,7 @@ public class GroupService extends Service {
 	 */
 	public boolean setAllowMergeRequests(CachedEntity setGroup)
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(setGroup))
+		if(this.isCharacterGroupCreator() && this.isCharacterInSpecifiedGroup(setGroup))
 		{
 			setGroup.setProperty("allowMergeRequests", Boolean.TRUE);
 			return true;
@@ -144,7 +144,7 @@ public class GroupService extends Service {
 	 */
 	public boolean setDisallowMergeRequests(CachedEntity setGroup)
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(setGroup))
+		if(this.isCharacterGroupCreator() && this.isCharacterInSpecifiedGroup(setGroup))
 		{
 			setGroup.setProperty("allowMergeRequests", Boolean.FALSE);
 			return true;
@@ -166,7 +166,7 @@ public class GroupService extends Service {
 	 */
 	public CachedEntity setRequestMergeWith(CachedEntity mergeGroup)
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(mergeGroup) == false)
+		if(this.isCharacterGroupCreator() && this.isCharacterInSpecifiedGroup(mergeGroup) == false)
 		{
 			if(doesGroupAllowMergeRequests(mergeGroup))
 			{
@@ -183,7 +183,7 @@ public class GroupService extends Service {
 	 */
 	public boolean cancelMergeRequest()
 	{
-		if(this.isAdmin && getMergeRequestGroupKeyFor(this.characterGroup) != null)
+		if(this.isCharacterGroupCreator() && getMergeRequestGroupKeyFor(this.characterGroup) != null)
 		{
 			this.characterGroup.setProperty("pendingMergeGroupKey", null);
 			return true;
@@ -193,7 +193,7 @@ public class GroupService extends Service {
 	
 	public boolean denyMergeApplicationFrom(CachedEntity requestGroup)
 	{
-		if(this.isAdmin && this.isPendingMergeWith(requestGroup))
+		if(this.isCharacterGroupCreator() && this.isPendingMergeWith(requestGroup))
 		{
 			// We've validated that the requesting group is wanting to merge
 			// with this character's group. Deny the request by blanking out the 
@@ -211,7 +211,7 @@ public class GroupService extends Service {
 	 */
 	public boolean acceptMergeApplicationFrom(CachedDatastoreService ds, CachedEntity mergeGroup) throws UserErrorMessage
 	{
-		if(this.isAdmin && this.isCharacterInSpecifiedGroup(mergeGroup) == false)
+		if(this.isCharacterGroupCreator() && this.isCharacterInSpecifiedGroup(mergeGroup) == false)
 		{
 			// Ensure the mergeGroup actually requested the merge
 			if (GameUtils.equals(mergeGroup.getProperty("pendingMergeGroupKey"), this.characterGroup.getKey())==false)
@@ -300,6 +300,7 @@ public class GroupService extends Service {
 		}
 		return false;
 	}
+	
 	public List<Key> cleanNullKeysFromList(List<Key> keys)
 	{
 		if (keys != null)

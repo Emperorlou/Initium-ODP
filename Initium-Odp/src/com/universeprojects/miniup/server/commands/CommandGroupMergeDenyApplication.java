@@ -39,7 +39,7 @@ public class CommandGroupMergeDenyApplication extends Command {
 		GroupService service = new GroupService(db, character);
 		if(service.characterHasGroup() == false)
 			throw new UserErrorMessage("Character does not belong to a group!");
-		if(service.isCharacterGroupAdmin() == false)
+		if(service.isCharacterGroupCreator() == false)
 			throw new UserErrorMessage("Character is not an admin of the group!");
 		
 		if(service.denyMergeApplicationFrom(group))

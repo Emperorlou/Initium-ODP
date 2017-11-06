@@ -188,26 +188,29 @@ public class GroupController extends PageController {
 						
 						request.setAttribute("newMemberApplicants", appliedMembersOutput);
 						
-						if(allowMergeRequests)
-							request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestDisallow' onclick='groupMergeRequestsDisallow(event)' title='Clicking this will prevent other groups from requesting to merge with this group.'>Disallow Merge Requests</a>");
-						else
-							request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestAllow' onclick='groupMergeRequestsAllow(event)' title='Clicking this will allow other groups to request merging with this group.'>Allow Merge Requests</a>");
-						
-						String currentMergeRequestString = "No pending merge requests.";
-						Key mergeGroupKey = service.getMergeRequestGroupKeyFor(group);
-						if(mergeGroupKey != null)
+						if(isCreator)
 						{
-							CachedEntity mergeGroup = db.getEntity(mergeGroupKey);
-							if(mergeGroup != null)
-								currentMergeRequestString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event)' title='Clicking this will cancel the pending merge request with the specified group'>Cancel merge request with "+mergeGroup.getProperty("name")+"</a>";
+							if(allowMergeRequests)
+								request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestDisallow' onclick='groupMergeRequestsDisallow(event)' title='Clicking this will prevent other groups from requesting to merge with this group.'>Disallow Merge Requests</a>");
+							else
+								request.setAttribute("mergeRequestToggleButton", "<a id='mergeRequestAllow' onclick='groupMergeRequestsAllow(event)' title='Clicking this will allow other groups to request merging with this group.'>Allow Merge Requests</a>");
+							
+							String currentMergeRequestString = "No pending merge requests.";
+							Key mergeGroupKey = service.getMergeRequestGroupKeyFor(group);
+							if(mergeGroupKey != null)
+							{
+								CachedEntity mergeGroup = db.getEntity(mergeGroupKey);
+								if(mergeGroup != null)
+									currentMergeRequestString = "<a id='groupMergeRequest' onclick='groupMergeCancelRequest(event)' title='Clicking this will cancel the pending merge request with the specified group'>Cancel merge request with "+mergeGroup.getProperty("name")+"</a>";
+							}
+							request.setAttribute("currentMergeRequest", currentMergeRequestString);
 						}
-						request.setAttribute("currentMergeRequest", currentMergeRequestString);
 					}
 				}
 				else
 				{
 					request.setAttribute("inThisGroup", false);
-					if(isAdmin && allowMergeRequests)
+					if(isCreator && allowMergeRequests)
 					{
 						request.setAttribute("allowMergeRequests", allowMergeRequests);
 						// Group allows merge requests and viewing character is an admin.
@@ -219,6 +222,8 @@ public class GroupController extends PageController {
 							requestMergeString = "<a id='groupMergeRequest' onclick='groupMergeSubmitRequest(event, "+group.getId()+")' title='Clicking this will submit a request to merge with the current group.'>Request Merge With Group</a>";
 						request.setAttribute("currentMergeRequest", requestMergeString);
 					}
+					else
+						request.setAttribute("allowMergeRequests", false);
 				}
 			} 
 			else {
