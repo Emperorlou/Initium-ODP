@@ -37,23 +37,16 @@ public class CommandGroupMergeAcceptApplication extends Command {
 			throw new UserErrorMessage("The group you're attempting to merge did not indicate they wish to merge with your group.");
 		
 		GroupService service = new GroupService(db, character);
-		try
-		{
-			if(service.acceptMergeApplicationFrom(ds, groupToMerge))
-				setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
-			else
-				throw new UserErrorMessage("Unexpected issue merging groups!");
-		}
-		catch(Exception ex)
-		{
-			if(service.characterHasGroup() == false)
-				throw new UserErrorMessage("Character does not belong to a group!");
-			if(service.isCharacterGroupAdmin() == false)
-				throw new UserErrorMessage("Character is not an admin of the group!");
-			if(service.isCharacterInSpecifiedGroup(groupToMerge))
-				throw new RuntimeException("Unable to merge identical groups!");
-			throw ex;
-		}
+
+		if(service.characterHasGroup() == false)
+			throw new UserErrorMessage("Character does not belong to a group!");
+		if(service.isCharacterGroupCreator() == false)
+			throw new UserErrorMessage("Character is not an admin of the group!");
+		if(service.isCharacterInSpecifiedGroup(groupToMerge))
+			throw new RuntimeException("Unable to merge identical groups!");
+		
+		if(service.acceptMergeApplicationFrom(ds, groupToMerge))
+			setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}
 
 }
