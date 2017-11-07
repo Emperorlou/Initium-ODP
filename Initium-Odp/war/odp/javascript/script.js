@@ -229,6 +229,7 @@ function closeAllPopups()
     $("#popups").hide();
     window.popupsOpen = 0;
     window.documentBindEnter = false;
+    $(".blur").removeClass("blur");
 }
 
 function closeAllTooltips()
