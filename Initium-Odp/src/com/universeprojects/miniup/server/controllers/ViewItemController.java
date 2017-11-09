@@ -22,7 +22,9 @@ import com.universeprojects.miniup.server.ItemAspect;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
+import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.ScriptService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
@@ -122,25 +124,40 @@ public class ViewItemController extends PageController {
 				List<Key> scriptKeys = (List<Key>)item.getProperty("scripts");
 				if (scriptKeys!=null && scriptKeys.isEmpty()==false)
 				{
-					List<CachedEntity> directItemScripts = db.getScriptsOfType(scriptKeys, ODPDBAccess.ScriptType.directItem);
+					List<CachedEntity> directItemScripts = db.getScriptsOfType(scriptKeys, 
+							ODPDBAccess.ScriptType.directItem, ODPDBAccess.ScriptType.ownerHtml);
 					if (directItemScripts!=null && directItemScripts.isEmpty()==false)
 					{
+						boolean ownerHtmlSpecified = false;
 						for(CachedEntity script:directItemScripts)
 						{
 							if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) continue;
-							ItemPopupEntry scriptEntry = new ItemPopupEntry(
-									(String)script.getProperty("caption"), 
-									(String)script.getProperty("description"), 
-									"doTriggerItem(event,"+script.getId()+","+item.getId()+")");
-							
-							itemPopupEntries.add(scriptEntry);
+							Object scriptType = script.getProperty("type");
+							if(GameUtils.enumEquals(scriptType, ODPDBAccess.ScriptType.directItem))
+							{
+								ItemPopupEntry scriptEntry = new ItemPopupEntry(
+										(String)script.getProperty("caption"), 
+										(String)script.getProperty("description"), 
+										"doTriggerItem(event,"+script.getId()+","+item.getId()+")");
+								
+								itemPopupEntries.add(scriptEntry);
+							}
+							else if(ownerHtmlSpecified == false && GameUtils.enumEquals(scriptType, ODPDBAccess.ScriptType.ownerHtml))
+							{
+								SimpleEvent scriptEvent = new SimpleEvent(currentChar, db);
+								if(ScriptService.getScriptService(db).executeScript(scriptEvent, script, item) && scriptEvent.getAttribute("ownerOnlyHtml") != null)
+								{
+									ownerHtmlSpecified = true;
+									itemMap.put("ownerOnlyHtml", scriptEvent.getAttribute("ownerOnlyHtml"));
+								}
+							}
 						}
 					}
 				}
 				
 				// Owner only HTML
 				field = item.getProperty("ownerOnlyHtml");
-				if(field != null && "".equals(field)==false)
+				if(field != null && "".equals(field)==false && itemMap.containsKey("ownerOnlyHtml") == false)
 					itemMap.put("ownerOnlyHtml", field.toString());
 			}
 			

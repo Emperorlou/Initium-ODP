@@ -98,13 +98,14 @@ public class ODPDBAccess
 
 	public enum GroupStatus
 	{
-		Applied, Member, Admin, Kicked
+		Applied, Member, Admin, Veteran, Kicked
 	}
 	
 	public enum ScriptType
 	{
 		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
-		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem, global;
+		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem, global,
+		ownerHtml;
 	}
 
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
