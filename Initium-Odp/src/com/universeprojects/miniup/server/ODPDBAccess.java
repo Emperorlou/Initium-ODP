@@ -98,7 +98,7 @@ public class ODPDBAccess
 
 	public enum GroupStatus
 	{
-		Applied, Member, Admin, Veteran, Kicked
+		Applied, Member, Admin, Kicked
 	}
 	
 	public enum ScriptType
