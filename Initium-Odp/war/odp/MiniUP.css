@@ -123,12 +123,20 @@ a:HOVER
 	text-decoration: underline;	
 }
 
+.list-item
+{
+	display:table-cell;
+	width:100%;
+}
+
 .list-item-X
 {
 	margin-top: 10px;
 	font-size: 20px;
 	color: #AA0000; 
-	cursor:pointer;	
+	cursor:pointer;
+	display:table-cell;
+	vertical-align:middle;	
 }
 
 hr {
@@ -1058,6 +1066,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 }
 .main-button:hover
 {
+	text-decoration: none;
 	text-shadow: 0px 0px 20px yellow;
 }
 .main-button .shortcut-key
@@ -1140,7 +1149,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
     height: 38px;
     margin: 0 auto;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
     padding-top: 14px;
     cursor: pointer;
@@ -1153,6 +1162,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 }
 .v3-main-button-half:hover
 {
+	text-decoration: none;
 	text-shadow: 0px 0px 20px yellow;
 }
  .v3-main-button-half .shortcut-key

@@ -22,10 +22,10 @@
 </style>
 <c:forEach var="character" items="${characters}">
 	<div class='selectable'>
-		<div class='list-item-X' onclick='doDeleteCharacter(event,${character.id},"${character.name}")'>X</div>
-		<div>
+		<div class='list-item'>
 			${character.html}
 		</div>
+		<div class='list-item-X' onclick='doDeleteCharacter(event,${character.id},"${character.name}")'>X</div>
 		<c:if test="${character.id==currentCharacterId }">
 			<a class='character-display-box-overlay selected-character' onclick='switchCharacter(event, ${character.id})'></a>
 		</c:if>
