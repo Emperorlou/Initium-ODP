@@ -17,7 +17,7 @@ function changeInventionTab(event)
 }
 
 </script>
-
+<div class='highlightbox-red'>Please be aware that the invention system is still very new at this point and not particularly useful YET.</div>
 <div class='tab-row normal-container backdrop1b'>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='knowledge-tab'></div>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='experimentation-tab'></div>

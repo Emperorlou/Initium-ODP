@@ -136,6 +136,9 @@ $(window).ready(function(e){
 	
 });
 
+
+
+
 /**
  * This removes the * from the title, (and by extension the 'unread messages' symbol on chrome browsers).
  *  

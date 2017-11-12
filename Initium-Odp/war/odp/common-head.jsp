@@ -41,8 +41,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=207"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=187">
+<script type="text/javascript" src="/odp/javascript/script.js?v=208"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=188">
 
 
 
@@ -90,7 +90,9 @@
 	<c:if test='${newChatIdToken!=null}'>
 	window.newChatIdToken = "${newChatIdToken}";
 	</c:if>
+	<c:if test='${userId!=null}'>
 	window.userId = ${userId};
+	</c:if>
 	window.isTestServer = ${isTestServer};
 	window.verifyCode = "${verifyCode}";
 	window.serverTime=<c:out value="${serverTime}"/>;
