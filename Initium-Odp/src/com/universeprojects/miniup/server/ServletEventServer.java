@@ -229,7 +229,7 @@ public class ServletEventServer extends HttpServlet
 					
 				if (message.startsWith("/app"))
 				{
-					message = "<a href='http://initium-resources.appspot.com/android.apk'>[Android App Download]</a> &#8226; <a href='http://initium-resources.appspot.com/windows.xap'>[Windows Phone App Download]</a> &#8226; [iOS App Coming Soon...] "+message.substring(4);
+					message = "<a href='https://play.google.com/store/apps/details?id=com.playinitium' target='_blank'>[Android App Download]</a> &#8226; <a href='http://initium-resources.appspot.com/windows.xap'>[Windows Phone App Download]</a> &#8226; [iOS App Coming Soon...] "+message.substring(4);
 				}
 				
 				if (message.startsWith("/about"))
