@@ -2362,7 +2362,7 @@ public class GameUtils
 		{
 			if (((String) fieldValue).equalsIgnoreCase("true"))
 				return bool==true;
-			else if (((String) fieldValue).equalsIgnoreCase("false"))
+			else if (fieldValue == "" || ((String) fieldValue).equalsIgnoreCase("false"))
 				return bool==false;
 			else
 				throw new IllegalArgumentException("Invalid field value: "+fieldValue);
