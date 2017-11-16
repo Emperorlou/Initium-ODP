@@ -5559,6 +5559,7 @@ public class ODPDBAccess
 		if(playerSetLocation)
 		{
 			setPartiedField(party, character, "locationKey", destinationKey);
+			setPartiedField(party, character, "locationEntryDatetime", new Date());
 			if("Town".equals(destination.getProperty("type")))
 				setPartiedField(party, character, "homeTownKey", destinationKey);
 		}
