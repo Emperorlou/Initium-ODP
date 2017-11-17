@@ -4401,6 +4401,44 @@ body
 
 
 
+/* Overhead Map */
+
+.overheadmap-mode #banner-base
+{
+	background: url(http://localhost:8888/images/ui3/mapbackground1.jpg) center center / cover no-repeat !important;	
+}
+
+.overheadmap-cell-container
+{
+    position: absolute;
+}
+
+.overheadmap-cell-container:hover
+{
+	filter: drop-shadow(0px 0px 12px #FFFFCC);	
+}
+
+.overheadmap-cell-label-container
+{
+	position: absolute;
+    width: 100%;
+    bottom: 7px;
+    margin: 0px;
+    text-align: center;
+}
+
+.overheadmap-cell-label-container span
+{
+    font-family: quest;
+    color: #3e3323;
+    font-size: 18px;
+    background: url(http://localhost:8888/images/ui3/mapbackground1.jpg) center center no-repeat;
+    border-radius: 0;
+    padding-left: 7px;
+    padding-right: 7px;
+    border: 1px solid #453f2e;
+    display: inline-block;
+}
 
 
 
