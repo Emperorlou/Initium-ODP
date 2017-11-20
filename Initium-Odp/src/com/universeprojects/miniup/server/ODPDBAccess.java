@@ -4713,6 +4713,7 @@ public class ODPDBAccess
 		// First, move all items in his inventory to the ground...
 		List<CachedEntity> items = getFilteredList("Item", "containerKey", characterToDie.getKey());
 		
+		StringBuilder dropAllSB = new StringBuilder();
 		for(CachedEntity item:items)
 		{
 			// If the item is a "naturalEquipment", simply delete it instead of moving to the ground
@@ -4744,6 +4745,7 @@ public class ODPDBAccess
 						
 						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
 						{
+							dropAllSB.append("," + item.getId().toString());
 							loot+="<div style='display:inline-block; margin-right:3px;'>";
 							loot+=GameUtils.renderItem(item)+"<br>";
 							loot+="<div>";
@@ -4762,6 +4764,16 @@ public class ODPDBAccess
 				}
 				db.put(item);
 			}
+		}
+		
+		if(dropAllSB.length()>0)
+		{
+			String dropAllString = dropAllSB.substring(1);
+			loot+="<div style='display:block; margin:6px;'>";
+			loot+="	<div class='main-item-controls'>";
+			loot+="		<a onclick='doCommand(event,\"ItemsDrop\",{\"itemIds\":\"" + dropAllString + "\"});' >Drop All</a>";
+			loot+="	</div>";
+			loot+="</div>";
 		}
 		
 		// Now drop all the carried characters.
