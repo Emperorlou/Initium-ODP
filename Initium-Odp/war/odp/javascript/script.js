@@ -2478,6 +2478,44 @@ function createQuestWindow(html)
 }
 
 
+function createMapWindow(html) 
+{
+	$(".popupBlurrable").addClass("blur");
+    window.popupsNum++;
+    window.popupsOpen++;
+    window.popupsArray[popupsNum-1] = "yes";
+    $("#popups").show();
+    currentPopups = $("#popups").html();
+	
+	
+	
+	var windowHtml = "";
+	windowHtml += 
+			"<div class='overheadmap-window'>" +
+			"<div id='global-navigation-map' class='overheadmap-window-internal'>";
+	
+	windowHtml+=html;
+	
+	windowHtml+=
+			"</div>";
+	
+	windowHtml+=
+			"<div class='quest-window-bottombutton-container'>"+
+            "<div class='quest-window-bottombutton' onclick='closepopupMessage(" + popupsNum +")'>"+
+            "Okay"+
+            "</div>"+
+            "</div>"+
+            
+			"</div>";
+
+	
+	
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
+    expandpopupMessage();
+    enterPopupClose();
+}
+
+
 
 function createWelcomeWindow() 
 {
@@ -2932,6 +2970,73 @@ function initializeClosableMessage(id)
 	if (localStorage.getItem("closableMessage-"+id)!=null)
 		$("#"+id).hide();
 }
+
+function viewGlobeNavigation()
+{
+	var mapData = $("#global-navigation-map");
+	if (mapData.length==0) return;
+	html = $(mapData[mapData.length-1]).html();
+	createMapWindow(html);
+}
+
+function isGlobeNavigationVisible()
+{
+	if ($("#global-navigation-map").length>1)
+		return true;
+	
+	return false;
+}
+
+//function addOverheadMapCell(locationName, locationId, imageUrl, positionX, positionY)
+//{
+//	positionX = positionX*100+"px";
+//	positionY = positionY*100+"px";
+//	
+//	var html = 
+//		  "<div class='overheadmap-cell-container-base'>"; 
+//	html+="		<a onclick='doGoto(event, "+locationId+", false);' class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"; top:"+positionY+";'>";
+//    html+="			<div class='overheadmap-cell-label-container'>";
+//    html+="				<div class='label'>"+locationName+"</div>";
+//    html+="			</div>";
+//    html+="			<img src='"+imageUrl+"'/>";
+//    html+="		</a>";
+//    html+="</div>";
+//    
+//    $("#overheadmap-cells").append(html);
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3497,6 +3602,7 @@ function doGoto(event, pathId, attack)
 				if(action.error !== undefined)
 				{
 					clearPopupPermanentOverlay(); 
+					closeAllPagePopups();
 				}
 				else if (action.isComplete)
 				{
@@ -3512,7 +3618,6 @@ function doGoto(event, pathId, attack)
 				{
 					var locationName = action.locationName;
 					popupPermanentOverlay_Walking(locationName, window.biome);
-
 				}
 			},
 			function()	// recallFunction

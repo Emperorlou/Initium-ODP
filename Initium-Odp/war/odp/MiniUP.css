@@ -2143,6 +2143,11 @@ a.range-increment {
     z-index: 10000000;	
 }
 
+.hiddenPullout-content p
+{
+	margin-top:8px;
+}
+
 
 .hiddenTooltip
 {
@@ -2644,23 +2649,23 @@ position: absolute;
 }
 #knowledge-tab
 {
-	background-image:url('http://initium-resources.appspot.com/images/ui/tab-knowledge-button.png');
+	background-image:url('https://initium-resources.appspot.com/images/ui/tab-knowledge-button.png');
 }
 #experimentation-tab
 {
-	background-image:url('http://initium-resources.appspot.com/images/ui/tab-experiments-button.png');
+	background-image:url('https://initium-resources.appspot.com/images/ui/tab-experiments-button.png');
 }
 #idea-tab
 {
-	background-image:url('http://initium-resources.appspot.com/images/ui/tab-ideas-button.png');
+	background-image:url('https://initium-resources.appspot.com/images/ui/tab-ideas-button.png');
 }
 #itemConstruction-tab
 {
-	background-image:url('http://initium-resources.appspot.com/images/ui/tab-builditem-button.png');
+	background-image:url('https://initium-resources.appspot.com/images/ui/tab-builditem-button.png');
 }
 #buildingConstruction-tab
 {
-	background-image:url('http://initium-resources.appspot.com/images/ui/tab-buildbuilding-button.png');
+	background-image:url('https://initium-resources.appspot.com/images/ui/tab-buildbuilding-button.png');
 }
 .tab-content
 {
@@ -4403,20 +4408,59 @@ body
 
 /* Overhead Map */
 
-.overheadmap-mode #banner-base
+.overheadmap-mode .banner-shadowbox
 {
-	background: url(http://localhost:8888/images/ui3/mapbackground1.jpg) center center / cover no-repeat !important;	
+	background: url(https://initium-resources.appspot.com/images/ui3/mapbackground1.jpg) center center / cover no-repeat !important;	
+}
+
+.overheadmap-mode #immovablesPanel, .overheadmap-mode #banner-text-overlay, .overheadmap-mode #banner-fx, .overheadmap-mode #banner-base
+{
+	display:none;
+}
+
+.overheadmap-mode .overheadmap-overlay
+{
+	display:inherit;
+}
+
+.overheadmap-overlay
+{
+	display:none;
+}
+
+
+.overheadmap-X
+{
+    float: right;
+    color: #453f2e;
+    margin-right: 6px;	
+    margin-top: 6px;	
+}
+
+.overheadmap-X img:hover
+{
+	filter: drop-shadow(0px 0px 12px #FFFFCC);	
+}
+
+.overheadmap-cell-container-base
+{
+	position: absolute;
+    left: 50%;
+    top: 50%;	
 }
 
 .overheadmap-cell-container
 {
     position: absolute;
+    margin-left:-50px;
+    margin-top:-50px;
 }
 
 .overheadmap-cell-container:hover
 {
-	filter: drop-shadow(0px 0px 12px #FFFFCC);	
+	filter: drop-shadow(0px 0px 12px #FFFFCC);
 }
+
 
 .overheadmap-cell-label-container
 {
@@ -4425,23 +4469,63 @@ body
     bottom: 7px;
     margin: 0px;
     text-align: center;
+    z-index:1;
 }
 
-.overheadmap-cell-label-container span
+.overheadmap-cell-label-container .label
 {
     font-family: quest;
     color: #3e3323;
     font-size: 18px;
-    background: url(http://localhost:8888/images/ui3/mapbackground1.jpg) center center no-repeat;
-    border-radius: 0;
+    background: #fff0de;
+    background-size: inherit;
+    border-radius: 3px;
     padding-left: 7px;
     padding-right: 7px;
-    border: 1px solid #453f2e;
+    border: 2px solid #342b1e;
     display: inline-block;
+    text-shadow:none;
+    font-weight: bold;
 }
 
+.overheadmap-window
+{
+    border-style: solid;
+    border-width: 72px 91px 90px 99px;
+    -moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    -webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    margin-left: 0%;
+    margin-top: 0%;
+    top: 0px;
+    bottom: 25px;	
+}
 
+.overheadmap-window-internal
+{
+	position:relative;
+    color: #614f33;
+    margin: -60px;
+    margin-top: -38px;
+    padding-bottom: 60px;
+    overflow-y: auto;
+    height: 100%;
+    font-family: quest;	
+}
 
+#global-navigation-map
+{
+	display:none;
+}
+
+.overheadmap-window #global-navigation-map
+{
+	display:inherit;
+}
 
 
 

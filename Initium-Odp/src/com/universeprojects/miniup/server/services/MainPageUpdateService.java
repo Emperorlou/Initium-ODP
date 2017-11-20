@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -34,6 +36,7 @@ public class MainPageUpdateService extends Service
 	protected List<CachedEntity> discoveries = null;  // All the discoveries we have for this character and location.
 	protected List<CachedEntity> paths = null;  // All the paths that we can currently see that are connected to the path we're location in.
 	protected List<CachedEntity> destLocations = null;  // The location entities at the other end of the paths; on the side we're not on currently.
+	protected Map<Key, CachedEntity> destLocationsMap = null;
 	protected List<Integer> pathEnds = null;  // 1 or 2. Since each path is 2 sided, this number indicates which side we are NOT on currently.
 	
 	
@@ -128,6 +131,20 @@ public class MainPageUpdateService extends Service
 			immovables = query.getFilteredList("Item", "containerKey", location.getKey(), "immovable", true);
 			if (immovables == null) immovables = new ArrayList<CachedEntity>(0);
 		}
+	}
+	
+	protected Map<Key,CachedEntity> getDestLocationsMap()
+	{
+		if (destLocations==null) return null;
+		
+		if (destLocationsMap==null)
+		{
+			destLocationsMap = new HashMap<>();
+			for(CachedEntity entity:destLocations)
+				destLocationsMap.put(entity.getKey(), entity);
+		}
+		
+		return destLocationsMap;
 	}
 	
 	/**
@@ -450,6 +467,7 @@ public class MainPageUpdateService extends Service
 		updateImmovablesPanel(); 
 		updateMidMessagePanel();
 		updateLocationQuicklist();
+		updateGlobalNavigationMap();
 	}
 
 	public void updateFullPage_shortcut(boolean refreshChat)
@@ -589,6 +607,67 @@ public class MainPageUpdateService extends Service
 		return "";
 	}
 	
+	public String updateGlobalNavigationMap()
+	{
+		StringBuilder html = new StringBuilder();
+		
+		
+		Long shiftX = (Long)location.getProperty("mapComponentX");
+		Long shiftY = (Long)location.getProperty("mapComponentY");
+
+		if (shiftX!=null && shiftY!=null && location.getProperty("mapComponentImage")!=null && "Global".equals(location.getProperty("mapComponentType")))
+		{
+				
+			addGlobalNavigationMapEntry(html, location, null, shiftX, shiftY);
+			
+			if (paths!=null)
+				for(int i = 0; i<paths.size(); i++)
+				{
+					CachedEntity path = paths.get(i);
+					CachedEntity location = destLocations.get(i);
+					String type = (String)location.getProperty("mapComponentType");
+					if ("Global".equals(type))
+					{
+						addGlobalNavigationMapEntry(html, location, path, shiftX, shiftY);
+					}
+					
+				}
+		}
+		else
+		{
+			html.append("This location is not mapped yet. Complain to a content dev!");
+		}
+		
+		return updateHtmlContents("#global-navigation-map", html.toString());
+	}
+	
+	private void addGlobalNavigationMapEntry(StringBuilder html, CachedEntity location, CachedEntity path, Long shiftX, Long shiftY)
+	{
+		String imageUrl = GameUtils.getResourceUrl((String)location.getProperty("mapComponentImage"));
+		Long positionX = (Long)location.getProperty("mapComponentX");
+		Long positionY = (Long)location.getProperty("mapComponentY");
+		
+		if (positionX==null || positionY==null || imageUrl==null)
+			return;
+		
+		positionX-=shiftX;
+		positionY-=shiftY;
+		
+		positionX = positionX*100;
+		positionY = positionY*100;
+		
+		html.append("<div class='overheadmap-cell-container-base'>"); 
+		if (path!=null)
+			html.append("		<a onclick='doGoto(event, "+path.getId()+", false);' class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
+		else
+			html.append("		<a class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
+		html.append("			<div class='overheadmap-cell-label-container'>");
+		html.append("				<div class='label'>"+location.getProperty("name")+"</div>");
+		html.append("			</div>");
+		html.append("			<img src='"+imageUrl+"'/>");
+		html.append("		</a>");
+		html.append("</div>");
+	}
 	
 	public String updateInBannerOverlayLinks()
 	{
@@ -598,6 +677,8 @@ public class MainPageUpdateService extends Service
 			
 			newHtml.append("<a id='thisLocation-button' class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>");			
 			newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img src='https://initium-resources.appspot.com/images/ui/compass1.png'></a>");			
+			newHtml.append("<a id='globe-navigation-button' class='path-overlay-link' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img src='https://initium-resources.appspot.com/images/ui/navigation-map-icon2.png' style='max-width:32px'></a>");			
+			newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
 			
 			loadPathCache();
 			

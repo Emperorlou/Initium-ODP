@@ -1819,10 +1819,13 @@ public class ODPDBAccess
 			CachedEntity newBuff = generateNewObject(def, "Buff");
 			if(newBuff != null)
 			{
-				int expiry = ((Long)newBuff.getProperty("expiry")).intValue();
-				GregorianCalendar cal = new GregorianCalendar();
-				cal.add(Calendar.SECOND, expiry);
-				newBuff.setProperty("expiry", cal.getTime());
+				if (newBuff.getProperty("expiry")!=null)
+				{
+					int expiry = ((Long)newBuff.getProperty("expiry")).intValue();
+					GregorianCalendar cal = new GregorianCalendar();
+					cal.add(Calendar.SECOND, expiry);
+					newBuff.setProperty("expiry", cal.getTime());
+				}
 				newBuff.setProperty("parentKey", characterKey);
 				addBuffToBuffsCache(characterKey, newBuff);
 			}
