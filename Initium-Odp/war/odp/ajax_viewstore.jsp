@@ -113,6 +113,7 @@
         // These are only used for the sorting method db.sortSaleItemList()
         if ("Museum".equals(saleItem.getProperty("status"))) {
         	item.setProperty("dogecoins",0);
+        	continue;
         }
         item.setProperty("store-dogecoins", saleItem.getProperty("dogecoins"));
         item.setProperty("store-status", saleItem.getProperty("status"));
