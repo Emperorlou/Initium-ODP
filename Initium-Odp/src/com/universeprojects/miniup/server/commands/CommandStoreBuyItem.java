@@ -65,6 +65,8 @@ public class CommandStoreBuyItem extends Command {
 			throw new UserErrorMessage("The owner of the store has already sold this item.");
 		if ("Hidden".equals(saleItem.getProperty("status")))
 			throw new UserErrorMessage("The owner of the store is not selling this item at the moment.");
+		if ("Museum".equals(saleItem.getProperty("status")))
+			throw new UserErrorMessage("This item is for display only.");
 
 		Long cost = (Long)saleItem.getProperty("dogecoins");
 		if (cost==null)
