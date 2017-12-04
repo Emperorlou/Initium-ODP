@@ -39,9 +39,7 @@ public class CommandItemsDrop extends CommandItemsBase {
 		for(CachedEntity dropItem:batchItems)
 		{
 			if(GameUtils.equals(dropItem.getProperty("containerKey"), character.getKey()) == false)
-			{
-				throw new UserErrorMessage("Item does not belong to character");
-			}
+				continue;
 			
 			if(CommonChecks.checkCharacterIsBusy(character))
 				throw new UserErrorMessage("Your character is currently busy and cannot drop items.");
