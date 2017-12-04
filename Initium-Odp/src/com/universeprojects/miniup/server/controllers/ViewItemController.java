@@ -19,11 +19,14 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ItemAspect;
+import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
-import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
+import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
+import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.QuestService;
 import com.universeprojects.miniup.server.services.ScriptService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -68,6 +71,23 @@ public class ViewItemController extends PageController {
 		if (CommonChecks.checkItemIsChippedToken(item))
 			request.setAttribute("showChippedTokenUI", true);
 
+		if (item.getProperty("newQuest")!=null)
+		{
+			CachedEntity questDefEntity = db.getEntity((Key)item.getProperty("newQuest"));
+			if (questDefEntity!=null)
+			{
+				QuestService questService = new QuestService(db);
+				QuestDefEntity questDef = new QuestDefEntity(db, questDefEntity);
+				QuestEntity quest = questDef.getQuestEntity(db.getCurrentCharacterKey());
+				
+				if (quest!=null && quest.isComplete())
+					request.setAttribute("questComplete", true);
+				
+				request.setAttribute("newQuest", true);
+				
+			}
+			
+		}
 		
 		
 		if (CommonChecks.checkItemIsAccessible(item, character))

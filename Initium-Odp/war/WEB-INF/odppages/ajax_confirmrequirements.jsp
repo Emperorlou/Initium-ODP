@@ -80,6 +80,18 @@ function selectRequirement(event, requirementSlotIndex, gerKeyList)
 	doCommand(event, "ConfirmRequirementsUpdate", {slotIndex:requirementSlotIndex, gerKeyList:gerKeyList});	
 }
 
+function selectAll(event)
+{
+	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementSlotIndex);
+
+	var itemVisual = $("#item-candidates").find(".confirm-requirements-item-candidate");
+	itemVisual.detach();
+	itemPanelForRequirement.append(itemVisual);
+	itemVisual.hide();
+	itemVisual.fadeIn("slow");
+	event.stopPropagation();
+}
+
 function selectItem(event, itemId)
 {
 	// Check that we're not trying to select an item that is already chosen as a requirement. It doesn't work that way.
@@ -120,11 +132,10 @@ function unselectItem(event)
 
 function confirmRequirements_collectChoices(event)
 {
-	
 	var result = {};
 	result.slots = {};
 	result.repetitionCount = null;
-	var requirementsContainers = $(event.target).closest(".main-splitScreen").find(".confirm-requirements-entry");
+	var requirementsContainers = $("#requirement-categories").find(".confirm-requirements-entry");
 	for(var i = 0; i<requirementsContainers.length; i++)
 	{
 		var requirementsContainer = $(requirementsContainers[i]);
@@ -154,10 +165,35 @@ function confirmRequirements_collectChoices(event)
 	return result;
 }
 </script>
+<div class='center' style='margin-bottom:15px'>
+	<c:if test="${type=='IdeaToPrototype'}">
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCreatePrototype(event, ${ideaId}, "<c:out value="${ideaName}"/>", "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Start Prototyping</a>
+	</c:if>
+	<c:if test="${type=='ConstructItemSkill'}">
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doConstructItemSkill(event, ${skillId}, "<c:out value="${skillName}"/>", "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Begin</a>
+	</c:if>
+	<c:if test="${type=='CollectCollectable'}">
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Begin</a>
+	</c:if>
+	<c:if test="${type=='GenericCommand'}">
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Okay</a>
+	</c:if>
+	<c:if test="${type=='GenericLongOperation'}">
+		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='longOperation(event, "${longOperationUrl}", null, null, "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Okay</a>
+	</c:if>
+</div>
+
 <c:if test="${maxReps!=null}">
-How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}' uniqueId='${repsUniqueId}'/><br> 
+How many times do you want to do this: <input type='number' id='repetitionCount' min='1' max='${maxReps}' uniqueId='${repsUniqueId}'/>
+<p style="display: inline-block;">
+	<a onclick="$('#repetitionCount').val('10000')" style="font-size: 25px;">&#8734;</a>
+</p>
+<br> 
 </c:if>
-<div class='main-splitScreen'>
+
+
+
+<div id='requirement-categories' class='main-splitScreen'>
 <c:forEach var="requirementCategory" items="${formattedRequirements}">
 	<h4><c:out value="${requirementCategory.name}"/></h4>
 	<c:forEach var="requirement" items="${requirementCategory.list}">
@@ -169,28 +205,12 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 	</c:forEach>
 </c:forEach>
 <br>
-<div class='center'>
-	<c:if test="${type=='IdeaToPrototype'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCreatePrototype(event, ${ideaId}, "<c:out value="${ideaName}"/>", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Start Prototyping</a>
-	</c:if>
-	<c:if test="${type=='ConstructItemSkill'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doConstructItemSkill(event, ${skillId}, "<c:out value="${skillName}"/>", "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>
-	</c:if>
-	<c:if test="${type=='CollectCollectable'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Begin</a>
-	</c:if>
-	<c:if test="${type=='GenericCommand'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Okay</a>
-	</c:if>
-	<c:if test="${type=='GenericLongOperation'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='longOperation(event, "${longOperationUrl}", null, null, "${userRequestId}", "${repsUniqueId}")' class='big-link'>Okay</a>
-	</c:if>
-</div>
 
 </div>
 
 <div class='main-splitScreen'>
 <h4>Available Items</h4>
+<p style='float:right;margin:0px;'><a onclick='selectAll(event)'>Add All</a></p>
 <div id='item-candidates'>
 <-- Select a slot on the left to begin
 </div>

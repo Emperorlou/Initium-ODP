@@ -1131,6 +1131,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 }
 .v3-main-button:hover
 {
+	text-decoration:none;
 	text-shadow: 0px 0px 20px yellow;
 }
 .v3-main-button .shortcut-key
@@ -4431,10 +4432,22 @@ body
 
 .overheadmap-X
 {
-    float: right;
-    color: #453f2e;
-    margin-right: 6px;	
-    margin-top: 6px;	
+	position: absolute;
+    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    color: #e2b766;
+    width: 57px;
+    height: 46px;
+    text-align: center;
+    padding-top: 13px;
+    padding-left: 1px;
+    z-index: 1100001;
+    font-family: dos;
+    font-size: 26px;
+    margin-top: -12px;
+    margin-right: -9px;
+    top: 4%;
+    right: 4%;
+    transform: scale(0.7);
 }
 
 .overheadmap-X img:hover
@@ -4484,7 +4497,7 @@ body
     padding-right: 7px;
     border: 2px solid #342b1e;
     display: inline-block;
-    text-shadow:none;
+    text-shadow:none; 
     font-weight: bold;
 }
 
@@ -4497,12 +4510,10 @@ body
     -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
     border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
     position: fixed;
-    left: 0px;
-    right: 0px;
-    margin-left: 0%;
-    margin-top: 0%;
-    top: 0px;
-    bottom: 25px;	
+    left: 4%;
+    right: 4%;
+    top: 4%;
+    bottom: 4%;	
 }
 
 .overheadmap-window-internal
@@ -4669,6 +4680,21 @@ body
 */
 @media (max-width:750px)
 {
+	
+	.overheadmap-window
+	{
+	    left: 0%;
+	    right: 0%;
+	    top: 0%;
+	    bottom: 0%;	
+	}
+
+	.overheadmap-X
+	{
+	    right: 0%;
+	    top: 0%;
+	}
+
 	.section
 	{
 		display:block;

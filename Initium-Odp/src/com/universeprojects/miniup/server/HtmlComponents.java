@@ -352,7 +352,7 @@ public class HtmlComponents {
 	private static String generateButtonBarItem(String buttonId, String minitip, String onClick, String imgSource)
 	{
 		if (minitip!=null && minitip.equals("")==false)
-			return "<a id='"+buttonId+"' onclick='"+onClick+"' minitip='"+minitip+"'><img src='"+imgSource+"' border=0 /></a>";
+			return "<a id='"+buttonId+"' onclick='"+onClick+"' minitip='"+minitip+"'><img alt='"+minitip.replace("'", "&#39;")+"' src='"+imgSource+"' border=0 /></a>";
 		else
 			return "<a id='"+buttonId+"' onclick='"+onClick+"'><img src='"+imgSource+"' border=0 /></a>";
 	}

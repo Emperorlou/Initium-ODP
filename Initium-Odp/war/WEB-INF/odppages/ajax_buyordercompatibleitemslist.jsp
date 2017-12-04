@@ -24,9 +24,10 @@
 
 
 </style>
+<p><a onclick='storeBuyOrderExecuteAll(event, ${buyOrderId});'>Sell All</a></p>
 <div class='main-item-subnote'>Selling up to <span class='boHighlight'>${buyOrderMaxQuantity}</span> units of <span class='boHighlight'>${buyOrderName}</span> at <span class='boHighlight'>${buyOrderValueEach}g</span> each</div>
 <c:forEach var="item" items="${items}">
-	<div class='selectable'>
+	<div class='selectable' id='${item.id}'>
 		<!-- <div class='list-item-X' onclick='doDeleteCharacter(event,${character.id},"${character.name}")'>X</div> -->
 		<div>
 			${item.html}

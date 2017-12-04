@@ -12,9 +12,9 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 
 public class InitiumObject
 {
-	final ODPDBAccess db;
-	final CachedEntity entity;
-	Map<String, InitiumAspect> aspects;
+	final protected ODPDBAccess db;
+	final protected CachedEntity entity;
+	protected Map<String, InitiumAspect> aspects;
 	
 	@SuppressWarnings("unchecked")
 	public InitiumObject(ODPDBAccess db, CachedEntity entity)

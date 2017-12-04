@@ -101,10 +101,12 @@
     
     
 %>
+<!-- 
 <script type='text/javascript'>
     changeChatTab("PrivateChat");
     setPrivateChatTo("<%=otherCharacter.getProperty("name")%>","<%=otherCharacter.getKey().getId()%>");
 </script>
+ -->
 <script type='text/javascript'>var tradeVersion=${tradeVersion};</script>
     <div class='main-page'>
         <h2>Trading with <c:out value="${otherCharacterName}"/></h2> 

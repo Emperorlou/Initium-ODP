@@ -159,7 +159,27 @@ public class ODPDBAccess
 	{
 		if (ds != null) return ds;
 
-		ds = new CachedDatastoreService();
+		ds = new CachedDatastoreService()
+		{
+			@Override
+			protected boolean isPutEventHandlerEnabled()
+			{
+				return true;
+			}
+			
+			protected boolean putEventHandler(CachedEntity entity) 
+			{
+				if (entity.getKind().equals("Character"))
+				{
+					// Always update the locationEntryDatetime timestamp
+					entity.setProperty("locationEntryDatetime", new Date());
+				}
+				
+				return true;
+			}
+		};
+		
+		
 		return ds;
 	}
 
@@ -2895,7 +2915,11 @@ public class ODPDBAccess
 			
 			// Here is a special feature where we automatically make the other character ready if the traders are the same user
 			if (GameUtils.equals(character1.getProperty("userKey"), character2.getProperty("userKey")))
+			{
 				tradeObject.flagReady(ds, character1, tradeObject.isReady(ds, character));
+				character1.setProperty("mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
+				character1.setProperty("combatant", null);
+			}
 			
 		}
 		else if (GameUtils.equals(tradeObject.character1Key, character.getKey()))
@@ -2905,7 +2929,11 @@ public class ODPDBAccess
 
 			// Here is a special feature where we automatically make the other character ready if the traders are the same user
 			if (GameUtils.equals(character1.getProperty("userKey"), character2.getProperty("userKey")))
+			{
 				tradeObject.flagReady(ds, character2, tradeObject.isReady(ds, character));
+				character2.setProperty("mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
+				character2.setProperty("combatant", null);
+			}
 		}
 
 		if (((Key)character1.getProperty("locationKey")).getId() != ((Key)character2.getProperty("locationKey")).getId())
@@ -6734,5 +6762,5 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 }

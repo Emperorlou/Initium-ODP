@@ -56,7 +56,7 @@ function changeInventionTab(event)
 		<c:if test="${hasExperimentItems==true}">
 			<c:forEach var="item" items="${availableItems}">
 				<div class='experiment-available-item-container'>
-					<input type='checkbox' id='experimentItem(${item.id})'/>
+					<input type='checkbox' class='experiment-item-checkbox' id='${item.id}'/>
 					${item.html}
 				</div>
 			</c:forEach>

@@ -2499,15 +2499,9 @@ function createMapWindow(html)
 	windowHtml+=
 			"</div>";
 	
-	windowHtml+=
-			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' onclick='closepopupMessage(" + popupsNum +")'>"+
-            "Okay"+
-            "</div>"+
-            "</div>"+
-            
-			"</div>";
+	windowHtml+="</div>";
 
+	windowHtml+="<a class='overheadmap-X' onclick='closepopupMessage(" + popupsNum +")'>X</a>";
 	
 	
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
@@ -2940,6 +2934,27 @@ function storeBuyOrderExecute(event, buyOrderId, itemId)
 	});
 }
 
+function storeBuyOrderExecuteAll(event, buyOrderId)
+{
+	var itemIds = [];
+	var items = $("#buyordercompatibleitemslist").children(".selectable");
+	for(var i = 0; i<items.length; i++)
+	{
+		var id = items.get(i).id;
+		itemIds.push(parseInt(id));
+	}
+	
+	confirmPopup("Sell your stuff", "Are you sure you want to sell EVERYTHING you are holding that matches this buy order?<br>(Only 20 can be sold at a time)", function(){
+		doCommand(event, "StoreBuyOrderExecute", {buyOrderId:buyOrderId, itemId:itemIds}, function(data){
+			$("#buyordercompatibleitemslist-container").html(
+					"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+					"	<h4>Item picker</h4>" +
+					"	<div id='buyordercompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>");
+			$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId);
+		});
+	});
+}
+
 function viewBuyOrderOptions(event, buyOrderId)
 {
 	$("body").append("" +
@@ -3005,7 +3020,14 @@ function isGlobeNavigationVisible()
 //    $("#overheadmap-cells").append(html);
 //}
 
-
+function beginQuest(event, itemId)
+{
+	doCommand(event, "BeginQuest", {itemId:itemId}, function(data){
+		if (data.error) return;
+		
+		viewQuest(data.questDefKey);
+	});
+}
 
 
 
@@ -3630,8 +3652,11 @@ function doGoto(event, pathId, attack)
 
 function doExperiment(event)
 {
+	var checkedIds = $(".experiment-item-checkbox:checked").map(function(){return $(this).attr('id');}).get();
+	if (checkedIds.length==0) checkedIds = null;
+	
 	showBannerLoadingIcon();
-	longOperation(event, "Experiment", null, 
+	longOperation(event, "ExperimentNew", {itemIds:checkedIds}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
@@ -3677,7 +3702,7 @@ function repeatConfirmRequirementsButton(repsUniqueId)
 function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId)
 {
 	showBannerLoadingIcon();
-	longOperation(event, "BeginPrototype", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
+	longOperation(event, "CreatePrototype", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)

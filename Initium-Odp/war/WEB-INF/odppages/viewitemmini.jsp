@@ -60,6 +60,14 @@
 		</c:forEach>
 		</c:if>
 	</div>
+	<c:if test="${newQuest && questComplete!=true}">
+	<div class='normal-container'>
+		<p>
+		<a onclick='beginQuest(event, ${item.itemId})'>Begin Quest</a><br>
+		There is a quest associated with this item. Click 'Begin Quest' to do this quest.
+		</p>
+	</div>
+	</c:if>
 	<c:if test="${showChippedTokenUI}">
 	<div class='normal-container'>
 		<p>

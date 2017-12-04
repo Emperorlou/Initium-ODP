@@ -40,6 +40,8 @@ public class CommandTradeAddAllItems extends Command {
 		if (tradeObject.isComplete())
 			throw new UserErrorMessage("Trade is already complete.");
 		
+		
+		boolean tooManyItems = false;
 		for(int i = items.size()-1;i>=0;i--)
 		{
 			CachedEntity item = items.get(i);
@@ -52,8 +54,17 @@ public class CommandTradeAddAllItems extends Command {
             	items.remove(i);
                 continue;
             }
+            if (items.size()>200)
+            {
+            	items.remove(i);
+            	tooManyItems = true;
+            	continue;
+            }
 		}
         
+		if (tooManyItems)
+			setPopupMessage("There were too many items so only the first 200 were added.");
+		
 		db.addTradeItems(ds, tradeObject, db.getCurrentCharacter(), items);
         db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);
         
