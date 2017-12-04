@@ -1803,11 +1803,18 @@ function reloadPagePopup(quietly)
 	}
 }
 
+window.moveItemTimer = null;
 function moveItem(event, itemId, newContainerKind, newContainerId)
 {
-	ajaxAction("/ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode, event, function(){
-		reloadPagePopup(true);
-	});
+    ajaxAction("/ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode, event, function(){
+        // Clear any previously set timer before setting a fresh one
+    	if(window.moveItemTimer != null)
+    		window.clearTimeout(window.moveItemTimer);
+    	window.moveItemTimer = setTimeout(function () {
+            reloadPagePopup(true);
+            window.moveItemTimer = null;
+        }, 2000);
+    });
 }
 
 function loadInlineItemsAndCharacters()
