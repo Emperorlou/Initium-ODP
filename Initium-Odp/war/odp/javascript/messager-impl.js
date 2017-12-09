@@ -27,7 +27,7 @@ var messageCodes = [
 var messager;
 //if(window.isTestServer && localStorage.getItem("userNewChat")=="true") 
 //{
-   	messager = new EventServerMessager("http://www.derekabenson.com:6969/eventbus", newChatIdToken);
+   	messager = new EventServerMessager("https://eventserver.universeprojects.com:8080/", newChatIdToken);
 //} else {
 //    messager = new Messager(5000, 10000, 30, "https://chat-dot-playinitium.appspot.com", chatIdToken);
 //}

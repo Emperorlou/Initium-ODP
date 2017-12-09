@@ -3191,7 +3191,7 @@ public class ODPDBAccess
 		if (ds==null)
 			ds = getDB();
 		
-		if (user!=null && Boolean.TRUE.equals(user.getProperty("premium")))
+		if (user!=null)
 		{
 			List<CachedEntity> paths = getFilteredList("Path", "ownerKey", user.getKey());
 			

@@ -8,19 +8,19 @@ String.prototype.startsWith = function(prefix){
 	else
 		return false;
 };
-function EventServerMessager(chatServerUrl, idToken)
+function EventServerMessager(eventServerUrl, idToken)
 {
 	var that = this;
+
+	this._chatServer = eventServerUrl;
+	this._idToken = idToken;
 	
-	const eventServerUrl = "https://eventserver.universeprojects.com:8080/";
 	this.socket = null;
 	if (!window.console) window.console = {};
 	if (!window.console.log) window.console.log = function () { };
 
 	this.waitingForSendResponse = false;
 
-	this.chatServer = chatServerUrl;
-	this.idToken = idToken;
 
 	this.channel = "GlobalChat";
 
@@ -150,9 +150,29 @@ function EventServerMessager(chatServerUrl, idToken)
 
 	this.notifyChatIsActive = function(){};
 
-	this.reconnect = function()
+	this.reconnect = function(eventServerUrl, idToken)
 	{
+		this.disconnect();
+		
+		this._chatServer = eventServerUrl;
+		this._idToken = idToken;
 		this._connect();
+	};
+	
+	this.disconnect = function()
+	{
+		if (that.socket!=null)
+		{
+			try
+			{
+				that.reconnectTimer = {};	// Here we're setting the reconnect timer to non-null to block the auto reconnection from taking place
+				that.socket.close();
+			}
+			catch(e)
+			{
+				// Ignore errors
+			}
+		}
 	};
 	
 	this._connect = function()
@@ -236,10 +256,10 @@ function EventServerMessager(chatServerUrl, idToken)
     ///////////////////////////////////
     // Constructor area
 
-    if (this.chatServer==null)
-    	this.chatServer = "";
+    if (this._chatServer==null)
+    	this._chatServer = "";
 
-    const url = eventServerUrl+"socket?token="+encodeURIComponent(idToken);
+    var url = this._chatServer+"socket?token="+encodeURIComponent(this._idToken);
     const options = {};
     
     this._connect();

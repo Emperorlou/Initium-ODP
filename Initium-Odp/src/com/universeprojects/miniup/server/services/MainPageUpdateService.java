@@ -346,8 +346,11 @@ public class MainPageUpdateService extends Service
 	public String getLocationBanner()
 	{
 		String banner = (String)location.getProperty("banner");
-		
-		if (CommonChecks.checkCharacterIsInCombat(character) && CommonChecks.checkLocationIsCombatSite(location)==false)
+		if (CommonChecks.checkCharacterIsIncapacitated(character))
+		{
+			banner = "images/unconscious1.jpg";
+		}
+		else if (CommonChecks.checkCharacterIsInCombat(character) && CommonChecks.checkLocationIsCombatSite(location)==false)
 		{
 			CachedEntity combatant = getCombatant();
 			if (combatant!=null && CommonChecks.checkCharacterIsDead(combatant)==false)
@@ -504,7 +507,13 @@ public class MainPageUpdateService extends Service
 	
 	public String updateLocationName()
 	{
-		return updateHtmlContents("#locationName", (String)location.getProperty("name"));
+		String html = "??";
+		if (CommonChecks.checkCharacterIsIncapacitated(character))
+			html = "";
+		else
+			html = (String)location.getProperty("name");
+		
+		return updateHtmlContents("#locationName", html);
 	}
 	
 	/**
@@ -611,33 +620,39 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder html = new StringBuilder();
 		
-		
-		Long shiftX = (Long)location.getProperty("mapComponentX");
-		Long shiftY = (Long)location.getProperty("mapComponentY");
-
-		if (shiftX!=null && shiftY!=null && location.getProperty("mapComponentImage")!=null && "Global".equals(location.getProperty("mapComponentType")))
+		if (CommonChecks.checkCharacterIsIncapacitated(character))
 		{
-				
-			addGlobalNavigationMapEntry(html, location, null, shiftX, shiftY);
-			
-			if (paths!=null)
-				for(int i = 0; i<paths.size(); i++)
-				{
-					CachedEntity path = paths.get(i);
-					CachedEntity location = destLocations.get(i);
-					String type = (String)location.getProperty("mapComponentType");
-					if ("Global".equals(type))
-					{
-						addGlobalNavigationMapEntry(html, location, path, shiftX, shiftY);
-					}
-					
-				}
+			html.append("You are incapacitated and cannot see this map right now.");
 		}
 		else
 		{
-			html.append("This location is not mapped yet. Complain to a content dev!");
+			
+			Long shiftX = (Long)location.getProperty("mapComponentX");
+			Long shiftY = (Long)location.getProperty("mapComponentY");
+	
+			if (shiftX!=null && shiftY!=null && location.getProperty("mapComponentImage")!=null && "Global".equals(location.getProperty("mapComponentType")))
+			{
+					
+				addGlobalNavigationMapEntry(html, location, null, shiftX, shiftY);
+				
+				if (paths!=null)
+					for(int i = 0; i<paths.size(); i++)
+					{
+						CachedEntity path = paths.get(i);
+						CachedEntity location = destLocations.get(i);
+						String type = (String)location.getProperty("mapComponentType");
+						if ("Global".equals(type))
+						{
+							addGlobalNavigationMapEntry(html, location, path, shiftX, shiftY);
+						}
+						
+					}
+			}
+			else
+			{
+				html.append("This location is not mapped yet. Complain to a content dev!");
+			}
 		}
-		
 		return updateHtmlContents("#global-navigation-map", html.toString());
 	}
 	
@@ -724,6 +739,10 @@ public class MainPageUpdateService extends Service
 			{
 				//	newHtml.append(getHtmlForInBannerLink(50, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore(event)"));
 			}
+			else if (CommonChecks.checkCharacterIsIncapacitated(character))
+			{
+				// Do nothing, we don't want to show any overlay links
+			}
 			else
 			{
 				newHtml.append(getHtmlForInBannerLink(50, 47, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Exit</span>", "window.btnLeaveAndForget.click()"));
@@ -771,7 +790,9 @@ public class MainPageUpdateService extends Service
 
 	public String updateButtonList(boolean showHidden){
 		
-		if (cs.isInCombat(character))
+		if (CommonChecks.checkCharacterIsIncapacitated(character))
+			return updateButtonList_Incapacitated();
+		else if (cs.isInCombat(character))
 			return updateButtonList_CombatMode();
 		else
 		{
@@ -914,13 +935,13 @@ public class MainPageUpdateService extends Service
 			if ("TRUE".equals(destLocation.getProperty("defenceStructuresAllowed")))
 					defensiveStructureAllowed = true;
 
-			if ("PlayerHouse".equals(path.getProperty("type")))
-			{
-				if (user!=null && Boolean.TRUE.equals(user.getProperty("premium")))
-				{/*Simpler if logic this way*/}
-				else
-					newHtml.append("<p style='text-align:center;' title='Save this link to your house. This is a temporary workaround'>https://www.playinitium.com/ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"</p>");
-			}
+//			if ("PlayerHouse".equals(path.getProperty("type")))
+//			{
+//				if (user!=null && Boolean.TRUE.equals(user.getProperty("premium")))
+//				{/*Simpler if logic this way*/}
+//				else
+//					newHtml.append("<p style='text-align:center;' title='Save this link to your house. This is a temporary workaround'>https://www.playinitium.com/ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"</p>");
+//			}
 
 
 			
@@ -998,6 +1019,18 @@ public class MainPageUpdateService extends Service
 		return updateHtmlContents("#main-button-list", newHtml.toString());
 	}
 	
+	protected String updateButtonList_Incapacitated()
+	{
+		StringBuilder newHtml = new StringBuilder();
+		
+		if (CommonChecks.checkCharacterIsDead(character))
+			newHtml.append("<a onclick='newCharacterFromDead()' class='v3-main-button'>Spawn a new character</a>");
+		if (CommonChecks.checkCharacterIsUnconscious(character))
+			newHtml.append("<a onclick='newCharacterFromUnconscious()' class='v3-main-button'>Spawn a new character</a>");
+		
+		return updateHtmlContents("#main-button-list", newHtml.toString());
+	}
+	
 
 //	public String updateCombatView(CombatService cs, CachedEntity combatant, String combatResult)
 //	{
@@ -1039,8 +1072,9 @@ public class MainPageUpdateService extends Service
 			
 		}
 		js.append("		window.newChatIdToken= '"+db.getChatToken()+"';");
-		js.append("		messager.reconnect();");
 		js.append("		$('.chat_messages').html('');");
+		js.append("		messager.reconnect('https://eventserver.universeprojects.com:8080', window.newChatIdToken);");
+	   	
 		
 		if (refreshChat==false)
 			js.append("}");
@@ -1090,6 +1124,21 @@ public class MainPageUpdateService extends Service
 		js.append("locationAudioDescriptorPreset = '"+locationAudioDescriptorPreset+"';");
 		
 		js.append("setAudioDescriptor(locationAudioDescriptor, locationAudioDescriptorPreset, isOutside);");
+
+		if (CommonChecks.checkCharacterIsUnconscious(character))
+		{
+			js.append("setBannerOverlayText('YOU&#39;RE INCAPACITATED!', 'Ok so you&#39;re not dead yet, but all of your inventory has been dropped at the site where you fell. If you&#39;re a premium member, it&#39;s POSSIBLE to be rescued if help comes in time.', true);");
+			
+		}
+		else if (CommonChecks.checkCharacterIsDead(character))
+		{
+			js.append("setBannerOverlayText('YOU&#39;RE DEAD!', 'Ok so you&#39;re dead. What does this mean? It means you have lost all of your stuff, all of your progress you&#39;re essentially starting a new character from the beginning. Please be careful next time!', true);");
+		}
+		
+		if (CommonChecks.checkCharacterIsIncapacitated(character))
+			js.append("$('#campsPanel').hide()");
+		else
+			js.append("$('#campsPanel').show()");
 		
 		
 		return updateJavascript("ajaxJs", js.toString());
@@ -1102,7 +1151,7 @@ public class MainPageUpdateService extends Service
 	
 	public String updateButtonBar()
 	{
-		if(cs.isInCombat(character)) return updateHtmlContents("#buttonbar", "");
+		if(cs.isInCombat(character) || CommonChecks.checkCharacterIsIncapacitated(character)) return updateHtmlContents("#buttonbar", "");
 		return updateHtmlContents("#buttonbar", HtmlComponents.generateButtonBar(character));
 	}
 
@@ -1110,6 +1159,42 @@ public class MainPageUpdateService extends Service
 	{
 		String desc = (String)location.getProperty("description");
 		if (desc==null) desc = "";
+		
+		if (CommonChecks.checkCharacterIsDead(character))
+		{
+			desc += "If you were carrying some good stuff when you died, all that stuff is now lying beside your corpse. "; 
+			desc += "When you start a new character, you could try to recover it and any gold you might have had on you. "; 
+			desc += "If it's in a tricky spot (I mean, you were killed right? Probably pretty dangerous), then you MIGHT be  "; 
+			desc += "able to enlist some help from people in chat with your new character. Be careful though! Not everyone ";
+			desc += "can be trusted! ";
+			
+		}
+		else if (CommonChecks.checkCharacterIsUnconscious(character))
+		{
+			desc += "It's not too late for you, you can be saved still! In order to be saved, you must be picked up by someone ";
+			desc += "and taken to a rest area and then dropped there. As soon as you are dropped, if you're still alive, you will ";
+			desc += "revive with 1 hitpoint. <strong>This can only be done if you AND your rescuer are both premium members. You ";
+			desc += "also cannot use an alt, it MUST be another player that rescues you.</strong>";
+
+			if (CommonChecks.checkUserIsPremium(user)==false)
+			{
+				desc += "<p class='highlightbox-red'>";
+				desc += "You are not a premium member, but it is not too late to become one. If you ";
+				desc += "become a premium member, someone could pick up your body and bring you to a rest area to save you. "; 
+				desc += "<strong style='color:red'>Please note that becoming a premium member does NOT guarantee that you will be saved. It just means ";
+				desc += "that someone COULD save you if you don't die before they get you to a rest area.</strong> ";
+				desc += "</p> ";
+				desc += "<center><a onclick='viewProfile()' class='v3-main-button' style='color:#FFFFFF'>Become a premium member for $5</a></center>";
+			}
+			else
+			{
+				desc += "<p class='highlightbox-green'>";
+				desc += "You ARE a premium member and so it is possible for somebody to come and save you!";
+				desc += "</p>";
+			}
+			
+		}
+		
 		return updateHtmlContents("#locationDescription", desc);
 	}
 	
@@ -1149,10 +1234,10 @@ public class MainPageUpdateService extends Service
 	
 	public String updateTerritoryView()
 	{
-		if (location.getProperty("territoryKey")!=null)
-		{
-			return HtmlComponents.generateTerritoryView(character, getTerritoryOwningGroup(), getTerritory());
-		}
+//		if (location.getProperty("territoryKey")!=null)
+//		{
+//			return HtmlComponents.generateTerritoryView(character, getTerritoryOwningGroup(), getTerritory());
+//		}
 
 		return updateHtmlContents("#locationScripts", "");
 	}
@@ -1263,6 +1348,9 @@ public class MainPageUpdateService extends Service
 
 	public String updateImmovablesPanel(CachedEntity updatedItem)
 	{
+		if (CommonChecks.checkCharacterIsIncapacitated(character))
+			return updateHtmlContents("#immovablesPanel", "");
+
 		loadImmovables();
 		
 		for(int i = 0; i<immovables.size(); i++)
@@ -1277,6 +1365,10 @@ public class MainPageUpdateService extends Service
 	
 	public String updateImmovablesPanel()
 	{
+		if (CommonChecks.checkCharacterIsIncapacitated(character))
+			return updateHtmlContents("#immovablesPanel", "");
+
+		
 		StringBuilder html = new StringBuilder();
 		
 		loadImmovables();
@@ -1326,16 +1418,17 @@ public class MainPageUpdateService extends Service
 	
 	public String updateCampsPanel()
 	{
-		if(cs.isInCombat(character))
-			return updateHtmlContents("#campsPanel", "");
-		
 		StringBuilder html = new StringBuilder();
-		html.append("<div class='main-description'>");
-		if(location != null && db.isCharacterAbleToCreateCampsite(ds, character, location))
-			html.append("This location could host up to " + location.getProperty("supportsCamps") + " camps.");
-		else
-			html.append("This location is not suitable for a camp.");
-		html.append("</div>");
+		
+		if (CommonChecks.checkCharacterIsIncapacitated(character)==false && cs.isInCombat(character)==false)
+		{
+			html.append("<div class='main-description'>");
+			if(location != null && db.isCharacterAbleToCreateCampsite(ds, character, location))
+				html.append("This location could host up to " + location.getProperty("supportsCamps") + " camps.");
+			else
+				html.append("This location is not suitable for a camp.");
+			html.append("</div>");
+		}
 		
 		return updateHtmlContents("#campsPanel", html.toString());
 	}
@@ -1412,19 +1505,20 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder html = new StringBuilder();
 		
-		if (CommonChecks.checkLocationIsCombatSite(location) && CommonChecks.checkCharacterIsInCombat(character)==false)
-		{
-			html.append("<div class='boldbox'>");
-			html.append("	<div id='inline-items' class='main-splitScreen'>");
-			html.append("	</div>");
-			html.append("	<div id='inline-characters' class='main-splitScreen'>");
-			html.append("	</div>");
-			html.append("</div>");
-			html.append("<script type='text/javascript'>");
-			html.append("	loadInlineItemsAndCharacters();");
-			html.append("	loadInlineCollectables();");
-			html.append("</script>");
-		}
+		if (CommonChecks.checkCharacterIsIncapacitated(character)==false)
+			if (CommonChecks.checkLocationIsCombatSite(location) && CommonChecks.checkCharacterIsInCombat(character)==false)
+			{
+				html.append("<div class='boldbox'>");
+				html.append("	<div id='inline-items' class='main-splitScreen'>");
+				html.append("	</div>");
+				html.append("	<div id='inline-characters' class='main-splitScreen'>");
+				html.append("	</div>");
+				html.append("</div>");
+				html.append("<script type='text/javascript'>");
+				html.append("	loadInlineItemsAndCharacters();");
+				html.append("	loadInlineCollectables();");
+				html.append("</script>");
+			}
 		
 		
 		

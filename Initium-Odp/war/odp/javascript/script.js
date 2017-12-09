@@ -1629,7 +1629,7 @@ function newPremiumToken()
 
 function newCharacterFromUnconscious()
 {
-	confirmPopup("Create a new character?", "If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
+	confirmPopup("Create a new character?", "Are you Sure? If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
 		enforceSingleAction();
 		window.location.href = "/ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode;
 	});
@@ -3603,11 +3603,15 @@ function setBannerImage(url)
 	updateDayNightCycle(true);
 }
 
-function setBannerOverlayText(title, text)
+function setBannerOverlayText(title, text, noCancel)
 {
 	if (text==null)
 		text = "";
+	
 	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
+	
+	if (noCancel)
+		contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"</div>";
 	
 	$(".travel-scene-text").remove();
 	$("#banner-base").append(contents);
