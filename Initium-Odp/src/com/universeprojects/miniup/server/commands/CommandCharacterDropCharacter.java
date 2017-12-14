@@ -22,8 +22,8 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
  */
 public class CommandCharacterDropCharacter extends Command {
 
-	public CommandCharacterDropCharacter(ODPDBAccess db, HttpServletRequest request,
-			HttpServletResponse response) {
+	public CommandCharacterDropCharacter(ODPDBAccess db,
+			HttpServletRequest request, HttpServletResponse response) {
 		super(db, request, response);
 	}
 
@@ -41,6 +41,8 @@ public class CommandCharacterDropCharacter extends Command {
 		
 		db.doCharacterDropCharacter(location, character, dropCharacter);
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+		
+		if(GameUtils.isPlayerIncapacitated(dropCharacter) == false)
+			db.sendMainPageUpdateForCharacter(db.getDB(), dropCharacter.getKey(), "updateFullPage_shortcut");
 	}
-
 }
