@@ -28,15 +28,14 @@ function EventServerMessager(eventServerUrl, idToken)
 	
 	this.firstGet = true;
 	
-	this.reconnectTimer = null;
-
+	this.url = null;
 
 	this.sendMessage = function(message)
 	{
 		ga('send', 'pageview', 'ServletChat');
 		
-		if(this.checkClientSideChatCommands!=null){
-			if(this.checkClientSideChatCommands(message))
+		if(that.checkClientSideChatCommands!=null){
+			if(that.checkClientSideChatCommands(message))
 				return;
 		}
 
@@ -45,7 +44,7 @@ function EventServerMessager(eventServerUrl, idToken)
 		
 	    var a = $.post("/ServletChat",
 		{
-			roomId:this.channel,
+			roomId:that.channel,
 			msg:message,
 		});
         a.always(function(){
@@ -53,12 +52,12 @@ function EventServerMessager(eventServerUrl, idToken)
         });
 
 		
-//		var a = $.post(this.chatServer + "/messager",
+//		var a = $.post(that.chatServer + "/messager",
 //		{
-//			channel:this.channel,
-//			markers:this._getMarkersCombined(),
+//			channel:that.channel,
+//			markers:that._getMarkersCombined(),
 //			message:message,
-//			"idToken2":this.idToken
+//			"idToken2":that.idToken
 //		});
 
 		a.done(function(data){
@@ -67,11 +66,11 @@ function EventServerMessager(eventServerUrl, idToken)
 
 		a.fail(function(xhr, textStatus, error){
 			if (that.onError!=null)
-				that.onError(xhr, textStatus, error);
+				that.onError(error.message);
 			that.waitingForSendResponse = false;
 		});
 
-		this.waitingForSendResponse = true;
+		that.waitingForSendResponse = true;
 	};
 
 
@@ -89,8 +88,8 @@ function EventServerMessager(eventServerUrl, idToken)
 
 	this._processMessage = function(data)
 	{
-		if (this.onMessagesChecked!=null)
-			this.onMessagesChecked();
+		if (that.onMessagesChecked!=null)
+			that.onMessagesChecked();
 
 		if (data == null || data.length==null || data.length==0)
 			return;
@@ -106,9 +105,9 @@ function EventServerMessager(eventServerUrl, idToken)
 
 			// A hacky workaround method of removing duplicate messages
 //			var uniqueId = newDataType.timestamp+newDataType.text+newDataType.details;
-//			if (this.messagesReceived.indexOf(uniqueId)>=0)
+//			if (that.messagesReceived.indexOf(uniqueId)>=0)
 //				continue;
-//			this.messagesReceived.push(uniqueId);
+//			that.messagesReceived.push(uniqueId);
 			// End hack
 			
 			if (newDataType.channel!="!Notifications")
@@ -127,7 +126,7 @@ function EventServerMessager(eventServerUrl, idToken)
 				message.code = message.code.split("-")[0];
 				if (message.nicknameStyled==null) message.nicknameStyled = message.nickname; 
 				
-				this.onChatMessage(message);
+				that.onChatMessage(message);
 			}
 			else
 			{
@@ -137,12 +136,12 @@ function EventServerMessager(eventServerUrl, idToken)
 					details:newDataType.additionalData.details
 				};
 				
-				this.onNotificationMessage(message);
+				that.onNotificationMessage(message);
 			}
 		}
 
     	if (receivedMessage)
-    		this.notifyChatIsActive();
+    		that.notifyChatIsActive();
 	};
 
 	this.lastGetMessageCall = null;
@@ -152,11 +151,15 @@ function EventServerMessager(eventServerUrl, idToken)
 
 	this.reconnect = function(eventServerUrl, idToken)
 	{
-		this.disconnect();
+		that.disconnect();
 		
-		this._chatServer = eventServerUrl;
-		this._idToken = idToken;
-		this._connect();
+		if (eventServerUrl!=null)
+			that._chatServer = eventServerUrl;
+		if (idToken!=null)
+			that._idToken = idToken;
+		
+		that.url = that._chatServer+"socket?token="+encodeURIComponent(that._idToken);
+		that._connect();
 	};
 	
 	this.disconnect = function()
@@ -165,7 +168,7 @@ function EventServerMessager(eventServerUrl, idToken)
 		{
 			try
 			{
-				that.reconnectTimer = {};	// Here we're setting the reconnect timer to non-null to block the auto reconnection from taking place
+				window.eventServerReconnectTimer = {};	// Here we're setting the reconnect timer to non-null to block the auto reconnection from taking place
 				that.socket.close();
 			}
 			catch(e)
@@ -192,7 +195,12 @@ function EventServerMessager(eventServerUrl, idToken)
 		}
 		
 	    that.sockJsConnected = false;
-	    that.socket = new SockJS(url, null, options);
+	    if (that.url==null)
+	    {
+	    	console.log("Url not set!?");
+	    	return;
+	    }
+	    that.socket = new SockJS(that.url, null, options);
 	    that.socket.onopen = function(event) 
 	    {
 //	    	that.messagesReceived = [];	// Removing duplicates this way - Here we're clearing the unique messages we received so we don't accidentally ignore them when they are sent again
@@ -200,34 +208,35 @@ function EventServerMessager(eventServerUrl, idToken)
 	        console.log("connected: "+JSON.stringify(event));
 	        that.sockJsConnected = true;
 
-	        if (that.reconnectTimer!=null)
-	        {
-		        clearInterval(that.reconnectTimer);
-		        that.reconnectTimer = null;
-	        }
+	        that.endAutoReconnections();
 	        if (that.onConnectionStateChange!=null)
 	        	that.onConnectionStateChange("connected");
 	    };
 	    that.socket.onclose = function (event) {
-	    	
+	    	if (event.wasClean==false)
+		    	that.onError(event.reason);
+	    		
 	        console.log("close: "+JSON.stringify(event));
 	        that.sockJsConnected = false;
 	        
-	        if (that.reconnectTimer==null)
-	        {
-	        	console.log("Auto-retrying connection every 3 seconds starting now...");
-	        	that.reconnectTimer = setInterval(that._connect, 3000);
-	        }
+	    	that.startAutoReconnections();
 	        if (that.onConnectionStateChange!=null)
 	        	that.onConnectionStateChange("disconnected");
 	    };
 	    that.socket.onerror = function (event) {
+	    	that.onError(event.reason);
 	        console.log("error: "+JSON.stringify(event));
 	    };
 	    that.socket.onmessage = function (event) {
-	        var data = JSON.parse(event.data);
+	    	that.endAutoReconnections();
+	    	
+	    	var data = JSON.parse(event.data);
 	        if (data.messages!=null && data.messages.length>0 && data.messages[0].additionalData.__history!=true)
+	        {
 	        	that.firstGet = false;
+	        	if (that.onFirstGetComplete)
+	        		that.onFirstGetComplete();
+	        }
 	        that._processMessage(data.messages);
 	    };
 	    window.onbeforeunload = function () {
@@ -238,6 +247,21 @@ function EventServerMessager(eventServerUrl, idToken)
 		  
 	};
 
+	this.startAutoReconnections = function(){
+        if (window.eventServerReconnectTimer==null)
+        {
+        	console.log("Auto-retrying connection every 3 seconds starting now...");
+        	window.eventServerReconnectTimer = setInterval(that.reconnect, 3000);
+        }
+	};
+	
+	this.endAutoReconnections = function(){
+        if (window.eventServerReconnectTimer!=null)
+        {
+	        clearInterval(window.eventServerReconnectTimer);
+	        window.eventServerReconnectTimer = null;
+        }
+	};
 
     this.onChatMessage = null;
     this.onNotificationMessage = null;
@@ -256,10 +280,12 @@ function EventServerMessager(eventServerUrl, idToken)
     ///////////////////////////////////
     // Constructor area
 
+    this.endAutoReconnections();	// Just in case we've already been constructed before, we'll end auto reconnections so we don't cause connection loops
+    
     if (this._chatServer==null)
     	this._chatServer = "";
 
-    var url = this._chatServer+"socket?token="+encodeURIComponent(this._idToken);
+    this.url = this._chatServer+"socket?token="+encodeURIComponent(this._idToken);
     const options = {};
     
     this._connect();

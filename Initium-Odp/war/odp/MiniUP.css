@@ -474,17 +474,18 @@ hr:after {
 .mini-window-header
 {
 	position:relative;
-	width:290px;
 	height:132px;
 	background-color:#222222;
 	padding:14px;	
 	font-size:16px;
+	margin:-4px;
+	margin-bottom:0px;
 }
 
 .mini-window-header-split
 {
 	vertical-align:top;
-	width: 142px;
+	width: 133px;
 	margin: 0px;
 	padding: 0px;
 	display:inline-block;
@@ -598,7 +599,7 @@ a.main-highlight:HOVER
 .backgroundcliptext .item-custom
 {
 	font-size:20px;
-    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+    text-shadow: 1px 1px 1px #004e00a1;
     color: transparent;
     background-color: #00BB00 !important;
     -webkit-background-clip: text;
@@ -661,7 +662,7 @@ a.main-highlight:HOVER
 .backgroundcliptext .item-rare
 {
     font-size: 20px;
-    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+    text-shadow: 1px 1px 0px #864800b0;
     color: transparent;
     background-color: #DD7700;
     -webkit-background-clip: text;
@@ -671,9 +672,9 @@ a.main-highlight:HOVER
 .backgroundcliptext .item-unique
 {
     font-size: 20px;
-    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+    text-shadow: 1px 1px 1px #b38400c9;
     color: transparent;
-    background-color: #F9CC00;
+	background-color: #f9c000;
     -webkit-background-clip: text;
     -moz-background-clip: text;
 }
@@ -682,7 +683,7 @@ a.main-highlight:HOVER
 .backgroundcliptext .item-epic
 {
     font-size: 20px;
-    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+    text-shadow: 1px 1px 0px #5e2e8cd4;
     color: transparent;
     background-color: #AC54FF;
     -webkit-background-clip: text;
@@ -692,7 +693,7 @@ a.main-highlight:HOVER
 .backgroundcliptext .item-magic
 {
     font-size: 20px;
-    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+    text-shadow: 1px 1px 1px #0b2e4e8a;
     color: transparent;
 	background-color: #2597FF;
     -webkit-background-clip: text;
@@ -1436,7 +1437,7 @@ a.range-increment {
     border-width: 4px;
     height: 25px;
     position: relative;
-    top: 0px;
+    top: -1px;
     right: -1px;
     cursor:pointer;
 }
@@ -1757,12 +1758,12 @@ a.range-increment {
 
 .avatar-equip-gloves-left
 {
-	position:absolute; top:10px; left:1px; width:10px; height:15px; background-size:contain; background-position:center; background-repeat:no-repeat;
+	position:absolute; top:13px; left:3px; width:10px; height:15px; background-size:contain; background-position:center; background-repeat:no-repeat;
 }
 
 .avatar-equip-gloves-right
 {
-	position:absolute; top:10px; right:1px; width:10px; height:15px; background-size:contain; background-position:center; background-repeat:no-repeat; -moz-transform: scaleX(-1); -o-transform: scaleX(-1); -webkit-transform: scaleX(-1); transform: scaleX(-1); filter: FlipH; -ms-filter: "FlipH";
+	position:absolute; top:13px; right:5px; width:10px; height:15px; background-size:contain; background-position:center; background-repeat:no-repeat; -moz-transform: scaleX(-1); -o-transform: scaleX(-1); -webkit-transform: scaleX(-1); transform: scaleX(-1); filter: FlipH; -ms-filter: "FlipH";
 }
 
 .avatar-equip-leftHand
@@ -1865,7 +1866,7 @@ a.range-increment {
 {
 	position:absolute;
 	top:25px;
-	left:5px;
+	left:6px;
 	width:20px;
 	height:30px;
 	background-size:contain;
@@ -1877,7 +1878,7 @@ a.range-increment {
 {
 	position:absolute;
 	top:25px;
-	right:5px;
+	right:10px;
 	width:20px;
 	height:30px;
 	background-size:contain;
@@ -2256,7 +2257,7 @@ a.range-increment {
 
 .backgroundcliptext .premium-character-name
 {
-    text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.7);
+    text-shadow: 1px 1px 0px rgba(72, 0, 0, 0.65);
     color: transparent;
     background-color: #FF0000;
     -webkit-background-clip: text;
@@ -2773,7 +2774,7 @@ position: absolute;
 
 .revealTutorial-popup
 {
-	width:320px;
+	width:305px;
 	padding-left:5px;
 	padding-right:5px;
 	z-index:10000000;
@@ -3947,9 +3948,25 @@ body
 	background-color:#000000;
 }
 
-.cluetip-rounded .cluetip-outer
+.cluetip-outer
 {
-	/*margin:7px;*/
+	
+}
+
+.cluetip-arrows
+{
+    border-color: #62656e;	
+    border-width: 11px 11px 11px 0;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    font-size: 0;
+    line-height: 0%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    background: transparent none;
+    margin:-6px;
 }
 
 

@@ -84,9 +84,9 @@ function RevealTutorial()
 			elementWidth = element.width();
 			elementHeight = element.height();
 		}
-		var popupLeft = elementPos.left+(elementWidth/2)-(320/2);
+		var popupLeft = elementPos.left+(elementWidth/2)-(305/2);
+		if (popupLeft>$(window).width()-305-16) popupLeft=$(window).width()-305-16;
 		if (popupLeft<0) popupLeft = 0;
-		if (popupLeft>$(window).width()-320-16) popupLeft=$(window).width()-320-16;
 		var popupTop = elementPos.top+elementHeight+3;
 
 		

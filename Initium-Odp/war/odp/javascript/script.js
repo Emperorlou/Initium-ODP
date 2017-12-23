@@ -309,7 +309,7 @@ function clearPopupPermanentOverlay()
 function popupPermanentOverlay_Experiment(title, text)
 {
 	$("#banner-text-overlay").hide();
-	if (window.previousBannerUrl!=bannerUrl)
+	if (bannerUrl!=null && window.previousBannerUrl!=bannerUrl)
 		window.previousBannerUrl = bannerUrl;
 	setBannerImage("https://initium-resources.appspot.com/images/animated/invention1.gif");
 	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
@@ -321,14 +321,14 @@ function popupPermanentOverlay_Experiment(title, text)
 function popupPermanentOverlay_Searching(locationName)
 {
 	$("#banner-text-overlay").hide();
-	if (window.previousBannerUrl!=bannerUrl)
+	if (bannerUrl!=null && window.previousBannerUrl!=bannerUrl)
 		window.previousBannerUrl = bannerUrl;
 	popupPermanentOverlay_WalkingBase("Exploring "+locationName, "You are wandering around, looking for anything of interest...");
 }
 
 function popupPermanentOverlay_Walking(locationName)
 {
-	if (window.previousBannerUrl!=bannerUrl)
+	if (bannerUrl!=null && window.previousBannerUrl!=bannerUrl)
 		window.previousBannerUrl = bannerUrl;
 	popupPermanentOverlay_WalkingBase("Walking to "+locationName);
 }
@@ -1713,6 +1713,17 @@ function pagePopup(url, closeCallback, title)
 		popupStackCloseCallbackHandlers.push(null);
 }
 
+function pagePopupHtml(title, html)
+{
+	exitFullscreenChat();
+	
+	var stackIndex = incrementStackIndex();
+	var pagePopupId = "page-popup"+stackIndex;
+	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><div class='page-popup-title'><h4>"+title+"</h4></div><div id='"+pagePopupId+"-content'>"+html+"</div><div class='mobile-spacer'></div></div>");
+	$("body").scrollTo("#buttonbar");
+}
+
 function pagePopupIframe(url)
 {
 	
@@ -2855,6 +2866,16 @@ function loadRelatedSkills(itemKey)
 	doCommand(event, "RelatedSkillsUpdate", {itemKey:itemKey});
 }
 
+function makeIntoPopupHtml(html)
+{
+	clearMakeIntoPopup();
+	
+	window.scrollTo(0,0);
+	$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	html = "<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" + html;
+	$("body").append("<div class='main-buttonbox v3-window3 make-popup make-popup-html'>"+html+"</div>");
+}
+
 function makeIntoPopup(jquerySelector)
 {
 	clearMakeIntoPopup();
@@ -2866,6 +2887,7 @@ function makeIntoPopup(jquerySelector)
 
 function clearMakeIntoPopup()
 {
+	$(".make-popup-html").remove();
 	$(".make-popup").removeClass("make-popup");
 	$(".make-popup-underlay").remove();
 	$(".make-popup-X").remove();
@@ -3036,8 +3058,97 @@ function beginQuest(event, itemId)
 	});
 }
 
+function viewNoobWindow()
+{
+	var html = "" +
+			"<h4>Need some help?</h4>" +
+			"<h5>Do the 'noob' quests</h5>" +
+			"<p>Follow the noob quests, they teach you how to play the game and they don't take very long to complete. Do so by clicking the big white ! button on the button bar to open your quest list. <br><a onclick='clearMakeIntoPopup();viewQuests()'>Your quests list</a></p>" +
+			"<h5>Can't find the right buttons?</h5>" +
+			"<p>This is a brief UI tutorial to familiarize you with the very basics. Hopefully one day the UI will be so intuitive this won't be necessary for anybody. <br><a onclick='clearMakeIntoPopup();uiTutorial.run()'>Start tutorial</a></p>" +
+			"<h5>Got more questions you need answers to?</h5>" +
+			"<p>This is a FAQ made by players, for players. Common questions and their answers. You can find this by typing /faq in chat as well.<br><a onclick='clearMakeIntoPopup();' href='http://initium.wikia.com/wiki/Staub%27s_FAQ_Guide' target='_blank'>Community FAQ</a></p>" +
+			"<h5>Community-made fast track cheat sheet</h5>" +
+			"<p>This will help you make good decisions early in the game. This is mostly for new players but it's a good place to start if you don't want to make the same mistakes everyone else has made already.<br><a onclick='clearMakeIntoPopup();' href='http://initium.wikia.com/wiki/The_Starter_and_Progression_Guide' target='_blank'>Player-made guide</a></p>" +
+//			"<h5>Talk to the community in global!</h5>" +
+//			"<p>Last but not least our small gaming community is (generally) very helpful and happy you're here! If you have any questions just ask and many will be willing to go out of their way to help you out.</p>" +
+			"";
+	
+	makeIntoPopupHtml(html);
+}
 
-
+function viewJoinTeam()
+{
+	var html = "" +
+			"				<p>We are always on the look-out for those who want to help build Initium. You don\'t need to be a programmer to help! There are 3 categories of \r\n" + 
+			"				help you can provide with varying degrees of skill required. They are as follows...</p>\r\n" + 
+			"\r\n" + 
+			"				<h5>Back and Frontend Developers</h5>\r\n" + 
+			"				<p>\r\n" + 
+			"				(Java, Javascript, Html, and/or CSS experience recommended)<br>" +
+			"				Got some programming experience? We\'re able to accommodate a variety of different skill levels for the backend development. If\r\n" + 
+			"				you\'re interested just send me an email and then jump right into getting your development environment setup \r\n" + 
+			"				<a href=\'https://github.com/Emperorlou/Initium-ODP\'>using these installation instructions</a>. If you have any trouble, definitely \r\n" + 
+			"				let me know via email and I\'ll try to help you out.\r\n" + 
+			"				<br><br>				\r\n" + 
+			"				If you\'re more a frontend guy, there is certainly stuff to be done there as well so don\'t hesitate to share your javascript and jquery experience with us!\r\n" + 
+			"				<br><br>\r\n" + 
+			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be a Code Developer for Initium\' target=\"_top\">Apply to be a Code Developer here</a>\r\n" + 
+			"				<br><br>\r\n" + 
+			"				<i>Include how much time you have on a daily basis to help with development, what you do for a living, and what kind of experience\r\n" + 
+			"				you have with web development. You don\'t necessarily need experience to be accepted!</i> \r\n" + 
+			"				</p>			\r\n" + 
+			"\r\n" + 
+			"				\r\n" + 
+			"				<h5>Content Developers</h5>\r\n" + 
+			"				<p>\r\n" + 
+			"				(no specific skill required but you probably wont get in till you've been active for a month or so)<br>" +
+			"				We usually have a handful of content developers active at any time. These are people who create the game world using an online editor that was custom built for\r\n" + 
+			"				Initium. It is very easy to use. If you wish to become a content developer, give me a shout! Just so you are aware however, I generally pick people who are\r\n" + 
+			"				regular, active members of the community and tend to play quite a lot. The most important part of being a content developer is that you have a lot of time \r\n" + 
+			"				on your hands! \r\n" + 
+			"				<br><br>\r\n" + 
+			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be a Content Developer for Initium\' target=\"_top\">Apply to be a Content Developer here</a>\r\n" + 
+			"				<br><br>\r\n" + 
+			"				<i>Simply include your in-game character name, how much time you have on a daily basis to help with world building, what you do for a living, and any other \r\n" + 
+			"				bits of information that would help me decide to choose you as our next content dev!</i> \r\n" + 
+			"				</p>\r\n" + 
+			"	\r\n" + 
+			"	\r\n" + 
+			"				<h5>Artists</h5>\r\n" + 
+			"				<p>\r\n" + 
+			"				(pixel art, photoshop work)<br>" +
+			"				We can always use talented artists to help us create new banner images and equipment icons. After you\'ve had a good look at the game and the art style, \r\n" + 
+			"				apply here and provide us with some cool sample work that relates!\r\n" + 
+			"				<br><br>\r\n" + 
+			"				If you\'re not really an artist but you can use a computer AND you can get your hands on Photoshop CS5 (CS5 is important) then you have everything you need\r\n" + 
+			"				to help us with creating beautiful banners from photographs. Most of the work is just 1-click once you\'re setup!\r\n" + 
+			"				<br><br>\r\n" + 
+			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be an Artist for Initium\' target=\"_top\">Apply to be an Artist here</a>\r\n" + 
+			"				<br><br>\r\n" + 
+			"				<i>Include how much time you have on a daily basis to help with art development, what you do for a living, and include any sample art pieces\r\n" + 
+			"				that might relate (or not) to help your application!</i> \r\n" + 
+			"				</p>			\r\n" + 
+			"	\r\n" + 
+			"				<h5>Marketing</h5>\r\n" + 
+			"				<p>\r\n" + 
+			"				(using Reddit, social media, posting on forums, contacting journalists, research)<br>" +
+			"				This is a new position that we\'re preparing for. While Initium is still very new and a work-in-progress, many people have had hundreds of hours of fun\r\n" + 
+			"				with the game even in it\'s current state. We\'d like to start marketing the game in a variety of different ways that finally branch outside of using\r\n" + 
+			"				Reddit (which has been our exclusive marketing platform up to this point). As a marketing agent, you would help us fill out a spreadsheet of possible\r\n" + 
+			"				places that we can advertise the game for free (like different subreddits, or gaming magazines), journalists that might be interested in writing an \r\n" + 
+			"				article about Initium, or maybe just using other forms of social media to get the word out.  \r\n" + 
+			"				<br><br>\r\n" + 
+			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be Marketing agent for Initium\' target=\"_top\">Apply to be Marketing Agent here</a>\r\n" + 
+			"				<br><br>\r\n" + 
+			"				<i>Include how much time you have on a daily basis to help with marketing, and what you do for a living.</i> \r\n" + 
+			"				</p>\r\n" + 
+			"";
+	
+	
+	pagePopupHtml("Join the team!", html);
+	
+}
 
 
 
@@ -3599,6 +3710,9 @@ function showBannerLoadingIcon()
 
 function setBannerImage(url)
 {
+	if (bannerUrl!=null && window.previousBannerUrl!=bannerUrl)
+		window.previousBannerUrl = bannerUrl;
+	
 	bannerUrl = url;
 	updateDayNightCycle(true);
 }
@@ -3713,7 +3827,7 @@ function repeatConfirmRequirementsButton(repsUniqueId)
 function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId)
 {
 	showBannerLoadingIcon();
-	longOperation(event, "CreatePrototype", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
+	longOperation(event, "BeginPrototype", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
@@ -3879,8 +3993,6 @@ function doRest()
 function doCampDefend()
 {
 	showBannerLoadingIcon();
-	if (window.previousBannerUrl!=bannerUrl)
-		window.previousBannerUrl = bannerUrl;
 	longOperation(null, "CampDefend", null, 
 			function(action) // responseFunction
 			{
@@ -3904,8 +4016,6 @@ function doCampDefend()
 function doCampCreate(campName)
 {
 	showBannerLoadingIcon();
-	if (window.previousBannerUrl!=bannerUrl)
-		window.previousBannerUrl = bannerUrl;
 	longOperation(null, "CampCreate", {"name":campName}, 
 		function(action) // responseFunction
 		{
@@ -4464,8 +4574,8 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
 // Game Settings
 function resetChat()
 {
-	$(".chat_messages").html(""); 
-	messager.markers = [null, null, null, null, null, getItem("NotificationsMarker")];
+	$(".chat_messages").html("");
+	messager.reconnect();
 }
 
 function isMusicEnabled()

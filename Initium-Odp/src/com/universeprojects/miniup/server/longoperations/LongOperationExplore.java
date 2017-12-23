@@ -159,7 +159,7 @@ public class LongOperationExplore extends LongOperation {
 				// First try to find a monster
 				if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location))
 				{
-					return "You found yourself a monster! He doesn't look too happy.."; 
+					return "You're being attacked!"; 
 				}
 				
 				// Now try to discover campsites...

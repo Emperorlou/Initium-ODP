@@ -54,7 +54,7 @@ public class CommandTradeAddAllItems extends Command {
             	items.remove(i);
                 continue;
             }
-            if (items.size()>200)
+            if (items.size()>400)
             {
             	items.remove(i);
             	tooManyItems = true;
@@ -63,7 +63,7 @@ public class CommandTradeAddAllItems extends Command {
 		}
         
 		if (tooManyItems)
-			setPopupMessage("There were too many items so only the first 200 were added.");
+			setPopupMessage("There were too many items so only the first 400 were added.");
 		
 		db.addTradeItems(ds, tradeObject, db.getCurrentCharacter(), items);
         db.sendNotification(ds, otherCharacter, NotificationType.tradeChanged);

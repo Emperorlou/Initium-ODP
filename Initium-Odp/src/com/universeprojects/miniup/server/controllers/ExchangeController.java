@@ -153,6 +153,13 @@ public class ExchangeController extends PageController {
 	    {
 	    	CachedEntity sellingCharacter = pool.get((Key)buyOrdersPT.get(i).getProperty("characterKey"));	
 	        
+	    	// If the character died and his buy order is still around, delete the buy order
+	    	if (sellingCharacter==null)
+	    	{
+	    		ds.delete(buyOrdersPT.get(i));
+	    		continue;
+	    	}
+	    	
 			// If the character isn't currently vending, then don't sell
 			if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(sellingCharacter.getProperty("mode"))==false)
 				continue;
@@ -164,6 +171,13 @@ public class ExchangeController extends PageController {
 	    {
 	    	CachedEntity sellingCharacter = pool.get((Key)buyOrdersCT.get(i).getProperty("characterKey"));	
 	        
+	    	// If the character died and his buy order is still around, delete the buy order
+	    	if (sellingCharacter==null)
+	    	{
+	    		ds.delete(buyOrdersPT.get(i));
+	    		continue;
+	    	}
+	    	
 			// If the character isn't currently vending, then don't sell
 			if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(sellingCharacter.getProperty("mode"))==false)
 				continue;

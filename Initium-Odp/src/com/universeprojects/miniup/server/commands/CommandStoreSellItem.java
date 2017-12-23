@@ -30,7 +30,7 @@ public class CommandStoreSellItem extends Command {
 	@Override
 public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
-		Long amount = Long.parseLong(parameters.get("amount"));
+		Long amount = Long.parseLong(parameters.get("amount").trim());
 		Long itemId = Long.parseLong(parameters.get("itemId"));
 		
 		if (amount<0)

@@ -27,7 +27,6 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -651,52 +650,6 @@ public class ODPDBAccess
 		return getDB().fetchAsList(kind, filter, 1000);
 	}
 
-	public List<CachedEntity> getFilteredORList(Cursor cursor, String kind, String fieldName, Object equalToValue, String fieldName2, Object equalToValue2)
-	{
-		FilterPredicate f1 = new FilterPredicate(fieldName, FilterOperator.EQUAL, equalToValue);
-		FilterPredicate f2 = new FilterPredicate(fieldName2, FilterOperator.EQUAL, equalToValue2);
-		Filter filter = CompositeFilterOperator.or(f1, f2);
-		Query q = new Query(kind);
-		q.setFilter(filter);
-
-		return getDB().fetchAsList(q, 1000, cursor);
-	}
-
-	public List<CachedEntity> getFilteredORList(Cursor cursor, String kind, String fieldName, Object equalToValue, String fieldName2, Object equalToValue2, String fieldName3, Object equalToValue3)
-	{
-		FilterPredicate f1 = new FilterPredicate(fieldName, FilterOperator.EQUAL, equalToValue);
-		FilterPredicate f2 = new FilterPredicate(fieldName2, FilterOperator.EQUAL, equalToValue2);
-		FilterPredicate f3 = new FilterPredicate(fieldName3, FilterOperator.EQUAL, equalToValue3);
-		Filter filter = CompositeFilterOperator.or(f1, f2, f3);
-		Query q = new Query(kind);
-		q.setFilter(filter);
-
-		return getDB().fetchAsList(q, 1000, cursor);
-	}
-
-	public List<CachedEntity> getFilteredORList(String kind, String fieldName, Object equalToValue, String fieldName2, Object equalToValue2)
-	{
-		FilterPredicate f1 = new FilterPredicate(fieldName, FilterOperator.EQUAL, equalToValue);
-		FilterPredicate f2 = new FilterPredicate(fieldName2, FilterOperator.EQUAL, equalToValue2);
-		Filter filter = CompositeFilterOperator.or(f1, f2);
-		Query q = new Query(kind);
-		q.setFilter(filter);
-
-		return getDB().fetchAsList(q, 1000);
-	}
-
-	public List<CachedEntity> getFilteredORList(String kind, String fieldName, Object equalToValue, String fieldName2, Object equalToValue2, String fieldName3, Object equalToValue3)
-	{
-		FilterPredicate f1 = new FilterPredicate(fieldName, FilterOperator.EQUAL, equalToValue);
-		FilterPredicate f2 = new FilterPredicate(fieldName2, FilterOperator.EQUAL, equalToValue2);
-		FilterPredicate f3 = new FilterPredicate(fieldName3, FilterOperator.EQUAL, equalToValue3);
-		Filter filter = CompositeFilterOperator.or(f1, f2, f3);
-		Query q = new Query(kind);
-		q.setFilter(filter);
-
-		return getDB().fetchAsList(q, 1000);
-	}
-
 	public CachedEntity getUserById(long id)
 	{
 		try
@@ -915,8 +868,8 @@ public class ODPDBAccess
 	
 	public Iterable<CachedEntity> getLocationsForMonsterLevelUpdate()
 	{
-		Query q = new Query("Location").setFilter(CompositeFilterOperator.or(new FilterPredicate("type", FilterOperator.EQUAL, "Permanent"), new FilterPredicate("type", FilterOperator.EQUAL,
-				"CampSite")));
+		Query q = new Query("Location").setFilter(CompositeFilterOperator.or(new FilterPredicate("type", FilterOperator.EQUAL, "Permanent"), 
+				new FilterPredicate("type", FilterOperator.EQUAL, "CampSite")));
 		return getDB().fetchAsIterable(q);
 	}
 	
@@ -1025,29 +978,45 @@ public class ODPDBAccess
 
 	public List<CachedEntity> getAllPathsExcludingCombatSites()
 	{
-		FilterPredicate f1 = new FilterPredicate("type", FilterOperator.EQUAL, "Permanent");
-		FilterPredicate f2 = new FilterPredicate("type", FilterOperator.EQUAL, "PlayerHouse");
-		Filter f = CompositeFilterOperator.or(f1, f2);
-		Query q = new Query("Path").setFilter(f);
-		return getDB().fetchAsList(q, 1000);
+//		FilterPredicate f1 = new FilterPredicate("type", FilterOperator.EQUAL, "Permanent");
+//		FilterPredicate f2 = new FilterPredicate("type", FilterOperator.EQUAL, "PlayerHouse");
+//		Filter f = CompositeFilterOperator.or(f1, f2);
+//		Query q = new Query("Path").setFilter(f);
+//		return getDB().fetchAsList(q, 1000);
+//		QueryHelper query = new QueryHelper(ds);
+//		List<CachedEntity> list = query.getFilteredList("Path", "location1Key", locationKey);
+//		list.addAll(query.getFilteredList("Path", "location2Key", locationKey));
+//		return list;
+		return null;
+		
 	}
 
 	public List<CachedEntity> getPathsByLocation(Key locationKey)
 	{
-		FilterPredicate f1 = new FilterPredicate("location1Key", FilterOperator.EQUAL, locationKey);
-		FilterPredicate f2 = new FilterPredicate("location2Key", FilterOperator.EQUAL, locationKey);
-		Filter f = CompositeFilterOperator.or(f1, f2);
-		Query q = new Query("Path").setFilter(f);
-		return getDB().fetchAsList(q, 1000);
+//		FilterPredicate f1 = new FilterPredicate("location1Key", FilterOperator.EQUAL, locationKey);
+//		FilterPredicate f2 = new FilterPredicate("location2Key", FilterOperator.EQUAL, locationKey);
+//		Filter f = CompositeFilterOperator.or(f1, f2);
+//		Query q = new Query("Path").setFilter(f);
+//		return getDB().fetchAsList(q, 1000);
+		QueryHelper query = new QueryHelper(ds);
+		List<CachedEntity> list = query.getFilteredList("Path", "location1Key", locationKey);
+		list.addAll(query.getFilteredList("Path", "location2Key", locationKey));
+		return list;
 	}
 
-	public List<CachedEntity> getPathsByLocation_KeysOnly(Key locationKey)
+	public List<Key> getPathsByLocation_KeysOnly(Key locationKey)
 	{
-		FilterPredicate f1 = new FilterPredicate("location1Key", FilterOperator.EQUAL, locationKey);
-		FilterPredicate f2 = new FilterPredicate("location2Key", FilterOperator.EQUAL, locationKey);
-		Filter f = CompositeFilterOperator.or(f1, f2);
-		Query q = new Query("Path").setFilter(f).setKeysOnly();
-		return getDB().fetchAsList(q, 1000);
+//		FilterPredicate f1 = new FilterPredicate("location1Key", FilterOperator.EQUAL, locationKey);
+//		FilterPredicate f2 = new FilterPredicate("location2Key", FilterOperator.EQUAL, locationKey);
+//		Filter f = CompositeFilterOperator.or(f1, f2);
+//		Query q = new Query("Path").setFilter(f).setKeysOnly();
+//		return getDB().fetchAsList(q, 1000);
+		QueryHelper query = new QueryHelper(ds);
+		List<Key> list = query.getFilteredList_Keys("Path", "location1Key", locationKey);
+		list.addAll(query.getFilteredList_Keys("Path", "location2Key", locationKey));
+		return list;
+		
+		
 	}
 	
 	public List<CachedEntity> getPathsBetweenLocations(Key location1Key, Key location2Key)
@@ -1224,37 +1193,43 @@ public class ODPDBAccess
 
 	public List<CachedEntity> getDiscoveriesForCharacterAndLocation(Key characterKey, Key location, boolean showHidden)
 	{
-		Collection<Filter> andFilters = new ArrayList<Filter>();
-		andFilters.add(new FilterPredicate("characterKey", FilterOperator.EQUAL, characterKey));
-		if (showHidden==false)
-			andFilters.add(new FilterPredicate("hidden", FilterOperator.EQUAL, false));
-		andFilters.add(CompositeFilterOperator.or(new FilterPredicate("location1Key", FilterOperator.EQUAL, location), new FilterPredicate("location2Key", FilterOperator.EQUAL, location)));
-		
-		CompositeFilter filters = CompositeFilterOperator.and(andFilters);
-		
-		Query q = new Query("Discovery").setFilter(filters);
-		List<CachedEntity> fetchAsList = getDB().fetchAsList(q, 1000);
+//		Collection<Filter> andFilters = new ArrayList<Filter>();
+//		andFilters.add(new FilterPredicate("characterKey", FilterOperator.EQUAL, characterKey));
+//		if (showHidden==false)
+//			andFilters.add(new FilterPredicate("hidden", FilterOperator.EQUAL, false));
+//		andFilters.add(CompositeFilterOperator.or(new FilterPredicate("location1Key", FilterOperator.EQUAL, location), 
+//				new FilterPredicate("location2Key", FilterOperator.EQUAL, location)));
+//		
+//		CompositeFilter filters = CompositeFilterOperator.and(andFilters);
+//		
+//		Query q = new Query("Discovery").setFilter(filters);
 
+		QueryHelper query = new QueryHelper(ds);
+		List<CachedEntity> location1List = query.getFilteredList("Discovery", "characterKey", characterKey, "location1Key", location);
+		List<CachedEntity> location2List = query.getFilteredList("Discovery", "characterKey", characterKey, "location2Key", location);
+		List<CachedEntity> fetchAsList = location1List;
+		fetchAsList.addAll(location2List);
+		
 		log.log(Level.WARNING, fetchAsList.size() + " discoveries found.");
 		
-		// TODO: Delete me after a while! This will slowly convert all discoveries to use the boolean hidden value type instead of strings of TRUE|FALSE
-		if (showHidden)
-		{
-			List<CachedEntity> entitiesToSave = null;
-			for(CachedEntity discovery:fetchAsList)
-			{
-				Object hiddenVal = discovery.getProperty("hidden");
-				if (hiddenVal==null || hiddenVal instanceof String)
-				{
-					if (entitiesToSave==null) entitiesToSave = new ArrayList<CachedEntity>();
-					discovery.setProperty("hidden", GameUtils.booleanEquals(discovery.getProperty("hidden"), true));
-					entitiesToSave.add(discovery);
-				}
-			}
-			
-			if (entitiesToSave!=null)
-				ds.put(entitiesToSave);
-		}
+//		// TODO: Delete me after a while! This will slowly convert all discoveries to use the boolean hidden value type instead of strings of TRUE|FALSE
+//		if (showHidden)
+//		{
+//			List<CachedEntity> entitiesToSave = null;
+//			for(CachedEntity discovery:fetchAsList)
+//			{
+//				Object hiddenVal = discovery.getProperty("hidden");
+//				if (hiddenVal==null || hiddenVal instanceof String)
+//				{
+//					if (entitiesToSave==null) entitiesToSave = new ArrayList<CachedEntity>();
+//					discovery.setProperty("hidden", GameUtils.booleanEquals(discovery.getProperty("hidden"), true));
+//					entitiesToSave.add(discovery);
+//				}
+//			}
+//			
+//			if (entitiesToSave!=null)
+//				ds.put(entitiesToSave);
+//		}
 		
 		return fetchAsList;
 	}
@@ -2854,13 +2829,17 @@ public class ODPDBAccess
 	{
 		if (ds==null)
 			ds = getDB();
-		for(CachedEntity item:items)
+		for(int i = items.size()-1; i>=0; i--)
 		{
+			CachedEntity item = items.get(i);
 			if (tradeObject==null || tradeObject.isCancelled())
 				throw new UserErrorMessage("Trade has been cancelled.");
 			
 			if (((Key)item.getProperty("containerKey")).getId() != character.getKey().getId())
-				throw new UserErrorMessage("You do not currently have the '"+item.getProperty("name")+"' item in your posession and cannot trade it.");
+			{
+				item.refetch(ds);
+				items.remove(i);
+			}
 		}
 		
 		tradeObject.addObjects(ds, character, items);
@@ -5769,7 +5748,7 @@ public class ODPDBAccess
 		
 		QueryHelper q = new QueryHelper(ds);
 		List<CachedEntity> characters = q.getFilteredList("Character", "locationKey", locationKey);
-		List<CachedEntity> paths = getPathsByLocation_KeysOnly(locationKey);
+		List<Key> paths = getPathsByLocation_KeysOnly(locationKey);
 		List<CachedEntity> discoveries = new ArrayList<CachedEntity>();
 		if (playerCharacter!=null)
 			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey, true);
@@ -5815,10 +5794,10 @@ public class ODPDBAccess
 			// Delete the discoveries of the paths to this location
 			for(CachedEntity discovery:discoveries)
 			{
-				for(CachedEntity path:paths)
+				for(Key path:paths)
 				{
 					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
-					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
+					if (discoveryEntityKey.getKind().equals(path.getKind()) && discoveryEntityKey.getId()==path.getId())
 					{
 						discovery.setProperty("hidden", true);
 						ds.put(discovery);
@@ -5852,18 +5831,18 @@ public class ODPDBAccess
 				ds.delete(item.getKey());
 			
 			// Delete all paths to this location
-			for(CachedEntity path:paths)
-				ds.delete(path.getKey());
+			for(Key path:paths)
+				ds.delete(path);
 			
 			// Delete the discoveries of the paths to this location
 			for(CachedEntity discovery:discoveries)
 			{
 				if (discovery==null)
 					continue;
-				for(CachedEntity path:paths)
+				for(Key path:paths)
 				{
 					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
-					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
+					if (discoveryEntityKey.getKind().equals(path.getKind()) && discoveryEntityKey.getId()==path.getId())
 						ds.delete(discovery.getKey());
 				}
 				
@@ -5912,7 +5891,7 @@ public class ODPDBAccess
 		
 		QueryHelper q = new QueryHelper(ds);
 		List<CachedEntity> characters = q.getFilteredList("Character", "locationKey", locationKey);
-		List<CachedEntity> paths = getPathsByLocation_KeysOnly(locationKey);
+		List<Key> paths = getPathsByLocation_KeysOnly(locationKey);
 		List<CachedEntity> discoveries = new ArrayList<CachedEntity>();
 		if (playerCharacter!=null)
 			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey, true);
@@ -5959,18 +5938,18 @@ public class ODPDBAccess
 			}
 			
 			// Delete all paths to this location
-			for(CachedEntity path:paths)
-				ds.delete(path.getKey());
+			for(Key path:paths)
+				ds.delete(path);
 			
 			// Delete the discoveries of the paths to this location
 			for(CachedEntity discovery:discoveries)
 			{
 				if (discovery==null)
 					continue;
-				for(CachedEntity path:paths)
+				for(Key path:paths)
 				{
 					Key discoveryEntityKey = (Key)discovery.getProperty("entityKey");
-					if (discoveryEntityKey.getKind().equals(path.getKey().getKind()) && discoveryEntityKey.getId()==path.getKey().getId())
+					if (discoveryEntityKey.getKind().equals(path.getKind()) && discoveryEntityKey.getId()==path.getId())
 						ds.delete(discovery.getKey());
 				}
 				

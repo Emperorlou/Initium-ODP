@@ -15,6 +15,7 @@ function decode_utf8( s ) {
 	}
 }
 
+var normalChatDirection = false;
 var messageCodes = [
              "GameMessages",
              "GlobalChat",
@@ -44,9 +45,22 @@ messager.onMessagesChecked = function()
 //		$("#ping").text(messager.ping);
 };
 
-messager.onError = function(xhr, textStatus, error)
+messager.onError = function(error)
 {
-	$("#chat_messages").prepend("<div style='color:red'>"+textStatus+": "+error+"</div>");
+	var messageText = "Chat server error: "+error;
+	
+	var message = 
+	{
+		characterId:null,
+		nickname:null,
+		message:messageText,
+		code:"GameMessages",
+		createdDate:new Date(),
+		nicknameStyled:null,
+		mode:"admin",
+	};
+	
+	this.onChatMessage(message);
 };
 
 messager.onConnectionStateChange = function(state)
@@ -59,6 +73,10 @@ messager.onConnectionStateChange = function(state)
 	$("#ping").html(state);
 };
 
+messager.onFirstGetComplete = function()
+{
+	
+};
 
 messager.onNotificationMessage = function(message)
 {
@@ -190,7 +208,7 @@ messager.onChatMessage = function(chatMessage)
 			// First remove any previous messages so we don't clutter chat
 			$("#chat_messages_"+messager.channel).find(".gameMessage-text").parent().remove();
 			
-			$("#chat_messages_"+messager.channel).prepend(html+"</div>");
+			addMessageToChatMessages("#chat_messages_"+messager.channel, html+"</div>");
 			doNotNotifyNewMessage = true;
 		}
 	}
@@ -228,11 +246,53 @@ messager.onChatMessage = function(chatMessage)
 		html+="</div>";
 	}
 	html+="</div>";
-	$("#chat_messages_"+chatMessage.code).prepend(html);
+	
+	addMessageToChatMessages("#chat_messages_"+chatMessage.code, html, messager.firstGet);
 
 	if (doNotNotifyNewMessage==false)
 		notifyNewMessage(chatMessage.code);
 };
+
+function addMessageToChatMessages(selector, html, isFirstGet)
+{
+	var msgsList = $(selector);
+	
+	// If we're close to the bottom of the chat window, we want to force scrolling to the bottom
+	if (normalChatDirection)
+	{
+		var scrollDown = false;
+		if (msgsList.scrollTop()+msgsList.height()>msgsList.prop("scrollHeight")-70)
+			scrollDown = true;
+		if (msgsList.css('display') == 'none')
+			scrollDown = true;
+		if (isFirstGet)
+			scrollDown = true;
+			
+		msgsList.append(html);
+		
+		if (isFirstGet!=true)
+		{
+			var children = msgsList.children();
+			if (children.length>1000)
+				$(children[0]).remove();
+				
+			if (scrollDown)
+				msgsList.scrollTop(msgsList.prop("scrollHeight")-msgsList.height());
+		}
+	}
+	else
+	{
+		if (isFirstGet!=true)
+		{
+			var children = msgsList.children();
+			if (children.length>1000)
+				$(children[children.length-1]).remove();
+		}
+		
+		msgsList.prepend(html);
+	}
+}
+
 
 messager.checkClientSideChatCommands = function(chatMessage)
 {
@@ -274,6 +334,8 @@ function changeChatTab(code)
 
 	messager.channel = code;
 	$('#chat_messages_'+code).show();
+	if (normalChatDirection)
+		$('#chat_messages_'+code).scrollTop($('#chat_messages_'+code).prop("scrollHeight")-$('#chat_messages_'+code).height());
 
 	// Reset the unread counter
 	$("#"+code+"-chat-indicator").text("").hide();

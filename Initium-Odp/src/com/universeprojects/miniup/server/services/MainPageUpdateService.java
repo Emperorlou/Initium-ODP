@@ -1073,7 +1073,7 @@ public class MainPageUpdateService extends Service
 		}
 		js.append("		window.newChatIdToken= '"+db.getChatToken()+"';");
 		js.append("		$('.chat_messages').html('');");
-		js.append("		messager.reconnect('https://eventserver.universeprojects.com:8080', window.newChatIdToken);");
+		js.append("		messager.reconnect('https://eventserver.universeprojects.com:8080/', window.newChatIdToken);");
 	   	
 		
 		if (refreshChat==false)

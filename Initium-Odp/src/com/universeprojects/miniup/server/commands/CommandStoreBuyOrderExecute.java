@@ -120,14 +120,16 @@ public class CommandStoreBuyOrderExecute extends TransactionCommand
 			
 			storeCharacter.setProperty("dogecoins", storeGold);
 			db.getCurrentCharacter().setProperty("dogecoins", yourGold);
-			if (maxQuantity!=null)
-				buyOrder.setProperty("quantity", maxQuantity-actualQuantityToSell);
 			
 			
 			totalBoughtGold+=totalCost;
 			totalQuantityBought+=actualQuantityToSell;
 			
 			totalEntitiesBought++;
+
+			if (maxQuantity!=null)
+				buyOrder.setProperty("quantity", maxQuantity-totalQuantityBought);
+			
 			
 			if (totalEntitiesBought>=20)
 				break;

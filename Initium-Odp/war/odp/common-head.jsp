@@ -41,12 +41,12 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=218"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=198">
+<script type="text/javascript" src="/odp/javascript/script.js?v=232"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=212">
 
 
 
-<script type="text/javascript" src="/odp/javascript/messager.js?v=54"></script>
+<script type="text/javascript" src="/odp/javascript/messager.js?v=66s"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
 <script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
@@ -127,10 +127,10 @@
 		
 	    $(this).cluetip(
 	    {
-			cluetipClass: 'rounded',
+			cluetipClass: '',
 			showTitle: false, 
 			height: 'auto', 
-			width: 320,
+			width: 299,
 	        sticky: true, 
 	        closePosition: 'title',
 	        arrows: true,
@@ -140,7 +140,7 @@
 	        onShow: function(e) 
 	        {
 	        	$("#cluetip-waitimage").css('z-index', 2000000); 
-	        	$("#cluetip").css('z-index', 2000000); 
+	        	$("#cluetip").css('z-index', 2000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
 	        	return true;
 	        }
 	        
@@ -154,10 +154,10 @@
 		
 	    $(this).cluetip(
 	    {
-			cluetipClass: 'rounded',
+			cluetipClass: '',
 			showTitle: false, 
 			height: 'auto', 
-			width: 320,
+			width: 299,
 	        sticky: true, 
 	        closePosition: 'title', 
 	        arrows: true,
@@ -176,7 +176,7 @@
 	            
 	            // Make the cluetip on top of everything
 	        	$("#cluetip-waitimage").css('z-index', 2000000); 
-	        	$("#cluetip").css('z-index', 2000000); 
+	        	$("#cluetip").css('z-index', 2000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
 	        	return true;
 	        }	        
 	    }).addClass("hasTooltip");
@@ -189,10 +189,10 @@
 		
 	    $(this).cluetip(
 	    {
-			cluetipClass: 'rounded',
+			cluetipClass: '',
 			showTitle: false, 
 			height: 'auto', 
-			width: 320,
+			width: 299,
 	        sticky: true, 
 	        closePosition: 'title',
 	        closeText: ' ',
@@ -213,7 +213,7 @@
 
 	            // Make the cluetip on top of everything
 	        	$("#cluetip-waitimage").css('z-index', 2000000); 
-	        	$("#cluetip").css('z-index', 2000000); 
+	        	$("#cluetip").css('z-index', 2000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
 	        	return true;
 	        }	        
 	    }).addClass("hasTooltip");
