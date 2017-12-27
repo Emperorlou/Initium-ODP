@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.longoperations;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -96,6 +97,7 @@ public class LongOperationCampCreate extends LongOperation
 			"location the camp was created in. Reducing the monster activity outside of the camp " +
 			"will make the camp much easier to defend.");
 		campsite.setProperty("discoverAnythingChance", 100d);
+		campsite.setProperty("createdDate", new Date());
 		campsite.setProperty("type", "CampSite");
 		campsite.setProperty("decayRate", 100l);
 		campsite.setProperty("parentLocationKey", parentLocation.getKey());
