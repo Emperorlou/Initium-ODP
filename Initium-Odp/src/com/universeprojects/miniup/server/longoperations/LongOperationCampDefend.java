@@ -48,7 +48,10 @@ public class LongOperationCampDefend extends LongOperation
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		
+		ds.beginBulkWriteMode();
 		boolean foundMonster = db.randomMonsterEncounter(ds, character, location, 5, 1d);
+		ds.commitBulkWrite();
+		
 		String description = "You stood guard but found nothing.";
 		if(foundMonster)
 		{
