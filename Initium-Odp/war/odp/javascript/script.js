@@ -2687,41 +2687,52 @@ function createUpgradeToPremiumWindow()
 	windowHtml += 
 			"<div class='quest-window-container'>" +
 			"<div class='quest-window'>" +
-			"<div class='quest-window-internal'>";
+			"<div class='quest-window-internal' style='padding-bottom:0px;'>";
 	
-	windowHtml+="<h4>Upgrade to premium for $5.00</h4>" +
-			"<p><b>The cost of a full account will soon increase!</b></p>" +
-			"<p>Currently, while Initium is still in development, you can get a full premium account for only <b>$5.00</b> however the cost for a premium account will " +
-			"increase once the game is officially launched. Take advantage of this pre-launch price by donating at least 5 dollars.</p>" +
-			"<p>" +
-			"Premium account features include:" +
-			"<ul>" +
-			"<li>The ability to be rescued from death</li>" +
-			"<li>Multiple characters on the same account</li>" +
-			"<li>Your characters will not forget their houses when they die</li>" +
-			"</ul>" +
-			"</p>" +
-			"<p>Getting a premium account now will ensure your account will be grandfathered in when the price structure changes!</p>" +
-			"<p>" +
-			"<center>" +
-			"<form id='donatequick' action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank' onsubmit='setTimeout(function(){closepopupMessage(" + popupsNum +"); }, 1000)'>" +
-			"<input type='hidden' name='custom' value='"+window.userId+"'> " +
-			"<input type='hidden' name='cmd' value='_donations'> " +
-			"<input type='hidden' name='business' value='narmstrong@playinitium.com'>" +
-			"<input type='hidden' name='amount' value='5.00'>" +
-			"<input type='hidden' name='currency_code' value='USD'>" +
-			"<input type='hidden' name='item_name' value='Initium Development'>" +
-			"<input type='hidden' name='tax' value='0'>" +
-			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!'>" + 
-			"<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>" +
-			"</form>" +
-			"</center>" +
-			"</p>";
+	if (window.isPremium==true)
+	{
+		windowHtml+="" +
+		"<h4>Thank-you for your continued support!</h4>";
+	
+	}
+	else
+	{
+		windowHtml+="" +
+				"<h4>Upgrade to premium for $5.00</h4>" +
+				"<p><b>The cost of a full account will soon increase!</b></p>" +
+				"<p>Currently, while Initium is still in development, you can get a full premium account for only <b>$5.00</b> however the cost for a premium account will " +
+				"increase once the game is officially launched. Take advantage of this pre-launch price by donating at least 5 dollars.</p>" +
+				"<p>" +
+				"Premium account features include:" +
+				"<ul>" +
+				"<li>The ability to be rescued from death</li>" +
+				"<li>Multiple characters on the same account</li>" +
+				"<li>Your characters will not forget their houses when they die</li>" +
+				"</ul>" +
+				"</p>" +
+				"<p>Getting a premium account now will ensure your account will be grandfathered in when the price structure changes!</p>" +
+				"<p><b>ALSO..</b></p>";
+	}
+	windowHtml+="" +
+	"<p>Please be aware that donations of $25 or more will result in DOUBLE the donation credit (as though you donated twice as much) which you can use to buy cosmetic item customizations, trade with other players, buy more character slots, and gift premium memberships to those less fortunate.</p>";
 	
 	windowHtml+=
 			"</div>";
 	
 	windowHtml+="" +
+			"<center style='position: absolute; bottom: -39px; width: 100%;'>" +
+			"<form id='donatequick' action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank' onsubmit='setTimeout(function(){closepopupMessage(" + popupsNum +"); }, 1000)'>" +
+			"<input type='hidden' name='custom' value='"+window.userId+"'> " +
+			"<input type='hidden' name='cmd' value='_donations'> " +
+			"<input type='hidden' name='business' value='narmstrong@playinitium.com'>" +
+			"<input type='number' name='amount' id='donate-amount' value='5.00' placeholder='Donation amount'><br>" +
+			"<input type='hidden' name='currency_code' value='USD'>" +
+			"<input type='hidden' name='item_name' value='Initium Development'>" +
+			"<input type='hidden' name='tax' value='0'>" +
+			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!' style='cursor:pointer;'><br>" + 
+			"<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>" +
+			"</form>" +
+			"</center>" +
 			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
 			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
 			"Click here to disable sounds" +
@@ -2952,7 +2963,7 @@ function storeNewBuyOrder(event)
 function storeBuyOrderExecute(event, buyOrderId, itemId)
 {
 	confirmPopup("Sell your stuff", "Are you sure you want to sell all of this item? <br>(If you want to sell only a partial amount, you will have to split the stack first in your inventory)", function(){
-		doCommand(event, "StoreBuyOrderExecute", {buyOrderId:buyOrderId, itemId:itemId}, function(data){
+		doCommand(event, "StoreBuyOrderExecute", {buyOrderId:buyOrderId, itemId:[itemId]}, function(data){
 			// Refresh the popup so we can sell another
 			$("#buyordercompatibleitemslist-container").html(
 					"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +

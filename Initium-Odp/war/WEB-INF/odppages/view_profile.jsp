@@ -16,14 +16,10 @@
 		${donationHistory}
 	</p>
 	<br>
-	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-		<input type='hidden' name='custom' value='${userId}' /> 
-		<input type="hidden" name="cmd" value="_s-xclick"> 
-		<input type="hidden" name="hosted_button_id" value="3XHAZVVPB3KH2">
-		<input type="image" src="https://initium-resources.appspot.com/images/ui/paypal-donate-button.png" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"> 
-		<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-	</form>
-	<img src='https://initium-resources.appspot.com/images/paypal-cards.jpg' border=0 />
+	<a onclick='createUpgradeToPremiumWindow()'>
+		<img src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border="0" alt="PayPal - The safer, easier way to pay online!"/><br> 
+		<img src='https://initium-resources.appspot.com/images/paypal-cards.jpg' border=0 />
+	</a>
 	<div class='fineprint'>
 		You <u>do not</u> need a PayPal account when you donate using credit or bank cards.
 	</div>

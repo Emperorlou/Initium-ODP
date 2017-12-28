@@ -61,6 +61,12 @@ public class CommandItemsTrade extends CommandItemsBase {
 		for(CachedEntity tradeItem:batchItems)
 		{
 			if(equipItemIds.contains(tradeItem.getKey())) continue;
+
+			if (tradeItems.size()>=400)
+			{
+				setPopupMessage("There were too many items so only the first 400 were added.");
+				break;
+			}
 			
 			tradeItems.add(tradeItem);
 			tradedString.append(HtmlComponents.generatePlayerTradeItemHtml(tradeItem));

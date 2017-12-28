@@ -151,7 +151,17 @@ function EventServerMessager(eventServerUrl, idToken)
 
 	this.reconnect = function(eventServerUrl, idToken)
 	{
-		that.disconnect();
+		if (that.socket!=null)
+		{
+			try
+			{
+				that.socket.close();
+			}
+			catch(e)
+			{
+				// Ignore errors
+			}
+		}
 		
 		if (eventServerUrl!=null)
 			that._chatServer = eventServerUrl;
@@ -168,6 +178,7 @@ function EventServerMessager(eventServerUrl, idToken)
 		{
 			try
 			{
+				that.endAutoReconnections();
 				window.eventServerReconnectTimer = {};	// Here we're setting the reconnect timer to non-null to block the auto reconnection from taking place
 				that.socket.close();
 			}

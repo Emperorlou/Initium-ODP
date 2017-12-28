@@ -1824,6 +1824,9 @@ public class ODPDBAccess
 				newBuff.setProperty("parentKey", characterKey);
 				addBuffToBuffsCache(characterKey, newBuff);
 			}
+			
+			ds.put(newBuff);
+			
 			return newBuff;
 		}
 		return null;
