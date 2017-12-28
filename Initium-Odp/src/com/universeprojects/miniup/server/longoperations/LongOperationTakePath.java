@@ -264,7 +264,7 @@ public class LongOperationTakePath extends LongOperation {
 		Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
 		CachedEntity location = db.getEntity(locationKey);
 		
-//		db.getDB().beginBulkWriteMode();
+		db.getDB().beginBulkWriteMode();
 		CachedEntity newLocation = null;
 		try
 		{
@@ -283,8 +283,7 @@ public class LongOperationTakePath extends LongOperation {
 		}
 		finally
 		{
-			
-//			db.getDB().commitBulkWrite();
+			db.getDB().commitBulkWrite();
 		}
 
 		MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
