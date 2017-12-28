@@ -81,33 +81,41 @@ public class LongOperationCampCreate extends LongOperation
 	{
 		CachedDatastoreService ds = db.getDB();
 
-		boolean foundMonster = db.randomMonsterEncounter(ds, character, parentLocation, 6, 1d);
-		if (foundMonster)
-			return null;
-
-		ds.allocateIds("Location", 1);
-		CachedEntity campsite = new CachedEntity("Location", ds.getPreallocatedIdFor("Location"));
-		campsite.setProperty("banner", "images/banner---campsite1.jpg");
-		campsite.setProperty("name", "Camp: "+campName);
-		campsite.setProperty("description", "This is a player created camp.<br><br>" +
-			"Defend the camp by pressing the Defend button " +
-			"regularly. You can keep track of the integrity of the camp with the status line " +
-			"shown below. A camp that is not adequately defended can be overrun and players will no longer be able to use it to rest.<br><br>" +
-			"The speed at which a camp is overrun depends on the monster activity in the " +
-			"location the camp was created in. Reducing the monster activity outside of the camp " +
-			"will make the camp much easier to defend.");
-		campsite.setProperty("discoverAnythingChance", 100d);
-		campsite.setProperty("createdDate", new Date());
-		campsite.setProperty("type", "CampSite");
-		campsite.setProperty("decayRate", 100l);
-		campsite.setProperty("parentLocationKey", parentLocation.getKey());
-		campsite.setProperty("isOutside", "TRUE");
-		campsite.setProperty("supportsCampfires", 1L);
-		campsite.setProperty("maxMonsterCount", parentLocation.getProperty("maxMonsterCount"));
-		campsite.setProperty("monsterRegenerationRate", parentLocation.getProperty("monsterRegenerationRate"));
-		ds.put(campsite);
-		CachedEntity path = db.newPath(ds, "Path to camp - "+campName, parentLocation.getKey(), null, campsite.getKey(), "Leave camp", 100, 0l, "CampSite");
-		// Returns the destination.
-		return db.doCharacterTakePath(ds, character, path);
+		ds.beginBulkWriteMode();
+		try
+		{
+			boolean foundMonster = db.randomMonsterEncounter(ds, character, parentLocation, 6, 1d);
+			if (foundMonster)
+				return null;
+	
+			ds.allocateIds("Location", 1);
+			CachedEntity campsite = new CachedEntity("Location", ds.getPreallocatedIdFor("Location"));
+			campsite.setProperty("banner", "images/banner---campsite1.jpg");
+			campsite.setProperty("name", "Camp: "+campName);
+			campsite.setProperty("description", "This is a player created camp.<br><br>" +
+				"Defend the camp by pressing the Defend button " +
+				"regularly. You can keep track of the integrity of the camp with the status line " +
+				"shown below. A camp that is not adequately defended can be overrun and players will no longer be able to use it to rest.<br><br>" +
+				"The speed at which a camp is overrun depends on the monster activity in the " +
+				"location the camp was created in. Reducing the monster activity outside of the camp " +
+				"will make the camp much easier to defend.");
+			campsite.setProperty("discoverAnythingChance", 100d);
+			campsite.setProperty("createdDate", new Date());
+			campsite.setProperty("type", "CampSite");
+			campsite.setProperty("decayRate", 100l);
+			campsite.setProperty("parentLocationKey", parentLocation.getKey());
+			campsite.setProperty("isOutside", "TRUE");
+			campsite.setProperty("supportsCampfires", 1L);
+			campsite.setProperty("maxMonsterCount", parentLocation.getProperty("maxMonsterCount"));
+			campsite.setProperty("monsterRegenerationRate", parentLocation.getProperty("monsterRegenerationRate"));
+			ds.put(campsite);
+			CachedEntity path = db.newPath(ds, "Path to camp - "+campName, parentLocation.getKey(), null, campsite.getKey(), "Leave camp", 100, 0l, "CampSite");
+			// Returns the destination.
+			return db.doCharacterTakePath(ds, character, path);
+		}
+		finally
+		{
+			ds.commitBulkWrite();
+		}
 	}
 }
