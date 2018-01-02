@@ -80,7 +80,7 @@ public class LongOperationCampCreate extends LongOperation
 	public static CachedEntity doAttemptCreateCampsite(ODPDBAccess db, CachedEntity character, CachedEntity parentLocation, String campName) throws UserErrorMessage
 	{
 		CachedDatastoreService ds = db.getDB();
-
+		CachedEntity path = null;
 		ds.beginBulkWriteMode();
 		try
 		{
@@ -109,13 +109,17 @@ public class LongOperationCampCreate extends LongOperation
 			campsite.setProperty("maxMonsterCount", parentLocation.getProperty("maxMonsterCount"));
 			campsite.setProperty("monsterRegenerationRate", parentLocation.getProperty("monsterRegenerationRate"));
 			ds.put(campsite);
-			CachedEntity path = db.newPath(ds, "Path to camp - "+campName, parentLocation.getKey(), null, campsite.getKey(), "Leave camp", 100, 0l, "CampSite");
-			// Returns the destination.
-			return db.doCharacterTakePath(ds, character, path);
+			path = db.newPath(ds, "Path to camp - "+campName, parentLocation.getKey(), null, campsite.getKey(), "Leave camp", 100, 0l, "CampSite");
 		}
 		finally
 		{
 			ds.commitBulkWrite();
 		}
+		
+		if(path == null)
+			throw new RuntimeException("Path not created to created camp.");
+		
+		// Returns the destination.
+		return db.doCharacterTakePath(ds, character, path);
 	}
 }
