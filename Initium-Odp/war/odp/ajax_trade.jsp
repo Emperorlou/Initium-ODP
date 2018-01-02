@@ -141,7 +141,7 @@
         </div>
         </div>
         <div class='main-splitScreen'> 
-        <div class='${otherCharacterTradeWindowClass}'><h4><c:out value="${otherCharacterName}"/>"s offer</h4>
+        <div class='${otherCharacterTradeWindowClass}'><h4><c:out value="${otherCharacterName}"/>'s offer</h4>
         <h4>Gold: <%=GameUtils.formatNumber(tradeObject.getDogecoinsFor(otherCharacter.getKey())) %></h4>
         <%
             for(CachedEntity item:tradeObject.getItemsFor(otherCharacter.getKey()))

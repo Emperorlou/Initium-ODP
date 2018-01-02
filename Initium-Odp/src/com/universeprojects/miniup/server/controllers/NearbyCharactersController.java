@@ -55,6 +55,7 @@ public class NearbyCharactersController extends PageController {
 	    	
 	    	StringBuilder sb = new StringBuilder();
 	    	boolean dead = false;
+	    	if (curChar.getProperty("hitpoints")==null) continue;
 	    	if (((Double)curChar.getProperty("hitpoints"))<=0)
                 dead = true;
 	    	

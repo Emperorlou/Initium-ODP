@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.commands;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -135,6 +136,8 @@ public class CommandPlayerCreateHouseMap extends Command
 				"<p>This map shows the path from " + townLocation.getProperty("name") + " to " + character.getProperty("name") + "'s property " + location.getProperty("name") + ". </p>" + 
 				"<p><a onclick='playerReadMap(event, " +itemId + ", " + housePath.getId() + "," + !reusable + ")'>Read map to " + location.getProperty("name") + "</a></p>");
 		houseMap.setProperty("keyCode", housePath.getId());
+		houseMap.setProperty("_aspects", Arrays.asList(new String[]{"Flammable"}));
+		
 		// Allow user to destroy the script.
 		List<CachedEntity> destroyScripts = db.getFilteredList("Script", "name", "DestroyPlayerMap");
 		if(destroyScripts.isEmpty() == false)

@@ -111,7 +111,7 @@ public class LongOperationCampCreate extends LongOperation
 			ds.put(campsite);
 			CachedEntity path = db.newPath(ds, "Path to camp - "+campName, parentLocation.getKey(), null, campsite.getKey(), "Leave camp", 100, 0l, "CampSite");
 			// Returns the destination.
-			return db.doCharacterTakePath(ds, character, path);
+			return db.doCharacterTakePath(ds, character, path, campsite, false, false);
 		}
 		finally
 		{

@@ -5425,6 +5425,29 @@ public class ODPDBAccess
 		else
 			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
 		destination = getEntity(destinationKey);
+		
+		return doCharacterTakePath(db, character, path, destination, allowAttack, isExplore);
+	}
+	
+	public CachedEntity doCharacterTakePath(CachedDatastoreService db, CachedEntity character, CachedEntity path, CachedEntity destination, boolean allowAttack, boolean isExplore) throws UserErrorMessage
+	{
+		if (db==null)
+			db = getDB();
+
+		if (CHARACTER_MODE_COMBAT.equals(character.getProperty("mode")))
+			throw new UserErrorMessage("You cannot move while you're in combat.");
+		
+		Key destinationKey = destination.getKey();
+		// First get the character's current location
+		Key currentLocationKey = (Key)character.getProperty("locationKey");
+		
+		// Then determine which location the character will end up on.
+		// If we find that the character isn't on either end of the path, we'll throw.
+		Key pathLocation1Key = (Key)path.getProperty("location1Key");
+		Key pathLocation2Key = (Key)path.getProperty("location2Key");
+		if (currentLocationKey.getId()!=pathLocation1Key.getId() && currentLocationKey.getId()!=pathLocation2Key.getId())
+			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
+
 		if (CommonChecks.checkLocationIsCombatSite(destination));
 			destination.setProperty("lastUsedDate", new Date());
 		
