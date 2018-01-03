@@ -265,26 +265,25 @@ public class LongOperationTakePath extends LongOperation {
 		CachedEntity location = db.getEntity(locationKey);
 		
 		db.getDB().beginBulkWriteMode();
-		CachedEntity newLocation = null;
 		try
 		{
 			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, 1, 0.5d))
 				throw new GameStateChangeException("While you were on your way, someone found you..");
-			
-			
-			CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
-			Boolean attack = (Boolean)getDataProperty("attack");
-			if (attack==null) attack = false;
-		
-			if (path==null)
-				throw new UserErrorMessage("The path you were attempting to take no longer exists.");
-			
-			newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
 		}
 		finally
 		{
 			db.getDB().commitBulkWrite();
 		}
+			
+		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
+		Boolean attack = (Boolean)getDataProperty("attack");
+		if (attack==null) attack = false;
+	
+		if (path==null)
+			throw new UserErrorMessage("The path you were attempting to take no longer exists.");
+		
+		CachedEntity newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
+		
 
 		MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
 		update.updateFullPage_shortcut(true);
