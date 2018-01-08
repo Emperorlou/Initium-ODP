@@ -97,6 +97,32 @@ public class ItemDef extends OdpDomain {
 	public String getDexterityPenalty() {
 		return (String) getCachedEntity().getProperty("dexterityPenalty");
 	}
+	
+	/**
+	 *  The amount of a bonus this item has on the wearer when they perform actions that have to do with strength. The wearer`s strength will be added by the amount in this field.
+	 *  
+	 * @param strengthModifier
+	 */
+	public void setStrengthModifier(String strengthModifier) {
+		getCachedEntity().setProperty("strengthModifier", strengthModifier);
+	}
+
+	public String getStrengthModifier() {
+		return (String) getCachedEntity().getProperty("strengthModifier");
+	}
+	
+	/**
+	 *  The amount of a bonus this item has on the wearer when they perform actions that have to do with intelligence. The wearer`s intelligence will be added by the amount in this field.
+	 *  
+	 * @param intelligenceModifier
+	 */
+	public void setIntelligenceModifier(String intelligenceModifier) {
+		getCachedEntity().setProperty("intelligenceModifier", intelligenceModifier);
+	}
+
+	public String getIntelligenceModifier() {
+		return (String) getCachedEntity().getProperty("intelligenceModifier");
+	}
 
 	/**
 	 *  If left blank, no dogecoins can be added to the resulting item. Otherwise, dogecoins can be added or removed.

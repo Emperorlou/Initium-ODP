@@ -102,6 +102,30 @@ public class Item extends OdpDomain {
 	public Long getDexterityPenalty() {
 		return (Long) getCachedEntity().getProperty("dexterityPenalty");
 	}
+	
+	/**
+	 * 
+	 * @param strengthModifier
+	 */
+	public void setStrengthModifier(Long strengthModifier) {
+		getCachedEntity().setProperty("strengthModifier", strengthModifier);
+	}
+
+	public Long getStrengthModifier() {
+		return (Long) getCachedEntity().getProperty("strengthModifier");
+	}
+	
+	/**
+	 * 
+	 * @param intelligenceModifier
+	 */
+	public void setIntelligenceModifier(Long intelligenceModifier) {
+		getCachedEntity().setProperty("intelligenceModifier", intelligenceModifier);
+	}
+
+	public Long getIntelligenceModifier() {
+		return (Long) getCachedEntity().getProperty("intelligenceModifier");
+	}
 
 	/**
 	 *  If blank, no dogecoins can be added to this item. Otherwise, dogecoins can be taken and added to it.
