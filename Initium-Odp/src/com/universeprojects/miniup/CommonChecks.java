@@ -265,6 +265,20 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+
+	/**
+	 * Checks if the given location is considered a camp site.
+	 * 
+	 * @param location
+	 * @return
+	 */
+	public static boolean checkLocationIsCampSite(CachedEntity location)
+	{
+		if (location != null && "CampSite".equals(location.getProperty("type")))
+			return true;
+		
+		return false;
+	}
 	
 	/**
 	 * Checks if the given slot exists in the list of available equipment slots.

@@ -737,27 +737,27 @@ public class MainPageUpdateService extends Service
 
 			if (CommonChecks.checkLocationIsCombatSite(location)==false)
 			{
+				if (CommonChecks.checkLocationIsCampSite(location))
+				{
+					newHtml.append(getHtmlForInBannerLink(50, 46, "<span id='defendCampsiteBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Defend button below.'>Defend</span>", "window.btnDefendCamp.click()"));
+					String js = 
+							"<script type='text/javascript'>" +
+							"setTimeout(function(){" +
+							"window.btnDefendCamp = $('.v3-main-button[shortcut=68]');" +
+							"if (window.btnDefendCamp.length>0)" +
+							"{" +
+							"	$('#defendCampsiteBannerButton').show();" +
+							"	if (window.btnDefendCamp.length>1) window.btnDefendCamp = $(window.btnDefendCamp[0]);" +
+							"}" +
+							"}, 500);" +
+							"</script>";
+					newHtml.append(js);
+				}
 				//	newHtml.append(getHtmlForInBannerLink(50, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore(event)"));
 			}
 			else if (CommonChecks.checkCharacterIsIncapacitated(character))
 			{
 				// Do nothing, we don't want to show any overlay links
-			}
-			else if ("CampSite".equals(location.getProperty("type")))
-			{
-				newHtml.append(getHtmlForInBannerLink(50, 46, "<span id='defendCampsiteBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Defend button below.'>Defend</span>", "window.btnDefendCamp.click()"));
-				String js = 
-						"<script type='text/javascript'>" +
-						"setTimeout(function(){" +
-						"window.btnDefendCamp = $('.v3-main-button[shortcut=68]');" +
-						"if (window.btnDefendCamp.length>0)" +
-						"{" +
-						"	$('#defendCampsiteBannerButton').show();" +
-						"	if (window.btnDefendCamp.length>1) window.btnDefendCamp = $(window.btnDefendCamp[0]);" +
-						"}" +
-						"}, 500);" +
-						"</script>";
-				newHtml.append(js);
 			}
 			else
 			{
