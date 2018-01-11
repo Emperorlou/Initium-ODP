@@ -739,7 +739,7 @@ public class MainPageUpdateService extends Service
 			{
 				if (CommonChecks.checkLocationIsCampSite(location))
 				{
-					newHtml.append(getHtmlForInBannerLink(50, 46, "<span id='defendCampsiteBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Defend button below.'>Defend</span>", "window.btnDefendCamp.click()"));
+					newHtml.append(getHtmlForInBannerLink(50, 46, "<span id='defendCampsiteBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Defend button below.'>Defend</span>", "window.btnDefendCamp.click();$(this).hide();"));
 					String js = 
 							"<script type='text/javascript'>" +
 							"setTimeout(function(){" +
