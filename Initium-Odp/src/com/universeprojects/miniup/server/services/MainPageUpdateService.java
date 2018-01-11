@@ -843,6 +843,20 @@ public class MainPageUpdateService extends Service
 		
 		if ("CampSite".equals(location.getProperty("type")))
 		{
+			newHtml.append(getHtmlForInBannerLink(50, 46, "<span id='defendCampsiteBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Defend button below.'>Defend</span>", "window.btnDefendCamp.click()"));
+			String js = 
+					"<script type='text/javascript'>" +
+					"setTimeout(function(){" +
+					"window.btnDefendCamp = $('.v3-main-button[shortcut=68]');" +
+					"if (window.btnDefendCamp.length>0)" +
+					"{" +
+					"	$('#defendCampsiteBannerButton').show();" +
+					"	if (window.btnDefendCamp.length>1) window.btnDefendCamp = $(window.btnDefendCamp[0]);" +
+					"}" +
+					"}, 500);" +
+					"</script>";
+			newHtml.append(js);
+			
 			newHtml.append("<a href='#' onclick='doCampDefend()' class='v3-main-button' shortcut='68'><span class='shortcut-key'>(D)</span>Defend</a>");
 			newHtml.append("<br>");
 		}
