@@ -113,11 +113,11 @@ public class ExchangeController extends PageController {
 	        
 	        // These are only used for the sorting method db.sortSaleItemList()
 		Double storeSale = (Double)sellingCharacter.getProperty("storeSale");
-		if(storeSale==null) storeSale = Double.valueOf(100);
+		if(storeSale==null) storeSale = 100d;
 		Long coins = (Long)saleItem.getProperty("dogecoins");
 		coins = Long.valueOf(Math.round(coins.doubleValue()*((storeSale.doubleValue())/100d)));    
 		    
-	        item.setProperty("store-dogecoins", (Object)coins);
+	        item.setProperty("store-dogecoins", coins);
 	        item.setProperty("store-status", saleItem.getProperty("status"));
 	        item.setProperty("store-saleItemKey", saleItem.getKey());
 	        
