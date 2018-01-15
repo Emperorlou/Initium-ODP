@@ -321,6 +321,12 @@ messager.checkClientSideChatCommands = function(chatMessage)
 			doCollectCharacter(null, null, characterName);
 			return true;
 		}
+		if (chatMessage.toLowerCase().startsWith("/w "))
+		{
+			var characterName = chatMessage.substring(3);
+			setPrivateChatTo(characterName);
+			return true;
+		}
 	}
 	return false;
 };

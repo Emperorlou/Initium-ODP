@@ -23,7 +23,6 @@ import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequireme
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.PropertiesService;
-import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 
 public class CommandPlayerCreateHouseMap extends Command
 {

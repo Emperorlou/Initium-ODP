@@ -18,7 +18,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandConstructItemSkillRename extends Command
 {
-	final public String nameRegex = "[A-Za-z0-9.'# ]+";
+	final public String nameRegex = "[A-Za-z0-9.'\\-#\\(\\) ]+";
 	public CommandConstructItemSkillRename(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
 		super(db, request, response);

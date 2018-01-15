@@ -26,7 +26,7 @@ import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
-import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
+import com.universeprojects.miniup.server.services.GenericEntityRequirementResult;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 
 public class AspectFireplace extends ItemAspect
@@ -531,6 +531,10 @@ public class AspectFireplace extends ItemAspect
 				inventionService.useItem(firestarter.get(0), 1L);
 
 				ds.put(fireplace.getEntity());
+				
+				CachedEntity createCampfireSkillDef = db.getEntity("ConstructItemIdeaDef", 4988291556573184L);// This is the create campfire skill
+				if (inventionService.getKnowledgeService().increaseKnowledgeFor(createCampfireSkillDef, 5, 80))
+					db.sendGameMessage(ds, db.getCurrentCharacter(), "Your Create Fire knowledge increased by 5.");
 
 			}
 			finally
@@ -591,6 +595,10 @@ public class AspectFireplace extends ItemAspect
 
 				ds.put(fireplace.getEntity());
 
+				CachedEntity createCampfireSkillDef = db.getEntity("ConstructItemIdeaDef", 4988291556573184L);// This is the create campfire skill
+				if (inventionService.getKnowledgeService().increaseKnowledgeFor(createCampfireSkillDef, 1, 20))
+					db.sendGameMessage(ds, db.getCurrentCharacter(), "Your Create Fire knowledge increased by 1.");
+				
 			}
 			finally
 			{

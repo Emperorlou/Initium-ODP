@@ -15,8 +15,8 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 import com.universeprojects.miniup.server.services.ConfirmSkillRequirementsBuilder;
+import com.universeprojects.miniup.server.services.GenericEntityRequirementResult;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
@@ -172,9 +172,23 @@ public class LongOperationDoSkillConstructItem extends LongOperation
 			ds.put(item);
 		}
 		
+		Double skillExecutionExperienceValue = (Double)ideaDef.getProperty("skillExecutionExperienceValue");
+		if (skillExecutionExperienceValue==null) skillExecutionExperienceValue = 1d;
+		
 		// Now add to the knowledge we gain
-		knowledgeService.increaseKnowledgeFor(skill, 1, 100);
-		knowledgeService.increaseKnowledgeFor(item, 1, 100);
+		if (skillExecutionExperienceValue>=1)
+		{
+			knowledgeService.increaseKnowledgeFor(skill, skillExecutionExperienceValue.intValue(), 100);
+			knowledgeService.increaseKnowledgeFor(item, skillExecutionExperienceValue.intValue(), 100);
+		}
+		else if (skillExecutionExperienceValue>0 && skillExecutionExperienceValue<1)
+		{
+			if (GameUtils.roll(skillExecutionExperienceValue*100))
+			{
+				knowledgeService.increaseKnowledgeFor(skill, 1, 100);
+				knowledgeService.increaseKnowledgeFor(item, 1, 100);
+			}
+		}
 		
 		// Give the player a message that points to the skill and the new item he made
 		String msg = "You created an item: "+GameUtils.renderItem(item);

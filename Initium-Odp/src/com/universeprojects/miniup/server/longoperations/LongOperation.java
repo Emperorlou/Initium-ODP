@@ -72,8 +72,21 @@ public abstract class LongOperation extends OperationBase
 			
 			data = getLongOperationData(db, longOperationDataEntity);
 			
-			if (data!=null && getPageRefreshJavascriptCall().equals(data.get("pageRefreshJavascriptCall"))==false)
-				throw new UserErrorMessage("You are already performing an action and cannot perform another until the first action is either cancelled or finished.");
+			if (data!=null)
+			{
+				String currentPageRefreshJSCall = null;
+				try
+				{
+					currentPageRefreshJSCall = getPageRefreshJavascriptCall();
+				}
+				catch(Exception e)
+				{
+					throw new InvalidLongOperationFieldValueException(e);
+				}
+				
+				if (currentPageRefreshJSCall.equals(data.get("pageRefreshJavascriptCall"))==false)
+					throw new UserErrorMessage("You are already performing an action and cannot perform another until the first action is either cancelled or finished.");
+			}
 		}
 		catch(InvalidLongOperationFieldValueException e)
 		{
@@ -163,10 +176,11 @@ public abstract class LongOperation extends OperationBase
 		longOperationDataEntity.setProperty("data", null);
 		
 		setDataProperty("cancelled", true);
-		
-		db.getDB().delete(longOperationDataEntity);
+
 		if (db.getDB().isBulkWriteModeOn())
-			db.getDB().commitBulkWrite();
+			db.getDB().cancelBulkWrite();
+
+		db.getDB().delete(longOperationDataEntity);
 		longOperationDataEntity = null;
 	}
 	
@@ -175,10 +189,10 @@ public abstract class LongOperation extends OperationBase
 		CachedEntity dataEntity = getLongOperationDataEntity(db, characterKey);
 		if (dataEntity==null) return;
 		dataEntity.setProperty("data", null);
+		if (db.getDB().isBulkWriteModeOn())
+			db.getDB().cancelBulkWrite();
 		
 		db.getDB().delete(dataEntity);
-		if (db.getDB().isBulkWriteModeOn())
-			db.getDB().commitBulkWrite();
 	}
 	
 	public boolean isComplete()
@@ -240,6 +254,7 @@ public abstract class LongOperation extends OperationBase
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			cancelLongOperation(db, db.getCurrentCharacterKey());
 			throw e;
 		}
@@ -337,6 +352,7 @@ public abstract class LongOperation extends OperationBase
 			response.setContentType("application/json");
 			PrintWriter out = response.getWriter();
 			result = new JSONObject();
+			result.putAll(getStateData());
 			result.put("hasNewGameMessages", db.hasNewGameMessages());
 			result.put("error", e.getMessage());
 			result.put("cancelled", true);

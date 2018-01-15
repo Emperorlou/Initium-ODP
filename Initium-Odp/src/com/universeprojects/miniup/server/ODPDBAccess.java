@@ -6583,26 +6583,25 @@ public class ODPDBAccess
 		
 	}
 	
-	public CachedEntity combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
+	public void combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
 	{
-		if (stackedItem.getProperty("quantity")==null) return stackedItem;
+		if (stackedItem.getProperty("quantity")==null) return;
 		
 		QueryHelper q = new QueryHelper(ds);
-		List<CachedEntity> inventory = q.getFilteredList("Item", "containerKey", characterKey);
+		List<CachedEntity> inventory = q.getFilteredList("Item", "containerKey", characterKey, "name", stackedItem.getProperty("name"));
 		for(CachedEntity item:inventory)
 		{
-			if (CommandItemsStackMerge.canStack(stackedItem, item))
+			if (item!=null && CommandItemsStackMerge.canStack(stackedItem, item))
 			{
 				Long quantity = (Long)item.getProperty("quantity");
 				quantity+=(Long)stackedItem.getProperty("quantity");
-				item.setProperty("quantity", quantity);
-				if (stackedItem.getKey().isComplete())
-					ds.delete(stackedItem);
-				ds.put(item);
-				return item;
+				
+				stackedItem.setProperty("quantity", quantity);
+				if (item.getKey().isComplete())
+					ds.delete(item);
+				ds.put(stackedItem);
 			}
 		}		
-		return stackedItem;
 	}
 	
 	public void doDeleteCharacter(Key key)
@@ -6768,4 +6767,20 @@ public class ODPDBAccess
 		return null;
 	}
 	
+	public boolean isLocalhost()
+	{
+		return getRequest().getServerName().contains("localhost");
+	}
+
+	public Collection<String> getFieldNamesForEntity(String kind)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Collection<String> getFieldNamesForAspect(String aspectName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

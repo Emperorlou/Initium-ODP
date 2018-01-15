@@ -422,4 +422,11 @@ public abstract class CommonChecks
 			return true;
 		return false;
 	}
+
+	public static boolean checkItemIsStackable(CachedEntity entity)
+	{
+		if (entity.getProperty("quantity")!=null)
+			return true;
+		return false;
+	}
 }
