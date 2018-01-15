@@ -4964,8 +4964,11 @@ public class ODPDBAccess
 		if (getParty(ds, character)!=null)
 			throw new UserErrorMessage("You cannot join another party until you leave the one you're in already. <a onclick='leaveParty()'>Click here</a> to leave your current party.");
 		
+		// Get party first. If single member in party, clears out party code, which
+		// allows us to create party with new code.
+		List<CachedEntity> currentParty = getParty(ds, partiedCharacter);
 		String partyCode = (String)partiedCharacter.getProperty("partyCode");
-		if (partyCode==null || partyCode.equals(""))
+		if (partyCode==null || partyCode.equals("") || currentParty == null)
 		{
 			if ("TRUE".equals(partiedCharacter.getProperty("partyJoinsAllowed"))==false)
 				throw new UserErrorMessage("This user is not accepting party joins at this time.");
@@ -4980,7 +4983,6 @@ public class ODPDBAccess
 		}
 		else
 		{
-			List<CachedEntity> currentParty = getParty(ds, partiedCharacter);
 			CachedEntity leader = null;
 			for(CachedEntity e:currentParty)
 				if ("TRUE".equals(e.getProperty("partyLeader")))
