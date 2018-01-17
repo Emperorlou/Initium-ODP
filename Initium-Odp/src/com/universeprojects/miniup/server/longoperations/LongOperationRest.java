@@ -37,8 +37,17 @@ public class LongOperationRest extends LongOperation {
 			throw new UserErrorMessage("You cannot rest here. Find a rest site like a camp or an Inn, or even a player's house.");
 		
 		Double hitpointsToRegain = (Double)db.getCurrentCharacter().getProperty("maxHitpoints")-(Double)db.getCurrentCharacter().getProperty("hitpoints");
-		if ("CampSite".equals(locationType) && hitpointsToRegain<=0)
-			throw new UserErrorMessage("You don't need to rest, you're already at full health! NOW GET OUT THERE AND KICK SOME ASS!");
+		if (hitpointsToRegain<=0)
+		{
+			if("CampSite".equals(locationType))
+				throw new UserErrorMessage("You don't need to rest, you're already at full health! NOW GET OUT THERE AND KICK SOME ASS!");
+			
+			for(CachedEntity buff:db.getBuffsFor(db.getCurrentCharacterKey()))
+			{
+				if("Well Rested".equals(buff.getProperty("name")))
+					throw new UserErrorMessage("You don't need to rest, you're already at full health and well rested! NOW GET OUT THERE AND KICK SOME ASS!");
+			}
+		}
 		
 		// Check, if it's night time and we're outside, that we have a fire going
 //		if (GameUtils.getDayNight()>0.9 && CommonChecks.checkLocationIsOutside(location))
