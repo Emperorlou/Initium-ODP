@@ -361,6 +361,15 @@ public abstract class CommonChecks
 	{
 		return "Instance".equals(location.getProperty("combatType"));
 	}
+	
+	public static boolean checkLocationIsGoodRestSite(CachedEntity location)
+	{
+		return "RestSite".equals(location.getProperty("type")) &&
+				(location.getProperty("ownerKey")!=null ||
+				"Aera Inn".equals(location.getProperty("name")) ||
+				"Volantis Inn".equals(location.getProperty("name")) ||
+				"Wastelander's Rest Stop".equals(location.getProperty("name")));
+	}
 
 	public static boolean checkLocationIsOutside(CachedEntity location)
 	{

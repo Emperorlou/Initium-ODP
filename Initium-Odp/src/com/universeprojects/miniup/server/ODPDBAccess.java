@@ -4625,16 +4625,23 @@ public class ODPDBAccess
 					// If the character was a party leader, re-assign leader to another player (a LIVE one hopefully)
 					if ("TRUE".equals(characterToDie.getProperty("partyLeader")))
 					{
+						Double maxDex = 0.0d;
+						CachedEntity newLeader = null;
 						List<CachedEntity> partyMembers = getParty(db, characterToDie);
 						if (partyMembers!=null)
 							for(CachedEntity member:partyMembers)
-								if (GameUtils.isPlayerIncapacitated(member)==false)
+								if (GameUtils.isPlayerIncapacitated(member)==false && (Double)member.getProperty("dexterity") > maxDex)
 								{
-									characterToDie.setProperty("partyLeader", "FALSE");
-									member.setProperty("partyLeader", "TRUE");
-									db.put(member);
-									break;
+									maxDex = (Double)member.getProperty("dexterity");
+									newLeader = member;
 								}
+						
+						if(newLeader != null)
+						{
+							characterToDie.setProperty("partyLeader", "FALSE");
+							newLeader.setProperty("partyLeader", "TRUE");
+							db.put(newLeader);
+						}
 					}
 					
 					
