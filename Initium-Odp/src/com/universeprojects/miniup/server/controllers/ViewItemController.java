@@ -277,6 +277,22 @@ public class ViewItemController extends PageController {
 
 			itemMap.put("dexpen", field.toString());
 		}
+		
+		field = item.getProperty("strengthModifier");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+
+			itemMap.put("strmod", field.toString());
+		}
+		
+		field = item.getProperty("intelligenceModifier");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+
+			itemMap.put("intmod", field.toString());
+		}
 
 		field = item.getProperty("strengthRequirement");
 		if (field!=null && field.toString().trim().equals("")==false)

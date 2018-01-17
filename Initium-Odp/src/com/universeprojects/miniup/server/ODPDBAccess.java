@@ -1745,6 +1745,24 @@ public class ODPDBAccess
 	{
 		Double str = getDoubleBuffableProperty(character, "strength");
 
+		// Get all strength modifying armors and include that in the
+		// calculation...
+		for (String slot : EQUIPMENT_SLOTS)
+		{
+			if (character.getProperty("equipment" + slot) != null)
+			{
+				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
+				if (equipment == null) continue;
+				Long modifier = (Long) equipment.getProperty("strengthModifier");
+				if (modifier != null)
+				{
+					str += (str * (modifier.doubleValue() / 100d));
+				}
+			}
+		}
+
+		if (str < 2) str = 2d;
+				
 		return str;
 	}
 	
@@ -1752,6 +1770,23 @@ public class ODPDBAccess
 	{
 		Double val = getDoubleBuffableProperty(character, "intelligence");
 		
+		// Get all intelligence modifying armors and include that in the
+		// calculation...
+		for (String slot : EQUIPMENT_SLOTS)
+		{
+			if (character.getProperty("equipment" + slot) != null)
+			{
+				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
+				if (equipment == null) continue;
+				Long modifier = (Long) equipment.getProperty("intelligenceModifier");
+				if (modifier != null)
+				{
+					val += (val * (modifier.doubleValue() / 100d));
+				}
+			}
+		}
+
+		if (val < 2) val = 2d;
 		
 		return val;
 	}
