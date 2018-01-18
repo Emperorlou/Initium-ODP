@@ -116,7 +116,8 @@ public class ODPDBAccess
 	public static final String CHARACTER_MODE_TRADING = "TRADING";
 	public static final String[] EQUIPMENT_SLOTS = new String[]
 	{
-			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck"
+			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck",
+			"Cosmetic1", "Cosmetic2", "Cosmetic3"
 	};
 	private CachedDatastoreService ds = null;
 
@@ -1415,7 +1416,10 @@ public class ODPDBAccess
 			throw new UserErrorMessage("This item is not equipable.");
 		
 		if (equipSlotRaw.equals("Ring"))
-			equipSlotRaw = "LeftRing, RightRing";
+			equipSlotRaw = "LeftRing,RightRing";
+		
+		if (equipSlotRaw.equals("Cosmetic"))
+			equipSlotRaw = "Cosmetic1,Cosmetic2,Cosmetic3";
 		
 		equipSlotRaw = equipSlotRaw.trim();
 		if (equipSlotRaw.endsWith(","))
@@ -1431,9 +1435,14 @@ public class ODPDBAccess
 		{
 			for(int i = 0; i<equipSlotArr.length; i++)
 			{
-				if (character.getProperty("equipment"+equipSlotArr[i])==null)
+				String slotCheck = equipSlotArr[i].trim();
+				
+				if(CommonChecks.checkIsValidEquipSlot(slotCheck)) 
+					continue;
+				
+				if (character.getProperty("equipment"+slotCheck)==null)
 				{
-					destinationSlot = equipSlotArr[i];
+					destinationSlot = slotCheck;
 					break;
 				}
 			}
@@ -1456,9 +1465,9 @@ public class ODPDBAccess
 		
 		destinationSlot = destinationSlot.trim(); // Clean it up, just in case
 		
-		String equipmentSlot = (String)equipment.getProperty("equipSlot");
-		if (equipmentSlot==null)
-			throw new UserErrorMessage("You cannot equip this item.");
+//		String equipmentSlot = (String)equipment.getProperty("equipSlot");
+//		if (equipmentSlot==null)
+//			throw new UserErrorMessage("You cannot equip this item.");
 //		if (destinationSlot.contains(equipmentSlot)==false)
 //			throw new CodeException("You cannot put a "+equipmentSlot+" item in the "+destinationSlot+" slot.");
 
@@ -1482,6 +1491,10 @@ public class ODPDBAccess
 		if (destinationSlot!=null && destinationSlot.trim().equals("")==false)
 		{
 			String[] destinationSlots = destinationSlot.split(" and ");
+			// Validate destination slots first.
+			for (String slot:destinationSlots)
+				if(CommonChecks.checkIsValidEquipSlot(slot.trim())==false)
+					throw new RuntimeException("Invalid EquipSlot specified for item.");
 			
 			// Check if we need to unequip some items first if they're in the way (and replacing is requested)
 			for (String slot:destinationSlots)
@@ -1536,29 +1549,21 @@ public class ODPDBAccess
 
 		for (String slot : EQUIPMENT_SLOTS)
 		{
-			if (character.getProperty("equipment" + slot) != null && ((Key) character.getProperty("equipment" + slot)).getId() == equipment.getKey().getId())
+			if (GameUtils.equals(equipment.getKey(), character.getProperty("equipment" + slot)))
 				character.setProperty("equipment" + slot, null);
 		}
 
 		db.put(character);
-
 	}
 
 	public void doCharacterUnequipEntity(CachedDatastoreService db, CachedEntity character, Key entityKey)
 	{
 		if (db == null) db = getDB();
 
-		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
+		CachedEntity equipment = getEntity(entityKey);
+		if (equipment == null) return;
 
-		for (int i = 0; i < EQUIPMENT_SLOTS.length; i++)
-		{
-			Key equipment = (Key) character.getProperty("equipment" + EQUIPMENT_SLOTS[i]);
-			if (equipment != null && entityKey.getId() == equipment.getId())
-			{
-				doCharacterUnequipEntity(db, character, EQUIPMENT_SLOTS[i]);
-			}
-		}
-
+		doCharacterUnequipEntity(db, character, equipment);
 	}
 
 	public void doCharacterRestFully(CachedEntity character)
@@ -3366,7 +3371,7 @@ public class ODPDBAccess
 	public String cleanCharacterName(String name)
 	{
 		name = name.trim();
-		name = name.replace("  ", " ");
+		name = name.replaceAll("\\s{2,}"," ");
 		return name;
 	}
 	
