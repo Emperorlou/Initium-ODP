@@ -1279,6 +1279,14 @@ public class MainPageUpdateService extends Service
 				{
 					pool.addToQueue((Key)partyCharacter.getProperty("userKey"));
 				}
+				Collections.sort(party, new Comparator<CachedEntity>(){
+					@Override
+					public int compare(CachedEntity c1, CachedEntity c2){
+						String partyCharacter1 = (String)c1.getProperty("name");
+						String partyCharacter2 = (String)c2.getProperty("name");
+						return partyCharacter1.compareTo(partyCharacter2);
+					}
+				});
 				pool.loadEntities();
 
 				for(CachedEntity partyCharacter:party)
