@@ -1467,7 +1467,6 @@ public class MainPageUpdateService extends Service
 		Double monsterCount = db.getMonsterCountForLocation(ds, location);
 		Double maxMonsterCount = (Double)location.getProperty("maxMonsterCount");
 		
-		
 		if (monsterCount!=null && maxMonsterCount!=null)
 		{
 			if ("CampSite".equals(location.getProperty("type")))
@@ -1478,11 +1477,11 @@ public class MainPageUpdateService extends Service
 					html.append("<p>Camp integrity: <span class='main-item-subnote'>"+GameUtils.formatPercent(1d-monsterPercent)+"</span></p>");
 					
 				}
-				
 			}
 			else
 			{
-				if (maxMonsterCount>10)
+				if (maxMonsterCount>10 && 
+						GameUtils.booleanEquals(location.getProperty("hideMonsterActivity"), true)==false)
 				{
 					if (monsterCount<1) monsterCount = 0d;
 					double monsterPercent = monsterCount/maxMonsterCount;
