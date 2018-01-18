@@ -2037,6 +2037,10 @@ function joinParty(eventObject, partyCode) {
 	doCommand(eventObject, "PartyJoin", {"inputType":"partyCode","partyCode": partyCode});
 }
 
+function joinPartyCharacter(eventObject, characterId) {
+	doCommand(eventObject, "PartyJoin", {"inputType":"characterId","characterId":characterId});
+}
+
 function joinPartyCharacterName(eventObject, characterName) {
 	doCommand(eventObject, "PartyJoin", {"inputType":"characterName","characterName":characterName});
 }
