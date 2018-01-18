@@ -61,7 +61,7 @@ public class NearbyCharactersController extends PageController {
 	    	
 	    	sb.append("<div>");
 	    	sb.append("<div class='main-item-container'>");
-	    	sb.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId="+curChar.getId()+"'>"+curChar.getProperty("name"));
+	    	sb.append("<a class='main-item clue' rel='/odp/viewcharactermini?characterId="+curChar.getId()+"'>"+curChar.getProperty("name"));
 	    	sb.append("<div class='main-item-controls' style='top:0px'>");
             if (dead)
             {

@@ -1290,7 +1290,7 @@ public class MainPageUpdateService extends Service
 					boolean dead = CommonChecks.checkCharacterIsUnconscious(partyCharacter);
 
 					newHtml.append("<div style='display:inline-block;vertical-align:top;'>");
-					newHtml.append("<a class='main-item clue' style='width:inherit;' rel='viewcharactermini.jsp?characterId="+partyCharacter.getKey().getId()+"'>");
+					newHtml.append("<a class='main-item clue' style='width:inherit;' rel='/odp/viewcharactermini?characterId="+partyCharacter.getKey().getId()+"'>");
 					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true));
 					newHtml.append("<br>");
 					if (!GameUtils.equals(character.getKey(), partyCharacter.getKey()) && user!=null && 

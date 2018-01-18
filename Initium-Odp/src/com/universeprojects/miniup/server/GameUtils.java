@@ -1444,7 +1444,7 @@ public class GameUtils
     		nameClass = "chatMessage-text";
     	
     	if (includePopupLink)
-    		return "<a class='clue "+nameClass+"' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+name+"</a>";
+    		return "<a class='clue "+nameClass+"' rel='/odp/viewcharactermini?characterId="+character.getKey().getId()+"'>"+name+"</a>";
     	else
     		return "<span class='"+nameClass+"'>"+name+"</span>";
     }
@@ -1660,7 +1660,7 @@ public class GameUtils
 					GameUtils.formatNumber(character.getProperty("intelligence"), true) + "<br/>" + 
 					GameUtils.formatNumber(db.getCharacterCarryingWeight(character) / 1000, true) + "/" + 
 					GameUtils.formatNumber(db.getCharacterMaxCarryingWeight(character) / 1000, true) + "kg";
-			sb.append("<a class='clue' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"' minitip='" + minitip + "'>");
+			sb.append("<a class='clue' rel='/odp/viewcharactermini?characterId="+character.getKey().getId()+"' minitip='" + minitip + "'>");
 		}
 		
 		String sizePrepend = "";
