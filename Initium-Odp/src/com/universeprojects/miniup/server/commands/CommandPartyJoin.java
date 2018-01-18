@@ -44,13 +44,20 @@ public class CommandPartyJoin extends Command {
 		if (mode != null && mode.equals("COMBAT"))
 			throw new UserErrorMessage("You cannot join a party while in combat!");
 		
-		if(parameters.get("inputType").equals("partyCode")) {
+		if(parameters.get("inputType").equals("characterId"))
+		{
+			partyCharacter = db.getEntity("Character", this.tryParseId(parameters, "characterId"));
+		}
+		if(parameters.get("inputType").equals("partyCode")) 
+		{
 			String toJoin = parameters.get("partyCode");
 			if(toJoin == null || "".equals(toJoin))
 				throw new RuntimeException("Specified party code is null!");
 			
 			partyCharacter = db.getPartyLeader(ds, toJoin, null);
-		} else if (parameters.get("inputType").equals("characterName")) {
+		} 
+		else if (parameters.get("inputType").equals("characterName")) 
+		{
 			String characterName = parameters.get("characterName");
 			partyCharacter = db.getCharacterByName(characterName);
 		}
