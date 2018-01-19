@@ -190,15 +190,22 @@ public abstract class ScriptEvent extends OperationBase
 	public void sendGameUpdate(Key entityKey, String updateMethod)
 	{
 		Set<String> curUpdates = dbGameUpdates.get(entityKey);
-		if(curUpdates == null) curUpdates = dbGameUpdates.put(entityKey, new HashSet<String>());
+		if(curUpdates == null) 
+		{
+			dbGameUpdates.put(entityKey, new HashSet<String>());
+			curUpdates = dbGameUpdates.get(entityKey);
+		}
 		curUpdates.add(updateMethod);
 	}
 	
 	public boolean removeGameUpdate(Key entityKey, String updateMethod)
 	{
 		Set<String> curUpdates = dbGameUpdates.get(entityKey);
-		if(curUpdates == null) curUpdates = dbGameUpdates.put(entityKey, new HashSet<String>());
-		
+		if(curUpdates == null) 
+		{
+			dbGameUpdates.put(entityKey, new HashSet<String>());
+			curUpdates = dbGameUpdates.get(entityKey);
+		}		
 		return curUpdates.remove(updateMethod);
 	}
 	
