@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
@@ -186,6 +187,20 @@ public abstract class CommandScriptBase extends Command {
 					}
 					else
 						setJavascriptResponse(event.getJavascriptResponse());
+					
+					for(Entry<Key,Set<String>> update:event.getGameUpdates().entrySet())
+					{
+						if("Location".equals(update.getKey().getKind()))
+						{
+							for(String method:update.getValue())
+								db.sendMainPageUpdateForLocation(update.getKey(), ds, method);
+						}
+						else if("Character".equals(update.getKey().getKind()))
+						{
+							for(String method:update.getValue())
+								db.sendMainPageUpdateForCharacter(ds, update.getKey(), method);
+						}
+					}
 				}
 				afterExecuteScript(db, event);
 			}
