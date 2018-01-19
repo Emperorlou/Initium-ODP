@@ -10,6 +10,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
  * Base wrapper class for CachedEntity objects, for use with the Scripting 
@@ -160,7 +161,11 @@ public class EntityWrapper extends BaseWrapper
 	@SuppressWarnings("unchecked")
 	public boolean addScript(String scriptName)
 	{
-		if(this.wrappedEntity.hasProperty("scripts")==false) return false;
+		if(this.wrappedEntity.hasProperty("scripts")==false)
+		{
+			ScriptService.log.log(Level.SEVERE, "Entity hasProperty(script) returned false for " + wrappedEntity.getKind());
+			return false;
+		}
 		List<CachedEntity> addScripts = db.getFilteredList("Script", "name", scriptName);
 		if(!addScripts.isEmpty())
 		{
@@ -175,8 +180,11 @@ public class EntityWrapper extends BaseWrapper
 			}
 			entityScripts.add(newScriptKey);
 			this.setProperty("scripts", entityScripts);
+			ScriptService.log.log(Level.WARNING, "Script '" + scriptName + "' associated to entity " + wrappedEntity.getKey().toString());
 			return true;
 		}
+		else
+			ScriptService.log.log(Level.WARNING, "Script '" + scriptName + "' not found.");
 		
 		return false;
 	}

@@ -230,7 +230,11 @@ public class Character extends EntityWrapper
 		ScriptService.log.log(Level.INFO, "Adding BuffDef by name: " + buffDefName);
 		CachedEntity newBuff = db.awardBuffByDef(buffDefName, this.getKey());
 		if(newBuff != null)
-			return new Buff(newBuff, db, this);
+		{
+			Buff buff = new Buff(newBuff, db, this);
+			buff.isNewEntity = true;
+			return buff;
+		}
 		else
 			ScriptService.log.log(Level.SEVERE, "Unable to create buff via BuffDef: " + buffDefName);
 		return null;
@@ -241,7 +245,11 @@ public class Character extends EntityWrapper
 	{
 		CachedEntity newBuff = db.awardBuff(null, this.getKey(), icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
 		if(newBuff != null)
-			return new Buff(newBuff, db, this);
+		{
+			Buff buff = new Buff(newBuff, db, this);
+			buff.isNewEntity = true;
+			return buff;
+		}
 		else
 			ScriptService.log.log(Level.SEVERE, "Unable to create manual buff " + name + " for character " + this.getId());
 		return null;
