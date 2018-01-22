@@ -2,20 +2,22 @@ package com.universeprojects.miniup.server.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Collections;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
@@ -38,8 +40,16 @@ public class ViewCharacterMiniController extends PageController {
 		response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
 		
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
-		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity user = db.getCurrentUser();
+		
+		Long charId = WebUtils.getLongParam(request, "characterId");
+		Key charKey = KeyFactory.createKey("Item", charId);
+		CachedEntity character = db.getEntity(charKey); 
+		if (character==null)
+		{
+			response.sendError(404);
+			return null;
+		}
 	
 	/**
 	boolean isSelf = false;
@@ -64,7 +74,7 @@ public class ViewCharacterMiniController extends PageController {
 	if (type.equals("NPC") && (Double)character.getProperty("hitpoints")>0d)
 		throw new RuntimeException("Should not have been able to view this character.");
 	
-	boolean isSelf = GameUtils.equals(db.getCurrentUser().getKey(), character.getProperty("userKey"));
+	boolean isSelf = GameUtils.equals(user.getKey(), character.getProperty("userKey"));
 
 	if (isSelf)
 	{
