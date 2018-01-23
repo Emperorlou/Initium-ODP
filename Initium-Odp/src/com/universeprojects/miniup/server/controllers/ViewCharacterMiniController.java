@@ -43,7 +43,7 @@ public class ViewCharacterMiniController extends PageController {
 		CachedEntity user = db.getCurrentUser();
 		
 		Long charId = WebUtils.getLongParam(request, "characterId");
-		Key charKey = KeyFactory.createKey("Item", charId);
+		Key charKey = KeyFactory.createKey("Character", charId);
 		CachedEntity character = db.getEntity(charKey); 
 		if (character==null)
 		{
