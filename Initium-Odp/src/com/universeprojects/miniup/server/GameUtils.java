@@ -33,6 +33,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -1631,7 +1632,7 @@ public class GameUtils
 		nameAndBars.append("		</div>");
 		
 		// Insert the group stuff if we have one passed in
-		if (group!=null)
+		if (CommonChecks.checkCharacterIsMemberOfHisGroup(character))
 		{
 			nameAndBars.append("<a onclick='viewGroup("+group.getId()+")' class='main-highlight'>"+group.getProperty("name")+"</a>");
 			if (character.getProperty("groupRank")!=null)
