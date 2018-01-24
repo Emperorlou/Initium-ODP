@@ -268,8 +268,16 @@ public class ViewItemController extends PageController {
 		else if("".equals(itemType) == false) itemSlot = itemSlot + " " + itemType; 
 		
 		itemMap.put("itemSlot", itemSlot);
-		
+
 		boolean requirements = false;
+		field = item.getProperty("strengthRequirement");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+			
+			itemMap.put("strReq", GameUtils.formatNumber(field));
+		}
+		
 		field = item.getProperty("dexterityPenalty");
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
@@ -282,7 +290,7 @@ public class ViewItemController extends PageController {
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
 			requirements=true;
-
+			
 			itemMap.put("strmod", field.toString());
 		}
 		
@@ -292,14 +300,6 @@ public class ViewItemController extends PageController {
 			requirements=true;
 
 			itemMap.put("intmod", field.toString());
-		}
-
-		field = item.getProperty("strengthRequirement");
-		if (field!=null && field.toString().trim().equals("")==false)
-		{
-			requirements=true;
-			
-			itemMap.put("strReq", GameUtils.formatNumber(field));
 		}
 
 		itemMap.put("requirements", requirements);
