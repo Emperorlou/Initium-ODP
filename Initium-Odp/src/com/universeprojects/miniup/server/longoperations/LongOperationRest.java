@@ -128,6 +128,9 @@ public class LongOperationRest extends LongOperation {
 		// Update character widget
 		mpus.updateInBannerCharacterWidget();
 		
+		// Update party view
+		mpus.updatePartyView();
+		
 		// Camp site might have been destroyed while resting, 
 		// so update location banner, description, and monster count.
 		mpus.updateLocationJs();

@@ -33,6 +33,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -1458,7 +1459,7 @@ public class GameUtils
     		nameClass = "chatMessage-text";
     	
     	if (includePopupLink)
-    		return "<a class='clue "+nameClass+"' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"'>"+name+"</a>";
+    		return "<a class='clue "+nameClass+"' rel='/odp/viewcharactermini?characterId="+character.getKey().getId()+"'>"+name+"</a>";
     	else
     		return "<span class='"+nameClass+"'>"+name+"</span>";
     }
@@ -1645,7 +1646,7 @@ public class GameUtils
 		nameAndBars.append("		</div>");
 		
 		// Insert the group stuff if we have one passed in
-		if (group!=null)
+		if (CommonChecks.checkCharacterIsMemberOfHisGroup(character))
 		{
 			nameAndBars.append("<a onclick='viewGroup("+group.getId()+")' class='main-highlight'>"+group.getProperty("name")+"</a>");
 			if (character.getProperty("groupRank")!=null)
@@ -1674,7 +1675,7 @@ public class GameUtils
 					GameUtils.formatNumber(character.getProperty("intelligence"), true) + "<br/>" + 
 					GameUtils.formatNumber(db.getCharacterCarryingWeight(character) / 1000, true) + "/" + 
 					GameUtils.formatNumber(db.getCharacterMaxCarryingWeight(character) / 1000, true) + "kg";
-			sb.append("<a class='clue' rel='/viewcharactermini.jsp?characterId="+character.getKey().getId()+"' minitip='" + minitip + "'>");
+			sb.append("<a class='clue' rel='/odp/viewcharactermini?characterId="+character.getKey().getId()+"' minitip='" + minitip + "'>");
 		}
 		
 		String sizePrepend = "";

@@ -464,7 +464,7 @@ public class HtmlComponents {
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div><div class='main-item-container'>");
-		sb.append("<a class='main-item clue' rel='viewcharactermini.jsp?characterId=" + applied.getId() + "'>" + applied.getProperty("name"));
+		sb.append("<a class='main-item clue' rel='/odp/viewcharactermini?characterId=" + applied.getId() + "'>" + applied.getProperty("name"));
 		sb.append("<div class='main-item-controls' style='top:0px'>");
 		sb.append("<a onclick='groupAcceptJoinGroupApplication(event, " + applied.getId() + ")'>Accept</a>");
 		sb.append("<a onclick='groupDenyJoinGroupApplication(event, " + applied.getId() + ")'>Deny</a>");
@@ -495,7 +495,7 @@ public class HtmlComponents {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div>");
 		sb.append("<div class='main-item-container'>");
-		sb.append("<div class='main-item clue' rel='viewcharactermini.jsp?characterId=" + character.getKey().getId() + "'>" + character.getProperty("name"));
+		sb.append("<div class='main-item clue' rel='/odp/viewcharactermini?characterId=" + character.getKey().getId() + "'>" + character.getProperty("name"));
 		sb.append("</div>");
 		sb.append("<div class='main-item-controls' style='top:0px; display:block; margin-bottom:25px;'>");
 		sb.append("<span>" + groupPermissionTag + "</span> ");
