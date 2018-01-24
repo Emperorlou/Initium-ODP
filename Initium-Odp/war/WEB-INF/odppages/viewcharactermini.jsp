@@ -6,7 +6,7 @@
 		<div class='mini-window-header'>
 			<div class='mini-window-header-split'>
 			<c:if test="${type == 'PC' }">
-				<a onclick='partyJoin(${characterIDKey})'>Join Party</a><br><br>
+				<a onclick='$(".cluetip").hide(); joinPartyCharacter(event, ${characterIDKey})'>Join Party</a><br><br>
 				<a onclick='$(".cluetip").hide(); setPrivateChatTo("${characterNameStr}", ${characterIDKey})'>Private Chat</a><br><br>
 				<a onclick='$(".cluetip").hide(); ignoreAPlayer(${characterID}, "${characterNameStr}");'>Ignore</a>
 			</c:if>

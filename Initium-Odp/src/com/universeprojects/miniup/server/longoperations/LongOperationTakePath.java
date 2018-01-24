@@ -1,6 +1,8 @@
 package com.universeprojects.miniup.server.longoperations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -98,6 +100,22 @@ public class LongOperationTakePath extends LongOperation {
 			destinationKey = pathLocation1Key;
 		else
 			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+db.getCurrentCharacter().getKey().getId()+") Path("+path.getKey().getId()+")");
+
+		// Script paths have script as destination. Let them discover (with party),
+		// but don't let them take the path. Generated button has trigger script.
+		if("Script".equals(destinationKey.getKind()))
+		{
+			try
+			{
+				List<CachedEntity> party = db.getParty(ds, character);
+				if(party == null || party.size() == 0) party = Arrays.asList(character);
+				for(CachedEntity member:party)
+					db.newDiscovery(ds, member, path);
+			}
+			catch (Exception tex) {}
+			throw new UserErrorMessage("You cannot travel this path normally...");
+		}
+		
 		destination = db.getEntity(destinationKey);
 
 		boolean isInParty = true;
