@@ -168,18 +168,16 @@ public class ViewCharacterMiniController extends PageController {
 	request.setAttribute("printBuff", printBuff);
 
 	// Printing achievements
-	if(achievements != null)
-	{
-		List<String> printAchievement = new ArrayList<String>();
 	
-		for(CachedEntity achievement:achievements)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'>");
-				printAchievement.add(sb.toString());
-			}
-		request.setAttribute("printAchievement", printAchievement);
-	}
+	List<String> printAchievement = new ArrayList<String>();
+
+	for(CachedEntity achievement:achievements)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'>");
+			printAchievement.add(sb.toString());
+		}
+	request.setAttribute("printAchievement", printAchievement);
 	
 	// Printing the equipment list with the EquipmentControl
 				
