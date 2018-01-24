@@ -30,7 +30,7 @@ function EventServerMessager(eventServerUrl, idToken)
 	
 	this.url = null;
 
-	this.sendMessage = function(message)
+	this.sendMessage = function(message, targetCharacter)
 	{
 		ga('send', 'pageview', 'ServletChat');
 		
@@ -46,6 +46,7 @@ function EventServerMessager(eventServerUrl, idToken)
 		{
 			roomId:that.channel,
 			msg:message,
+			targetCharacter:targetCharacter
 		});
         a.always(function(){
             that.waitingForSendResponse = false;

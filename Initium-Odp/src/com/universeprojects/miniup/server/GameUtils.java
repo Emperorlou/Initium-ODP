@@ -1646,7 +1646,7 @@ public class GameUtils
 		nameAndBars.append("		</div>");
 		
 		// Insert the group stuff if we have one passed in
-		if (CommonChecks.checkCharacterIsMemberOfHisGroup(character))
+		if (group!=null && CommonChecks.checkCharacterIsMemberOfHisGroup(character))
 		{
 			nameAndBars.append("<a onclick='viewGroup("+group.getId()+")' class='main-highlight'>"+group.getProperty("name")+"</a>");
 			if (character.getProperty("groupRank")!=null)

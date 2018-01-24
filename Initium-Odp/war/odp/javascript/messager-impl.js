@@ -439,34 +439,14 @@ $(document).ready(function(){
 
 			var message = $("#chat_input").val();
 
-            if(window.isTestServer) {
-                var target = null;
-                if (messager.channel == "PrivateChat" && currentPrivateChatCharacterId!=null)
-    			{
-    				target = "#"+currentPrivateChatCharacterId;
-    			}
-    			else if (messager.channel == "PrivateChat" && currentPrivateChatCharacterName!=null)
-    			{
-    				target = currentPrivateChatCharacterName;
-    			}
-
-    			if (messager.channel == "PrivateChat" && currentPrivateChatCharacterName==null)
-    			{
-    				alert("You cannot chat privately until you select a person to chat privately with. Click on their name and then click on Private Chat.");
-    				return;
-    			}
-                messager.sendMessage(message, target);
-    			$("#chat_input").val('');
-                return true;
-            }
-
-			if (messager.channel == "PrivateChat" && currentPrivateChatCharacterId!=null)
+            var target = null;
+            if (messager.channel == "PrivateChat" && currentPrivateChatCharacterId!=null)
 			{
-				message = "#"+currentPrivateChatCharacterId + ": "+message;
+				target = "#"+currentPrivateChatCharacterId;
 			}
 			else if (messager.channel == "PrivateChat" && currentPrivateChatCharacterName!=null)
 			{
-				message = currentPrivateChatCharacterName + ": "+message;
+				target = currentPrivateChatCharacterName;
 			}
 
 			if (messager.channel == "PrivateChat" && currentPrivateChatCharacterName==null)
@@ -474,9 +454,10 @@ $(document).ready(function(){
 				alert("You cannot chat privately until you select a person to chat privately with. Click on their name and then click on Private Chat.");
 				return;
 			}
-
-			messager.sendMessage(message);
+            messager.sendMessage(message, target);
 			$("#chat_input").val('');
+            return true;
+
 	});
 
 });
