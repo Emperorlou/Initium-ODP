@@ -18,10 +18,20 @@
 	padding: 13px;
 }
 
+.popout-character
+{
+	display:table-cell;
+	font-size:20px;
+	vertical-align:middle;
+	color:#FFFFFF;
+	padding-right:5px;
+}
+
 
 </style>
 <c:forEach var="character" items="${characters}">
 	<div class='selectable'>
+		<a href='main.jsp?char=${character.urlSafeKey}' target='_blank' class='popout-character'>↸</a>
 		<div class='list-item'>
 			${character.html}
 		</div>
@@ -37,7 +47,7 @@
 <div class='selectable'>
 	<div id="newui" class="character-display-box" style='position:relative; filter:opacity(0.3);width:100%;'>
 		<a class="" rel="" minitip="Create new character">
-			<div class="avatar-equip-backing v3-window3" style="background-color:none;border-width:6px;">
+			<div class="avatar-equip-backing v3-window3" style="background-color:none;border-width:6px;margin-left:24px;">
 				<div class="avatar-equip-cloak" style="background-image:url(&quot;https://initium-resources.appspot.com/images/ui/newui/avatar-silhouette-male1.png&quot;);font-size: 24px;text-align: center;">+</div>
 			</div>
 		</a>

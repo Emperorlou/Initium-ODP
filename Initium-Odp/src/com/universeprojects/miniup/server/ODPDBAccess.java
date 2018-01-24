@@ -359,7 +359,18 @@ public class ODPDBAccess
 		if (userId != null)
 		{
 			CachedEntity user = getCurrentUser();
-			Key characterKey = (Key) user.getProperty("characterKey");
+			
+			String overrideCharKeyStr = request.getParameter("char");
+			Key characterKey = null;
+			
+			if (overrideCharKeyStr!=null)
+			{
+				characterKey = KeyFactory.stringToKey(overrideCharKeyStr);
+			}
+			else
+			{
+				characterKey = (Key) user.getProperty("characterKey");
+			}
 			return characterKey;
 		}
 
@@ -394,11 +405,17 @@ public class ODPDBAccess
 		if (userId != null)
 		{
 			CachedEntity user = getCurrentUser();
-			Key characterKey = (Key) user.getProperty("characterKey");
+			Key characterKey = getCurrentCharacterKey();
 			CachedEntity character = getEntity(characterKey);
 
 			if (character != null)
 			{
+				// VERY IMPORTANT!!!!!!
+				// Check that the character key we have is ACTUALLY from the logged in user. Since we now allow overriding of the current character, 
+				// we need to make sure other people aren't trying to take control of someone else's character.
+				if (GameUtils.equals(character.getProperty("userKey"), user.getKey())==false)
+					throw new RuntimeException("Attempted to use a character that does not belong to the logged in user's account.");
+				
 				request.setAttribute("characterEntity", character);
 
 				return character;

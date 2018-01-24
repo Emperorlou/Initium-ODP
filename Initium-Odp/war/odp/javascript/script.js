@@ -4,6 +4,25 @@ window.popupsArray = new Array();
 
 window.singlePostFormSubmitted = false;
 
+var getUrlParameter = function(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+window.characterOverride = getUrlParameter("char");
+if (window.characterOverride==null || window.characterOverride=="null")
+	window.characterOverride = "";
+
 var notifyHandler = null;
 // Case insensitive Contains selector.f
 jQuery.expr[':'].ContainsI = function(a, i, m) { return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0; };
@@ -137,7 +156,6 @@ $(window).ready(function(e){
 	});
 	
 });
-
 
 
 
@@ -776,32 +794,32 @@ function transmuteItems(eventObject, containerId)
 //function storeSellItem(itemId)
 //{
 //	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
-//		window.location.href="/ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode;
+//		window.location.href="/ServletCharacterControl?type=storeSellItem&itemId="+itemId+"&amount="+confirm+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //	});
 //}
 
 //function removeAllStoreItems()
 //{
 //	confirmPopup("Remove All Items", "Are you sure you want to remove ALL the items from your store?", function(){
-//		window.location.href='/ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode;
+//		window.location.href='/ServletCharacterControl?type=storeDeleteAllItems'+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //	});
 //}
 
 //function storeDeleteSoldItems()
 //{
-//	location.href = "/ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode;
+//	location.href = "/ServletCharacterControl?type=storeDeleteSoldItems"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //}
 //
 //function storeDeleteItem(saleItemId)
 //{
-//	location.href = "/ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode;	
+//	location.href = "/ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;	
 //}
 
 //function renameStore()
 //{
 //	promptPopup("Rename Storefront", "Provide a new name for your store:", "", function(name){
 //		if (name!=null && name!="")
-//			window.location.href='/ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode;
+//			window.location.href='/ServletCharacterControl?type=storeRename&name='+encodeURIComponent(name)+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //	});
 //}
 
@@ -871,7 +889,7 @@ function doCollectCharacter(event, characterId, characterName)
 //	promptPopup("Trade Gold", "How much gold do you want to add to the trade:", currentDogecoin+"", function(amount){
 //		if (amount!=null && amount!="")
 //		{
-//			window.location.href='/ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode;
+//			window.location.href='/ServletCharacterControl?type=setTradeDogecoin&amount='+encodeURIComponent(amount)+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //		}
 //	});
 //}
@@ -1006,7 +1024,7 @@ function compareWeapons(a, b) {
 
 function loadInventory()
 {
-	$("#inventory").load("/odp/inventorylist.jsp?ajax=true", function(){
+	$("#inventory").load("/odp/inventorylist.jsp?ajax=true&char="+window.characterOverride, function(){
 		var sorted = $('#invItems h4:contains("Armor")').nextUntil('#invItems h4').sort(compareArmor);
 		sorted.map(function() { var html = $(this)[0].outerHTML; $(this).remove(); $('#invItems h4:contains("Armor")').after(html)});
 		sorted = $('#invItems h4:contains("Shield")').nextUntil('#invItems h4').sort(compareArmor);
@@ -1021,7 +1039,7 @@ function loadInventory()
 
 function loadEquipment()
 {
-	$("#equipment").load("/odp/equipmentlist?ajax=true");
+	$("#equipment").load("/odp/equipmentlist?ajax=true&char="+window.characterOverride);
 //	$("#inventory").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
 //	});
@@ -1034,7 +1052,10 @@ function ajaxAction(url, eventObject, loadFunction)
 	else
 		url+="?ajax=true";
 	
-	url += "&v="+window.verifyCode;
+	url += "&v="+window.verifyCode+"&char="+window.characterOverride;
+	
+	if (window.characterOverride!=null && window.characterOverride.length>10)
+		url+="&char="+window.characterOverride;
 
 	var clickedElement = $(eventObject.currentTarget);
 	var originalText = clickedElement.html();
@@ -1165,7 +1186,7 @@ function endWar(eventObject, groupId)
 }
 //function cancelLeaveGroup()d
 //{
-//	window.location.href = "/ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode;
+//	window.location.href = "/ServletCharacterControl?type=cancelLeaveGroup"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //}
 function groupAcceptAllianceRequest(eventObject, groupId)
 {
@@ -1251,12 +1272,12 @@ function makeGroupCreator(eventObject, characterId)
 
 //function duelConfirmation_Yes()
 //{
-//	window.location.href="/ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode;
+//	window.location.href="/ServletCharacterControl?type=duelResponse&accepted=true"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //}
 //
 //function duelConfirmation_No()
 //{
-//	window.location.href="/ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode;
+//	window.location.href="/ServletCharacterControl?type=duelResponse&accepted=false"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //}
 
 function reloadPopup(element, backUrl, event)
@@ -1309,7 +1330,7 @@ function refreshPopup(url, event)
 //	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
 //		if (sale!=null)
 //		{
-//			window.location.href="/ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode;
+//			window.location.href="/ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //		}
 //	});
 //	
@@ -1320,7 +1341,7 @@ function destroyThrowaway()
 {
 	confirmPopup("Destroy Throwaway", "Are you SURE you want to destroy your throwaway? This action is permanent!", function(){
 		enforceSingleAction();
-		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode;
+		window.location.href = 'ServletUserControl?type=destroyThrowaway'+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	});
 }
 
@@ -1371,7 +1392,7 @@ function acceptCharacterTransfer()
 		if (charName!=null)
 		{
 			enforceSingleAction();
-			window.location.href = "/ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode;
+			window.location.href = "/ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode+"&char="+window.characterOverride+"&char="+window.characterOverride;
 		}
 	});
 }
@@ -1382,7 +1403,7 @@ function transferCharacter(currentCharName)
 		if (email!=null)
 		{
 			enforceSingleAction();
-			window.location.href = "/ServletUserControl?type=transferCharacter&email="+encodeURIComponent(email)+"&v="+window.verifyCode;
+			window.location.href = "/ServletUserControl?type=transferCharacter&email="+encodeURIComponent(email)+"&v="+window.verifyCode+"&char="+window.characterOverride;
 		}
 	});
 }
@@ -1603,7 +1624,7 @@ function refreshInstanceRespawnWarning()
 //function buyItem(itemName, itemPrice, merchantCharacterId, saleItemId, itemId)
 //{
 //	confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='viewitemmini.jsp?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", function(){
-//		window.location.href = "/ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode;
+//		window.location.href = "/ServletCharacterControl?type=storeBuyItem&characterId="+merchantCharacterId+"&saleItemId="+saleItemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //	});
 //}
 
@@ -1625,7 +1646,7 @@ function newPremiumToken()
 {
 	confirmPopup("Create new premium token?", "Are you sure you want to create a premium token and put it in your inventory?\n\nBe aware that this token can be traded AND looted if you die.", function(){
 		enforceSingleAction();
-		window.location.href = "/ServletUserControl?type=newPremiumToken"+"&v="+window.verifyCode;
+		window.location.href = "/ServletUserControl?type=newPremiumToken"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	});
 }
 
@@ -1633,7 +1654,7 @@ function newCharacterFromUnconscious()
 {
 	confirmPopup("Create a new character?", "Are you Sure? If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
 		enforceSingleAction();
-		window.location.href = "/ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode;
+		window.location.href = "/ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	});
 }
 
@@ -1643,13 +1664,13 @@ function enterDefenceStructureSlot(slot)
 	{
 		confirmPopup("Defend this structure?", "Are you sure you want to defend this structure? If you do this, other players will be able to attack and kill you.", function(){
 			enforceSingleAction();
-			window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
+			window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode+"&char="+window.characterOverride;
 		});
 	}
 	else
 	{
 		enforceSingleAction();
-		window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode;
+		window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	}
 }
 
@@ -1700,6 +1721,9 @@ function pagePopup(url, closeCallback, title)
 	else
 		url+="?ajax=true";
 	
+	if (window.characterOverride!=null && window.characterOverride.length>10)
+		url += "&char="+window.characterOverride;
+	
 	exitFullscreenChat();
 	
 	var stackIndex = incrementStackIndex();
@@ -1730,9 +1754,9 @@ function pagePopupIframe(url)
 {
 	
 	if (url.indexOf("?")>0)
-		url+="&ajax=true";
+		url+="&ajax=true&char="+window.characterOverride;
 	else
-		url+="?ajax=true";
+		url+="?ajax=true&char="+window.characterOverride;
 	
 	exitFullscreenChat();
 	
@@ -1819,7 +1843,7 @@ function reloadPagePopup(quietly)
 window.moveItemTimer = null;
 function moveItem(event, itemId, newContainerKind, newContainerId)
 {
-    ajaxAction("/ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode, event, function(){
+    ajaxAction("/ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode+"&char="+window.characterOverride, event, function(){
         // Clear any previously set timer before setting a fresh one
     	if(window.moveItemTimer != null)
     		window.clearTimeout(window.moveItemTimer);
@@ -1832,13 +1856,13 @@ function moveItem(event, itemId, newContainerKind, newContainerId)
 
 function loadInlineItemsAndCharacters()
 {
-	$("#inline-items").load("/odp/locationitemlist?ajax=true");	
-	$("#inline-characters").load("/odp/locationcharacterlist?ajax=true");	
+	$("#inline-items").load("/odp/locationitemlist?ajax=true&char="+window.characterOverride);	
+	$("#inline-characters").load("/odp/locationcharacterlist?ajax=true&char="+window.characterOverride);	
 }
 
 function loadInlineCollectables()
 {
-	$("#collectables-area").load("ajax_collectables.jsp?ajax=true");	
+	$("#collectables-area").load("ajax_collectables.jsp?ajax=true&char="+window.characterOverride);	
 }
 
 function inventory()
@@ -1953,7 +1977,7 @@ function resendVerificationEmail()
 {
 	confirmPopup("Resend verification email", "Are you sure you need to resend the verification email? Be sure to check your spam box if you don't seem to be receiving it!", function(){
 		enforceSingleAction();
-		location.href = "/ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode;
+		location.href = "/ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	});
 	
 }
@@ -1962,7 +1986,7 @@ function changeEmailAddress(oldEmail)
 {
 	promptPopup("Change email", "What email address would you like to use for your account?", oldEmail, function(value){
 		enforceSingleAction();
-		location.href = "/ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value)+"&v="+window.verifyCode;
+		location.href = "/ServletUserControl?type=changeEmailAddress&email="+encodeURIComponent(value)+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	});
 }
 
@@ -1982,7 +2006,7 @@ function orderItemCustomization(itemId, orderTypeId, requiredDetails)
 	confirmPopup("Are you sure?", "This will send an email to a content developer notifying them that you'd like to customize an item.<br>You will be asked to provide some details in the next popup.", function(){
 		promptPopup("Customization Details", requiredDetails, "", function(value){
 			enforceSingleAction();
-			location.href="/ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+window.verifyCode+"&requiredDetails="+encodeURIComponent(value);
+			location.href="/ServletUserControl?type=customItemOrder&itemId="+itemId+"&orderTypeId="+orderTypeId+"&v="+window.verifyCode+"&char="+window.characterOverride+"&requiredDetails="+encodeURIComponent(value);
 		});
 	});
 }
@@ -2050,7 +2074,7 @@ function leaveParty()
 {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
 		enforceSingleAction();
-		location.href = "/ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode;
+		location.href = "/ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	});
 }
 
@@ -2066,37 +2090,37 @@ function enforceSingleAction()
 function combatAttackWithLeftHand()
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function combatAttackWithRightHand()
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function combatEscape()
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=escape"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=escape"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function combatAllowCharacterIn()
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function storeDisabled()
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function storeEnabled()
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 ////////////////////////////////////////////////////////
@@ -2130,19 +2154,19 @@ function toggleHideUserActivity(eventObject)
 function campsiteDefend()
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=defend"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=defend"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function leaveAndForgetCombatSite(pathId)
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function forgetCombatSite(locationId)
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function groupAcceptJoinGroupApplication(eventObject, characterId)
@@ -2165,7 +2189,7 @@ function groupMemberKick(eventObject, characterId, characterName)
 function groupMemberKickCancel(characterId)
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function groupRequestJoin(eventObject, groupId)
@@ -2214,31 +2238,31 @@ function groupMergeCancelRequest(eventObject)
 function tradeRemoveItem(itemId)
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function tradeCancel()
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function tradeReady(version)
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function tradeAddItem(itemId)
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function partyJoin(characterId)
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function tradeStartTradeNew(eventObject,characterId)
@@ -2325,7 +2349,7 @@ function tradeAddAllItemsNew(eventObject)
 function duelRequest(characterId)
 {
 	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode;
+	location.href = "/ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode+"&char="+window.characterOverride;
 }
 
 function viewManageStore()
@@ -2459,7 +2483,7 @@ function viewQuest(keyString)
 {
 	createQuestWindow("<div id='quest-id-"+keyString+"'><div style='text-align:center'><img src='/javascript/images/wait.gif' border=0/></div></div>");
 	
-	$("#quest-id-"+keyString).load("/odp/quest?key="+keyString);
+	$("#quest-id-"+keyString).load("/odp/quest?key="+keyString+"&char="+window.characterOverride);
 }
 
 function createQuestWindow(html) 
@@ -2920,7 +2944,7 @@ function viewCharacterSwitcher()
 			"	<div id='characterswitcher'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>" +
 			"</div>" +
 			"<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
-	$("#characterswitcher").load("/odp/characterswitcher");
+	$("#characterswitcher").load("/odp/characterswitcher?char="+window.characterOverride);
 }
 
 function createNewCharacter(event)
@@ -2975,7 +2999,7 @@ function storeBuyOrderExecute(event, buyOrderId, itemId)
 					"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
 					"	<h4>Item picker</h4>" +
 					"	<div id='buyordercompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>");
-			$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId);
+			$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId+"&char="+window.characterOverride);
 		});
 	});
 }
@@ -2996,7 +3020,7 @@ function storeBuyOrderExecuteAll(event, buyOrderId)
 					"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
 					"	<h4>Item picker</h4>" +
 					"	<div id='buyordercompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>");
-			$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId);
+			$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId+"&char="+window.characterOverride);
 		});
 	});
 }
@@ -3010,7 +3034,7 @@ function viewBuyOrderOptions(event, buyOrderId)
 			"	<div id='buyordercompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>" +
 			"</div>" +
 			"<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
-	$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId);
+	$("#buyordercompatibleitemslist").load("/odp/buyordercompatibleitemslist?buyOrderId="+buyOrderId+"&char="+window.characterOverride);
 }
 
 function storeDeleteBuyOrder(event, buyOrderId)
@@ -3328,6 +3352,9 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	else
 		parameters.v = verifyCode;
 	
+	if (window.characterOverride!=null && window.characterOverride.length>10)
+		parameters.char = window.characterOverride;
+	
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "/cmd?cmd="+commandName;
 	
@@ -3565,6 +3592,9 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		parameters = {"v":verifyCode};
 	else
 		parameters.v = verifyCode;
+	
+	if (window.characterOverride!=null && window.characterOverride.length>10)
+		parameters.char = window.characterOverride;
 	
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "/longoperation?cmd="+commandName;
@@ -4176,7 +4206,7 @@ function updateTerritory()
 {
 	var territoryView = $("#territoryView");
 	territoryView.html("<img src='/javascript/images/wait.gif' border=0/>"+territoryView.html());
-	territoryView.load("ajax_territoryview.jsp");
+	territoryView.load("ajax_territoryview.jsp?char="+window.characterOverride);
 }
 
 

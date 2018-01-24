@@ -86,6 +86,7 @@ public class CharacterSwitcherController extends PageController {
 				data.put("html", GameUtils.renderCharacterWidget(pool, request, db, c, user, true));
 			data.put("id", c.getKey().getId());
 			data.put("name", c.getProperty("name"));
+			data.put("urlSafeKey", c.getUrlSafeKey());
 
 		}
 		
