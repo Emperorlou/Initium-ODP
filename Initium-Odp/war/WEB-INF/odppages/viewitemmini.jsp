@@ -20,7 +20,7 @@
 		<div>
 			<p>${item.itemSlot}</p>
 			<div class='item-popup-stats'>
-				<c:if test="${item.strReq != null}"><div name='strengthRequirement' class='item-popup-field' title='This is the strength the wearer is required to have in order to equip this item.'>Strength requirement: <div class='main-item-subnote'>${item.strReq}</div></div><br/><br/></c:if>
+				<c:if test="${item.strReq != null}"><div name='strengthRequirement' class='item-popup-field' title='This is the strength the wearer is required to have in order to equip this item.'>Strength requirement: <div class='main-item-subnote'>${item.strReq}</div></div><br/></c:if>
 				<c:if test="${item.dexpen != null}"><div name='dexterityPenalty' class='item-popup-field' title='This is the percentage that the wearer`s dexterity will be reduced when making dexterity based rolls. Dexterity penalties stack.'>Dexterity penalty: <div class='main-item-subnote'>${item.dexpen}%</div></div><br/></c:if>
 				<c:if test="${item.strmod != null}"><div name='strengthModifier' class='item-popup-field' title='This is the percentage that the wearer`s strength will be modified when making strength based rolls. Strength modifiers stack.'>Strength modifier: <div class='main-item-subnote'>${item.strmod}%</div></div><br/></c:if>
 				<c:if test="${item.intmod != null}"><div name='intelligenceModifier' class='item-popup-field' title='This is the percentage that the wearer`s intelligence will be modified when making intelligence based rolls. Intelligence modifiers stack.'>Intelligence modifier: <div class='main-item-subnote'>${item.intmod}%</div></div><br/></c:if>

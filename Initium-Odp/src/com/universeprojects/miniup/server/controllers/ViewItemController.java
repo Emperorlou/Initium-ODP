@@ -269,13 +269,15 @@ public class ViewItemController extends PageController {
 		
 		itemMap.put("itemSlot", itemSlot);
 
+		boolean requirements = false;
 		field = item.getProperty("strengthRequirement");
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
+			requirements=true;
+			
 			itemMap.put("strReq", GameUtils.formatNumber(field));
 		}
 		
-		boolean requirements = false;
 		field = item.getProperty("dexterityPenalty");
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
