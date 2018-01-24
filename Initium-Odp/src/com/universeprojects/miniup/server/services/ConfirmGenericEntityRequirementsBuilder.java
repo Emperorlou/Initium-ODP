@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.services;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.json.shared.JSONObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
-import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
 
 public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<GenericEntityRequirementResult>
 {
@@ -142,13 +140,5 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 	protected String getPagePopupTitle()
 	{
 		return "Tools/materials to use";
-	}
-
-	
-	public class GenericEntityRequirementResult implements Serializable
-	{
-		private static final long serialVersionUID = 5635978106621359645L;
-		public Map<String,List<Key>> slots = new HashMap<>();
-		public Integer repetitionCount = null; 
 	}
 }

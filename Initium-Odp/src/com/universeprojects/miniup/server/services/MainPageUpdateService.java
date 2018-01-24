@@ -1279,6 +1279,14 @@ public class MainPageUpdateService extends Service
 				{
 					pool.addToQueue((Key)partyCharacter.getProperty("userKey"));
 				}
+				Collections.sort(party, new Comparator<CachedEntity>(){
+					@Override
+					public int compare(CachedEntity c1, CachedEntity c2){
+						String partyCharacter1 = (String)c1.getProperty("name");
+						String partyCharacter2 = (String)c2.getProperty("name");
+						return partyCharacter1.compareTo(partyCharacter2);
+					}
+				});
 				pool.loadEntities();
 
 				for(CachedEntity partyCharacter:party)
@@ -1459,7 +1467,6 @@ public class MainPageUpdateService extends Service
 		Double monsterCount = db.getMonsterCountForLocation(ds, location);
 		Double maxMonsterCount = (Double)location.getProperty("maxMonsterCount");
 		
-		
 		if (monsterCount!=null && maxMonsterCount!=null)
 		{
 			if ("CampSite".equals(location.getProperty("type")))
@@ -1470,11 +1477,11 @@ public class MainPageUpdateService extends Service
 					html.append("<p>Camp integrity: <span class='main-item-subnote'>"+GameUtils.formatPercent(1d-monsterPercent)+"</span></p>");
 					
 				}
-				
 			}
 			else
 			{
-				if (maxMonsterCount>10)
+				if (maxMonsterCount>10 && 
+						GameUtils.booleanEquals(location.getProperty("hideMonsterActivity"), true)==false)
 				{
 					if (monsterCount<1) monsterCount = 0d;
 					double monsterPercent = monsterCount/maxMonsterCount;

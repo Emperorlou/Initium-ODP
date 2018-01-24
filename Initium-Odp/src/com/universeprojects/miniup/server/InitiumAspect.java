@@ -1,12 +1,16 @@
 package com.universeprojects.miniup.server;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.gefcommon.shared.elements.GameAspect;
+import com.universeprojects.gefcommon.shared.elements.GameObject;
 import com.universeprojects.miniup.server.commands.framework.Command;
 
-public abstract class InitiumAspect
+public abstract class InitiumAspect implements GameAspect<Key>
 {
 	final protected ODPDBAccess db;
 	final protected InitiumObject object;
@@ -30,19 +34,35 @@ public abstract class InitiumAspect
 		
 	}
 
+	@Override
 	public void setProperty(String fieldName, Object value)
 	{
 		entity.setProperty(new StringBuilder().append(aspectId).append(":").append(fieldName).toString(), value);
 	}
 	
+	@Override
 	public Object getProperty(String fieldName)
 	{
 		return entity.getProperty(new StringBuilder().append(aspectId).append(":").append(fieldName).toString());
 	}
 
+	@Override
+	public String getName()
+	{
+		return aspectId;
+	}
 	
+	@Override
+	public Collection<String> getPropertyNames()
+	{
+		return db.getFieldNamesForAspect(aspectId);
+	}	
 	
-	
+	@Override
+	public GameObject<Key> getGameObject()
+	{
+		return object;
+	}
 	
 	
 	

@@ -2,9 +2,11 @@ package com.universeprojects.miniup.server.scripting.events;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import com.google.appengine.api.datastore.Key;
@@ -182,6 +184,41 @@ public abstract class ScriptEvent extends OperationBase
 	public boolean updatesGameState()
 	{
 		return jsResponse == JavascriptResponse.FullPageRefresh || reloadWidgets;
+	}
+	
+	private Map<Key, Set<String>> dbGameUpdates = new HashMap<Key, Set<String>>();
+	public void sendGameUpdate(Key entityKey, String updateMethod)
+	{
+		Set<String> curUpdates = dbGameUpdates.get(entityKey);
+		if(curUpdates == null) 
+		{
+			dbGameUpdates.put(entityKey, new HashSet<String>());
+			curUpdates = dbGameUpdates.get(entityKey);
+		}
+		curUpdates.add(updateMethod);
+	}
+	
+	public boolean removeGameUpdate(Key entityKey, String updateMethod)
+	{
+		Set<String> curUpdates = dbGameUpdates.get(entityKey);
+		if(curUpdates == null) 
+		{
+			dbGameUpdates.put(entityKey, new HashSet<String>());
+			curUpdates = dbGameUpdates.get(entityKey);
+		}		
+		return curUpdates.remove(updateMethod);
+	}
+	
+	public String[] getGameUpdatesFor(Key entityKey)
+	{
+		if(dbGameUpdates.containsKey(entityKey)==false) return new String[0];
+		Set<String> curUpdates = dbGameUpdates.get(entityKey);
+		return curUpdates.toArray(new String[curUpdates.size()]);
+	}
+	
+	public Map<Key, Set<String>> getGameUpdates()
+	{
+		return dbGameUpdates;
 	}
 	
 	/**

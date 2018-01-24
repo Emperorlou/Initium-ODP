@@ -1745,6 +1745,24 @@ public class ODPDBAccess
 	{
 		Double str = getDoubleBuffableProperty(character, "strength");
 
+		// Get all strength modifying armors and include that in the
+		// calculation...
+		for (String slot : EQUIPMENT_SLOTS)
+		{
+			if (character.getProperty("equipment" + slot) != null)
+			{
+				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
+				if (equipment == null) continue;
+				Long modifier = (Long) equipment.getProperty("strengthModifier");
+				if (modifier != null)
+				{
+					str += (str * (modifier.doubleValue() / 100d));
+				}
+			}
+		}
+
+		if (str < 2) str = 2d;
+				
 		return str;
 	}
 	
@@ -1752,6 +1770,23 @@ public class ODPDBAccess
 	{
 		Double val = getDoubleBuffableProperty(character, "intelligence");
 		
+		// Get all intelligence modifying armors and include that in the
+		// calculation...
+		for (String slot : EQUIPMENT_SLOTS)
+		{
+			if (character.getProperty("equipment" + slot) != null)
+			{
+				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
+				if (equipment == null) continue;
+				Long modifier = (Long) equipment.getProperty("intelligenceModifier");
+				if (modifier != null)
+				{
+					val += (val * (modifier.doubleValue() / 100d));
+				}
+			}
+		}
+
+		if (val < 2) val = 2d;
 		
 		return val;
 	}
@@ -4590,16 +4625,23 @@ public class ODPDBAccess
 					// If the character was a party leader, re-assign leader to another player (a LIVE one hopefully)
 					if ("TRUE".equals(characterToDie.getProperty("partyLeader")))
 					{
+						Double maxDex = 0.0d;
+						CachedEntity newLeader = null;
 						List<CachedEntity> partyMembers = getParty(db, characterToDie);
 						if (partyMembers!=null)
 							for(CachedEntity member:partyMembers)
-								if (GameUtils.isPlayerIncapacitated(member)==false)
+								if (GameUtils.isPlayerIncapacitated(member)==false && (Double)member.getProperty("dexterity") > maxDex)
 								{
-									characterToDie.setProperty("partyLeader", "FALSE");
-									member.setProperty("partyLeader", "TRUE");
-									db.put(member);
-									break;
+									maxDex = (Double)member.getProperty("dexterity");
+									newLeader = member;
 								}
+						
+						if(newLeader != null)
+						{
+							characterToDie.setProperty("partyLeader", "FALSE");
+							newLeader.setProperty("partyLeader", "TRUE");
+							db.put(newLeader);
+						}
 					}
 					
 					
@@ -4964,8 +5006,11 @@ public class ODPDBAccess
 		if (getParty(ds, character)!=null)
 			throw new UserErrorMessage("You cannot join another party until you leave the one you're in already. <a onclick='leaveParty()'>Click here</a> to leave your current party.");
 		
+		// Get party first. If single member in party, clears out party code, which
+		// allows us to create party with new code.
+		List<CachedEntity> currentParty = getParty(ds, partiedCharacter);
 		String partyCode = (String)partiedCharacter.getProperty("partyCode");
-		if (partyCode==null || partyCode.equals(""))
+		if (partyCode==null || partyCode.equals("") || currentParty == null)
 		{
 			if ("TRUE".equals(partiedCharacter.getProperty("partyJoinsAllowed"))==false)
 				throw new UserErrorMessage("This user is not accepting party joins at this time.");
@@ -4980,7 +5025,6 @@ public class ODPDBAccess
 		}
 		else
 		{
-			List<CachedEntity> currentParty = getParty(ds, partiedCharacter);
 			CachedEntity leader = null;
 			for(CachedEntity e:currentParty)
 				if ("TRUE".equals(e.getProperty("partyLeader")))
@@ -6583,26 +6627,25 @@ public class ODPDBAccess
 		
 	}
 	
-	public CachedEntity combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
+	public void combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
 	{
-		if (stackedItem.getProperty("quantity")==null) return stackedItem;
+		if (stackedItem.getProperty("quantity")==null) return;
 		
 		QueryHelper q = new QueryHelper(ds);
-		List<CachedEntity> inventory = q.getFilteredList("Item", "containerKey", characterKey);
+		List<CachedEntity> inventory = q.getFilteredList("Item", "containerKey", characterKey, "name", stackedItem.getProperty("name"));
 		for(CachedEntity item:inventory)
 		{
-			if (CommandItemsStackMerge.canStack(stackedItem, item))
+			if (item!=null && CommandItemsStackMerge.canStack(stackedItem, item))
 			{
 				Long quantity = (Long)item.getProperty("quantity");
 				quantity+=(Long)stackedItem.getProperty("quantity");
-				item.setProperty("quantity", quantity);
-				if (stackedItem.getKey().isComplete())
-					ds.delete(stackedItem);
-				ds.put(item);
-				return item;
+				
+				stackedItem.setProperty("quantity", quantity);
+				if (item.getKey().isComplete())
+					ds.delete(item);
+				ds.put(stackedItem);
 			}
 		}		
-		return stackedItem;
 	}
 	
 	public void doDeleteCharacter(Key key)
@@ -6768,4 +6811,20 @@ public class ODPDBAccess
 		return null;
 	}
 	
+	public boolean isLocalhost()
+	{
+		return getRequest().getServerName().contains("localhost");
+	}
+
+	public Collection<String> getFieldNamesForEntity(String kind)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Collection<String> getFieldNamesForAspect(String aspectName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

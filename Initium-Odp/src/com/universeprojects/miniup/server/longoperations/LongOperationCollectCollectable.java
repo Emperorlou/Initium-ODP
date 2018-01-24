@@ -14,7 +14,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder;
-import com.universeprojects.miniup.server.services.ConfirmGenericEntityRequirementsBuilder.GenericEntityRequirementResult;
+import com.universeprojects.miniup.server.services.GenericEntityRequirementResult;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
@@ -48,6 +48,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 		
 		String collectableIdStr = parameters.get("collectableId");
 		CachedEntity collectable = db.getEntity("Collectable", Long.parseLong(collectableIdStr));
+		if (collectable==null) throw new UserErrorMessage("This collectable no longer exists.");
 		CachedEntity collectableDef = db.getEntity((Key)collectable.getProperty("_definitionKey"));
 
 		setDataProperty("collectableId", collectable.getKey().getId());
@@ -177,7 +178,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 			item.setProperty("containerKey", location.getKey());
 		}
 		
-		item = db.combineStackedItemWithFirstStack(item, db.getCurrentCharacter().getKey());
+		db.combineStackedItemWithFirstStack(item, db.getCurrentCharacter().getKey());
 		ds.put(item);
 		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);

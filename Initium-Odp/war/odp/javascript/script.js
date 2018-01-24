@@ -132,6 +132,8 @@ $(window).ready(function(e){
 	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
 	$(window).focus(function(){
 		flagReadMessages();
+		
+		updateBannerWeatherSystem();
 	});
 	
 });
@@ -2035,6 +2037,10 @@ function joinParty(eventObject, partyCode) {
 	doCommand(eventObject, "PartyJoin", {"inputType":"partyCode","partyCode": partyCode});
 }
 
+function joinPartyCharacter(eventObject, characterId) {
+	doCommand(eventObject, "PartyJoin", {"inputType":"characterId","characterId":characterId});
+}
+
 function joinPartyCharacterName(eventObject, characterName) {
 	doCommand(eventObject, "PartyJoin", {"inputType":"characterName","characterName":characterName});
 }
@@ -3725,7 +3731,7 @@ function setBannerImage(url)
 		window.previousBannerUrl = bannerUrl;
 	
 	bannerUrl = url;
-	updateDayNightCycle(true);
+	updateBannerWeatherSystem();
 }
 
 function setBannerOverlayText(title, text, noCancel)
@@ -3792,7 +3798,7 @@ function doExperiment(event)
 	if (checkedIds.length==0) checkedIds = null;
 	
 	showBannerLoadingIcon();
-	longOperation(event, "ExperimentNew", {itemIds:checkedIds}, 
+	longOperation(event, "InventionExperimentNew", {itemIds:checkedIds}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
@@ -3838,7 +3844,8 @@ function repeatConfirmRequirementsButton(repsUniqueId)
 function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId)
 {
 	showBannerLoadingIcon();
-	longOperation(event, "BeginPrototype", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
+	//BeginPrototype
+	longOperation(event, "InventionPrototypeNew", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
@@ -3876,7 +3883,8 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 	closeAllTooltips();
 	
 	showBannerLoadingIcon();
-	longOperation(event, "DoSkillConstructItem", {skillName:skillName, skillId:skillId,repsUniqueId:repsUniqueId}, 
+	//DoSkillConstructItem
+	longOperation(event, "InventionConstructItemSkillNew", {skillName:skillName, constructItemSkillId:skillId,repsUniqueId:repsUniqueId}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)

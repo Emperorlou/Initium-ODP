@@ -63,7 +63,10 @@ public class LongOperationCampDefend extends LongOperation
 		if(foundMonster)
 			mpus.updateFullPage_shortcut();
 		else
+		{
+			mpus.updateInBannerOverlayLinks();
 			mpus.updateMonsterCountPanel();
+		}
 		
 		return description;
 	}

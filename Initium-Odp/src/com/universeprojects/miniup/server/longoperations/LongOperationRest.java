@@ -38,7 +38,16 @@ public class LongOperationRest extends LongOperation {
 		
 		Double hitpointsToRegain = (Double)db.getCurrentCharacter().getProperty("maxHitpoints")-(Double)db.getCurrentCharacter().getProperty("hitpoints");
 		if (hitpointsToRegain<=0)
-			throw new UserErrorMessage("You don't need to rest, you're already at full health! NOW GET OUT THERE AND KICK SOME ASS!");
+		{
+			if("CampSite".equals(locationType))
+				throw new UserErrorMessage("You don't need to rest, you're already at full health! NOW GET OUT THERE AND KICK SOME ASS!");
+			
+			for(CachedEntity buff:db.getBuffsFor(db.getCurrentCharacterKey()))
+			{
+				if("Well Rested".equals(buff.getProperty("name")))
+					throw new UserErrorMessage("You don't need to rest, you're already at full health and well rested! NOW GET OUT THERE AND KICK SOME ASS!");
+			}
+		}
 		
 		// Check, if it's night time and we're outside, that we have a fire going
 //		if (GameUtils.getDayNight()>0.9 && CommonChecks.checkLocationIsOutside(location))
@@ -69,10 +78,10 @@ public class LongOperationRest extends LongOperation {
 //				throw new UserErrorMessage("It's night time but there is no campfire. You cannot rest at night unless there is an active fire going.");
 //		}
 		
+		int waitTime = 5 + Math.max(0, hitpointsToRegain.intValue());
+		setDataProperty("description", "It will take "+waitTime+" seconds to regain your health.");
 		
-		setDataProperty("description", "It will take "+hitpointsToRegain.intValue()+" seconds to regain your health.");
-		
-		return hitpointsToRegain.intValue();
+		return waitTime;
 	}
 
 	@Override
@@ -85,8 +94,7 @@ public class LongOperationRest extends LongOperation {
 		
 		// If the character is resting in a "nice" location, then give the well rested buff
 		// ie. If this is a player house, then it should be a RestSite and have an owner.
-		if ("RestSite".equals(location.getProperty("type")) &&
-				location.getProperty("ownerKey")!=null)
+		if (CommonChecks.checkLocationIsGoodRestSite(location))
 		{
 			db.awardBuff_WellRested(ds, db.getCurrentCharacter());
 		}

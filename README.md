@@ -62,10 +62,14 @@ git remote add upstream https://github.com/Emperorlou/initium-odp.git
 
 That's it.
 
-## Get the CachedDatastore repo as well
+## Get the CachedDatastore and GEFCommon repo as well
 https://github.com/Emperorlou/Cached-Datastore
 
 You only need a clone of this repo, don't create a fork. No changes should be made to this repo unless instructed by another dev (specifically the creator).
+
+https://bitbucket.org/universeprojects/gefcommon.git
+
+Currently the GEFCommon project doesn't have an eclipse project file associated with it. This project is VERY simple though as it only consists of some interface classes and has no dependencies. You should be able to easily create a standard java project with these files.
 
 ## Import CachedDatastore AND Initium-ODP as a project into your eclipse
 These directions assume a fresh install. 

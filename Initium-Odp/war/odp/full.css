@@ -185,3 +185,12 @@ body
 	right:0px;
 	bottom:0px;
 }
+
+.banner1
+{
+	-webkit-box-shadow: initial;
+	-moz-box-shadow: initial;
+	-o-box-shadow: initial;	
+	box-shadow: initial;
+	
+}

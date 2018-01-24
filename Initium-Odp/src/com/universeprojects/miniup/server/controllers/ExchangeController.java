@@ -102,6 +102,7 @@ public class ExchangeController extends PageController {
 	            continue;
 	        }
 	        
+	        
 			// If the character isn't currently vending, then don't sell
 			if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(sellingCharacter.getProperty("mode"))==false)
 			{
@@ -112,7 +113,12 @@ public class ExchangeController extends PageController {
 	        
 	        
 	        // These are only used for the sorting method db.sortSaleItemList()
-	        item.setProperty("store-dogecoins", saleItem.getProperty("dogecoins"));
+		Double storeSale = (Double)sellingCharacter.getProperty("storeSale");
+		if(storeSale==null) storeSale = 100d;
+		Long coins = (Long)saleItem.getProperty("dogecoins");
+		coins = Long.valueOf(Math.round(coins.doubleValue()*((storeSale.doubleValue())/100d)));    
+		    
+	        item.setProperty("store-dogecoins", coins);
 	        item.setProperty("store-status", saleItem.getProperty("status"));
 	        item.setProperty("store-saleItemKey", saleItem.getKey());
 	        
@@ -152,11 +158,17 @@ public class ExchangeController extends PageController {
 	    for(int i = 0; i<buyOrdersPT.size(); i++)
 	    {
 	    	CachedEntity sellingCharacter = pool.get((Key)buyOrdersPT.get(i).getProperty("characterKey"));	
-	        
+	    	Long sellingCharacterGold = (Long)sellingCharacter.getProperty("dogecoins");
+	    	
 	    	// If the character died and his buy order is still around, delete the buy order
 	    	if (sellingCharacter==null)
 	    	{
 	    		ds.delete(buyOrdersPT.get(i));
+	    		continue;
+	    	}
+	    	
+	    	if (sellingCharacterGold<(Long)buyOrdersPT.get(i).getProperty("value"))
+	    	{
 	    		continue;
 	    	}
 	    	

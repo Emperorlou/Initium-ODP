@@ -182,7 +182,6 @@ function updateDayNightCycle(forceRefresh)
 		if (lightning>0)
 		{
 			var rainGif = "hd-light-rain1.gif";
-			if (smallScreen) rainGif = "light-rain1.gif";
 			var bg=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 			bg+=	"rgba(230, 230, 230, "+lightning+")";
@@ -315,8 +314,10 @@ function updateBannerWeatherSystem()
 {
 	if (isOutside=="TRUE")
 	{
-		if (bannerWeatherUpdateTimerId==null)
-			bannerWeatherUpdateTimerId = setInterval(updateDayNightCycle, 50);
+		if (bannerWeatherUpdateTimerId!=null)
+			clearInterval(bannerWeatherUpdateTimerId);
+		
+		bannerWeatherUpdateTimerId = setInterval(updateDayNightCycle, 100);
 		
 		updateDayNightCycle(true);
 	}

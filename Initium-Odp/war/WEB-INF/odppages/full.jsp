@@ -33,7 +33,7 @@
 <script type="text/javascript" src="https://code.createjs.com/preloadjs-0.6.2.min.js"></script>
 <script type="text/javascript" src="https://code.createjs.com/soundjs-0.6.2.min.js"></script>
 
-<script type="text/javascript" src="javascript/modernizr.js"></script>
+<script type="text/javascript" src="/javascript/modernizr.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" onload="if (window.module!=null) window.$ = window.jQuery = module.exports;"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
@@ -60,7 +60,7 @@
 
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css">
-<script src="javascript/rangeslider/rangeslider.min.js"></script>
+<script src="/javascript/rangeslider/rangeslider.min.js"></script>
 
 <script src="/odp/javascript/openseadragon/openseadragon.min.js"></script>
 <script src="/odp/javascript/map.js?t=4"></script>
@@ -239,7 +239,7 @@
 
 
 
-<script type="text/javascript" src="/odp/javascript/banner-weather.js?v=9"></script>
+<script type="text/javascript" src="/odp/javascript/banner-weather.js?v=11"></script>
 <script type="text/javascript" src="/odp/javascript/soundeffects.js?v=13"></script>
 
 
@@ -353,7 +353,7 @@ on our slack channel!
 http://github.com/Emperorlou/Initium-ODP 
 
                                            -->
-<body class="   pace-done pace-done" style="
+<body class="banner1" style="
     background-image: url(https://initium-resources.appspot.com/images/fullscreen-banners/aera1.jpg);
     background-size: cover;
     background-position: center center;
@@ -391,4 +391,9 @@ http://github.com/Emperorlou/Initium-ODP
 
 	<div id='global-navigation-map'>${globalNavigationMap}</div>	
 
-</body></html>
+	<script id='ajaxJs' type='text/javascript'>
+	${bannerJs}
+	</script>
+
+</body>
+</html>

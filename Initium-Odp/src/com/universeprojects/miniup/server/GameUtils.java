@@ -1088,6 +1088,20 @@ public class GameUtils
 			requirements=true;
 			sb.append("			<div " + (isComparisonItem ? "" : "name='dexterityPenalty' ") + "class='item-popup-field' title='This is the percentage that the wearer`s dexterity will be reduced when making dexterity based rolls. Dexterity penalties stack.'>Dexterity penalty: <div class='main-item-subnote'>"+field+"%</div></div>\r\n");
 		}
+		
+		field = item.getProperty("strengthModifier");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+			sb.append("			<div " + (isComparisonItem ? "" : "name='strengthModifier' ") + "class='item-popup-field' title='This is the percentage that the wearer`s strength will be modified when making strength based rolls. Strength modifiers stack.'>Strength modifier: <div class='main-item-subnote'>"+field+"%</div></div>\r\n");
+		}
+		
+		field = item.getProperty("intelligenceModifier");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+			sb.append("			<div " + (isComparisonItem ? "" : "name='intelligenceModifier' ") + "class='item-popup-field' title='This is the percentage that the wearer`s intelligence will be reduced when making intelligence based rolls. Intelligence modifiers stack.'>Intelligence modifier: <div class='main-item-subnote'>"+field+"%</div></div>\r\n");
+		}
 
 		field = item.getProperty("strengthRequirement");
 		if (field!=null && field.toString().trim().equals("")==false)

@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.gefcommon.shared.elements.GameAspect;
+import com.universeprojects.gefcommon.shared.elements.GameObject;
 
-public class InitiumObject
+public class InitiumObject implements GameObject<Key>
 {
 	final protected ODPDBAccess db;
 	final protected CachedEntity entity;
@@ -103,4 +106,93 @@ public class InitiumObject
 		return aspects.get(aspectId);
 	}
 
+	@Override
+	public String getSchemaKind()
+	{
+		return entity.getKind();
+	}
+
+	@Override
+	public Key getKey()
+	{
+		return entity.getKey();
+	}
+
+	@Override
+	public String getName()
+	{
+		return (String)entity.getProperty("name");
+	}
+
+	@Override
+	public String getItemClass()
+	{
+		return (String)entity.getProperty("itemClass");
+	}
+
+	@Override
+	public Long getQuantity()
+	{
+		return (Long)entity.getProperty("quantity");
+	}
+
+	@Override
+	public void setQuantity(Long value)
+	{
+		entity.setProperty("quantity", value);
+	}
+
+	@Override
+	public Long getDurability()
+	{
+		return (Long)entity.getProperty("durability");
+	}
+
+	@Override
+	public void setDurability(Long value)
+	{
+		entity.setProperty("durability", value);
+	}
+
+	@Override
+	public Object getProperty(String fieldName)
+	{
+		return entity.getProperty(fieldName);
+	}
+
+	@Override
+	public void setProperty(String fieldName, Object value)
+	{
+		entity.setProperty(fieldName, value);
+	}
+
+	@Override
+	public Collection<String> getPropertyNames()
+	{
+		return db.getFieldNamesForEntity(entity.getKind());
+	}
+
+	@Override
+	public Collection<String> getAspectNames()
+	{
+		return (Collection<String>)entity.getProperty("_aspects");
+	}
+
+	@Override
+	public GameAspect<Key> getAspect(String aspectName)
+	{
+		if (aspects==null) return null;
+		return aspects.get(aspectName);
+	}
+
+	@Override
+	public boolean hasAspect(String aspectName)
+	{
+		if (aspects!=null)
+			return aspects.containsKey(aspectName);
+		
+		return false;
+	}
+
+	
 }
