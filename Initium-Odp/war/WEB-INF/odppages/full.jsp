@@ -338,7 +338,7 @@ modifyMaxScreenWidth();
 
 </script>
 	<link rel="stylesheet" href="/odp/MiniUP.css?t=1"/>
-	<link rel="stylesheet" href="/odp/full.css"/>
+	<link rel="stylesheet" href="/odp/full.css?t=1"/>
 
 </head>
 
@@ -353,11 +353,10 @@ on our slack channel!
 http://github.com/Emperorlou/Initium-ODP 
 
                                            -->
-<body class="banner1" style="
-    background-image: url(https://initium-resources.appspot.com/images/fullscreen-banners/aera1.jpg);
-    background-size: cover;
-    background-position: center center;
-">
+<body>
+	<div  class="banner1">
+		<div class='banner1-rain-effect1'></div>
+	</div>
 
 	<div class='minimap-container'>
 		<div class='minimap-contents'>

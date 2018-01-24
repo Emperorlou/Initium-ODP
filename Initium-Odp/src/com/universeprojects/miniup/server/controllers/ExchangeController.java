@@ -157,8 +157,8 @@ public class ExchangeController extends PageController {
 	    
 	    for(int i = 0; i<buyOrdersPT.size(); i++)
 	    {
+	    	
 	    	CachedEntity sellingCharacter = pool.get((Key)buyOrdersPT.get(i).getProperty("characterKey"));	
-	    	Long sellingCharacterGold = (Long)sellingCharacter.getProperty("dogecoins");
 	    	
 	    	// If the character died and his buy order is still around, delete the buy order
 	    	if (sellingCharacter==null)
@@ -166,6 +166,8 @@ public class ExchangeController extends PageController {
 	    		ds.delete(buyOrdersPT.get(i));
 	    		continue;
 	    	}
+	    	
+	    	Long sellingCharacterGold = (Long)sellingCharacter.getProperty("dogecoins");
 	    	
 	    	if (sellingCharacterGold<(Long)buyOrdersPT.get(i).getProperty("value"))
 	    	{

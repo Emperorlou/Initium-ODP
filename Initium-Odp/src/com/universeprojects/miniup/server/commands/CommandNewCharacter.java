@@ -88,7 +88,7 @@ public class CommandNewCharacter extends Command
 		
 		CachedEntity character = db.newPlayerCharacter(null, auth, user, name, null);
 
-		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, null, this);
+		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, db.getEntity((Key)character.getProperty("locationKey")), this);
 		mpus.updateFullPage_shortcut();
 		
 //		if (isNewUser)

@@ -61,7 +61,7 @@
 <script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
 <script src='/odp/javascript/map.js?t=4'></script>
 
-<script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit"></script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit" async defer></script>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

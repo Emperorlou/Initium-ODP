@@ -38,7 +38,7 @@ function getWeather()
 	var hourProgression = (serverTime-behindHour)/3600000;
 	
 	var interpolationDelta = weatherDifference*hourProgression;
-	
+	return 1;
 	return behindHourWeather+interpolationDelta;
 }	
 
@@ -240,7 +240,6 @@ function updateDayNightCycle(forceRefresh)
 		else if (rainStrength>0.65)
 		{
 			var rainGif = "hd-light-rain1.gif";
-			if (smallScreen) rainGif = "light-rain1.gif";
 
 			var bg=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 

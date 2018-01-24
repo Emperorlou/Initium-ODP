@@ -188,9 +188,29 @@ body
 
 .banner1
 {
+	position:fixed;
+	left:0px;
+	right:0px;
+	top:0px;
+	bottom:0px;
 	-webkit-box-shadow: initial;
 	-moz-box-shadow: initial;
 	-o-box-shadow: initial;	
 	box-shadow: initial;
 	
+	background-size: cover;
+    background-position: center center;
 }
+
+.banner1-rain-effect1
+{
+	background: url(https://initium-resources.appspot.com/images/effects/hd-light-rain1.gif);
+	background-size: cover;
+    mix-blend-mode: screen;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+

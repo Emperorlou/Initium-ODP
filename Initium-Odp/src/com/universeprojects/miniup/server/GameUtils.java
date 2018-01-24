@@ -871,7 +871,7 @@ public class GameUtils
 		    	sb.append("minitip='");
 	    		if ("Weapon".equals((String)item.getProperty("itemType"))) {
 	    			String diceRoll = (String)item.getProperty("weaponDamage");
-	    			if (diceRoll == null) {
+	    			if (diceRoll == null || diceRoll.equals("")) {
 	    				diceRoll = "1d1";
 	    			} else {
 	    				diceRoll = diceRoll.substring(2);

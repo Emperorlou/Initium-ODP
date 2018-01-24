@@ -75,7 +75,7 @@ input[type='checkbox']
 		
 	</div>
 	
-	<center><p><a onclick='fullpageRefresh()' style='font-size:24px'>Apply Changes</a></p></center>
+	<center><p><a onclick='fullpageRefresh()' style='margin-top:50px; font-size:24px'>Apply Changes</a></p></center>
 	
 	<script type="text/javascript">
 		var checkboxIds = ["checkboxDisableMusic", 

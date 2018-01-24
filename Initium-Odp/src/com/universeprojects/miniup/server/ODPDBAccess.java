@@ -566,7 +566,7 @@ public class ODPDBAccess
 	 * Important: If a given CachedEntity cannot be found in the database, the return will
 	 * contain a null entry for that key's index.
 	 * 
-	 * @param key
+	 * @param owningEntityKey
 	 * @return
 	 */
 	public List<CachedEntity> getEntity(Key...keys)
@@ -5306,6 +5306,7 @@ public class ODPDBAccess
 		
 		for(CachedEntity item:inventory)
 		{
+			if (item==null) continue;
 			Long weight = getItemWeight(item);
 			
 			if (weight==0L)
@@ -5400,6 +5401,7 @@ public class ODPDBAccess
 
 	public Long getItemWeight(CachedEntity item)
 	{
+		if (item==null) return null;
 		Long itemQuantity = (Long)item.getProperty("quantity");
 		if (itemQuantity==null) itemQuantity = 1L;
 		Long itemWeight = (Long)item.getProperty("weight");
@@ -5788,7 +5790,7 @@ public class ODPDBAccess
 	 * 
 	 * @param ds
 	 * @param currentCharacter
-	 * @param key
+	 * @param owningEntityKey
 	 */
 	public void doDeleteCombatSite(CachedDatastoreService ds, CachedEntity playerCharacter, Key locationKey)
 	{
