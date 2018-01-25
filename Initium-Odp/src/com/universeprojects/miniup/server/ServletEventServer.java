@@ -66,7 +66,7 @@ public class ServletEventServer extends HttpServlet
 					if (userOrCharacter.getKind().equals("User"))
 					{
 						CachedEntity user = db.getEntity(userOrCharacter);
-						characterKey = (Key)user.getProperty("characterKey");
+						characterKey = db.getCurrentCharacterKey();
 					}
 					else
 						characterKey = userOrCharacter;
@@ -118,8 +118,8 @@ public class ServletEventServer extends HttpServlet
 					character = db.getEntity(accountKey);
 				else if (accountKey.getKind().equals("User"))
 				{
-					CachedEntity user = db.getEntity(accountKey);
-					character = db.getEntity((Key)user.getProperty("characterKey"));
+//					CachedEntity user = db.getEntity(accountKey);
+					character = db.getCurrentCharacter();
 				} else {
 					// accountId was invalid
 					break;

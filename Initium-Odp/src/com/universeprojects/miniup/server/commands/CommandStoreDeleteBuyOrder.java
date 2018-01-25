@@ -40,7 +40,7 @@ public class CommandStoreDeleteBuyOrder extends Command {
 			return;
 		
 		CachedEntity user = db.getCurrentUser();
-		Key characterKey = (Key) user.getProperty("characterKey");
+		Key characterKey = db.getCurrentCharacterKey();
 		
 		if (GameUtils.equals(characterKey, buyOrder.getProperty("characterKey"))==false)
 			throw new UserErrorMessage("The buy order this user is trying to delete does not belong to his character.");

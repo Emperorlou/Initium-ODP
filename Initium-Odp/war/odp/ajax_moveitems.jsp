@@ -13,41 +13,15 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.universeprojects.miniup.server.WebUtils"%>
 <%@page import="com.google.appengine.api.datastore.Key"%>
-<%@page import="com.universeprojects.miniup.server.GameFunctions"%>
 <%@page import="java.util.List"%>
-<%@page import="com.universeprojects.miniup.server.SecurityException"%>
-<%@page import="com.universeprojects.miniup.server.CommonEntities"%>
-<%@page import="com.universeprojects.miniup.server.ErrorMessage"%>
 <%@page import="com.universeprojects.miniup.server.JspSnippets"%>
 <%@page import="com.google.appengine.api.datastore.Entity"%>
 <%@page import="com.universeprojects.miniup.server.ODPDBAccess"%>
-<%@page import="com.universeprojects.miniup.server.Authenticator"%>
 <%
 	response.setHeader("Access-Control-Allow-Origin", "*");		// This is absolutely necessary for phonegap to work
 
-	Authenticator auth = null;
-	try
-	{
-		auth = Authenticator.getInstance(request, true);
-	}
-	catch(DDOSProtectionException e)
-	{
-		// Ignore this here
-	}
-
-	GameFunctions db = auth.getDB(request);
+	ODPDBAccess db = ODPDBAccess.getInstance(request);	
 	CachedDatastoreService ds = db.getDB();
-	try
-	{
-		auth.doSecurityChecks(request);
-	}
-	catch(SecurityException e)
-	{
-		JspSnippets.handleSecurityException_Ajax(e, request, response);
-		return;
-	}
-	
-	CommonEntities common = CommonEntities.getInstance(request);
 	
 	Key selfSideKey = null;
 	Key otherSideKey = null;
@@ -61,10 +35,10 @@
 	String preset = WebUtils.getStrParam(request, "preset");
 	if ("location".equals(preset))
 	{
-		selfSide = common.getCharacter();
-		otherSide = common.getLocation();
-		selfSideKey = common.getCharacter().getKey();
-		otherSideKey = common.getLocation().getKey();
+		selfSide = db.getCurrentCharacter();
+		otherSide = db.getEntity((Key)selfSide.getProperty("locationKey"));
+		selfSideKey = selfSide.getKey();
+		otherSideKey = otherSide.getKey();
 	}
 	else
 	{
@@ -79,9 +53,9 @@
 	
 	ContainerService cs = new ContainerService(db);	
 	
-	if (cs.checkContainerAccessAllowed(common.getCharacter(), selfSide)==false)
+	if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), selfSide)==false)
 		throw new RuntimeException("Hack attempt might have happened.");
-	if (cs.checkContainerAccessAllowed(common.getCharacter(), otherSide)==false)
+	if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), otherSide)==false)
 		throw new RuntimeException("Hack attempt might have happened.");
 	
 
@@ -202,7 +176,7 @@
 			}
 			else if (selfSide.getKey().getKind().equals("Character"))
 			{
-				out.println(GameUtils.renderCharacterWidget(request, db, selfSide, common.getUser(), true)); 
+				out.println(GameUtils.renderCharacterWidget(request, db, selfSide, db.getCurrentUser(), true)); 
 			}
 			else if (selfSide.getKey().getKind().equals("Item"))
 			{
@@ -257,16 +231,16 @@
 			{
 
 				// In our own character inventory, we don't want to display items that are currently equipped
-				if (GameUtils.equals(selfSide.getKey(), common.getCharacter().getKey()))
+				if (GameUtils.equals(selfSide.getKey(), db.getCurrentCharacterKey()))
 				{
-					if (db.checkCharacterHasItemEquipped(common.getCharacter(), item.getKey()))
+					if (db.checkCharacterHasItemEquipped(db.getCurrentCharacter(), item.getKey()))
 						continue;
 				}
 				
 				boolean hasRequiredStrength = true;
-				if (common.getCharacter()!=null)
+				if (db.getCurrentCharacter()!=null)
 				{
-					Double characterStrength = db.getCharacterStrength(common.getCharacter());
+					Double characterStrength = db.getCharacterStrength(db.getCurrentCharacter());
 					
 					Double strengthRequirement = null;
 					try
@@ -307,7 +281,7 @@
 				if (CommonChecks.checkItemIsMovable(item))
 					out.println("<a onclick='moveItem(event, "+item.getKey().getId()+", \""+otherSide.getKind()+"\", "+otherSide.getKey().getId()+")' class='move-left'>--&gt;</a>");
 				out.println("<div class='main-item'>");
-				out.println(GameUtils.renderItem(db, common.getCharacter(), item));
+				out.println(GameUtils.renderItem(db, db.getCurrentCharacter(), item));
 				out.println("<div class='main-item-controls'>");
 				if (item.getProperty("maxWeight")!=null)
 				{
@@ -397,7 +371,7 @@
 				if (CommonChecks.checkItemIsMovable(item))
 					out.println("<a onclick='moveItem(event, "+item.getKey().getId()+", \""+selfSide.getKind()+"\", "+selfSide.getKey().getId()+")' class='move-right'>&lt;--</a>");
 				out.println("<div class='main-item'>");
-				out.println(GameUtils.renderItem(db, common.getCharacter(), item));				
+				out.println(GameUtils.renderItem(db, db.getCurrentCharacter(), item));				
 				out.println("<div class='main-item-controls'>");
 				if (item.getProperty("maxWeight")!=null)
 				{

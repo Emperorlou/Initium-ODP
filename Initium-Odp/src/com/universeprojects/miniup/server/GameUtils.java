@@ -1475,7 +1475,7 @@ public class GameUtils
     	boolean isSelf = false;
     	String lowDurabilityClass = "";
     	if (GameUtils.equals(db.getCurrentCharacterKey(), character.getKey()) ||
-    			(selfUser!=null && GameUtils.equals(selfUser.getProperty("characterKey"), character.getKey())))
+    			(GameUtils.equals(db.getCurrentUserKey(), character.getProperty("userKey"))))
     		isSelf = true;
     	
     	boolean isCloaked = false;

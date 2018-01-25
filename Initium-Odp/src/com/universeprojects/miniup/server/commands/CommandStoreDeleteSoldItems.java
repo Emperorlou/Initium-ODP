@@ -32,7 +32,7 @@ public class CommandStoreDeleteSoldItems extends Command {
 		CachedDatastoreService ds = getDS();
 		
 		CachedEntity user = db.getCurrentUser();
-		Key characterKey = (Key) user.getProperty("characterKey");
+		Key characterKey = db.getCurrentCharacterKey();
 				
 		List<CachedEntity> saleItems = db.getSaleItemsFor(characterKey);
 		

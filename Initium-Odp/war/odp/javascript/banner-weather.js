@@ -38,7 +38,7 @@ function getWeather()
 	var hourProgression = (serverTime-behindHour)/3600000;
 	
 	var interpolationDelta = weatherDifference*hourProgression;
-	return 1;
+//	return 1;
 	return behindHourWeather+interpolationDelta;
 }	
 
