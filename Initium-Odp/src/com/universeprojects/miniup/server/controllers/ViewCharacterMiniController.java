@@ -157,36 +157,42 @@ public class ViewCharacterMiniController extends PageController {
 	}
 	
 	// Printing buffs
-	List<String> printBuff = new ArrayList<String>();
-
+	// List<String> printBuff = new ArrayList<String>();
+	StringBuilder sb = new StringBuilder();
+	
 	for(CachedEntity buff:buffs)
 		{
-			StringBuilder sb = new StringBuilder();
 			sb.append("<img src='https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'>");
-			printBuff.add(sb.toString());
+			// printBuff.add(sb.toString());
 		}
-	request.setAttribute("printBuff", printBuff);
+	request.setAttribute("printBuff", sb.toString());
 
 	// Printing achievements
 	
+<<<<<<< Updated upstream
 	List<String> printAchievement = new ArrayList<String>();
 
 	if (achievements!=null && achievements.isEmpty()==false)
 		for(CachedEntity achievement:achievements)
+=======
+	// List<String> printAchievement = new ArrayList<String>();
+	sb = new StringBuilder();
+	for(CachedEntity achievement:achievements)
+>>>>>>> Stashed changes
 		{
-			StringBuilder sb = new StringBuilder();
 			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'>");
-			printAchievement.add(sb.toString());
+			// printAchievement.add(sb.toString());
 		}
-	request.setAttribute("printAchievement", printAchievement);
+	request.setAttribute("printAchievement", sb.toString());
 	
 	// Printing the equipment list with the EquipmentControl
 				
 	List<String> equipList = new ArrayList<String>();
+	sb = new StringBuilder();
 	
 	for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
 		{
-			StringBuilder sb = new StringBuilder();
+
 			sb.append("<div class='main-item equip-item'><span class='equip-slot'>"+slot+": </span>");
 			CachedEntity item = db.getEntity((Key)character.getProperty("equipment"+slot));
 			// Allow updating specific slots via commands.
