@@ -157,47 +157,46 @@ public class ViewCharacterMiniController extends PageController {
 	}
 	
 	// Printing buffs
-	List<String> printBuff = new ArrayList<String>();
-
+	// List<String> printBuff = new ArrayList<String>();
+	StringBuilder sb = new StringBuilder();
+	
 	for(CachedEntity buff:buffs)
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("<img src='https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'>");
-			printBuff.add(sb.toString());
+			sb.append("<img src='https://initium-resources.appspot.com/").append(buff.getProperty("icon")).append("' border='0'>");
+			// printBuff.add(sb.toString());
 		}
-	request.setAttribute("printBuff", printBuff);
+	request.setAttribute("printBuff", sb.toString());
 
 	// Printing achievements
 	
-	List<String> printAchievement = new ArrayList<String>();
-
-	if (achievements!=null && achievements.isEmpty()==false)
-		for(CachedEntity achievement:achievements)
+	// List<String> printAchievement = new ArrayList<String>();
+	sb = new StringBuilder();
+	for(CachedEntity achievement:achievements)
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'>");
-			printAchievement.add(sb.toString());
+			sb.append("<img src='https://initium-resources.appspot.com/").append(achievement.getProperty("icon")).append("' border='0'>");
+			// printAchievement.add(sb.toString());
 		}
-	request.setAttribute("printAchievement", printAchievement);
+	request.setAttribute("printAchievement", sb.toString());
 	
 	// Printing the equipment list with the EquipmentControl
 				
-	List<String> equipList = new ArrayList<String>();
+	// List<String> equipList = new ArrayList<String>();
+	sb = new StringBuilder();
 	
 	for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("<div class='main-item equip-item'><span class='equip-slot'>"+slot+": </span>");
+
+			sb.append("<div class='main-item equip-item'><span class='equip-slot'>").append(slot).append(": </span>");
 			CachedEntity item = db.getEntity((Key)character.getProperty("equipment"+slot));
 			// Allow updating specific slots via commands.
 			// Selector would be ".equip-item span[rel='RightHand']"
-			sb.append("<span rel='" + slot + "'>");
+			sb.append("<span rel='").append(slot).append("'>");
 			sb.append(GameUtils.renderEquipSlot(item));
 			sb.append("</span>");
 			sb.append("</div>");
-			equipList.add(sb.toString());
+			//equipList.add(sb.toString());
 		}
-	request.setAttribute("equipList", equipList);
+	request.setAttribute("equipList", sb.toString());
 	
 	// Starting a chat	
 	String characterNameStr = character.getProperty("name").toString().replaceAll("<.*?>", "");
