@@ -1454,7 +1454,7 @@ public class ODPDBAccess
 			{
 				String slotCheck = equipSlotArr[i].trim();
 				
-				if(CommonChecks.checkIsValidEquipSlot("equipment"+slotCheck)==false) 
+				if(CommonChecks.checkIsValidEquipSlot(slotCheck)==false) 
 					continue;
 				
 				if (character.getProperty("equipment"+slotCheck)==null)
