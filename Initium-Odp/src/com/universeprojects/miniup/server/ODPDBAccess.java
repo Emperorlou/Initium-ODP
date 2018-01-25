@@ -1787,17 +1787,19 @@ public class ODPDBAccess
 		
 		// Get all dexterity reducing armors and include that in the
 		// calculation...
+		List<Key> slotKeys = new ArrayList<Key>();
 		for (String slot : EQUIPMENT_SLOTS)
-		{
 			if (character.getProperty("equipment" + slot) != null)
+				slotKeys.add((Key)character.getProperty("equipment" + slot));
+		
+		List<CachedEntity> equips = getDB().get(slotKeys);
+		for(CachedEntity item:equips)
+		{
+			if (item == null) continue;
+			Long modifier = (Long) item.getProperty(propertyName);
+			if (modifier != null)
 			{
-				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
-				if (equipment == null) continue;
-				Long modifier = (Long) equipment.getProperty(propertyName);
-				if (modifier != null)
-				{
-					value += (value * (modifier.doubleValue() / 100d)) * statModifier;
-				}
+				value += (value * (modifier.doubleValue() / 100d)) * statModifier;
 			}
 		}
 		
