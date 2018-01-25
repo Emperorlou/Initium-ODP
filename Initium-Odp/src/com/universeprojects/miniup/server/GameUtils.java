@@ -9,12 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -32,7 +29,6 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
-import com.universeprojects.cacheddatastore.ShardedCounterService;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
@@ -1847,23 +1843,24 @@ public class GameUtils
     public static String renderAchievementsList(List<CachedEntity> achievements)
     {
     	StringBuilder sb = new StringBuilder();
-		for(CachedEntity achievement:achievements)
-		{
-			if (achievement==null) continue;
-			sb.append("<div class='achievement-detail'>");
-			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'/>");
-			sb.append("<div class='achievement-detail-header'>");
-			sb.append("<h5>"+achievement.getProperty("title")+"</h5>");
-			String description = (String)achievement.getProperty("description");
-			if (description!=null)
+    	if (achievements!=null && achievements.isEmpty()==false)
+			for(CachedEntity achievement:achievements)
 			{
-				sb.append("<div class='achievement-detail-description item-flavor-description'>");
-				sb.append(description);
+				if (achievement==null) continue;
+				sb.append("<div class='achievement-detail'>");
+				sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'/>");
+				sb.append("<div class='achievement-detail-header'>");
+				sb.append("<h5>"+achievement.getProperty("title")+"</h5>");
+				String description = (String)achievement.getProperty("description");
+				if (description!=null)
+				{
+					sb.append("<div class='achievement-detail-description item-flavor-description'>");
+					sb.append(description);
+					sb.append("</div>");
+				}
+				sb.append("</div>");
 				sb.append("</div>");
 			}
-			sb.append("</div>");
-			sb.append("</div>");
-		}
 		return sb.toString();
     }
     public static String renderSimpleBanner(String bannerUrl)

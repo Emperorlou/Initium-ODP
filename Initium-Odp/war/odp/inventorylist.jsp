@@ -1,46 +1,28 @@
+<%@page import="com.universeprojects.cacheddatastore.QueryHelper"%>
 <%@page import="com.universeprojects.miniup.CommonChecks"%>
 <%@page import="com.universeprojects.miniup.server.DDOSProtectionException"%>
-<%@page import="com.universeprojects.miniup.server.HiddenUtils"%>
 <%@page import="com.universeprojects.miniup.server.WebUtils"%>
 <%@page import="com.universeprojects.cacheddatastore.CachedEntity"%>
 <%@page import="com.universeprojects.miniup.server.GameUtils"%>
 <%@page import="com.google.appengine.api.datastore.KeyFactory"%>
 <%@page import="com.google.appengine.api.datastore.Key"%>
-<%@page import="com.universeprojects.miniup.server.GameFunctions"%>
 <%@page import="java.util.List"%>
-<%@page import="com.universeprojects.miniup.server.SecurityException"%>
-<%@page import="com.universeprojects.miniup.server.CommonEntities"%>
-<%@page import="com.universeprojects.miniup.server.ErrorMessage"%>
 <%@page import="com.universeprojects.miniup.server.JspSnippets"%>
 <%@page import="com.google.appengine.api.datastore.Entity"%>
 <%@page import="com.universeprojects.miniup.server.ODPDBAccess"%>
-<%@page import="com.universeprojects.miniup.server.Authenticator"%>
 <%
 	response.setHeader("Access-Control-Allow-Origin", "*");		// This is absolutely necessary for phonegap to work
 
-	Authenticator auth = null;
-	try
-	{
-		auth = Authenticator.getInstance(request, true);
-	}
-	catch(DDOSProtectionException e)
-	{
-		// Ignore this here
-	}
-
-	GameFunctions db = auth.getDB(request);
+	ODPDBAccess db = ODPDBAccess.getInstance(request);
 	
-	CommonEntities common = CommonEntities.getInstance(request);
-	
-	
-	
+	QueryHelper query = new QueryHelper(db.getDB());
 	// Get all the items we see here in this location...
-	List<CachedEntity> items = db.getEntityListFrom(common.getCharacter().getKey(), "inventory");
+	List<CachedEntity> items = query.getFilteredList("Item", "containerKey", db.getCurrentCharacterKey());
 	items = db.sortSaleItemList(items);
 	
-	List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", common.getCharacter().getKey());
+	List<CachedEntity> saleItems = db.getFilteredList("SaleItem", "characterKey", db.getCurrentCharacterKey());
 	
-	List<CachedEntity> carryingChars = db.getFilteredList("Character", "locationKey", common.getCharacter().getKey());
+	List<CachedEntity> carryingChars = db.getFilteredList("Character", "locationKey", db.getCurrentCharacterKey());
 	if (carryingChars.isEmpty()==false)
 		request.setAttribute("isCarryingCharacters", true);
 	
@@ -91,7 +73,7 @@
 			String currentCategory = "";
 			for(CachedEntity item:items)
 			{
-				if (db.checkCharacterHasItemEquipped(common.getCharacter(), item.getKey()))
+				if (db.checkCharacterHasItemEquipped(db.getCurrentCharacter(), item.getKey()))
 					continue;
 				
 				String itemType = (String)item.getProperty("itemType");
@@ -118,7 +100,7 @@
 				out.println("<div class='invItem' ref=" + item.getKey().getId() + ">");
 				out.println("<div class='main-item'>");
 				out.println("<input type=checkbox><div class='main-item-container'>");
-				out.println("		"+GameUtils.renderItem(db, common.getCharacter(), item)+saleText);
+				out.println("		"+GameUtils.renderItem(db, db.getCurrentCharacter(), item)+saleText);
 				out.println("<br>");
 				out.println("		<div class='main-item-controls'>");
 				// Get all the slots this item can be equipped in
@@ -128,7 +110,7 @@
 				out.println("			<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
 				if (item.getProperty("maxWeight")!=null)
 				{
-					out.println("<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"+common.getCharacter().getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>");
+					out.println("<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"+db.getCurrentCharacterKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>");
 				}
 				out.println("		</div>");
 				out.println("	</div>");
