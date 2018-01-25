@@ -171,7 +171,8 @@ public class ViewCharacterMiniController extends PageController {
 	
 	List<String> printAchievement = new ArrayList<String>();
 
-	for(CachedEntity achievement:achievements)
+	if (achievements!=null && achievements.isEmpty()==false)
+		for(CachedEntity achievement:achievements)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'>");

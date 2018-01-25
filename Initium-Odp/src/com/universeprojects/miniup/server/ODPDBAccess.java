@@ -364,7 +364,7 @@ public class ODPDBAccess
 			String overrideCharKeyStr = request.getParameter("char");
 			Key characterKey = null;
 			
-			if (overrideCharKeyStr!=null)
+			if (overrideCharKeyStr!=null && overrideCharKeyStr.trim().equals("")==false)
 			{
 				characterKey = KeyFactory.stringToKey(overrideCharKeyStr);
 			}
