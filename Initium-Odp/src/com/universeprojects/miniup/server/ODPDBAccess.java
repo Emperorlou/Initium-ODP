@@ -122,6 +122,7 @@ public class ODPDBAccess
 	private CachedDatastoreService ds = null;
 
 	public Map<Key, List<CachedEntity>> buffsCache = new HashMap<Key, List<CachedEntity>>();
+	public Map<Key, Map<String, Double>> statsCache = new HashMap<Key, Map<String, Double>>(); 
 
 	protected ODPDBAccess(HttpServletRequest request)
 	{
@@ -1740,8 +1741,50 @@ public class ODPDBAccess
 
 	public Double getCharacterDexterity(CachedEntity character)
 	{
-		Double dex = getDoubleBuffableProperty(character, "dexterity");
+		Double dex = getCachedCharacterStat(character, "dexterity");
+		if(dex == null)
+		{
+			dex = getItemBuffedCharacterStat(character, "dexterity", "dexterityPenalty", -1.0d);
+			setCachedCharacterStat(character, "dexterity", dex);
+		}
+	
+		if (dex < 2) dex = 2d;
 
+		return dex;
+	}
+
+	public Double getCharacterStrength(CachedEntity character)
+	{
+		Double str = getCachedCharacterStat(character, "strength");
+		if(str == null)
+		{
+			str = getItemBuffedCharacterStat(character, "strength", "strengthModifier", 1.0);
+			setCachedCharacterStat(character, "strength", str);
+		}
+	
+		if (str < 2) str = 2d;
+
+		return str;
+	}
+	
+	public Double getCharacterIntelligence(CachedEntity character)
+	{
+		Double valInt = getCachedCharacterStat(character, "intelligence");
+		if(valInt == null)
+		{
+			valInt = getItemBuffedCharacterStat(character, "intelligence", "intelligenceModifier", 1.0);
+			setCachedCharacterStat(character, "intelligence", valInt);
+		}
+	
+		if (valInt < 2) valInt = 2d;
+
+		return valInt;
+	}
+	
+	public Double getItemBuffedCharacterStat(CachedEntity character, String stat, String propertyName, Double statModifier)
+	{
+		Double value = getDoubleBuffableProperty(character, stat);
+		
 		// Get all dexterity reducing armors and include that in the
 		// calculation...
 		for (String slot : EQUIPMENT_SLOTS)
@@ -1750,70 +1793,34 @@ public class ODPDBAccess
 			{
 				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
 				if (equipment == null) continue;
-				Long penalty = (Long) equipment.getProperty("dexterityPenalty");
-				if (penalty != null)
-				{
-					dex -= (dex * (penalty.doubleValue() / 100d));
-				}
-			}
-		}
-
-		if (dex < 2) dex = 2d;
-
-		return dex;
-	}
-
-	public Double getCharacterStrength(CachedEntity character)
-	{
-		Double str = getDoubleBuffableProperty(character, "strength");
-
-		// Get all strength modifying armors and include that in the
-		// calculation...
-		for (String slot : EQUIPMENT_SLOTS)
-		{
-			if (character.getProperty("equipment" + slot) != null)
-			{
-				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
-				if (equipment == null) continue;
-				Long modifier = (Long) equipment.getProperty("strengthModifier");
+				Long modifier = (Long) equipment.getProperty(propertyName);
 				if (modifier != null)
 				{
-					str += (str * (modifier.doubleValue() / 100d));
+					value += (value * (modifier.doubleValue() / 100d)) * statModifier;
 				}
 			}
 		}
-
-		if (str < 2) str = 2d;
-				
-		return str;
+		
+		return value;
 	}
 	
-	public Double getCharacterIntelligence(CachedEntity character)
+	public Double getCachedCharacterStat(CachedEntity charEntity, String stat)
 	{
-		Double val = getDoubleBuffableProperty(character, "intelligence");
-		
-		// Get all intelligence modifying armors and include that in the
-		// calculation...
-		for (String slot : EQUIPMENT_SLOTS)
-		{
-			if (character.getProperty("equipment" + slot) != null)
-			{
-				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
-				if (equipment == null) continue;
-				Long modifier = (Long) equipment.getProperty("intelligenceModifier");
-				if (modifier != null)
-				{
-					val += (val * (modifier.doubleValue() / 100d));
-				}
-			}
-		}
-
-		if (val < 2) val = 2d;
-		
-		return val;
+		Map<String, Double> charMap = statsCache.get(charEntity.getKey());
+		if(statsCache == null) return null;
+		return charMap.get(stat);
 	}
 	
-
+	public void setCachedCharacterStat(CachedEntity charEntity, String stat, Double value)
+	{
+		Map<String, Double> charMap = statsCache.get(charEntity.getKey());
+		if(statsCache == null)
+		{
+			charMap = new HashMap<String, Double>();
+			statsCache.put(charEntity.getKey(), charMap);
+		}
+		charMap.put(stat, value);
+	}
 
 	public CachedEntity awardBuff(CachedDatastoreService ds, Key parentKey, String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
 			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
