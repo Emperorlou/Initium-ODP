@@ -1807,14 +1807,14 @@ public class ODPDBAccess
 	public Double getCachedCharacterStat(CachedEntity charEntity, String stat)
 	{
 		Map<String, Double> charMap = statsCache.get(charEntity.getKey());
-		if(statsCache == null) return null;
+		if(charMap == null) return null;
 		return charMap.get(stat);
 	}
 	
 	public void setCachedCharacterStat(CachedEntity charEntity, String stat, Double value)
 	{
 		Map<String, Double> charMap = statsCache.get(charEntity.getKey());
-		if(statsCache == null)
+		if(charMap == null)
 		{
 			charMap = new HashMap<String, Double>();
 			statsCache.put(charEntity.getKey(), charMap);
