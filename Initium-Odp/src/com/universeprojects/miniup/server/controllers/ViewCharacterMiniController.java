@@ -75,6 +75,7 @@ public class ViewCharacterMiniController extends PageController {
 		throw new RuntimeException("Should not have been able to view this character.");
 	
 	boolean isSelf = GameUtils.equals(user.getKey(), character.getProperty("userKey"));
+	request.setAttribute("isSelf", isSelf);
 
 	if (isSelf)
 	{
