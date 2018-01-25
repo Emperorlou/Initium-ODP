@@ -1743,10 +1743,7 @@ public class ODPDBAccess
 	{
 		Double dex = getCachedCharacterStat(character, "dexterity");
 		if(dex == null)
-		{
-			dex = getItemBuffedCharacterStat(character, "dexterity", "dexterityPenalty", -1.0d);
-			setCachedCharacterStat(character, "dexterity", dex);
-		}
+			dex = getDoubleBuffableProperty(character, "dexterity");
 	
 		if (dex < 2) dex = 2d;
 
@@ -1757,10 +1754,7 @@ public class ODPDBAccess
 	{
 		Double str = getCachedCharacterStat(character, "strength");
 		if(str == null)
-		{
-			str = getItemBuffedCharacterStat(character, "strength", "strengthModifier", 1.0);
-			setCachedCharacterStat(character, "strength", str);
-		}
+			str = getDoubleBuffableProperty(character, "strength");
 	
 		if (str < 2) str = 2d;
 
@@ -1771,43 +1765,59 @@ public class ODPDBAccess
 	{
 		Double valInt = getCachedCharacterStat(character, "intelligence");
 		if(valInt == null)
-		{
-			valInt = getItemBuffedCharacterStat(character, "intelligence", "intelligenceModifier", 1.0);
-			setCachedCharacterStat(character, "intelligence", valInt);
-		}
+			valInt = getDoubleBuffableProperty(character, "intelligence");
 	
 		if (valInt < 2) valInt = 2d;
 
 		return valInt;
 	}
 	
-	public Double getItemBuffedCharacterStat(CachedEntity character, String stat, String propertyName, Double statModifier)
+	public void fillCachedCharacterStats(CachedEntity character)
 	{
-		Double value = getDoubleBuffableProperty(character, stat);
+		Double dex = getDoubleBuffableProperty(character, "dexterity");
+		Double tInt = getDoubleBuffableProperty(character, "intelligence");
+		Double str = getDoubleBuffableProperty(character, "strength");
 		
 		// Get all dexterity reducing armors and include that in the
 		// calculation...
+		List<Key> slotKeys = new ArrayList<Key>();
 		for (String slot : EQUIPMENT_SLOTS)
-		{
 			if (character.getProperty("equipment" + slot) != null)
-			{
-				CachedEntity equipment = getEntity((Key) character.getProperty("equipment" + slot));
-				if (equipment == null) continue;
-				Long modifier = (Long) equipment.getProperty(propertyName);
-				if (modifier != null)
-				{
-					value += (value * (modifier.doubleValue() / 100d)) * statModifier;
-				}
-			}
+				slotKeys.add((Key)character.getProperty("equipment" + slot));
+		
+		List<CachedEntity> equips = getDB().get(slotKeys);
+		for(CachedEntity item:equips)
+		{
+			if (item == null) continue;
+			Long modifier = (Long) item.getProperty("dexterityPenalty");
+			if (modifier != null)
+				dex -= (dex * (modifier.doubleValue() / 100d));
+			
+			modifier = (Long) item.getProperty("strengthModifier");
+			if (modifier != null)
+				str += (str * (modifier.doubleValue() / 100d));
+			
+			modifier = (Long) item.getProperty("intelligenceModifier");
+			if (modifier != null)
+				tInt += (tInt * (modifier.doubleValue() / 100d));
 		}
 		
-		return value;
+		Map<String, Double> charMap = new HashMap<String, Double>();
+		charMap.put("dexterity", dex);
+		charMap.put("strength", str);
+		charMap.put("intelligence", tInt);
+		statsCache.put(character.getKey(), charMap);
 	}
 	
 	public Double getCachedCharacterStat(CachedEntity charEntity, String stat)
 	{
 		Map<String, Double> charMap = statsCache.get(charEntity.getKey());
-		if(charMap == null) return null;
+		if(charMap == null) 
+		{
+			fillCachedCharacterStats(charEntity);
+			charMap = statsCache.get(charEntity.getKey());
+			if(charMap == null) return getDoubleBuffableProperty(charEntity, stat);
+		}
 		return charMap.get(stat);
 	}
 	
