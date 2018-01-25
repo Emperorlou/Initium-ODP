@@ -1,7 +1,6 @@
 package com.universeprojects.miniup.server.controllers;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -41,7 +40,6 @@ public class ViewCharacterMiniController extends PageController {
 		response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
 		
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
-		CachedEntity user = db.getCurrentUser();
 		
 		Long charId = WebUtils.getLongParam(request, "characterId");
 		Key charKey = KeyFactory.createKey("Character", charId);
@@ -51,6 +49,7 @@ public class ViewCharacterMiniController extends PageController {
 			response.sendError(404);
 			return null;
 		}
+		CachedEntity user = db.getEntity((Key)character.getProperty("userKey"));
 	
 		/**
 		boolean isSelf = false;
@@ -75,7 +74,7 @@ public class ViewCharacterMiniController extends PageController {
 		if (type.equals("NPC") && (Double)character.getProperty("hitpoints")>0d)
 			throw new RuntimeException("Should not have been able to view this character.");
 		
-		boolean isSelf = GameUtils.equals(user.getKey(), character.getProperty("userKey"));
+		boolean isSelf = GameUtils.equals(user.getKey(), db.getCurrentUserKey());
 		request.setAttribute("isSelf", isSelf);
 	
 		if (isSelf)
@@ -173,7 +172,8 @@ public class ViewCharacterMiniController extends PageController {
 		
 		// List<String> printAchievement = new ArrayList<String>();
 		sb = new StringBuilder();
-		for(CachedEntity achievement:achievements)
+		if (achievements!=null)
+			for(CachedEntity achievement:achievements)
 			{
 				sb.append("<img src='https://initium-resources.appspot.com/").append(achievement.getProperty("icon")).append("' border='0'>");
 				// printAchievement.add(sb.toString());
