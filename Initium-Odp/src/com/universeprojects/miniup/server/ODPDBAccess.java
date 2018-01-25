@@ -4210,10 +4210,13 @@ public class ODPDBAccess
 		else if (result instanceof Integer)
 			attackResult.damage = (int)result;
 		
+		// Get all character stats first. Destroying equipment will affect all modifiers,
+		// so will need to be recalculated AFTER the hit.
+		Double str = getCharacterStrength(sourceCharacter);
+		Double intelligence = getCharacterIntelligence(sourceCharacter);
 		
 		// Lets just go ahead and determine the strength bonus of the attack if it succeeds 
 		int strengthDamageBonus = 0;
-		Double str = getDoubleBuffableProperty(sourceCharacter, "strength");
 		if (str==null) str = 3d;
 		str-=3d;
 		// Special case, if the character is using a 2handed weapon, then double the effect of strength...
@@ -4222,7 +4225,6 @@ public class ODPDBAccess
 		str*=2d;
 		strengthDamageBonus = new Double(GameUtils.rnd.nextDouble()*str).intValue();
 		if (strengthDamageBonus<0) strengthDamageBonus=0;
-		
 		
 		
 		String weaponName = "bare hands";
@@ -4237,6 +4239,8 @@ public class ODPDBAccess
 		        if (durability<=0)
 		        {
 		            doDestroyEquipment(db, sourceCharacter, weapon);
+		            // Force recalc of stats.
+		            statsCache.remove(sourceCharacter.getKey());
 		            if (weapon.getProperty("naturalEquipment")!=null && weapon.getProperty("naturalEquipment").equals("TRUE"))
 		            	attackResult.status = "<div class='equipment-destroyed-notice'>"+sourceCharacter.getProperty("name")+"'s "+weapon.getProperty("name")+" is no longer usable. </div>";
 		            else
@@ -4260,7 +4264,6 @@ public class ODPDBAccess
 		
 		// Increase the critChance by the character's intelligence such that every point of int 
 		// increases the chance by 2.5% (unscaled) starting from 4
-		Double intelligence = getDoubleBuffableProperty(sourceCharacter, "intelligence");
 		if (intelligence!=null)
 		{
 		    double adj = intelligence-4d;
@@ -4449,7 +4452,7 @@ public class ODPDBAccess
 			if (durability <= 0)
 			{
 				doDestroyEquipment(getDB(), targetCharacter, blockingEntity);
-
+				statsCache.remove(targetCharacter.getKey());
 				String status = (String) result.get("status");
 				if (status == null) status = "";
 				if (blockingEntity.getProperty("naturalEquipment") != null && blockingEntity.getProperty("naturalEquipment").equals("TRUE"))
