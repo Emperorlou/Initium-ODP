@@ -74,9 +74,15 @@ public class ViewCharacterMiniController extends PageController {
 		if (type.equals("NPC") && (Double)character.getProperty("hitpoints")>0d)
 			throw new RuntimeException("Should not have been able to view this character.");
 		
-		boolean isSelf = GameUtils.equals(user.getKey(), db.getCurrentUserKey());
-		request.setAttribute("isSelf", isSelf);
+		// isSelf is false by default, check if character is not an NPC and after that check if chosen character is self.
+		boolean isSelf = false;
+		
+		if (!type.equals("NPC"))
+			isSelf = GameUtils.equals(user.getKey(), db.getCurrentUserKey());
+		
+		request.setAttribute("isSelf", isSelf);	
 	
+		// If character investigated is self also show weight.
 		if (isSelf)
 		{
 			long carrying = db.getCharacterCarryingWeight(character);
