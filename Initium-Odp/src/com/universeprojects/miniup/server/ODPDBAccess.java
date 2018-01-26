@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.tools.ant.taskdefs.Get;
+
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
@@ -4166,13 +4168,17 @@ public class ODPDBAccess
                 }
                 else
                 {
-                    String loot = doCharacterKilled(user, targetCharacter, sourceCharacter);
-                    status+=" The battle is over, you won!";
+                	// We check if the source character is the same as the current character. If yes, battle is won, if not, it's lost.
+                	String verb = GameUtils.equals(getCurrentCharacterKey(), sourceCharacter.getKey()) ? "won" : "lost";
+                	
+                	String loot = doCharacterKilled(user, targetCharacter, sourceCharacter);
+                    status+=" The battle is over, you " + verb + "!" ;
                     if (loot!=null)
                     {
-                        status=status+"<br><br>"+loot;
+                    	status=status+"<br><br>"+loot;
                     }
                     return status;
+                  		
                 }
             }
             
