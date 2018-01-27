@@ -2368,6 +2368,7 @@ function newCharacterFromDead()
 function switchCharacter(eventObject, characterId)
 {
 	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function(){
+		window.history.replaceState({}, document.title, "/" + "main.jsp");		
 		closeAllTooltips();
 		clearMakeIntoPopup();
 	});
