@@ -22,8 +22,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.tools.ant.taskdefs.Get;
-
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
@@ -6878,5 +6876,17 @@ public class ODPDBAccess
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	/**
+	 * This increases the knowledge you have with a piece of equipment (requires an itemClass assigned to it and
+	 * for that item class to be created in the database; requires ItemClass entity).
+	 * 
+	 * The 100 means there is a 1 in 100 chance of getting a point of experience with the equipment, this is to 
+	 * reduce load on the DB and effectively makes experience divided by 100.
+	 */
+	public void increaseKnowledgeForEquipment100(CachedEntity equipment)
+	{
+		
 	}
 }
