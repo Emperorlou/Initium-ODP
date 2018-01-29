@@ -103,11 +103,7 @@ public class CommandStoreBuyItem extends Command {
 		try
 		{
 			// Refetch all items in transaction.
-			List<CachedEntity> refetched = ds.refetch(Arrays.asList(item, saleItem, sellingCharacter, character));
-			item = refetched.get(0);
-			saleItem = refetched.get(1);
-			sellingCharacter = refetched.get(2);
-			character = refetched.get(3);
+			ds.refetch(Arrays.asList(item, saleItem, sellingCharacter, character));
 			
 			// If quantity item, need to make sure enough 
 			// quantity still available to purchase.

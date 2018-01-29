@@ -108,21 +108,21 @@ public class TradeObject implements Serializable
 	
 	public static boolean checkEntitiesChanged(CachedDatastoreService ds, List<CachedEntity> entities)
 	{
-		List<CachedEntity> refetchedEntities = ds.refetch(entities);
+		ds.refetch(entities);
 		
 		// First check if any of the refetched entities no longer exist...
-		for(CachedEntity e:refetchedEntities)
+		for(CachedEntity e:entities)
 			if (e==null)
 				return true;
 
-		if (entities.size()!=refetchedEntities.size())
+		if (entities.size()!=entities.size())
 			return true;
 		
 		// Now check if any of the fields have changed...
 		for(int i = 0; i<entities.size(); i++)
 		{
 			CachedEntity e = entities.get(i);
-			CachedEntity refetchedE = refetchedEntities.get(i);
+			CachedEntity refetchedE = entities.get(i);
 
 			// First check all fields on the entities are equal to the refetched entities
 			for(String fieldName:e.getProperties().keySet())
