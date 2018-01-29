@@ -214,6 +214,11 @@ messager.onChatMessage = function(chatMessage)
 	}
 	else if (chatMessage.mode==null)
 	{
+		// Here we're going to fix some characters that look the same
+		var beforeReplace = chatMessage.nickname;
+		chatMessage.nickname = chatMessage.nickname.replace(/I/g, "<span class='chat-character-fix'>I</span>");
+		chatMessage.nicknameStyled = chatMessage.nicknameStyled.replace(">"+beforeReplace+"<", ">"+chatMessage.nickname+"<");
+		
 		if (chatMessage.message.length > 2000)
 			chatMessage.message = "/me is a spammer. Kill him with fire!";
 		var meMode = chatMessage.message.toLowerCase().startsWith("/me ");
