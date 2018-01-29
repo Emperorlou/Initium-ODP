@@ -1,7 +1,5 @@
 package com.universeprojects.miniup.server.scripting.events;
 
-import javax.transaction.NotSupportedException;
-
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
@@ -30,16 +28,16 @@ public class MoveEvent extends ScriptEvent
 		toLocation = endLocation;
 	}
 
-	public MoveEvent(CachedEntity character, ODPDBAccess db) throws NotSupportedException
+	public MoveEvent(CachedEntity character, ODPDBAccess db) throws UnsupportedOperationException
 	{
 		super(character, db);
-		throw new NotSupportedException("Constructor type not supported.");
+		throw new UnsupportedOperationException("Constructor type not supported.");
 	}
 	
-	public MoveEvent(EntityWrapper character) throws NotSupportedException
+	public MoveEvent(EntityWrapper character) throws UnsupportedOperationException
 	{
 		super(character);
-		throw new NotSupportedException("Constructor type not supported.");
+		throw new UnsupportedOperationException("Constructor type not supported.");
 	}
 
 	@Override

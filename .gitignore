@@ -9,3 +9,11 @@
 *.iml
 *.eml
 .idea/
+.gradle/
+/CachedDatastore/
+/GameElementsFramework/
+/GEFCommon/
+/initium-core/
+/RandomGenerators/
+/RestClient/
+/java-webapp-lite/

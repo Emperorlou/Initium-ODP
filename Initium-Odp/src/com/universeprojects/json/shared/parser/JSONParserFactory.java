@@ -1,12 +1,9 @@
 package com.universeprojects.json.shared.parser;
 
-import com.google.appengine.labs.repackaged.com.google.common.annotations.GwtIncompatible;
-
 public class JSONParserFactory {
 	
 	private static ParserHelper parserHelper;
 	
-	@GwtIncompatible
 	public static void initServerParser() {
 		parserHelper = new ServerParserHelper();
 	}
@@ -19,7 +16,6 @@ public class JSONParserFactory {
 		return parserHelper.getParser();
 	}
 	
-	@GwtIncompatible
 	public static JSONServerParser getServerParser() {
 		if(parserHelper == null) parserHelper = new ServerParserHelper();
 		return (JSONServerParser) parserHelper.getParser();
@@ -41,7 +37,6 @@ public class JSONParserFactory {
 //		}
 //	}
 	
-	@GwtIncompatible
 	private static class ServerParserHelper implements ParserHelper {
 		final ThreadLocal<JSONServerParser> serverParser = new ThreadLocal<JSONServerParser>() {
 			@Override

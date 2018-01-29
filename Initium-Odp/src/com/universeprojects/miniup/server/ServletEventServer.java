@@ -1,29 +1,26 @@
 package com.universeprojects.miniup.server;
 
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.json.shared.parser.JSONParserFactory;
+import com.universeprojects.json.shared.parser.JSONServerParser;
+import com.universeprojects.json.shared.parser.ParseException;
+import com.universeprojects.miniup.CommonChecks;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
-import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.json.shared.JSONObject;
-import com.universeprojects.json.shared.parser.JSONParser;
-import com.universeprojects.json.shared.parser.JSONParserFactory;
-import com.universeprojects.json.shared.parser.ParseException;
-import com.universeprojects.miniup.CommonChecks;
 
 
 
@@ -47,11 +44,10 @@ public class ServletEventServer extends HttpServlet
 
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		
-		JSONParser parser = JSONParserFactory.getServerParser();
+		JSONServerParser parser = JSONParserFactory.getServerParser();
 		
-		String rawBody = IOUtils.toString(request.getReader());
 		try {
-			JSONObject body = (JSONObject) parser.parse(rawBody);
+			JSONObject body = (JSONObject) parser.parse(request.getReader());
 			JSONObject respBody = new JSONObject();
 			respBody.put("success", false);
 			switch (request.getParameter("type")) {

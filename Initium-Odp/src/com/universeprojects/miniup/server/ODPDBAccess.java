@@ -6465,8 +6465,7 @@ public class ODPDBAccess
 		return null;
 	}
 
-	public Key decodeAndCheckChatAuthToken(String authToken) throws SecurityException
-	{
+	public Key decodeAndCheckChatAuthToken(String authToken) throws SecurityException {
 		return null;
 	}
 

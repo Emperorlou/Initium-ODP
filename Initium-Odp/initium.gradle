@@ -1,0 +1,18 @@
+apply plugin: 'com.google.cloud.tools.appengine'
+
+sourceSets {
+    main.java.srcDir 'src'
+    test.java.srcDir 'test'
+}
+
+dependencies {
+    compile project(':GEFCommon')
+    compile project(':CachedDatastore')
+    compile 'com.universeprojects:java-webapp-lite:1.0-SNAPSHOT'
+    compile 'commons-codec:commons-codec:1.6'
+
+    compile 'org.mozilla:rhino:1.7.8'
+
+    testCompile "com.google.appengine:appengine-testing:$appengineVersion"
+    testCompile 'junit:junit:4.12'
+}
