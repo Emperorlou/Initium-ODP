@@ -19,7 +19,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.domain.OdpDomain;
 
 import helper.utilities.ClassFinder;
-import helper.utilities.HttpServletRequestImpl;
+import helper.utilities.HttpServletRequestMock;
 
 public class OdpDaoTest {
 
@@ -30,7 +30,7 @@ public class OdpDaoTest {
 	public void before() {
 		helper.setUp();
 		CachedDatastoreService.disableRemoteAPI();
-		ds = ODPDBAccess.getInstance(new HttpServletRequestImpl()).getDB();
+		ds = ODPDBAccess.getInstance(new HttpServletRequestMock()).getDB();
 	}
 
 	@After

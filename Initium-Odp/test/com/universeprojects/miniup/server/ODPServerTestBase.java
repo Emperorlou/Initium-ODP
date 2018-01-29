@@ -1,6 +1,6 @@
 package com.universeprojects.miniup.server;
 
-import helper.utilities.HttpServletRequestImpl;
+import helper.utilities.HttpServletRequestMock;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +25,7 @@ public class ODPServerTestBase {
 	public void before() {
 		helper.setUp();
 		CachedDatastoreService.disableRemoteAPI();
-		db = new ODPDBAccess(new HttpServletRequestImpl());
+		db = new ODPDBAccess(new HttpServletRequestMock());
 		ds = db.getDB();
 	}
 

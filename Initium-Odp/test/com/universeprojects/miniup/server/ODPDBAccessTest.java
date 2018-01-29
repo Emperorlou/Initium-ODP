@@ -17,7 +17,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
-import helper.utilities.HttpServletRequestImpl;
+import helper.utilities.HttpServletRequestMock;
 
 public class ODPDBAccessTest {
 
@@ -32,7 +32,7 @@ public class ODPDBAccessTest {
 	public void before() {
 		helper.setUp();
 		CachedDatastoreService.disableRemoteAPI();
-		testObj = new ODPDBAccess(new HttpServletRequestImpl());
+		testObj = new ODPDBAccess(new HttpServletRequestMock());
 	}
 
 	@After
@@ -107,11 +107,13 @@ public class ODPDBAccessTest {
 		character1.setProperty("partyCode", partyCode);
 		character1.setProperty("userKey", user.getKey());
 		character1.setProperty("partyLeader", "TRUE");
+		character1.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character1);
 		CachedEntity character2 = new CachedEntity("Character");
 		character2.setProperty("locationKey", currentLocationKey);
 		character2.setProperty("partyCode", partyCode);
 		character2.setProperty("userKey", user.getKey());
+		character2.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character2);
 		CachedEntity destinationEntity = new CachedEntity("Location");
 		destinationEntity.setProperty("ownerKey", user.getKey());
@@ -184,6 +186,7 @@ public class ODPDBAccessTest {
 		character1.setProperty("partyCode", partyCode);
 		character1.setProperty("userKey", user1.getKey());
 		character1.setProperty("partyLeader", "TRUE");
+		character1.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character1);
 		CachedEntity user2 = new CachedEntity("User");
 		testObj.getDB().put(user2);
@@ -191,6 +194,7 @@ public class ODPDBAccessTest {
 		character2.setProperty("locationKey", currentLocationKey);
 		character2.setProperty("partyCode", partyCode);
 		character2.setProperty("userKey", user2.getKey());
+		character2.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character2);
 		CachedEntity user3 = new CachedEntity("User");
 		testObj.getDB().put(user3);
@@ -220,11 +224,13 @@ public class ODPDBAccessTest {
 		character1.setProperty("partyCode", partyCode);
 		character1.setProperty("userKey", user.getKey());
 		character1.setProperty("partyLeader", "TRUE");
+		character1.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character1);
 		CachedEntity character2 = new CachedEntity("Character");
 		character2.setProperty("locationKey", currentLocationKey);
 		character2.setProperty("partyCode", partyCode);
 		character2.setProperty("userKey", user.getKey());
+		character2.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character2);
 		CachedEntity destinationEntity = new CachedEntity("Location");
 		destinationEntity.setProperty("ownerKey", user.getKey());
@@ -318,6 +324,7 @@ public class ODPDBAccessTest {
 		character1.setProperty("userKey", user.getKey());
 		character1.setProperty("groupKey", group.getKey());
 		character1.setProperty("groupStatus", GroupStatus.Member.name());
+		character1.setProperty("hitpoints", 100d);
 		String partyCode = "partyCode";
 		character1.setProperty("partyCode", partyCode);
 		character1.setProperty("partyLeader", "TRUE");
@@ -328,6 +335,7 @@ public class ODPDBAccessTest {
 		character2.setProperty("partyCode", partyCode);
 		character2.setProperty("groupKey", group.getKey());
 		character2.setProperty("groupStatus", GroupStatus.Member.name());
+		character2.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character2);
 		CachedEntity destinationEntity = new CachedEntity("Location");
 		destinationEntity.setProperty("ownerKey", group.getKey());
@@ -365,6 +373,7 @@ public class ODPDBAccessTest {
 		character1.setProperty("userKey", user.getKey());
 		character1.setProperty("groupKey", group.getKey());
 		character1.setProperty("groupStatus", GroupStatus.Admin.name());
+		character1.setProperty("hitpoints", 100d);
 		String partyCode = "partyCode";
 		character1.setProperty("partyCode", partyCode);
 		character1.setProperty("partyLeader", "TRUE");
@@ -373,6 +382,7 @@ public class ODPDBAccessTest {
 		character2.setProperty("locationKey", currentLocationKey);
 		character2.setProperty("userKey", user.getKey());
 		character2.setProperty("partyCode", partyCode);
+		character2.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character2);
 		CachedEntity destinationEntity = new CachedEntity("Location");
 		destinationEntity.setProperty("ownerKey", group.getKey());
@@ -401,6 +411,7 @@ public class ODPDBAccessTest {
 		character1.setProperty("userKey", user.getKey());
 		character1.setProperty("groupKey", group.getKey());
 		character1.setProperty("groupStatus", GroupStatus.Admin.name());
+		character1.setProperty("hitpoints", 100d);
 		String partyCode = "partyCode";
 		character1.setProperty("partyCode", partyCode);
 		testObj.getDB().put(character1);
@@ -408,7 +419,8 @@ public class ODPDBAccessTest {
 		character2.setProperty("locationKey", currentLocationKey);
 		character2.setProperty("userKey", user.getKey());
 		character2.setProperty("partyCode", partyCode);
-		character1.setProperty("partyLeader", "TRUE");
+		character2.setProperty("hitpoints", 100d);
+		character2.setProperty("partyLeader", "TRUE");
 		testObj.getDB().put(character2);
 		CachedEntity destinationEntity = new CachedEntity("Location");
 		destinationEntity.setProperty("ownerKey", group.getKey());
@@ -442,6 +454,7 @@ public class ODPDBAccessTest {
 		String partyCode = "partyCode";
 		character1.setProperty("partyCode", partyCode);
 		character1.setProperty("partyLeader", "TRUE");
+		character1.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character1);
 		CachedEntity character2 = new CachedEntity("Character");
 		character2.setProperty("locationKey", currentLocationKey);
@@ -449,6 +462,7 @@ public class ODPDBAccessTest {
 		character2.setProperty("partyCode", partyCode);
 		character2.setProperty("groupKey", group2.getKey());
 		character2.setProperty("groupStatus", GroupStatus.Member.name());
+		character2.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character2);
 		CachedEntity destinationEntity = new CachedEntity("Location");
 		destinationEntity.setProperty("ownerKey", group1.getKey());
@@ -479,6 +493,7 @@ public class ODPDBAccessTest {
 		character1.setProperty("userKey", user.getKey());
 		character1.setProperty("groupKey", group1.getKey());
 		character1.setProperty("groupStatus", GroupStatus.Admin.name());
+		character1.setProperty("hitpoints", 100d);
 		String partyCode = "partyCode";
 		character1.setProperty("partyCode", partyCode);
 		testObj.getDB().put(character1);
@@ -489,6 +504,7 @@ public class ODPDBAccessTest {
 		character1.setProperty("partyLeader", "TRUE");
 		character2.setProperty("groupKey", group2.getKey());
 		character2.setProperty("groupStatus", GroupStatus.Member.name());
+		character2.setProperty("hitpoints", 100d);
 		testObj.getDB().put(character2);
 		CachedEntity destinationEntity = new CachedEntity("Location");
 		destinationEntity.setProperty("ownerKey", group1.getKey());
