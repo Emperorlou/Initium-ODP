@@ -1024,7 +1024,7 @@ function compareWeapons(a, b) {
 
 function loadInventory()
 {
-	$("#inventory").load("/odp/inventorylist.jsp?ajax=true&char="+window.characterOverride, function(){
+	$("#inventory").load("/odp/inventorylist?ajax=true&char="+window.characterOverride, function(){
 		var sorted = $('#invItems h4:contains("Armor")').nextUntil('#invItems h4').sort(compareArmor);
 		sorted.map(function() { var html = $(this)[0].outerHTML; $(this).remove(); $('#invItems h4:contains("Armor")').after(html)});
 		sorted = $('#invItems h4:contains("Shield")').nextUntil('#invItems h4').sort(compareArmor);
@@ -1565,6 +1565,11 @@ function autofixDeathModeNotSet(event)
 function characterDropCharacter(event, characterId)
 {
 	doCommand(event, "CharacterDropCharacter", {"characterId":characterId}, loadInventory);
+}
+
+function characterDropAllCharacters(event)
+{
+	doCommand(event, "CharacterDropAllCharacters", loadInventory);
 }
 
 function characterDropItem(event, itemId)
