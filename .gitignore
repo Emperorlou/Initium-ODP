@@ -19,3 +19,5 @@
 /java-webapp-lite/
 /.classpath
 /.project
+build/
+RemoteSystemsTempFiles/
