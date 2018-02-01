@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -7,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
@@ -37,8 +37,8 @@ public class CommandCharacterDropAllCharacters extends Command {
 		if(CommonChecks.checkCharacterIsBusy(character))
 			throw new UserErrorMessage("You are currently busy and cannot drop this character");
 		
-		List<java.security.Key> updateKeys = new ArrayList<Key>();
-		List<CachedEntity> carriedChars = getFilteredList("Character", "locationKey", character.getKey());
+		List<Key> updateKeys = new ArrayList<Key>();
+		List<CachedEntity> carriedChars = query.getFilteredList("Character", "locationKey", character.getKey());
 		for(CachedEntity charToDrop:carriedChars)
 		{
 			db.doCharacterDropCharacter(location, character, charToDrop);
