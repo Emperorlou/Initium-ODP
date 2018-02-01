@@ -21,7 +21,7 @@ import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
 /**
- * Controller for the view_profile page.
+ * Controller for the ViewCharacterMini page.
  * Available request params:
  *
 **/
@@ -110,8 +110,6 @@ public class ViewCharacterMiniController extends PageController {
 		List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
 		if (buffs!=null && buffs.isEmpty()==false)
 			request.setAttribute("buffs", true);
-		
-	//	List<CachedEntity> achievements = null;
 	
 		
 		List<CachedEntity> achievements = null;
@@ -164,31 +162,26 @@ public class ViewCharacterMiniController extends PageController {
 		}
 		
 		// Printing buffs
-		// List<String> printBuff = new ArrayList<String>();
 		StringBuilder sb = new StringBuilder();
 		
 		for(CachedEntity buff:buffs)
 			{
 				sb.append("<img src='https://initium-resources.appspot.com/").append(buff.getProperty("icon")).append("' border='0'>");
-				// printBuff.add(sb.toString());
 			}
 		request.setAttribute("printBuff", sb.toString());
 	
 		// Printing achievements
 		
-		// List<String> printAchievement = new ArrayList<String>();
 		sb = new StringBuilder();
 		if (achievements!=null)
 			for(CachedEntity achievement:achievements)
 			{
 				sb.append("<img src='https://initium-resources.appspot.com/").append(achievement.getProperty("icon")).append("' border='0'>");
-				// printAchievement.add(sb.toString());
 			}
 		request.setAttribute("printAchievement", sb.toString());
 		
 		// Printing the equipment list with the EquipmentControl
 					
-		// List<String> equipList = new ArrayList<String>();
 		sb = new StringBuilder();
 		
 		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)

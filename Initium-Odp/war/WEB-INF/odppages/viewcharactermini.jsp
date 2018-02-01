@@ -4,13 +4,13 @@
 <div id='reload-div'>
 	<div style='max-width:320px;'>
 		<div class='mini-window-header'>
-			<div class='mini-window-header-split'>
 			<c:if test="${type == 'PC' }">
+			<div class='mini-window-header-split'>
 				<a onclick='$(".cluetip").hide(); joinPartyCharacter(event, ${characterIDKey})'>Join Party</a><br><br>
 				<a onclick='$(".cluetip").hide(); setPrivateChatTo("${characterNameStr}", ${characterIDKey})'>Private Chat</a><br><br>
 				<a onclick='$(".cluetip").hide(); ignoreAPlayer(${characterID}, "${characterNameStr}");'>Ignore</a>
-			</c:if>
 			</div>
+			</c:if>
 			
 			
 			<div class='mini-window-header-split' style='text-align:right'>
@@ -66,9 +66,8 @@
 		</c:if>			
 
 	</div>
-	
+	<c:if test="${type == 'PC' && (isCloaked==false || (isCloaked==true && isSelf==true))}">
 	<div class='normal-container'>
-		<c:if test="${isCloaked==false || (isCloaked==true && isSelf==true)}">
 			<h5>Referral Stats</h5>
 			<div style='margin-left:10px'>
 				<p>
@@ -86,6 +85,6 @@
 			<div class='item-flavor-description'>
 				This character is cloaked. All stats and equipment are hidden from other players.
 			</div>
-		</c:if>
 	</div>
+	</c:if>
 </div>
