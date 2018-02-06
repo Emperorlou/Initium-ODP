@@ -3,6 +3,7 @@
 <div id='reload-div-return'></div>
 <div id='reload-div'>
 	<div style='max-width:320px;'>
+		<c:if test="${type == 'PC' "}>
 		<div class='mini-window-header'>
 			<c:if test="${type == 'PC' }">
 			<div class='mini-window-header-split'>
@@ -24,6 +25,7 @@
 				</c:if>
 			</div>
 		</div>
+		</c:if>
 				
 		
 		<c:if test="${isPartied==true}"> 
@@ -66,7 +68,7 @@
 		</c:if>			
 
 	</div>
-	<c:if test="${type == 'PC' && (isCloaked==false || (isCloaked==true && isSelf==true))}">
+	<c:if test="${(isCloaked==false && type!='PC') || (isCloaked==true && isSelf==true)}">
 	<div class='normal-container'>
 			<h5>Referral Stats</h5>
 			<div style='margin-left:10px'>
