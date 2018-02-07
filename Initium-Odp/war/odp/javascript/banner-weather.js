@@ -38,7 +38,7 @@ function getWeather()
 	var hourProgression = (serverTime-behindHour)/3600000;
 	
 	var interpolationDelta = weatherDifference*hourProgression;
-//	return 1;
+//	return 0;
 	return behindHourWeather+interpolationDelta;
 }	
 
@@ -311,7 +311,7 @@ function magicallyDetermineAnimationUrl(urlBase, urlEnd, fps, frameCount,offset)
 var bannerWeatherUpdateTimerId = null;
 function updateBannerWeatherSystem()
 {
-	if (isOutside=="TRUE")
+	if (window.isOutside=="TRUE")
 	{
 		if (bannerWeatherUpdateTimerId!=null)
 			clearInterval(bannerWeatherUpdateTimerId);
@@ -327,11 +327,14 @@ function updateBannerWeatherSystem()
 			clearInterval(bannerWeatherUpdateTimerId);
 			bannerWeatherUpdateTimerId = null;
 		}
-		
-		var banner = $(".banner-shadowbox, .banner1");
-		banner.css("background", "url('"+bannerUrl+"') no-repeat center center");
-		banner.css("background-blend-mode", "normal");
-		banner.css("background-size", "cover");
+
+		if (window.bannerUrl!=null)
+		{
+			var banner = $(".banner-shadowbox, .banner1");
+			banner.css("background", "url('"+window.bannerUrl+"') no-repeat center center");
+			banner.css("background-blend-mode", "normal");
+			banner.css("background-size", "cover");
+		}
 	}
 }
 

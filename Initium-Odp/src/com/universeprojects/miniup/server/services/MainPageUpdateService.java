@@ -832,6 +832,13 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<div class='main-buttonbox v3-window3 this-location-box'>");
 		newHtml.append("<h4>This Location</h4>");
 		
+		newHtml.append("<div>");
+		String desc = (String)location.getProperty("description");
+		if (desc==null) desc = "";
+		newHtml.append(desc);
+		newHtml.append("</div>");
+		
+		
 		newHtml.append("<a id='main-explore' href='#' class='v3-main-button' shortcut='69' onclick='doExplore(event, false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
 		newHtml.append("<br>");
 		newHtml.append("<a id='main-explore-ignorecombatsites' class='v3-main-button' href='#' shortcut='87' onclick='doExplore(event, true)'><span class='shortcut-key'>(W)</span>Explore (no old sites)</a>");
@@ -1152,9 +1159,16 @@ public class MainPageUpdateService extends Service
 		}
 		
 		if (CommonChecks.checkCharacterIsIncapacitated(character))
-			js.append("$('#campsPanel').hide()");
+			js.append("$('#campsPanel').hide();");
 		else
-			js.append("$('#campsPanel').show()");
+			js.append("$('#campsPanel').show();");
+		
+		
+		
+		// Here we'll update the button bar
+		//addType1Button(position, imageUrl, shortcut, javascript)
+		js.append("addType1Button(1, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
+		js.append("addType1Button(2, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
 		
 		
 		return updateJavascript("ajaxJs", js.toString());
@@ -1173,8 +1187,7 @@ public class MainPageUpdateService extends Service
 
 	public String updateLocationDescription()
 	{
-		String desc = (String)location.getProperty("description");
-		if (desc==null) desc = "";
+		String desc = "";
 		
 		if (CommonChecks.checkCharacterIsDead(character))
 		{

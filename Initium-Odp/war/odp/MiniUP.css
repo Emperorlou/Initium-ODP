@@ -994,6 +994,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 }
 .make-popup
 {
+	display:block!important;
     max-width: 600px;
     width:300px;
     z-index: 10000000;
@@ -1280,10 +1281,11 @@ hr.items-separator {
 
 .popup_confirm_option
 {
-	margin:20px;
-	color: #DAA520;
-	font-size:36px;
-	cursor:pointer;
+    margin: 20px;
+    padding-top: 10px;
+    color: #DAA520;
+    font-size: 27px;
+    cursor: pointer;
 }
 .popup_prompt_input
 {
@@ -2493,7 +2495,7 @@ position: absolute;
     text-align: center;
     padding-top: 13px;
     padding-left: 1px;
-    top: -12px;
+    top: -34px;
     right: 0px;
     z-index: 1100001;
     font-family: dos;
@@ -2503,8 +2505,8 @@ position: absolute;
 .page-popup-Reload
 {
     position: absolute;
-    top: -12px;
-    left: -4px;
+    top: -34px;
+    left: -34px;
     z-index: 1100001;
     font-family: Lucida Sans;
     font-size: 32px;
@@ -4561,7 +4563,15 @@ body
 	display:inherit;
 }
 
+.this-location-box
+{
+	display:none;
+}
 
+.navigation-box
+{
+	display:none;
+}
 
 
 

@@ -1687,7 +1687,7 @@ function incrementStackIndex()
 	currentPopupStackIndex++;
     if (currentPopupStackIndex==1)
     {
-		$(".main-page #page-popup-root").html("<div class='page-popup-glass'></div><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a>");
+		$("#page-popup-root").html("");
 	    $(document).bind("keydown", popupKeydownHandler);
     }
     else
@@ -1733,8 +1733,9 @@ function pagePopup(url, closeCallback, title)
 	
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
+	
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><div class='page-popup-title'><h4>"+title+"</h4></div><div id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a><div class='page-popup-title'><h4>"+title+"</h4></div><div class='page-popup-content' id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	$("body").scrollTo("#buttonbar");
 	
@@ -1751,7 +1752,7 @@ function pagePopupHtml(title, html)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><div class='page-popup-title'><h4>"+title+"</h4></div><div id='"+pagePopupId+"-content'>"+html+"</div><div class='mobile-spacer'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><div class='page-popup-title'><h4>"+title+"</h4></div><div class='page-popup-content' id='"+pagePopupId+"-content'>"+html+"</div><div class='mobile-spacer'></div></div>");
 	$("body").scrollTo("#buttonbar");
 }
 
@@ -2965,6 +2966,15 @@ function createNewCharacter(event)
 	});
 }
 
+function mustCreateNewCharacter()
+{
+	promptPopup("New Character", "It seems your character died a while ago and we no longer know " + 
+			"what your old character\'s name was. <br>Give your new character a name:", "", function(name){
+		doCommand(event, "NewCharacter", {name:name}, function(){
+		});
+	});
+}
+
 function toggleMainPullout()
 {
 	var mainPullout = $("#main-pullout");
@@ -3197,7 +3207,10 @@ function viewJoinTeam()
 	
 }
 
-
+function viewThisLocationWindow()
+{
+	makeIntoPopup(".this-location-box");
+}
 
 
 
@@ -4125,9 +4138,36 @@ function handleUserRequest(data)
  * it will include a call to doGoto() with all the same parameters in some script tags.
  */
 
-function toggleMinimizeChat()
+function updateMinimizeChat()
+{
+	$(window).load(function(){
+		var minimized = localStorage.getItem("minimizeChat");
+		if (minimized == "true")
+			toggleMinimizeChat(false);
+		else if (minimized == "false")
+			toggleMinimizeChat(true);
+	});
+}
+
+function toggleMinimizeChat(forceHide)
 {
 	$("#chat_tab").toggle();
+	
+	var chatbox = $("#chatbox-container");
+	if (forceHide==false || chatbox.hasClass("chat-hide"))
+	{
+		// Show it
+		localStorage.setItem("minimizeChat", "true");
+		$("#chatbox-container").removeClass("chat-hide");
+		$(".minimize-chat-button").text("<");
+	}
+	else if (forceHide==true || chatbox.hasClass("chat-hide")==false)
+	{
+		// Hide it
+		localStorage.setItem("minimizeChat", "false");
+		$("#chatbox-container").addClass("chat-hide");
+		$(".minimize-chat-button").text(">");
+	}
 }
 
 function toggleMinimizeSoldItems()
@@ -4744,9 +4784,15 @@ function toggleEnvironmentSoundEffects(newState)
 	
 	// Set the correct image for the header mute button
 	if (enabled)
+	{
 		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
+		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-off1.png");
+	}
 	else
+	{
 		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
+		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-on1.png");
+	}
 	
 }
 

@@ -359,10 +359,12 @@ function changeChatTab(code)
 	{
 		$("#"+messageCodes[i]+"_tab").removeClass("chat_tab_selected");
 		$("#"+messageCodes[i]+"_tab_newui").removeClass("selected");
+		$("#"+messageCodes[i]+"_tab_fullui").removeClass("highlighted");
 	}
 
 	$("#"+code+"_tab").addClass("chat_tab_selected");
 	$("#"+code+"_tab_newui").addClass("selected");
+	$("#"+code+"_tab_fullui").addClass("highlighted");
 
 	if (code === "GameMessages")
 		$("#chat_form_wrapper").hide();

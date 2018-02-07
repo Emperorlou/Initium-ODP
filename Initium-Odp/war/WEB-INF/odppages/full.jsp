@@ -287,7 +287,7 @@
 
 <script type="text/javascript">
 	/*Other javascript variables*/
-	window.isPremium = true;
+	window.isPremium = ${isPremium};
 	
 	
 	
@@ -305,6 +305,10 @@
 		
 	});
 
+	// Html5 storage remember our local client
+	updateMinimizeBox("#chat_box_minimize_button", ".chat_box");
+	updateMinimizeChat();
+
 	
 	$(function() {
 	    Pace.on("done", function(){
@@ -317,26 +321,8 @@
 <script type="text/javascript" src="/odp/javascript/reveal-tutorial.js?v=15"></script>
 <script type="text/javascript" src="/odp/javascript/reveal-tutorial-impl.js?v=6"></script>
 
-<!-- Dynamically add style tags that modify -->
-<style id="msw"></style>
-<script type="text/javascript">
-function modifyMaxScreenWidth()
-{
-	var msw = getMaxScreenWidth();
-	if (msw!=1280)
-	{
-		$("#msw").empty();
-		$("#msw").append(".main-page{max-width:"+parseInt(msw)+"px;}");
-	}
-	else
-	{
-		$("#msw").empty();		
-	}
-}
+<script type="text/javascript" src="/odp/full.js?v=1"></script>
 
-modifyMaxScreenWidth();
-
-</script>
 	<link rel="stylesheet" href="/odp/MiniUP.css?t=1"/>
 	<link rel="stylesheet" href="/odp/full.css?t=1"/>
 
@@ -354,45 +340,126 @@ http://github.com/Emperorlou/Initium-ODP
 
                                            -->
 <body>
-	<div  class="banner1">
-		<div class='banner1-rain-effect1'></div>
-	</div>
 
-	<div class='minimap-container'>
-		<div class='minimap-contents'>
-			${globalNavigationMap}
+
+
+	<div id="popups" style="display: none;"></div>
+	<div class='popupBlurrable'>
+		<div  class="banner1">
+			<!-- <div class='banner1-rain-effect1'></div>-->
 		</div>
-		<div class='minimap-overlay'>
+
+
+		<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
+			${inBannerCharacterWidget}
 		</div>
-	</div>
 	
-	<div id="chatbox-container">
-	    <div class="chatbox-tab">!</div>
-	    <div class="chatbox-tab highlighted">Global</div>
-	    <div class="chatbox-tab">Location</div>
-	    <div class="chatbox-tab">Group</div>
-	    <div class="chatbox-tab">Party</div>
-	    <div class="chatbox-tab">Private</div>
-		<div id="chatbox">
-			<div class='chat_messages' id="chat_messages_GameMessages"></div>
-			<div class='chat_messages' id="chat_messages_GlobalChat"></div>
-			<div class='chat_messages' id="chat_messages_LocationChat"></div>
-			<div class='chat_messages' id="chat_messages_GroupChat"></div>
-			<div class='chat_messages' id="chat_messages_PartyChat"></div>
-			<div class='chat_messages' id="chat_messages_PrivateChat"></div>
+		<div class='minimap-container'>
+			<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->
+			<div class='minimap-contents'>
+				${globalNavigationMap}
+			</div>
+			<div class='minimap-overlay'></div>
+			<div class='minimap-button minimap-button-map' onclick='viewGlobeNavigation()'></div>
 		</div>
-	</div>    
-
-
-
+		
+		
+		<div class='main-buttonbar-container'>
+		    <div class='main-buttonbar main-buttonbar-mobile' >
+				<div class="type1-button" id='button1'>
+				</div>
+				<div class="type1-button" id='button2'>
+				</div>
+				<div class="type1-button" id='button3'>
+				</div>
+				<div class="type1-button" id='button4'>
+				</div>
+				<div class="type1-button" id='button5'>
+				</div>
+				<div class="type1-button" id='button6'>
+				</div>
+				<div id='immovablesPanel'>${immovablesPanel}</div>
+				
+				<!-- Micro Menu -->
+				<div class='type2-button' id='mm-button1' onclick='inventory();'><img src='https://initium-resources.appspot.com/images/ui4/micromenu-button-character1.png'/></div>
+				<div class='type2-button' id='mm-button2' onclick='viewQuests();'><img src='https://initium-resources.appspot.com/images/ui4/micromenu-button-quests1.png'/></div>
+				<div class='type2-button' id='mm-button3' onclick='viewManageStore();'><img src='https://initium-resources.appspot.com/images/ui4/micromenu-button-mystore1.png'/></div>
+				
+		    </div>
+		</div>
 	
 		
+		<div id="chatbox-container">
+		    <div class="chatbox-tab minimize-chat-button" onclick='toggleMinimizeChat()'>&lt;</div>
+		    <div id='GameMessages_tab_fullui' class="chatbox-tab" onclick='changeChatTab("GameMessages")'>!</div>
+		    <div id='GlobalChat_tab_fullui' class="chatbox-tab highlighted"onclick='changeChatTab("GlobalChat")'>Global</div>
+		    <div id='LocationChat_tab_fullui' class="chatbox-tab"onclick='changeChatTab("LocationChat")'>Location</div>
+		    <div id='GroupChat_tab_fullui' class="chatbox-tab"onclick='changeChatTab("GroupChat")'>Group</div>
+		    <div id='PartyChat_tab_fullui' class="chatbox-tab"onclick='changeChatTab("PartyChat")'>Party</div>
+		    <div id='PrivateChat_tab_fullui' class="chatbox-tab"onclick='changeChatTab("PrivateChat")'>Private</div>
+			<div id="chatbox">
+				<div class='chat_messages' id="chat_messages_GameMessages"></div>
+				<div class='chat_messages' id="chat_messages_GlobalChat"></div>
+				<div class='chat_messages' id="chat_messages_LocationChat"></div>
+				<div class='chat_messages' id="chat_messages_GroupChat"></div>
+				<div class='chat_messages' id="chat_messages_PartyChat"></div>
+				<div class='chat_messages' id="chat_messages_PrivateChat"></div>
+			</div>
+			<div class='chatbox-input-bar'>
+				<form id="chat_form">
+					<input class='chatbox-input-bar-input' id="chat_input" type="text" autocomplete="off" maxlength='2000'/>
+					<input class='chatbox-input-bar-submit' id="chat_submit" type="submit" value='Submit'/>
+				</form>
+			</div>
+		</div>    
+	
+		<div class='main-page popupBlurrable'>
+			<div class='header v3-header1'>
+				<div class='header-inner'>
+					<div id='pullout-button' class='header-inner-section'><a onclick='toggleMainPullout()'><img src='https://initium-resources.appspot.com/images/ui3/header-button-options1.png' alt='Pullout menu' height='34px'/></a></div>
+					<div class='header-inner-section' style='width:100%;vertical-align: middle; text-align: center;'><div style='margin-left:-32px; margin-right:-22px;'><a id='locationName' onclick='location.reload()'>${locationName }</a></div></div>
+					<div id='mainMoneyIndicator' class='header-inner-section' onclick='viewProfile()'>
+						${mainGoldIndicator}
+					</div>
+					<!-- <div id='map-button' class='header-inner-section'><a onclick='viewMap()'><img alt='View player-made world map' src='https://initium-resources.appspot.com/images/ui3/header-button-map1.png' height='34px'/></a></div> -->
+					<div id='settings-button' class='header-inner-section'><a onclick='viewSettings()'><img alt='Game settings' src='https://initium-resources.appspot.com/images/ui3/header-button-settings1.png' height='34px'/></a></div>
+					<div id='sound-button' class='header-inner-section'><a onclick='toggleEnvironmentSoundEffects()'><img alt='Sound effects' src='https://initium-resources.appspot.com/images/ui3/header-button-sound-on1.png' height='34px'/></a></div>
+				</div>
+			</div>
+		</div>
+			
+		<div id='page-popup-root'></div> 
+	
+		<div id='global-navigation-map'>${globalNavigationMap}</div>	
+	</div>
 
-	<div id='global-navigation-map'>${globalNavigationMap}</div>	
 
+	<div class='hiddenPullout' id='main-pullout'>
+		<div class='hiddenPullout-content'>
+			<h5 style='margin-top:0px;'>Your Referrals</h5>
+			<p><a href='${refUrl}' title='Share this link online and with your friends'>Your referral link (share this!)</a></p>
+			<div style='margin-left:10px'>
+			<p>
+				Referral views: ${referralViews}<br>
+				Referral signups: ${referralSignups}<br>
+				Referral donations: $${referralDonations}
+			</p>
+			</div>
+			<br/>
+			<p><a onclick='toggleMainPullout(); viewCharacterSwitcher()'>Switch characters</a></p>
+			<p><a onclick='toggleMainPullout(); viewProfile()'>View your profile</a></p>
+			<p><a onclick='toggleMainPullout(); popupCharacterTransferService(${characterId}, "<c:out value="${characterName}"/>", "<c:out value="${characterToTransfer}"/>")' style='cursor:pointer'>Open the Character Transfer Service</a></p>
+			<p><a onclick='toggleMainPullout(); uiTutorial.run();'>Watch the UI tutorial</a></p>
+			<p><a onclick='toggleMainPullout(); viewAutofix()'>Help! Something's Wrong!</a></p>
+			<p><a onclick='toggleMainPullout(); logout()'>Logout</a></p>
+		</div>
+	</div>
+
+		
 	<script id='ajaxJs' type='text/javascript'>
 	${bannerJs}
 	</script>
+
 
 </body>
 </html>

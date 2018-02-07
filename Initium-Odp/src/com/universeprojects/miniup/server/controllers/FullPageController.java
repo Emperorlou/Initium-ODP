@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
-import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.GamePageUpdateService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -50,7 +50,10 @@ public class FullPageController extends PageController {
 
 		long serverTime = System.currentTimeMillis();
 		request.setAttribute("serverTime", serverTime);
+				
+		request.setAttribute("isTestServer", GameUtils.isTestServer(request));
 		
+		request.setAttribute("userId", db.getCurrentUserKey().getId());
 		
 		// Getting user data...
 		CachedEntity user = db.getCurrentUser();
@@ -65,7 +68,12 @@ public class FullPageController extends PageController {
 		// Getting character data...
 		CachedEntity character = db.getCurrentCharacter();
 		if (character==null)
-			throw new RuntimeException("Character is null. We have to code something to handle this.");
+		{
+			
+			String js = "mustCreateNewCharacter();";
+			request.setAttribute("bannerJs", js);	
+			return "/WEB-INF/odppages/full.jsp";
+		}
 		
 		request.setAttribute("chatIdToken", db.getChatIdToken(character.getKey()));
 		if (user!=null)

@@ -75,23 +75,23 @@ public abstract class JspSnippets
 						"');</script>");
 			}
 		}
-		String queryString = request.getQueryString();
-		StringBuffer url = request.getRequestURL();
-		if(queryString != null && queryString.trim().isEmpty() == false) {
-			queryString = queryString.replaceAll("message=[^&]*", "");
-			queryString = queryString.replaceAll("error=[^&]*", "");
-			queryString = queryString.replaceAll("v=[^&]*", "");
-			queryString = queryString.replaceAll("&&+","&");
-			if(queryString.startsWith("&"))
-				queryString = queryString.substring(1);
-			if(queryString.trim().isEmpty() == false)
-				url.append("?").append(queryString);
-		}
-
-
-		//Cleanup parameters
-		if (cleanupParams)
-			out.println("<script type='text/javascript'>window.history.replaceState(null, document.title, \""+url.toString()+"\");</script>");
+//		String queryString = request.getQueryString();
+//		StringBuffer url = request.getRequestURL();
+//		if(queryString != null && queryString.trim().isEmpty() == false) {
+//			queryString = queryString.replaceAll("message=[^&]*", "");
+//			queryString = queryString.replaceAll("error=[^&]*", "");
+//			queryString = queryString.replaceAll("v=[^&]*", "");
+//			queryString = queryString.replaceAll("&&+","&");
+//			if(queryString.startsWith("&"))
+//				queryString = queryString.substring(1);
+//			if(queryString.trim().isEmpty() == false)
+//				url.append("?").append(queryString);
+//		}
+//
+//
+//		//Cleanup parameters
+//		if (cleanupParams)
+//			out.println("<script type='text/javascript'>window.history.replaceState(null, document.title, \""+url.toString()+"\");</script>");
 		
 		
 		
