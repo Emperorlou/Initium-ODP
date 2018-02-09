@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.appengine.api.datastore.Key;
@@ -62,6 +63,7 @@ public class PropertiesService extends Service {
 			playerHouse.setProperty("ownerKey", user.getKey());
 			playerHouse.setProperty("isOutside", "FALSE");
 			playerHouse.setProperty("supportsCampfires", 1L);
+			playerHouse.setProperty("createdDate", new Date());
 
 			ds.put(playerHouse);
 			

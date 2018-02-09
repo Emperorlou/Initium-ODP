@@ -4597,9 +4597,7 @@ public class ODPDBAccess
 				public Map<String, Object> doTransaction(CachedDatastoreService ds) 
 				{
 					boolean giveLootToAttacker = false;
-					CachedEntity characterToDie = db.refetch(characterToDieFinal);
-					CachedEntity attackingCharacter = db.refetch(attackingCharacterFinal);
-					CachedEntity dyingCharacterLocation = db.refetch(locationFinal);
+ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationFinal));
 					
 					// We no longer set the character name to Dead here. We now do that from the death screen.
 //						String charName = (String)characterToDie.getProperty("name");	// Save the character name for later
@@ -4608,22 +4606,22 @@ public class ODPDBAccess
 					
 					
 					boolean attackingCharacterNeedsNotification = false;
-					if (GameUtils.enumEquals(attackingCharacter.getProperty("combatType"), CombatType.DefenceStructureAttack))
+					if (GameUtils.enumEquals(attackingCharacterFinal.getProperty("combatType"), CombatType.DefenceStructureAttack))
 						attackingCharacterNeedsNotification = false;
 					
 					// Now make the attacking character no longer in combat mode
-					setCharacterMode(null, attackingCharacter, ODPDBAccess.CHARACTER_MODE_NORMAL);
-					attackingCharacter.setProperty("combatant", null);
-					attackingCharacter.setProperty("combatType", null);
-					attackingCharacter.setProperty("locationEntryDatetime", new Date());
+					setCharacterMode(null, attackingCharacterFinal, ODPDBAccess.CHARACTER_MODE_NORMAL);
+					attackingCharacterFinal.setProperty("combatant", null);
+					attackingCharacterFinal.setProperty("combatType", null);
+					attackingCharacterFinal.setProperty("locationEntryDatetime", new Date());
 	
 					// Make the attacking character party no longer in combat mode
 					List<CachedEntity> party = getParty(ds, attackingCharacterFinal);
 					if (party != null) {
-						setPartiedField(party, attackingCharacter, "mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
-						setPartiedField(party, attackingCharacter, "combatant", null);
-						setPartiedField(party, attackingCharacter, "combatType", null);
-						setPartiedField(party, attackingCharacter, "locationEntryDatetime", new Date());
+						setPartiedField(party, attackingCharacterFinal, "mode", ODPDBAccess.CHARACTER_MODE_NORMAL);
+						setPartiedField(party, attackingCharacterFinal, "combatant", null);
+						setPartiedField(party, attackingCharacterFinal, "combatType", null);
+						setPartiedField(party, attackingCharacterFinal, "locationEntryDatetime", new Date());
 					}
 					
 					////////////////////////
@@ -4631,49 +4629,49 @@ public class ODPDBAccess
 			
 					
 					// First, always set the timestamp
-					characterToDie.setProperty("locationEntryDatetime", new Date());
+					characterToDieFinal.setProperty("locationEntryDatetime", new Date());
 
 					
 					// If the attacker is a PC
-					if (attackingCharacter.getProperty("type")==null || "".equals(attackingCharacter.getProperty("type")) || "PC".equals(attackingCharacter.getProperty("type")))
+					if (attackingCharacterFinal.getProperty("type")==null || "".equals(attackingCharacterFinal.getProperty("type")) || "PC".equals(attackingCharacterFinal.getProperty("type")))
 					{
-						if (dyingCharacterLocation.getProperty("type")!=null && dyingCharacterLocation.getProperty("type").equals("CombatSite"))
+						if (locationFinal.getProperty("type")!=null && locationFinal.getProperty("type").equals("CombatSite"))
 						{
 							// Now change the location's banner to the generic defeated banner
-							dyingCharacterLocation.setProperty("banner", "images/npc-defeated1.jpg");
-							dyingCharacterLocation.setProperty("description", "This is the location where a battle took place, but the battle is over now.");
+							locationFinal.setProperty("banner", "images/npc-defeated1.jpg");
+							locationFinal.setProperty("description", "This is the location where a battle took place, but the battle is over now.");
 						}
 					}
 					
 					// If the killed character is a NPC
-					if (characterToDie.getProperty("type")==null || "".equals(characterToDie.getProperty("type")) || "NPC".equals(characterToDie.getProperty("type")))
+					if (characterToDieFinal.getProperty("type")==null || "".equals(characterToDieFinal.getProperty("type")) || "NPC".equals(characterToDieFinal.getProperty("type")))
 					{
-						resetInstanceRespawnTimer(dyingCharacterLocation);
+						resetInstanceRespawnTimer(locationFinal);
 						
 						
-						characterToDie.setProperty("mode", "DEAD");
-						characterToDie.setProperty("name", "Dead "+characterToDie.getProperty("name"));
+						characterToDieFinal.setProperty("mode", "DEAD");
+						characterToDieFinal.setProperty("name", "Dead "+characterToDieFinal.getProperty("name"));
 					}
 					else
 					{
-						characterToDie.setProperty("mode", "UNCONSCIOUS");
+						characterToDieFinal.setProperty("mode", "UNCONSCIOUS");
 						
-						doCharacterDieChance(characterToDie);
+						doCharacterDieChance(characterToDieFinal);
 					}
 					
 					// If the attacking character was at full health when he killed his opponent, award a buff
-					if (attackingCharacter.getProperty("hitpoints").equals(attackingCharacter.getProperty("maxHitpoints")))
+					if (attackingCharacterFinal.getProperty("hitpoints").equals(attackingCharacterFinal.getProperty("maxHitpoints")))
 					{
-						awardBuff_Pumped(ds, attackingCharacter);
+						awardBuff_Pumped(ds, attackingCharacterFinal);
 					}
 					
 
 					// If the character was a party leader, re-assign leader to another player (a LIVE one hopefully)
-					if ("TRUE".equals(characterToDie.getProperty("partyLeader")))
+					if ("TRUE".equals(characterToDieFinal.getProperty("partyLeader")))
 					{
 						Double maxDex = 0.0d;
 						CachedEntity newLeader = null;
-						List<CachedEntity> partyMembers = getParty(db, characterToDie);
+						List<CachedEntity> partyMembers = getParty(db, characterToDieFinal);
 						if (partyMembers!=null)
 							for(CachedEntity member:partyMembers)
 								if (GameUtils.isPlayerIncapacitated(member)==false && (Double)member.getProperty("dexterity") > maxDex)
@@ -4684,7 +4682,7 @@ public class ODPDBAccess
 						
 						if(newLeader != null)
 						{
-							characterToDie.setProperty("partyLeader", "FALSE");
+							characterToDieFinal.setProperty("partyLeader", "FALSE");
 							newLeader.setProperty("partyLeader", "TRUE");
 							db.put(newLeader);
 						}
@@ -4712,7 +4710,7 @@ public class ODPDBAccess
 //
 //					}
 					if (attackingCharacterNeedsNotification)
-						sendNotification(db, attackingCharacter.getKey(), NotificationType.fullpageRefresh);
+						sendNotification(db, attackingCharacterFinal.getKey(), NotificationType.fullpageRefresh);
 					
 
 					// Here we check if the battle took place in an instance, defence structure, or territory. If so, 
@@ -4720,50 +4718,50 @@ public class ODPDBAccess
 					// ALSO
 					// If the fight took place in a non-combat site AND the hitpoints is less than 100, we will auto loot
 					Long gold = null;
-					CachedEntity attackerCharacterLocation = getEntity((Key)attackingCharacter.getProperty("locationKey"));
+					CachedEntity attackerCharacterLocation = getEntity((Key)attackingCharacterFinal.getProperty("locationKey"));
 					if (	
 							/* If the attacker or defender were standing in an instance*/
-							(dyingCharacterLocation.getProperty("territoryKey")!=null || 
-							dyingCharacterLocation.getProperty("defenceStructure")!=null || 
-							"Instance".equals(dyingCharacterLocation.getProperty("combatType")) ||
+							(locationFinal.getProperty("territoryKey")!=null || 
+									locationFinal.getProperty("defenceStructure")!=null || 
+							"Instance".equals(locationFinal.getProperty("combatType")) ||
 							attackerCharacterLocation.getProperty("territoryKey")!=null || 
 							attackerCharacterLocation.getProperty("defenceStructure")!=null || 
 							"Instance".equals(attackerCharacterLocation.getProperty("combatType")))
 							||
 							/* If the fight took place in a non-combat site and the max hitpoints of the defender was less than 100 */
-							("CombatSite".equals(dyingCharacterLocation.getProperty("type"))==false &&
-							(Double)characterToDie.getProperty("maxHitpoints")<100d)
+							("CombatSite".equals(locationFinal.getProperty("type"))==false &&
+							(Double)characterToDieFinal.getProperty("maxHitpoints")<100d)
 						)
 					{
-						gold = (Long)characterToDie.getProperty("dogecoins");
-						if (attackingCharacter.getProperty("dogecoins")==null) attackingCharacter.setProperty("dogecoins", 0L);
+						gold = (Long)characterToDieFinal.getProperty("dogecoins");
+						if (attackingCharacterFinal.getProperty("dogecoins")==null) attackingCharacterFinal.setProperty("dogecoins", 0L);
 						
 						if (gold!=null)
-							attackingCharacter.setProperty("dogecoins", ((Long)attackingCharacter.getProperty("dogecoins"))+gold);
-						characterToDie.setProperty("dogecoins", 0l);
+							attackingCharacterFinal.setProperty("dogecoins", ((Long)attackingCharacterFinal.getProperty("dogecoins"))+gold);
+						characterToDieFinal.setProperty("dogecoins", 0l);
 						giveLootToAttacker = true;
 					}
 					
 
-					characterToDie.setProperty("combatType", null);
-					characterToDie.setProperty("status", CharacterMode.NORMAL.toString());
-					characterToDie.setProperty("combatant", null);
+					characterToDieFinal.setProperty("combatType", null);
+					characterToDieFinal.setProperty("status", CharacterMode.NORMAL.toString());
+					characterToDieFinal.setProperty("combatant", null);
 					
 					// Leave the party if we haven't already
-					doRequestLeaveParty(ds, characterToDie, true);
+					doRequestLeaveParty(ds, characterToDieFinal, true);
 					
-					db.put(characterToDie);
-					db.put(dyingCharacterLocation);
-					db.put(attackingCharacter);
+					db.put(characterToDieFinal);
+					db.put(locationFinal);
+					db.put(attackingCharacterFinal);
 					if (party != null) {
-						putPartyMembersToDB_SkipSelf(db, party, attackingCharacter);
+						putPartyMembersToDB_SkipSelf(db, party, attackingCharacterFinal);
 					}
 					
 					Map<String, Object> result = new HashMap<String, Object>();
 					
-					result.put("characterToDie", characterToDie);
-					result.put("attackingCharacter", attackingCharacter);
-					result.put("location", dyingCharacterLocation);
+					result.put("characterToDie", characterToDieFinal);
+					result.put("attackingCharacter", attackingCharacterFinal);
+					result.put("location", locationFinal);
 					result.put("giveLootToAttacker", giveLootToAttacker);
 					result.put("goldCollected", gold);
 					
@@ -4776,9 +4774,9 @@ public class ODPDBAccess
 			throw new RuntimeException(e.getMessage());
 		}
 
-		CachedEntity characterToDie = (CachedEntity)result.get("characterToDie");
-		CachedEntity location = (CachedEntity)result.get("location");
-		CachedEntity attackingCharacter = (CachedEntity)result.get("attackingCharacter");
+		CachedEntity characterToDie = characterToDieFinal;
+		CachedEntity location = locationFinal;
+		CachedEntity attackingCharacter = attackingCharacterFinal;
 		boolean giveLootToAttacker = (Boolean)result.get("giveLootToAttacker");
 		boolean overburdened = false;
 		
@@ -4892,12 +4890,12 @@ public class ODPDBAccess
 		
 		// Finally, lets update the character that was passed into this method so further processing will have
 		// the updated field values
-		CachedDatastoreService.copyFieldValues(characterToDie, characterToDieFinal);
-		CachedDatastoreService.copyFieldValues(attackingCharacter, attackingCharacterFinal);
+		// DEPRECATED: We are maintaining proper state directly on the referenced entity.
+		//CachedDatastoreService.copyFieldValues(characterToDie, characterToDieFinal);
+		//CachedDatastoreService.copyFieldValues(attackingCharacter, attackingCharacterFinal);
 		
 		return loot;
 	}
-	
 	
 	
 	
