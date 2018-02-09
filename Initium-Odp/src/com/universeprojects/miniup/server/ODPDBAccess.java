@@ -5877,13 +5877,18 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		// 1. If the monster is dead
 		// 2. If the monster has no money on him anymore
 		// 3. If the player chose "leave and forget"
+		// 4. Site has no characters.
 		// Then we will force delete the site
-		if (leaveAndForget && forceDelete==false && characters.size()==1 && paths.size()==1)
+		if (leaveAndForget && forceDelete==false && characters.size()<=1 && paths.size()==1)
 		{
-			CachedEntity monster = characters.get(0);
-			if ("NPC".equals(monster.getProperty("type")) &&
+			CachedEntity monster = null;
+			
+			if(characters.isEmpty()==false)
+				monster = characters.get(0);
+			
+			if (monster == null || ("NPC".equals(monster.getProperty("type")) &&
 					(Double)monster.getProperty("hitpoints")<1 &&
-					(long)monster.getProperty("dogecoins")==0)
+					(long)monster.getProperty("dogecoins")==0))
 			{
 				forceDelete = true;
 			}

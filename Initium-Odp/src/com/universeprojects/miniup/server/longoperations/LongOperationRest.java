@@ -42,11 +42,18 @@ public class LongOperationRest extends LongOperation {
 			if("CampSite".equals(locationType))
 				throw new UserErrorMessage("You don't need to rest, you're already at full health! NOW GET OUT THERE AND KICK SOME ASS!");
 			
+			boolean hasDrunk = false;
+			boolean hasWellRested = false;
 			for(CachedEntity buff:db.getBuffsFor(db.getCurrentCharacterKey()))
 			{
 				if("Well Rested".equals(buff.getProperty("name")))
-					throw new UserErrorMessage("You don't need to rest, you're already at full health and well rested! NOW GET OUT THERE AND KICK SOME ASS!");
+					hasWellRested = true;
+				if("Drunk".equals(buff.getProperty("name")))
+					hasDrunk = true;
 			}
+			
+			if(hasWellRested == true && hasDrunk == false)
+				throw new UserErrorMessage("You don't need to rest, you're already at full health and well rested! NOW GET OUT THERE AND KICK SOME ASS!");
 		}
 		
 		// Check, if it's night time and we're outside, that we have a fire going
@@ -96,6 +103,16 @@ public class LongOperationRest extends LongOperation {
 		// ie. If this is a player house, then it should be a RestSite and have an owner.
 		if (CommonChecks.checkLocationIsGoodRestSite(location))
 		{
+			List<CachedEntity> curBuffs = db.getBuffsFor(db.getCurrentCharacterKey());
+			for(int i = curBuffs.size()-1; i>=0; i--)
+			{
+				CachedEntity buff = curBuffs.get(i);
+				if(buff != null && "Drunk".equals(buff.getProperty("name")))
+				{
+					ds.delete(buff);
+					curBuffs.remove(i);
+				}
+			}
 			db.awardBuff_WellRested(ds, db.getCurrentCharacter());
 		}
 		else
