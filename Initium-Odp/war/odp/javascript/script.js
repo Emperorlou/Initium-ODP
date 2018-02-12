@@ -993,7 +993,7 @@ function compareArmor (a, b) {
 }
 
 function compareWeapons(a, b) {
-	var parser = /(\d+)D(\d+)x([.\d]+) (\d+)% \(([\d.,]+)\/([\d.,]+)\).*?([\-\d]+)\/([\-\d]+)\/([\-\d]+) ([EGAPMN])\/([EGAPMN])\/([EGAPMN])/;
+	var parser = /(\d+)D(\d+)x([.\d]+) (-?\d+)% \(([\d.,]+)\/([\d.,]+)\).*?([\-\d]+)\/([\-\d]+)\/([\-\d]+) ([EGAPMN])\/([EGAPMN])\/([EGAPMN])/;
     var astats = parser.exec($(a).find('[minitip]').attr('minitip'));
     var bstats = parser.exec($(b).find('[minitip]').attr('minitip'));
     var amax = parseFloat(astats[5]);
