@@ -118,7 +118,7 @@ public abstract class CommandScriptBase extends Command {
 				ContainerService cs = new ContainerService(db);
 				
 				if(cs.checkContainerAccessAllowed(character, entitySource)==false)
-					throw new UserErrorMessage("You are not located at the specified trigger location!");
+					throw new UserErrorMessage("This item is not within your reach!");
 				break;
 			}
 			default:

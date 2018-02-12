@@ -423,11 +423,17 @@ public class HtmlComponents {
 		return generateButtonBarItem("questButton", "Open your quests page", "viewQuests(event)", "https://initium-resources.appspot.com/images/ui/quest1.png");
 	}
 	
+	public static String generateInventoryButton()
+	{
+		return generateButtonBarItem("inventoryButton", "Open your inventory", "inventory(event)", "https://initium-resources.appspot.com/images/ui/backpack1.png");
+	}
+	
 	public static String generateButtonBar(CachedEntity character)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("<div id='buttonbar-main' class='header-inner'>");
+		sb.append("<div id='buttonbar-main' class='header-inner' style='padding-top: 5px;'>");
 		// Buttons
+		sb.append("<span>" + generateInventoryButton() + "</span>");
 		sb.append("<span>" + generateQuestButton() + "</span>");
 		sb.append("<span>" + generateInventionButton() + "</span>");
 		sb.append("<span>" + generateManageStoreButton() + "</span>");
@@ -437,6 +443,8 @@ public class HtmlComponents {
 		sb.append("<span>" + generateToggleCloak(character) + "</span>");
 		// Help text
 		sb.append("<div class='hiddenTooltip' id='buttonbar-help'><h5>The Button Bar</h5>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/backpack1.png' border='0' style='float:left; padding:4px;'>");
+		sb.append("<p>This is your inventory. Click here to see what you have on you and to equip weapons and armor on your character.</p>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/quest1.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This is your quest log. New players are given a set of quests to help them learn the game. Here is where you start new quests and complete ongoing ones.</p>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/invention1.png' border='0' style='float:left; padding:4px;'>");

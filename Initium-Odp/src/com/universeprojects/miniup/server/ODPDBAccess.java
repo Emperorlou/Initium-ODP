@@ -6514,6 +6514,12 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		return null;
 	}
 
+	public List<List<Object>> get2DCollectionValueFromEntity(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/**
 	 * Picks up the character, ensuring the user accounts are different,
 	 * characters are at the same location, and pickupCharacter is able to
@@ -6890,5 +6896,11 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 	public void increaseKnowledgeForEquipment100(CachedEntity equipment)
 	{
 		
+	}
+
+	public String getFieldTypeFor(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

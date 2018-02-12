@@ -1187,6 +1187,7 @@ public class MainPageUpdateService extends Service
 
 	public String updateLocationDescription()
 	{
+		StringBuilder html = new StringBuilder();
 		String desc = "";
 		
 		if (CommonChecks.checkCharacterIsDead(character))
@@ -1222,6 +1223,20 @@ public class MainPageUpdateService extends Service
 				desc += "</p>";
 			}
 			
+		}
+
+		
+
+		// Here we add the camp situation
+		html.append(desc);
+		if (CommonChecks.checkCharacterIsIncapacitated(character)==false && cs.isInCombat(character)==false)
+		{
+			html.append("<div class='main-description'>");
+			if(location != null && db.isCharacterAbleToCreateCampsite(ds, character, location))
+				html.append("This location could host up to " + location.getProperty("supportsCamps") + " camps.");
+			else
+				html.append("This location is not suitable for a camp.");
+			html.append("</div>");
 		}
 		
 		return updateHtmlContents("#locationDescription", desc);

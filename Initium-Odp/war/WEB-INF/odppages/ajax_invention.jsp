@@ -1,22 +1,6 @@
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <%@ page language="java" contentType="text/html; charset=UTF8" pageEncoding="UTF8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<script type='text/javascript'>
-function changeInventionTab(event)
-{
-	var element = $(event.target);
-	var id = element.attr("id");
-	var code = id.substring(0, id.indexOf("-"));
-	
-	$(".tab-selected").removeClass("tab-selected");
-	element.addClass("tab-selected");
-	
-	$(".tab-content-selected").removeClass("tab-content-selected");
-	$(".tab-content#"+code+"-content").addClass("tab-content-selected");
-	console.log(code);
-}
-
-</script>
 <div class='highlightbox-red'>Please be aware that the invention system is still very new at this point and not particularly useful YET.</div>
 <div class='tab-row normal-container backdrop1b'>
 	<div onclick='changeInventionTab(event)' class='tab-row-tab' id='knowledge-tab'></div>
@@ -141,3 +125,29 @@ function changeInventionTab(event)
 		
 	</div>
 </div>
+
+<script type='text/javascript'>
+function changeInventionTab(event)
+{
+	var element = $(event.target);
+	var id = element.attr("id");
+	var code = id.substring(0, id.indexOf("-"));
+	
+	$(".tab-selected").removeClass("tab-selected");
+	element.addClass("tab-selected");
+	
+	$(".tab-content-selected").removeClass("tab-content-selected");
+	$(".tab-content#"+code+"-content").addClass("tab-content-selected");
+	console.log(code);
+	
+	localStorage.setItem("invention_page_tab", code);
+}
+
+// Kinda hacky but it's short and it'll prolly work
+var lastTab = localStorage.getItem("invention_page_tab");
+if(lastTab!=null)
+{
+	changeInventionTab({target:$("#"+lastTab+"-tab")[0]});
+}
+
+</script>

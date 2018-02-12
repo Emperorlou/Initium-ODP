@@ -1871,7 +1871,7 @@ function loadInlineCollectables()
 	$("#collectables-area").load("ajax_collectables.jsp?ajax=true&char="+window.characterOverride);	
 }
 
-function inventory()
+function inventory(event)
 {
 	pagePopup("/odp/ajax_inventory.jsp", null, "Your Inventory");
 }
@@ -4935,4 +4935,9 @@ function changeGenericTab(event, tabId)
 	$("."+tabId+".tab-content-selected").removeClass("tab-content-selected").addClass("tab-content");
 	$("."+tabId+"."+code+"-content").addClass("tab-content-selected").removeClass("tab-content");
 	console.log(code);
+}
+
+function addType1Button()
+{
+	// A placeholder since this is actually in full.js now
 }
