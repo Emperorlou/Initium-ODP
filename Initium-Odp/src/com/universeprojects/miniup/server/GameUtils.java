@@ -1382,10 +1382,11 @@ public class GameUtils
 		sb.append("		<div class='main-item-container'>");
 		sb.append("			" + GameUtils.renderItem(db, character, item) + saleText + "<br/>");
 		sb.append("			<div class='main-item-controls'>");
-		sb.append("				<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
+		if(CommonChecks.checkItemIsEquippable(item))
+			sb.append("				<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
 		sb.append("				<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
 		if (item.getProperty("maxWeight") != null) {
-			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"
+			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"
 										+ character.getId()
 										+ "&otherSide=Item_"
 										+ item.getKey().getId() + "\")'>Open</a>");
