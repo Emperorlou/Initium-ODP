@@ -1139,13 +1139,15 @@ function helpPopup()
 function shareItem(itemId)
 {
 	var message = "Item("+itemId+")";
-	if (messager.channel == "PrivateChat" && currentPrivateChatCharacterId!=null)
+	
+	var target = null;
+    if (messager.channel == "PrivateChat" && currentPrivateChatCharacterId!=null)
 	{
-		message = "#"+currentPrivateChatCharacterId + ": "+message;
+		target = "#"+currentPrivateChatCharacterId;
 	}
 	else if (messager.channel == "PrivateChat" && currentPrivateChatCharacterName!=null)
 	{
-		message = currentPrivateChatCharacterName + ": "+message;
+		target = currentPrivateChatCharacterName;
 	}
 
 	if (messager.channel == "PrivateChat" && currentPrivateChatCharacterName==null)
@@ -1153,9 +1155,8 @@ function shareItem(itemId)
 		alert("You cannot chat privately until you select a person to chat privately with. Click on their name and then click on Private Chat.");
 		return;
 	}
-
 	
-	messager.sendMessage(message);
+	messager.sendMessage(message, target);
 	//popupMessage("Item shared", "Everyone who is in your location can now see the item you just shared.");
 	
 	closeAllTooltips();
