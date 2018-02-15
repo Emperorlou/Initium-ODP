@@ -41,8 +41,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=246"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=226">
+<script type="text/javascript" src="/odp/javascript/script.js?v=248"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=228">
 
 
 
@@ -59,7 +59,7 @@
 <script src="javascript/rangeslider/rangeslider.min.js"></script>
 
 <script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
-<script src='/odp/javascript/map.js?t=4'></script>
+<script src='/odp/javascript/map.js?t=5'></script>
 
 <script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit" async defer></script>
 

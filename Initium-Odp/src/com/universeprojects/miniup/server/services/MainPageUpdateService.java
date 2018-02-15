@@ -832,7 +832,7 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<div class='main-buttonbox v3-window3 this-location-box'>");
 		newHtml.append("<h4>This Location</h4>");
 		
-		newHtml.append("<div>");
+		newHtml.append("<div id='in-button-list-location-description'>");
 		String desc = (String)location.getProperty("description");
 		if (desc==null) desc = "";
 		newHtml.append(desc);
@@ -1188,7 +1188,8 @@ public class MainPageUpdateService extends Service
 	public String updateLocationDescription()
 	{
 		StringBuilder html = new StringBuilder();
-		String desc = "";
+		String desc = (String)location.getProperty("description");
+		if (desc==null) desc = "";
 		
 		if (CommonChecks.checkCharacterIsDead(character))
 		{

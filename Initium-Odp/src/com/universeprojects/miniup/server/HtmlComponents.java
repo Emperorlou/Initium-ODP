@@ -418,6 +418,11 @@ public class HtmlComponents {
 		return generateButtonBarItem("inventionButton", "Open your invention page", "viewInvention(event)", "https://initium-resources.appspot.com/images/ui/invention1.png");
 	}
 	
+	public static String generateMapButton()
+	{
+		return generateButtonBarItem("mapButton", "Open a player-made map of the world", "viewMap(event)", "https://initium-resources.appspot.com/images/ui/playerMap1.png");
+	}
+	
 	public static String generateQuestButton()
 	{
 		return generateButtonBarItem("questButton", "Open your quests page", "viewQuests(event)", "https://initium-resources.appspot.com/images/ui/quest1.png");
@@ -435,11 +440,12 @@ public class HtmlComponents {
 		// Buttons
 		sb.append("<span>" + generateInventoryButton() + "</span>");
 		sb.append("<span>" + generateQuestButton() + "</span>");
+		sb.append("<span>" + generateMapButton() + "</span>");
 		sb.append("<span>" + generateInventionButton() + "</span>");
 		sb.append("<span>" + generateManageStoreButton() + "</span>");
 		sb.append("<span>" + generateToggleStorefront(character) + "</span>");
 		sb.append("<span>" + generateTogglePartyJoin(character) + "</span>");
-		sb.append("<span>" + generateToggleDuel(character) + "</span>");
+//		sb.append("<span>" + generateToggleDuel(character) + "</span>");
 		sb.append("<span>" + generateToggleCloak(character) + "</span>");
 		// Help text
 		sb.append("<div class='hiddenTooltip' id='buttonbar-help'><h5>The Button Bar</h5>");
@@ -456,9 +462,9 @@ public class HtmlComponents {
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/partyJoinsAllowed.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This is the party join button. When enabled (without the red cross), other characters will be able to join you in a party. If you are not already in a party then when someone joins you, you will automatically become the party leader. <br>");
 		sb.append("More information on parties and how they work can be found in the <a href='odp/mechanics.jsp#parties'>game mechanics page</a>.</p>");
-		sb.append("<img src='https://initium-resources.appspot.com/images/ui/duelRequestsAllowed.png' border='0' style='float:left; padding:4px;'>");
-		sb.append("<p>This button allows you to control whether or not you are accepting duel requests. When enabled, other players are able to request to duel with you. You will be given the option to accept a duel request or deny it. When you accept, you will be whisked away into a special arena where you and the other player will engage in battle.<br>"); 
-		sb.append("More information on the different types of duels and how they work can be found in the <a href='odp/mechanics.jsp#duels'>game mechanics page</a>.</p>");
+//		sb.append("<img src='https://initium-resources.appspot.com/images/ui/duelRequestsAllowed.png' border='0' style='float:left; padding:4px;'>");
+//		sb.append("<p>This button allows you to control whether or not you are accepting duel requests. When enabled, other players are able to request to duel with you. You will be given the option to accept a duel request or deny it. When you accept, you will be whisked away into a special arena where you and the other player will engage in battle.<br>"); 
+//		sb.append("More information on the different types of duels and how they work can be found in the <a href='odp/mechanics.jsp#duels'>game mechanics page</a>.</p>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/cloakedEnabled.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This button will not allow other players to see your character stats, referral stats, or equipment. It can be an important tool in PvP to hide your equipment so other players are less prepared to attack you since they do not know what you're weak to. However if you're not planning on doing PvP any time soon, keeping this option off makes it easier for people to see what you have and to help you - or just to show off your great gear.</p>");
 		sb.append("</div>");

@@ -48,6 +48,15 @@ input[type='checkbox']
 </head>
 <body>
 	<div class='settings-page'>
+		<h2>General</h2>
+		<div class='setting-entry setting-entry-select'>UI Style: 
+			<select id='selectUIStyle'>
+				<option value='default'>Default</option>
+				<option value='experimental1'>Experimental 1 (work in progress)</option>
+				<option value='wowlike'>World of Warcraft style (work in progress)</option>
+			</select>
+		</div>
+		
 		<h2>Sound/Music</h2>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableMusic'> Disable music</div>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableEnvironmentSoundEffects'> Disable environment sound effects</div>
@@ -75,7 +84,7 @@ input[type='checkbox']
 		
 	</div>
 	
-	<center><p><a onclick='fullpageRefresh()' style='margin-top:50px; font-size:24px'>Apply Changes</a></p></center>
+	<center><p><a onclick='fullpageRefresh()' style='margin-top:90px; font-size:24px'>Apply Changes</a></p></center>
 	
 	<script type="text/javascript">
 		var checkboxIds = ["checkboxDisableMusic", 
@@ -109,6 +118,23 @@ input[type='checkbox']
 				currentSetting = ""+rangeDefaults[i];
 			$("#"+rangeId).prop("value", currentSetting);
 		}
+		
+		var selectIds = ["selectUIStyle"
+		                 ];
+		var selectDefaults = ["default"];
+		
+		for(var i = 0; i<selectIds.length; i++)
+		{
+			var selectId = selectIds[i];
+			var currentSetting = localStorage.getItem(selectId);
+			if (currentSetting==null)
+				currentSetting = selectDefaults[i];
+			$("#"+selectId).val(currentSetting);
+		}
+		
+		$(".setting-entry-select select").change(function(){
+			localStorage.setItem(this.id+"", this.value);
+		});
 		
 		
 		$(".setting-entry-checkbox input").change(function() 

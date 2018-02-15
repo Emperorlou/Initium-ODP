@@ -1,3 +1,28 @@
+var uiStyle = localStorage.getItem("selectUIStyle");
+var queryParams = "";
+if (location.href.indexOf("?")>-1)
+	queryParams = location.href.substring(location.href.indexOf("?"));
+
+if (location.href.indexOf("orders.jsp")>-1 || location.href.indexOf("mechanics.jsp")>-1)
+{
+	// Do nothing in this case.
+}
+else if (uiStyle==null || uiStyle=="default")
+{
+	if (location.href.indexOf("/main.jsp")==-1)
+		location.href = "/main.jsp"+queryParams;
+}
+else if (uiStyle=="experimental1")
+{
+	if (location.href.indexOf("/odp/experimental")==-1)
+		location.href = "/odp/experimental"+queryParams;
+}
+else if (uiStyle=="wowlike")
+{
+	if (location.href.indexOf("/odp/full")==-1)
+		location.href = "/odp/full"+queryParams;
+}
+
 window.popupsNum = 0;
 window.popupsOpen = 0;
 window.popupsArray = new Array();
@@ -143,9 +168,16 @@ $(window).ready(function(e){
 	
 	// Set the correct image for the header mute button
 	if (isSoundEffectsEnabled())
+	{
 		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
+		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-on1.png");
+		
+	}
 	else
+	{
 		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
+		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-off1.png");
+}
 		
 
 	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
