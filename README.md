@@ -7,6 +7,7 @@ It's possible to get things working using a different IDE and other different va
 **Please let me know if anything doesn't work for you so I can update the documentation!**
 
 ## Download and install JDK 1.7
+(Only if you don't already have it)
 You should be able to find what you need here:
 http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html
 You’ll want to download the “Java SE Development Kit 7u80” (It’s possible that you’ll be prompted to create an Oracle account) 
