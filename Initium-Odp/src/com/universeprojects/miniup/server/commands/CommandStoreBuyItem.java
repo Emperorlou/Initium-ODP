@@ -88,7 +88,7 @@ public class CommandStoreBuyItem extends Command {
 		Double storeSale = (Double)sellingCharacter.getProperty("storeSale");
 		if (storeSale==null) storeSale = 100d;
 
-		Double unitCost=Math.round(cost.doubleValue()*(storeSale/100));
+		Double unitCost =Math.round(cost.doubleValue()*(storeSale/100));
 		cost =  unitCost * buyQuantity
 		
 		if (cost>(Long)character.getProperty("dogecoins"))

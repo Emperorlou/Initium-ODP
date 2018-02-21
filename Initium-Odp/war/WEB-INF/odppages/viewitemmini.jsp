@@ -46,6 +46,14 @@
 				<c:if test="${item.durability != null}"><div name='durability' class='item-popup-field' title='The number of uses this item still has left. Once it reaches 0, the item is destroyed.'>Durability: <div class='main-item-subnote'>${item.durability}</div></div></c:if>
 				<c:if test="${item.aspectList != null}"><div class='simple-aspect-list'>${item.aspectList}</div></c:if>
 			</div>
+			<c:if test="${item.modifiers!=null}">
+				<br>
+				<div name='modifiers' class='item-modifiers'>
+					<c:forEach items="${item.modifiers}" var="modifier">
+						<div>${modifier}</div>
+					</c:forEach>
+				</div>
+			</c:if>
 			<br/>
 			<br/>
 			<div name='description' class='item-flavor-description'>${item.description}</div>
@@ -153,6 +161,14 @@
 					<c:if test="${comparison.warmth != null}"><div class='item-popup-field' title='The amount of warmth this item provides the wearer.'>Warmth: <div class='main-item-subnote'>${comparison.warmth} units</div></div></c:if>
 					<c:if test="${comparison.durability != null}"><div class='item-popup-field' title='The number of uses this item still has left. Once it reaches 0, the item is destroyed.'>Durability: <div class='main-item-subnote'>${comparison.durability}</div></div></c:if>
 				</div>
+				<c:if test="${comparison.modifiers!=null}">
+					<br>
+					<div name='modifiers' class='item-modifiers'>
+						<c:forEach items="${comparison.modifiers}" var="modifier">
+							<div>${modifier}</div>
+						</c:forEach>
+					</div>
+				</c:if>
 				<br/>
 				<c:if test="${comparison.description != null}"><br/>
 				<div class='item-flavor-description'>${comparison.description}</div></c:if>

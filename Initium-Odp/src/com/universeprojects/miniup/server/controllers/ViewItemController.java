@@ -26,6 +26,7 @@ import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.ModifierService;
 import com.universeprojects.miniup.server.services.QuestService;
 import com.universeprojects.miniup.server.services.ScriptService;
 import com.universeprojects.web.Controller;
@@ -460,6 +461,11 @@ public class ViewItemController extends PageController {
 		if (field!=null && field.toString().trim().equals("")==false)
 			itemMap.put("description", field.toString());
 		
+		
+		// Modifiers
+		ModifierService mService = new ModifierService(db);
+		List<String> modifiers = mService.getFullModifierLines(item);
+		itemMap.put("modifiers", modifiers);
 		
 		return itemMap;
 	}

@@ -38,6 +38,7 @@ import com.google.appengine.api.memcache.MemcacheService.SetPolicy;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
 import com.universeprojects.miniup.CommonChecks;
@@ -46,9 +47,11 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.ModifierService;
 import com.universeprojects.miniup.server.services.MovementService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
+import com.universeprojects.miniup.server.services.ModifierService.ModifierType;
 
 public class ODPDBAccess
 {
@@ -124,10 +127,13 @@ public class ODPDBAccess
 	public Map<Key, List<CachedEntity>> buffsCache = new HashMap<Key, List<CachedEntity>>();
 	public Map<Key, Map<String, Double>> statsCache = new HashMap<Key, Map<String, Double>>(); 
 
+	public EntityPool pool = null;
+	
 	protected ODPDBAccess(HttpServletRequest request)
 	{
 		this.request = request;
 		getDB(); // Initialize the datastore service
+		pool = new EntityPool(ds);
 	}
 	
 	public static ODPDBAccess getInstance(HttpServletRequest request)
@@ -138,7 +144,20 @@ public class ODPDBAccess
 		return factory.getInstance(request);
 	}
 
-
+	public Collection<CachedEntity> getCharacterEquipment(CachedEntity character)
+	{
+		List<Key> equipmentKeys = new ArrayList<>();
+		for(String slot:EQUIPMENT_SLOTS)
+		{
+			Key equipmentKey = (Key)character.getProperty("equipment"+slot);
+			if (equipmentKey!=null)
+				equipmentKeys.add(equipmentKey);
+		}
+		pool.addToQueue(equipmentKeys);
+		pool.loadEntities();
+		return pool.get(equipmentKeys);
+	}
+	
 	
 	public boolean isTestServer()
 	{
@@ -2139,6 +2158,19 @@ public class ODPDBAccess
 				startValue += val;
 			}
 		}
+		
+		ModifierService mService = new ModifierService(this);
+		Collection<CachedEntity> characterEquipment = getCharacterEquipment(entity);
+		ModifierType modifierType = mService.getModifierType(fieldName);
+		if (modifierType!=null)
+		{
+			for(CachedEntity equip:characterEquipment)
+			{
+				startValue = mService.getAffectedValue(startValue, equip, modifierType);
+			}
+		}
+		
+		
 
 		return startValue;
 	}
@@ -2171,6 +2203,19 @@ public class ODPDBAccess
 			}
 		}
 
+		
+		ModifierService mService = new ModifierService(this);
+		Collection<CachedEntity> characterEquipment = getCharacterEquipment(entity);
+		ModifierType modifierType = mService.getModifierType(fieldName);
+		if (modifierType!=null)
+		{
+			for(CachedEntity equip:characterEquipment)
+			{
+				startValue = mService.getAffectedValue(startValue, equip, modifierType);
+			}
+		}
+		
+		
 		return startValue;
 	}
 

@@ -365,6 +365,7 @@ http://github.com/Emperorlou/Initium-ODP
 <body>
 <!-- Fixes a bug with chrome regarding mix-blending -->
 <div id='mix-blending-fix'></div>
+<div id='popups'></div>
 <div id='contents'>
 
 	<div class='main-page popupBlurrable'>

@@ -3,7 +3,12 @@ var queryParams = "";
 if (location.href.indexOf("?")>-1)
 	queryParams = location.href.substring(location.href.indexOf("?"));
 
-if (location.href.indexOf("orders.jsp")>-1 || location.href.indexOf("mechanics.jsp")>-1)
+if (location.href.charAt(location.href.length-1)=="/" || 
+		location.href.indexOf("landing.jsp")>-1 || 
+		location.href.indexOf("orders.jsp")>-1 || 
+		location.href.indexOf("resetpassword.jsp")>-1 || 
+		location.href.indexOf("newcharacter.jsp")>-1 || 
+		location.href.indexOf("mechanics.jsp")>-1)
 {
 	// Do nothing in this case.
 }

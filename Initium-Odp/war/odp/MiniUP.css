@@ -593,6 +593,11 @@ a.main-highlight:HOVER
 	font-size:15px;
 }
 
+.item-modifiers
+{
+	color:#56519d;
+}
+
 .simple-aspect-list
 {
 	margin-top:7px;
