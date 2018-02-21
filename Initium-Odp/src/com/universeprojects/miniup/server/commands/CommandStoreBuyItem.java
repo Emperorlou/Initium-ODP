@@ -139,6 +139,7 @@ public class CommandStoreBuyItem extends Command {
 				saleItem = newSaleItem;
 			}
 			
+			saleItem.setProperty("dogecoins", cost);
 			saleItem.setProperty("status", "Sold");
 			saleItem.setProperty("soldTo", character.getKey());
 			sellingCharacter.setProperty("dogecoins", ((Long)sellingCharacter.getProperty("dogecoins"))+cost);
