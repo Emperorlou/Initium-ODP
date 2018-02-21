@@ -88,8 +88,8 @@ public class CommandStoreBuyItem extends Command {
 		Double storeSale = (Double)sellingCharacter.getProperty("storeSale");
 		if (storeSale==null) storeSale = 100d;
 
-		Double unitCost =Math.round(cost.doubleValue()*(storeSale/100));
-		cost =  unitCost * buyQuantity
+		Long unitCost = Math.round(cost.doubleValue() * (storeSale / 100));
+		cost = unitCost * buyQuantity;
 		
 		if (cost>(Long)character.getProperty("dogecoins"))
 			throw new UserErrorMessage("You do not have enough funds to buy this item. You have "+character.getProperty("dogecoins")+" and it costs "+cost+".");	
@@ -142,6 +142,7 @@ public class CommandStoreBuyItem extends Command {
 			
 			// Maintain unit cost instead, in case of quantity items.
 			saleItem.setProperty("dogecoins", unitCost);
+			saleItem.setProperty("soldPrice", cost);
 			saleItem.setProperty("status", "Sold");
 			saleItem.setProperty("soldTo", character.getKey());
 			sellingCharacter.setProperty("dogecoins", ((Long)sellingCharacter.getProperty("dogecoins"))+cost);

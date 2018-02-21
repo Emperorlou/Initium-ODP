@@ -144,6 +144,8 @@ public class HtmlComponents {
 		}
 		
 		String finalCost = cost.toString();
+		if(saleItem.getProperty("soldPrice") != null && GameUtils.equals(cost, saleItem.getProperty("soldPrice")) == false)
+			finalCost = ((Long)saleItem.getProperty("soldPrice")).toString() + "/" + finalCost + " each";
 		String result = "";
 			   result+="<div class='saleItem' ref='"+saleItem.getKey().getId()+"'>";
 		   	   result+="<div class='main-item'>";
@@ -208,6 +210,8 @@ public class HtmlComponents {
         if("Sold".equals(saleItem.getProperty("status"))==false)
         	cost=Math.round(cost.doubleValue()*(storeSale/100));
         String finalCost = GameUtils.formatNumber(cost, false);
+        if(saleItem.getProperty("soldPrice") != null && GameUtils.equals(cost, saleItem.getProperty("soldPrice")) == false)
+			finalCost = GameUtils.formatNumber(saleItem.getProperty("soldPrice"), false) + "/" + finalCost + " each";
         
         Long quantity = (Long)item.getProperty("quantity");
         if(quantity == null) quantity = 1L;
