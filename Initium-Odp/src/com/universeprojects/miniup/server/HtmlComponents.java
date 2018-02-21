@@ -120,13 +120,14 @@ public class HtmlComponents {
 			storeSale = 100.0;
 		}
 		
-		boolean isVending = CommonChecks.checkCharacterIsVending(db.getCurrentCharacter());
-		Long cost = (Long)saleItem.getProperty("dogecoins");
-		cost=Math.round(cost.doubleValue()*(storeSale/100));
-		String finalCost = cost.toString();
 		String statusText = (String)saleItem.getProperty("status");
-		if (statusText.equals("Sold"))
+		boolean isSold = "Sold".equals(statusText);
+		boolean isVending = CommonChecks.checkCharacterIsVending(db.getCurrentCharacter());
+		
+		Long cost = (Long)saleItem.getProperty("dogecoins");
+		if (isSold)
 		{
+			isVending = false;
 			String soldTo = "";
 			if (saleItem.getProperty("soldTo")!=null)
 			{
@@ -136,7 +137,13 @@ public class HtmlComponents {
 			}
 			statusText = "<div class='saleItem-sold'>"+statusText+soldTo+"</div>";
 		}
+		else
+		{
+			// Only adjust non-sold items.
+			cost=Math.round(cost.doubleValue()*(storeSale/100));
+		}
 		
+		String finalCost = cost.toString();
 		String result = "";
 			   result+="<div class='saleItem' ref='"+saleItem.getKey().getId()+"'>";
 		   	   result+="<div class='main-item'>";
@@ -197,7 +204,9 @@ public class HtmlComponents {
         
         
         Long cost = (Long)saleItem.getProperty("dogecoins");
-        cost=Math.round(cost.doubleValue()*(storeSale/100));
+        // Only adjust cost if not sold.
+        if("Sold".equals(saleItem.getProperty("status"))==false)
+        	cost=Math.round(cost.doubleValue()*(storeSale/100));
         String finalCost = GameUtils.formatNumber(cost, false);
         
         Long quantity = (Long)item.getProperty("quantity");
