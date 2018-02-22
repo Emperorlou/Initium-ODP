@@ -329,6 +329,13 @@ hr:after {
     margin: 0 auto;	
 }
 
+.main-page-half
+{
+    margin: 0px!important;
+    position: relative!important;
+    width: 50%!important;
+}
+
 .main-bottomhalf
 {
 	position:relative;
@@ -734,6 +741,7 @@ a.main-highlight:HOVER
 	display: inline-block;
 	font-size:17px;
 	width:99%;
+	position:relative;
 }
 
 .equip-slot

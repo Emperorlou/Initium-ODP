@@ -1727,6 +1727,7 @@ function incrementStackIndex()
     {
 		$("#page-popup-root").html("");
 	    $(document).bind("keydown", popupKeydownHandler);
+	    
     }
     else
    	{

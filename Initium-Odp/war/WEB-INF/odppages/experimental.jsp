@@ -348,7 +348,92 @@ function updateBannerSize()
 		$("#banner").css("height", (win.height()-333)+"px");
 }
 $(window).resize(updateBannerSize);
+
+
+function incrementStackIndex()
+{
+	currentPopupStackIndex++;
+    if (currentPopupStackIndex==1)
+    {
+		$("#page-popup-root").html("");
+	    $(document).bind("keydown", popupKeydownHandler);
+	    $(".main-page").addClass("main-page-half");
+    }
+    else
+   	{
+    	$("#page-popup"+(currentPopupStackIndex-1)).hide();
+   	}
+    return currentPopupStackIndex;
+}
+
+function decrementStackIndex()
+{
+	if (currentPopupStackIndex==0)
+		return 0;
+	
+	currentPopupStackIndex--;
+	if (currentPopupStackIndex==0)
+	{
+		window.scrollTo(0,0);
+		$("#page-popup-root").empty();
+		$(".page-popup-newui").remove();
+		$(document).unbind("keydown", popupKeydownHandler);
+	    $(".main-page").removeClass("main-page-half");
+	}
+	else
+	{
+		$("#page-popup"+currentPopupStackIndex).show();
+		$("#page-popup"+(currentPopupStackIndex+1)).remove();
+	}
+	return currentPopupStackIndex;
+}
+
 </script>
+
+<style>
+@media (min-width:1200px)
+{
+
+	.page-popup
+	{
+    position: fixed;
+    z-index: 2;
+    bottom: 0px;
+    top: 0px;
+    left: 50%;
+    right: -29px;
+    margin: 0px;
+	}
+	
+	.page-popup-title
+	{
+		position:absolute;
+	    text-align: center;
+	    top: -32px;
+	    width: 100%;
+	    margin: 0 auto;
+	    left: 0px;	
+	}
+	
+	.page-popup-title h4
+	{
+		top:0px;
+	}
+	
+	.page-popup-content
+	{
+		overflow-y:auto;
+		height:100%;
+	}
+	
+	#page-popup-root
+	{
+		z-index:10000000;
+	}
+}
+
+</style>
+
 </head>
 
 <!--
@@ -604,10 +689,11 @@ http://github.com/Emperorlou/Initium-ODP
 			<div id='collectablesPanel' class='paragraph'>
 				${collectablesPanel}
 			</div>
-			
+<!-- 			
 			<div id='locationDescription' class='paragraph'>
 				${locationDescription}
 			</div>
+-->
 			<div id='locationQuicklist'>
 				${locationQuicklist}
 			</div>
