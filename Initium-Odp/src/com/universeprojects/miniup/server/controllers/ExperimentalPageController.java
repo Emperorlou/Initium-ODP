@@ -102,6 +102,7 @@ public class ExperimentalPageController extends PageController {
 
 		MainPageUpdateService updateService = new MainPageUpdateService(db, db.getCurrentUser(), character, location, null);
 		
+		request.setAttribute("locationName", updateService.updateLocationName());
 		request.setAttribute("mainMoneyIndicator", updateService.updateMoney());
 		request.setAttribute("bannerTextOverlay", updateService.updateInBannerOverlayLinks());
 		request.setAttribute("mainButtonList", updateService.updateButtonList());

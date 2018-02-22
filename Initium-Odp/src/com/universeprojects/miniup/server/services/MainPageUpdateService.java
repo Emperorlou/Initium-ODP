@@ -684,6 +684,8 @@ public class MainPageUpdateService extends Service
 		html.append("</div>");
 	}
 	
+	
+	
 	public String updateInBannerOverlayLinks()
 	{
 		StringBuilder newHtml = new StringBuilder();
@@ -696,7 +698,8 @@ public class MainPageUpdateService extends Service
 			newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
 			
 			loadPathCache();
-			
+
+			boolean noOverlayLinks = true;
 			for(int i = 0; i<paths.size(); i++)
 			{
 				CachedEntity path = paths.get(i);
@@ -708,6 +711,9 @@ public class MainPageUpdateService extends Service
 				String overlayCoordinates = (String)path.getProperty("location"+pathEnd+"OverlayCoordinates");
 				if (overlayCoordinates==null || overlayCoordinates.matches("\\d+x\\d+")==false)
 					continue;
+				
+				noOverlayLinks = false;
+				
 				String top = "";
 				String left = "";
 				String[] split = overlayCoordinates.split("x");
@@ -734,6 +740,38 @@ public class MainPageUpdateService extends Service
 				
 				newHtml.append(getHtmlForInBannerLink(topInt, leftInt, buttonCaption, onclick));
 			}
+			
+			// Here we'll add a default overlay link if there is only 1 path and there are no other overlay links setup
+			if (paths.size()==1)
+			{
+				CachedEntity path = paths.get(0);
+				CachedEntity destLocation = destLocations.get(0);
+				Integer pathEnd = pathEnds.get(0);
+					
+				String destLocationName = (String)destLocation.getProperty("name");
+				
+				
+				double topDbl = 150;
+				double leftDbl = 728/2;
+				int topInt = new Double(topDbl/211d*100).intValue();
+				int leftInt = new Double(leftDbl/728d*100).intValue();
+		
+
+				String buttonCaption = "Head towards "+destLocationName;
+				String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
+				String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
+				if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
+					buttonCaption = buttonCaptionOverride;
+				if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
+					buttonCaption = overlayCaptionOverride;
+				
+				
+				String onclick = "doGoto(event, "+path.getKey().getId()+", true);";				
+				
+				newHtml.append(getHtmlForInBannerLinkCentered(topInt, leftInt, buttonCaption, onclick));
+				
+			}
+			
 
 			if (CommonChecks.checkLocationIsCombatSite(location)==false)
 			{
@@ -761,7 +799,7 @@ public class MainPageUpdateService extends Service
 			}
 			else
 			{
-				newHtml.append(getHtmlForInBannerLink(50, 47, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Exit</span>", "window.btnLeaveAndForget.click()"));
+				newHtml.append(getHtmlForInBannerLinkCentered(50, 50, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Leave and forget</span>", "window.btnLeaveAndForget.click()"));
 				String js = 
 						"<script type='text/javascript'>" +
 						"setTimeout(function(){" +
@@ -801,6 +839,12 @@ public class MainPageUpdateService extends Service
 	private String getHtmlForInBannerLink(double top, double left, String buttonCaption, String onclickJs)
 	{
 		return "<a onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='top:"+top+"%;left: "+left+"%;'>"+buttonCaption+"</a>";
+		
+	}
+
+	private String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs)
+	{
+		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='position:relative; margin-left:-50%;'>"+buttonCaption+"</a></div>";
 		
 	}
 

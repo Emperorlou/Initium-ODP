@@ -33,8 +33,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=246"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=226">
+<script type="text/javascript" src="/odp/javascript/script.js?v=327"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=327">
 
 
 
@@ -430,6 +430,14 @@ function decrementStackIndex()
 	{
 		z-index:10000000;
 	}
+	
+	.main-page-half
+	{
+	    margin: 0px!important;
+	    position: relative!important;
+	    width: 50%!important;
+	}
+	
 }
 
 </style>
@@ -457,7 +465,7 @@ http://github.com/Emperorlou/Initium-ODP
 		<div class='header v3-header1'>
 			<div class='header-inner'>
 				<div id='pullout-button' class='header-inner-section'><a onclick='toggleMainPullout()'><img src='https://initium-resources.appspot.com/images/ui3/header-button-options1.png' alt='Pullout menu' height='34px'/></a></div>
-				<div class='header-inner-section' style='width:100%;vertical-align: middle; text-align: center;'><div style='margin-left:-32px; margin-right:-22px;'><a id='locationName' onclick='location.reload()'>${locationName }</a></div></div>
+				<div class='header-inner-section' style='width:100%;vertical-align: middle; text-align: center;'><div style='margin-left:-32px; margin-right:-22px;'><a id='locationName' onclick='location.reload()'>${locationName}</a></div></div>
 				<div id='mainMoneyIndicator' class='header-inner-section' onclick='viewProfile()'>
 					${mainMoneyIndicator}
 				</div>
