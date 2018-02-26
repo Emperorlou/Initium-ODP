@@ -33,8 +33,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=327"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=327">
+<script type="text/javascript" src="/odp/javascript/script.js?v=331"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=331">
 
 
 
@@ -125,11 +125,11 @@
 	        arrows: true,
 	        ajaxCache: false,
 	        mouseOutClose: false,
-	        cluezIndex: 2000000,
+	        cluezIndex: 20000000,
 	        onShow: function(e) 
 	        {
-	        	$("#cluetip-waitimage").css('z-index', 2000000); 
-	        	$("#cluetip").css('z-index', 2000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
+	        	$("#cluetip-waitimage").css('z-index', 20000000); 
+	        	$("#cluetip").css('z-index', 20000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
 	        	return true;
 	        }
 	        
@@ -153,7 +153,7 @@
 	        ajaxCache: false,
 	        mouseOutClose: false,
 	        activation:"click",
-	        cluezIndex: 2000000,
+	        cluezIndex: 20000000,
 	        onShow: function() {
 	            // close cluetip when users click outside of it
 	            $(document).click(function(e) {
@@ -164,8 +164,8 @@
 	            })
 	            
 	            // Make the cluetip on top of everything
-	        	$("#cluetip-waitimage").css('z-index', 2000000); 
-	        	$("#cluetip").css('z-index', 2000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
+	        	$("#cluetip-waitimage").css('z-index', 20000000); 
+	        	$("#cluetip").css('z-index', 20000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
 	        	return true;
 	        }	        
 	    }).addClass("hasTooltip");
@@ -190,7 +190,7 @@
 	        mouseOutClose: false,
 	        activation:"click",
 	        local:true,
-	        cluezIndex: 2000000,
+	        cluezIndex: 20000000,
 	        onShow: function() {
 	            // close cluetip when users click outside of it
 	            $(document).click(function(e) {
@@ -201,8 +201,8 @@
 	            })
 
 	            // Make the cluetip on top of everything
-	        	$("#cluetip-waitimage").css('z-index', 2000000); 
-	        	$("#cluetip").css('z-index', 2000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
+	        	$("#cluetip-waitimage").css('z-index', 20000000); 
+	        	$("#cluetip").css('z-index', 20000000).css("box-shadow", "rgba(0, 0, 0, 1) 3px 3px 14px").addClass("v3-window3");
 	        	return true;
 	        }	        
 	    }).addClass("hasTooltip");

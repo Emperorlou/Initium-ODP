@@ -1604,13 +1604,20 @@ public class MainPageUpdateService extends Service
 		if (CommonChecks.checkCharacterIsIncapacitated(character)==false)
 			if (CommonChecks.checkLocationIsCombatSite(location) && CommonChecks.checkCharacterIsInCombat(character)==false)
 			{
-				html.append("<div class='boldbox'>");
-				html.append("	<div id='inline-items' class='main-splitScreen'>");
-				html.append("	</div>");
-				html.append("	<div id='inline-characters' class='main-splitScreen'>");
-				html.append("	</div>");
-				html.append("</div>");
+				StringBuilder js = new StringBuilder();
+				js.append("<div id='locationQuickList-contents'>");
+				js.append("<div><h4>Loot</h4></div>");
+				if (paths.size()==1)
+					js.append("<p><a onclick='clearMakeIntoPopup();doGoto(event, "+paths.get(0).getId()+", false);' style='float:right'>Leave</a></p>");
+				js.append("<p><a onclick='clearMakeIntoPopup();window.btnLeaveAndForget.click()' style='float:left'>Leave and forget</a></p>");
+				js.append("<div style='height:34px;'></div>");
+				js.append("	<div id='inline-characters'>");
+				js.append("	</div>");
+				js.append("	<div id='inline-items'>");
+				js.append("	</div>");
+				js.append("</div>");
 				html.append("<script type='text/javascript'>");
+				html.append("	makeIntoPopupHtml(\""+js+"\", true);");
 				html.append("	loadInlineItemsAndCharacters();");
 				html.append("	loadInlineCollectables();");
 				html.append("</script>");

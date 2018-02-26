@@ -1984,6 +1984,7 @@ function doDrinkBeer(eventObject)
 
 function doLeaveAndForgetCombatSite(eventObject, pathId)
 {
+	clearMakeIntoPopup();
 	showBannerLoadingIcon();
 	doCommand(eventObject, "LeaveAndForgetCombatSite", {"pathId" : pathId}, clearPopupPermanentOverlay);
 }
@@ -2953,14 +2954,15 @@ function loadRelatedSkills(itemKey)
 	doCommand(event, "RelatedSkillsUpdate", {itemKey:itemKey});
 }
 
-function makeIntoPopupHtml(html)
+function makeIntoPopupHtml(html, disableGlass)
 {
 	clearMakeIntoPopup();
 	
 	window.scrollTo(0,0);
-	$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	if (disableGlass!=true)
+		$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
 	html = "<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" + html;
-	$("body").append("<div class='main-buttonbox v3-window3 make-popup make-popup-html'>"+html+"</div>");
+	$("body").append("<div style='position:absolute; left:50%; top:10%;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>"+html+"</div></div>");
 }
 
 function makeIntoPopup(jquerySelector)
