@@ -3,29 +3,25 @@ var queryParams = "";
 if (location.href.indexOf("?")>-1)
 	queryParams = location.href.substring(location.href.indexOf("?"));
 
-if (location.href.charAt(location.href.length-1)=="/" || 
-		location.href.indexOf("landing.jsp")>-1 || 
-		location.href.indexOf("orders.jsp")>-1 || 
-		location.href.indexOf("resetpassword.jsp")>-1 || 
-		location.href.indexOf("newcharacter.jsp")>-1 || 
-		location.href.indexOf("mechanics.jsp")>-1)
+if (location.href.indexOf("main.jsp")>-1 || 
+		location.href.indexOf("/odp/experimental")>-1 || 
+		location.href.indexOf("/odp/full")>-1)
 {
-	// Do nothing in this case.
-}
-else if (uiStyle==null || uiStyle=="default")
-{
-	if (location.href.indexOf("/main.jsp")==-1)
-		location.href = "/main.jsp"+queryParams;
-}
-else if (uiStyle=="experimental1")
-{
-	if (location.href.indexOf("/odp/experimental")==-1)
-		location.href = "/odp/experimental"+queryParams;
-}
-else if (uiStyle=="wowlike")
-{
-	if (location.href.indexOf("/odp/full")==-1)
-		location.href = "/odp/full"+queryParams;
+	if (uiStyle==null || uiStyle=="default")
+	{
+		if (location.href.indexOf("/main.jsp")==-1)
+			location.href = "/main.jsp"+queryParams;
+	}
+	else if (uiStyle=="experimental1")
+	{
+		if (location.href.indexOf("/odp/experimental")==-1)
+			location.href = "/odp/experimental"+queryParams;
+	}
+	else if (uiStyle=="wowlike")
+	{
+		if (location.href.indexOf("/odp/full")==-1)
+			location.href = "/odp/full"+queryParams;
+	}
 }
 
 window.popupsNum = 0;
@@ -354,6 +350,7 @@ function random(start, end)
 
 function clearPopupPermanentOverlay()
 {
+	cancelTravelLine();
 	$("#banner-text-overlay").show();
 	$("#banner-base").html("");
 	if (window.previousBannerUrl!=null)
@@ -2587,7 +2584,7 @@ function createMapWindow(html)
 	var windowHtml = "";
 	windowHtml += 
 			"<div class='overheadmap-window'>" +
-			"<div id='global-navigation-map' class='overheadmap-window-internal'>";
+			"<div class='global-navigation-map overheadmap-window-internal'>";
 	
 	windowHtml+=html;
 	
@@ -2954,6 +2951,23 @@ function loadRelatedSkills(itemKey)
 	doCommand(event, "RelatedSkillsUpdate", {itemKey:itemKey});
 }
 
+function makeIntoPopupFromUrl(url, title, disableGlass)
+{
+	clearMakeIntoPopup();
+	
+	window.scrollTo(0,0);
+	if (disableGlass!=true)
+		$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	$("body").append("<div style='position:absolute; left:50%; top:10%;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>" +
+			"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+			"	<h4>"+title+"</h4>" +
+			"<div id='make-popup-url-contents'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div></div></div>");
+
+	$("#make-popup-url-contents").load(url);
+}
+
+
+
 function makeIntoPopupHtml(html, disableGlass)
 {
 	clearMakeIntoPopup();
@@ -3115,15 +3129,75 @@ function initializeClosableMessage(id)
 
 function viewGlobeNavigation()
 {
-	var mapData = $("#global-navigation-map");
+	var mapData = $(".global-navigation-map");
 	if (mapData.length==0) return;
 	html = $(mapData[mapData.length-1]).html();
 	createMapWindow(html);
 }
 
+function drawTravelLine(startX, startY, x, y, seconds)
+{
+	$(".global-navigation-map").append("" +
+			"<svg id='travel-line-container' style='position:absolute;left:0px; top:0px;bottom:0px;right:0px;width:100%;height:100%;z-index:1;'>" +
+			"	<line id='travel-line' x1='"+startX+"' y1='"+startY+"' x2='"+startX+"' y2='"+startY+"'/>" +
+			"</svg>"
+			).append("" +
+					"<a id='travel-line-cancel-button' onclick='cancelLongOperations(event)'>Cancel Travel</a>");
+	
+	
+	window.travelLineData = 
+	{
+		startTime:new Date().getTime(),
+		endTime:new Date().getTime()+((seconds+1)*1000),
+		x1:startX,
+		y1:startY,
+		x2:x,
+		y2:y
+	};
+	
+	setTimeout(updateTravelLine, 100);
+}
+
+function cancelTravelLine()
+{
+	window.travelLineData = null;
+	$("#travel-line-container").remove();
+	$("#travel-line-cancel-button").remove();
+}
+
+function updateTravelLine()
+{
+	var data = window.travelLineData;
+	if (data==null) return;
+	
+	var elapsed = new Date().getTime()-data.startTime;
+	var percentComplete = elapsed/(data.endTime-data.startTime);
+	if (percentComplete>1) percentComplete = 1;
+	
+	var x = (data.x2-data.x1)*percentComplete;
+	var y = (data.y2-data.y1)*percentComplete;
+	
+	x+=data.x1;
+	y+=data.y1;
+	
+	var travelLine = $("#travel-line");
+	var parent = travelLine.parent();
+	
+	var canvasWidth = parent.width();
+	var canvasHeight = parent.height();
+	
+	travelLine.attr("x1", data.x1+(canvasWidth/2)).attr("y1", data.y1+(canvasHeight/2)).attr("x2",x+(canvasWidth/2)).attr("y2",y+(canvasHeight/2));
+	
+	if (percentComplete<1)
+	{
+		setTimeout(updateTravelLine, 100);
+	}
+	
+}
+
 function isGlobeNavigationVisible()
 {
-	if ($("#global-navigation-map").length>1)
+	if ($(".global-navigation-map").length>1)
 		return true;
 	
 	return false;
@@ -3253,6 +3327,10 @@ function viewThisLocationWindow()
 	makeIntoPopup(".this-location-box");
 }
 
+function viewLocalNavigation(event, showHidden)
+{
+	makeIntoPopupFromUrl("/odp/sublocations?showHidden="+showHidden, "Local Navigation", true);
+}
 
 
 
@@ -3667,7 +3745,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		clickedElement = $(eventObject.currentTarget);
 		if(clickedElement.find("img.wait").length == 0) {
 			originalText = clickedElement.html();
-			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
+			clickedElement.addClass("marching-ants");
 		}
 	}
 
@@ -3686,7 +3764,10 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 	.done(function(data)
 	{
 		if (clickedElement!=null)
+		{
 			clickedElement.html(originalText);
+			clickedElement.removeClass("marching-ants");
+		}
 		
 		if (data.captcha==true)
 		{
@@ -3788,7 +3869,10 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			popupMessage(errorThrown, "There was an error when trying to perform the action.");
 
 		if (clickedElement!=null)
+		{
 			clickedElement.html(originalText);
+			clickedElement.removeClass("marching-ants");
+		}
 		
 		lastLongOperationEventObject = null;
 	});

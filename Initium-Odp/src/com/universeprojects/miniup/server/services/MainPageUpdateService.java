@@ -167,8 +167,11 @@ public class MainPageUpdateService extends Service
 	{
 		if (paths==null)
 		{
-			discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), location.getKey(), showHidden);
-//			discoveries = new ArrayList<>(); // <-- when debugging locally
+			boolean speedUpTest = false;
+			if (speedUpTest==false || db.isTestServer()==false)
+				discoveries = db.getDiscoveriesForCharacterAndLocation(character.getKey(), location.getKey(), showHidden);
+			else
+				discoveries = new ArrayList<>(); // <-- when debugging locally
 			
 			// Order discoveries by createdDate of discovery entity
 			Collections.sort(discoveries, new Comparator<CachedEntity>()
@@ -630,7 +633,7 @@ public class MainPageUpdateService extends Service
 			Long shiftX = (Long)location.getProperty("mapComponentX");
 			Long shiftY = (Long)location.getProperty("mapComponentY");
 	
-			if (shiftX!=null && shiftY!=null && location.getProperty("mapComponentImage")!=null && "Global".equals(location.getProperty("mapComponentType")))
+			if (shiftX!=null && shiftY!=null && "Global".equals(location.getProperty("mapComponentType")))
 			{
 					
 				addGlobalNavigationMapEntry(html, location, null, shiftX, shiftY);
@@ -653,12 +656,13 @@ public class MainPageUpdateService extends Service
 				html.append("This location is not mapped yet. Complain to a content dev!");
 			}
 		}
-		return updateHtmlContents("#global-navigation-map", html.toString());
+		return updateHtmlContents(".global-navigation-map", html.toString());
 	}
 	
 	private void addGlobalNavigationMapEntry(StringBuilder html, CachedEntity location, CachedEntity path, Long shiftX, Long shiftY)
 	{
 		String imageUrl = GameUtils.getResourceUrl((String)location.getProperty("mapComponentImage"));
+		if (imageUrl==null) imageUrl = GameUtils.getResourceUrl("images/overheadmap/unavailable1.png");
 		Long positionX = (Long)location.getProperty("mapComponentX");
 		Long positionY = (Long)location.getProperty("mapComponentY");
 		
@@ -671,9 +675,20 @@ public class MainPageUpdateService extends Service
 		positionX = positionX*100;
 		positionY = positionY*100;
 		
+		
 		html.append("<div class='overheadmap-cell-container-base'>"); 
 		if (path!=null)
-			html.append("		<a onclick='doGoto(event, "+path.getId()+", false);' class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
+		{
+			Long currentPositionX = (Long)this.location.getProperty("mapComponentX");
+			Long currentPositionY = (Long)this.location.getProperty("mapComponentY");
+			String travelLine = "";
+			if (currentPositionX!=null && currentPositionY!=null)
+			{
+				Long seconds = db.getPathTravelTime(path, character);
+				travelLine = "drawTravelLine(0, 0,"+(positionX)+", "+(positionY)+", "+seconds+");";
+			}
+			html.append("		<a onclick='"+travelLine+" doGoto(event, "+path.getId()+", false);' class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
+		}
 		else
 			html.append("		<a class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
 		html.append("			<div class='overheadmap-cell-label-container'>");
@@ -827,24 +842,32 @@ public class MainPageUpdateService extends Service
 			if (weapons.get(1)!=null)
 				rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
 			
-			newHtml.append(getHtmlForInBannerLink(50, 40, "<img src='"+leftIcon+"' alt='Left Hand' style='max-width:32px; max-height:32px;padding:5px;z-index:2000002;'/>", "doCombatAttackLeftHand(event)"));
-			newHtml.append(getHtmlForInBannerLink(50, 60, "<img src='"+rightIcon+"' alt='Right Hand' style='max-width:32px; max-height:32px;padding:5px;z-index:2000002;'/>", "doCombatAttackRightHand(event)"));
-			newHtml.append(getHtmlForInBannerLink(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)"));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 40, "<img src='"+leftIcon+"' alt='Left Hand' class='combat-button' />", "doCombatAttackLeftHand(event)"));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)"));
+			newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)"));
 		}
+		
+		
+		if (CommonChecks.checkCharacterIsIncapacitated(character)==false && 
+				CommonChecks.checkLocationIsCombatSite(location)==false &&
+				CommonChecks.checkLocationIsCampSite(location)==false &&
+				CommonChecks.checkLocationIsInstance(location)==false && 
+				CommonChecks.checkCharacterIsBusy(character)==false)
+		newHtml.append(getHtmlForInBannerLinkCentered(50, 50, "Explore", "doExplore(event);"));
 		
 		
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
 	}
 	
-	private String getHtmlForInBannerLink(double top, double left, String buttonCaption, String onclickJs)
+	protected String getHtmlForInBannerLink(double top, double left, String buttonCaption, String onclickJs)
 	{
 		return "<a onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='top:"+top+"%;left: "+left+"%;'>"+buttonCaption+"</a>";
 		
 	}
 
-	private String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs)
+	protected String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs)
 	{
-		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='position:relative; margin-left:-50%;'>"+buttonCaption+"</a></div>";
+		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>"+buttonCaption+"</a></div>";
 		
 	}
 

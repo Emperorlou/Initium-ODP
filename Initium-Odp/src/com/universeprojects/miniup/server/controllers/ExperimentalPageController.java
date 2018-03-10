@@ -12,7 +12,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
-import com.universeprojects.miniup.server.services.MainPageUpdateService;
+import com.universeprojects.miniup.server.services.ExperimentalPageUpdateService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
 
@@ -100,7 +100,7 @@ public class ExperimentalPageController extends PageController {
 		
 		
 
-		MainPageUpdateService updateService = new MainPageUpdateService(db, db.getCurrentUser(), character, location, null);
+		ExperimentalPageUpdateService updateService = new ExperimentalPageUpdateService(db, db.getCurrentUser(), character, location, null);
 		
 		request.setAttribute("locationName", updateService.updateLocationName());
 		request.setAttribute("mainMoneyIndicator", updateService.updateMoney());
@@ -127,6 +127,7 @@ public class ExperimentalPageController extends PageController {
 		if (db.getCurrentCharacter().isUnsaved())
 			db.getDB().put(db.getCurrentCharacter());
 
+		request.setAttribute("version", GameUtils.version);
 		
 		return "/WEB-INF/odppages/experimental.jsp";
 	}

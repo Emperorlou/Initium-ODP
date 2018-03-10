@@ -1,12 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
-</head>
-<body>
+<%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 
-</body>
-</html>
+<c:if test='${showHidden!=true}'>
+	<p><a onclick='viewLocalNavigation(event, true)'>Show Hidden Paths</a></p>
+</c:if>
+<c:forEach var="location" items="${locations}">
+	<div onclick='doGoto(event, ${location.id})' class='sublocation-display-container'>
+		<div class='sublocation-display' style='background-image:url(${location.bannerUrl})'></div>
+		<h5>${location.name}</h5>
+	</div>
+</c:forEach>

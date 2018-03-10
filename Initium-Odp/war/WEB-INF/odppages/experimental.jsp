@@ -33,8 +33,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=331"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=331">
+<script type="text/javascript" src="/odp/javascript/script.js?v=${version}"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">
 
 
 
@@ -454,6 +454,7 @@ on our slack channel!
 
 http://github.com/Emperorlou/Initium-ODP 
 
+Version: ${version}
                                            -->
 <body>
 <!-- Fixes a bug with chrome regarding mix-blending -->
@@ -758,6 +759,6 @@ http://github.com/Emperorlou/Initium-ODP
 
 	</div>
 	
-	<div id='global-navigation-map'>${globalNavigationMap}</div>	
+	<div class='global-navigation-map'>${globalNavigationMap}</div>	
 </body>
 </html>

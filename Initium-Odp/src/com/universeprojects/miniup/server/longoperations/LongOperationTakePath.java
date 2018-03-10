@@ -265,59 +265,13 @@ public class LongOperationTakePath extends LongOperation {
 		// Ok, lets begin then...
 		setDataProperty("locationName", destination.getProperty("name"));
 		
-		Long travelTime = (Long)path.getProperty("travelTime");
-		if (travelTime==null)
-			travelTime = 6L;
-		
-		Long buffedTravel = getBuffedTravelTime(character, travelTime);
+		Long buffedTravel = db.getPathTravelTime(path, character);
 		setDataProperty("secondsToWait", buffedTravel);
 		
 		return buffedTravel.intValue();
 	}
-	
-	/**
-	 * Calculates the travel time after buffed movement speed.
-	 * @param character Character entity we're getting buff movement speed for.
-	 * @param travelTime Initial travel time.
-	 * @return
-	 */
-	private Long getBuffedTravelTime(CachedEntity character, Long travelTime)
-	{
-		// Values are inverse here. Positive flat adjustments subtract from travel
-		// time, and percentage adjustments divide the time. An X% increase represents
-		// 100 + X decrease in time, so 100% should be 1/2 the time, 200% should 
-		// be 1/3 the time, etc. Percentages are multiplicative, not additive, and
-		// apply after the flat adjustments.
-		
-		// Start with the original travel time.
-		Double workingAmount = travelTime.doubleValue();
-		double modifyFactor = 1.0d;
-		List<String> buffs = db.getBuffEffectsFor(character.getKey(), "movementSpeed");
-		for (String effect : buffs)
-		{
-			effect = effect.replace("+", "");
-			if (effect.endsWith("%"))
-			{
-				effect = effect.substring(0, effect.length() - 1);
-				double val = new Double(effect);
-				val = 1.0+(val/100);
-				modifyFactor = modifyFactor * val;
-			}
-			else
-			{
-				double val = new Double(effect);
-				workingAmount = workingAmount - val;
-			}
-		}
-		
-		// If it's close to 0, treat it as 0. Otherwise we get
-		// a large number, and we clamp value to [0,30].
-		if(modifyFactor >= 0.01d) 
-			travelTime = Math.round(workingAmount/modifyFactor);
 
-		travelTime = Math.min(Math.max(travelTime, 0), 30);
-		return travelTime;
-	}
+	
 
 	@Override
 	String doComplete() throws UserErrorMessage {

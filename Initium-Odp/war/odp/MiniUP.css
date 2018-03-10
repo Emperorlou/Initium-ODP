@@ -14,6 +14,17 @@
     src: url(arial-narrow-2.ttf);
 }
 
+/**
+ * Marching ants border
+ */
+ 
+.marching-ants 
+{
+    border: 1px solid transparent!important;
+    -moz-border-image: image-url('https://initium-resources.appspot.com/images/ants1.gif') 1 repeat repeat!important;
+    -webkit-border-image: url('https://initium-resources.appspot.com/images/ants1.gif') 1 repeat repeat!important;
+    border-image: url('https://initium-resources.appspot.com/images/ants1.gif') 1 repeat repeat!important;
+}
 .chat-character-fix
 {
 	font-family: serif;	
@@ -339,6 +350,7 @@ hr:after {
 {
 	position: relative;
     z-index: 1000100;
+    min-height:50px;
   	/*padding-bottom: 28.98352%;*/
 }
 
@@ -2878,9 +2890,40 @@ position: absolute;
 	width:100%;
 }
 
+.combat-button
+{
+	min-width:42px;
+	padding:5px;
+	z-index:2000002;
+	/*image-rendering:pixelated;*/
+}
 
+.sublocation-display-container
+{
+	position: relative;
+	cursor:pointer;
+	margin-top:0px;
+}
 
+.sublocation-display-container h5
+{
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    margin: 0px;
+    text-shadow: 1px 1px 2px #000;
+    text-align: right;    
+}
 
+.sublocation-display
+{
+    width: 100%;
+    height: 50px;
+    background-position: center center;
+    background-size: cover;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
 
 
 
@@ -3231,6 +3274,10 @@ position: absolute;
 }
 @media (max-width:480px)
 {
+	.combat-button
+	{
+		min-width:32px;
+	}
 	.main-splitScreen
 	{
 		width:100%;
@@ -3341,7 +3388,6 @@ position: absolute;
 	}
 	
 }
-
 
 	
 	
@@ -4574,14 +4620,39 @@ body
     font-family: quest;	
 }
 
-#global-navigation-map
+.global-navigation-map
 {
 	display:none;
 }
 
-.overheadmap-window #global-navigation-map
+.overheadmap-window .global-navigation-map
 {
 	display:inherit;
+}
+
+#travel-line
+{
+	stroke: #342c22;
+    stroke-width: 6px;
+    stroke-dasharray: 10;
+    stroke-linecap:round;
+}
+
+#travel-line-cancel-button
+{
+	position:absolute;
+	top:0px;
+	width:100%;
+	left:0px;
+	text-align:center;
+	z-index:2;
+}
+
+#travel-line-cancel-button
+{
+	font-size:22px;
+	color:#3e3323;
+	font-weight:bold;
 }
 
 .this-location-box

@@ -105,6 +105,7 @@ public class InventionController extends PageController {
 		for(CachedEntity idea:constructItemIdeas)
 		{
 			CachedEntity ideaDef = pool.get((Key)idea.getProperty("_definitionKey"));
+			if (ideaDef==null) continue;
 			pool.addToQueue(ideaDef.getProperty("itemDef"));
 		}	
 		
@@ -120,6 +121,8 @@ public class InventionController extends PageController {
 		for(CachedEntity idea:constructItemIdeas)
 		{
 			CachedEntity ideaDef = pool.get((Key)idea.getProperty("_definitionKey"));
+			
+			if (ideaDef==null) continue;
 			
 			String ideaName = (String)ideaDef.getProperty("name");
 			String ideaDescription = (String)ideaDef.getProperty("ideaDescription");

@@ -38,6 +38,8 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
+	final public static String version = "0.5.6-11";
+	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
 	final static DecimalFormat singleDigitFormat = new DecimalFormat("#,##0.0");

@@ -122,6 +122,7 @@ public class FullPageController extends PageController {
 		request.setAttribute("immovablesPanel", updateService.updateImmovablesPanel()); 
 		request.setAttribute("globalNavigationMap", updateService.updateGlobalNavigationMap());
 
+		request.setAttribute("version", GameUtils.version);
 		
 		return "/WEB-INF/odppages/full.jsp";
 	}

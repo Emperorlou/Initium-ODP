@@ -45,8 +45,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css">
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=231"></script>
-<!--<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=211">-->
+<script type="text/javascript" src="/odp/javascript/script.js?v=${version}"></script>
+<!--<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">-->
 
 
 
@@ -321,10 +321,10 @@
 <script type="text/javascript" src="/odp/javascript/reveal-tutorial.js?v=15"></script>
 <script type="text/javascript" src="/odp/javascript/reveal-tutorial-impl.js?v=6"></script>
 
-<script type="text/javascript" src="/odp/full.js?v=1"></script>
+<script type="text/javascript" src="/odp/full.js?v=${version}"></script>
 
-	<link rel="stylesheet" href="/odp/MiniUP.css?t=1"/>
-	<link rel="stylesheet" href="/odp/full.css?t=1"/>
+	<link rel="stylesheet" href="/odp/MiniUP.css?t=${version}"/>
+	<link rel="stylesheet" href="/odp/full.css?t=${version}"/>
 
 </head>
 
@@ -338,7 +338,8 @@ on our slack channel!
 
 http://github.com/Emperorlou/Initium-ODP 
 
-                                           -->
+Version: ${version}
+-->
 <body>
 
 
@@ -430,7 +431,7 @@ http://github.com/Emperorlou/Initium-ODP
 			
 		<div id='page-popup-root'></div> 
 	
-		<div id='global-navigation-map'>${globalNavigationMap}</div>	
+		<div class='global-navigation-map'>${globalNavigationMap}</div>	
 	</div>
 
 

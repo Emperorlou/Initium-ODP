@@ -41,8 +41,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=258"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=258">
+<script type="text/javascript" src="/odp/javascript/script.js?v=${version}"></script>
+<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">
 
 
 
