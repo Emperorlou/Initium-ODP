@@ -2166,7 +2166,8 @@ public class ODPDBAccess
 		{
 			for(CachedEntity equip:characterEquipment)
 			{
-				startValue = mService.getAffectedValue(startValue, equip, modifierType);
+				if(equip != null)
+					startValue = mService.getAffectedValue(startValue, equip, modifierType);
 			}
 		}
 		
