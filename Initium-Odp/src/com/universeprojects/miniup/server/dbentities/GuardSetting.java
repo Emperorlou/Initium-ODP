@@ -99,5 +99,13 @@ public class GuardSetting extends InitiumEntityBase
 	}
 	
 	
-
+	public Long getLine()
+	{
+		return (Long)entity.getProperty("line");
+	}
+	
+	public void setLine(Long line)
+	{
+		entity.setProperty("line", line);
+	}
 }
