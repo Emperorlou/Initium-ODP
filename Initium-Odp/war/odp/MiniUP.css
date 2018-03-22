@@ -139,6 +139,16 @@ a:HOVER
 	text-decoration: underline;	
 }
 
+.standard-button-highlight:hover
+{
+	filter: brightness(1.5);
+}
+
+.standard-button-highlight:active
+{
+	filter:brightness(0.5);
+}
+
 .list-item
 {
 	display:table-cell;
@@ -1234,6 +1244,16 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	color:#DDDDDD;
 
 
+}
+
+.main-textbox2 input[type=text], .main-textbox2 input[type=password], .main-textbox2 input[type=email]
+{
+	border-style: solid;
+	border-width: 17px 19px 17px 16px;
+	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/input1-background.png) 17 19 17 16 stretch;
+	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/input1-background.png) 17 19 17 16 stretch;
+	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/input1-background.png) 17 19 17 16 stretch;
+	border-image: url(https://initium-resources.appspot.com/images/ui3/input1-background.png) 17 19 17 16 fill stretch;
 }
 
 .main-textbox input[type=text], .main-textbox input[type=password], .main-textbox input[type=email]
@@ -4563,7 +4583,7 @@ body
 
 .overheadmap-cell-container:hover
 {
-	filter: drop-shadow(0px 0px 12px #FFFFCC);
+	filter: drop-shadow(0px 0px 12px #FFFFCC) brightness(1.6);
 }
 
 
