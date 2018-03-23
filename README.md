@@ -1,5 +1,5 @@
 # Initium-ODP
-This project allows people to contribute to the parts of Initium that are open source.                
+This project allows people to contribute to the parts of Initium that are open source.                 
 
 # How to get your development environment setup
 It's possible to get things working using a different IDE and other different variations (like JDK version), but I'll try to give you precise instructions for getting things working the way I know how.  
