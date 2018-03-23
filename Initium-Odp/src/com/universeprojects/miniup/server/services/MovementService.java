@@ -35,7 +35,7 @@ public class MovementService extends Service {
 		if (lockCode != null) 
 		{
 			if (checkHasKey(character, (long)lockCode) == false)
-				throw new UserErrorMessage("This location is locked. You must have the correct key in your inventory before you can access it.");
+				throw new UserErrorMessage("This location is locked. You must have the correct key before you can access it.");
 			else {
 				FilterPredicate f1 = new FilterPredicate("containerKey", FilterOperator.EQUAL, character.getKey());
 				FilterPredicate f2 = new FilterPredicate("keyCode", FilterOperator.EQUAL, (long)lockCode);
@@ -43,18 +43,22 @@ public class MovementService extends Service {
 				
 				List<CachedEntity> matchingKeys = ds.fetchAsList("Item", CompositeFilterOperator.and(f1, f2), 1000);
 				
-				// first matching key loses 1 durability
-				CachedEntity key = matchingKeys.get(0);
-				
-				if (GameUtils.equals(key.getProperty("durability"), null) == false) {
-					long durability = (long) key.getProperty("durability");
+				// If no item keys, then it's a buff key, which doesn't get affected.
+				if(matchingKeys.isEmpty()==false)
+				{
+					// first matching key loses 1 durability
+					CachedEntity key = matchingKeys.get(0);
 					
-					if (durability > 1) {
-						key.setProperty("durability", durability - 1);
-						ds.put(key);
+					if (GameUtils.equals(key.getProperty("durability"), null) == false) {
+						long durability = (long) key.getProperty("durability");
+						
+						if (durability > 1) {
+							key.setProperty("durability", durability - 1);
+							ds.put(key);
+						}
+						else
+							ds.delete(key);
 					}
-					else
-						ds.delete(key);
 				}
 			}
 		}
