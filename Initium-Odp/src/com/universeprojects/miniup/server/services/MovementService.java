@@ -62,6 +62,8 @@ public class MovementService extends Service {
 	
 	private boolean checkHasKey(CachedEntity character, long lockCode) {
 		int matchingKeys = db.getFilteredList_Count("Item", "containerKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
+		if(matchingKeys == 0)
+			matchingKeys = db.getFilteredList_Count("Buff", "parentKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
 		
 		return (matchingKeys > 0);
 	}
