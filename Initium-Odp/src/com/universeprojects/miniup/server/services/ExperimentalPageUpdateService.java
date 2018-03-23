@@ -29,5 +29,10 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		return "";
 	}
 
+	@Override
+	protected String updateButtonList_Incapacitated()
+	{
+		return "";
+	}
 	
 }

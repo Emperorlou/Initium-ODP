@@ -20,6 +20,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.WarnPlayerException;
 import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.CombatService;
+import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.TerritoryService;
 
@@ -258,6 +259,16 @@ public class LongOperationTakePath extends LongOperation {
 			
 			if (allowAttack==false && blockadeStructure!=null)
 				throw new UserErrorMessage("You are approaching a defensive structure which will cause you to enter into combat with whoever is defending the structure. Are you sure you want to approach?<br><br><a onclick='closeAllPopups();doGoto(event,"+path.getKey().getId()+",true)'>Click here to attack!</a>", false);
+			
+			GuardService guardService = new GuardService(db);
+			CachedEntity guardToAttack = guardService.tryToEnterLocation(character, destinationKey, allowAttack);
+			if (guardToAttack!=null)
+			{
+				combatService.enterCombat(character, guardToAttack, true);
+				
+				throw new GameStateChangeException(); // If we've been interrupted, we'll just get out and not actually travel to the location
+				
+			}
 			
 			// Ok, lets begin then...
 			setDataProperty("locationName", destination.getProperty("name"));

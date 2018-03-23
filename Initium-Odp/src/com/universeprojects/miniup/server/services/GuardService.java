@@ -89,7 +89,7 @@ public class GuardService extends Service
 		for(int guardIndex=0; guardIndex<guardSettings.size(); guardIndex=guardIndex+5) // Checking 5 guards at a time for a good match
 		{
 			characterKeys.clear();
-			for(int i = guardIndex; i<5; i++)
+			for(int i = guardIndex; i<5 && i<guardSettings.size(); i++)
 			{
 				characterKeys.add(guardSettings.get(i).getCharacterKey());
 			}
@@ -182,6 +182,7 @@ public class GuardService extends Service
 	{
 		// make sure the guard still exists
 		if (guard==null) throw new DeleteGuardSetting(guardSetting);
+		if (CommonChecks.checkCharacterIsDead(guard)) throw new DeleteGuardSetting(guardSetting);
 		// Make sure the guard actually belongs to this guard setting
 		if (GameUtils.equals(guard.getKey(), guardSetting.getCharacterKey())==false) throw new RuntimeException("Verifying a guard with a guard setting that is meant for someone else.");
 		// Make sure the guard is not busy doing something else

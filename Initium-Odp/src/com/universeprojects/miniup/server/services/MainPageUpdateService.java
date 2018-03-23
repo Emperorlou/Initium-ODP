@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
@@ -336,6 +337,61 @@ public class MainPageUpdateService extends Service
 			}
 			
 			ds.delete(keysToDelete);
+			
+			
+			
+			
+			
+			
+			// Now that we're here, there is a special case for player houses. If we're in a player house and we have no
+			// paths available to us, show the path out (if one exists)
+			if (paths.isEmpty() && GameUtils.equals("RestSite", location.getProperty("type")))
+			{
+				List<CachedEntity> list = query.getFilteredList("Path", 2, "location1Key", FilterOperator.EQUAL, location.getKey());
+				list.addAll(query.getFilteredList("Path", 2, "location2Key", FilterOperator.EQUAL, location.getKey()));
+				
+				if (list.size()==1)
+				{
+					CachedEntity path = list.get(0);
+					
+					Key destination = null;
+					// First get the character's current location
+					Key currentLocationKey = location.getKey();
+					
+					// Then determine which location the character will end up on.
+					// If we find that the character isn't on either end of the path, we'll throw.
+					Integer pathEnd = null;
+					Key pathLocation1Key = (Key)path.getProperty("location1Key");
+					Key pathLocation2Key = (Key)path.getProperty("location2Key");
+					if (pathLocation1Key==null)
+						return;
+					if (pathLocation2Key==null)
+						return;
+					if (currentLocationKey.getId()==pathLocation1Key.getId())
+					{
+						destination = pathLocation2Key;
+						pathEnd = 2;
+					}
+					else if (currentLocationKey.getId()==pathLocation2Key.getId())
+					{
+						destination = pathLocation1Key;
+						pathEnd = 1;
+					}
+					
+					if (pathEnd == 1 && "FromLocation1Only".equals(path.getProperty("forceOneWay")))
+						return;	
+					else if (pathEnd == 2 && "FromLocation2Only".equals(path.getProperty("forceOneWay")))
+						return;	
+					
+					if (destination!=null)
+					{
+						paths.add(path);
+						destLocations.add(db.getEntity(destination));
+						pathEnds.add(pathEnd);
+					}
+					
+				}
+			}
 		}
 	}
 	
@@ -755,80 +811,93 @@ public class MainPageUpdateService extends Service
 				
 				newHtml.append(getHtmlForInBannerLink(topInt, leftInt, buttonCaption, onclick));
 			}
-			
-			// Here we'll add a default overlay link if there is only 1 path and there are no other overlay links setup
-			if (paths.size()==1)
-			{
-				CachedEntity path = paths.get(0);
-				CachedEntity destLocation = destLocations.get(0);
-				Integer pathEnd = pathEnds.get(0);
-					
-				String destLocationName = (String)destLocation.getProperty("name");
-				
-				
-				double topDbl = 150;
-				double leftDbl = 728/2;
-				int topInt = new Double(topDbl/211d*100).intValue();
-				int leftInt = new Double(leftDbl/728d*100).intValue();
-		
 
-				String buttonCaption = "Head towards "+destLocationName;
-				String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
-				String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
-				if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
-					buttonCaption = buttonCaptionOverride;
-				if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
-					buttonCaption = overlayCaptionOverride;
+			if (CommonChecks.checkCharacterIsIncapacitated(character)){
+				String onclick = null;				
+				if (CommonChecks.checkCharacterIsDead(character))
+					onclick = "newCharacterFromDead()";
+				if (CommonChecks.checkCharacterIsUnconscious(character))
+					onclick = "newCharacterFromUnconscious()";
 				
-				
-				String onclick = "doGoto(event, "+path.getKey().getId()+", true);";				
-				
-				newHtml.append(getHtmlForInBannerLinkCentered(topInt, leftInt, buttonCaption, onclick));
+				newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "Spawn a new character", onclick));
 				
 			}
-			
-
-			if (CommonChecks.checkLocationIsCombatSite(location)==false)
+			else
 			{
-				if (CommonChecks.checkLocationIsCampSite(location))
+			
+				// Here we'll add a default overlay link if there is only 1 path and there are no other overlay links setup
+				if (paths.size()==1)
 				{
-					newHtml.append(getHtmlForInBannerLink(50, 46, "<span id='defendCampsiteBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Defend button below.'>Defend</span>", "window.btnDefendCamp.click();$(this).hide();"));
+					CachedEntity path = paths.get(0);
+					CachedEntity destLocation = destLocations.get(0);
+					Integer pathEnd = pathEnds.get(0);
+						
+					String destLocationName = (String)destLocation.getProperty("name");
+					
+					
+					double topDbl = 150;
+					double leftDbl = 728/2;
+					int topInt = new Double(topDbl/211d*100).intValue();
+					int leftInt = new Double(leftDbl/728d*100).intValue();
+			
+	
+					String buttonCaption = "Head towards "+destLocationName;
+					String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
+					String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
+					if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
+						buttonCaption = buttonCaptionOverride;
+					if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
+						buttonCaption = overlayCaptionOverride;
+					
+					
+					String onclick = "doGoto(event, "+path.getKey().getId()+", true);";				
+					
+					newHtml.append(getHtmlForInBannerLinkCentered(topInt, leftInt, buttonCaption, onclick));
+					
+				}
+				
+	
+				if (CommonChecks.checkLocationIsCombatSite(location)==false)
+				{
+					if (CommonChecks.checkLocationIsCampSite(location))
+					{
+						newHtml.append(getHtmlForInBannerLink(50, 46, "<span id='defendCampsiteBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Defend button below.'>Defend</span>", "window.btnDefendCamp.click();$(this).hide();"));
+						String js = 
+								"<script type='text/javascript'>" +
+								"setTimeout(function(){" +
+								"window.btnDefendCamp = $('.v3-main-button[shortcut=68]');" +
+								"if (window.btnDefendCamp.length>0)" +
+								"{" +
+								"	$('#defendCampsiteBannerButton').show();" +
+								"	if (window.btnDefendCamp.length>1) window.btnDefendCamp = $(window.btnDefendCamp[0]);" +
+								"}" +
+								"}, 500);" +
+								"</script>";
+						newHtml.append(js);
+					}
+					//	newHtml.append(getHtmlForInBannerLink(50, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore(event)"));
+				}
+				else if (CommonChecks.checkCharacterIsIncapacitated(character))
+				{
+					// Do nothing, we don't want to show any overlay links
+				}
+				else
+				{
+					newHtml.append(getHtmlForInBannerLinkCentered(50, 50, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Leave and forget</span>", "window.btnLeaveAndForget.click()"));
 					String js = 
 							"<script type='text/javascript'>" +
 							"setTimeout(function(){" +
-							"window.btnDefendCamp = $('.v3-main-button[shortcut=68]');" +
-							"if (window.btnDefendCamp.length>0)" +
+							"window.btnLeaveAndForget = $('.v3-main-button[shortcut=70]');" +
+							"if (window.btnLeaveAndForget.length>0)" +
 							"{" +
-							"	$('#defendCampsiteBannerButton').show();" +
-							"	if (window.btnDefendCamp.length>1) window.btnDefendCamp = $(window.btnDefendCamp[0]);" +
+							"	$('#leaveAndForgetBannerButton').show();" +
+							"	if (window.btnLeaveAndForget.length>1) window.btnLeaveAndForget = $(window.btnLeaveAndForget[0]);" +
 							"}" +
 							"}, 500);" +
 							"</script>";
 					newHtml.append(js);
 				}
-				//	newHtml.append(getHtmlForInBannerLink(50, 45, "<span style='padding:5px;z-index:2000002;'>Explore</span>", "doExplore(event)"));
-			}
-			else if (CommonChecks.checkCharacterIsIncapacitated(character))
-			{
-				// Do nothing, we don't want to show any overlay links
-			}
-			else
-			{
-				newHtml.append(getHtmlForInBannerLinkCentered(50, 50, "<span id='leaveAndForgetBannerButton' style='padding:5px;z-index:2000002;display:none;' title='This is the same as clicking the Leave and Forget button below.'>Leave and forget</span>", "window.btnLeaveAndForget.click()"));
-				String js = 
-						"<script type='text/javascript'>" +
-						"setTimeout(function(){" +
-						"window.btnLeaveAndForget = $('.v3-main-button[shortcut=70]');" +
-						"if (window.btnLeaveAndForget.length>0)" +
-						"{" +
-						"	$('#leaveAndForgetBannerButton').show();" +
-						"	if (window.btnLeaveAndForget.length>1) window.btnLeaveAndForget = $(window.btnLeaveAndForget[0]);" +
-						"}" +
-						"}, 500);" +
-						"</script>";
-				newHtml.append(js);
-			}
-			
+			}			
 		}
 		else
 		{
