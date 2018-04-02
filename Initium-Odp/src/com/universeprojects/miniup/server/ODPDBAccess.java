@@ -63,6 +63,8 @@ public class ODPDBAccess
 	
 	final private HttpServletRequest request;
 	
+	private Map<Key,Set<String>> mpusSendQueue = null;
+	
 	public enum CharacterMode
 	{
 		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD
@@ -459,7 +461,7 @@ public class ODPDBAccess
 		return null;
 
 	}
-
+	
 	/**
 	 * Gets an entity from the database by it's kind and ID. If no entity was
 	 * found, this method will simply return null.
@@ -473,14 +475,9 @@ public class ODPDBAccess
 	public CachedEntity getEntity(String kind, Long id)
 	{
 		Key key = createKey(kind, id);
-		try
-		{
-			return ds.get(key);
-		}
-		catch (EntityNotFoundException e)
-		{
-			return null;
-		}
+		pool.addToQueue(key);
+		pool.loadEntities();
+		return pool.get(key);
 	}
 
 	/**
@@ -496,14 +493,9 @@ public class ODPDBAccess
 	public CachedEntity getEntity(String kind, String entityName)
 	{
 		Key key = createKey(kind, entityName);
-		try
-		{
-			return ds.get(key);
-		}
-		catch (EntityNotFoundException e)
-		{
-			return null;
-		}
+		pool.addToQueue(key);
+		pool.loadEntities();
+		return pool.get(key);
 	}
 	
 	/**
@@ -551,7 +543,9 @@ public class ODPDBAccess
 	 */
 	public List<CachedEntity> getEntities(List<Key> keyList)
 	{
-		return ds.fetchEntitiesFromKeys(keyList);
+		pool.addToQueue(keyList);
+		pool.loadEntities();
+		return pool.get(keyList);
 	}
 
 	/**
@@ -565,7 +559,11 @@ public class ODPDBAccess
 	 */
 	public List<CachedEntity> getEntities(Key... keyList)
 	{
-		return ds.fetchEntitiesFromKeys(keyList);
+		List<Key> list = Arrays.asList(keyList);
+		pool.addToQueue(list);
+		pool.loadEntities();
+		return pool.get(list);
+
 	}
 
 	public InitiumObject getInitiumObject(Key key)
@@ -587,15 +585,9 @@ public class ODPDBAccess
 	public CachedEntity getEntity(Key key)
 	{
 		if (key == null) return null;
-		try
-		{
-			return getDB().get(key);
-		}
-		catch (EntityNotFoundException e)
-		{
-			// Ignore
-		}
-		return null;
+		pool.addToQueue(key);
+		pool.loadEntities();
+		return pool.get(key);
 	}
 
 	/**
@@ -610,7 +602,10 @@ public class ODPDBAccess
 	public List<CachedEntity> getEntity(Key...keys)
 	{
 		if (keys == null) return null;
-		return getDB().get(keys);
+		List<Key> list = Arrays.asList(keys);
+		pool.addToQueue(list);
+		pool.loadEntities();
+		return pool.get(list);
 	}
 
 	/**
@@ -1231,43 +1226,40 @@ public class ODPDBAccess
 
 	public List<CachedEntity> getDiscoveriesForCharacterAndLocation(Key characterKey, Key location, boolean showHidden)
 	{
-//		Collection<Filter> andFilters = new ArrayList<Filter>();
-//		andFilters.add(new FilterPredicate("characterKey", FilterOperator.EQUAL, characterKey));
-//		if (showHidden==false)
-//			andFilters.add(new FilterPredicate("hidden", FilterOperator.EQUAL, false));
-//		andFilters.add(CompositeFilterOperator.or(new FilterPredicate("location1Key", FilterOperator.EQUAL, location), 
-//				new FilterPredicate("location2Key", FilterOperator.EQUAL, location)));
-//		
-//		CompositeFilter filters = CompositeFilterOperator.and(andFilters);
-//		
-//		Query q = new Query("Discovery").setFilter(filters);
-
+		List<CachedEntity> fetchAsList = null;
 		QueryHelper query = new QueryHelper(ds);
-		List<CachedEntity> location1List = query.getFilteredList("Discovery", "characterKey", characterKey, "location1Key", location);
-		List<CachedEntity> location2List = query.getFilteredList("Discovery", "characterKey", characterKey, "location2Key", location);
-		List<CachedEntity> fetchAsList = location1List;
-		fetchAsList.addAll(location2List);
 		
-		log.log(Level.WARNING, fetchAsList.size() + " discoveries found.");
 		
-//		// TODO: Delete me after a while! This will slowly convert all discoveries to use the boolean hidden value type instead of strings of TRUE|FALSE
+		// FOR SOME REASON, THE NICE CODE BELOW TAKES ALMOST A FULL SECOND TO COMPLETE IF SHOW HIDDEN = FALSE. WTF
 //		if (showHidden)
 //		{
-//			List<CachedEntity> entitiesToSave = null;
-//			for(CachedEntity discovery:fetchAsList)
-//			{
-//				Object hiddenVal = discovery.getProperty("hidden");
-//				if (hiddenVal==null || hiddenVal instanceof String)
-//				{
-//					if (entitiesToSave==null) entitiesToSave = new ArrayList<CachedEntity>();
-//					discovery.setProperty("hidden", GameUtils.booleanEquals(discovery.getProperty("hidden"), true));
-//					entitiesToSave.add(discovery);
-//				}
-//			}
-//			
-//			if (entitiesToSave!=null)
-//				ds.put(entitiesToSave);
+//			List<CachedEntity> location1List = query.getFilteredList("Discovery", "characterKey", characterKey, "location1Key", location);
+//			List<CachedEntity> location2List = query.getFilteredList("Discovery", "characterKey", characterKey, "location2Key", location);
+//			fetchAsList = location1List;
+//			fetchAsList.addAll(location2List);
 //		}
+//		else
+//		{
+//			List<CachedEntity> location1List = query.getFilteredList("Discovery", "characterKey", characterKey, "location1Key", location, "hidden", false);
+//			List<CachedEntity> location2List = query.getFilteredList("Discovery", "characterKey", characterKey, "location2Key", location, "hidden", false);
+//			fetchAsList = location1List;
+//			fetchAsList.addAll(location2List);
+//		}
+
+		
+		// So instead, we will query for all discoveries and then just pair them down
+		List<CachedEntity> location1List = query.getFilteredList("Discovery", "characterKey", characterKey, "location1Key", location);
+		List<CachedEntity> location2List = query.getFilteredList("Discovery", "characterKey", characterKey, "location2Key", location);
+		fetchAsList = location1List;
+		fetchAsList.addAll(location2List);
+		
+		if (showHidden==false)
+			for(int i = fetchAsList.size()-1; i>=0; i--)
+				if (GameUtils.equals(fetchAsList.get(i).getProperty("hidden"), true))
+					fetchAsList.remove(i);
+		
+		
+		log.log(Level.WARNING, fetchAsList.size() + " discoveries found.");
 		
 		return fetchAsList;
 	}
@@ -3220,6 +3212,9 @@ public class ODPDBAccess
 	
 	public boolean isCharacterDefending(CachedEntity characterLocation, CachedEntity character)
 	{
+		if ("AutoDefender".equals(character.getProperty("combatType")))
+			return true;
+		
 		if (character.getProperty("status")!=null && character.getProperty("status").equals(CharacterStatus.Normal)==false)
 			return false;
 		
@@ -4178,6 +4173,8 @@ public class ODPDBAccess
             	catch(Exception ex) { priorDamage = damage; }
             	damageMap.put(charKey, priorDamage.toString());
             	setValue_StringStringMap(targetCharacter, "combatStatsDamageMap", damageMap);
+            	
+            	queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateInBannerCharacterWidget");
             }
             
             
@@ -4756,7 +4753,7 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 //
 //					}
 					if (attackingCharacterNeedsNotification)
-						sendNotification(db, attackingCharacterFinal.getKey(), NotificationType.fullpageRefresh);
+						sendMainPageUpdateForCharacter(db, attackingCharacterFinal.getKey(), "updateFullPage_shortcut");
 					
 
 					// Here we check if the battle took place in an instance, defence structure, or territory. If so, 
@@ -4896,10 +4893,10 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 							loot+="<div>";
 							loot+="		<div class='main-item-controls'>";
 							// Get all the slots this item can be equipped in
-							loot+="			<a onclick='ajaxAction(\"ServletCharacterControl?type=dropItem&itemId="+item.getKey().getId()+"\", event, loadInventory)' >Drop on ground</a>";
+							loot+="			<a onclick='ajaxAction(\"/ServletCharacterControl?type=dropItem&itemId="+item.getKey().getId()+"\", event, loadInventory)' >Drop on ground</a>";
 							if (item.getProperty("maxWeight")!=null)
 							{
-								loot+="<a onclick='pagePopup(\"ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
+								loot+="<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
 							}
 							loot+="		</div>";
 							loot+="</div>";
@@ -5013,7 +5010,7 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 			{
 				character.setProperty("mode", CharacterMode.DEAD.toString());
 				
-				sendNotification(getDB(), character.getKey(), NotificationType.fullpageRefresh);
+				sendMainPageUpdateForCharacter(getDB(), character.getKey(), "updateFullPage_shortcut");
 				
 				return true;
 			}
@@ -5622,14 +5619,16 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 					groupKeySet.add(mapKey);
 				}
 
-				if(!groupKeySet.contains(ownerKey.toString()) || groupKeySet.size() != 1) { // Check for non-matching keys
+				if((!groupKeySet.contains(ownerKey.toString()) || groupKeySet.size() != 1) && 
+						"Town".equals(destination.getProperty("type"))==false/*Exclude leaving*/) { 
 					throw new UserErrorMessage(String.format("You cannot enter a group owned house unless %s.", party.size() > 1 ? "all members of your party are members of the group" : "you are a member of the group"));
 				}
 			} else if("User".equals(ownerKey.getKind())) {
 				Key pathOwner = (Key) path.getProperty("ownerKey");
 				for (CachedEntity partyMember : party) {
 					boolean isPathOwner = GameUtils.equals(pathOwner, partyMember.getProperty("userKey"));
-					if (!isPathOwner && !movementService.isPathDiscovered(partyMember.getKey(), path.getKey())) {
+					if (!isPathOwner && !movementService.isPathDiscovered(partyMember.getKey(), path) && 
+							"Town".equals(destination.getProperty("type"))==false/*Exclude leaving*/) {
 						throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", party.size() > 1 ? "every character already has been given access" : "you already have been given access"));
 					}
 				}
@@ -5821,7 +5820,7 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		
 		// Send main-page update for all party members but the leader.
 		if(partyKeys.isEmpty()==false)
-			sendMainPageUpdateForCharacters(db, partyKeys, "updateFullPage_shortcut");
+			queueMainPageUpdateForCharacters(partyKeys, "updateFullPage_shortcut");
 		
 		return destination;
 	}
@@ -6251,7 +6250,7 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 				if (party!=null)
 					for(CachedEntity member:party)
 						if (member.getKey().getId()!=character.getKey().getId())
-							sendNotification(db, member.getKey(), NotificationType.fullpageRefresh);
+							sendMainPageUpdateForCharacter(db, member.getKey(), "updateFullPage_shortcut");
 				
 				
 				// Now we want to check if the monster should regain hitpoints or not
@@ -6276,7 +6275,7 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 					
 					db.put(monster);
 					
-					sendNotification(db, monster.getKey(), NotificationType.fullpageRefresh);
+					sendMainPageUpdateForCharacter(db, monster.getKey(), "updateFullPage_shortcut");
 				}
 				else
 				{
@@ -6661,6 +6660,42 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void queueMainPageUpdateForCharacters(Collection<Key> characterKeys, String...updateMethods)
+	{
+		if (characterKeys==null) return;
+		
+		for(Key charKey:characterKeys)
+		{
+			queueMainPageUpdateForCharacter(charKey, updateMethods);
+		}
+	}
+	
+	public void queueMainPageUpdateForCharacter(Key characterKey, String...updateMethods)
+	{
+		if (mpusSendQueue==null) mpusSendQueue = new HashMap<>();
+		Set<String> uMethods = mpusSendQueue.get(characterKey);
+		if (uMethods==null) 
+		{
+			uMethods = new HashSet<String>();
+			mpusSendQueue.put(characterKey, uMethods);
+		}
+		
+		uMethods.addAll(Arrays.asList(updateMethods));
+	}
+	
+	public void sendMainPageUpdateQueue(CachedDatastoreService ds)
+	{
+		if (mpusSendQueue==null) return;
+		
+		for(Key charKey:mpusSendQueue.keySet()){
+			if (mpusSendQueue.get(charKey)==null) continue;
+			Set<String> uMethods = mpusSendQueue.get(charKey);
+			sendMainPageUpdateForCharacter(ds, charKey, uMethods.toArray(new String[uMethods.size()]));
+		}
+		
+		mpusSendQueue.clear();
+	}
 
 	public void sendSoundEffectToCharacters(CachedDatastoreService ds, Collection<Key> characterKeys, String...soundEffects)
 	{
@@ -6692,6 +6727,11 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		return null;
 	}
 
+	public void sendGameMessage(String message)
+	{
+		sendGameMessage(getDB(), getCurrentCharacter(), message);
+	}
+	
 	public void sendGameMessage(CachedDatastoreService ds, CachedEntity character, String message)
 	{
 		// TODO Auto-generated method stub
@@ -7005,4 +7045,35 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		return buffedTravel;
 	}
 
+	public CachedEntity getCharacterLocation(CachedEntity character)
+	{
+		Key locationKey = (Key)character.getProperty("locationKey");
+		CachedEntity location = getEntity(locationKey);
+		
+		
+		
+		if (locationKey==null || location==null)
+		{
+			location = getEntity((Key)getCurrentCharacter().getProperty("homeTownKey"));
+			if (location==null)
+				location = getEntity(getDefaultLocationKey());
+			character.setProperty("locationKey", location.getKey());
+			
+			if (GameUtils.equals(character.getKey(), getCurrentCharacterKey()))
+				getCurrentCharacter().setProperty("locationKey", location.getKey());
+		}
+		
+		return location;
+	}
+
+	public Key stringToKey(String value)
+	{
+		return null;
+	}
+	
+	public String keyToString(Key value)
+	{
+		if (value==null) return null;
+		return value.toString();
+	}
 }

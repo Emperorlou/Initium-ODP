@@ -57,15 +57,8 @@ public class MainPageUpdateService extends Service
 		this.cs = new CombatService(db);
 
 		// If the character's location is null, time to send them to their home town or default location
-		if (character.getProperty("locationKey")==null)
-		{
-			this.location = db.getEntity((Key)db.getCurrentCharacter().getProperty("homeTownKey"));
-			if (this.location==null)
-				this.location = db.getEntity(db.getDefaultLocationKey());
-			db.getCurrentCharacter().setProperty("locationKey", this.location.getKey());	// Not sure why this was throwing an NPE sometimes. Added a null check that shouldn't happen.
-			this.character.setProperty("locationKey", this.location.getKey());
-		}
-		
+		if (location==null)
+			this.location = db.getCharacterLocation(character);
 		
 	}
 
@@ -760,13 +753,23 @@ public class MainPageUpdateService extends Service
 	public String updateInBannerOverlayLinks()
 	{
 		StringBuilder newHtml = new StringBuilder();
+		newHtml.append("<script type='text/javascript'>window.singleLeavePathId=null;</script>");
 		if (CommonChecks.checkCharacterIsInCombat(character)==false)
 		{
+			// Check if we should add the show loot popup button
+			if (CommonChecks.checkCharacterIsIncapacitated(character)==false && 
+					CommonChecks.checkLocationIsCombatSite(location) && 
+					CommonChecks.checkCharacterIsInCombat(character)==false)
+			{
+				newHtml.append(getHtmlForInBannerLinkCentered(30, 50, "Show loot", "showLootPopup()"));				
+			}
 			
 			newHtml.append("<a id='thisLocation-button' class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>");			
 			newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img alt='Navigation' src='https://initium-resources.appspot.com/images/ui/compass1.png'></a>");			
 			newHtml.append("<a id='globe-navigation-button' class='path-overlay-link' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img alt='Global navigation' src='https://initium-resources.appspot.com/images/ui/navigation-map-icon2.png' style='max-width:32px'></a>");			
 			newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
+			newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' style='max-width:32px'></a>");			
+			
 			
 			loadPathCache();
 
@@ -848,9 +851,10 @@ public class MainPageUpdateService extends Service
 						buttonCaption = buttonCaptionOverride;
 					if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
 						buttonCaption = overlayCaptionOverride;
-					
-					
-					String onclick = "doGoto(event, "+path.getKey().getId()+", true);";				
+
+					newHtml.append("<script type='text/javascript'>window.singleLeavePathId=").append(paths.get(0).getId()).append(";</script>");
+
+					String onclick = "doGoto(event, window.singleLeavePathId, true);";				
 					
 					newHtml.append(getHtmlForInBannerLinkCentered(topInt, leftInt, buttonCaption, onclick));
 					
@@ -1060,7 +1064,7 @@ public class MainPageUpdateService extends Service
 			CachedEntity destLocation = destLocations.get(i);
 			Integer pathEnd = pathEnds.get(i);
 
-			
+			newHtml.append("<div class='location-link-"+destLocation.getId()+"'>");
 			
 				
 			String destLocationName = (String)destLocation.getProperty("name");
@@ -1144,7 +1148,7 @@ public class MainPageUpdateService extends Service
 			else
 				newHtml.append("<a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='v3-main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 	//		newHtml.append("<a href='ServletCharacterControl?type=goto&pathId="+path.getKey().getId()+"' class='v3-main-button' "+shortcutPart+"  "+onclick+">"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
-			newHtml.append("<br>");
+			newHtml.append("</div>");
 
 		}
 		
@@ -1220,6 +1224,7 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder js = new StringBuilder();
 		
+		js.append("clearMakeIntoPopup();");
 		
 		js.append("window.bannerUrl = '"+getLocationBanner()+"';");
 		js.append("window.previousBannerUrl = null;");
@@ -1505,33 +1510,7 @@ public class MainPageUpdateService extends Service
 	public String updateCollectablesView()
 	{
 		StringBuilder html = new StringBuilder();
-		
-		List<CachedEntity> collectablesHere = db.getCollectablesForLocation(location.getKey());
-		
-		if (collectablesHere!=null && collectablesHere.isEmpty()==false)
-		{
-			html.append("<h5>Resources</h5>");
-			
-			for(CachedEntity collectable:collectablesHere)
-			{
-				Long secondsTime = (Long)collectable.getProperty("extractionEase");
-				if (secondsTime==null)
-					secondsTime = 0L;
-				
-				html.append("<div class='main-item'> ");
-				html.append("<div class='main-item-container'>");
-				html.append(GameUtils.renderCollectable(collectable)); 
-				html.append("<br>");
-				html.append("<div class='main-item-controls'>");
-				html.append("<a href='#' onclick='doCollectCollectable(event, "+collectable.getKey().getId()+")'>Extract/Collect</a>");
-				html.append("</div>"); 
-				html.append("</div>");
-				html.append("</div>");
-				html.append("<br/>");
-			}
-		}
-		
-		
+		// Probably getting rid of this		
 		return updateHtmlContents("#collectablesPanel", html.toString());
 	}
 
@@ -1696,22 +1675,9 @@ public class MainPageUpdateService extends Service
 		if (CommonChecks.checkCharacterIsIncapacitated(character)==false)
 			if (CommonChecks.checkLocationIsCombatSite(location) && CommonChecks.checkCharacterIsInCombat(character)==false)
 			{
-				StringBuilder js = new StringBuilder();
-				js.append("<div id='locationQuickList-contents'>");
-				js.append("<div><h4>Loot</h4></div>");
-				if (paths.size()==1)
-					js.append("<p><a onclick='clearMakeIntoPopup();doGoto(event, "+paths.get(0).getId()+", false);' style='float:right'>Leave</a></p>");
-				js.append("<p><a onclick='clearMakeIntoPopup();window.btnLeaveAndForget.click()' style='float:left'>Leave and forget</a></p>");
-				js.append("<div style='height:34px;'></div>");
-				js.append("	<div id='inline-characters'>");
-				js.append("	</div>");
-				js.append("	<div id='inline-items'>");
-				js.append("	</div>");
-				js.append("</div>");
 				html.append("<script type='text/javascript'>");
-				html.append("	makeIntoPopupHtml(\""+js+"\", true);");
-				html.append("	loadInlineItemsAndCharacters();");
-				html.append("	loadInlineCollectables();");
+				if (paths!=null && paths.size()==1)
+					html.append("	showLootPopup();");
 				html.append("</script>");
 			}
 		

@@ -6,15 +6,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.services.CombatService;
-import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
  * Allows the player to attempt to forget a combat site.
@@ -36,7 +33,6 @@ public class CommandForgetCombatSite extends Command {
 
 		db.doDeleteCombatSite(null, character, KeyFactory.createKey("Location", locationId), true, false);		
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(((Key) character.getProperty("locationKey")).getId()), this);
-		mpus.updateButtonList();
+		deleteHtml(".location-link-"+locationId);
 	}
 }

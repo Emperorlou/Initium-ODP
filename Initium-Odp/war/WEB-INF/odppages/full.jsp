@@ -432,6 +432,7 @@ Version: ${version}
 		<div id='page-popup-root'></div> 
 	
 		<div class='global-navigation-map'>${globalNavigationMap}</div>	
+		<div id='loot-popup'></div>
 	</div>
 
 

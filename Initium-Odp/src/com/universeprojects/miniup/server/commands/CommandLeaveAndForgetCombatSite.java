@@ -74,6 +74,7 @@ public class CommandLeaveAndForgetCombatSite extends Command {
 		mpus.updateFullPage_shortcut();
 		if(location != null)
 			db.sendGameMessage(ds, character, "You have arrived at " + location.getProperty("name") + ".");
+		
 	}
 
 }

@@ -38,7 +38,7 @@
 
 
 
-<script type="text/javascript" src="/odp/javascript/messager.js?v=69"></script>
+<script type="text/javascript" src="/odp/javascript/messager.js?v=70"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
 <script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
@@ -266,7 +266,7 @@
 	}
 </script>
 
-<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=52'></script>
+<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=53'></script>
 
 
 <script type='text/javascript'>
@@ -760,5 +760,6 @@ Version: ${version}
 	</div>
 	
 	<div class='global-navigation-map'>${globalNavigationMap}</div>	
+	<div id='loot-popup'></div>
 </body>
 </html>

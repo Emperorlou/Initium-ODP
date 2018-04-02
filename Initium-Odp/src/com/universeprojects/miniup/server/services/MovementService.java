@@ -79,7 +79,8 @@ public class MovementService extends Service {
 	 * @param pathKey
 	 * @return
 	 */
-	public boolean isPathDiscovered(Key characterKey, Key pathKey) {
-		return queryHelper.getFilteredList_Count("Discovery", "characterKey", FilterOperator.EQUAL, characterKey, "entityKey", FilterOperator.EQUAL, pathKey) > 0;
+	public boolean isPathDiscovered(Key characterKey, CachedEntity path) {
+		if (path.getProperty("discoveryChance").equals(100d)) return true;
+		return queryHelper.getFilteredList_Count("Discovery", "characterKey", FilterOperator.EQUAL, characterKey, "entityKey", FilterOperator.EQUAL, path.getKey()) > 0;
 	}
 }

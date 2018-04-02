@@ -222,7 +222,12 @@ public class CommandCombatAttack extends Command
 		
 		if (GameUtils.isPlayerIncapacitated(character))
 		{
-			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
+			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			mpus.updateFullPage_shortcut();
+			
+			db.sendMainPageUpdateForCharacter(ds, targetCharacter.getKey(), "updateFullPage_shortcut");
+			
+			return;
 		}
 		else if (GameUtils.isPlayerIncapacitated(targetCharacter))
 		{
@@ -230,6 +235,9 @@ public class CommandCombatAttack extends Command
 			// We're done with combat
 			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			mpus.updateFullPage_shortcut();
+			
+			db.sendMainPageUpdateForCharacter(ds, targetCharacter.getKey(), "updateFullPage_shortcut");
+			
 			return;
 		}
 		else

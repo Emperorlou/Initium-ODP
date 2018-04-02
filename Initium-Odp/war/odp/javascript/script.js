@@ -1693,8 +1693,7 @@ function newPremiumToken()
 function newCharacterFromUnconscious()
 {
 	confirmPopup("Create a new character?", "Are you Sure? If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
-		enforceSingleAction();
-		window.location.href = "/ServletUserControl?type=newCharacterFromUnconscious"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+		doCommand(event, "CharacterRespawn");
 	});
 }
 
@@ -2003,8 +2002,11 @@ function doForgetCombatSite(eventObject, locationId)
  */
 function doForgetAllCombatSites(eventObject, forgettableCombatSiteArray)
 {
-	confirmPopup("System Message","Are you sure you want to forget all combat sites in this location?", 
-			function(){doCommand(eventObject, "ForgetAllCombatSites", {"forgettableCombatSiteArray" : forgettableCombatSiteArray})});
+	confirmPopup("System Message","Are you sure you want to forget all combat sites in this location?", function()
+	{
+		clearMakeIntoPopup();
+		doCommand(eventObject, "ForgetAllCombatSites", {"forgettableCombatSiteArray" : forgettableCombatSiteArray});
+	});
 }
 
 /**
@@ -2402,10 +2404,9 @@ function viewManageStore()
     pagePopup("/odp/ajax_managestore.jsp", null, "Your Store");
 }
 
-function newCharacterFromDead()
+function newCharacterFromDead(event)
 {
-	enforceSingleAction();
-	location.href = "/ServletUserControl?type=newCharacterFromDead"+"&v="+verifyCode;
+	doCommand(event, "CharacterRespawn");
 }
 
 function switchCharacter(eventObject, characterId)
@@ -2898,6 +2899,8 @@ var lastUpdate = null;
 var queuedMainPageUpdates = [];
 function requestUpdateMainPage(updateList)
 {
+	var needsToWait = queuedMainPageUpdates.length==0;
+	
 	// Add all the new updates we need to do to the queue if they aren't already there
 	var newUpdateList = [];
 	if (updateList!=null)
@@ -2905,7 +2908,12 @@ function requestUpdateMainPage(updateList)
 	for(var i = 0; i<newUpdateList.length; i++)
 		if (queuedMainPageUpdates.indexOf(newUpdateList[i])==-1)
 			queuedMainPageUpdates.push(newUpdateList[i]);
-	
+
+	if (needsToWait)
+	{
+		setTimeout(requestUpdateMainPage, 500);
+		return;
+	}
 	
 	var currentTime = new Date().getTime();
 	if (lastUpdate==null || lastUpdate<currentTime-3000)
@@ -2918,7 +2926,7 @@ function requestUpdateMainPage(updateList)
 				firstTime = false;
 			else
 				data+=",";
-			data+=queuedMainPageUpdates[i];
+			data+=queuedMainPageUpdates.pop();
 		}
 		doCommand(null, "RequestMainPageUpdate", {updateList:data, newUI:window.newUI});
 		lastUpdate = currentTime;
@@ -3332,11 +3340,45 @@ function viewLocalNavigation(event, showHidden)
 	makeIntoPopupFromUrl("/odp/sublocations?showHidden="+showHidden, "Local Navigation", true);
 }
 
+function showLootPopup()
+{
+	clearMakeIntoPopup();
+	
+	var html = "";
+	html += "<div id='locationQuickList-contents'>";
+	html += "<div><h4>Loot</h4></div>";
+	if (window.singleLeavePathId!=null)
+		html += "<p><a onclick='clearMakeIntoPopup();doGoto(event, window.singleLeavePathId, false);' style='float:right'>Leave</a></p>";
+	html += "<p><a onclick='clearMakeIntoPopup();window.btnLeaveAndForget.click()' style='float:left'>Leave and forget</a></p>";
+	html += "<div style='height:34px;'></div>";
+	html += "	<div id='inline-characters'>";
+	html += "	</div>";
+	html += "	<div id='inline-collectables'>";
+	html += "	</div>";
+	html += "	<div id='inline-items'>";
+	html += "	</div>";
+	html += "</div>";
+	
+	clearMakeIntoPopup();
+	
+	makeIntoPopupHtml(html, true);
+	loadInlineItemsAndCharacters();
+}
 
+function viewGuardSettings(event)
+{
+	pagePopup("/odp/guardsettings", null, "Guard Settings");
+}
 
+function deleteGuardSetting(id)
+{
+	doCommand("GuardDeleteSetting", {guardSettingId:id});
+}
 
-
-
+function newGuardSetting(event, entity, type, attack)
+{
+	doCommand(event, "GuardNewSetting", {entityKey:entity, type:type, attack:attack});
+}
 
 
 

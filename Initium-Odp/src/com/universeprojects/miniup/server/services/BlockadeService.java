@@ -225,7 +225,7 @@ public class BlockadeService extends Service
         }
 
         if (finalResult.defender!=null)
-            db.sendNotification(ds, finalResult.defender.getKey(), NotificationType.fullpageRefresh);
+            db.sendMainPageUpdateForCharacter(ds, finalResult.defender.getKey(), "updateFullPage_shortcut");
 
         return finalResult;
     }
@@ -290,7 +290,7 @@ public class BlockadeService extends Service
 	
 		ds.put(defender);
 		ds.put(characterToAllowIn);
-		db.sendNotification(ds, characterToAllowIn.getKey(), NotificationType.fullpageRefresh);
+		db.sendMainPageUpdateForCharacter(ds, characterToAllowIn.getKey(), "updateFullPage_shortcut");
 		// TODO: Check to make sure the character is actually defending a structure so we don't just teleport random people.
 		// Right now it's not possible to enter combat with anyone who isn't dueling you or attacking your defending structure so it's ok, but eventually
 		// this might not be the only cases.

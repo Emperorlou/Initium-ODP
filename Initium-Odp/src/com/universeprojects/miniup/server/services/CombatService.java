@@ -37,6 +37,8 @@ public class CombatService extends Service
 	
 	public void enterCombat(CachedEntity attacker, CachedEntity defender, boolean autoAttack)
 	{
+		if (GameUtils.equals(attacker.getKey(), defender.getKey())) throw new RuntimeException("You cannot attack yourself.");
+		
 		attacker.setProperty("combatant", defender.getKey());
 		attacker.setProperty("mode", "COMBAT");
 		
@@ -53,6 +55,7 @@ public class CombatService extends Service
 
 		if (autoAttack)
 		{
+			defender.setProperty("combatType", "AutoDefender");
 			attacker.setProperty("combatType", "DefenceStructureAttack");
 			db.flagCharacterCombatAction(db.getDB(), attacker);
 		}
@@ -60,7 +63,7 @@ public class CombatService extends Service
 		ds.put(attacker);
 		ds.put(defender);
 		
-		db.sendNotification(ds, defender.getKey(), NotificationType.fullpageRefresh);
+		db.sendMainPageUpdateForCharacter(ds, defender.getKey(), "updateFullPage_shortcut");
 	}
 
 	public boolean isInCombat(CachedEntity character)

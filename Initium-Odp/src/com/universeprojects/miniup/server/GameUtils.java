@@ -38,7 +38,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.6-11";
+	final public static String version = "0.5.6-20";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -962,7 +962,7 @@ public class GameUtils
 		boolean hasRequiredStrength = true;
 		if (character!=null)
 		{
-			Double characterStrength = db.getCharacterStrength(character);
+			Double characterStrength = (Double)character.getProperty("strength");
 			
 			Double strengthRequirement = null;
 			try

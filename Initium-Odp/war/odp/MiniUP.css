@@ -2037,7 +2037,7 @@ a.range-increment {
 {
 	display: inline-block;
 	margin: 4px 2px;
-	z-index:2000001;
+	/*z-index:2000001;*/
 }
 
 #inBannerCombatantWidget
@@ -2923,6 +2923,16 @@ position: absolute;
 	position: relative;
 	cursor:pointer;
 	margin-top:0px;
+}
+
+.sublocation-display-container .forget-button
+{
+	float: left;
+    color: #FF0000;
+    font-size: 42px;
+    font-family: sans-serif;
+    margin-left: 6px;
+    margin-top: 2px;	
 }
 
 .sublocation-display-container h5

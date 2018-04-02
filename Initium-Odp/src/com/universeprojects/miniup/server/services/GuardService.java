@@ -6,11 +6,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.ConfirmAttackException;
+import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.dbentities.GuardSetting;
 import com.universeprojects.miniup.server.dbentities.GuardSetting.GuardExclusion;
 import com.universeprojects.miniup.server.dbentities.GuardSetting.GuardType;
@@ -33,6 +35,52 @@ public class GuardService extends Service
 		return guardSettingsCache;
 	}
 	
+	public void deleteAllGuardSettings(Key characterKey)
+	{
+		List<Key> list = query.getFilteredList_Keys("GuardSetting", 3000, "characterKey", characterKey);
+		ds.delete(list);
+	}
+	
+	public void deleteAllGuardSettings(Key characterKey, Key locationKey)
+	{
+		List<Key> list = query.getFilteredList_Keys("GuardSetting", 3000, "characterKey", FilterOperator.EQUAL, characterKey, "locationKey", FilterOperator.EQUAL, locationKey);
+		ds.delete(list);
+	}
+	
+	public GuardSetting newGuardService(Key characterKey, Key locationKey, Key entityKey, GuardType type) throws UserErrorMessage
+	{
+		if (checkIfAlreadyGuarding(characterKey, locationKey, entityKey, type))
+			throw new UserErrorMessage("You already have a guard setting for this. Remove the guard setting before you make another of the same kind.");
+		
+		GuardSetting gs = new GuardSetting(db, new CachedEntity("GuardSetting"));
+		gs.setActive(true);
+		gs.setCharacterKey(characterKey);
+		gs.setLocationKey(locationKey);
+		gs.setEntityKey(entityKey);
+		gs.setSettings(type);
+		return gs;
+	}
+	
+	public List<GuardSetting> getAllActiveGuardSettingsForLocation(Key locationKey)
+	{
+		return entitiesToGuardSettings(query.getFilteredList("GuardSetting", "active", true, "locationKey", locationKey));
+	}
+	
+	public List<GuardSetting> getGuardSettings(Key characterKey)
+	{
+		return entitiesToGuardSettings(query.getFilteredList("GuardSetting", "characterKey", characterKey));
+	}
+	
+	public List<GuardSetting> getGuardSettings(Key characterKey, Key locationKey)
+	{
+		return entitiesToGuardSettings(query.getFilteredList("GuardSetting", "characterKey", characterKey, "locationKey", locationKey));
+	}
+	
+	public boolean checkIfAlreadyGuarding(Key characterKey, Key locationKey, Key entityKey, GuardType type)
+	{
+		return query.getFilteredList_Count("GuardSetting", "characterKey", FilterOperator.EQUAL, characterKey, "locationKey", FilterOperator.EQUAL, locationKey, "settings", FilterOperator.EQUAL, type.toString())>0;
+	}
+	
 	/**
 	 * Checks if the character is allowed to enter a given location and returns the key of the guard
 	 * that would attack the character if they tried.
@@ -44,7 +92,14 @@ public class GuardService extends Service
 	 */
 	public CachedEntity tryToEnterLocation(CachedEntity character, Key locationKey, boolean attack) throws ConfirmAttackException
 	{
-		return guardCheck(character, locationKey, locationKey, GuardType.NoTresspassing, attack);
+		return guardCheck(character, locationKey, locationKey, GuardType.NoTrespassers, attack);
+	}
+	
+	public CachedEntity tryToGuardLocation(CachedEntity character, Key locationKey, GuardType type, boolean attack) throws ConfirmAttackException
+	{
+		if (type == GuardType.NoGuarding) return null;
+		
+		return guardCheck(character, locationKey, locationKey, GuardType.NoGuarding, attack);
 	}
 	
 	public CachedEntity tryToTakeItem(CachedEntity character, CachedEntity item, boolean attack) throws ConfirmAttackException
@@ -125,13 +180,84 @@ public class GuardService extends Service
 		return null;
 	}
 	
+	public CachedEntity guardCheck_not(CachedEntity character, Key locationKey, Key entityKey, GuardType guardType, boolean userWantsToAttack) throws ConfirmAttackException
+	{
+		List<CachedEntity> rawList = query.getFilteredList("GuardSetting", 1000, null, "active", FilterOperator.EQUAL, true, "locationKey", FilterOperator.EQUAL, locationKey, "entityKey", FilterOperator.EQUAL, entityKey);
+		List<GuardSetting> guardSettings = entitiesToGuardSettings(rawList);
+		prepareGuardList(guardSettings);
+		
+		for(int i = guardSettings.size()-1; i>=0; i--)
+		{
+			GuardSetting gs = guardSettings.get(i);
+			for(GuardType type:gs.getSettings())
+			{
+				if (type.toString().equals(guardType.toString()))
+					continue;
+			}
+			
+			guardSettings.remove(i);
+		}
+		
+		List<Key> characterKeys = new ArrayList<>(); 
+		// Go through the guards looking for those that are present and are not excluding this character
+		for(int guardIndex=0; guardIndex<guardSettings.size(); guardIndex=guardIndex+5) // Checking 5 guards at a time for a good match
+		{
+			characterKeys.clear();
+			for(int i = guardIndex; i<5 && i<guardSettings.size(); i++)
+			{
+				characterKeys.add(guardSettings.get(i).getCharacterKey());
+			}
+			
+			List<CachedEntity> guards = db.getEntities(characterKeys);
+			for(int i = 0; i<guards.size(); i++)
+			{
+				CachedEntity guard = guards.get(i);
+				GuardSetting guardSetting = guardSettings.get(guardIndex+i);
+				
+				try 
+				{
+					if (verifyGuardWithGuardSetting(guard, guardSetting))
+					{
+						if (checkCharacterIsExcludedFromGuardSetting(guard, guardSetting, character))
+							continue;
+						
+						if (userWantsToAttack)
+							return guard;
+						else
+						{
+							throwUserError(guardSettings.size(), entityKey, guardType);
+						}
+					}
+				} catch (DeleteGuardSetting e) 
+				{
+					db.getDB().delete(e.guardSetting.getKey());
+				}
+			}
+			
+		}
+		
+		return null;
+	}
+	
 	private void throwUserError(int size, Key entityKey, GuardType guardType) throws ConfirmAttackException
 	{
 		CachedEntity entity = db.getEntity(entityKey);
 		
-		if (guardType == GuardType.NoTresspassing)
+		if (guardType == GuardType.NoTrespassers)
 		{
-			throw new ConfirmAttackException("There are up to "+size+" guards keeping you from tresspassing in "+entity.getProperty("name")+". Are you sure you want to attack?");
+			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards keeping you from tresspassing in "+entity.getProperty("name")+". Are you sure you want to attack?");
+		}
+		else if (guardType == GuardType.NoGuarding)
+		{
+			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards keeping you from guarding anything in "+entity.getProperty("name")+". You will need to fight them off before you can guard anything here. Are you sure you want to attack?");
+		}
+		else if (guardType == GuardType.NoMoving)
+		{
+			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards keeping you from taking "+entity.getProperty("name")+". You will need to fight them off before you can take it. Are you sure you want to attack?");
+		}
+		else if (guardType == GuardType.NoUsing)
+		{
+			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards keeping you from using "+entity.getProperty("name")+". You will need to fight them off before you can use it. Are you sure you want to attack?");
 		}
 	}
 
@@ -198,8 +324,8 @@ public class GuardService extends Service
 	private boolean checkCharacterIsExcludedFromGuardSetting(CachedEntity guard, GuardSetting guardSetting, CachedEntity perp)
 	{
 		// Check if the perp is supposed to be excluded because he is an alt of the guard
-		if (GameUtils.equals(guard.getProperty("userKey"), perp.getProperty("userKey")))
-			 return true;
+//		if (GameUtils.equals(guard.getProperty("userKey"), perp.getProperty("userKey")))
+//			 return true;
 		
 		// Check if the perp is supposed to be excluded because of his group
 		if (guardSetting.getExclude().contains(GuardExclusion.Group))

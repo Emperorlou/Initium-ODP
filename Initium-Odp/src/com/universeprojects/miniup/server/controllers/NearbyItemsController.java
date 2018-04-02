@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -39,11 +41,48 @@ public class NearbyItemsController extends PageController
 				CommonChecks.checkCharacterIsInCombat(character) ||
 				GameUtils.isPlayerIncapacitated(character))
 			return null;
+
+		// Get all the items we see here in this location...
+		List<CachedEntity> collectablesHere = null;
+		QueryHelper query = new QueryHelper(db.getDB());
+		collectablesHere = query.getFilteredList("Collectable", 50, null, "locationKey", FilterOperator.EQUAL, locationKey);
+		
+		StringBuilder collectablesHtml = new StringBuilder();
+		if (collectablesHere!=null && collectablesHere.isEmpty()==false)
+		{
+			collectablesHtml.append("<h5>Resources</h5>");
+			
+			for(CachedEntity collectable:collectablesHere)
+			{
+				Long secondsTime = (Long)collectable.getProperty("extractionEase");
+				if (secondsTime==null)
+					secondsTime = 0L;
+				
+				collectablesHtml.append("<div class='main-item'> ");
+				collectablesHtml.append("<div class='main-item-container'>");
+				collectablesHtml.append(GameUtils.renderCollectable(collectable)); 
+				collectablesHtml.append("<br>");
+				collectablesHtml.append("<div class='main-item-controls'>");
+				collectablesHtml.append("<a href='#' onclick='doCollectCollectable(event, "+collectable.getKey().getId()+")'>Extract/Collect</a>");
+				collectablesHtml.append("</div>"); 
+				collectablesHtml.append("</div>");
+				collectablesHtml.append("</div>");
+				collectablesHtml.append("<br/>");
+			}
+		}
+	
+	    request.setAttribute("collectablesToShow", collectablesHtml.toString());
+		
+		
+		
+		
+		
 		
 		List<CachedEntity> itemsHere = db.getItemsListSortedForLocation(null, locationKey);
 	    int itemsCount = itemsHere.size();
+	    itemsCount+=collectablesHere.size();
 	    
-	    request.setAttribute("itemsCount", itemsCount < 50 ? itemsCount : "50+");
+	    request.setAttribute("itemsCount", itemsHere.size() < 50 ? itemsCount : itemsCount+"+");
 	    
 	    List<String> itemsToShow = new ArrayList<String>();
 	    for(CachedEntity item:itemsHere)
@@ -55,8 +94,8 @@ public class NearbyItemsController extends PageController
 	    	sb.append("<br>");
 	    	sb.append("<div class='main-item-controls'>");
             if (item.getProperty("maxWeight")!=null)
-            	sb.append("<a onclick='pagePopup(\"ajax_moveitems.jsp?selfSide=Character_"+character.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
-            sb.append("<a onclick='ajaxAction(\"ServletCharacterControl?type=collectItem&itemId="+item.getId()+"\", event, function(){})'>Collect</a>");
+            	sb.append("<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+character.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
+            sb.append("<a onclick='ajaxAction(\"/ServletCharacterControl?type=collectItem&itemId="+item.getId()+"\", event, function(){})'>Collect</a>");
     
             sb.append("</div>"); 
             sb.append("</div>");
@@ -69,6 +108,7 @@ public class NearbyItemsController extends PageController
 	    	itemsToShow.add(0, "<h5>Items</h5>");
 	    
 	    request.setAttribute("itemsToShow", itemsToShow);
+	    request.setAttribute("isMaxItems", itemsHere.size()==50);
 	    
 		return "/WEB-INF/odppages/locationitemlist.jsp";
 	}

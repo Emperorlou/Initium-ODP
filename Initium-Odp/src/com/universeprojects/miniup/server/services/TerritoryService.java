@@ -183,7 +183,7 @@ public class TerritoryService extends Service
 			new CombatService(db).enterCombat(character, defender, true);
 			// Since we don't know how this method is called, use sendNotifaction rather than setJavascriptResponse
 			// Defender is refreshed from CombatService
-			db.sendNotification(db.getDB(), character.getKey(), NotificationType.fullpageRefresh);
+			db.sendMainPageUpdateForCharacter(db.getDB(), character.getKey(), "updateFullPage_shortcut");
 		}
 		
 		return false;
@@ -518,7 +518,7 @@ public class TerritoryService extends Service
 			// Reset status because we're leaving a territory.
 			character.setProperty("status", "Normal");
 			ds.put(character);
-			db.sendNotification(ds, character.getKey(), NotificationType.fullpageRefresh);
+			db.sendMainPageUpdateForCharacter(ds, character.getKey(), "updateFullPage_shortcut");
 		}
 	}
 	

@@ -148,7 +148,7 @@ messager.onChatMessage = function(chatMessage)
 
 		try
 		{
-			if (characterId != chatMessage.characterId)
+			if (characterId != chatMessage.characterId && chatMessage.isHistory!=true)
 			{
 				doPopupNotification(null, "New private message", chatMessage.nickname+": "+chatMessage.message, "PrivateMessage", null, function(){
 					setPrivateChatTo(chatMessage.nickname, chatMessage.characterId);

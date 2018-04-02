@@ -122,6 +122,7 @@ function EventServerMessager(eventServerUrl, idToken)
 					createdDate:newDataType.timestamp,
 					nicknameStyled:newDataType.additionalData.senderDisplayNameStyled,
 					mode:newDataType.additionalData.mode,
+					isHistory:newDataType.additionalData.__history
 				};
 				
 				message.code = message.code.split("-")[0];

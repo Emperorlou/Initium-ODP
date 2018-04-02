@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.server.ODPAuthenticator;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
@@ -37,6 +38,7 @@ public abstract class Command extends OperationBase
 	{
 		this.request = request;
 		this.response = response;
+		
 		
 		this.db = db;
 		this.ds = db.getDB();
