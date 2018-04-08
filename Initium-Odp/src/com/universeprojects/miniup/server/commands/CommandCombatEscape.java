@@ -34,6 +34,8 @@ public class CommandCombatEscape extends Command {
 		CombatService cs = new CombatService(db);
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		
+		ds.beginBulkWriteMode();
+		
 		CachedEntity targetCharacter = db.getCharacterCombatant(character);
 		if (targetCharacter==null || GameUtils.isPlayerIncapacitated(targetCharacter))
 		{
@@ -43,7 +45,7 @@ public class CommandCombatEscape extends Command {
 		}
 		
 		// Combat check depends on the opponent's location, not the character's.
-		CachedEntity targetLocation = ds.getIfExists((Key)targetCharacter.getProperty("locationKey"));
+		CachedEntity targetLocation = db.getEntity((Key)targetCharacter.getProperty("locationKey"));
 		if (cs.isInCombatWith(character, targetCharacter, targetLocation)==false)
 		{
 			cs.leaveCombat(character, null);
@@ -83,8 +85,19 @@ public class CommandCombatEscape extends Command {
                 }
             }
 		}
+
 		
-		character = ds.refetch(character);
+		
+		
+		
+		
+		ds.commitBulkWrite();
+		
+		
+		
+		
+		
+//		character = ds.refetch(character);
 		location = db.getEntity((Key)character.getProperty("locationKey"));
 		mpus = new MainPageUpdateService(db, user, character, location, this);
 		

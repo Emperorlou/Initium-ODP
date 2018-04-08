@@ -37,7 +37,7 @@ public class CommandCombatAttack extends Command
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity user = db.getCurrentUser();
-		CachedEntity location = ds.getIfExists((Key)character.getProperty("locationKey"));
+		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 
 		CombatService cs = new CombatService(db);
 		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
@@ -52,7 +52,11 @@ public class CommandCombatAttack extends Command
 		}
 		
 		if(cs.isInCombat(character) == false)
-			throw new UserErrorMessage("You are not currently in combat and cannot attack!");
+		{
+			mpus.updateFullPage_shortcut();
+			setPopupMessage("You are not currently in combat and cannot attack!");
+			return;
+		}
 		
 		
 		CachedEntity targetCharacter = db.getCharacterCombatant(character);
@@ -63,7 +67,7 @@ public class CommandCombatAttack extends Command
 			return;
 		}
 		
-		CachedEntity targetLocation = ds.getIfExists((Key)targetCharacter.getProperty("locationKey"));
+		CachedEntity targetLocation = db.getEntity((Key)targetCharacter.getProperty("locationKey"));
 		// Raid boss could possibly be in instance, so check for it
 		// explicitly even though isInCombatWith handles non-instance
 		// already.
@@ -175,8 +179,6 @@ public class CommandCombatAttack extends Command
 				status+=counterAttackStatus;
 			}
 			
-			ds.putIfChanged(character, targetCharacter);
-			
 			if (((Double)targetCharacter.getProperty("hitpoints"))>0)
 			{
 				if (counterAttackStatus!=null) characterCrit = counterAttackStatus.contains("It's a critical hit!");
@@ -242,7 +244,7 @@ public class CommandCombatAttack extends Command
 		}
 		else if (GameUtils.isPlayerIncapacitated(targetCharacter))
 		{
-			if (CommonChecks.checkLocationIsCombatSite(location)) location = ds.refetch(location);
+//			if (CommonChecks.checkLocationIsCombatSite(location)) location = ds.refetch(location);
 			// We're done with combat
 			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			mpus.updateFullPage_shortcut();

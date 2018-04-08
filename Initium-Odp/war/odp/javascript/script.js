@@ -4456,6 +4456,10 @@ $(document).keyup(function(event){
 	{
 		buttonToPress[0].click();
 	}
+	else if (event.which==71) // G
+	{
+		viewGuardSettings();
+	}
 	else if (event.which==73) // I
 	{
 		inventory();
