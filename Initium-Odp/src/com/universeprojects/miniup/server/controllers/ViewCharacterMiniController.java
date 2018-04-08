@@ -127,9 +127,14 @@ public class ViewCharacterMiniController extends PageController {
 			{
 				public int compare(CachedEntity o1, CachedEntity o2)
 				{
-					if (o1==null || o2==null)
-						return 0;
-					return ((Long)o1.getProperty("pointValue")).compareTo((Long)o2.getProperty("pointValue"));
+					Long o1PointValue = 0l;
+					Long o2PointValue = 0l;
+					if (o1!=null && o1.getProperty("pointValue")!=null)
+						o1PointValue = ((Number)o1.getProperty("pointValue")).longValue();
+					if (o2!=null && o2.getProperty("pointValue")!=null)
+						o2PointValue = ((Number)o2.getProperty("pointValue")).longValue();
+					
+					return o1PointValue.compareTo(o2PointValue);
 				}
 			});
 		}

@@ -122,7 +122,8 @@ public class MainPageUpdateService extends Service
 	{
 		if (immovables==null)
 		{
-			immovables = query.getFilteredList("Item", "containerKey", location.getKey(), "immovable", true);
+			if (db.isTestServer()==false) // Don't get immovables if we're on the test server, its too slow...?
+				immovables = query.getFilteredList("Item", "immovable", true, "containerKey", location.getKey());
 			if (immovables == null) immovables = new ArrayList<CachedEntity>(0);
 		}
 	}

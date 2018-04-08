@@ -47,6 +47,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.miniup.server.services.ModifierService;
 import com.universeprojects.miniup.server.services.MovementService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
@@ -437,7 +438,10 @@ public class ODPDBAccess
 				// Check that the character key we have is ACTUALLY from the logged in user. Since we now allow overriding of the current character, 
 				// we need to make sure other people aren't trying to take control of someone else's character.
 				if (GameUtils.equals(character.getProperty("userKey"), user.getKey())==false)
+				{
+					//TODO: Here it would be good to throw an exception that causes the client to do a hard refresh
 					throw new RuntimeException("Attempted to use a character that does not belong to the logged in user's account.");
+				}
 				
 				request.setAttribute("characterEntity", character);
 
@@ -458,8 +462,8 @@ public class ODPDBAccess
 			}
 		}
 
+		//TODO: Here it would be good to throw an exception that causes the client to create a new character (if they're logged in) or login (if they're not)
 		return null;
-
 	}
 	
 	/**
@@ -1255,7 +1259,7 @@ public class ODPDBAccess
 		
 		if (showHidden==false)
 			for(int i = fetchAsList.size()-1; i>=0; i--)
-				if (GameUtils.equals(fetchAsList.get(i).getProperty("hidden"), true))
+				if (fetchAsList.get(i)==null || GameUtils.equals(fetchAsList.get(i).getProperty("hidden"), true))
 					fetchAsList.remove(i);
 		
 		
@@ -4186,17 +4190,22 @@ public class ODPDBAccess
             
             
             
-            if (targetCharacter.isUnsaved())
-            	db.put(targetCharacter);
-            if (sourceCharacter.isUnsaved())
-            	db.put(sourceCharacter);
-            if (user!=null && user.isUnsaved())
-            	db.put(user);
             
             
             // Check if the target is killed
             if (targetHitpoints<=0)
             {
+                // Now we heal the defender if he was infact a defender
+                pool.addToQueue(sourceCharacter.getProperty("locationKey"), targetCharacter.getProperty("locationKey"));
+                if (CommonChecks.checkCharacterDefenderToAutoHeal(getEntity((Key)sourceCharacter.getProperty("locationKey")), sourceCharacter, 
+                		getEntity((Key)targetCharacter.getProperty("locationKey")), targetCharacter))
+                {
+					Double hitpoints = (Double)sourceCharacter.getProperty("hitpoints");
+					Double maxHitpoints = (Double)sourceCharacter.getProperty("maxHitpoints");
+					if (hitpoints<maxHitpoints)
+						sourceCharacter.setProperty("hitpoints", maxHitpoints);
+                }
+                
                 // If the character who did the killing is a zombie, the target character will be turned into a zombie instead of killing them
                 if ("Zombie".equals(sourceCharacter.getProperty("status")))
                 {
@@ -4205,7 +4214,6 @@ public class ODPDBAccess
                     if (user!=null && user.isUnsaved())
                     	db.put(user);
                     db.put(sourceCharacter, targetCharacter);
-                    return status;
                 }
                 else
                 {
@@ -4218,11 +4226,17 @@ public class ODPDBAccess
                     {
                     	status=status+"<br><br>"+loot;
                     }
-                    return status;
                   		
                 }
+                
             }
             
+            if (targetCharacter.isUnsaved())
+            	db.put(targetCharacter);
+            if (sourceCharacter.isUnsaved())
+            	db.put(sourceCharacter);
+            if (user!=null && user.isUnsaved())
+            	db.put(user);
             
             return status; 
         }
@@ -4635,12 +4649,13 @@ public class ODPDBAccess
 		{
 			result = new InitiumTransaction<Map<String, Object>>(db) 
 			{
+				public boolean disableTransaction() {return true;};
 				
 				@Override
 				public Map<String, Object> doTransaction(CachedDatastoreService ds) 
 				{
 					boolean giveLootToAttacker = false;
-ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationFinal));
+//					ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationFinal));
 					
 					// We no longer set the character name to Dead here. We now do that from the death screen.
 //						String charName = (String)characterToDie.getProperty("name");	// Save the character name for later
@@ -4648,9 +4663,9 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 //						db.put(characterToDie);
 					
 					
-					boolean attackingCharacterNeedsNotification = false;
-					if (GameUtils.enumEquals(attackingCharacterFinal.getProperty("combatType"), CombatType.DefenceStructureAttack))
-						attackingCharacterNeedsNotification = false;
+//					boolean attackingCharacterNeedsNotification = false;
+//					if (GameUtils.enumEquals(attackingCharacterFinal.getProperty("combatType"), CombatType.DefenceStructureAttack))
+//						attackingCharacterNeedsNotification = false;
 					
 					// Now make the attacking character no longer in combat mode
 					setCharacterMode(null, attackingCharacterFinal, ODPDBAccess.CHARACTER_MODE_NORMAL);
@@ -4752,8 +4767,8 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 //						attackingCharacter.setProperty("combatType", null);
 //
 //					}
-					if (attackingCharacterNeedsNotification)
-						sendMainPageUpdateForCharacter(db, attackingCharacterFinal.getKey(), "updateFullPage_shortcut");
+//					if (attackingCharacterNeedsNotification)
+//						queueMainPageUpdateForCharacter(attackingCharacterFinal.getKey(), "updateFullPage_shortcut");
 					
 
 					// Here we check if the battle took place in an instance, defence structure, or territory. If so, 
@@ -5818,9 +5833,20 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		if (destination.isUnsaved())
 			ds.put(destination);
 		
+		// Now remove all guard settings since we moved
+		GuardService gService = new GuardService(this);
+		if (party!=null && party.isEmpty()==false)
+		{
+			for(CachedEntity c:party)
+				gService.deleteGuardSettings(c.getKey());
+		}
+		else
+			gService.deleteGuardSettings(character.getKey());
+		
 		// Send main-page update for all party members but the leader.
 		if(partyKeys.isEmpty()==false)
 			queueMainPageUpdateForCharacters(partyKeys, "updateFullPage_shortcut");
+		
 		
 		return destination;
 	}
@@ -6236,7 +6262,6 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 			Random rnd = new Random();
 			if (rnd.nextDouble()*characterDex>rnd.nextDouble()*monsterDex)
 			{
-				boolean defenceStructureAttack = "DefenceStructureAttack".equals(character.getProperty("combatType"));
 				List<CachedEntity> party = getParty(db, character);
 				
 				
@@ -6250,19 +6275,15 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 				if (party!=null)
 					for(CachedEntity member:party)
 						if (member.getKey().getId()!=character.getKey().getId())
-							sendMainPageUpdateForCharacter(db, member.getKey(), "updateFullPage_shortcut");
+							queueMainPageUpdateForCharacter(member.getKey(), "updateFullPage_shortcut");
 				
 				
 				// Now we want to check if the monster should regain hitpoints or not
 				// Hitpoints should be regenerated if the monster is in a rest area 
 				CachedEntity monsterLocation = getEntity((Key)monster.getProperty("locationKey"));
-				
-				boolean isTerritoryCombat = false;
-				if (monsterLocation.getProperty("territoryKey")!=null || characterLocation.getProperty("territoryKey")!=null)
-					isTerritoryCombat = true;
-				
-				// When running from RaidBoss, don't want them to heal.
-				if (monsterLocation!=null && CommonChecks.checkCharacterIsRaidBoss(monster) == false && (defenceStructureAttack || isTerritoryCombat))
+
+				// Here we heal the defender but when running from RaidBoss, don't want them to heal.
+				if (CommonChecks.checkCharacterDefenderToAutoHeal(monsterLocation, monster, characterLocation, character))
 				{
 					Double hitpoints = (Double)monster.getProperty("hitpoints");
 					Double maxHitpoints = (Double)monster.getProperty("maxHitpoints");
@@ -6275,7 +6296,6 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 					
 					db.put(monster);
 					
-					sendMainPageUpdateForCharacter(db, monster.getKey(), "updateFullPage_shortcut");
 				}
 				else
 				{
@@ -6321,10 +6341,21 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 						
 		
 						// If we're here, we didn't go down ANY path, so just go down the first one then...
-						doCharacterTakePath(db, character, paths.get(0), true);
+						if (paths.isEmpty())
+						{
+							if (parentLocation==null)
+							{
+								character.setProperty("locationKey", getDefaultLocationKey());
+							}
+							else
+								character.setProperty("locationKey", parentLocation.getKey());
+						}
+						else
+							doCharacterTakePath(db, character, paths.get(0), true);
 					}
 				}				
 
+				queueMainPageUpdateForCharacter(monster.getKey(), "updateFullPage_shortcut");
 				
 				
 				return true;
@@ -6667,12 +6698,17 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		
 		for(Key charKey:characterKeys)
 		{
+			if (GameUtils.equals(charKey, getCurrentCharacterKey()))
+				continue;
 			queueMainPageUpdateForCharacter(charKey, updateMethods);
 		}
 	}
 	
 	public void queueMainPageUpdateForCharacter(Key characterKey, String...updateMethods)
 	{
+		if (GameUtils.equals(characterKey, getCurrentCharacterKey()))
+			return;
+		
 		if (mpusSendQueue==null) mpusSendQueue = new HashMap<>();
 		Set<String> uMethods = mpusSendQueue.get(characterKey);
 		if (uMethods==null) 
@@ -7043,6 +7079,25 @@ ds.refetch(Arrays.asList(characterToDieFinal, attackingCharacterFinal, locationF
 		
 		Long buffedTravel = getBuffedTravelTime(character, travelTime);
 		return buffedTravel;
+	}
+
+	public Key getCharacterLocationKey(CachedEntity character)
+	{
+		Key locationKey = (Key)character.getProperty("locationKey");
+		
+		
+		if (locationKey==null)
+		{
+			locationKey = (Key)getCurrentCharacter().getProperty("homeTownKey");
+			if (locationKey==null)
+				locationKey = getDefaultLocationKey();
+			character.setProperty("locationKey", locationKey);
+			
+			if (GameUtils.equals(character.getKey(), getCurrentCharacterKey()))
+				getCurrentCharacter().setProperty("locationKey", locationKey);
+		}
+		
+		return locationKey;
 	}
 
 	public CachedEntity getCharacterLocation(CachedEntity character)

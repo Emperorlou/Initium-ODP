@@ -439,4 +439,37 @@ public abstract class CommonChecks
 		return false;
 	}
 
+	public static boolean checkLocationIsAutoHealForGuard(CachedEntity guardLocation, CachedEntity guard)
+	{
+		if (guardLocation==null) return false;
+		if (guard==null) return false;
+		
+		if ("RestSite".equals(guardLocation.getProperty("type")) ||
+				"Town".equals(guardLocation.getProperty("type")) ||
+				"CityHall".equals(guardLocation.getProperty("type")))
+			return true;
+		
+		return false;
+	}
+
+	public static boolean checkCharacterDefenderToAutoHeal(CachedEntity defenderLocation, CachedEntity defender, CachedEntity attackerLocation, CachedEntity attacker)
+	{
+		
+		boolean defenceStructureAttack = "DefenceStructureAttack".equals(attacker.getProperty("combatType"));
+		
+		boolean isTerritoryCombat = false;
+		if (defenderLocation.getProperty("territoryKey")!=null || attackerLocation.getProperty("territoryKey")!=null)
+			isTerritoryCombat = true;
+		
+		boolean isGuardToHeal = false;
+		if ("AutoDefender".equals(defender.getProperty("combatType")) && CommonChecks.checkLocationIsAutoHealForGuard(defenderLocation, defender))
+			isGuardToHeal = true;
+		
+		if (defenderLocation!=null && CommonChecks.checkCharacterIsRaidBoss(defender) == false && 
+				(defenceStructureAttack || isTerritoryCombat || isGuardToHeal))
+			return true;
+		
+		return false;
+	}
+
 }

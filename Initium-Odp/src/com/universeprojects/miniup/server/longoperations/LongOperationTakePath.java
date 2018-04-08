@@ -86,7 +86,8 @@ public class LongOperationTakePath extends LongOperation {
 			CachedEntity destination = null;
 			Key destinationKey = null;
 			// First get the character's current location
-			Key currentLocationKey = (Key)character.getProperty("locationKey");
+			Key currentLocationKey = db.getCharacterLocationKey(character);
+			
 			
 			// Then determine which location the character will end up on.
 			// If we find that the character isn't on either end of the path, we'll throw.

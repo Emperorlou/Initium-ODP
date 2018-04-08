@@ -449,7 +449,7 @@ public class HtmlComponents {
 	public static String generateButtonBar(CachedEntity character)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("<div id='buttonbar-main' class='header-inner' style='padding-top: 5px;'>");
+		sb.append("<div id='buttonbar-main' class='header-inner'>");
 		// Buttons
 		sb.append("<span>" + generateInventoryButton() + "</span>");
 		sb.append("<span>" + generateQuestButton() + "</span>");

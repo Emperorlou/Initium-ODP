@@ -260,6 +260,11 @@ function popupMessage(title, content, noBackground)
 
 $(document).bind("keydown",function(e) 
 {
+	if (isMakePopupOpen() && e.keyCode == 27)
+	{
+		clearMakeIntoPopup();
+		return;
+	}
     if (popupsOpen >= 1) 
     {
         if ((e.keyCode == 13) || (e.keyCode == 27)) 
@@ -268,6 +273,16 @@ $(document).bind("keydown",function(e)
         }
     }
 });
+
+
+
+function isPagePopupsOpen()
+{
+	if (window.popupsOpen<=0)
+		return false;
+	
+	return true;
+}
 
 function enterPopupClose() 
 {
@@ -294,8 +309,10 @@ function closeAllTooltips()
 }
 
 function closepopupMessage(popupID) {
+	
     $("#popupWrapperBackground_" + popupID).remove();
-	window.popupsOpen = window.popupsOpen-1;
+    if (window.popupsOpen>0)
+    	window.popupsOpen = window.popupsOpen-1;
     window.popupsArray[popupID-1] = "no";
     window.documentBindEnter = false;
     if (window.popupsOpen<=0)
@@ -305,6 +322,7 @@ function closepopupMessage(popupID) {
     }
     else
     	enterPopupClose();
+    
 }
 function expandpopupMessage() 
 {
@@ -2987,6 +3005,11 @@ function makeIntoPopupHtml(html, disableGlass)
 	$("body").append("<div style='position:absolute; left:50%; top:10%;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>"+html+"</div></div>");
 }
 
+function isMakePopupOpen()
+{
+	return $(".make-popup").length>0;
+}
+
 function makeIntoPopup(jquerySelector)
 {
 	clearMakeIntoPopup();
@@ -3370,9 +3393,9 @@ function viewGuardSettings(event)
 	pagePopup("/odp/guardsettings", null, "Guard Settings");
 }
 
-function deleteGuardSetting(id)
+function deleteGuardSetting(event, id)
 {
-	doCommand("GuardDeleteSetting", {guardSettingId:id});
+	doCommand(event, "GuardDeleteSetting", {guardSettingId:id});
 }
 
 function newGuardSetting(event, entity, type, attack)

@@ -437,8 +437,20 @@ function decrementStackIndex()
 	    position: relative!important;
 	    width: 50%!important;
 	}
-	
+
 }
+#buttonbar-main
+{
+	padding-top:5px;
+}	
+@media (max-width:480px)
+{
+	#buttonbar-main
+	{
+		padding-top:3px;
+	}
+}
+
 
 </style>
 

@@ -41,6 +41,8 @@ public class CommandCombatAttack extends Command
 
 		CombatService cs = new CombatService(db);
 		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
+
+		ds.beginBulkWriteMode();
 		
 		if (GameUtils.isPlayerIncapacitated(character))
 		{
@@ -208,6 +210,15 @@ public class CommandCombatAttack extends Command
 		}
 		
 		
+		
+		
+		
+		
+		ds.commitBulkWrite();
+
+		
+		
+		
 		if(status != null && status.isEmpty() == false)
 		{
 			// We want to make a summary combat message and add the full details by a click
@@ -220,14 +231,14 @@ public class CommandCombatAttack extends Command
 			db.sendGameMessage(db.getDB(), character, html);
 		}
 		
+		
 		if (GameUtils.isPlayerIncapacitated(character))
 		{
 			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			mpus.updateFullPage_shortcut();
 			
-			db.sendMainPageUpdateForCharacter(ds, targetCharacter.getKey(), "updateFullPage_shortcut");
+			db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
 			
-			return;
 		}
 		else if (GameUtils.isPlayerIncapacitated(targetCharacter))
 		{
@@ -236,9 +247,8 @@ public class CommandCombatAttack extends Command
 			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			mpus.updateFullPage_shortcut();
 			
-			db.sendMainPageUpdateForCharacter(ds, targetCharacter.getKey(), "updateFullPage_shortcut");
+			db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
 			
-			return;
 		}
 		else
 		{
@@ -248,7 +258,7 @@ public class CommandCombatAttack extends Command
 			mpus.updateButtonList();
 			mpus.updatePartyView();
 		}
-		
+
 		
 	}
 

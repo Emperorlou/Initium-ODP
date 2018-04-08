@@ -1,7 +1,6 @@
 package com.universeprojects.miniup.server.dbentities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,22 +95,14 @@ public class GuardSetting extends InitiumEntityBase
 		entity.setProperty("locationKey", locationKey);
 	}
 
-	public Set<GuardType> getSettings()
+	public GuardType getSettings()
 	{
-		String raw = (String)entity.getProperty("settings");
-		if (raw==null) return new HashSet<>();
-		String[] rawValues = raw.split(",");
-		
-		Set<GuardType> result = new HashSet<>();
-		for(String val:rawValues)
-			result.add(GuardType.valueOf(val));
-		
-		return result;
+		return GuardType.valueOf((String)entity.getProperty("settings"));
 	}
 
-	public void setSettings(GuardType...settings)
+	public void setSettings(GuardType settings)
 	{
-		entity.setProperty("settings", StringUtils.join(settings, ','));
+		entity.setProperty("settings", settings.toString());
 	}
 	
 	
@@ -195,49 +186,46 @@ public class GuardSetting extends InitiumEntityBase
 		return text;
 	}
 
-	protected static String getGuardTypeText(String kind, Set<GuardType> types)
+	protected static String getGuardTypeText(String kind, GuardType guardType)
 	{
 		String text = "...actually nevermind";
-		if (types==null || types.isEmpty()) return text;
+		if (guardType==null) return text;
 
 		text=" ";
 		List<String> list = new ArrayList<>();
-		for(GuardType ge:types)
+		if (kind==null)
 		{
-			if (kind==null)
-			{
+			throw new RuntimeException("Unhandled type");
+		}
+		else if (kind.equals("Item"))
+		{
+			if (guardType == GuardType.NoMoving)
+				list.add("taking it");
+			else if (guardType == GuardType.NoTrespassers)
+				list.add("entering it");
+			else if (guardType == GuardType.NoUsing)
+				list.add("using it");
+			else if (guardType == GuardType.NoGuarding)
+				list.add("guarding it");
+			else
 				throw new RuntimeException("Unhandled type");
-			}
-			else if (kind.equals("Item"))
-			{
-				if (ge == GuardType.NoMoving)
-					list.add("taking it");
-				else if (ge == GuardType.NoTrespassers)
-					list.add("entering it");
-				else if (ge == GuardType.NoUsing)
-					list.add("using it");
-				else if (ge == GuardType.NoGuarding)
-					list.add("guarding it");
-				else
-					throw new RuntimeException("Unhandled type");
-			}
-			else if (kind.equals("Location"))
-			{
-				if (ge == GuardType.NoTrespassers)
-					list.add("coming here");
-				else if (ge == GuardType.NoMoving)
-					list.add("taking anything");
-				else if (ge == GuardType.NoUsing)
-					list.add("using anything");
-				else if (ge == GuardType.NoGuarding)
-					list.add("guarding anything");
-				else
-					throw new RuntimeException("Unhandled type");
-			}
+		}
+		else if (kind.equals("Location"))
+		{
+			if (guardType == GuardType.NoTrespassers)
+				list.add("coming here");
+			else if (guardType == GuardType.NoMoving)
+				list.add("taking anything");
+			else if (guardType == GuardType.NoUsing)
+				list.add("using anything");
+			else if (guardType == GuardType.NoGuarding)
+				list.add("guarding anything");
+			else
+				throw new RuntimeException("Unhandled type");
+		}
 			
 				
 			
-		}
 		text+=generateHumanReadableList(list);
 		
 		return text;

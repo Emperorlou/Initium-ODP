@@ -31,7 +31,7 @@
 </style>
 <c:forEach var="character" items="${characters}">
 	<div class='selectable'>
-		<a href='main.jsp?char=${character.urlSafeKey}' target='_blank' class='popout-character'>↸</a>
+		<a href='/main.jsp?char=${character.urlSafeKey}' target='_blank' class='popout-character'>↸</a>
 		<div class='list-item'>
 			${character.html}
 		</div>

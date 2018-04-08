@@ -76,6 +76,7 @@ public class GuardSettingsController extends PageController {
 	    	String finalGuardLine = gs.getFullLine(entity);
     		
     		Map<String,String> setting = new HashMap<>();
+    		setting.put("id", gs.getKey().getId()+"");
     		setting.put("key", gs.getUrlSafeKey());
     		setting.put("text", finalGuardLine);
     		setting.put("active", gs.isActive()+"");
@@ -84,15 +85,16 @@ public class GuardSettingsController extends PageController {
 	    
 	    List<GuardSetting> allGS = guardService.getAllActiveGuardSettingsForLocation(locationKey);
 	    Map<String, Integer> guardCounts = new HashMap<>();
+	    for(GuardType type:GuardType.values())
+	    	guardCounts.put(type.toString(), 0);
+	    
 	    for(GuardSetting guard:allGS)
 	    {
-	    	for(GuardType type:guard.getSettings())
-	    	{
-	    		Integer count = guardCounts.get(type.toString());
-	    		if (count==null) count = 0;
-	    		count++;
-	    		guardCounts.put(type.toString(), count);
-	    	}
+	    	GuardType type = guard.getSettings();
+    		Integer count = guardCounts.get(type.toString());
+    		if (count==null) count = 0;
+    		count++;
+    		guardCounts.put(type.toString(), count);
 	    }
 
 	    request.setAttribute("guardCounts", guardCounts);
