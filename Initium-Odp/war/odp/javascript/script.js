@@ -1622,7 +1622,7 @@ function characterDropCharacter(event, characterId)
 
 function characterDropAllCharacters(event)
 {
-	doCommand(event, "CharacterDropAllCharacters", loadInventory);
+	doCommand(event, "CharacterDropAllCharacters", null, loadInventory);
 }
 
 function characterDropItem(event, itemId)
