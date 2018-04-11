@@ -72,13 +72,13 @@ public class PropertiesService extends Service {
 			pathToHouse.setProperty("ownerKey", user.getKey());
 
 			// Save path and have our character discover it
-			ds.put(pathToHouse);
 			db.doCharacterDiscoverEntity(ds, character, pathToHouse);
 			
 			// Finally subtract the money from the player's character
 			character.setProperty("dogecoins", dogecoins - cost);
 			character.setProperty("locationKey", playerHouse.getKey());
-			ds.put(character);
+			
+			ds.put(character, pathToHouse);
 
 			ds.commit();
 			

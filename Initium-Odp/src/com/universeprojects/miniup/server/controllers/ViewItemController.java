@@ -18,7 +18,9 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
+import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.ItemAspect;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
@@ -42,9 +44,11 @@ public class ViewItemController extends PageController {
 	@Override
 	protected final String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
+
 		response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
 
-		ODPDBAccess db = ODPDBAccess.getInstance(request);
 	    CachedDatastoreService ds = db.getDB();
 	    CachedEntity character = db.getCurrentCharacter(); 
 	    

@@ -108,8 +108,9 @@ public class LongOperationCampCreate extends LongOperation
 			campsite.setProperty("supportsCampfires", 1L);
 			campsite.setProperty("maxMonsterCount", parentLocation.getProperty("maxMonsterCount"));
 			campsite.setProperty("monsterRegenerationRate", parentLocation.getProperty("monsterRegenerationRate"));
-			ds.put(campsite);
+			
 			CachedEntity path = db.newPath(ds, "Path to camp - "+campName, parentLocation.getKey(), null, campsite.getKey(), "Leave camp", 100, 0l, "CampSite");
+			ds.put(campsite, path);
 			// Returns the destination.
 			return db.doCharacterTakePath(ds, character, path, campsite, false, false);
 		}

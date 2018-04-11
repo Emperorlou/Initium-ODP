@@ -13,6 +13,8 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.CommandAttack;
 import com.universeprojects.web.Controller;
@@ -31,6 +33,8 @@ public class NearbyMerchantsController extends PageController
 			HttpServletResponse response) throws ServletException, IOException 
 	{
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
+
 		CachedEntity character = db.getCurrentCharacter();
 		
 		Key locationKey = (Key)character.getProperty("locationKey");

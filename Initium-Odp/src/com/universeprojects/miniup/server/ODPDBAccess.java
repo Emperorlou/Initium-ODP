@@ -180,6 +180,9 @@ public class ODPDBAccess
 	
 	public CachedDatastoreService getDB()
 	{
+		// Check if we hvae a CDS in the request attributes already
+		if (ds==null)
+			ds = (CachedDatastoreService)request.getAttribute("CachedDatastoreService");
 		if (ds != null) return ds;
 
 		ds = new CachedDatastoreService()
@@ -201,6 +204,8 @@ public class ODPDBAccess
 				return true;
 			}
 		};
+		
+		request.setAttribute("CachedDatastoreService", ds);
 		
 		
 		return ds;
@@ -329,6 +334,8 @@ public class ODPDBAccess
 
 		Long userId = (Long) session.getAttribute("userId");
 
+		if (userId==null) throw new NotLoggedInException();
+		
 		return createKey("User", userId);
 	}
 
@@ -397,17 +404,52 @@ public class ODPDBAccess
 			}
 			return characterKey;
 		}
-
-		if (authenticatedInstantCharacterId != null)
-		{
-			Key characterKey = createKey("Character", authenticatedInstantCharacterId);
-			return characterKey;
-		}
-
-		return null;
+		else
+			throw new NotLoggedInException();
 
 	}
 	
+	/**
+	 * This is only used by the getCurrentCharacter() method to find a suitable replacement character
+	 * when the current character is null or otherwise not set on the user.
+	 * 
+	 * @return
+	 */
+	private CachedEntity getCurrentCharacter_whenNull()
+	{
+		List<CachedEntity> allChars = getUserCharacters(getCurrentUser());
+		boolean found = false;
+		for(CachedEntity chr:allChars)
+		{
+			if (chr!=null)
+			{
+				getCurrentUser().setProperty("characterKey", chr.getKey());
+				found = true;
+				return chr;
+			}
+		}
+		
+		if (found==false)
+		{
+			try
+			{
+				CachedEntity newChar = newPlayerCharacter(ds, getAuthenticator(), getCurrentUser(), "Unnamed", null);
+				ds.put(newChar);
+				return newChar;
+			}
+			catch(DDOSProtectionException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		throw new RuntimeException("Couldn't find a suitable character to switch the user to and couldn't create a new character.");
+	}
+
+	public CachedEntity getCurrentCharacter()
+	{
+		return getCurrentCharacter(false);
+	}
 	/**
 	 * Gets the character entity of the user who is currently logged in (if they
 	 * are logged in).
@@ -418,7 +460,7 @@ public class ODPDBAccess
 	 * @param request
 	 * @return
 	 */
-	public CachedEntity getCurrentCharacter()
+	public CachedEntity getCurrentCharacter(boolean ignoreNotLoggedIn)
 	{
 		if (getRequest().getAttribute("characterEntity") != null) return (CachedEntity) getRequest().getAttribute("characterEntity");
 
@@ -448,22 +490,15 @@ public class ODPDBAccess
 				return character;
 			}
 		}
+		else
+			if (ignoreNotLoggedIn)
+				return null;
+			else
+				throw new NotLoggedInException();
 
-		if (authenticatedInstantCharacterId != null)
-		{
-			Key characterKey = createKey("Character", authenticatedInstantCharacterId);
-			CachedEntity character = getEntity(characterKey);
-
-			if (character != null)
-			{
-				request.setAttribute("characterEntity", character);
-
-				return character;
-			}
-		}
-
-		//TODO: Here it would be good to throw an exception that causes the client to create a new character (if they're logged in) or login (if they're not)
-		return null;
+		CachedEntity newCharacter = getCurrentCharacter_whenNull();
+		//TODO: Here it would be good to throw an exception that causes the client to create a new character (if they're logged in)
+		return newCharacter;
 	}
 	
 	/**
@@ -946,9 +981,6 @@ public class ODPDBAccess
 		path.setProperty("discoveryChance", discoveryChance);
 		path.setProperty("travelTime", travelTime);
 		path.setProperty("type", type);
-
-		// Set some default attributes
-		db.put(path);
 
 		return path;
 	}
@@ -1614,7 +1646,7 @@ public class ODPDBAccess
 	public void doCharacterCollectItem(CachedEntity character, CachedEntity item) throws UserErrorMessage
 	{
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
-		if (item == null) throw new IllegalArgumentException("Item cannot be null.");
+		if (item == null) throw new UserErrorMessage("This item no longer exists.");
 
 		if (CommonChecks.checkItemIsMovable(item)==false)
 			throw new UserErrorMessage("You cannot pick up this item.");
@@ -3550,7 +3582,6 @@ public class ODPDBAccess
 		if (result.size()==1)
 		{
 			result.get(0).setProperty("partyCode", null);
-			ds.put(result.get(0));
 			return null;
 		}
 		
@@ -4873,6 +4904,8 @@ public class ODPDBAccess
 		StringBuilder dropAllSB = new StringBuilder();
 		for(CachedEntity item:items)
 		{
+			if (item==null) continue;
+			
 			// If the item is a "naturalEquipment", simply delete it instead of moving to the ground
 			if ("TRUE".equals(item.getProperty("naturalEquipment")))
 			{
@@ -4908,7 +4941,7 @@ public class ODPDBAccess
 							loot+="<div>";
 							loot+="		<div class='main-item-controls'>";
 							// Get all the slots this item can be equipped in
-							loot+="			<a onclick='ajaxAction(\"/ServletCharacterControl?type=dropItem&itemId="+item.getKey().getId()+"\", event, loadInventory)' >Drop on ground</a>";
+							loot+="			<a onclick='characterDropItem(event, "+item.getKey().getId()+", loadInventory)' >Drop on ground</a>";
 							if (item.getProperty("maxWeight")!=null)
 							{
 								loot+="<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
@@ -5575,6 +5608,12 @@ public class ODPDBAccess
 		
 		if("Script".equals(destinationKey.getKind())) return null;
 		destination = getEntity(destinationKey);
+
+		String forceOneWay = (String)path.getProperty("forceOneWay");
+		if ("FromLocation1Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation2Key.getId())
+			throw new UserErrorMessage("You cannot take this path.");
+		if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
+			throw new UserErrorMessage("You cannot take this path.");
 		
 		return doCharacterTakePath(db, character, path, destination, allowAttack, isExplore);
 	}
@@ -5591,22 +5630,10 @@ public class ODPDBAccess
 		// First get the character's current location
 		Key currentLocationKey = (Key)character.getProperty("locationKey");
 		
-		// Then determine which location the character will end up on.
-		// If we find that the character isn't on either end of the path, we'll throw.
-		Key pathLocation1Key = (Key)path.getProperty("location1Key");
-		Key pathLocation2Key = (Key)path.getProperty("location2Key");
-		if (currentLocationKey.getId()!=pathLocation1Key.getId() && currentLocationKey.getId()!=pathLocation2Key.getId())
-			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
-
 		if (CommonChecks.checkLocationIsCombatSite(destination));
 			destination.setProperty("lastUsedDate", new Date());
 		
 
-		String forceOneWay = (String)path.getProperty("forceOneWay");
-		if ("FromLocation1Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation2Key.getId())
-			throw new UserErrorMessage("You cannot take this path.");
-		if ("FromLocation2Only".equals(forceOneWay) && currentLocationKey.getId() == pathLocation1Key.getId())
-			throw new UserErrorMessage("You cannot take this path.");
 
 		String partyCode = (String) character.getProperty("partyCode");
 		boolean isInParty = partyCode != null && !"".equals(partyCode);
@@ -5620,46 +5647,19 @@ public class ODPDBAccess
 		
 		MovementService movementService = new MovementService(this);
 
-		Key ownerKey = (Key) destination.getProperty("ownerKey");
-		if (ownerKey != null) {
-			// Check to see if all members of the party have access to enter owned housing.
-			if("Group".equals(ownerKey.getKind())){
-				Set<String> groupKeySet = new HashSet<String>(); // Sets guarantee one and only one entry per unique value
-				List<String> isActiveInGroupStatusList = Arrays.asList(GroupStatus.Admin.name(), GroupStatus.Member.name()); // Wish we had streaming to build this appropriately
-				for(CachedEntity partyMember: party) {
-					//Removes those who have just applied or have been kicked
-					boolean belongstoGroup = isActiveInGroupStatusList.contains(partyMember.getProperty("groupStatus"));
-					Key groupKey = (Key) partyMember.getProperty("groupKey"); // This should always be here if they belong to a group
-					String mapKey = belongstoGroup ? groupKey.toString() : UUID.randomUUID().toString(); // random UUID to ensure uniqueness
-					groupKeySet.add(mapKey);
-				}
+		if (path!=null)
+		{
+			movementService.checkCharacterIsAllowedToEnterOwnedProperty(path, destination, party);
 
-				if((!groupKeySet.contains(ownerKey.toString()) || groupKeySet.size() != 1) && 
-						"Town".equals(destination.getProperty("type"))==false/*Exclude leaving*/) { 
-					throw new UserErrorMessage(String.format("You cannot enter a group owned house unless %s.", party.size() > 1 ? "all members of your party are members of the group" : "you are a member of the group"));
-				}
-			} else if("User".equals(ownerKey.getKind())) {
-				Key pathOwner = (Key) path.getProperty("ownerKey");
-				for (CachedEntity partyMember : party) {
-					boolean isPathOwner = GameUtils.equals(pathOwner, partyMember.getProperty("userKey"));
-					if (!isPathOwner && !movementService.isPathDiscovered(partyMember.getKey(), path) && 
-							"Town".equals(destination.getProperty("type"))==false/*Exclude leaving*/) {
-						throw new UserErrorMessage(String.format("You cannot enter a player owned house unless %s.", party.size() > 1 ? "every character already has been given access" : "you already have been given access"));
-					}
-				}
-			} else {
-				// TODO - Exception? If we can't determine the owner type; the character will be allowed to take the path. 
-			}
-		}
-
-		// Discover the path the party is taking if we haven't already discovered it..
-		if (party.size() > 1)
-			for(CachedEntity member:party)
-				if (GameUtils.equals(member.getKey(), character.getKey())==false)
-					doCharacterDiscoverEntity(db, member, path);
+			// Discover the path the party is taking if we haven't already discovered it..
+			if (party.size() > 1)
+				for(CachedEntity member:party)
+					if (GameUtils.equals(member.getKey(), character.getKey())==false)
+						doCharacterDiscoverEntity(db, member, path);
 		
-		// Check if this property is locked and if so, if we have the key to enter it...
-		movementService.checkForLocks(character, path, destinationKey);
+			// Check if this property is locked and if so, if we have the key to enter it...
+			movementService.checkForLocks(character, path, destinationKey);
+		}
 
 		// Blockade needs to happen on TakePath
 		BlockadeService bs = new BlockadeService(this);
@@ -5765,42 +5765,45 @@ public class ODPDBAccess
 		}
 		
 		// Now check if we have a discovery for this path we just took...
-		CachedEntity discovery = getDiscoveryByEntity(character.getKey(), path.getKey()); 
-		if (discovery==null)
+		if (path!=null)
 		{
-			newDiscovery(db, character, path);
-		}
-		else
-		{
-			if (GameUtils.booleanEquals(discovery.getProperty("hidden"), true))
+			CachedEntity discovery = getDiscoveryByEntity(character.getKey(), path.getKey()); 
+			if (discovery==null)
 			{
-				discovery.setProperty("hidden", false);
-				db.put(discovery);
+				newDiscovery(db, character, path);
 			}
-		}
-		
-		// HACK: We didn't always save the PlayerHouse Paths against users. If this PlayerHouse path doesn't have a user assigned to it, assign it to us
-		if ("PlayerHouse".equals(path.getProperty("type")) && 
-				(path.getProperty("ownerKey")==null || 
-				("Town".equals(destination.getProperty("type"))==false && destination.getProperty("ownerKey")==null)))
-		{
-			CachedEntity user = getUserByCharacterKey(character.getKey());
-			if (user!=null)
+			else
 			{
-				path.setProperty("ownerKey", user.getKey());
-				destination.setProperty("ownerKey", user.getKey());
-				
-				db.put(path);
-				// Note: The destination location gets saved later
+				if (GameUtils.booleanEquals(discovery.getProperty("hidden"), true))
+				{
+					discovery.setProperty("hidden", false);
+					db.put(discovery);
+				}
 			}
-		}
-		// HACK: We didn't always set the player house to be indoors and include the ability to make a fire. Now we do.
-		if ("PlayerHouse".equals(path.getProperty("type")) && 
-				"FALSE".equals(destination.getProperty("isOutside"))==false &&
-				"RestSite".equals(destination.getProperty("type")))
-		{
-			destination.setProperty("isOutside", "FALSE");
-			destination.setProperty("supportsCampfires", 1L);
+			
+			// HACK: We didn't always save the PlayerHouse Paths against users. If this PlayerHouse path doesn't have a user assigned to it, assign it to us
+			if ("PlayerHouse".equals(path.getProperty("type")) && 
+					(path.getProperty("ownerKey")==null || 
+					("Town".equals(destination.getProperty("type"))==false && destination.getProperty("ownerKey")==null)))
+			{
+				CachedEntity user = getUserByCharacterKey(character.getKey());
+				if (user!=null)
+				{
+					path.setProperty("ownerKey", user.getKey());
+					destination.setProperty("ownerKey", user.getKey());
+					
+					db.put(path);
+					// Note: The destination location gets saved later
+				}
+			}
+			// HACK: We didn't always set the player house to be indoors and include the ability to make a fire. Now we do.
+			if ("PlayerHouse".equals(path.getProperty("type")) && 
+					"FALSE".equals(destination.getProperty("isOutside"))==false &&
+					"RestSite".equals(destination.getProperty("type")))
+			{
+				destination.setProperty("isOutside", "FALSE");
+				destination.setProperty("supportsCampfires", 1L);
+			}
 		}
 		
 		// Here we're going to take a list we got from the opponentResult stuff and reuse it for performance reasons...
@@ -6266,16 +6269,6 @@ public class ODPDBAccess
 				
 				
 				
-				setPartiedField(party, character, "mode", CHARACTER_MODE_NORMAL);
-				setPartiedField(party, character, "combatant", null);
-				setPartiedField(party, character, "combatType", null);
-				putPartyMembersToDB(db, party, character);
-
-				// now notify the party members to refresh
-				if (party!=null)
-					for(CachedEntity member:party)
-						if (member.getKey().getId()!=character.getKey().getId())
-							queueMainPageUpdateForCharacter(member.getKey(), "updateFullPage_shortcut");
 				
 				
 				// Now we want to check if the monster should regain hitpoints or not
@@ -6295,10 +6288,31 @@ public class ODPDBAccess
 					monster.setProperty("combatType", null);
 					
 					db.put(monster);
+
+					setPartiedField(party, character, "mode", CHARACTER_MODE_NORMAL);
+					setPartiedField(party, character, "combatant", null);
+					setPartiedField(party, character, "combatType", null);
+					putPartyMembersToDB(db, party, character);
+
+					// now notify the party members to refresh
+					if (party!=null)
+						for(CachedEntity member:party)
+							if (member.getKey().getId()!=character.getKey().getId())
+								queueMainPageUpdateForCharacter(member.getKey(), "updateFullPage_shortcut");
 					
 				}
 				else
 				{
+					setPartiedField(party, character, "mode", CHARACTER_MODE_NORMAL);
+					setPartiedField(party, character, "combatant", null);
+					setPartiedField(party, character, "combatType", null);
+					putPartyMembersToDB(db, party, character);
+
+					// now notify the party members to refresh
+					if (party!=null)
+						for(CachedEntity member:party)
+							if (member.getKey().getId()!=character.getKey().getId())
+								queueMainPageUpdateForCharacter(member.getKey(), "updateFullPage_shortcut");
 
 					// First lets take the monster out of combat
 					monster.setProperty("mode", CHARACTER_MODE_NORMAL);
@@ -6355,6 +6369,8 @@ public class ODPDBAccess
 					}
 				}				
 
+				
+				
 				queueMainPageUpdateForCharacter(monster.getKey(), "updateFullPage_shortcut");
 				
 				
@@ -6863,7 +6879,7 @@ public class ODPDBAccess
         
         Key homeTownKey = null;
         
-        CachedEntity newCharacter = new CachedEntity("Character");
+        CachedEntity newCharacter = new CachedEntity("Character", ds.getPreallocatedIdFor("Character"));
         // Set the starting attributes
         newCharacter.setProperty("name", name);
         newCharacter.setProperty("homeTownKey", homeTownKey);
@@ -6898,7 +6914,6 @@ public class ODPDBAccess
             newCharacter.setProperty("userKey", user.getKey());
         }
 
-        boolean characterSaved = false;
         // If there is a previous character, copy over some things from him
         if (oldCharacter!=null)
         {
@@ -6910,9 +6925,6 @@ public class ODPDBAccess
                 newCharacter.setProperty("groupRank", oldCharacter.getProperty("groupRank"));
                 newCharacter.setProperty("groupStatus", oldCharacter.getProperty("groupStatus"));
                 newCharacter.setProperty("leaveGroupDate", oldCharacter.getProperty("leaveGroupDate"));
-                
-                ds.put(newCharacter);    // Do an initial put so we generate a proper key when doing the group/party stuff below...
-                characterSaved=true;
                 
                 // ok he was in a group, we'll need to copy some stuff over to the new char
                 // If the dead character is the creator of the group, copy over creator status...
@@ -6933,8 +6945,6 @@ public class ODPDBAccess
         }
 
         
-        if (characterSaved==false)
-            ds.put(newCharacter);
         
         if (user!=null)
         {
@@ -7130,5 +7140,11 @@ public class ODPDBAccess
 	{
 		if (value==null) return null;
 		return value.toString();
+	}
+
+	public ODPAuthenticator getAuthenticator() throws DDOSProtectionException
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

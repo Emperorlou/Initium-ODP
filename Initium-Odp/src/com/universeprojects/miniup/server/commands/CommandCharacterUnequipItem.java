@@ -63,6 +63,8 @@ public class CommandCharacterUnequipItem extends Command {
 		
 		db.doCharacterUnequipEntity(ds, character, equipmentItem);
 		
+		ds.put(character);
+		
 		// If we've gotten this far, we can assume it was successful. Update the in banner widget.
 		// JS function reloads the page popup.
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);

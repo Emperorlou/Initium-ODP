@@ -828,13 +828,32 @@ public class MainPageUpdateService extends Service
 			}
 			else
 			{
-			
-				// Here we'll add a default overlay link if there is only 1 path and there are no other overlay links setup
-				if (paths.size()==1)
+				// Look at the paths to see if there is only one permanent path away from this location. If so, we'll use that
+				// and put it on the banner to go back easily...
+				Integer onlyOnePathIndex = null;
+				for(int i = 0; i<paths.size(); i++)
 				{
-					CachedEntity path = paths.get(0);
-					CachedEntity destLocation = destLocations.get(0);
-					Integer pathEnd = pathEnds.get(0);
+					if ("Permanent".equals(paths.get(i).getProperty("type")))
+					{
+						if (onlyOnePathIndex==null)
+						{
+							onlyOnePathIndex = i;
+						}
+						else
+						{
+							// If we found more than one, then just get out and nevermind.
+							onlyOnePathIndex = null;
+							break;
+						}
+					}
+				}
+				// Here we'll add a default overlay link if there is only 1 path and there are no other overlay links setup
+				if (paths.size()==1 || onlyOnePathIndex!=null)
+				{
+					if (paths.size()==1) onlyOnePathIndex = 0;
+					CachedEntity path = paths.get(onlyOnePathIndex);
+					CachedEntity destLocation = destLocations.get(onlyOnePathIndex);
+					Integer pathEnd = pathEnds.get(onlyOnePathIndex);
 						
 					String destLocationName = (String)destLocation.getProperty("name");
 					
@@ -853,7 +872,7 @@ public class MainPageUpdateService extends Service
 					if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
 						buttonCaption = overlayCaptionOverride;
 
-					newHtml.append("<script type='text/javascript'>window.singleLeavePathId=").append(paths.get(0).getId()).append(";</script>");
+					newHtml.append("<script type='text/javascript'>window.singleLeavePathId=").append(paths.get(onlyOnePathIndex).getId()).append(";</script>");
 
 					String onclick = "doGoto(event, window.singleLeavePathId, true);";				
 					

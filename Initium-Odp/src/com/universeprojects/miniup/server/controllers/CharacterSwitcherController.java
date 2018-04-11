@@ -19,6 +19,8 @@ import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -34,6 +36,8 @@ public class CharacterSwitcherController extends PageController {
 	protected final String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
+		
 		CachedEntity character = db.getCurrentCharacter();
 		CachedEntity user = db.getCurrentUser();
 
