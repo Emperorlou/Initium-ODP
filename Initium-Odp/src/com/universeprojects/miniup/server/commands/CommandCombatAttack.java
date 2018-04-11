@@ -179,6 +179,8 @@ public class CommandCombatAttack extends Command
 				status+=counterAttackStatus;
 			}
 			
+			ds.putIfChanged(character, targetCharacter);
+			
 			if (((Double)targetCharacter.getProperty("hitpoints"))>0)
 			{
 				if (counterAttackStatus!=null) characterCrit = counterAttackStatus.contains("It's a critical hit!");
