@@ -683,6 +683,12 @@ function buyHouse(eventObject)
 	});
 }
 
+function doCollectItem(event, itemId)
+{
+	doCommand(event, "CollectItem", {itemId:itemId});
+}
+
+
 function playerReadMap(eventObject, itemId, pathId, hasDura)
 {
 	closeAllTooltips();
@@ -1625,10 +1631,10 @@ function characterDropAllCharacters(event)
 	doCommand(event, "CharacterDropAllCharacters", null, loadInventory);
 }
 
-function characterDropItem(event, itemId)
+function characterDropItem(event, itemId, callback)
 {
 	// No callback necessary. Command clears out the item (doesn't touch header).
-	doCommand(event, "CharacterDropItem", {"itemId":itemId});
+	doCommand(event, "CharacterDropItem", {"itemId":itemId}, callback);
 }
 
 function characterEquipSet(event, containerId)
@@ -1902,7 +1908,8 @@ function reloadPagePopup(quietly)
 window.moveItemTimer = null;
 function moveItem(event, itemId, newContainerKind, newContainerId)
 {
-    ajaxAction("/ServletCharacterControl?type=moveItem&itemId="+itemId+"&destinationKey="+newContainerKind+"_"+newContainerId+"&v="+window.verifyCode+"&char="+window.characterOverride, event, function(){
+	var destinationKey = newContainerKind+"_"+newContainerId;
+	doCommand(event, "MoveItem", {itemId:itemId, destinationKey:destinationKey}, function(){
         // Clear any previously set timer before setting a fresh one
     	if(window.moveItemTimer != null)
     		window.clearTimeout(window.moveItemTimer);
@@ -1910,7 +1917,7 @@ function moveItem(event, itemId, newContainerKind, newContainerId)
             reloadPagePopup(true);
             window.moveItemTimer = null;
         }, 2000);
-    });
+	});
 }
 
 function loadInlineItemsAndCharacters()
@@ -4184,6 +4191,7 @@ function doCollectCollectable(event, collectableId, userRequestId)
 			},
 			userRequestId);
 }
+
 
 
 

@@ -15,6 +15,8 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.ShardedCounterService;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.web.Controller;
@@ -37,9 +39,8 @@ public class ViewCharacterMiniController extends PageController {
 	protected String processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException 
 	{
-		response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
-		
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
 		
 		Long charId = WebUtils.getLongParam(request, "characterId");
 		Key charKey = KeyFactory.createKey("Character", charId);
@@ -77,7 +78,7 @@ public class ViewCharacterMiniController extends PageController {
 		// isSelf is false by default, check if character is not an NPC and after that check if chosen character is self.
 		boolean isSelf = false;
 		
-		if (!type.equals("NPC"))
+		if (!type.equals("NPC") && user!=null)
 			isSelf = GameUtils.equals(user.getKey(), db.getCurrentUserKey());
 		
 		request.setAttribute("isSelf", isSelf);	

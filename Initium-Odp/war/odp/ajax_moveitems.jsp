@@ -54,9 +54,13 @@
 	ContainerService cs = new ContainerService(db);	
 	
 	if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), selfSide)==false)
-		throw new RuntimeException("Hack attempt might have happened.");
+	{
+		return;
+	}
 	if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), otherSide)==false)
-		throw new RuntimeException("Hack attempt might have happened.");
+	{
+		return;
+	}
 	
 
 	// Now fetch all items in these containers...

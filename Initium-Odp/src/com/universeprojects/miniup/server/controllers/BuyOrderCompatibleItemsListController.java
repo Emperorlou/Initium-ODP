@@ -15,6 +15,8 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.web.Controller;
@@ -30,12 +32,13 @@ public class BuyOrderCompatibleItemsListController extends PageController {
 	@Override
 	protected final String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
+		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
 		
 		try
 		{
 			List<Map<String,String>> itemsFormatted = new ArrayList<>();
 			
-			ODPDBAccess db = ODPDBAccess.getInstance(request);
 			Long buyOrderId = Long.parseLong(request.getParameter("buyOrderId"));
 			
 			// Prepare the buy order

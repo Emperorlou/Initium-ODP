@@ -458,7 +458,8 @@ public abstract class CommonChecks
 		boolean defenceStructureAttack = "DefenceStructureAttack".equals(attacker.getProperty("combatType"));
 		
 		boolean isTerritoryCombat = false;
-		if (defenderLocation.getProperty("territoryKey")!=null || attackerLocation.getProperty("territoryKey")!=null)
+		if ((defenderLocation!=null && defenderLocation.getProperty("territoryKey")!=null) || 
+				(attackerLocation!=null && attackerLocation.getProperty("territoryKey")!=null))
 			isTerritoryCombat = true;
 		
 		boolean isGuardToHeal = false;

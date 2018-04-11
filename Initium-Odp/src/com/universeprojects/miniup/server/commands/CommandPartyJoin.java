@@ -65,16 +65,22 @@ public class CommandPartyJoin extends Command {
 		if(partyCharacter == null)
 			throw new UserErrorMessage("Specified character is not in a group!");
 		
+		ds.beginBulkWriteMode();
+		
 		// This method contains all the validations necessary.
 		db.doRequestJoinParty(ds, character, partyCharacter);
 		
+		
 		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
 		mpus.updatePartyView();
+		
 		
 		List<CachedEntity> party = db.getParty(ds, character);
 		// Not sure how this happens. Just create a new list with the two chars
 		if(party == null)
 			party = Arrays.asList(character, partyCharacter);
+		
+		ds.commitBulkWrite();
 		
 		List<Key> partyKeys = new ArrayList<Key>();
 		for(CachedEntity member:party)
@@ -83,5 +89,6 @@ public class CommandPartyJoin extends Command {
 		
 		if(partyKeys.isEmpty()==false)
 			db.sendMainPageUpdateForCharacters(ds, partyKeys, "updatePartyView");
+		
 	}
 }

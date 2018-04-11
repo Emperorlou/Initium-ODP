@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
@@ -32,6 +34,8 @@ public class QuestListController extends PageController {
 	protected final String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
+
 		QuestService questService = new QuestService(db);
 		
 		List<QuestEntity> activeQuests = questService.getActiveQuests();

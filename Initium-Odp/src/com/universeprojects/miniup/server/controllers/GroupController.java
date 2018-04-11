@@ -16,6 +16,8 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
+import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.services.GroupService;
@@ -32,9 +34,11 @@ public class GroupController extends PageController {
 	@Override
 	protected String processRequest(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
+		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
+
 		response.setHeader("Access-Control-Allow-Origin", "*");     // This is absolutely necessary for phonegap to work
 
-		ODPDBAccess db = ODPDBAccess.getInstance(request);
 	    CachedDatastoreService ds = db.getDB();
 	    CachedEntity character = db.getCurrentCharacter(); 
 		GroupService service = new GroupService(db, character);

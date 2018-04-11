@@ -15,6 +15,8 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
@@ -34,6 +36,9 @@ public class InventionController extends PageController {
 //		if (GameUtils.isTestServer(request))
 //		{
 			ODPDBAccess db = ODPDBAccess.getInstance(request);
+			try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
+
+			
 			EntityPool pool = new EntityPool(db.getDB());
 			ODPKnowledgeService knowledge = db.getKnowledgeService(db.getCurrentCharacter().getKey());
 			ODPInventionService invention = db.getInventionService(db.getCurrentCharacter(), knowledge);

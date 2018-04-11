@@ -14,6 +14,8 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -29,11 +31,13 @@ public class NearbyItemsController extends PageController
 	@Override
 	protected String processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException 
-	{
+			{
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
+		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
+
 		CachedEntity character = db.getCurrentCharacter();
 		
-		Key locationKey = (Key)character.getProperty("locationKey");
+		Key locationKey = db.getCharacterLocationKey(character);
 		if(locationKey == null)
 			throw new RuntimeException("Invalid game state. Character location null");
 		
@@ -95,7 +99,7 @@ public class NearbyItemsController extends PageController
 	    	sb.append("<div class='main-item-controls'>");
             if (item.getProperty("maxWeight")!=null)
             	sb.append("<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+character.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
-            sb.append("<a onclick='ajaxAction(\"/ServletCharacterControl?type=collectItem&itemId="+item.getId()+"\", event, function(){})'>Collect</a>");
+            sb.append("<a onclick='doCollectItem(event, "+item.getId()+")'>Collect</a>");
     
             sb.append("</div>"); 
             sb.append("</div>");

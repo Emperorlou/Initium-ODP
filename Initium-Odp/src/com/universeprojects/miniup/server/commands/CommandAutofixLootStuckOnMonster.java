@@ -85,10 +85,10 @@ public class CommandAutofixLootStuckOnMonster extends Command {
 							if ("FALSE".equals(isNatural) || isNatural==null || "".equals(isNatural))
 							{
 								monster.setProperty("equipment" + slot, null);
-								ds.put(monster);
 							}
 						}
 					}
+					ds.put(monster);
 				}
 			}
 			setJavascriptResponse(JavascriptResponse.FullPageRefresh);
