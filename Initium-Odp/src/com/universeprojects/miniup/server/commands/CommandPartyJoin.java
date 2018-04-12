@@ -71,7 +71,7 @@ public class CommandPartyJoin extends Command {
 		db.doRequestJoinParty(ds, character, partyCharacter);
 		
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, null, this);
 		mpus.updatePartyView();
 		
 		

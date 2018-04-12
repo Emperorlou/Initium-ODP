@@ -97,7 +97,7 @@ public class MainPageController extends PageController {
 		
 		
 
-		MainPageUpdateService updateService = new MainPageUpdateService(db, db.getCurrentUser(), character, location, null);
+		MainPageUpdateService updateService = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, location, null);
 		
 		request.setAttribute("bannerTextOverlay", updateService.updateInBannerOverlayLinks());
 		request.setAttribute("inBannerCharacterWidget", updateService.updateInBannerCharacterWidget());

@@ -360,7 +360,7 @@ hr:after {
 {
 	position: relative;
     z-index: 1000100;
-    min-height:70px;
+    min-height:103px;
   	/*padding-bottom: 28.98352%;*/
 }
 
@@ -2955,6 +2955,31 @@ position: absolute;
     border-top-right-radius: 8px;
 }
 
+.v3-party-panel-contents
+{
+	margin-top:80px;
+	transform-origin: 0% 0%;
+    transform: scale(0.7);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3417,6 +3442,10 @@ position: absolute;
 	    margin-left: -160px !important;
 	}
 	
+	.v3-party-panel-contents
+	{
+		margin-top:40px;
+	}
 }
 
 	
@@ -4746,7 +4775,6 @@ body
 
 
 
-
 @media (min-width:1456px)
 {
 	.banner1
@@ -4895,6 +4923,7 @@ body
 	.chat_messages
 	{
 		font-size:12px;
+		height:110px;
 	}
 
 }

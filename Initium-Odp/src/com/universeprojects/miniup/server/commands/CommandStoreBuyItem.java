@@ -163,7 +163,7 @@ public class CommandStoreBuyItem extends Command {
 			db.sendSoundEffectToCharacter(ds, sellingCharacter.getKey(), "coins1");
 			db.sendGameMessage(ds, storeCharacter, "You sold "+buyQuantity+" "+item.getProperty("name")+" to "+character.getProperty("name")+" for "+cost+" gold.");
 			
-			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+			MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, null, this);
 			mpus.updateMoney();
 		}
 		finally

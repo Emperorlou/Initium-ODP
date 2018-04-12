@@ -34,7 +34,7 @@ public class CommandCharacterRespawn extends Command
 		
 		setPopupMessage("You have been given a new character by the name of "+newCharacter.getProperty("name")+". When your last character died, he dropped all of his gear where he was standing and it should still be there if no one else has found it yet. If you had anything worth keeping, you could attempt to recover it with this new character, but whatever killed you is probably still near your corpse - beware!");
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, user, newCharacter, db.getCharacterLocation(newCharacter), this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, user, newCharacter, db.getCharacterLocation(newCharacter), this);
 		mpus.updateFullPage_shortcut(true);
 	}
 }

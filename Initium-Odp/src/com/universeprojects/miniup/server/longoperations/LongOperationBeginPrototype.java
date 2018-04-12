@@ -195,7 +195,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		if (CommonChecks.checkItemIsMovable(item)==false)
 		{
 			CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
-			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			mpus.updateImmovablesPanel(item);
 		}
 		

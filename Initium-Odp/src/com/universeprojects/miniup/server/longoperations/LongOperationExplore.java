@@ -84,13 +84,13 @@ public class LongOperationExplore extends LongOperation {
 		CachedEntity location = db.getEntity((Key)newLocation);
 		if (GameUtils.equals(oldLocaiton, newLocation)==false || GameUtils.equals(oldCombatant, newCombatant)==false)
 		{
-			MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			update.updateFullPage_shortcut();
 			
 		}
 		else
 		{
-			MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			update.updateMonsterCountPanel();
 			update.updateMidMessagePanel();
 		}

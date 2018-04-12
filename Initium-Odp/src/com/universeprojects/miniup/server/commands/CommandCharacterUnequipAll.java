@@ -48,7 +48,7 @@ public class CommandCharacterUnequipAll extends Command {
 		}
 		ds.put(character);
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
 		
 		if(itemKeys.isEmpty()==false)

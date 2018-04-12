@@ -152,7 +152,7 @@ public class CommandStoreBuyOrderExecute extends TransactionCommand
 		
 		
 		db.sendMainPageUpdateForCharacter(ds, storeCharacterKey, "updateMoney");
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), null, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), null, this);
 		mpus.updateMoney();
 		
 	}

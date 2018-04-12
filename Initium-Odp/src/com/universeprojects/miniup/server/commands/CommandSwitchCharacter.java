@@ -92,7 +92,7 @@ public class CommandSwitchCharacter extends Command {
 		
 		// Consolidating this to quick refresh the page
 		CachedEntity location = ds.getIfExists((Key) targetCharacter.getProperty("locationKey"));
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), targetCharacter, location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), targetCharacter, location, this);
 		mpus.updateFullPage_shortcut();
 		
 		js.append("window.newChatIdToken= '"+db.getChatToken(targetCharacter.getKey())+"';");

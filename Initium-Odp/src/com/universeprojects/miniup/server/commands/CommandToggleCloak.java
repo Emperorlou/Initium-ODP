@@ -55,7 +55,7 @@ public class CommandToggleCloak extends Command
 
 		updateHtml("#"+parameters.get("buttonId"), HtmlComponents.generateToggleCloak(character));
 		// Update character widget.
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
 	}
 }

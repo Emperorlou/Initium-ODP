@@ -155,7 +155,7 @@ public class CommandDeleteAndRecreate extends Command {
 		
 		// Consolidating this to quick refresh the page
 		CachedEntity location = ds.getIfExists((Key)newChar.getProperty("locationKey"));
-		MainPageUpdateService mpus = new MainPageUpdateService(db, user, newChar, location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, user, newChar, location, this);
 		mpus.updateFullPage_shortcut();
 	}
 

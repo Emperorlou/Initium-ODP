@@ -289,8 +289,7 @@ public class LongOperationTakePath extends LongOperation {
 
 	@Override
 	String doComplete() throws UserErrorMessage {
-		Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
-		CachedEntity location = db.getEntity(locationKey);
+		CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
 		
 		db.getDB().beginBulkWriteMode();
 		try
@@ -313,7 +312,7 @@ public class LongOperationTakePath extends LongOperation {
 		CachedEntity newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
 		
 
-		MainPageUpdateService update = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
+		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
 		update.updateFullPage_shortcut(true);
 
 		

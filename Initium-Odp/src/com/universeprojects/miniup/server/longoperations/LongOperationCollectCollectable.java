@@ -181,7 +181,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 		db.combineStackedItemWithFirstStack(item, db.getCurrentCharacter().getKey());
 		ds.put(item);
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		mpus.updateCollectablesView();
 		mpus.updateLocationQuicklist();
 		

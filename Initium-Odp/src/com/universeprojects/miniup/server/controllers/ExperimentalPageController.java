@@ -81,7 +81,7 @@ public class ExperimentalPageController extends PageController {
 		
 		
 		// Getting location data...
-		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
+		CachedEntity location = db.getCharacterLocation(character);
 		boolean isOutside = false;
 		if ("TRUE".equals(location.getProperty("isOutside")))
 			isOutside = true;

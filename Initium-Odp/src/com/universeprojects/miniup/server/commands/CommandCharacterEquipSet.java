@@ -244,7 +244,7 @@ public class CommandCharacterEquipSet extends Command {
 		ds.put(character);
 		ds.commitBulkWrite();
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}

@@ -1,7 +1,14 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 
@@ -11,18 +18,8 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 	public ExperimentalPageUpdateService(ODPDBAccess db, CachedEntity user, CachedEntity character, CachedEntity location, OperationBase operation)
 	{
 		super(db, user, character, location, operation);
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args)
-	{
-		// TODO Auto-generated method stub
-
-	}
-	
 	@Override
 	protected String updateButtonList_CombatMode()
 	{
@@ -33,6 +30,92 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 	protected String updateButtonList_Incapacitated()
 	{
 		return "";
+	}
+	
+	@Override
+	public String updatePartyView()
+	{
+		StringBuilder newHtml = new StringBuilder();
+
+		if (isInParty())
+		{
+			newHtml.append("<div class='v3-party-panel-contents'>");
+//			newHtml.append("<a onclick='doLeaveParty(event)' style='float:right'>Leave Party</a>");
+			List<CachedEntity> party = getParty();
+			if (party!=null)
+			{
+				String mode = (String)character.getProperty("mode");
+				Boolean isCharacterBusy = (mode!=null && mode.equals("NORMAL")==false);
+
+				// Get Characters and Users
+				EntityPool pool = new EntityPool(db.getDB());
+				for(CachedEntity partyCharacter:party)
+				{
+					pool.addToQueue((Key)partyCharacter.getProperty("userKey"));
+				}
+				Collections.sort(party, new Comparator<CachedEntity>(){
+					@Override
+					public int compare(CachedEntity c1, CachedEntity c2){
+						String partyCharacter1 = (String)c1.getProperty("name");
+						String partyCharacter2 = (String)c2.getProperty("name");
+						return partyCharacter1.compareTo(partyCharacter2);
+					}
+				});
+				pool.loadEntities();
+
+				for(CachedEntity partyCharacter:party)
+				{
+					if (GameUtils.equals(partyCharacter.getKey(), character.getKey()))
+						continue;
+					
+					CachedEntity partyUser = pool.get((Key)partyCharacter.getProperty("userKey"));
+					boolean isThisMemberTheLeader = false;
+					if ("TRUE".equals(partyCharacter.getProperty("partyLeader")))
+						isThisMemberTheLeader = true;
+					boolean dead = CommonChecks.checkCharacterIsUnconscious(partyCharacter);
+
+					newHtml.append("<br>");
+					newHtml.append("<div style='display:inline-block;vertical-align:top;'>");
+					newHtml.append("<a class='main-item clue' style='width:inherit;' rel='/odp/viewcharactermini?characterId="+partyCharacter.getKey().getId()+"'>");
+					newHtml.append("<div style='display:inline-block; position:relative;'>");
+					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true));
+					newHtml.append("<div style='position:absolute; top:0px; bottom: 0px; left:55px; right: 0px;'></div>");// Cover the widget so we can't click it
+					newHtml.append("</div>");
+					newHtml.append("<br>");
+					if (!GameUtils.equals(character.getKey(), partyCharacter.getKey()) && user!=null && 
+							GameUtils.equals(user.getKey(), partyUser.getKey())) {
+						newHtml.append("<div class='main-item-controls' style='top:0px'>");
+						newHtml.append("<a onclick='switchCharacter(event, "+partyCharacter.getKey().getId()+")'>Switch</a>");
+						newHtml.append("</div>");
+					}
+
+					if (isThisMemberTheLeader)
+						newHtml.append("<div class='main-item-controls' style='top:0px;'>(Leader)</div>");
+					else if (dead)
+					{
+						if(GameUtils.equals(character.getProperty("locationKey"), partyCharacter.getProperty("locationKey")))
+						{
+							newHtml.append("<div class='main-item-controls' style='top:0px'>");
+							newHtml.append("<a onclick='collectDogecoinFromCharacter("+partyCharacter.getKey().getId()+")'>Collect "+partyCharacter.getProperty("dogecoins")+" gold</a>");
+							newHtml.append("</div>");
+						}
+					}
+					else if (!isCharacterBusy)
+					{
+						newHtml.append("<div class='main-item-controls' style='top:0px'>");
+						// If this party character is not currently the leader and we are the current party leader then render the "make leader" button
+						if (isThisMemberTheLeader == false && isPartyLeader())
+							newHtml.append("<a onclick='doSetLeader(event, " + partyCharacter.getKey().getId() + ", \"" + partyCharacter.getProperty("name") + "\")'>Make Leader</a>");
+						newHtml.append("</div>");
+					}
+					newHtml.append("</a>");
+					newHtml.append("</div>");
+				}
+			}
+			newHtml.append("</div>");
+		}
+		
+		return updateHtmlContents("#partyPanel", newHtml.toString());
 	}
 	
 }

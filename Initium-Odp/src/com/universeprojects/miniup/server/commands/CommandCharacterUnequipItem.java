@@ -67,7 +67,7 @@ public class CommandCharacterUnequipItem extends Command {
 		
 		// If we've gotten this far, we can assume it was successful. Update the in banner widget.
 		// JS function reloads the page popup.
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
 		
 		// Now update the slots

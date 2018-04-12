@@ -342,7 +342,9 @@ modifyMaxScreenWidth();
 function updateBannerSize()
 {
 	var win = $(window);
-	if (win.width()<=480)
+	if (win.width()<=400)
+		$("#banner").css("height", (win.height()-309+40)+"px");
+	else if (win.width()<=480)
 		$("#banner").css("height", (win.height()-309)+"px");
 	else
 		$("#banner").css("height", (win.height()-333)+"px");
@@ -505,6 +507,9 @@ Version: ${version}
 						<div id='banner-base' class='banner-daynight'></div>
 						<div id='banner-fx'></div>
 	<!-- 					<div id='main-viewport-container'></div> -->
+						<div id='partyPanel'>
+						${partyPanel}
+						</div>
 						<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
 							${inBannerCharacterWidget}
 						</div>
@@ -719,9 +724,6 @@ Version: ${version}
 				${locationQuicklist}
 			</div>
             <!-- <div id='monsterCountPanel'>${monsterCountPanel}</div> -->
-			<div id='partyPanel'>
-			${partyPanel}
-			</div>
 			
 			<div id='locationScripts'>${locationScripts}</div>
 			

@@ -165,7 +165,7 @@ public class CommandPlayerCreateHouseMap extends Command
 		// If inventory is open, we want to refresh the popup.
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, user, character, location, this);
 		mpus.updateMoney();
 		
 		// Notify the user that an item has been created.
