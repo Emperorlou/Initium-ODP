@@ -70,7 +70,7 @@ public class CommandLeaveAndForgetCombatSite extends Command {
 		
 		// Get the new location, so we can update using MPUS.
 		location = ds.getIfExists((Key)character.getProperty("locationKey"));
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, location, this);
 		mpus.updateFullPage_shortcut();
 		if(location != null)
 			db.sendGameMessage(ds, character, "You have arrived at " + location.getProperty("name") + ".");

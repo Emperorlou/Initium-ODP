@@ -65,7 +65,7 @@ public class CommandCharacterEquipItem extends Command {
 		db.doCharacterEquipEntity(ds, character, item);
 		
 		// If we've gotten this far, we can assume it was successful. Update the in banner widget.
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, null, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
 		
 		// Remove the item from inventory first.

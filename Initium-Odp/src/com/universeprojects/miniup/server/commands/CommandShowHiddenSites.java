@@ -30,7 +30,7 @@ public class CommandShowHiddenSites extends Command {
 		ODPDBAccess db = getDB();
 		CachedEntity character = db.getCurrentCharacter();
 
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(((Key) character.getProperty("locationKey")).getId()), this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, db.getLocationById(((Key) character.getProperty("locationKey")).getId()), this);
 		mpus.updateButtonList(true);
 	}
 }

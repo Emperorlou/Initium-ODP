@@ -77,7 +77,7 @@ public class CommandPlayerReadMap extends Command {
 		if(GameUtils.equals(location.getKey(), path.getProperty("location1Key")) ||
 				GameUtils.equals(location.getKey(), path.getProperty("location2Key")))
 		{
-			MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
+			MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, user, character, location, this);
 			mpus.updateButtonList();
 		}
 	}

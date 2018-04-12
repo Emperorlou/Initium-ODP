@@ -63,7 +63,7 @@ public class CommandForgetAllCombatSites extends Command {
 		finally 
 		{
 			ds.commitBulkWrite();
-			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getLocationById(characterLocationKey.getId()), this);
+			MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, db.getLocationById(characterLocationKey.getId()), this);
 			mpus.updateButtonList();
 		}
 	}

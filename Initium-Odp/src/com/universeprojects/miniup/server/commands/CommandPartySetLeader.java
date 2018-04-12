@@ -84,7 +84,7 @@ public class CommandPartySetLeader extends Command {
 			List<CachedEntity> party = db.getParty(null, character);
 			if(party == null) party = Arrays.asList(character, member);
 			CachedEntity location = ds.getIfExists((Key)character.getProperty("locationKey"));
-			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, location, this);
+			MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, location, this);
 			mpus.updatePartyView();
 			mpus.updateButtonBar(); // Also sets the allow party join bit, so update button bar.
 			

@@ -90,7 +90,7 @@ public class CommandNewCharacter extends Command
 		
 		ds.put(character);
 
-		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, db.getEntity((Key)character.getProperty("locationKey")), this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, user, character, db.getEntity((Key)character.getProperty("locationKey")), this);
 		mpus.updateFullPage_shortcut();
 		
 //		if (isNewUser)

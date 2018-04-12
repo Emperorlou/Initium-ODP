@@ -61,6 +61,28 @@ public class MainPageUpdateService extends Service
 			this.location = db.getCharacterLocation(character);
 		
 	}
+	
+	public static MainPageUpdateService getInstance(ODPDBAccess db, CachedEntity user, CachedEntity character, CachedEntity location, OperationBase operation)
+	{
+		String mainPageUrl = db.getRequest().getParameter("mainPageUrl");
+		if (mainPageUrl==null) mainPageUrl = "";
+		if (mainPageUrl.contains("/odp/full"))
+		{
+			return new FullPageUpdateService(db, user, character, location, operation);
+		}
+		else if (mainPageUrl.contains("/odp/experimental"))
+		{
+			return new ExperimentalPageUpdateService(db, user, character, location, operation);
+		}
+		else if (mainPageUrl.contains("/odp/game"))
+		{
+			return new GamePageUpdateService(db, user, character, location, operation);
+		}
+		else
+		{
+			return new MainPageUpdateService(db, user, character, location, operation);
+		}
+	}
 
 	protected String updateHtmlContents(String selector, String newHtml)
 	{
@@ -740,7 +762,7 @@ public class MainPageUpdateService extends Service
 			html.append("		<a onclick='"+travelLine+" doGoto(event, "+path.getId()+", false);' class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
 		}
 		else
-			html.append("		<a class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
+			html.append("		<a onclick='viewLocalNavigation(event)' class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
 		html.append("			<div class='overheadmap-cell-label-container'>");
 		html.append("				<div class='label'>"+location.getProperty("name")+"</div>");
 		html.append("			</div>");
@@ -1525,6 +1547,7 @@ public class MainPageUpdateService extends Service
 		}
 		
 		return updateHtmlContents("#partyPanel", newHtml.toString());
+		
 	}
 
 	public String updateCollectablesView()

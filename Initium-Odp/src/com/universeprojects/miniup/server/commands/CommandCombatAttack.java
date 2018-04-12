@@ -40,7 +40,7 @@ public class CommandCombatAttack extends Command
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 
 		CombatService cs = new CombatService(db);
-		MainPageUpdateService mpus = new MainPageUpdateService(db, user, character, location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, user, character, location, this);
 
 		ds.beginBulkWriteMode();
 		
@@ -238,7 +238,7 @@ public class CommandCombatAttack extends Command
 		
 		if (GameUtils.isPlayerIncapacitated(character))
 		{
-			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			mpus.updateFullPage_shortcut();
 			
 			db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
@@ -248,7 +248,7 @@ public class CommandCombatAttack extends Command
 		{
 //			if (CommonChecks.checkLocationIsCombatSite(location)) location = ds.refetch(location);
 			// We're done with combat
-			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+			mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 			mpus.updateFullPage_shortcut();
 			
 			db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");

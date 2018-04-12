@@ -27,7 +27,7 @@ public class CommandDrinkBeer extends Command {
         CachedDatastoreService ds = getDS();
         CachedEntity character = db.getCurrentCharacter();
         CachedEntity user = db.getCurrentUser();
-        MainPageUpdateService service = new MainPageUpdateService(db, user, character, null, this);
+        MainPageUpdateService service = MainPageUpdateService.getInstance(db, user, character, null, this);
 
         db.doDrinkBeer(ds, character);
         service.updateInBannerCharacterWidget();

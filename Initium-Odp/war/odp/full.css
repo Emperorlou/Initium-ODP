@@ -48,6 +48,7 @@ body
 {
 	max-width:initial;
 	position:absolute;
+	top:0px;
 }
 
 
@@ -279,7 +280,7 @@ body
 	position:fixed;
 	left:0px;
 	right:0px;
-	top:0px;
+	top:40px;
 	bottom:0px;
 	-webkit-box-shadow: initial;
 	-moz-box-shadow: initial;
@@ -526,6 +527,48 @@ body
 	color: #d4d4d4;
 }
 
+.v3-party-panel-contents
+{
+	margin-top:120px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -597,12 +640,17 @@ body
 {
 	#chatbox-container
 	{
-		bottom:171px;
+		bottom:146px;
 	}
 	
 	.page-popup-title
 	{
 		top:-39px;
+	}
+	
+	.v3-party-panel-contents
+	{
+		margin-top:80px;
 	}
 
 }
@@ -615,7 +663,10 @@ body
     	top: 94px;
 	}
 	
-	
+	#chatbox-container
+	{
+		height:79px;
+	}
 	
 }
 

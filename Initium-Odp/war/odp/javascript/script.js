@@ -2436,8 +2436,15 @@ function newCharacterFromDead(event)
 
 function switchCharacter(eventObject, characterId)
 {
-	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function(){
-		window.history.replaceState({}, document.title, "/" + "main.jsp");		
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function()
+	{
+		if (location.href.indexOf("/main.jsp")>-1)
+			window.history.replaceState({}, document.title, "/" + "main.jsp");		
+		else if (location.href.indexOf("/odp/experimental")>-1)
+			window.history.replaceState({}, document.title, "/" + "odp/experimental");		
+		else if (location.href.indexOf("/odp/full")>-1)
+			window.history.replaceState({}, document.title, "/" + "odp/full");		
+		
 		closeAllTooltips();
 		clearMakeIntoPopup();
 	});
@@ -2991,7 +2998,7 @@ function makeIntoPopupFromUrl(url, title, disableGlass)
 	window.scrollTo(0,0);
 	if (disableGlass!=true)
 		$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
-	$("body").append("<div style='position:absolute; left:50%; top:10%;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>" +
+	$("body").append("<div style='position:absolute; left:50%; top:10%;z-index:100000000;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>" +
 			"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
 			"	<h4>"+title+"</h4>" +
 			"<div id='make-popup-url-contents'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div></div></div>");
@@ -3562,6 +3569,8 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	else
 		parameters.v = verifyCode;
 	
+	parameters.mainPageUrl = location.href;
+	
 	if (window.characterOverride!=null && window.characterOverride.length>10)
 		parameters.char = window.characterOverride;
 	
@@ -3802,6 +3811,8 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		parameters = {"v":verifyCode};
 	else
 		parameters.v = verifyCode;
+	
+	parameters.mainPageUrl = location.href;
 	
 	if (window.characterOverride!=null && window.characterOverride.length>10)
 		parameters.char = window.characterOverride;

@@ -32,7 +32,7 @@ public class CommandCombatEscape extends Command {
 		CachedEntity user = db.getCurrentUser();
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		CombatService cs = new CombatService(db);
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		
 		ds.beginBulkWriteMode();
 		
@@ -99,7 +99,7 @@ public class CommandCombatEscape extends Command {
 		
 //		character = ds.refetch(character);
 		location = db.getEntity((Key)character.getProperty("locationKey"));
-		mpus = new MainPageUpdateService(db, user, character, location, this);
+		mpus = MainPageUpdateService.getInstance(db, user, character, location, this);
 		
 		if(userMessage != null && userMessage.isEmpty() == false)
 			db.sendGameMessage(db.getDB(), character, userMessage);

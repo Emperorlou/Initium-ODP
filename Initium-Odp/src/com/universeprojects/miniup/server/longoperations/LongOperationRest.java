@@ -141,7 +141,7 @@ public class LongOperationRest extends LongOperation {
 			}
 		}
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		// Update character widget
 		mpus.updateInBannerCharacterWidget();
 		

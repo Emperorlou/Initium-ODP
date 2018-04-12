@@ -13,6 +13,7 @@ import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
+import com.universeprojects.miniup.server.services.FullPageUpdateService;
 import com.universeprojects.miniup.server.services.GamePageUpdateService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -106,7 +107,7 @@ public class FullPageController extends PageController {
 		
 		
 
-		GamePageUpdateService updateService = new GamePageUpdateService(db, db.getCurrentUser(), character, location, null);
+		FullPageUpdateService updateService = new FullPageUpdateService(db, db.getCurrentUser(), character, location, null);
 		
 		request.setAttribute("bannerTextOverlay", updateService.updateInBannerOverlayLinks());
 		request.setAttribute("inBannerCharacterWidget", updateService.updateInBannerCharacterWidget());

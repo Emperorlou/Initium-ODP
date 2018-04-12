@@ -350,10 +350,15 @@ Version: ${version}
 			<!-- <div class='banner1-rain-effect1'></div>-->
 		</div>
 
+		<div id='partyPanel'>
+		${partyPanel}
+		</div>
 
 		<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
 			${inBannerCharacterWidget}
 		</div>
+
+		<div id='banner-text-overlay'>${bannerTextOverlay}</div>
 	
 		<div class='minimap-container'>
 			<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->

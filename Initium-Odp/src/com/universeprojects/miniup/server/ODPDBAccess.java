@@ -180,6 +180,8 @@ public class ODPDBAccess
 	
 	public CachedDatastoreService getDB()
 	{
+		CachedDatastoreService.singlePutMode = true;
+		
 		// Check if we hvae a CDS in the request attributes already
 		if (ds==null)
 			ds = (CachedDatastoreService)request.getAttribute("CachedDatastoreService");
@@ -204,7 +206,7 @@ public class ODPDBAccess
 				return true;
 			}
 		};
-		
+
 		request.setAttribute("CachedDatastoreService", ds);
 		
 		
@@ -3514,6 +3516,8 @@ public class ODPDBAccess
 		return null;
 	}
 	
+	
+	private List<CachedEntity> cachedParty = null;
 	/**
 	 * Returns all party members belonging to the party that the selfCharacter belongs to.
 	 * 
@@ -3525,6 +3529,7 @@ public class ODPDBAccess
 	 */
 	public List<CachedEntity> getParty(CachedDatastoreService ds, CachedEntity selfCharacter)
 	{
+		
 		String partyCode = (String)selfCharacter.getProperty("partyCode");
 		if (partyCode==null || partyCode.equals(""))
 			return null;
@@ -3532,31 +3537,34 @@ public class ODPDBAccess
 		if (ds==null)
 			ds = getDB();
 		
-		List<CachedEntity> result = getFilteredList("Character", "partyCode", partyCode);
+		if (cachedParty!=null)
+			return cachedParty;
+		
+		cachedParty = getFilteredList("Character", "partyCode", partyCode);
 		
 		// Replace the newly fetched self character with the entity we already have
-		for(int i = 0; i<result.size(); i++)
-			if (GameUtils.equals(selfCharacter.getKey(), result.get(i).getKey()))
-				result.set(i, selfCharacter);
+		for(int i = 0; i<cachedParty.size(); i++)
+			if (GameUtils.equals(selfCharacter.getKey(), cachedParty.get(i).getKey()))
+				cachedParty.set(i, selfCharacter);
 	
 		// Clear out any dead characters from the party.
-		for(int i = result.size()-1; i >= 0; i--)
-			if(GameUtils.equals(selfCharacter.getKey(), result.get(i).getKey())==false &&
-					CommonChecks.checkCharacterIsDead(result.get(i)))
+		for(int i = cachedParty.size()-1; i >= 0; i--)
+			if(GameUtils.equals(selfCharacter.getKey(), cachedParty.get(i).getKey())==false &&
+					CommonChecks.checkCharacterIsDead(cachedParty.get(i)))
 			{
-				result.get(i).setProperty("partyCode", null);
-				ds.put(result.get(i));
-				result.remove(i);
+				cachedParty.get(i).setProperty("partyCode", null);
+				ds.put(cachedParty.get(i));
+				cachedParty.remove(i);
 			}
 		
-		if (result.size() == 1)
+		if (cachedParty.size() == 1)
 		{
 			selfCharacter.setProperty("partyCode", null);
 			ds.put(selfCharacter);
 			return null;
 		}
 
-		return result;
+		return cachedParty;
 	}
 
 	protected List<CachedEntity> getParty(CachedDatastoreService ds, String partyCode)

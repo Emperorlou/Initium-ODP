@@ -36,7 +36,7 @@ public class CommandRequestMainPageUpdate extends Command
 		if (newUI)
 			mpus = new GamePageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), currentLocation, this);
 		else
-			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), currentLocation, this);
+			mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), currentLocation, this);
 		
 		// Use the given updateList to find the method we want to execute on the mpus
 		for(String updateMethodName:updateList)

@@ -59,7 +59,7 @@ public class LongOperationCampDefend extends LongOperation
 			description = "You found something attacking the camp!";
 		}
 		
-		MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, location, this);
+		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, location, this);
 		if(foundMonster)
 			mpus.updateFullPage_shortcut();
 		else
