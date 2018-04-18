@@ -685,7 +685,11 @@ function buyHouse(eventObject)
 
 function doCollectItem(event, itemId)
 {
-	doCommand(event, "CollectItem", {itemId:itemId});
+	doCommand(event, "CollectItem", {itemId:itemId}, 
+		function(data,error){
+			if(error) return;
+			$(event.currentTarget || event.target).text("");
+		});
 }
 
 
@@ -1909,15 +1913,19 @@ window.moveItemTimer = null;
 function moveItem(event, itemId, newContainerKind, newContainerId)
 {
 	var destinationKey = newContainerKind+"_"+newContainerId;
-	doCommand(event, "MoveItem", {itemId:itemId, destinationKey:destinationKey}, function(){
-        // Clear any previously set timer before setting a fresh one
-    	if(window.moveItemTimer != null)
-    		window.clearTimeout(window.moveItemTimer);
-    	window.moveItemTimer = setTimeout(function () {
-            reloadPagePopup(true);
-            window.moveItemTimer = null;
-        }, 2000);
-	});
+	doCommand(event, "MoveItem", {itemId:itemId, destinationKey:destinationKey}, 
+		function(data,error){
+	        // Clear any previously set timer before setting a fresh one
+	    	if(window.moveItemTimer != null)
+	    		window.clearTimeout(window.moveItemTimer);
+	    	window.moveItemTimer = setTimeout(function () {
+	            reloadPagePopup(true);
+	            window.moveItemTimer = null;
+	        }, 2000);
+	        
+	        if(error) return;
+	        $(event.currentTarget || event.target).text("");
+		});
 }
 
 function loadInlineItemsAndCharacters()
