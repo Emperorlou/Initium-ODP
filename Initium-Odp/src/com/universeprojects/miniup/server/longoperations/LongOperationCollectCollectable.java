@@ -178,8 +178,12 @@ public class LongOperationCollectCollectable extends LongOperation {
 			item.setProperty("containerKey", location.getKey());
 		}
 		
+		ds.beginBulkWriteMode();
+		
 		db.combineStackedItemWithFirstStack(item, db.getCurrentCharacter().getKey());
 		ds.put(item);
+		
+		ds.commitBulkWrite();
 		
 		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		mpus.updateCollectablesView();

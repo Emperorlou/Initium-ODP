@@ -7,15 +7,15 @@ if (location.href.indexOf("main.jsp")>-1 ||
 		location.href.indexOf("/odp/experimental")>-1 || 
 		location.href.indexOf("/odp/full")>-1)
 {
-	if (uiStyle==null || uiStyle=="default")
-	{
-		if (location.href.indexOf("/main.jsp")==-1)
-			location.href = "/main.jsp"+queryParams;
-	}
-	else if (uiStyle=="experimental1")
+	if (uiStyle==null || uiStyle=="default" || uiStyle=="experimental1")
 	{
 		if (location.href.indexOf("/odp/experimental")==-1)
 			location.href = "/odp/experimental"+queryParams;
+	}
+	else if (uiStyle=="classic")
+	{
+		if (location.href.indexOf("/main.jsp")==-1)
+			location.href = "/main.jsp"+queryParams;
 	}
 	else if (uiStyle=="wowlike")
 	{
@@ -2617,7 +2617,7 @@ function createMapWindow(html)
 	var windowHtml = "";
 	windowHtml += 
 			"<div class='overheadmap-window'>" +
-			"<div class='global-navigation-map overheadmap-window-internal'>";
+			"<div class='map-contents global-navigation-map overheadmap-window-internal'>";
 	
 	windowHtml+=html;
 	
@@ -3180,62 +3180,91 @@ function viewGlobeNavigation()
 	createMapWindow(html);
 }
 
-function drawTravelLine(startX, startY, x, y, seconds)
+function drawTravelLine(event, startX, startY, x, y, seconds)
 {
-	$(".global-navigation-map").append("" +
-			"<svg id='travel-line-container' style='position:absolute;left:0px; top:0px;bottom:0px;right:0px;width:100%;height:100%;z-index:1;'>" +
-			"	<line id='travel-line' x1='"+startX+"' y1='"+startY+"' x2='"+startX+"' y2='"+startY+"'/>" +
-			"</svg>"
-			).append("" +
-					"<a id='travel-line-cancel-button' onclick='cancelLongOperations(event)'>Cancel Travel</a>");
-	
-	
-	window.travelLineData = 
+	$(".minimap-button-cancel").show();
+	var maps = $(".map-contents");
+	for(var i = 0; i<maps.length; i++)
 	{
-		startTime:new Date().getTime(),
-		endTime:new Date().getTime()+((seconds+1)*1000),
-		x1:startX,
-		y1:startY,
-		x2:x,
-		y2:y
-	};
-	
-	setTimeout(updateTravelLine, 100);
+		var map = $(maps[i]);
+		var scale = map.css("transform");
+		if (scale!=null && scale!="none")
+		{
+			scale = scale.replace("scale(", "").replace(")", "");
+			scale = parseFloat(scale);
+		}
+		else
+			scale = 1;
+		
+		if (map.hasClass("minimap-contents"))
+			scale*=0.6;
+		
+		map.append("" +
+				"<svg class='travel-line-container' style='position:absolute;left:0px; top:0px;bottom:0px;right:0px;width:100%;height:100%;z-index:1;'>" +
+				"	<line class='travel-line' x1='"+startX+"' y1='"+startY+"' x2='"+startX+"' y2='"+startY+"'/>" +
+				"</svg>"
+				).append("<a class='travel-line-cancel-button' onclick='cancelLongOperations(event)'>Cancel Travel</a>");
+		
+		
+		map[0].travelLineData = 
+		{
+			startTime:new Date().getTime(),
+			endTime:new Date().getTime()+((seconds+1)*1000),
+			x1:startX,
+			y1:startY,
+			x2:x*scale,
+			y2:y*scale
+		};
+		
+		setTimeout(updateTravelLine, 100);
+	}
 }
 
 function cancelTravelLine()
 {
-	window.travelLineData = null;
-	$("#travel-line-container").remove();
-	$("#travel-line-cancel-button").remove();
+	$(".minimap-button-cancel").hide();
+	
+	var maps = $(".map-contents");
+	for(var i = 0; i<maps.length; i++)
+	{
+		var map = $(maps[i]);
+		map[0].travelLineData = null;
+	}
+	$(".travel-line-container").remove();
+	$(".travel-line-cancel-button").remove();
 }
 
 function updateTravelLine()
 {
-	var data = window.travelLineData;
-	if (data==null) return;
-	
-	var elapsed = new Date().getTime()-data.startTime;
-	var percentComplete = elapsed/(data.endTime-data.startTime);
-	if (percentComplete>1) percentComplete = 1;
-	
-	var x = (data.x2-data.x1)*percentComplete;
-	var y = (data.y2-data.y1)*percentComplete;
-	
-	x+=data.x1;
-	y+=data.y1;
-	
-	var travelLine = $("#travel-line");
-	var parent = travelLine.parent();
-	
-	var canvasWidth = parent.width();
-	var canvasHeight = parent.height();
-	
-	travelLine.attr("x1", data.x1+(canvasWidth/2)).attr("y1", data.y1+(canvasHeight/2)).attr("x2",x+(canvasWidth/2)).attr("y2",y+(canvasHeight/2));
-	
-	if (percentComplete<1)
+	var maps = $(".map-contents");
+	for(var i = 0; i<maps.length; i++)
 	{
-		setTimeout(updateTravelLine, 100);
+		var map = $(maps[i]);
+		var data = map[0].travelLineData;
+		if (data==null) continue;
+		
+		var elapsed = new Date().getTime()-data.startTime;
+		var percentComplete = elapsed/(data.endTime-data.startTime);
+		if (percentComplete>1) percentComplete = 1;
+		
+		var x = (data.x2-data.x1)*percentComplete;
+		var y = (data.y2-data.y1)*percentComplete;
+		
+		x+=data.x1;
+		y+=data.y1;
+		
+		var travelLine = map.find(".travel-line");
+		var parent = travelLine.parent();
+		
+		var canvasWidth = parent.width();
+		var canvasHeight = parent.height();
+		
+		travelLine.attr("x1", data.x1+(canvasWidth/2)).attr("y1", data.y1+(canvasHeight/2)).attr("x2",x+(canvasWidth/2)).attr("y2",y+(canvasHeight/2));
+		
+		if (percentComplete<1)
+		{
+			setTimeout(updateTravelLine, 100);
+		}
 	}
 	
 }
@@ -3559,9 +3588,11 @@ function activateWaitGif(eventObject)
 	
 }
 
-
+window.commandInProgress = false;
 function doCommand(eventObject, commandName, parameters, callback, userRequestId)
 {
+	if (window.commandInProgress==true)
+		return;
 	
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
@@ -3599,11 +3630,12 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 		parameters["__"+userRequestId+"UserResponse"] = JSON.stringify(selectedItems);
 	}
 	
-	
+	window.commandInProgress = true;
 	// We need to post, as larger batch operations failed due to URL string being too long
 	$.post(url, parameters)
 	.done(function(data)
 	{
+		window.commandInProgress = false;
 		// Return clicked element back to original state first.
 		// Ajax updates get overwritten if they're not simple updates
 		// on the original element.
@@ -3668,6 +3700,7 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	})
 	.fail(function(data)
 	{
+		window.commandInProgress = false;
 		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
 		if (eventObject!=null)
 			clickedElement.html(originalText.replace("hasTooltip", ""));
@@ -3804,6 +3837,9 @@ var lastLongOperationEventObject = null;
  */
 function longOperation(eventObject, commandName, parameters, responseFunction, recallFunction, userRequestId)
 {
+	if (window.commandInProgress==true)
+		return;
+	
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
 
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
@@ -3842,10 +3878,12 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		parameters["__"+userRequestId+"UserResponse"] = JSON.stringify(selectedItems);
 	}
 	
-	
+
+	window.commandInProgress=true;
 	$.post(url, parameters)
 	.done(function(data)
 	{
+		window.commandInProgress=false;
 		if (clickedElement!=null)
 		{
 			clickedElement.html(originalText);
@@ -3944,6 +3982,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		lastLongOperationEventObject = null;
 	})
 	.fail(function(xhr, textStatus, errorThrown){
+		window.commandInProgress=false;
 		hideBannerLoadingIcon();
 		clearPopupPermanentOverlay();
 		if (errorThrown=="Internal Server Error")
@@ -3966,6 +4005,9 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 
 function cancelLongOperations(eventObject)
 {
+	if (window.commandInProgress)
+		return;
+	
 	longOperation(eventObject, "cancelLongOperations", null, function(){
 		clearPopupPermanentOverlay();
 		if (lastLongOperationTimer!=null)

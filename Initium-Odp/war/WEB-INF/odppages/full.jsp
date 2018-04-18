@@ -43,7 +43,7 @@
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css">
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.finger/0.1.6/jquery.finger.min.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/script.js?v=${version}"></script>
 <!--<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">-->
@@ -362,11 +362,12 @@ Version: ${version}
 	
 		<div class='minimap-container'>
 			<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->
-			<div class='minimap-contents'>
+			<div class='map-contents minimap-contents'>
 				${globalNavigationMap}
 			</div>
 			<div class='minimap-overlay'></div>
 			<div class='minimap-button minimap-button-map' onclick='viewGlobeNavigation()'></div>
+			<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
 		</div>
 		
 		
@@ -436,9 +437,11 @@ Version: ${version}
 			
 		<div id='page-popup-root'></div> 
 	
-		<div class='global-navigation-map'>${globalNavigationMap}</div>	
+		<div class='map-contents global-navigation-map'>${globalNavigationMap}</div>	
 		<div id='loot-popup'></div>
+		<div id='main-button-list'>${mainButtonList}</div>
 	</div>
+
 
 
 	<div class='hiddenPullout' id='main-pullout'>

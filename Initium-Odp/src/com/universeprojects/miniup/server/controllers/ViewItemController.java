@@ -62,6 +62,11 @@ public class ViewItemController extends PageController {
 			return null;
 		}
 		
+		if (CommonChecks.checkItemIsNatural(item))
+		{
+			return null;
+		}
+		
 		if(character == null)
 		{
 			return null;
@@ -102,6 +107,8 @@ public class ViewItemController extends PageController {
 		request.setAttribute("item", getItemStats(db, character, item, false));
 		request.setAttribute("itemKey", KeyFactory.keyToString(item.getKey()));
 		
+		ds.beginBulkWriteMode();
+		
 		List<Map<String,Object>> comparisons = new ArrayList<Map<String,Object>>();
 		String equipSlot = (String)item.getProperty("equipSlot");
 		if (equipSlot!=null)
@@ -115,6 +122,8 @@ public class ViewItemController extends PageController {
 					comparisons.add(getItemStats(db, character, equipment, true));
 			}
 		}
+		
+		ds.commitBulkWrite();
 		
 		if(comparisons.isEmpty() == false)
 			request.setAttribute("comparisons", comparisons);

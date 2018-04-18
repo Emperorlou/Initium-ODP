@@ -29,16 +29,18 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.gefcommon.shared.elements.GameAspect;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
+import com.universeprojects.miniup.server.aspects.AspectPassiveChange;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ContainerService;
 
 
 public class GameUtils 
 {
-	final public static String version = "0.5.6-37";
+	final public static String version = "0.5.6-46";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -959,6 +961,10 @@ public class GameUtils
 		if (item==null)
 			return "";
 		
+		// Update passive changes
+		if (AspectPassiveChange.update(db, item)==true)
+			db.getDB().put(item);
+		
 		boolean hasRequiredStrength = true;
 		if (character!=null)
 		{
@@ -1032,6 +1038,10 @@ public class GameUtils
 			CachedEntity item, boolean isComparisonItem) 
 	{
 		if(item == null) return "";
+
+		// Update passive changes
+		if (AspectPassiveChange.update(db, item)==true)
+			db.getDB().put(item);
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class='normal-container'>\r\n");

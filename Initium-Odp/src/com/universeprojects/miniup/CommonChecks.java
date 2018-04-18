@@ -473,4 +473,10 @@ public abstract class CommonChecks
 		return false;
 	}
 
+	public static boolean checkItemIsNatural(CachedEntity item)
+	{
+		if (item==null) return false;
+		return "TRUE".equals(item.getProperty("naturalEquipment"));
+	}
+
 }

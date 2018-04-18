@@ -168,6 +168,7 @@ public class InventionController extends PageController {
 		
 	}
 	
+	
 	private void populateConstructItemSkillPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention, EntityPool pool)
 	{
 		List<CachedEntity> constructItemSkills = invention.getAllItemConstructionSkills();
@@ -190,6 +191,9 @@ public class InventionController extends PageController {
 			
 			// We'll also get the idea this skill came from
 			CachedEntity idea = pool.get((Key)skill.getProperty("_definitionKey"));
+			
+			if (idea==null)
+				continue;
 			
 			Map<String, Object> skillData = new HashMap<String, Object>();
 			

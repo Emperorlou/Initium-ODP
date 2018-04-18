@@ -118,4 +118,20 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		return updateHtmlContents("#partyPanel", newHtml.toString());
 	}
 	
+	@Override
+	protected String getSideBannerLinks()
+	{
+		StringBuilder newHtml = new StringBuilder();
+
+		newHtml.append("<div class='path-overlay-link major-banner-links' style='left:50%; top:15%;'>");
+		newHtml.append("<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>");			
+		newHtml.append("<a id='globe-navigation-button' class='button-overlay-major' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img alt='Global navigation' src='https://initium-resources.appspot.com/images/ui/navigation-map-icon2.png'></a>");			
+		newHtml.append("<a id='local-navigation-button' class='button-overlay-major' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png'></a>");			
+		newHtml.append("<a id='guard-button' class='button-overlay-major' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'></a>");
+		newHtml.append("</div>");
+		
+		return newHtml.toString();
+	}
+	
+	
 }

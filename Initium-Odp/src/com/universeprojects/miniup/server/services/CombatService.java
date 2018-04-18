@@ -68,10 +68,7 @@ public class CombatService extends Service
 
 	public boolean isInCombat(CachedEntity character)
 	{
-		if ("COMBAT".equals(character.getProperty("mode")))
-			return true;
-		else
-			return false;
+		return CommonChecks.checkCharacterIsInCombat(character);
 	}
 
 	public boolean isInCombatWith(CachedEntity character, CachedEntity opponent, CachedEntity location)
@@ -82,16 +79,16 @@ public class CombatService extends Service
 		
 		if (location != null && CommonChecks.checkLocationIsInstance(location) && CommonChecks.checkCharacterIsRaidBoss(opponent)==false)
 		{
-			if (GameUtils.equals(characterCombatant, opponent.getKey()) && GameUtils.equals(opponentCombatant, character.getKey()))
+			if (GameUtils.equals(characterCombatant, opponent.getKey()) && GameUtils.equals(opponentCombatant, character.getKey()) && 
+					CommonChecks.checkCharacterIsIncapacitated(character)==false && CommonChecks.checkCharacterIsIncapacitated(opponent)==false)
 				return true;
-			else
-				return false;
 		}
 		else
 		{
 			return GameUtils.equals(characterCombatant, opponent.getKey());
 		}
-		
+
+		return false;
 	}
 	
 	public boolean isInDefenseStructure(CachedEntity character, CachedEntity location)

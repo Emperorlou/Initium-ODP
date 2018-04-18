@@ -202,7 +202,8 @@ body
 	width:284px;
 	height:283px;
 	right:0px;
-	top:50px;
+	top:40px;
+	transform-origin: 100% 0%;
 }
 
 .minimap-locationname
@@ -270,6 +271,14 @@ body
 	right:26px;
 }
 
+.minimap-button-cancel
+{
+	background-image:url(https://initium-resources.appspot.com/images/ui4/button-cancel1.png);
+	width:122px;
+	height:48px;
+	bottom: -5px;
+	left: 29%;	
+}
 
 
 
@@ -529,9 +538,14 @@ body
 
 .v3-party-panel-contents
 {
+	position:fixed;
 	margin-top:120px;
 }
 
+.major-banner-links
+{
+	margin-left:-74px;
+}
 
 
 
@@ -585,19 +599,23 @@ body
 	    max-width:600px;
 	}
 	
-	.minimap-container
-	{
-		zoom:0.8;
-	}		
 }
 
-
-@media (max-width:720px)
+@media (max-width:1200px)
 {
 	.minimap-container
 	{
-		zoom:0.5;
-		top:80px;
+		transform:scale(0.8);
+	}		
+	
+}
+
+@media (max-width:735px)
+{
+	.minimap-container
+	{
+		transform:scale(0.5);
+		top:40px;
 	}	
 
 	.chatbox-tab
@@ -634,6 +652,11 @@ body
 		right:-30px;
 	}
 
+	.major-banner-links
+	{
+		margin-left:-34px;
+	}
+
 }
 
 @media (max-width:480px)
@@ -659,8 +682,9 @@ body
 {
 	.minimap-container
 	{
-		zoom: 0.43;
-    	top: 94px;
+		transform:scale(0.43);
+    	top: 38px;
+    	right: -2px;
 	}
 	
 	#chatbox-container

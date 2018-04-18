@@ -728,7 +728,7 @@ public class MainPageUpdateService extends Service
 				html.append("This location is not mapped yet. Complain to a content dev!");
 			}
 		}
-		return updateHtmlContents(".global-navigation-map", html.toString());
+		return updateHtmlContents(".map-contents", html.toString());
 	}
 	
 	private void addGlobalNavigationMapEntry(StringBuilder html, CachedEntity location, CachedEntity path, Long shiftX, Long shiftY)
@@ -757,7 +757,7 @@ public class MainPageUpdateService extends Service
 			if (currentPositionX!=null && currentPositionY!=null)
 			{
 				Long seconds = db.getPathTravelTime(path, character);
-				travelLine = "drawTravelLine(0, 0,"+(positionX)+", "+(positionY)+", "+seconds+");";
+				travelLine = "drawTravelLine(event, 0, 0,"+(positionX)+", "+(positionY)+", "+seconds+");";
 			}
 			html.append("		<a onclick='"+travelLine+" doGoto(event, "+path.getId()+", false);' class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"px; top:"+positionY+"px;'>");
 		}
@@ -772,6 +772,18 @@ public class MainPageUpdateService extends Service
 	}
 	
 	
+	protected String getSideBannerLinks()
+	{
+		StringBuilder newHtml = new StringBuilder();
+		
+		newHtml.append("<a id='thisLocation-button' class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png' style='max-width:32px'></a>");			
+		newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img alt='Navigation' src='https://initium-resources.appspot.com/images/ui/compass1.png' style='max-width:32px'></a>");			
+		newHtml.append("<a id='globe-navigation-button' class='path-overlay-link' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img alt='Global navigation' src='https://initium-resources.appspot.com/images/ui/navigation-map-icon2.png' style='max-width:32px'></a>");			
+		newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
+		newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' style='max-width:32px'></a>");
+		
+		return newHtml.toString();
+	}
 	
 	public String updateInBannerOverlayLinks()
 	{
@@ -787,12 +799,7 @@ public class MainPageUpdateService extends Service
 				newHtml.append(getHtmlForInBannerLinkCentered(30, 50, "Show loot", "showLootPopup()"));				
 			}
 			
-			newHtml.append("<a id='thisLocation-button' class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>");			
-			newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img alt='Navigation' src='https://initium-resources.appspot.com/images/ui/compass1.png'></a>");			
-			newHtml.append("<a id='globe-navigation-button' class='path-overlay-link' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img alt='Global navigation' src='https://initium-resources.appspot.com/images/ui/navigation-map-icon2.png' style='max-width:32px'></a>");			
-			newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
-			newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' style='max-width:32px'></a>");			
-			
+			newHtml.append(getSideBannerLinks());
 			
 			loadPathCache();
 
@@ -1207,7 +1214,7 @@ public class MainPageUpdateService extends Service
 		}
 			
 		
-			newHtml.append("<center><a onclick='doShowHiddenSites(event)'>Show hidden paths</a></center>");
+		newHtml.append("<center><a onclick='doShowHiddenSites(event)'>Show hidden paths</a></center>");
 		
 		return updateHtmlContents("#main-button-list", newHtml.toString());
 	}

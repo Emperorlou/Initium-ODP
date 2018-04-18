@@ -2963,6 +2963,18 @@ position: absolute;
 }
 
 
+.button-overlay-major
+{
+	margin-left:5px;
+	margin-right:5px;
+	width:64px;
+	height:64px;	
+}
+
+.button-overlay-major img
+{
+	max-height:50px;
+}
 
 
 
@@ -3325,6 +3337,15 @@ position: absolute;
 	    width: 300px;
 	}
 
+	.button-overlay-major
+	{
+		width:32px;
+		height:32px;	
+	}
+	.button-overlay-major img
+	{
+		max-height:32px;
+	}
 
 }
 @media (max-width:480px)
@@ -4689,7 +4710,7 @@ body
 	display:inherit;
 }
 
-#travel-line
+.travel-line
 {
 	stroke: #342c22;
     stroke-width: 6px;
@@ -4697,7 +4718,7 @@ body
     stroke-linecap:round;
 }
 
-#travel-line-cancel-button
+.travel-line-cancel-button
 {
 	position:absolute;
 	top:0px;
@@ -4707,7 +4728,7 @@ body
 	z-index:2;
 }
 
-#travel-line-cancel-button
+.travel-line-cancel-button
 {
 	font-size:22px;
 	color:#3e3323;
@@ -4924,6 +4945,14 @@ body
 	{
 		font-size:12px;
 		height:110px;
+	}
+	
+	.button-overlay-major
+	{
+		margin-left:1px;
+		margin-right:1px;
+		width:32px;
+		height:32px;	
 	}
 
 }

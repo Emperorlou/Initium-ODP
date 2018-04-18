@@ -39,7 +39,7 @@
 <script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.finger/0.1.6/jquery.finger.min.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/script.js?v=${version}"></script>
 <link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">

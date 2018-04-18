@@ -34,64 +34,66 @@ public class CommandCombatEscape extends Command {
 		CombatService cs = new CombatService(db);
 		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		
-		ds.beginBulkWriteMode();
-		
-		CachedEntity targetCharacter = db.getCharacterCombatant(character);
-		if (targetCharacter==null || GameUtils.isPlayerIncapacitated(targetCharacter))
-		{
-			cs.leaveCombat(character, null);
-			mpus.updateFullPage_shortcut();
-			return;
-		}
-		
-		// Combat check depends on the opponent's location, not the character's.
-		CachedEntity targetLocation = db.getEntity((Key)targetCharacter.getProperty("locationKey"));
-		if (cs.isInCombatWith(character, targetCharacter, targetLocation)==false)
-		{
-			cs.leaveCombat(character, null);
-			mpus.updateFullPage_shortcut();			
-			setPopupMessage("You're not in combat with this opponent, someone else is. This can happen if someone else entered combat around the same time as you.");
-			return;
-		}
-		
-		
-		// Throws UserErrorMessage. This is a valid situation, as it means the character is attempting 
-		// to do something not allowed (running as non-party leader, escaping while defending, etc).
-		boolean success = db.doCharacterAttemptEscape(location, character, targetCharacter);
-		db.flagNotALooter(request);
-		
 		String userMessage = "";
-		if(success)
+		CachedEntity targetCharacter = db.getCharacterCombatant(character);
+		
+		ds.beginBulkWriteMode();
+		try
 		{
-			userMessage = "You managed to escape!";
-		}
-		else
-		{
-			ODPAuthenticator auth = new ODPAuthenticator();
-			String counterAttackStatus = db.doMonsterCounterAttack(auth, user, targetCharacter, character);
+			if (targetCharacter==null || GameUtils.isPlayerIncapacitated(targetCharacter))
+			{
+				cs.leaveCombat(character, null);
+				ds.put(character);
+				mpus.updateFullPage_shortcut();
+				return;
+			}
 			
-			if (((Double)targetCharacter.getProperty("hitpoints"))>0)
-            {
-                userMessage+="<br>";
-                userMessage+="<strong>The "+targetCharacter.getProperty("name")+" attacks you as you're fleeing...</strong><br>";
-
-                if (counterAttackStatus==null)
-                {
-                    userMessage+="The "+targetCharacter.getProperty("name")+" missed!";
-                }
-                else 
-                {
-                    userMessage+=counterAttackStatus;
-                }
-            }
+			// Combat check depends on the opponent's location, not the character's.
+			CachedEntity targetLocation = db.getEntity((Key)targetCharacter.getProperty("locationKey"));
+			if (cs.isInCombatWith(character, targetCharacter, targetLocation)==false)
+			{
+				cs.leaveCombat(character, null);
+				ds.put(character);
+				mpus.updateFullPage_shortcut();			
+				setPopupMessage("You're not in combat with this opponent, someone else is. This can happen if someone else entered combat around the same time as you.");
+				return;
+			}
+			
+			
+			// Throws UserErrorMessage. This is a valid situation, as it means the character is attempting 
+			// to do something not allowed (running as non-party leader, escaping while defending, etc).
+			boolean success = db.doCharacterAttemptEscape(location, character, targetCharacter);
+			db.flagNotALooter(request);
+			
+			if(success)
+			{
+				userMessage = "You managed to escape!";
+			}
+			else
+			{
+				ODPAuthenticator auth = new ODPAuthenticator();
+				String counterAttackStatus = db.doMonsterCounterAttack(auth, user, targetCharacter, character);
+				
+				if (((Double)targetCharacter.getProperty("hitpoints"))>0)
+	            {
+	                userMessage+="<br>";
+	                userMessage+="<strong>The "+targetCharacter.getProperty("name")+" attacks you as you're fleeing...</strong><br>";
+	
+	                if (counterAttackStatus==null)
+	                {
+	                    userMessage+="The "+targetCharacter.getProperty("name")+" missed!";
+	                }
+	                else 
+	                {
+	                    userMessage+=counterAttackStatus;
+	                }
+	            }
+			}
 		}
-
-		
-		
-		
-		
-		
-		ds.commitBulkWrite();
+		finally
+		{
+			ds.commitBulkWrite();
+		}
 		
 		
 		

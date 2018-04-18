@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -7154,5 +7155,11 @@ public class ODPDBAccess
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public boolean applyFieldChanges(CachedEntity entityToChange, EmbeddedEntity changeMap)
+	{
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

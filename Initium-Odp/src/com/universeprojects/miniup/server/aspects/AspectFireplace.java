@@ -50,7 +50,6 @@ public class AspectFireplace extends ItemAspect
 		if (isFireActive(currentTimeMs) && isFireExpired(currentTimeMs) || isFireActive(currentTimeMs) && getMinutesSinceLastUpdate(currentTimeMs) >= 5)
 		{
 			updateFireProgress();
-			db.getDB().put(entity);
 		}
 
 		StringBuilder text = new StringBuilder();
