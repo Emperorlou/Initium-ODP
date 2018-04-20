@@ -1170,7 +1170,7 @@ public class ODPDBAccess
 	{
 		if (db == null) db = getDB();
 
-		if (entity.getKey().isComplete())
+		if (entity.getKey().isComplete() && character.getKey().isComplete())
 		{
 			CachedEntity oldDiscovery = getDiscoveryByEntity(character.getKey(), entity.getKey());
 			if (oldDiscovery != null) return oldDiscovery;
