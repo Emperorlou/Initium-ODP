@@ -4132,7 +4132,7 @@ public class ODPDBAccess
         if (rnd.nextDouble()*charDex>=rnd.nextDouble()*monsterDex)
         {
         	// Determine whether the weapon zombifies the target.
-        	boolean zombifyWeapon = GameUtils.booleanEquals(weapon.getProperty("zombifying"), true);
+        	boolean zombifyWeapon = weapon != null && GameUtils.booleanEquals(weapon.getProperty("zombifying"), true);
             AttackResult attackResult = attackWithWeapon(db, sourceCharacter, weapon, targetCharacter);
             String status = attackResult.status;
             int damage = attackResult.damage;
@@ -4250,7 +4250,8 @@ public class ODPDBAccess
                 }
                 
                 // If the NPC who did the killing is a zombie (or used a zombify weapon), the target character will be turned into a zombie instead of killing them
-                if ((zombifyWeapon || "Zombie".equals(sourceCharacter.getProperty("status"))) && "NPC".equals(sourceCharacter.getProperty("type")) 
+                if ((zombifyWeapon || "Zombie".equals(sourceCharacter.getProperty("status"))) && 
+                		"NPC".equals(sourceCharacter.getProperty("type"))) 
                 {
                     doCharacterZombify(auth, db, sourceCharacter, targetCharacter);
                     //status+=" The battle is over, you " + verb + "! But the target character has been turned into a zombie!";
@@ -4261,8 +4262,8 @@ public class ODPDBAccess
                 }
                 else
                 {
-                	String verb = GameUtils.equals(getCurrentCharacterKey(), sourceCharacter.getKey()) ? "won" : "lost";
                 	// We check if the source character is the same as the current character. If yes, battle is won, if not, it's lost.
+                	String verb = GameUtils.equals(getCurrentCharacterKey(), sourceCharacter.getKey()) ? "won" : "lost";
                 	String loot = doCharacterKilled(user, targetCharacter, sourceCharacter);
                     status+=" The battle is over, you " + verb + "!" ;
                     if (loot!=null)
