@@ -392,85 +392,8 @@ function decrementStackIndex()
 
 </script>
 
-<style>
-#buttonbar-main
-{
-	padding-top:5px;
-}	
-.major-banner-links
-{
-	margin-left:-116px;
-}
+<link rel="stylesheet" href="/odp/experimental.css?t=${version}"/>
 
-
-
-@media (min-width:1200px)
-{
-
-	.page-popup
-	{
-    position: fixed;
-    z-index: 2;
-    bottom: 0px;
-    top: 0px;
-    left: 50%;
-    right: -29px;
-    margin: 0px;
-	}
-	
-	.page-popup-title
-	{
-		position:absolute;
-	    text-align: center;
-	    top: -32px;
-	    width: 100%;
-	    margin: 0 auto;
-	    left: 0px;	
-	}
-	
-	.page-popup-title h4
-	{
-		top:0px;
-	}
-	
-	.page-popup-content
-	{
-		overflow-y:auto;
-		height:100%;
-	}
-	
-	#page-popup-root
-	{
-		z-index:10000000;
-	}
-	
-	.main-page-half
-	{
-	    margin: 0px!important;
-	    position: relative!important;
-	    width: 50%!important;
-	}
-
-}
-
-@media (max-width:720px)
-{
-	.major-banner-links
-	{
-		margin-left:-70px;
-	}
-}
-
-@media (max-width:480px)
-{
-	#buttonbar-main
-	{
-		padding-top:3px;
-	}
-}
-
-
-</style>
 
 </head>
 
@@ -534,6 +457,18 @@ Version: ${version}
 						</div>
 						<div id='immovablesPanel'>${immovablesPanel}</div>				
 						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
+
+<!-- 
+						<div class='minimap-container'>
+							<div class='map-contents minimap-contents'>
+								${globalNavigationMap}
+							</div>
+							<div class='minimap-overlay'></div>
+							<div class='minimap-button minimap-button-map' onclick='viewGlobeNavigation()'></div>
+							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
+						</div>
+ -->						
+						
 					</div>
 				</div>
 			</div>

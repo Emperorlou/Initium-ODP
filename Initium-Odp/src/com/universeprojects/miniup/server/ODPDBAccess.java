@@ -65,6 +65,8 @@ public class ODPDBAccess
 	
 	final private HttpServletRequest request;
 	
+	final QueryHelper query;
+	
 	private Map<Key,Set<String>> mpusSendQueue = null;
 	
 	public enum CharacterMode
@@ -138,6 +140,7 @@ public class ODPDBAccess
 		this.request = request;
 		getDB(); // Initialize the datastore service
 		pool = new EntityPool(ds);
+		query = new QueryHelper(ds);
 	}
 	
 	public static ODPDBAccess getInstance(HttpServletRequest request)
@@ -936,8 +939,7 @@ public class ODPDBAccess
 
 	public List<CachedEntity> getLocationCharacters(Key locationKey)
 	{
-		QueryHelper qh = new QueryHelper(getDB());
-		List<CachedEntity> charactersHere = qh.getFilteredList("Character", 51, "locationKey", FilterOperator.EQUAL, locationKey);
+		List<CachedEntity> charactersHere = query.getFilteredList("Character", 51, "locationKey", FilterOperator.EQUAL, locationKey);
 		return charactersHere;
 	}
 	
@@ -1070,7 +1072,6 @@ public class ODPDBAccess
 //		Filter f = CompositeFilterOperator.or(f1, f2);
 //		Query q = new Query("Path").setFilter(f);
 //		return getDB().fetchAsList(q, 1000);
-		QueryHelper query = new QueryHelper(ds);
 		List<CachedEntity> list = query.getFilteredList("Path", "location1Key", locationKey);
 		list.addAll(query.getFilteredList("Path", "location2Key", locationKey));
 		return list;
@@ -1083,7 +1084,6 @@ public class ODPDBAccess
 //		Filter f = CompositeFilterOperator.or(f1, f2);
 //		Query q = new Query("Path").setFilter(f).setKeysOnly();
 //		return getDB().fetchAsList(q, 1000);
-		QueryHelper query = new QueryHelper(ds);
 		List<Key> list = query.getFilteredList_Keys("Path", "location1Key", locationKey);
 		list.addAll(query.getFilteredList_Keys("Path", "location2Key", locationKey));
 		return list;
@@ -1093,9 +1093,8 @@ public class ODPDBAccess
 	
 	public List<CachedEntity> getPathsBetweenLocations(Key location1Key, Key location2Key)
 	{
-		QueryHelper qh = new QueryHelper(getDB());
-		List<CachedEntity> foundPaths = qh.getFilteredList("Path", "location1Key", location1Key, "location2Key", location2Key);
-		foundPaths.addAll(qh.getFilteredList("Path", "location1Key", location2Key, "location2Key", location1Key));
+		List<CachedEntity> foundPaths = query.getFilteredList("Path", "location1Key", location1Key, "location2Key", location2Key);
+		foundPaths.addAll(query.getFilteredList("Path", "location1Key", location2Key, "location2Key", location1Key));
 		return foundPaths;
 	}
 
@@ -1266,7 +1265,6 @@ public class ODPDBAccess
 	public List<CachedEntity> getDiscoveriesForCharacterAndLocation(Key characterKey, Key location, boolean showHidden)
 	{
 		List<CachedEntity> fetchAsList = null;
-		QueryHelper query = new QueryHelper(ds);
 		
 		
 		// FOR SOME REASON, THE NICE CODE BELOW TAKES ALMOST A FULL SECOND TO COMPLETE IF SHOW HIDDEN = FALSE. WTF
@@ -4008,8 +4006,7 @@ public class ODPDBAccess
 	
 	public List<CachedEntity> getInstanceSpawnersForLocation(final Key originKey, Key destinationKey)
 	{
-		QueryHelper qh = new QueryHelper(getDB());
-		List<CachedEntity> spawners = qh.getFilteredORList(null, "MonsterSpawner", "locationKey", originKey, "locationKey", destinationKey);
+		List<CachedEntity> spawners = query.getFilteredORList(null, "MonsterSpawner", "locationKey", originKey, "locationKey", destinationKey);
 		List<CachedEntity> foundSpawners = new ArrayList<CachedEntity>();
 		for(CachedEntity spawn:spawners)
 		{
@@ -5732,8 +5729,7 @@ public class ODPDBAccess
 		if(isExplore || isCombatSite)
 		{
 			// Now determine if the path contains an NPC that the character would immediately enter battle with...
-			QueryHelper qh = new QueryHelper(ds);
-			List<CachedEntity> npcsInTheArea = qh.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, destinationKey, "type", FilterOperator.EQUAL, "NPC");
+			List<CachedEntity> npcsInTheArea = query.getFilteredList("Character", 500, null, "locationKey", FilterOperator.EQUAL, destinationKey, "type", FilterOperator.EQUAL, "NPC");
 			npcsInTheArea = new ArrayList<CachedEntity>(npcsInTheArea);
 
 			shuffleCharactersByAttackOrder(npcsInTheArea);
@@ -5951,13 +5947,12 @@ public class ODPDBAccess
 		if ("CombatSite".equals(location.getProperty("type"))==false)
 			return;
 		
-		QueryHelper q = new QueryHelper(ds);
-		List<CachedEntity> characters = q.getFilteredList("Character", "locationKey", locationKey);
+		List<CachedEntity> characters = query.getFilteredList("Character", "locationKey", locationKey);
 		List<Key> paths = getPathsByLocation_KeysOnly(locationKey);
 		List<CachedEntity> discoveries = new ArrayList<CachedEntity>();
 		if (playerCharacter!=null)
 			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey, true);
-		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
+		List<CachedEntity> items = query.getFilteredList("Item", "containerKey", locationKey);
 		
 
 		// Here is a special case:
@@ -6099,13 +6094,12 @@ public class ODPDBAccess
 		if (parentLocation==null)
 			parentLocation = backupParentLocation;
 		
-		QueryHelper q = new QueryHelper(ds);
-		List<CachedEntity> characters = q.getFilteredList("Character", "locationKey", locationKey);
+		List<CachedEntity> characters = query.getFilteredList("Character", "locationKey", locationKey);
 		List<Key> paths = getPathsByLocation_KeysOnly(locationKey);
 		List<CachedEntity> discoveries = new ArrayList<CachedEntity>();
 		if (playerCharacter!=null)
 			discoveries = getDiscoveriesForCharacterAndLocation(playerCharacter.getKey(), locationKey, true);
-		List<CachedEntity> items = q.getFilteredList("Item", "containerKey", locationKey);
+		List<CachedEntity> items = query.getFilteredList("Item", "containerKey", locationKey);
 		
 
 //		boolean hasLiveNpc = false;
@@ -6840,8 +6834,7 @@ public class ODPDBAccess
 	{
 		if (stackedItem.getProperty("quantity")==null) return;
 		
-		QueryHelper q = new QueryHelper(ds);
-		List<CachedEntity> inventory = q.getFilteredList("Item", "containerKey", characterKey, "name", stackedItem.getProperty("name"));
+		List<CachedEntity> inventory = query.getFilteredList("Item", "containerKey", characterKey, "name", stackedItem.getProperty("name"));
 		for(CachedEntity item:inventory)
 		{
 			if (item!=null && CommandItemsStackMerge.canStack(stackedItem, item))
@@ -7165,5 +7158,13 @@ public class ODPDBAccess
 	{
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public List<Key> getImmovablesKeys(Key locationKey)
+	{
+		if (isTestServer()==false)	// ANYONE KNOW WHY THIS TAKES SO DAMN LONG????
+			return query.getFilteredList_Keys("Item", "immovable", FilterOperator.EQUAL, true, "containerKey", FilterOperator.EQUAL, locationKey);
+		else
+			return new ArrayList<>(0);
 	}
 }

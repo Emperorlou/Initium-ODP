@@ -1,4 +1,6 @@
 var uiStyle = localStorage.getItem("selectUIStyle");
+if (uiStyle==null) uiStyle = "classic";
+
 var queryParams = "";
 if (location.href.indexOf("?")>-1)
 	queryParams = location.href.substring(location.href.indexOf("?"));
@@ -7,7 +9,7 @@ if (location.href.indexOf("main.jsp")>-1 ||
 		location.href.indexOf("/odp/experimental")>-1 || 
 		location.href.indexOf("/odp/full")>-1)
 {
-	if (uiStyle==null || uiStyle=="default" || uiStyle=="experimental1")
+	if (uiStyle=="default")
 	{
 		if (location.href.indexOf("/odp/experimental")==-1)
 			location.href = "/odp/experimental"+queryParams;

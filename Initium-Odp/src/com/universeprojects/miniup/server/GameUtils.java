@@ -40,7 +40,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.6-46";
+	final public static String version = "0.5.6-49";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -2387,7 +2387,7 @@ public class GameUtils
 		{
 			if (((String) fieldValue).equalsIgnoreCase("true"))
 				return bool==true;
-			else if (fieldValue == "" || ((String) fieldValue).equalsIgnoreCase("false"))
+			else if (fieldValue.equals("") || ((String) fieldValue).equalsIgnoreCase("false"))
 				return bool==false;
 			else
 				throw new IllegalArgumentException("Invalid field value: "+fieldValue);

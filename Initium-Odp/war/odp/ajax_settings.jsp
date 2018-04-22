@@ -7,10 +7,10 @@
 <style>
 .setting-entry
 {
-	height: 28px;
 	font-size: 18px;
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
-	padding-top: 14px;
+	padding-top: 5px;
+	padding-bottom:5px;
 	display:block;
 	color:#CCCCCC;
 	text-decoration: none;
@@ -29,6 +29,11 @@
 .setting-entry-slider input
 {
 	width: 50%;
+}
+
+.setting-entry-select select
+{
+	max-width: 100%;
 }
 
 
@@ -51,7 +56,7 @@ input[type='checkbox']
 		<h2>General</h2>
 		<div class='setting-entry setting-entry-select'>UI Style: 
 			<select id='selectUIStyle'>
-				<option value='experimental1'>Default</option>
+				<option value='default'>Default</option>
 				<option value='classic'>Classic UI</option>
 				<option value='wowlike'>World of Warcraft style (work in progress)</option>
 			</select>

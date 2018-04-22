@@ -194,92 +194,6 @@ body
 
 
 
-/* Minimap */
-
-.minimap-container
-{
-	position:fixed;
-	width:284px;
-	height:283px;
-	right:0px;
-	top:40px;
-	transform-origin: 100% 0%;
-}
-
-.minimap-locationname
-{
-    position: relative;
-    width: 100%;
-    text-align: center;
-    bottom: 19px;
-    color: #d2a34c;
-    font-size: 17px;
-}
-.minimap-locationname span
-{
-    border-width: 4px;
-    padding: 2px;
-    padding-left: 10px;
-    padding-right: 10px;    
-}
-.minimap-contents
-{
-	overflow:hidden;
-	background-color:#f6d29b;
-	position:absolute;
-	top:0px;
-	left:0px;
-	right:0px;
-	bottom:0px;
-	-webkit-clip-path: circle(42% at 50% 50%);
-	clip-path: circle(42% at 50% 50%);
-}
-
-.minimap-contents .overheadmap-cell-container-base
-{
-	transform: scale(0.6);
-}
-
-.minimap-overlay
-{
-	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-backing1.png);
-	position:absolute;
-	top:0px;
-	left:0px;
-	right:0px;
-	bottom:0px;
-	pointer-events: none;
-}
-
-.minimap-button
-{
-	position:absolute;
-	cursor:pointer;
-	width:54px;
-	height:54px;
-}
-
-.minimap-button:hover
-{
-	filter: brightness(1.5);
-}
-
-.minimap-button-map
-{
-	background-image:url(https://i.imgur.com/IP1yHOI.png);
-	top:26px;
-	right:26px;
-}
-
-.minimap-button-cancel
-{
-	background-image:url(https://initium-resources.appspot.com/images/ui4/button-cancel1.png);
-	width:122px;
-	height:48px;
-	bottom: -5px;
-	left: 29%;	
-}
-
 
 
 
@@ -601,22 +515,9 @@ body
 	
 }
 
-@media (max-width:1200px)
-{
-	.minimap-container
-	{
-		transform:scale(0.8);
-	}		
-	
-}
 
 @media (max-width:735px)
 {
-	.minimap-container
-	{
-		transform:scale(0.5);
-		top:40px;
-	}	
 
 	.chatbox-tab
 	{
@@ -680,12 +581,6 @@ body
 
 @media (max-width:400px)
 {
-	.minimap-container
-	{
-		transform:scale(0.43);
-    	top: 38px;
-    	right: -2px;
-	}
 	
 	#chatbox-container
 	{
