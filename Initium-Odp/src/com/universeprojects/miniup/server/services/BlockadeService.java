@@ -299,7 +299,7 @@ public class BlockadeService extends Service
 	public void setBlockadeRule(CachedEntity character, 
 			CachedEntity location, String newRule) throws UserErrorMessage 
 	{
-		ODPDBAccess.BlockadeRule.valueOf(newRule);	// Check if this is a valid value, it will throw an IllegalArgumentException if it's not
+		ODPDBAccess.BlockadeRule.valueOf(ODPDBAccess.BlockadeRule.class, newRule);	// Check if this is a valid value, it will throw an IllegalArgumentException if it's not
 	
 		CachedDatastoreService ds=db.getDB();
 		

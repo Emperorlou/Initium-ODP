@@ -221,18 +221,57 @@ public class CommandCombatAttack extends Command
 				}
 			}
 		
+			// Now increase experience with the weapon used
+			if (weapon!=null)
+			{
+				if (db.increaseKnowledgeForEquipment100(weapon)==true)
+				{
+					String weaponClass = (String)weapon.getProperty("itemClass");
+					summaryStatus.append("Your experience with the "+weaponClass+" has increased.");
+				}
+			}
 		
 		
 		
-		
-		}
-		finally
-		{
-			ds.commitBulkWrite();
-		}
 
 		
 		
+		
+			
+			if (GameUtils.isPlayerIncapacitated(character))
+			{
+				mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+				mpus.updateFullPage_shortcut();
+				
+				db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
+				
+			}
+			else if (GameUtils.isPlayerIncapacitated(targetCharacter))
+			{
+	//			if (CommonChecks.checkLocationIsCombatSite(location)) location = ds.refetch(location);
+				// We're done with combat
+				mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+				mpus.updateFullPage_shortcut();
+				
+				db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
+				
+			}
+			else
+			{
+				// We're not done with combat
+				mpus.updateInBannerCharacterWidget();
+				mpus.updateInBannerCombatantWidget(targetCharacter);
+				mpus.updateButtonList();
+				mpus.updatePartyView();
+			}
+
+			db.commitInventionEntities();
+		}
+		finally
+		{
+			
+			ds.commitBulkWrite();
+		}
 		
 		if(status != null && status.isEmpty() == false)
 		{
@@ -245,35 +284,6 @@ public class CommandCombatAttack extends Command
 			html+=summaryStatus.toString()+" <span class='hint' rel='#hitDetails-"+randomId+"' style='color:#FFFFFF'>[More..]</span>";
 			db.sendGameMessage(db.getDB(), character, html);
 		}
-		
-		
-		if (GameUtils.isPlayerIncapacitated(character))
-		{
-			mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
-			mpus.updateFullPage_shortcut();
-			
-			db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
-			
-		}
-		else if (GameUtils.isPlayerIncapacitated(targetCharacter))
-		{
-//			if (CommonChecks.checkLocationIsCombatSite(location)) location = ds.refetch(location);
-			// We're done with combat
-			mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
-			mpus.updateFullPage_shortcut();
-			
-			db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
-			
-		}
-		else
-		{
-			// We're not done with combat
-			mpus.updateInBannerCharacterWidget();
-			mpus.updateInBannerCombatantWidget(targetCharacter);
-			mpus.updateButtonList();
-			mpus.updatePartyView();
-		}
-
 		
 	}
 

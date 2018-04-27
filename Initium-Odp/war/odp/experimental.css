@@ -4,7 +4,7 @@
 }	
 .major-banner-links
 {
-	margin-left:-116px;
+	margin-left:-98px;
 }
 
 .minimap-container
@@ -12,6 +12,77 @@
 	top:-18px!important;
 	right:-18px!important;
 }
+
+.global-navigation-map
+{
+	border-style: solid;
+    border-width: 72px 91px 90px 99px;
+    -moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    -webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
+
+	position:absolute;
+	bottom: 0px;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    margin: -13px;
+
+}
+
+body[bannerstate='globe-navigation'] .global-navigation-map
+{
+	display:block;
+}
+
+body[bannerstate='combat'] .major-banner-links
+{
+	display:none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -69,7 +140,12 @@
 {
 	.major-banner-links
 	{
-		margin-left:-70px;
+		margin-left:-56px;
+	}
+	
+	.global-navigation-map
+	{	
+		zoom:0.7;
 	}
 }
 
@@ -87,5 +163,10 @@
 	{
     	transform: scale(0.4);
     }
+
+	.global-navigation-map
+	{	
+		zoom:0.6;
+	}
 }
 

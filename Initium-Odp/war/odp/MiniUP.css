@@ -3168,6 +3168,11 @@ position: absolute;
 		transform:scale(0.8);
 	}		
 	
+	.page-popup-X
+	{
+		right:-29px;
+	}
+	
 }
 
 
@@ -4804,6 +4809,7 @@ body
 .global-navigation-map
 {
 	display:none;
+	color: #3e3323;
 }
 
 .overheadmap-window .global-navigation-map
@@ -4822,7 +4828,7 @@ body
 .travel-line-cancel-button
 {
 	position:absolute;
-	top:0px;
+	bottom:-60px;
 	width:100%;
 	left:0px;
 	text-align:center;

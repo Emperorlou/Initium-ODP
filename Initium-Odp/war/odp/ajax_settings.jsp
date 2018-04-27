@@ -56,8 +56,8 @@ input[type='checkbox']
 		<h2>General</h2>
 		<div class='setting-entry setting-entry-select'>UI Style: 
 			<select id='selectUIStyle'>
-				<option value='default'>Default</option>
 				<option value='classic'>Classic UI</option>
+				<option value='experimental'>Experimental</option>
 				<option value='wowlike'>World of Warcraft style (work in progress)</option>
 			</select>
 		</div>

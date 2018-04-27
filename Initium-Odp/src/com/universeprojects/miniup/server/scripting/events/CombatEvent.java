@@ -158,7 +158,7 @@ public class CombatEvent extends ScriptEvent {
 				ScriptType.onAttack, ScriptType.onAttackHit, ScriptType.onDefend, ScriptType.onDefendHit);
 		for(CachedEntity script:scripts)
 		{
-			ScriptType sType = ScriptType.valueOf((String)script.getProperty("type"));
+			ScriptType sType = ScriptType.valueOf(ScriptType.class, (String)script.getProperty("type"));
 			
 			// If allowed event type already exists in the script map, get it.
 			// Otherwise, create a new one, but don't add it yet. We only want

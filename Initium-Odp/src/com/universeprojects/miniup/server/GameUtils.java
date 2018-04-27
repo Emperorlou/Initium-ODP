@@ -29,7 +29,6 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
-import com.universeprojects.gefcommon.shared.elements.GameAspect;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
@@ -40,7 +39,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.6-49";
+	final public static String version = "0.5.6-59";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 

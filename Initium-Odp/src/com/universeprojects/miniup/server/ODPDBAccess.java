@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,13 +49,15 @@ import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.miniup.server.services.ModifierService;
+import com.universeprojects.miniup.server.services.ModifierService.ModifierType;
 import com.universeprojects.miniup.server.services.MovementService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
-import com.universeprojects.miniup.server.services.ModifierService.ModifierType;
 
 public class ODPDBAccess
 {
+	public static final int CHAT_BAN_SECONDS = 180;
+	
 	Logger log = Logger.getLogger(ODPDBAccess.class.getName());
 
 	public static ODPDBAccessFactory factory = null;
@@ -128,6 +129,7 @@ public class ODPDBAccess
 			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck",
 			"Cosmetic1", "Cosmetic2", "Cosmetic3"
 	};
+
 	private CachedDatastoreService ds = null;
 
 	public Map<Key, List<CachedEntity>> buffsCache = new HashMap<Key, List<CachedEntity>>();
@@ -1397,9 +1399,9 @@ public class ODPDBAccess
 				return;
 		}
 		
-		db.setStat("chatbanIP-" + ip, 1l, 3600 / 2);
+		db.setStat("chatbanIP-" + ip, 1l, CHAT_BAN_SECONDS);
 
-		db.setStat("chatban-" + characterName, 1l, 3600 / 2);
+		db.setStat("chatban-" + characterName, 1l, CHAT_BAN_SECONDS);
 	}
 
 	public void unchatban(String characterName, String ip)
@@ -4144,11 +4146,11 @@ public class ODPDBAccess
         	if (weapon!=null)
         	{
         		// Lets increase weapon experience now already
-        		if ("PC".equals(sourceCharacter.getProperty("type")))
-        		{
-        			ODPKnowledgeService knowledgeService = getKnowledgeService(sourceCharacter.getKey());
-        			knowledgeService.increaseKnowledgeFor(weapon, 1, 100);
-        		}
+//        		if ("PC".equals(sourceCharacter.getProperty("type")))
+//        		{
+//        			ODPKnowledgeService knowledgeService = getKnowledgeService(sourceCharacter.getKey());
+//        			knowledgeService.increaseKnowledgeFor(weapon, 1, 100);
+//        		}
         		
         		// If the weapon we're attacking with is in the right hand, the "otherWeapon" should be whatever is in the left hand
 	        	if (GameUtils.equals(weapon.getKey(), rightHand)==true && GameUtils.equals(weapon.getKey(), leftHand)==false)
@@ -7028,12 +7030,13 @@ public class ODPDBAccess
 	 * This increases the knowledge you have with a piece of equipment (requires an itemClass assigned to it and
 	 * for that item class to be created in the database; requires ItemClass entity).
 	 * 
-	 * The 100 means there is a 1 in 100 chance of getting a point of experience with the equipment, this is to 
-	 * reduce load on the DB and effectively makes experience divided by 100.
+	 * The 100 means there is a 1 in 100 chance of getting experience with the equipment, this is to 
+	 * reduce load on the DB.
+	 * @return 
 	 */
-	public void increaseKnowledgeForEquipment100(CachedEntity equipment)
+	public boolean increaseKnowledgeForEquipment100(CachedEntity equipment)
 	{
-		
+		return false;
 	}
 
 	public String getFieldTypeFor(CachedEntity entity, String fieldName)
@@ -7166,5 +7169,11 @@ public class ODPDBAccess
 			return query.getFilteredList_Keys("Item", "immovable", FilterOperator.EQUAL, true, "containerKey", FilterOperator.EQUAL, locationKey);
 		else
 			return new ArrayList<>(0);
+	}
+
+	
+	public void commitInventionEntities()
+	{
+		
 	}
 }

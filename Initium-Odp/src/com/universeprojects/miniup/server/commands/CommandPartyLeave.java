@@ -56,9 +56,10 @@ public class CommandPartyLeave extends Command {
 		// Use already retrieved keys here. Leaving party might have cleared it completely,
 		// but we still need to update all the old members.
 		List<Key> partyKeys = new ArrayList<Key>();
-		for(CachedEntity member:party)
-			if(member != null && GameUtils.equals(character.getKey(), member.getKey())==false)
-				partyKeys.add(member.getKey());
+		if (party!=null)
+			for(CachedEntity member:party)
+				if(member != null && GameUtils.equals(character.getKey(), member.getKey())==false)
+					partyKeys.add(member.getKey());
 		
 		if(partyKeys.isEmpty()==false)
 			db.sendMainPageUpdateForCharacters(ds, partyKeys, "updatePartyView");

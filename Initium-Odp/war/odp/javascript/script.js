@@ -9,20 +9,20 @@ if (location.href.indexOf("main.jsp")>-1 ||
 		location.href.indexOf("/odp/experimental")>-1 || 
 		location.href.indexOf("/odp/full")>-1)
 {
-	if (uiStyle=="default")
+	if (uiStyle=="experimental")
 	{
 		if (location.href.indexOf("/odp/experimental")==-1)
 			location.href = "/odp/experimental"+queryParams;
-	}
-	else if (uiStyle=="classic")
-	{
-		if (location.href.indexOf("/main.jsp")==-1)
-			location.href = "/main.jsp"+queryParams;
 	}
 	else if (uiStyle=="wowlike")
 	{
 		if (location.href.indexOf("/odp/full")==-1)
 			location.href = "/odp/full"+queryParams;
+	}
+	else
+	{
+		if (location.href.indexOf("/main.jsp")==-1)
+			location.href = "/main.jsp"+queryParams;
 	}
 }
 
@@ -272,7 +272,21 @@ $(document).bind("keydown",function(e)
         if ((e.keyCode == 13) || (e.keyCode == 27)) 
         {
             closepopupMessage(currentPopup());
+            return;
         }
+    }
+    
+    if (currentPopupStackIndex>0)
+    {
+    	if (e.keyCode == 27){
+    		closePagePopup();
+    		return;
+    	}
+    }
+    
+    if (e.keyCode == 27) 
+    {
+    	if (window.viewBannerDefault!=null) viewBannerDefault();
     }
 });
 
@@ -1745,14 +1759,12 @@ function enterDefenceStructureSlot(slot)
 
 var popupStackCloseCallbackHandlers = [];
 var currentPopupStackIndex = 0;
-var popupKeydownHandler = function(e){if (e.keyCode == 27) closePagePopup();};
 function incrementStackIndex()
 {
 	currentPopupStackIndex++;
     if (currentPopupStackIndex==1)
     {
 		$("#page-popup-root").html("");
-	    $(document).bind("keydown", popupKeydownHandler);
 	    
     }
     else
@@ -1773,7 +1785,6 @@ function decrementStackIndex()
 		window.scrollTo(0,0);
 		$("#page-popup-root").empty();
 		$(".page-popup-newui").remove();
-		$(document).unbind("keydown", popupKeydownHandler);
 	}
 	else
 	{
@@ -3007,8 +3018,8 @@ function makeIntoPopupFromUrl(url, title, disableGlass)
 	
 	window.scrollTo(0,0);
 	if (disableGlass!=true)
-		$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
-	$("body").append("<div style='position:absolute; left:50%; top:10%;z-index:100000000;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>" +
+		$(".make-popup-root").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	$(".make-popup-root").append("<div style='position:absolute; left:50%; top:10%;z-index:100000000;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>" +
 			"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
 			"	<h4>"+title+"</h4>" +
 			"<div id='make-popup-url-contents'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div></div></div>");
@@ -3024,9 +3035,9 @@ function makeIntoPopupHtml(html, disableGlass)
 	
 	window.scrollTo(0,0);
 	if (disableGlass!=true)
-		$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+		$(".make-popup-root").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
 	html = "<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" + html;
-	$("body").append("<div style='position:absolute; left:50%; top:10%;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>"+html+"</div></div>");
+	$(".make-popup-root").append("<div style='position:absolute; left:50%; top:10%;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>"+html+"</div></div>");
 }
 
 function isMakePopupOpen()
@@ -3039,7 +3050,7 @@ function makeIntoPopup(jquerySelector)
 	clearMakeIntoPopup();
 	
 	window.scrollTo(0,0);
-	$("body").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	$(".make-popup-root").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
 	$(jquerySelector).addClass("make-popup").prepend("<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>");
 }
 

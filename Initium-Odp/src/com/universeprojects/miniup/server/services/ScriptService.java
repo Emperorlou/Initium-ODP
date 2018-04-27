@@ -290,7 +290,7 @@ public class ScriptService extends Service
 		for(CachedEntity script:scripts)
 		{
 			if(script == null) continue;
-			ScriptType sType = ScriptType.valueOf((String)script.getProperty("type"));
+			ScriptType sType = ScriptType.valueOf(ScriptType.class, (String)script.getProperty("type"));
 			
 			// If allowed event type already exists in the script map, get it.
 			// Otherwise, create a new one, but don't add it yet. We only want

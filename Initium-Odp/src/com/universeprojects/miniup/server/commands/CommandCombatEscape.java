@@ -89,36 +89,41 @@ public class CommandCombatEscape extends Command {
 	                }
 	            }
 			}
+		
+		
+		
+		
+		
+	//		character = ds.refetch(character);
+			location = db.getEntity((Key)character.getProperty("locationKey"));
+			mpus = MainPageUpdateService.getInstance(db, user, character, location, this);
+			
+			
+			if (cs.isInCombat(character)==false || GameUtils.isPlayerIncapacitated(character))
+			{
+				// We're done with combat
+				mpus.updateFullPage_shortcut();
+			}
+			else
+			{
+				// We're not done with combat
+				mpus.updateInBannerCharacterWidget();
+				mpus.updateInBannerCombatantWidget(targetCharacter);
+				mpus.updateButtonList();
+			}
+			
+			
+			
+			db.commitInventionEntities();
 		}
 		finally
 		{
 			ds.commitBulkWrite();
 		}
-		
-		
-		
-		
-		
-//		character = ds.refetch(character);
-		location = db.getEntity((Key)character.getProperty("locationKey"));
-		mpus = MainPageUpdateService.getInstance(db, user, character, location, this);
+
 		
 		if(userMessage != null && userMessage.isEmpty() == false)
 			db.sendGameMessage(db.getDB(), character, userMessage);
-		
-		if (cs.isInCombat(character)==false || GameUtils.isPlayerIncapacitated(character))
-		{
-			// We're done with combat
-			mpus.updateFullPage_shortcut();
-			return;
-		}
-		else
-		{
-			// We're not done with combat
-			mpus.updateInBannerCharacterWidget();
-			mpus.updateInBannerCombatantWidget(targetCharacter);
-			mpus.updateButtonList();
-		}
 	}
 
 }

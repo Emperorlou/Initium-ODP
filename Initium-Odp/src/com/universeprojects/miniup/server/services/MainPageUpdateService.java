@@ -697,7 +697,9 @@ public class MainPageUpdateService extends Service
 		
 		if (CommonChecks.checkCharacterIsIncapacitated(character))
 		{
-			html.append("You are incapacitated and cannot see this map right now.");
+			html.append("<script type='text/javascript'>");
+			html.append("	viewBannerDefault();");
+			html.append("</script>");
 		}
 		else
 		{
@@ -725,7 +727,8 @@ public class MainPageUpdateService extends Service
 			}
 			else
 			{
-				html.append("This location is not mapped yet. Complain to a content dev!");
+				html.append("<p>This location is not mapped yet. Complain to a content dev!</p>");
+				html.append("<input type='hidden' id='blank-global-navigation' value='true'/>");
 			}
 		}
 		return updateHtmlContents(".map-contents", html.toString());
@@ -1353,6 +1356,11 @@ public class MainPageUpdateService extends Service
 		else
 			js.append("$('#campsPanel').show();");
 		
+		
+		if (CommonChecks.checkCharacterIsInCombat(character))
+			js.append("if (window.onCombatBegin) onCombatBegin();");
+		else
+			js.append("if (window.onCombatComplete && $('body').attr('bannerstate')=='combat') onCombatComplete();");
 		
 		
 		// Here we'll update the button bar

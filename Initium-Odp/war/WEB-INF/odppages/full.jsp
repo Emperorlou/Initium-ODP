@@ -340,7 +340,7 @@ http://github.com/Emperorlou/Initium-ODP
 
 Version: ${version}
 -->
-<body>
+<body class='make-popup-root'>
 
 
 

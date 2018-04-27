@@ -358,7 +358,6 @@ function incrementStackIndex()
     if (currentPopupStackIndex==1)
     {
 		$("#page-popup-root").html("");
-	    $(document).bind("keydown", popupKeydownHandler);
 	    $(".main-page").addClass("main-page-half");
     }
     else
@@ -379,7 +378,6 @@ function decrementStackIndex()
 		window.scrollTo(0,0);
 		$("#page-popup-root").empty();
 		$(".page-popup-newui").remove();
-		$(document).unbind("keydown", popupKeydownHandler);
 	    $(".main-page").removeClass("main-page-half");
 	}
 	else
@@ -389,6 +387,49 @@ function decrementStackIndex()
 	}
 	return currentPopupStackIndex;
 }
+
+function viewBannerDefault()
+{
+	$("body").attr("bannerstate", "");
+}
+
+function onCombatBegin()
+{
+	$("body").attr("bannerstate", "combat");
+}
+
+function onCombatComplete()
+{
+	if ($("body").attr("bannerstate")=="combat")
+		viewBannerDefault();
+}
+
+function toggleMovementState()
+{
+	
+	
+	if ($("body").attr("bannerstate")==="globe-navigation")
+		viewBannerDefault();
+	else
+	{
+		$("body").attr("bannerstate", "globe-navigation");
+		
+		// A special case of the globe nav map is blank, we'll actually also fire to open the local nav for convenience
+		if ($("#blank-global-navigation").length>0)
+			viewLocalNavigation();
+	}
+}
+
+
+function popupPermanentOverlay_Walking(locationName)
+{
+	if (bannerUrl!=null && window.previousBannerUrl!=bannerUrl)
+		window.previousBannerUrl = bannerUrl;
+	popupPermanentOverlay_WalkingBase("Walking to "+locationName);
+	$("#banner-base").html("");
+}
+
+
 
 </script>
 
@@ -430,7 +471,7 @@ Version: ${version}
 		</div>
 	</div>
 		
-	<div class='main-page popupBlurrable'>
+	<div class='main-page popupBlurrable make-popup-root'>
 		<div id='banner'>
 		
 			<div class='main-banner' >
@@ -446,17 +487,25 @@ Version: ${version}
 						<div id='banner-base' class='banner-daynight'></div>
 						<div id='banner-fx'></div>
 	<!-- 					<div id='main-viewport-container'></div> -->
+						<div id='immovablesPanel'>${immovablesPanel}</div>				
 						<div id='partyPanel'>
 						${partyPanel}
 						</div>
+						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
+						<div class='map-contents global-navigation-map'>${globalNavigationMap}</div>
+						
 						<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
 							${inBannerCharacterWidget}
 						</div>
 						<div id='inBannerCombatantWidget' class='combatantWidgetContainer'>
 							${inBannerCombatantWidget }
 						</div>
-						<div id='immovablesPanel'>${immovablesPanel}</div>				
-						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
+						
+						<div class="path-overlay-link major-banner-links" style="left:50%; top:15%;">
+							<a id="thisLocation-button" class="button-overlay-major" onclick="makeIntoPopup(&quot;.this-location-box&quot;)" style="right:0px;top:0px;"><img alt="Location actions" src="https://initium-resources.appspot.com/images/ui/magnifying-glass2.png"></a>
+							<a id="movement-button" class="button-overlay-major" onclick="toggleMovementState()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
+							<a id="guard-button" class="button-overlay-major" onclick="viewGuardSettings()" style="right:4px;top:142px;"><img alt="Guard settings" src="https://initium-resources.appspot.com/images/ui/guardsettings1.png"></a>
+						</div>							
 
 <!-- 
 						<div class='minimap-container'>
@@ -724,7 +773,6 @@ Version: ${version}
 
 	</div>
 	
-	<div class='map-contents global-navigation-map'>${globalNavigationMap}</div>	
 	<div id='loot-popup'></div>
 </body>
 </html>
