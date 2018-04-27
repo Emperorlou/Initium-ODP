@@ -933,13 +933,16 @@ function depositDogecoinsToItem(itemId, event)
 	});
 }
 
-function collectDogecoinsFromItem(itemId, event)
+function collectDogecoinsFromItem(itemId, event, reload)
 {
+	if(reload===undefined) reload = true;
 	// Command updates the gold indicator as needed, but not the inventory gold span. 
 	// Just reload popup (if one is open, that is).
 	doCommand(event, "DogeCoinsCollectFromItem", {"itemId" : itemId}, function(data, error){
 		if(error) return;
-		reloadPagePopup();
+		
+		if(reload) reloadPagePopup();
+		else $(event.currentTarget || event.target).text("Collect 0 gold");
 	});
 }
 
