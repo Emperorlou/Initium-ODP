@@ -100,7 +100,7 @@ public class NearbyItemsController extends PageController
             if (item.getProperty("maxWeight")!=null)
             	sb.append("<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+character.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
             if (item.getProperty("dogecoins")!=null)
-            	sb.append("<a shortcut='71' onclick='collectDogecoinsFromItem("+item.getId()+", event, false)'>Collect "+curChar.getProperty("dogecoins")+" gold</a>");
+            	sb.append("<a shortcut='71' onclick='collectDogecoinsFromItem("+item.getId()+", event, false)'>Collect "+item.getProperty("dogecoins")+" gold</a>");
             sb.append("<a onclick='doCollectItem(event, "+item.getId()+")'>Collect</a>");
             
             sb.append("</div>"); 
