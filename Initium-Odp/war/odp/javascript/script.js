@@ -4048,7 +4048,7 @@ function showBannerLoadingIcon()
 
 function setBannerImage(url)
 {
-	if (bannerUrl!=null && window.previousBannerUrl!=bannerUrl)
+	if (bannerUrl!=null && url!=bannerUrl && window.previousBannerUrl!=bannerUrl)
 		window.previousBannerUrl = bannerUrl;
 	
 	bannerUrl = url;
