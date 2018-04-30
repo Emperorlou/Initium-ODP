@@ -397,8 +397,6 @@ function clearPopupPermanentOverlay()
 function popupPermanentOverlay_Experiment(title, text)
 {
 	$("#banner-text-overlay").hide();
-	if (bannerUrl!=null && window.previousBannerUrl!=bannerUrl)
-		window.previousBannerUrl = bannerUrl;
 	setBannerImage("https://initium-resources.appspot.com/images/animated/invention1.gif");
 	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 
@@ -4243,6 +4241,7 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 
 function doCollectCollectable(event, collectableId, userRequestId)
 {
+	clearMakeIntoPopup();
 	showBannerLoadingIcon();
 	longOperation(event, "CollectCollectable", {collectableId:collectableId},  
 			function(action) // responseFunction
