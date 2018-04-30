@@ -107,7 +107,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 	}
 
 	@Override
-	String doComplete() throws UserErrorMessage {
+	String doComplete() throws UserErrorMessage, ContinuationException {
 		Long collectableId = (Long)getDataProperty("collectableId");
 		CachedEntity collectable = db.getEntity("Collectable", collectableId);
 		CachedEntity collectableDef = db.getEntity((Key)collectable.getProperty("_definitionKey"));
@@ -184,21 +184,33 @@ public class LongOperationCollectCollectable extends LongOperation {
 		ds.put(item);
 		
 		ds.commitBulkWrite();
-		
+
 		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		mpus.updateCollectablesView();
 		mpus.updateLocationQuicklist();
-		
+		String collectionResult = "You collected "+GameUtils.renderItem(item)+".";
 		if (CommonChecks.isItemImmovable(item))
 		{
 			mpus.updateImmovablesPanel(item);
-			return "You collected "+GameUtils.renderItem(item)+". It is now in the location where you are standing.";
+			collectionResult = "You collected "+GameUtils.renderItem(item)+". It is now in the location where you are standing.";
 		}
 		else if (onGround)
-			return "You got "+GameUtils.renderItem(item)+" however it was too heavy to hold and it is laying on the ground where you stand.";
-		else
-			return "You collected "+GameUtils.renderItem(item)+".";
+			collectionResult = "You got "+GameUtils.renderItem(item)+" however it was too heavy to hold and it is laying on the ground where you stand.";
+		
+		if(collectionCount > 0)
+		{
+			// Initial collection is based on ease, subsequent collections are minimum 5 seconds.
+			Long seconds = Math.min((Long)getDataProperty("secondsToWait"), 5);
+			int monsterTries = seconds.intValue()/30;
+			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, monsterTries, 0.20d))
+			{
+				collectionResult += " While you were looking for more " + item.getProperty("name") + ", someone found you...";
+				throw new GameStateChangeException(collectionResult);
+			}
 			
+			throw new ContinuationException(seconds.intValue(), collectionResult + " Continuing collection...");
+		}
+		return collectionResult;
 	}
 
 	@Override
