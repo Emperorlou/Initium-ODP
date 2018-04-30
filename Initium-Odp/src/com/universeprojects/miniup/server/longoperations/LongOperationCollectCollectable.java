@@ -139,7 +139,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 			throw new RuntimeException("ItemDef is null on the collectable definition: "+collectableDef.getKey());
 		
 		CachedEntity item = db.generateNewObject(itemDef, "Item");
-
+		String collectedItem = GameUtils.renderItem(item);
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(db.getCurrentCharacterKey());
 		ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), knowledgeService);
 		if (collectableDef.getProperty("toolsRequired")!=null || collectableDef.getProperty("toolsOptional")!=null)
@@ -188,7 +188,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		mpus.updateCollectablesView();
 		mpus.updateLocationQuicklist();
-		String collectionResult = "You collected "+GameUtils.renderItem(item)+".";
+		String collectionResult = "You collected " + collectedItem + " (total " +  GameUtils.renderItem(item)+").";
 		if (CommonChecks.isItemImmovable(item))
 		{
 			mpus.updateImmovablesPanel(item);
@@ -200,7 +200,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 		if(collectionCount > 0)
 		{
 			// Initial collection is based on ease, subsequent collections are minimum 5 seconds.
-			Long seconds = Math.min((Long)getDataProperty("secondsToWait"), 5);
+			Long seconds = Math.max((Long)getDataProperty("secondsToWait"), 5);
 			int monsterTries = seconds.intValue()/30;
 			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, monsterTries, 0.20d))
 			{
