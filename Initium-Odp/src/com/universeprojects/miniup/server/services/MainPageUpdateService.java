@@ -1302,8 +1302,6 @@ public class MainPageUpdateService extends Service
 		js.append("else if (bannerUrl=='' || bannerUrl == 'null')");
 		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
 
-		js.append("var serverTime = "+System.currentTimeMillis()+";");
-
 		js.append("var isOutside = '"+location.getProperty("isOutside")+"';");
 	
 		if ("TRADING".equals(character.getProperty("mode")))

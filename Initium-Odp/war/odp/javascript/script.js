@@ -3227,7 +3227,7 @@ function drawTravelLine(event, startX, startY, x, y, seconds)
 				"<svg class='travel-line-container' style='position:absolute;left:0px; top:0px;bottom:0px;right:0px;width:100%;height:100%;z-index:1;'>" +
 				"	<line class='travel-line' x1='"+startX+"' y1='"+startY+"' x2='"+startX+"' y2='"+startY+"'/>" +
 				"</svg>"
-				).append("<a class='travel-line-cancel-button' onclick='cancelLongOperations(event)'>Cancel Travel</a>");
+				).append("<a class='travel-line-cancel-button' onclick='cancelLongOperations(event)'><img src='https://initium-resources.appspot.com/images/ui4/button-cancel1.png' alt='Cancel Travel'/></a>");
 		
 		
 		map[0].travelLineData = 
