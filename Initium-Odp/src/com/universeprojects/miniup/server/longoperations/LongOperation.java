@@ -365,7 +365,7 @@ public abstract class LongOperation extends OperationBase
 		catch(ContinuationException e)
 		{
 			if (e.reason!=null)
-				db.sendGameMessage(db.getDB(), db.getCurrentCharacter(), e.getMessage());
+				db.sendGameMessage(db.getDB(), db.getCurrentCharacter(), e.reason);
 				
 			Calendar endTime = new GregorianCalendar();
 			endTime.add(Calendar.SECOND, e.seconds);
