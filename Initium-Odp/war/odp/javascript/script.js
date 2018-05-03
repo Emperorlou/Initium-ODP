@@ -4277,7 +4277,7 @@ function doExplore(event, ignoreCombatSites)
 	clearMakeIntoPopup();
 	
 	if (ignoreCombatSites == null)
-		ignoreCombatSites = false;
+		ignoreCombatSites = getBannerIgnoreOldSites();
 	showBannerLoadingIcon();
 	longOperation(event, "Explore", {ignoreCombatSites:ignoreCombatSites}, 
 			function(action) // responseFunction
@@ -5040,6 +5040,12 @@ function getMapQuality()
 	var setting = localStorage.getItem("checkboxUseLowResolutionMap") || "false";
 	if(setting === "true") return "low";
 	return "high";
+}
+
+function getBannerIgnoreOldSites()
+{
+	var setting = localStorage.getItem("checkboxBannerIgnoreOldSites") || "false";
+	return setting === "true";
 }
 
 function toggleEnvironmentSoundEffects(newState)
