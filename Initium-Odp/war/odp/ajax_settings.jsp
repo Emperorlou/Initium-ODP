@@ -61,6 +61,7 @@ input[type='checkbox']
 				<option value='wowlike'>World of Warcraft style (work in progress)</option>
 			</select>
 		</div>
+		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxBannerIgnoreOldSites'> Banner Explore New Locations Only</div>
 		
 		<h2>Sound/Music</h2>
 		<div class='setting-entry setting-entry-checkbox'><input type='checkbox' id='checkboxDisableMusic'> Disable music</div>
@@ -99,7 +100,8 @@ input[type='checkbox']
 		                   "checkboxDisableWeather", 
 		                   "checkboxDisableTravelAnimations",
 		                   "checkboxDisableAds",
-		                   "checkboxUseLowResolutionMap"];
+		                   "checkboxUseLowResolutionMap",
+		                   "checkboxBannerIgnoreOldSites"];
 		for(var i = 0; i<checkboxIds.length; i++)
 		{
 			var checkboxId = checkboxIds[i];
