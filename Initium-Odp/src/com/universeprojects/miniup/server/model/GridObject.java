@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.model;
 
 import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.miniup.server.WebUtils;
 
 
 public class GridObject {
@@ -40,7 +41,7 @@ public class GridObject {
 		jsonObject = new JSONObject();
 		setKey(key);
 		setfilename(filename);
-		setName(name);
+		setName(WebUtils.jsSafe(name));
 		setxGridCoord(xGridCoord);
 		setyGridCoord(yGridCoord);
 		setxGridCellOffset(xGridCellOffset);

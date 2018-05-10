@@ -3064,8 +3064,24 @@ position: absolute;
 
 
 
+/*/////////////////////////////////////////////////////
+// Map stuff
+*/
 
+#viewportcontainer
+{
+	position:absolute;	
+}
 
+#viewport
+{
+	position:absolute;
+}
+
+#grid
+{
+	position:relative;
+}
 
 
 
@@ -4810,6 +4826,17 @@ body
 {
 	display:none;
 	color: #3e3323;
+}
+
+.location-2d
+{
+	display:none;
+	position: absolute;
+    bottom: 0px;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    width: 100%;
 }
 
 .overheadmap-window .global-navigation-map
