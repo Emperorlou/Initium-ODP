@@ -203,7 +203,7 @@ public class ODPDBAccess
 			
 			protected boolean putEventHandler(CachedEntity entity) 
 			{
-				if (entity.getKind().equals("Character"))
+				if (entity!=null && entity.getKind().equals("Character"))
 				{
 					// Always update the locationEntryDatetime timestamp
 					entity.setProperty("locationEntryDatetime", new Date());

@@ -31,6 +31,22 @@
 
 }
 
+body[bannerstate='location-2d'] .location-2d
+{
+	display:block;
+}
+
+body[bannerstate='location-2d'] #banner-text-overlay, body[bannerstate='location-2d'] #immovablesPanel, body[bannerstate='location-2d'] #immovablesPanel
+{
+	display:none;
+}
+
+body[bannerstate='location-2d'] #partyPanel, body[bannerstate='location-2d'] #inBannerCharacterWidget, body[bannerstate='location-2d'] .major-banner-links
+{
+	z-index:10000;
+}
+
+
 body[bannerstate='globe-navigation'] .global-navigation-map
 {
 	display:block;

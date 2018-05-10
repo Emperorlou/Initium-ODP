@@ -3202,6 +3202,20 @@ function viewGlobeNavigation()
 	createMapWindow(html);
 }
 
+function view2DView()
+{
+	if ($("body").attr("bannerstate")==="location-2d")
+		viewBannerDefault();
+	else
+	{
+		$("body").attr("bannerstate", "location-2d");
+		
+		// Call the center function to view the banner centered
+		centerGridOnScreen();
+	}
+
+}
+
 function drawTravelLine(event, startX, startY, x, y, seconds)
 {
 	$(".minimap-button-cancel").show();

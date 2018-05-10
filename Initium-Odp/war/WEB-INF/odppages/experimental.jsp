@@ -450,7 +450,7 @@ http://github.com/Emperorlou/Initium-ODP
 
 Version: ${version}
                                            -->
-<body>
+<body bannerstate=''>
 <!-- Fixes a bug with chrome regarding mix-blending -->
 <div id='mix-blending-fix'></div>
 <div id='popups'></div>
@@ -493,7 +493,8 @@ Version: ${version}
 						</div>
 						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
 						<div class='map-contents global-navigation-map'>${globalNavigationMap}</div>
-						
+						<div id='main-viewport-container' class='location-2d'>${location2D}</div>	
+											
 						<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
 							${inBannerCharacterWidget}
 						</div>
@@ -505,6 +506,7 @@ Version: ${version}
 							<a id="thisLocation-button" class="button-overlay-major" onclick="makeIntoPopup(&quot;.this-location-box&quot;)" style="right:0px;top:0px;"><img alt="Location actions" src="https://initium-resources.appspot.com/images/ui/magnifying-glass2.png"></a>
 							<a id="movement-button" class="button-overlay-major" onclick="toggleMovementState()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
 							<a id="guard-button" class="button-overlay-major" onclick="viewGuardSettings()" style="right:4px;top:142px;"><img alt="Guard settings" src="https://initium-resources.appspot.com/images/ui/guardsettings1.png"></a>
+							<a id="2dview-button" class="button-overlay-major" onclick="view2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
 						</div>							
 
 <!-- 

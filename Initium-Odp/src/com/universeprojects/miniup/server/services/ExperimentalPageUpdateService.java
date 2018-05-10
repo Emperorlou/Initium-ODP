@@ -134,6 +134,35 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		
 		return newHtml.toString();
 	}
+
+	public String updateLocation2D()
+	{
+		StringBuilder newHtml = new StringBuilder();
+		
+		newHtml.append("<div id='viewportcontainer' class='vpcontainer'>");
+		newHtml.append("<div id='menu' class='menuContainer' style='visibility: hidden;'></div>");
+		newHtml.append("<div id='viewport' class='vp'>");
+		newHtml.append("<div id='grid' class='grid'>");
+		newHtml.append("<div id='ui-layer' class='uiLayer'></div>");
+		newHtml.append("<div id='cell-layer' class='cellLayer'></div>");
+		newHtml.append("<div id='ground-layer' class='groundLayer'></div>");
+		newHtml.append("<div id='object-layer' class='objectLayer'></div>");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		newHtml.append("</div>");
+		newHtml.append("<button type='button' onclick='openMenu()'>Menu</button>");
+		newHtml.append("<button type='button' onclick='mapPlow(event)'>Plow</button>");
+		newHtml.append("<button type='button' onclick='mapPlaceHouse(event)' style='position:relative'>Place House</button>");
+		newHtml.append("<button type='button' onclick='mapPlaceCity(event)' style='position:relative'>Place City</button>");
+		newHtml.append("<center><p id='selectedObjects' class='selectedObjectList'></p></center>");
+		newHtml.append("<script type='text/javascript' src='/odp/javascript/Sandbox.js?v="+GameUtils.version+"'></script>");
+		newHtml.append("<script>");
+		newHtml.append("var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2).toString() + "';");
+		newHtml.append("$(document).on('click', '#somebutton', function() { pressedButton(); });");
+		newHtml.append("</script>");
+		
+		return updateHtmlContents(".location-2d", newHtml.toString());
+	}
 	
 	
 }

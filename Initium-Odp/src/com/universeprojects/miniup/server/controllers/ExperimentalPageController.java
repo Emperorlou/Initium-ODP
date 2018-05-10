@@ -124,6 +124,7 @@ public class ExperimentalPageController extends PageController {
 		request.setAttribute("locationQuicklist", updateService.updateLocationQuicklist());
 		request.setAttribute("monsterCountPanel", updateService.updateMonsterCountPanel());
 		request.setAttribute("globalNavigationMap", updateService.updateGlobalNavigationMap());
+		request.setAttribute("location2D", updateService.updateLocation2D());
 		
 		
 		if (db.getCurrentCharacter().isUnsaved())
