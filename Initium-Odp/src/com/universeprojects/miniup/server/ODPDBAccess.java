@@ -2083,16 +2083,19 @@ public class ODPDBAccess
 		Collections.sort(sorted, new Comparator<CachedEntity>()
 		{
 			@Override
-			public int compare(CachedEntity item1, CachedEntity item2)
+			public int compare(CachedEntity storeItem1, CachedEntity storeItem2)
 			{
+				CachedEntity item1 = getEntity((Key) storeItem1.getItemKey());
+				CachedEntity item2 = getEntity((Key) storeItem2.getItemKey());
+				
 				String item1Type = (String) item1.getProperty("itemType");
 				String item2Type = (String) item2.getProperty("itemType");
 
 				String item1Name = (String) item1.getProperty("name");
 				String item2Name = (String) item2.getProperty("name");
 
-				Long item1Cost = (Long) item1.getProperty("store-dogecoins");
-				Long item2Cost = (Long) item2.getProperty("store-dogecoins");
+				Long item1Cost = (Long) item1.getProperty("dogecoins");
+				Long item2Cost = (Long) item2.getProperty("dogecoins");
 				
 				Double item1Max = 0.0d;
 				if ("Armor".equals(item1Type) || "Shield".equals(item1Type))
@@ -2109,7 +2112,7 @@ public class ODPDBAccess
 				{
 					item2Max = ((Long)item2.getProperty("blockChance").doubleValue());
 				}
-				else if ("Weapon".equals(item2Type))
+				else if ("Weapon".equals(item1Type))
 				{
 					item2Max = ((Double)item2.getProperty("_weaponMaxDamage"));
 				}
