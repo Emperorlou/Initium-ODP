@@ -2112,7 +2112,7 @@ public class ODPDBAccess
 				{
 					item2Max = ((Long)item2.getProperty("blockChance").doubleValue());
 				}
-				else if ("Weapon".equals(item1Type))
+				else if ("Weapon".equals(item2Type))
 				{
 					item2Max = ((Double)item2.getProperty("_weaponMaxDamage"));
 				}
