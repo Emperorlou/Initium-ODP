@@ -2076,7 +2076,7 @@ public class ODPDBAccess
 		}	
 	}
 
-	//Sort sale items by Type --> Name --> QualityScore --> Cost
+	//Sort sale items by Type --> Name --> Max Damage or Block Chance --> Cost
 	public List<CachedEntity> sortSaleItemList(List<CachedEntity> items)
 	{
 		List<CachedEntity> sorted = new ArrayList<CachedEntity>(items);
@@ -2093,9 +2093,26 @@ public class ODPDBAccess
 
 				Long item1Cost = (Long) item1.getProperty("store-dogecoins");
 				Long item2Cost = (Long) item2.getProperty("store-dogecoins");
-
-				Long item1Quality = (Long) GameUtils.determineQualityScore(item1.getProperties());
-				Long item2Quality = (Long) GameUtils.determineQualityScore(item2.getProperties());
+				
+				Double item1Max = 0.0d;
+				if ("Armor".equals(item1Type) || "Shield".equals(item1Type))
+				{
+					item1Max = ((Long)item1.getProperty("blockChance").doubleValue());
+				}
+				else if ("Weapon".equals(item1Type))
+				{
+					item1Max = ((Double)item1.getProperty("_weaponMaxDamage"));
+				}
+				
+				Double item2Max = 0.0d;
+				if ("Armor".equals(item2Type) || "Shield".equals(item2Type))
+				{
+					item2Max = ((Long)item2.getProperty("blockChance").doubleValue());
+				}
+				else if ("Weapon".equals(item2Type))
+				{
+					item2Max = ((Double)item2.getProperty("_weaponMaxDamage"));
+				}
 
 				if (item1Type == null) item1Type = "";
 				if (item2Type == null) item2Type = "";
@@ -2103,19 +2120,16 @@ public class ODPDBAccess
 				if (item2Name == null) item2Name = "";
 				if (item1Cost == null) item1Cost = 0l;
 				if (item2Cost == null) item2Cost = 0l;
-				if (item1Quality == null) item1Quality = 0l;
-				if (item2Quality == null) item2Quality = 0l;
-
 				if (item1Type.compareTo(item2Type) == 0)
 				{
 					if (item1Name.compareTo(item2Name) == 0)
 					{
-						if (item1Quality.compareTo(item2Quality) == 0)
+						if (item1Max.compareTo(item2Max) == 0)
 						{
 							return item1Cost.compareTo(item2Cost);
 						}
 						else
-							return item1Quality.compareTo(item2Quality);
+							return item1Max.compareTo(item2Max);
 					}
 					else
 						return item1Name.compareTo(item2Name);
