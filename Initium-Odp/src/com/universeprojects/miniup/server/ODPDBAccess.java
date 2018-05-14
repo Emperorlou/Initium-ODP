@@ -2097,7 +2097,7 @@ public class ODPDBAccess
 				Double item1Max = 0.0d;
 				if ("Armor".equals(item1Type) || "Shield".equals(item1Type))
 				{
-					item1Max = ((Long)item1.getProperty("blockChance").doubleValue());
+					item1Max = ((Long)item1.getProperty("blockChance")).doubleValue();
 				}
 				else if ("Weapon".equals(item1Type))
 				{
@@ -2107,7 +2107,7 @@ public class ODPDBAccess
 				Double item2Max = 0.0d;
 				if ("Armor".equals(item2Type) || "Shield".equals(item2Type))
 				{
-					item2Max = ((Long)item2.getProperty("blockChance").doubleValue());
+					item2Max = ((Long)item2.getProperty("blockChance")).doubleValue();
 				}
 				else if ("Weapon".equals(item2Type))
 				{
