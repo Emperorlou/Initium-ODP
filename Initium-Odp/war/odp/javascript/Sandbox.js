@@ -427,7 +427,10 @@ function buildMap(responseJson) {
             $hexBody += " data-yCoord=\"" + innerIndex + "\"";
             $hexBody += " style=\"";
             $hexBody += " z-index:" + backgroundObject.zIndex + ";";
-            $hexBody += " background:url(" + $picUrlPath + backgroundObject.backgroundFile + ") center center;";
+            if (backgroundObject.backgroundFile.indexOf("http")==0)
+            	$hexBody += " background:url(" + backgroundObject.backgroundFile + ") center center;";
+            else
+            	$hexBody += " background:url(" + $picUrlPath + backgroundObject.backgroundFile + ") center center;";
             $hexBody += " background-size:100% 100%;";
             $hexBody += "\">";
             $hexBody += "</div>";
@@ -871,7 +874,10 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
         for (i=0; i<previouslyUpdatedBackground.length; i++) {
             if (i>=20) break;
             if (i<0) break;
-            previouslyUpdatedBackground[i].backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground[i].filename + ") center center / 100% 100%";
+            if (previouslyUpdatedBackground[i].filename.indexOf("http")==0)
+            	previouslyUpdatedBackground[i].backgroundDiv.style.background = "url(" + previouslyUpdatedBackground[i].filename + ") center center / 100% 100%";
+            else
+            	previouslyUpdatedBackground[i].backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground[i].filename + ") center center / 100% 100%";
             if (selection) {
                 previouslyUpdatedBackground[i].backgroundDiv.className = previouslyUpdatedBackground[i].backgroundDiv.className.replace(/(?:^|\s)gridSelected(?!\S)/g, '');
             } else {
@@ -881,7 +887,10 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
     }
     for (i=0; i<previouslyUpdatedObjects.length; i++) {
         if (previouslyUpdatedObjects[i].key.includes("tempKey:")) {
-            previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
+        	if (previouslyUpdatedObjects[i].filename.indexOf("http")==0)
+        		previouslyUpdatedObjects[i].div.style.background = "url(" + previouslyUpdatedObjects[i].filename + ");";
+        	else
+        		previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
         }
         else if (previouslyUpdatedObjects[i].key == "o1") {
             previouslyUpdatedObjects[i].div.style.background = "url(" + $domain + previouslyUpdatedObjects[i].filename + ")";
@@ -891,7 +900,10 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
             } else if (previouslyUpdatedObjects[i].filename == "city.svg_.png") {
                 previouslyUpdatedObjects[i].div.style.background = "url(" + "http://opengameart.org/sites/default/files/city.svg_.png);";
             } else {
-                previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
+            	if (previouslyUpdatedObjects[i].filename.indexOf("http")==0)
+            		previouslyUpdatedObjects[i].div.style.background = "url(" + previouslyUpdatedObjects[i].filename + ");";
+            	else
+            		previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
             }
         }
         previouslyUpdatedObjects[i].div.style.backgroundSize = "100% 100%";
@@ -1296,7 +1308,10 @@ function updateGridObject(gridObject) {
         currentObject = gridObjects[gridObject.key];
         // Update the new object
         if (gridObject.filename != undefined) {
-            currentObject.div.style.backgroundImage = $picUrlPath + gridObject.filename + ")";
+        	if (gridObject.filename.indexOf("http")==0)
+        		currentObject.div.style.backgroundImage = gridObject.filename + ")";
+        	else
+        		currentObject.div.style.backgroundImage = $picUrlPath + gridObject.filename + ")";
         }
         if (gridObject.xGridCoord != undefined) {
             currentObject.xGridCoord = gridObject.xGridCoord;
@@ -1416,7 +1431,10 @@ function addGridObjectToMap(gridObject) {
         } else if (gridObject.filename == "city.svg_.png") {
             $hexBody += " background: url(&quot;http://opengameart.org/sites/default/files/city.svg_.png&quot;) 0% 0% / 100% 100%;";
         } else {
-            $hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
+        	if (gridObject.filename.indexOf("http")==0)
+        		$hexBody += " background:url(" + gridObject.filename + ");";
+        	else
+        		$hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
         }
     }
     $hexBody += " background-size:100% 100%;";

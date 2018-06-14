@@ -40,6 +40,11 @@ public class GridMapService {
 			new ObjectType("trees/tree4.png", 199, 487, 1, 0.2, true),
 			new ObjectType("trees/tree5.png", 165, 445, 1, 0.2, true),
 			new ObjectType("trees/tree6.png", 71, 73, 1, 0.2, true),
+			new ObjectType("https://i.imgur.com/B8sfVYr.png", 960, 540, 1, 0.2, true),
+			new ObjectType("https://i.imgur.com/P6HnmkJ.png", 480, 270, 1, 0.2, true),
+			new ObjectType("https://i.imgur.com/RtroHjA.png", 480, 270, 1, 0.2, true),
+			new ObjectType("https://i.imgur.com/tqxfxrw.png", 480, 270, 1, 0.2, true),
+			
 	};
 	
 	public static ObjectType[] bushes = {

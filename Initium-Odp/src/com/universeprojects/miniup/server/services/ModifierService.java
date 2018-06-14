@@ -70,16 +70,23 @@ public class ModifierService extends Service
 		
 		for(int i = 0; i<modifiers.size(); i++)
 		{
-			String modifierLine = modifiers.get(i);
-			
-			ModifierType modifierType = getModifierTypeFrom(modifierLine);
-			String fullValue = getFullValue(modifierType, modifierLine);
-			String fullName = getFullName(modifierType);
-			
-			if (fullValue.contains("%"))
-				modifiers.set(i, fullValue+" "+fullName);
-			else
-				modifiers.set(i, fullValue+" to "+fullName);
+			try
+			{
+				String modifierLine = modifiers.get(i);
+				
+				ModifierType modifierType = getModifierTypeFrom(modifierLine);
+				String fullValue = getFullValue(modifierType, modifierLine);
+				String fullName = getFullName(modifierType);
+				
+				if (fullValue.contains("%"))
+					modifiers.set(i, fullValue+" "+fullName);
+				else
+					modifiers.set(i, fullValue+" to "+fullName);
+			}
+			catch(Exception e)
+			{
+				modifiers.add("Error: "+e.getMessage());
+			}
 		}
 		
 		return modifiers;
