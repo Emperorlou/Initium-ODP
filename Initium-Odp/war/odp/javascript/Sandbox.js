@@ -14,10 +14,10 @@ var gridCellWidth = 64;
 var gridCellHeight = 32;
 var cursorWidth = 164;
 var cursorHeight = 166;
-var objectZOffset = 10;
+var objectZOffset = 100;
 var drugged = false;
 var reachedZoom = false;
-var $picUrlPath = "https://initium-resources.appspot.com/images/2d/";
+var $picUrlPath = "https://initium-resources.appspot.com/";
 var $domain = "https://initium-resources.appspot.com/";
 var firstLoad = true;
 var previouslySelectedBackground = [];
@@ -291,8 +291,8 @@ function scaleTiles(event, onCenter) {
             if (gridCells[x][y].objectKeys.length > 0) {
                 for (var keyIndex = 0; keyIndex < gridCells[x][y].objectKeys.length; keyIndex++) {
                     var currKey = gridCells[x][y].objectKeys[keyIndex];
-                    var top = gridObjects[currKey].yGridCoord * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObjects[currKey].yImageOrigin * map2dScale) - (gridObjects[currKey].yGridCellOffset/2 * map2dScale);
-                    var left = gridObjects[currKey].xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObjects[currKey].xImageOrigin * map2dScale) - (gridObjects[currKey].xGridCellOffset * map2dScale);
+                    var top = gridObjects[currKey].yGridCoord * scaledGridCellHeight + (scaledGridCellHeight / 2) - (gridObjects[currKey].yImageOrigin * map2dScale) - (gridObjects[currKey].yGridCellOffset * map2dScale);
+                    var left = gridObjects[currKey].xGridCoord * scaledGridCellWidth + (scaledGridCellWidth / 2) - (gridObjects[currKey].xImageOrigin * map2dScale) - (gridObjects[currKey].xGridCellOffset * map2dScale);
 
                     gridObjects[currKey].div.style.width = gridObjects[currKey].width * gridObjects[currKey].scale * map2dScale + "px";
                     gridObjects[currKey].div.style.height = gridObjects[currKey].height * gridObjects[currKey].scale * map2dScale + "px";
@@ -317,8 +317,6 @@ function loadMap() {
     snapToGrid = (document.getElementById('snapToGrid') == null) ? true : document.getElementById('snapToGrid').checked;
     scaleRate = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
     dragDelta = ($("#dragDelta").val() == undefined) ? 10 : $("#dragDelta").val();
-    gridTileWidth = isNaN(Number($("#gridWidth").val())) ? 20 : Number($("#gridWidth").val());
-    gridTileHeight = isNaN(Number($("#gridHeight").val())) ? 20 : Number($("#gridHeight").val());
     var seed = isNaN(Number($("#seed").val())) ? 123456 : Number($("#seed").val());
     var forestry = isNaN(Number($("#forestry").val())) ? 2 : Number($("#forestry").val());
     map2dScale = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
@@ -695,9 +693,9 @@ function keyPress(event) {
 }
 
 
-$('#viewport').on('contextmenu', function(){
-    return false;
-});
+//$('#viewport').on('contextmenu', function(){
+//    return false;
+//});
 
 function startHover(event) {
     usingKeys = false;
@@ -1381,15 +1379,19 @@ function updateGridObject(gridObject) {
  * Returns HTML string for adding to DOM
  */
 function addGridObjectToMap(gridObject) {
-    var scaledGridCellWidth = gridCellWidth * map2dScale;
+	// Don't bother adding it to the map if it's off the map
+	if (gridObject.xGridCoord<0 || gridObject.xGridCoord>gridTileWidth || gridObject.yGridCoord<0 || gridObject.yGridCoord>gridTileHeight)
+		return;	
+	
+	var scaledGridCellWidth = gridCellWidth * map2dScale;
     var scaledGridCellHeight = gridCellHeight * map2dScale;	
 
     
     var topZ = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
     var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * map2dScale) - (gridObject.xGridCellOffset * map2dScale);
-    var topPos = gridObject.yGridCoord * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObject.yImageOrigin * map2dScale) - ((gridObject.yGridCellOffset-(gridCellHeight/2))/2 * map2dScale/2);
-    var leftPos = gridObject.xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.xImageOrigin * map2dScale) - ((gridObject.xGridCellOffset-(gridCellWidth/2)) * map2dScale);
-    var key = gridObject.filename + ":" + gridObject.xGridCoord + "-" + gridObject.yGridCoord;
+    var topPos = gridObject.yGridCoord * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObject.yImageOrigin * map2dScale) - ((gridObject.yGridCellOffset)/2 * map2dScale/2);
+    var leftPos = gridObject.xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.xImageOrigin * map2dScale) - ((gridObject.xGridCellOffset) * map2dScale);
+    var key = gridObject.key;
 
     // If undefined footprint, assume 1x1
     if (gridObject.xFootprint == undefined || gridObject.yFootprint == undefined) {
@@ -1413,15 +1415,18 @@ function addGridObjectToMap(gridObject) {
         }
     }
 
-    objectScale = gridObject.scale ? gridObject.scale : 1;
+    var objectScale = gridObject.scale ? gridObject.scale : 1;
+    var gridMapObjectWidth = gridObject.width * map2dScale * objectScale;
+    var gridMapObjectHeight = gridObject.height * map2dScale * objectScale;
+    
     $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key + "\" " + "class=\"gridObject\"";
     $hexBody += " data-key=\"" + key + "\"";
     $hexBody += " style=\"";
     $hexBody += " top:" + topPos + "px;";
     $hexBody += " left:" + leftPos + "px;";
     $hexBody += " margin:" + (scaledGridCellWidth / 2) + "px;";
-    $hexBody += " width:" + gridObject.width * map2dScale * objectScale + "px;";
-    $hexBody += " height:" + gridObject.height * map2dScale * objectScale + "px;";
+    $hexBody += " width:" + (gridMapObjectWidth) + "px;";
+    $hexBody += " height:" + (gridMapObjectHeight) + "px;";
     $hexBody += " z-index:" + (Number(objectZOffset) + Number(topZ)) + ";";
     if (gridObject.key == "o1") {
         $hexBody += " background:url(" + $domain + gridObject.filename + ");";

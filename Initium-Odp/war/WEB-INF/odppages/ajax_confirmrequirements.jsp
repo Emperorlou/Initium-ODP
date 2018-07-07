@@ -193,25 +193,27 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 
 
 
-<div id='requirement-categories' class='main-splitScreen'>
-<c:forEach var="requirementCategory" items="${formattedRequirements}">
-	<h4><c:out value="${requirementCategory.name}"/></h4>
-	<c:forEach var="requirement" items="${requirementCategory.list}">
-		<div class='hiddenTooltip' id='requirementHelp-${requirement.slotName }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
-		<div id='requirement-container-${requirement.slotName}' slotName='${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
-			<div class='hint questionmark' rel='#requirementHelp-${requirement.slotName}'>?</div><div><c:out value="${requirement.name}"/></div>
-			<div id='itemHtmlForRequirement${requirement.slotName}'></div>
-		</div>
+	<div id='requirement-categories' class='main-splitScreen'>
+	<c:forEach var="requirementCategory" items="${formattedRequirements}">
+		<h4><c:out value="${requirementCategory.name}"/></h4>
+		<c:forEach var="requirement" items="${requirementCategory.list}">
+			<div class='hiddenTooltip' id='requirementHelp-${requirement.slotName }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
+			<div id='requirement-container-${requirement.slotName}' slotName='${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
+				<div class='hint questionmark' rel='#requirementHelp-${requirement.slotName}'>?</div><div><c:out value="${requirement.name}"/></div>
+				<div id='itemHtmlForRequirement${requirement.slotName}'></div>
+			</div>
+		</c:forEach>
 	</c:forEach>
-</c:forEach>
-<br>
+	<br>
+	
+	</div>
 
-</div>
-
-<div class='main-splitScreen'>
-<h4>Available Items</h4>
-<p style='float:right;margin:0px;'><a onclick='selectAll(event)'>Add All</a></p>
-<div id='item-candidates'>
-<-- Select a slot on the left to begin
-</div>
+	<c:if test="${hideAvailableItemsPanel!=true}">
+		<div class='main-splitScreen'>
+		<h4>Available Items</h4>
+		<p style='float:right;margin:0px;'><a onclick='selectAll(event)'>Add All</a></p>
+		<div id='item-candidates'>
+		<-- Select a slot on the left to begin
+		</div>
+	</c:if>
 </div> 

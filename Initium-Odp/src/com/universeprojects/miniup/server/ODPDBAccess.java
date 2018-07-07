@@ -3833,11 +3833,30 @@ public class ODPDBAccess
 	 * a new CachedEntity with all of the fields from the definition and with the curve
 	 * formulas all solved.
 	 * 
+	 * This version of this method allocates a key for the generated entity.
+	 * 
 	 * @param definition
 	 * @param generatedEntityKind The "entity type" or "kind" of the returned CachedEntity
 	 * @return
 	 */
 	public CachedEntity generateNewObject(CachedEntity definition, String generatedEntityKind)
+	{
+		return null;
+	}
+
+	/**
+	 * This is a placeholder since the actual implementation is not in the ODP.
+	 * 
+	 * This method takes the given definition object (like an ItemDef or NPCDef) and creates
+	 * a new CachedEntity with all of the fields from the definition and with the curve
+	 * formulas all solved.
+	 * 
+	 * @param definition
+	 * @param generatedEntityKind The "entity type" or "kind" of the returned CachedEntity
+	 * @param allocateKey If set to false, the method wont give the generated Item entity a key (useful if you don't plan on saving it to the DB in most cases)
+	 * @return
+	 */
+	public CachedEntity generateNewObject(Random rnd, CachedEntity definition, String generatedEntityKind, boolean allocateKey)
 	{
 		return null;
 	}
@@ -7199,6 +7218,25 @@ public class ODPDBAccess
 	
 	public void commitInventionEntities()
 	{
-		
+		// TODO Auto-generated method stub
 	}
+	
+	public boolean isKey(String keyString)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Key keyStringToKey(String keyString)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Map<String, Double> getFieldTypeMapEntityDouble(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

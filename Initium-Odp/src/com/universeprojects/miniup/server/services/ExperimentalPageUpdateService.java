@@ -139,6 +139,8 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 	{
 		StringBuilder newHtml = new StringBuilder();
 		
+		GridMapService gridMapService = new GridMapService(db, location);
+		
 		newHtml.append("<div id='viewportcontainer' class='vpcontainer'>");
 		newHtml.append("<div id='menu' class='menuContainer' style='visibility: hidden;'></div>");
 		newHtml.append("<div id='viewport' class='vp'>");
@@ -157,7 +159,9 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("<center><p id='selectedObjects' class='selectedObjectList'></p></center>");
 		newHtml.append("<script type='text/javascript' src='/odp/javascript/Sandbox.js?v="+GameUtils.version+"'></script>");
 		newHtml.append("<script>");
-		newHtml.append("var mapData = '" + GridMapService.buildNewGrid(123456,20,20,2).toString() + "';");
+		newHtml.append("var mapData = '" + gridMapService.buildNewGrid().toString() + "';");
+		newHtml.append("var gridTileWidth = "+gridMapService.getGridWidth()+";");
+		newHtml.append("var gridTileHeight = "+gridMapService.getGridHeight()+";");
 		newHtml.append("$(document).on('click', '#somebutton', function() { pressedButton(); });");
 		newHtml.append("</script>");
 		

@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
@@ -76,6 +77,49 @@ public abstract class InitiumAspect implements GameAspect<Key>
 	public static Class<? extends Command> getAspectCommand(String commandName)
 	{
 		return aspectCommands.get(commandName);
+	}
+
+	
+	@Override
+	public void setSubObjectSingle(String name, GameObject<Key> object)
+	{
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Not yet implemented");
+	}
+
+	@Override
+	public void setSubObjectList(String name, List<GameObject<Key>> object)
+	{
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Not yet implemented");
+	}
+
+	@Override
+	public void setSubObjectMap(String name, Map<?, GameObject<Key>> object)
+	{
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Not yet implemented");
+	}
+
+	@Override
+	public Map<String, GameObject<Key>> getSubObjectsSingle()
+	{
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Not yet implemented");
+	}
+
+	@Override
+	public Map<String, List<GameObject<Key>>> getSubObjectsList()
+	{
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Not yet implemented");
+	}
+
+	@Override
+	public Map<String, Map<?, GameObject<Key>>> getSubObjectsMap()
+	{
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Not yet implemented");
 	}
 	
 	
