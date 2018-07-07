@@ -6,8 +6,8 @@ var gridCellLayer = document.getElementById("cell-layer");
 var objects = document.getElementsByClassName('gridObject');
 var dragDelta = 10;
 var map2dScale = 1;
-var maxZoom = 2.4;
-var minZoom = .05;
+var maxZoom = 4;
+var minZoom = .2;
 var imgSizeX = 128;
 var imgSizeY = 64;
 var gridCellWidth = 64;
@@ -1386,11 +1386,14 @@ function addGridObjectToMap(gridObject) {
 	var scaledGridCellWidth = gridCellWidth * map2dScale;
     var scaledGridCellHeight = gridCellHeight * map2dScale;	
 
+    var objectScale = gridObject.scale ? gridObject.scale : 1;
+    var gridMapObjectWidth = gridObject.width * map2dScale * objectScale;
+    var gridMapObjectHeight = gridObject.height * map2dScale * objectScale;
     
-    var topZ = gridObject.height + (gridObject.yGridCoord * gridCellHeight + gridCellHeight / 2 - (gridObject.yImageOrigin) - (gridObject.yGridCellOffset));
     var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * map2dScale) - (gridObject.xGridCellOffset * map2dScale);
     var topPos = gridObject.yGridCoord * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObject.yImageOrigin * map2dScale) - ((gridObject.yGridCellOffset)/2 * map2dScale/2);
     var leftPos = gridObject.xGridCoord * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.xImageOrigin * map2dScale) - ((gridObject.xGridCellOffset) * map2dScale);
+    var topZ = topPos + gridMapObjectHeight;
     var key = gridObject.key;
 
     // If undefined footprint, assume 1x1
@@ -1415,19 +1418,17 @@ function addGridObjectToMap(gridObject) {
         }
     }
 
-    var objectScale = gridObject.scale ? gridObject.scale : 1;
-    var gridMapObjectWidth = gridObject.width * map2dScale * objectScale;
-    var gridMapObjectHeight = gridObject.height * map2dScale * objectScale;
     
     $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key + "\" " + "class=\"gridObject\"";
     $hexBody += " data-key=\"" + key + "\"";
     $hexBody += " style=\"";
+    $hexBody += " z-index:" + (parseInt(objectZOffset) + parseInt(topZ)) + ";";
     $hexBody += " top:" + topPos + "px;";
     $hexBody += " left:" + leftPos + "px;";
     $hexBody += " margin:" + (scaledGridCellWidth / 2) + "px;";
     $hexBody += " width:" + (gridMapObjectWidth) + "px;";
     $hexBody += " height:" + (gridMapObjectHeight) + "px;";
-    $hexBody += " z-index:" + (Number(objectZOffset) + Number(topZ)) + ";";
+    $hexBody += " z-index:" + (parseInt(objectZOffset) + parseInt(topZ)) + ";";
     if (gridObject.key == "o1") {
         $hexBody += " background:url(" + $domain + gridObject.filename + ");";
     } else {
@@ -1443,7 +1444,9 @@ function addGridObjectToMap(gridObject) {
         }
     }
     $hexBody += " background-size:100% 100%;";
-    $hexBody += "\">";
+    $hexBody += "\"";
+    $hexBody += " wtfz-index=\"" + (Number(objectZOffset) + Number(topZ)) + "\"";
+    $hexBody += ">";
     $hexBody += "</div>";
 
     $('#object-layer').append($hexBody);

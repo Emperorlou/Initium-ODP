@@ -17,81 +17,15 @@ import com.universeprojects.miniup.server.model.GridObject;
 
 public class GridMapService {
 
-	public static class ObjectType
-	{
-		public String img;
-		public int width;
-		public int height;
-		public double scale;
-		public double scaleVariance;
-		public boolean flippable;
-		
-		public ObjectType(String img, int width, int height, double scale, double scaleVariance, boolean flippable)
-		{
-			this.img = img;
-			this.width = width;
-			this.height = height;
-			this.scale = scale;
-			this.scaleVariance = scaleVariance;
-			this.flippable = flippable;
-		}
-	}
 	
 	public static double GLOBAL_SCALE = 0.4;
-	
-//	public static ObjectType[] trees = {
-//			new ObjectType("trees/tree1.png", 365, 486, 1, 0.2, true),
-//			new ObjectType("trees/tree2.png", 307, 581, 1, 0.2, true),
-//			new ObjectType("trees/tree3.png", 160, 461, 1, 0.2, true),
-//			new ObjectType("trees/tree4.png", 199, 487, 1, 0.2, true),
-//			new ObjectType("trees/tree5.png", 165, 445, 1, 0.2, true),
-//			new ObjectType("trees/tree6.png", 71, 73, 1, 0.2, true),
-//			new ObjectType("https://i.imgur.com/B8sfVYr.png", 960, 540, 1, 0.2, true),
-//			new ObjectType("https://i.imgur.com/P6HnmkJ.png", 480, 270, 1, 0.2, true),
-//			new ObjectType("https://i.imgur.com/RtroHjA.png", 480, 270, 1, 0.2, true),
-//			new ObjectType("https://i.imgur.com/tqxfxrw.png", 480, 270, 1, 0.2, true),
-//			
-//	};
-//	
-//	public static ObjectType[] bushes = {
-//			new ObjectType("bushes/bush1.png", 130, 86, 1, 0.2, true),
-//			new ObjectType("bushes/bush2.png", 112, 103, 1, 0.2, true),
-//			new ObjectType("bushes/bush3.png", 113, 100, 1, 0.2, true),
-//			new ObjectType("bushes/bush4.png", 112, 104, 1, 0.2, true),
-//			new ObjectType("bushes/bush5.png", 94, 94, 1, 0.2, true),
-//			new ObjectType("bushes/bush6.png", 156, 100, 1, 0.2, true),
-//			new ObjectType("bushes/bush7.png", 107, 105, 1, 0.2, true),
-//			new ObjectType("bushes/bush8.png", 98, 102, 1, 0.2, true),
-//	};
-//	
-//	public static ObjectType[] plants = {
-//			new ObjectType("plants/mushroom1.png", 33, 37, 1, 0.2, true),
-//			new ObjectType("plants/mushroom2.png", 58, 43, 1, 0.2, true),
-//			new ObjectType("plants/mushroom3.png", 55, 61, 1, 0.2, true),
-//			new ObjectType("plants/mushroom4.png", 34, 38, 1, 0.2, true),
-//			new ObjectType("plants/plant1.png", 125, 87, 1, 0.2, true),
-//			new ObjectType("plants/plant2.png", 118, 90, 1, 0.2, true),
-//			new ObjectType("plants/plant3.png", 120, 98, 1, 0.2, true),
-//			new ObjectType("plants/plant4.png", 131, 109, 1, 0.2, true),
-//			new ObjectType("plants/plant5.png", 132, 95, 1, 0.2, true),
-//			new ObjectType("plants/plant6.png", 132, 116, 1, 0.2, true),
-//			new ObjectType("plants/plant7.png", 110, 77, 1, 0.2, true),
-//			new ObjectType("plants/plant8.png", 115, 116, 1, 0.2, true),
-//			new ObjectType("plants/plant9.png", 128, 86, 1, 0.2, true),
-//			new ObjectType("plants/plant10.png", 104, 62, 1, 0.2, true),
-//			new ObjectType("plants/plant11.png", 82, 67, 1, 0.2, true),
-//			new ObjectType("plants/plant12.png", 47, 60, 1, 0.2, true),
-//			new ObjectType("plants/plant13.png", 108, 96, 1, 0.2, true),
-//			new ObjectType("plants/plant14.png", 92, 74, 1, 0.2, true),
-//			new ObjectType("plants/plant15.png", 103, 82, 1, 0.2, true),
-//			new ObjectType("plants/plant16.png", 93, 74, 1, 0.2, true),
-//	};
+
 	
 	final private ODPDBAccess db;
 	final private CachedDatastoreService ds;
 	final private CachedEntity location;
-	final private long locationWidth;
-	final private long locationHeight;
+	final private int locationWidth;
+	final private int locationHeight;
 	private boolean initialized = false;
 	private List<CachedEntity> locationPresets = null;
 	private Map<CachedEntity, Double> naturalItemsMap = null;
@@ -101,8 +35,8 @@ public class GridMapService {
 		this.db = db;
 		this.ds = db.getDB();
 		this.location = location;
-		locationWidth = (Long)location.getProperty("gridMapSizeX");
-		locationHeight = (Long)location.getProperty("gridMapSizeY");
+		locationWidth = ((Long)location.getProperty("gridMapWidth")).intValue();
+		locationHeight = ((Long)location.getProperty("gridMapHeight")).intValue();
 	}
 	
 	private void initialize()
@@ -127,27 +61,53 @@ public class GridMapService {
 			for(CachedEntity locationPreset:locationPresets)
 			{
 				Map<String, Double> elements = db.getFieldTypeMapEntityDouble(locationPreset, "elements");
-				for(String key:elements.keySet())
+				if (elements!=null)
+					for(String key:elements.keySet())
+					{
+						if (db.isKey(key))
+						{
+							Key realKey = db.keyStringToKey(key);
+							Double existingValue = itemDefKeys.get(realKey);
+							if (existingValue==null) existingValue = 0d;
+							existingValue += elements.get(key);
+							
+							itemDefKeys.put(realKey, existingValue);
+						}
+						else
+						{
+							Double existingValue = itemDefKeys.get(key);
+							if (existingValue==null) existingValue = 0d;
+							existingValue += elements.get(key);
+							
+							itemDefKeys.put(key, existingValue);
+						}
+					}
+			}
+		// Also add all of the location's elements
+		Map<String, Double> elements = db.getFieldTypeMapEntityDouble(location, "gridMapElements");
+		if (elements!=null)
+			for(String key:elements.keySet())
+			{
+				if (db.isKey(key))
 				{
-					if (db.isKey(key))
-					{
-						Key realKey = db.keyStringToKey(key);
-						Double existingValue = itemDefKeys.get(realKey);
-						if (existingValue==null) existingValue = 0d;
-						existingValue += elements.get(key);
-						
-						itemDefKeys.put(realKey, existingValue);
-					}
-					else
-					{
-						Double existingValue = itemDefKeys.get(key);
-						if (existingValue==null) existingValue = 0d;
-						existingValue += elements.get(key);
-						
-						itemDefKeys.put(key, existingValue);
-					}
+					Key realKey = db.keyStringToKey(key);
+					Double existingValue = itemDefKeys.get(realKey);
+					if (existingValue==null) existingValue = 0d;
+					existingValue += elements.get(key);
+					
+					itemDefKeys.put(realKey, existingValue);
+				}
+				else
+				{
+					Double existingValue = itemDefKeys.get(key);
+					if (existingValue==null) existingValue = 0d;
+					existingValue += elements.get(key);
+					
+					itemDefKeys.put(key, existingValue);
 				}
 			}
+		
+		
 		
 		// Now turn the itemDef keys and names we collected into actual ItemDef entities
 		// First do a bulk get for all the actual keys
@@ -224,7 +184,7 @@ public class GridMapService {
 			}
 			
 			if (spawnCount>0)
-				spawnCount = rnd.nextInt(spawnCount);
+				spawnCount = rnd.nextInt(spawnCount+1);
 			
 			for(int i = 0; i<spawnCount; i++)
 			{
@@ -265,8 +225,6 @@ public class GridMapService {
 			Integer imageWidth = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageWidth"))*GLOBAL_SCALE);
 			Integer imageHeight = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageHeight"))*GLOBAL_SCALE);
 
-			Integer columnLength = intVal(location.getProperty("gridMapWidth"));
-			Integer rowLength = intVal(location.getProperty("gridMapHeight"));
 			
 //			double scale = 1-(rnd.nextDouble()*type.scaleVariance);
 //			double width = ((double)type.width)*scale*GLOBAL_SCALE;
@@ -281,7 +239,7 @@ public class GridMapService {
 					generatedKey,
 					imageUrl,
 					"",
-					tileX-500+rowLength/2, tileY-500+columnLength/2,
+					tileX-500+locationWidth/2, tileY-500+locationHeight/2,
 					cellOffsetX,
 					cellOffsetY,
 					(int)(imageWidth / 2), (int)(imageHeight*0.95), (int)(imageWidth), (int)(imageHeight), false, false));
@@ -359,39 +317,6 @@ public class GridMapService {
 				if (objects!=null)
 					objectMap.putAll(objects);
 				
-//				
-//				int treeCount = 0;
-//				int bushCount = 0;
-//				int plantCount = 0;
-//				
-//				treeCount = generateRandomObject(objectMap, trees, j, i, 0.3, seed);
-//				if (treeCount==0)
-//					bushCount = generateRandomObject(objectMap, bushes, j, i, 0.3, seed);
-//				
-//				if (treeCount>0) 
-//					plantCount = rnd.nextInt(4);
-//				else if (bushCount>0)
-//					plantCount = rnd.nextInt(6);
-//				else
-//					plantCount = rnd.nextInt(10);
-//				plantCount = generateRandomObject(objectMap, plants, j, i, plantCount, seed);
-//				
-////				double treeNoiseResult = treeSsn.eval(j, i);
-////				double shrubNoiseResult = shrubSsn.eval(j, i);
-////				// Determine if object is generated at coordinate
-////				if (treeNoiseResult < ((forestry / 5.0) - 1)) 
-////				{
-////				}
-////				if (shrubNoiseResult < ((forestry / 5.0) - 1)) {
-////					objectMap.put("shrub1.png" + "tempKey:" + i + "-" + j, new GridObject(
-////							"tempKey:" + i + "-" + j,
-////							"shrub1.png",
-////							"A shrubbery!",
-////							i, j,
-////							new Random(seed * (i * j + i * 11 + j)).nextInt(20),
-////							new Random(seed * (i * j + i * 10 + j)).nextInt(20),
-////							75 / 2, ((65) / 2), 77, 65, false, false));
-////				}
 				// Build background data for coordinate
 				grid[tileX-500+rowLength/2][tileY-500+columnLength/2] = new GridCell("images/2d/floor/grass/tile-grass" + rnd.nextInt(7) + ".png",
 						tileX-500+rowLength/2, tileY-500+columnLength/2,
