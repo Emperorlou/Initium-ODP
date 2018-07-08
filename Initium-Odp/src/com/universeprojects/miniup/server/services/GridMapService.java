@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,8 @@ public class GridMapService {
 	final private ODPDBAccess db;
 	final private CachedDatastoreService ds;
 	final private CachedEntity location;
-	final private int locationWidth;
-	final private int locationHeight;
+	private Integer locationWidth;
+	private Integer locationHeight;
 	private boolean initialized = false;
 	private List<CachedEntity> locationPresets = null;
 	private Map<CachedEntity, Double> naturalItemsMap = null;
@@ -35,8 +36,10 @@ public class GridMapService {
 		this.db = db;
 		this.ds = db.getDB();
 		this.location = location;
-		locationWidth = ((Long)location.getProperty("gridMapWidth")).intValue();
-		locationHeight = ((Long)location.getProperty("gridMapHeight")).intValue();
+		locationWidth = intVal(location.getProperty("gridMapWidth"));
+		locationHeight = intVal(location.getProperty("gridMapHeight"));
+		if (locationWidth==null) locationWidth = 1;
+		if (locationHeight==null) locationHeight = 1;
 	}
 	
 	private void initialize()
@@ -218,12 +221,39 @@ public class GridMapService {
 		Map<String, GridObject> result = new HashMap<>();
 		for(int i = 0; i<items.size(); i++)
 		{
+			boolean pileRandom = false;
+			
 			CachedEntity item = items.get(i);
-			String imageUrl = (String)item.getProperty("GridMapObject:image");
-			Integer cellOffsetX = intVal(item.getProperty("gridMapCellOffsetX"));
-			Integer cellOffsetY = intVal(item.getProperty("gridMapCellOffsetY"));
-			Integer imageWidth = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageWidth"))*GLOBAL_SCALE);
-			Integer imageHeight = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageHeight"))*GLOBAL_SCALE);
+			String imageUrl = null;
+			Integer cellOffsetX = null;
+			Integer cellOffsetY = null;
+			Integer imageWidth = null;
+			Integer imageHeight = null;
+			if (item.getProperty("GridMapObject:image")==null || item.getProperty("GridMapObject:imageWidth")==null || item.getProperty("GridMapObject:imageHeight")==null) 
+			{
+				imageUrl = (String)item.getProperty("icon");
+				imageWidth = 8;
+				imageHeight = 8;
+				pileRandom = true;
+			}
+			else
+			{
+				imageUrl = (String)item.getProperty("GridMapObject:image");
+				imageWidth = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageWidth"))*GLOBAL_SCALE);
+				imageHeight = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageHeight"))*GLOBAL_SCALE);
+				
+			}
+			cellOffsetX = intVal(item.getProperty("gridMapCellOffsetX"));
+			cellOffsetY = intVal(item.getProperty("gridMapCellOffsetY"));
+
+			if (cellOffsetX==null || cellOffsetY==null || pileRandom)
+			{
+				long seed = location.getId()+(tileY*1000)+tileX+items.size();
+				if (seed<0) seed += Long.MAX_VALUE;
+				Random offsetRnd = new Random(seed);
+				cellOffsetX = (offsetRnd.nextInt(64)+offsetRnd.nextInt(64))/2;
+				cellOffsetY = (offsetRnd.nextInt(64)+offsetRnd.nextInt(64))/2;
+			}
 
 			
 //			double scale = 1-(rnd.nextDouble()*type.scaleVariance);
@@ -231,7 +261,6 @@ public class GridMapService {
 //			double height = ((double)type.height)*scale*GLOBAL_SCALE;
 			
 			
-			if (imageWidth==null || imageHeight==null) continue;
 			
 			String generatedKey = "Location:"+location.getKey().getId()+"-X:"+tileX+"-Y:"+tileY+"-Index:"+i;
 			
@@ -299,10 +328,8 @@ public class GridMapService {
 	
 	public GridMap buildNewGrid() {
 
-		if (location.getProperty("gridMapWidth")==null || location.getProperty("gridMapHeight")==null)
-			return null;
-		Integer columnLength = intVal(location.getProperty("gridMapWidth"));
-		Integer rowLength = intVal(location.getProperty("gridMapHeight"));
+		Integer rowLength = locationWidth;
+		Integer columnLength = locationHeight;
 		
 		GridCell[][] grid = new GridCell[rowLength][columnLength];
 		Map<String, GridObject> objectMap = new HashMap<>();
@@ -393,15 +420,51 @@ public class GridMapService {
 	public int getGridWidth()
 	{
 		Long width = (Long)location.getProperty("gridMapWidth");
-		if (width==null) width = 0L;
+		if (width==null || width<1) width = 1L;
 		return width.intValue();
 	}
 	
 	public int getGridHeight()
 	{
 		Long height = (Long)location.getProperty("gridMapHeight");
-		if (height==null) height = 0L;
+		if (height==null || height<1) height = 1L;
 		return height.intValue();
+	}
+
+	public void generateGridMapElementsFromParent(ODPDBAccess db, CachedEntity parentLocation, CachedEntity subLocation)
+	{
+		Map<String, Double> elements = new HashMap<>();
+		
+		// Add the location's elements from the generator field
+		populateElementsFromGenerator(db, parentLocation, "gridMapElementsGenerator", elements);
+		
+		
+		// Add the preset's elements from their generators too
+		if (parentLocation.getProperty("gridMapPresets")!=null && ((Collection<Key>)parentLocation.getProperty("gridMapPresets")).isEmpty()==false)
+		{
+			initialize();
+			
+			for(CachedEntity preset:locationPresets)
+			{
+				populateElementsFromGenerator(db, preset, "elementsGenerator", elements);
+			}
+		}
+		
+		db.setFieldTypeMapEntityDouble(subLocation, "gridMapElements", elements);
+	}
+	
+	private void populateElementsFromGenerator(ODPDBAccess db, CachedEntity entity, String fieldName, Map<String, Double> elements)
+	{
+		Map<String, String> elementsGenerator = db.getFieldTypeStringStringMap(entity, fieldName);
+		if (elementsGenerator!=null)
+			for(String key:elementsGenerator.keySet())
+			{
+				String value = elementsGenerator.get(key);
+				
+				Double dblValue = db.solveCurve_Double(value);
+				
+				elements.put(key, dblValue);
+			}
 	}
 	
 }

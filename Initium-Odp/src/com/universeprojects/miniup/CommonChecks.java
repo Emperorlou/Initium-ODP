@@ -479,4 +479,17 @@ public abstract class CommonChecks
 		return "TRUE".equals(item.getProperty("naturalEquipment"));
 	}
 
+	public static boolean checkLocationIsGoodForNaturalResource(CachedEntity location)
+	{
+		if (checkLocationIsOutside(location) && 
+				checkLocationIsInstance(location)==false && 
+				checkLocationIsCampSite(location)==false && 
+				checkLocationIsCombatSite(location)==false && 
+				checkLocationIsGoodRestSite(location)==false && 
+				"Permanent".equals(location.getProperty("type")))
+			return true;
+		
+		return false;
+	}
+
 }

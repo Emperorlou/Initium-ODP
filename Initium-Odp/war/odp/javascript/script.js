@@ -4286,14 +4286,16 @@ function doCollectCollectable(event, collectableId, userRequestId)
 
 
 
-function doExplore(event, ignoreCombatSites)
+function doExplore(event, ignoreCombatSites, findNaturalResources)
 {
 	clearMakeIntoPopup();
 	
 	if (ignoreCombatSites == null)
 		ignoreCombatSites = getBannerIgnoreOldSites();
+	if (findNaturalResources==null)
+		findNaturalResources = false;
 	showBannerLoadingIcon();
-	longOperation(event, "Explore", {ignoreCombatSites:ignoreCombatSites}, 
+	longOperation(event, "Explore", {ignoreCombatSites:ignoreCombatSites, findNaturalResources:findNaturalResources}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)

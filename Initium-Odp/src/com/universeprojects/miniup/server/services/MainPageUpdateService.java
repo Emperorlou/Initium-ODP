@@ -546,7 +546,9 @@ public class MainPageUpdateService extends Service
 		updateMidMessagePanel();
 		updateLocationQuicklist();
 		updateGlobalNavigationMap();
+		updateLocation2D();
 	}
+
 
 	public void updateFullPage_shortcut(boolean refreshChat)
 	{
@@ -579,6 +581,13 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#mainMoneyIndicator", html);
 	}
+
+
+	public String updateLocation2D()
+	{
+		String newHtml = "";
+		return updateHtmlContents(".location-2d", newHtml);
+	}	
 	
 	public String updateLocationName()
 	{
@@ -912,6 +921,12 @@ public class MainPageUpdateService extends Service
 					
 				}
 				
+				if (CommonChecks.checkLocationIsGoodRestSite(location))
+				{
+					newHtml.append(getHtmlForInBannerLinkCentered(60, 50, "Rest", "doRest();"));
+				}
+				
+				
 	
 				if (CommonChecks.checkLocationIsCombatSite(location)==false)
 				{
@@ -978,7 +993,9 @@ public class MainPageUpdateService extends Service
 				CommonChecks.checkLocationIsCampSite(location)==false &&
 				CommonChecks.checkLocationIsInstance(location)==false && 
 				CommonChecks.checkCharacterIsBusy(character)==false)
-		newHtml.append(getHtmlForInBannerLinkCentered(50, 50, "Explore", "doExplore(event);"));
+		{
+			newHtml.append(getHtmlForInBannerLinkCentered(50, 50, "Explore", "doExplore(event);"));
+		}
 		
 		
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
@@ -1034,6 +1051,11 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<a id='main-explore' href='#' class='v3-main-button' shortcut='69' onclick='doExplore(event, false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
 		newHtml.append("<br>");
 		newHtml.append("<a id='main-explore-ignorecombatsites' class='v3-main-button' href='#' shortcut='87' onclick='doExplore(event, true)'><span class='shortcut-key'>(W)</span>Explore (no old sites)</a>");
+		if (CommonChecks.checkLocationIsGoodForNaturalResource(location)) 
+		{
+			newHtml.append("<br>");
+			newHtml.append("<a id='main-explore' href='#' class='v3-main-button' onclick='doExplore(event, false, true)'><span class='shortcut-key'></span>Find Natural Resources</a>");
+		}
 		
 		newHtml.append("<br>");
 		newHtml.append("<div id='main-merchantlist' class='v3-main-button-half' onclick='loadLocationMerchants()' shortcut='83'>");

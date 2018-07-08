@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -25,8 +26,11 @@ public class LongOperationExplore extends LongOperation {
 	@Override
 	int doBegin(Map<String, String> parameters) throws UserErrorMessage {
 		Boolean ignoreCombatSites = false;
+		Boolean findNaturalResources = false;
 		if ("true".equals(parameters.get("ignoreCombatSites")))
-				ignoreCombatSites = true;
+			ignoreCombatSites = true;
+		if ("true".equals(parameters.get("findNaturalResources")))
+			findNaturalResources = true;
 		
 		if (GameUtils.isCharacterInParty(db.getCurrentCharacter()) && GameUtils.isCharacterPartyLeader(db.getCurrentCharacter())==false)
 			throw new UserErrorMessage("You cannot move your party because you are not the leader.");
@@ -44,9 +48,12 @@ public class LongOperationExplore extends LongOperation {
 
 		Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
 		CachedEntity location = db.getEntity(locationKey);
-		
+
+		if (findNaturalResources && CommonChecks.checkLocationIsGoodForNaturalResource(location)==false)
+			throw new UserErrorMessage("This is not somewhere that you can find natural resources. You generally need to use this option from a major location (like Aera Countryside and the likes).");
 		
 		setDataProperty("ignoreCombatSites", ignoreCombatSites);
+		setDataProperty("findNaturalResources", findNaturalResources);
 		setDataProperty("locationName", location.getProperty("name"));
 		
 		return 6;
@@ -58,11 +65,15 @@ public class LongOperationExplore extends LongOperation {
 		Boolean ignoreCombatSites = (Boolean)getDataProperty("ignoreCombatSites");
 		if (ignoreCombatSites==null) ignoreCombatSites = false;
 		
+		Boolean findNaturalResources = (Boolean)getDataProperty("findNaturalResources");
+		if (findNaturalResources==null) findNaturalResources = false;
+		
 		Object oldLocaiton = db.getCurrentCharacter().getProperty("locationKey");
 		Object oldCombatant = db.getCurrentCharacter().getProperty("combatant");
 		
-		String result = explore(db, ignoreCombatSites);
-		if (result.equals("After some exhausting searching you failed to find anything. That doesn't necessarily mean there is nothing to be found though.."))
+		String result = explore(db, ignoreCombatSites, findNaturalResources);
+		if (result.equals("After some exhausting searching you failed to find anything. That doesn't necessarily mean there is nothing to be found though..") || 
+				result.equals("After some searching you failed to find a new place that you haven't seen before, but you can try again.."))
 		{
 			Integer continuationCount = (Integer)getDataProperty("continuationCount");
 			if (continuationCount==null) continuationCount = 0;
@@ -113,7 +124,7 @@ public class LongOperationExplore extends LongOperation {
 		return result;
 	}
 
-	public String explore(ODPDBAccess db, boolean ignoreCombatSites) throws UserErrorMessage
+	public String explore(ODPDBAccess db, boolean ignoreCombatSites, boolean findNaturalResources) throws UserErrorMessage
 	{
 		ds.beginBulkWriteMode();
 		try
@@ -122,28 +133,40 @@ public class LongOperationExplore extends LongOperation {
 			CachedEntity location = db.getEntity(locationKey);
 			
 			// First get all the things that can be discovered at the character's current location
-			List<CachedEntity> discoverablePaths_PermanentOnly = db.getPathsByLocation_PermanentOnly(locationKey);
-			Collections.shuffle(discoverablePaths_PermanentOnly);
-			
-			List<CachedEntity> discoverablePaths_CampsAndBlockades = db.getPathsByLocationAndType(locationKey, "CampSite");
-			List<CachedEntity> discoverablePaths_BlockadesOnly = db.getPathsByLocationAndType(locationKey, "BlockadeSite");
-			discoverablePaths_CampsAndBlockades.addAll(discoverablePaths_BlockadesOnly);
-			Collections.shuffle(discoverablePaths_CampsAndBlockades);
-			
-			// Only when we're not ignoring old sites, otherwise don't get the paths.
+			List<CachedEntity> discoverablePaths_PermanentOnly = null;
+			List<CachedEntity> discoverablePaths_CampsAndBlockades = null;
+			List<CachedEntity> discoverablePaths_BlockadesOnly = null;
 			List<CachedEntity> discoverablePaths = null;
-			if(ignoreCombatSites==false)
+			List<CachedEntity> discoveries = null;
+			Set<String> discoveredEntities = null;
+
+			if (findNaturalResources==false)
 			{
-				discoverablePaths = db.getPathsByLocation(locationKey);
-				Collections.shuffle(discoverablePaths);
+				discoverablePaths_PermanentOnly = db.getPathsByLocation_PermanentOnly(locationKey);
+				Collections.shuffle(discoverablePaths_PermanentOnly);
+				
+				discoverablePaths_CampsAndBlockades = db.getPathsByLocationAndType(locationKey, "CampSite");
+				discoverablePaths_BlockadesOnly = db.getPathsByLocationAndType(locationKey, "BlockadeSite");
+				discoverablePaths_CampsAndBlockades.addAll(discoverablePaths_BlockadesOnly);
+				Collections.shuffle(discoverablePaths_CampsAndBlockades);
+				
+				// Only when we're not ignoring old sites, otherwise don't get the paths.
+				if(ignoreCombatSites==false)
+				{
+					discoverablePaths = db.getPathsByLocation(locationKey);
+					Collections.shuffle(discoverablePaths);
+				}
+				
+				
+				// And get all the things the character has discovered...
+				discoveries = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacter().getKey(), locationKey, true);
+				discoveredEntities = new HashSet<String>();
+				for(CachedEntity disco:discoveries)
+					if(disco != null)
+						discoveredEntities.add(((Key)disco.getProperty("entityKey")).toString());
 			}
 			
-			// And get all the things the character has discovered...
-			List<CachedEntity> discoveries = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacter().getKey(), locationKey, true);
-			Set<String> discoveredEntities = new HashSet<String>();
-			for(CachedEntity disco:discoveries)
-				if(disco != null)
-					discoveredEntities.add(((Key)disco.getProperty("entityKey")).toString());
+			
 			
 	//		Logger.getLogger("ServletCharacterControl").log(Level.WARNING, 
 	//				"Discoverable path count (no combat sites): "+discoverablePaths_PermanentOnly.size()+
@@ -163,6 +186,7 @@ public class LongOperationExplore extends LongOperation {
 				}
 				
 				// Now try to discover campsites...
+				if (findNaturalResources==false)
 				for(CachedEntity path:discoverablePaths_CampsAndBlockades)
 				{
 					Double discoveryChance = (Double)path.getProperty("discoveryChance");
@@ -201,6 +225,7 @@ public class LongOperationExplore extends LongOperation {
 				}
 				
 				// Now try to discover other, non-combat sites...
+				if (findNaturalResources==false)
 				for(CachedEntity path:discoverablePaths_PermanentOnly)
 				{
 					if (path.getProperty("discoveryChance") instanceof Long)
@@ -244,40 +269,50 @@ public class LongOperationExplore extends LongOperation {
 				}
 				
 				// Now discover combat sites
-				if (ignoreCombatSites==false)
-				for(CachedEntity path:discoverablePaths)
+				if (ignoreCombatSites==false && findNaturalResources==false)
 				{
-					if ("CombatSite".equals(path.getProperty("type"))==false)
-						continue;
-					
-					if (path.getProperty("discoveryChance") instanceof Long)
+					for(CachedEntity path:discoverablePaths)
 					{
-						path.setProperty("discoveryChance", ((Long)path.getProperty("discoveryChance")).doubleValue());
-						ds.put(path);
-					}
-					
-					if (discoveredEntities.contains(path.getKey().toString()))
-						continue;
-					
-					Double discoveryChance = (Double)path.getProperty("discoveryChance");
-					if (discoveryChance!=null && discoveryChance==100d)
-						continue;
-					
-					if (discoveryChance!=null && discoveryChance>0 && GameUtils.roll(discoveryChance))
-					{
-						// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
-						Key destinationKey = GameUtils.equals(path.getProperty("location1Key"), locationKey) ? 
-								(Key)path.getProperty("location2Key") : (Key)path.getProperty("location1Key");											
-						// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
-						if (ds.getIfExists(destinationKey)==null)
-						{
-							ds.delete(path);
+						if ("CombatSite".equals(path.getProperty("type"))==false)
 							continue;
+						
+						if (path.getProperty("discoveryChance") instanceof Long)
+						{
+							path.setProperty("discoveryChance", ((Long)path.getProperty("discoveryChance")).doubleValue());
+							ds.put(path);
 						}
-							
-						discoverPath(ds, db, path);
-						return "You found an old combat site. A battle had clearly taken place here..";
+						
+						if (discoveredEntities.contains(path.getKey().toString()))
+							continue;
+						
+						Double discoveryChance = (Double)path.getProperty("discoveryChance");
+						if (discoveryChance!=null && discoveryChance==100d)
+							continue;
+						
+						if (discoveryChance!=null && discoveryChance>0 && GameUtils.roll(discoveryChance))
+						{
+							// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
+							Key destinationKey = GameUtils.equals(path.getProperty("location1Key"), locationKey) ? 
+									(Key)path.getProperty("location2Key") : (Key)path.getProperty("location1Key");											
+							// Now check if the path is valid. If the "other" location doesn't exist, just delete the path right away
+							if (ds.getIfExists(destinationKey)==null)
+							{
+								ds.delete(path);
+								continue;
+							}
+								
+							discoverPath(ds, db, path);
+							return "You found an old combat site. A battle had clearly taken place here..";
+						}
 					}
+				}
+				
+				
+				// Now if we're looking for natural resources, lets spawn a new site
+				if (findNaturalResources)
+				{
+					db.doCreateNaturalResourceDiscovery(db.getCurrentCharacter());
+					return "You found an area you haven't seen before. There might be something here you're looking for..";
 				}
 			}
 		}
@@ -286,7 +321,10 @@ public class LongOperationExplore extends LongOperation {
 			ds.commitBulkWrite();
 		}
 		
-		return "After some exhausting searching you failed to find anything. That doesn't necessarily mean there is nothing to be found though..";
+		if (findNaturalResources==false)
+			return "After some exhausting searching you failed to find anything. That doesn't necessarily mean there is nothing to be found though..";
+		else
+			return "After some searching you failed to find a new place that you haven't seen before, but you can try again..";
 	}
 
 	

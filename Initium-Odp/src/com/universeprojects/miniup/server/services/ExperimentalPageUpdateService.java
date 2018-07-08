@@ -11,6 +11,7 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
+import com.universeprojects.miniup.server.model.GridMap;
 
 public class ExperimentalPageUpdateService extends MainPageUpdateService
 {
@@ -135,6 +136,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		return newHtml.toString();
 	}
 
+	@Override
 	public String updateLocation2D()
 	{
 		StringBuilder newHtml = new StringBuilder();
@@ -159,7 +161,10 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("<center><p id='selectedObjects' class='selectedObjectList'></p></center>");
 		newHtml.append("<script type='text/javascript' src='/odp/javascript/Sandbox.js?v="+GameUtils.version+"'></script>");
 		newHtml.append("<script>");
-		newHtml.append("var mapData = '" + gridMapService.buildNewGrid().toString() + "';");
+		GridMap gridMap = gridMapService.buildNewGrid();
+		String gridMapData = "";
+		if (gridMap!=null) gridMapData = gridMap.toString();
+		newHtml.append("var mapData = '" + gridMapData + "';");
 		newHtml.append("var gridTileWidth = "+gridMapService.getGridWidth()+";");
 		newHtml.append("var gridTileHeight = "+gridMapService.getGridHeight()+";");
 		newHtml.append("$(document).on('click', '#somebutton', function() { pressedButton(); });");
@@ -168,5 +173,12 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		return updateHtmlContents(".location-2d", newHtml.toString());
 	}
 	
+	@Override
+	public void updateFullPage_shortcut()
+	{
+		super.updateFullPage_shortcut();
+		
+		updateLocation2D();
+	}
 	
 }

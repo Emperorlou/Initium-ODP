@@ -47,6 +47,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.miniup.server.services.ModifierService;
 import com.universeprojects.miniup.server.services.ModifierService.ModifierType;
@@ -864,7 +865,7 @@ public class ODPDBAccess
 	 *            can even roll to discover something)
 	 * @return
 	 */
-	public CachedEntity newLocation(CachedDatastoreService db, String banner, String name, String description, Double discoverAnythingChance, String type, Key parentLocationKey, Key ownerKey)
+	public CachedEntity newLocation(CachedDatastoreService db, String banner, String name, String description, Double discoverAnythingChance, String type, CachedEntity parentLocation, Key ownerKey, int gridMapSize)
 	{
 		if (db == null) db = getDB();
 
@@ -875,9 +876,15 @@ public class ODPDBAccess
 		location.setProperty("description", description);
 		location.setProperty("discoverAnythingChance", discoverAnythingChance);
 		location.setProperty("type", type);
-		location.setProperty("parentLocationKey", parentLocationKey);
+		location.setProperty("parentLocationKey", parentLocation.getKey());
 		location.setProperty("ownerKey", ownerKey);
+		location.setProperty("gridMapWidth", (long)gridMapSize);
+		location.setProperty("gridMapHeight", (long)gridMapSize);
 
+		// GridMap stuff
+		GridMapService gmService = new GridMapService(this, parentLocation);
+		gmService.generateGridMapElementsFromParent(this, parentLocation, location);
+		
 		// Set some default attributes
 
 		db.put(location);
@@ -7234,6 +7241,30 @@ public class ODPDBAccess
 	}
 
 	public Map<String, Double> getFieldTypeMapEntityDouble(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Map<String, String> getFieldTypeStringStringMap(CachedEntity entity, String fieldName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setFieldTypeMapEntityDouble(CachedEntity entity, String fieldName, Map<String, Double> value)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setFieldTypeStringStringMap(CachedEntity entity, String fieldName, Map<String, String> value)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public CachedEntity doCreateNaturalResourceDiscovery(CachedEntity character)
 	{
 		// TODO Auto-generated method stub
 		return null;
