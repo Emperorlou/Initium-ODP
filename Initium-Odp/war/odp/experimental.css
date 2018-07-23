@@ -4,7 +4,7 @@
 }	
 .major-banner-links
 {
-	margin-left:-98px;
+	margin-left:-125px;
 }
 
 .minimap-container
@@ -156,7 +156,7 @@ body[bannerstate='combat'] .major-banner-links
 {
 	.major-banner-links
 	{
-		margin-left:-56px;
+		margin-left:-90px;
 	}
 	
 	.global-navigation-map

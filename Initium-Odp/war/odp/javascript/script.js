@@ -5241,3 +5241,10 @@ function addType1Button()
 {
 	// A placeholder since this is actually in full.js now
 }
+
+
+function changeUITo(value)
+{
+	localStorage.setItem("selectUIStyle", value);
+	location.reload();
+}

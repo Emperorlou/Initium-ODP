@@ -1658,6 +1658,9 @@ public class ODPDBAccess
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
 		if (item == null) throw new UserErrorMessage("This item no longer exists.");
 
+		if (CommonChecks.checkCharacterIsIncapacitated(character))
+			throw new UserErrorMessage("You cannot do that right now. You're incapacitated.");
+		
 		if (CommonChecks.checkItemIsMovable(item)==false)
 			throw new UserErrorMessage("You cannot pick up this item.");
 		
@@ -6782,6 +6785,7 @@ public class ODPDBAccess
 	
 	public void queueMainPageUpdateForCharacter(Key characterKey, String...updateMethods)
 	{
+		if (isLoggedIn(getRequest())==false) return;	// It's ok to do this when we're not logged in because cron job
 		if (GameUtils.equals(characterKey, getCurrentCharacterKey()))
 			return;
 		
@@ -7184,8 +7188,14 @@ public class ODPDBAccess
 				location = getEntity(getDefaultLocationKey());
 			character.setProperty("locationKey", location.getKey());
 			
+			if (CommonChecks.checkCharacterIsVending(character))
+				character.setProperty("mode", null);
+			
 			if (GameUtils.equals(character.getKey(), getCurrentCharacterKey()))
+			{
 				getCurrentCharacter().setProperty("locationKey", location.getKey());
+				getCurrentCharacter().setProperty("mode", null);
+			}
 		}
 		
 		return location;

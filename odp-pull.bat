@@ -14,4 +14,9 @@ cd ..\CachedDatastore
 git pull "origin" master
 echo.
 
+echo GEFJson
+cd ..\GEFJson
+git pull "origin" master
+echo.
+
 pause

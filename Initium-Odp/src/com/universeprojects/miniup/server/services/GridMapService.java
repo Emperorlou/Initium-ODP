@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
@@ -18,6 +20,12 @@ import com.universeprojects.miniup.server.model.GridObject;
 
 public class GridMapService {
 
+	public enum ItemEntryStatus
+	{
+		Procedural,
+		ProceduralDeleted,
+		Database
+	}
 	
 	public static double GLOBAL_SCALE = 0.4;
 
@@ -28,8 +36,10 @@ public class GridMapService {
 	private Integer locationWidth;
 	private Integer locationHeight;
 	private boolean initialized = false;
+	private boolean initializedLocationData = false;
 	private List<CachedEntity> locationPresets = null;
 	private Map<CachedEntity, Double> naturalItemsMap = null;
+	private EmbeddedEntity locationData = null;
 	
 	public GridMapService(ODPDBAccess db, CachedEntity location)
 	{
@@ -40,6 +50,17 @@ public class GridMapService {
 		locationHeight = intVal(location.getProperty("gridMapHeight"));
 		if (locationWidth==null) locationWidth = 1;
 		if (locationHeight==null) locationHeight = 1;
+	}
+
+	private void initializeLocationData()
+	{
+		if (initializedLocationData) return;
+		
+		CachedEntity locationDataEntity = db.getEntity(KeyFactory.createKey("GridMapLocationData", location.getId()));
+		if (locationDataEntity!=null)
+		{
+			locationData = (EmbeddedEntity)locationDataEntity.getProperty("gridMapTiles");
+		}
 	}
 	
 	private void initialize()
@@ -199,6 +220,87 @@ public class GridMapService {
 		return result;
 	}
 	
+	private int getRowStart()
+	{
+		return 500-locationWidth/2;
+	}
+	
+	private int getRowEnd()
+	{
+		return (int)Math.ceil(500d+locationWidth.doubleValue()/2);
+	}
+	
+	private int getColumnStart()
+	{
+		return 500-locationHeight/2;
+	}
+	
+	private int getColumnEnd()
+	{
+		return (int)Math.ceil(500d+locationHeight.doubleValue()/2);
+	}
+	
+	private List<CachedEntity> generateTileItems(Random rnd, int tileX, int tileY)
+	{
+		initializeLocationData();
+		
+		List<CachedEntity> tileItems = generateNaturalTileItems(rnd, tileX, tileY);
+		
+		if (locationData==null) return tileItems;
+		
+		EmbeddedEntity gridMapTile = (EmbeddedEntity)locationData.getProperty(tileX+"x"+tileY);
+		
+		if (gridMapTile==null) return tileItems;
+		
+		Boolean isProceduralItemsCleared = (Boolean)gridMapTile.getProperty("clearedProceduralItems"); 
+		Boolean hasDatabaseItems = (Boolean)gridMapTile.getProperty("hasDatabaseItems");
+		List<EmbeddedEntity> itemDBEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("items");
+		
+		if (isProceduralItemsCleared) tileItems.clear();
+		
+		if (hasDatabaseItems && itemDBEntries!=null && itemDBEntries.isEmpty()==false)
+		{
+			for(EmbeddedEntity entry:itemDBEntries)
+			{
+				Key itemKey = (Key)entry.getProperty("itemKey");
+				ItemEntryStatus status = parseIES(entry.getProperty("status"));
+				Integer proceduralGenerationIndex = null;
+				if (entry.getProperty("proceduralGenerationIndex")!=null) proceduralGenerationIndex = ((Long)entry.getProperty("proceduralGenerationIndex")).intValue();
+				
+				if (status == ItemEntryStatus.ProceduralDeleted && isProceduralItemsCleared==false)
+					tileItems.set(proceduralGenerationIndex, null);
+				else if (status == ItemEntryStatus.Database)
+				{
+					// TODO: I guess we... load it from the db here?
+				}
+				else if (status == ItemEntryStatus.Procedural)
+				{
+					// Do nothing here I suppose, we already generated everything
+				}
+				else
+					throw new RuntimeException("ItemEntryStatus type not handled: "+status);
+			}
+		}
+		
+		
+		return tileItems;
+	}
+	
+	private ItemEntryStatus parseIES(Object value)
+	{
+		if (value==null) return null;
+		return ItemEntryStatus.valueOf((String)value);
+	}
+	
+	private CachedEntity getGridMapTileEntity(int tileX, int tileY)
+	{
+		String keyString = location.getKey().getId()+"-"+tileX+"-"+tileY;
+		
+		Key key = KeyFactory.createKey("GridMapTile", keyString);
+		
+		return db.getEntity(key);
+	}
+	
 	private CachedEntity generateItem(Random rnd, CachedEntity itemDef, int tileX, int tileY)
 	{
 		CachedEntity item = db.generateNewObject(rnd, itemDef, "Item", false);
@@ -268,7 +370,7 @@ public class GridMapService {
 					generatedKey,
 					imageUrl,
 					"",
-					tileX-500+locationWidth/2, tileY-500+locationHeight/2,
+					tileX-getRowStart(), tileY-getColumnStart(),
 					cellOffsetX,
 					cellOffsetY,
 					(int)(imageWidth / 2), (int)(imageHeight*0.95), (int)(imageWidth), (int)(imageHeight), false, false));
@@ -295,36 +397,6 @@ public class GridMapService {
 	
 	
 
-//	public static int generateRandomObject(Map<String, GridObject> objectMap, ObjectType[] typeList, int x, int y, double count, long seed)
-//	{
-//		Random rnd = new Random(seed*(x+1)*(y+1));
-//		if (count<0) return 0;
-//		if (count<1) 
-//		{
-//			if (rnd.nextDouble()>=count) 
-//				return 0;
-//			else
-//				count = 1;
-//		}
-//		
-//		for(int index = 0; index<count; index++)
-//		{
-//			ObjectType type = typeList[rnd.nextInt(typeList.length)];
-//			double scale = 1-(rnd.nextDouble()*type.scaleVariance);
-//			double width = ((double)type.width)*scale*GLOBAL_SCALE;
-//			double height = ((double)type.height)*scale*GLOBAL_SCALE;
-//			objectMap.put(type.img + "tempKey:" + x + "-" + y, new GridObject(
-//					"tempKey:" + x + "-" + y,
-//					type.img,
-//					"",
-//					x, y,
-//					rnd.nextInt(64),
-//					rnd.nextInt(64),
-//					(int)(width / 2), (int)(height*0.95), (int)(width), (int)(height), false, false));
-//		}
-//		
-//		return (int)count;
-//	}
 	
 	public GridMap buildNewGrid() {
 
@@ -335,8 +407,8 @@ public class GridMapService {
 		Map<String, GridObject> objectMap = new HashMap<>();
 
 		// Loop over grid size
-		for (int tileX = 500-rowLength/2; tileX < Math.ceil(500d+rowLength.doubleValue()/2); tileX++) {
-			for (int tileY = 500-columnLength/2; tileY < Math.ceil(500d+columnLength.doubleValue()/2); tileY++) {
+		for (int tileX = getRowStart(); tileX < getRowEnd(); tileX++) {
+			for (int tileY = getColumnStart(); tileY < getColumnEnd(); tileY++) {
 				Random rnd = getRandomForTile(tileX, tileY);
 				
 				Map<String, GridObject> objects = generateGridObjects(tileX, tileY);
@@ -345,8 +417,8 @@ public class GridMapService {
 					objectMap.putAll(objects);
 				
 				// Build background data for coordinate
-				grid[tileX-500+rowLength/2][tileY-500+columnLength/2] = new GridCell("images/2d/floor/grass/tile-grass" + rnd.nextInt(7) + ".png",
-						tileX-500+rowLength/2, tileY-500+columnLength/2,
+				grid[tileX-getRowStart()][tileY-getColumnStart()] = new GridCell("images/2d/floor/grass/tile-grass" + rnd.nextInt(7) + ".png",
+						tileX-getRowStart(), tileY-getColumnStart(),
 						rnd.nextInt(10));
 			}
 		}
