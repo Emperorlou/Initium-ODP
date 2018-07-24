@@ -4315,17 +4315,20 @@ public class ODPDBAccess
                 }
                 else
                 {
+                	// Kill character. Loot gets ignored if character is not logged in.
+                	String loot = doCharacterKilled(user, targetCharacter, sourceCharacter);
                 	if(isLoggedIn(getRequest()))
                 	{
 	                	// We check if the source character is the same as the current character. If yes, battle is won, if not, it's lost.
 	                	String verb = GameUtils.equals(getCurrentCharacterKey(), sourceCharacter.getKey()) ? "won" : "lost";
-	                	String loot = doCharacterKilled(user, targetCharacter, sourceCharacter);
-	                    status+=" The battle is over, you " + verb + "!" ;
+	                    status += " The battle is over, you " + verb + "!" ;
 	                    if (loot!=null)
 	                    {
 	                    	status=status+"<br><br>"+loot;
 	                    }
-                	}	
+                	}
+                	else
+                		status += " The battle is over.";
                 }
                 
             }
