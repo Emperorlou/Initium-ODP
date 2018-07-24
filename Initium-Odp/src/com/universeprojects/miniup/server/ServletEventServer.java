@@ -188,7 +188,12 @@ public class ServletEventServer extends HttpServlet
 				{
 					message = "<a onclick='viewStore("+character.getKey().getId()+")'>[Visit Store]</a> "+message.substring(9);
 				}
-				
+
+				if (message.startsWith("/settings"))
+				{
+                    message = "<a onclick='viewSettings()'>[Tweak your Settings]</a> "+message.substring(9);
+				}
+
 				if (message.startsWith("/store"))
 				{
 					message = "<a onclick='viewStore("+character.getKey().getId()+")'>[Visit Store]</a> "+message.substring(6);
