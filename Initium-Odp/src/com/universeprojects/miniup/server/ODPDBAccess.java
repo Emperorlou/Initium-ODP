@@ -4315,15 +4315,17 @@ public class ODPDBAccess
                 }
                 else
                 {
-                	// We check if the source character is the same as the current character. If yes, battle is won, if not, it's lost.
-                	String verb = GameUtils.equals(getCurrentCharacterKey(), sourceCharacter.getKey()) ? "won" : "lost";
-                	String loot = doCharacterKilled(user, targetCharacter, sourceCharacter);
-                    status+=" The battle is over, you " + verb + "!" ;
-                    if (loot!=null)
-                    {
-                    	status=status+"<br><br>"+loot;
-                    }
-                  		
+                	if(isLoggedIn(getRequest()))
+                	{
+	                	// We check if the source character is the same as the current character. If yes, battle is won, if not, it's lost.
+	                	String verb = GameUtils.equals(getCurrentCharacterKey(), sourceCharacter.getKey()) ? "won" : "lost";
+	                	String loot = doCharacterKilled(user, targetCharacter, sourceCharacter);
+	                    status+=" The battle is over, you " + verb + "!" ;
+	                    if (loot!=null)
+	                    {
+	                    	status=status+"<br><br>"+loot;
+	                    }
+                	}	
                 }
                 
             }
@@ -5072,6 +5074,7 @@ public class ODPDBAccess
 			{
 				zombifiedUser.setProperty("characterKey", newCharacter.getKey());
 				ds.put(zombifiedUser);
+				queueMainPageUpdateForCharacter(newCharacter.getKey(), "updateFullPage_shortcut");
 			}
 		}
 		catch (UserErrorMessage e)
