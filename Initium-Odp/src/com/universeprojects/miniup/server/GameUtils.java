@@ -2412,7 +2412,7 @@ public class GameUtils
     {
         String damageFormula = (String)weapon.getProperty("weaponDamage");
         Double critChance = null;
-        if ((Long)weapon.getProperty("weaponDamageCriticalChance") instanceof Long)
+        if (weapon.getProperty("weaponDamageCriticalChance") instanceof Long)
         {
             Long chance = (Long)weapon.getProperty("weaponDamageCriticalChance");            
             critChance = chance.doubleValue()/100d;

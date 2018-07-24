@@ -46,8 +46,8 @@ public class LongOperationExplore extends LongOperation {
 		else
 			throw new UserErrorMessage("You cannot explore right now because you are busy.");
 
-		Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
-		CachedEntity location = db.getEntity(locationKey);
+		CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
+		
 
 		if (findNaturalResources && CommonChecks.checkLocationIsGoodForNaturalResource(location)==false)
 			throw new UserErrorMessage("This is not somewhere that you can find natural resources. You generally need to use this option from a major location (like Aera Countryside and the likes).");
@@ -68,7 +68,7 @@ public class LongOperationExplore extends LongOperation {
 		Boolean findNaturalResources = (Boolean)getDataProperty("findNaturalResources");
 		if (findNaturalResources==null) findNaturalResources = false;
 		
-		Object oldLocaiton = db.getCurrentCharacter().getProperty("locationKey");
+		Object oldLocaiton = db.getCharacterLocationKey(db.getCurrentCharacter());
 		Object oldCombatant = db.getCurrentCharacter().getProperty("combatant");
 		
 		String result = explore(db, ignoreCombatSites, findNaturalResources);
