@@ -191,7 +191,7 @@ public class ServletEventServer extends HttpServlet
 
 				if (message.startsWith("/settings"))
 				{
-                    message = "<a onclick='viewSettings()'>[Tweak your Settings]</a> "+message.substring(8);
+                    message = "<a onclick='viewSettings()'>[Tweak your Settings]</a> "+message.substring(9);
 				}
 
 				if (message.startsWith("/store"))

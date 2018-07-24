@@ -1965,7 +1965,7 @@ function viewChangelog()
 
 function viewSettings()
 {
-	pagePopup("/odp/ajax_settings.jsp", null, "Game Settings");
+	pagePopup("/odp/ajax_settings", null, "Game Settings");
 }
 
 function viewProfile()
