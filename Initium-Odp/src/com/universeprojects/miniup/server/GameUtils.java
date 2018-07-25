@@ -1001,13 +1001,7 @@ public class GameUtils
 		if (label==null || label.trim().equals("") || (label=WebUtils.htmlSafe(label).trim()).equals(""))
 			label = (String)item.getProperty("name");
 
-		String iconUrl = (String)item.getProperty("icon");
-		if (iconUrl!=null && iconUrl.startsWith("http://"))
-			iconUrl = "https://"+iconUrl.substring(7);
-		else if (iconUrl!=null && iconUrl.startsWith("http")==false)
-			iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
-		
-		
+		String iconUrl = getResourceUrl(item.getProperty("icon"));
 		
 		Long quantity = (Long)item.getProperty("quantity");
 		String quantityDiv = "";
@@ -1058,11 +1052,7 @@ public class GameUtils
 		
 		sb.append("	<div class='item-popup-header'>\r\n");
 		
-		String iconUrl = (String)item.getProperty("icon");
-		if (iconUrl!=null && iconUrl.startsWith("http://"))
-			iconUrl = "https://"+iconUrl.substring(7);
-		else if (iconUrl!=null && iconUrl.startsWith("http")==false)
-			iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
+		String iconUrl = getResourceUrl(item.getProperty("icon"));
 		
 		sb.append("		<div class='icon'>");
 		if (item.getProperty("quantity")!=null)
@@ -1435,9 +1425,9 @@ public class GameUtils
     		return "";
     	
     	if (popupEmbedded)
-    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+getResourceUrl(collectable.getProperty("icon"))+"' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     	else
-    		return "<a rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='https://initium-resources.appspot.com/"+collectable.getProperty("icon")+"' style='max-width:32px; max-height:32px;' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
+    		return "<a rel='/odp/viewitemmini?itemId="+collectable.getKey().getId()+"'><div class='main-item-image-backing'><img src='"+getResourceUrl(collectable.getProperty("icon"))+"' style='max-width:32px; max-height:32px;' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"+collectable.getProperty("name")+"</div></a>";
     }
 
     public static String renderCharacter(CachedEntity userOfCharacter, CachedEntity character)
@@ -1752,7 +1742,7 @@ public class GameUtils
 				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
 				for(CachedEntity buff:buffs)
 				{
-					sb.append("<img src='"+""+GameUtils.getResourceUrl(buff.getProperty("icon"))+"' border='0'>");
+					sb.append("<img src='"+GameUtils.getResourceUrl(buff.getProperty("icon"))+"' border='0'>");
 				}
 				sb.append("</div>");
 				
@@ -1824,7 +1814,7 @@ public class GameUtils
 		for(CachedEntity buff:buffs)
 		{
 			sb.append("<div class='buff-detail'>");
-			sb.append("<img src='https://initium-resources.appspot.com/"+buff.getProperty("icon")+"' border='0'/>");
+			sb.append("<img src='" + getResourceUrl(buff.getProperty("icon"))+"' border='0'/>");
 			sb.append("<div class='buff-detail-header'>");
 			sb.append("<h5>"+buff.getProperty("name")+"</h5>");
 			for(int i = 1; i<=3; i++)
@@ -1860,7 +1850,7 @@ public class GameUtils
 			{
 				if (achievement==null) continue;
 				sb.append("<div class='achievement-detail'>");
-				sb.append("<img src='https://initium-resources.appspot.com/"+achievement.getProperty("icon")+"' border='0'/>");
+				sb.append("<img src='"+getResourceUrl(achievement.getProperty("icon"))+"' border='0'/>");
 				sb.append("<div class='achievement-detail-header'>");
 				sb.append("<h5>"+achievement.getProperty("title")+"</h5>");
 				String description = (String)achievement.getProperty("description");
