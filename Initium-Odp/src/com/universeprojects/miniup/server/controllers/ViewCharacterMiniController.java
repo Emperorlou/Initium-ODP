@@ -171,9 +171,10 @@ public class ViewCharacterMiniController extends PageController {
 		StringBuilder sb = new StringBuilder();
 		
 		for(CachedEntity buff:buffs)
-			{
-				sb.append("<img src='https://initium-resources.appspot.com/").append(buff.getProperty("icon")).append("' border='0'>");
-			}
+		{
+			String iconUrl = GameUtils.getResourceUrl(buff.getProperty("icon"));
+			sb.append("<img src='" + iconUrl + "' border='0'>");
+		}
 		request.setAttribute("printBuff", sb.toString());
 	
 		// Printing achievements
@@ -182,7 +183,8 @@ public class ViewCharacterMiniController extends PageController {
 		if (achievements!=null)
 			for(CachedEntity achievement:achievements)
 			{
-				sb.append("<img src='https://initium-resources.appspot.com/").append(achievement.getProperty("icon")).append("' border='0'>");
+				String iconUrl = GameUtils.getResourceUrl(achievement.getProperty("icon"));
+				sb.append("<img src='" + iconUrl + "' border='0'>");
 			}
 		request.setAttribute("printAchievement", sb.toString());
 		
