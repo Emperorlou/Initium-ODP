@@ -307,7 +307,16 @@ public class ViewItemController extends PageController {
 			
 			itemMap.put("strmod", field.toString());
 		}
-		
+
+		field = item.getProperty("Slotted:maxCount");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+
+			itemMap.put("slotCount", field.toString());
+
+		}
+
 		field = item.getProperty("intelligenceModifier");
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
