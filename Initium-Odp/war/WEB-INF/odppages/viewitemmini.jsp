@@ -14,13 +14,6 @@
 			</div>
 			<div style='width:230px'>
 				<span name='itemName' class='${item.quality}'>${item.name}</span>
-				<c:if test="${item.slotCount >= 1}"><img src="https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg"/></c:if>
-				<c:if test="${item.slotCount >= 2}"><img src="https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg"/></c:if>
-				<c:if test="${item.slotCount >= 3}"><img src="https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg"/></c:if>
-				<c:if test="${item.slotCount >= 4}"><img src="https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg"/></c:if>
-				<c:if test="${item.slotCount >= 5}"><img src="https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg"/></c:if>
-				<c:if test="${item.slotCount >= 6}"><img src="https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg"/></c:if>
-
 				<div name='itemClass' class='main-highlight' style='font-size:14px'>${item.itemClass}</div>
 			</div>
 		</div>
