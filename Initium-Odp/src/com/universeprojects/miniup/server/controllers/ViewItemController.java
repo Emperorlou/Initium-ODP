@@ -327,7 +327,7 @@ public class ViewItemController extends PageController {
 			    {
 			        /* A caseswitch will be put here to go through
 			         * all the different gem possibilities and assign
-			         *  a value to slot.Name, slot.Image, etc.
+			         *  a value to slot.Name, slot.Image, etc
 			         */
 			    }
 			    else

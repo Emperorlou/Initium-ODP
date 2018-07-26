@@ -47,7 +47,7 @@
 				<c:if test="${item.aspectList != null}"><div class='simple-aspect-list'>${item.aspectList}</div></c:if>
 				
 				<c:forEach items="${item.slots}" var="slot">
-				<c:if test="${slot.slotIsEmpty = true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
+				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
 				</c:forEach>
 			</div>
 			<c:if test="${item.modifiers!=null}">
