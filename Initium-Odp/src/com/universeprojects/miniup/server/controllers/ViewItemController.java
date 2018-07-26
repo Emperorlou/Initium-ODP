@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -20,8 +21,8 @@ import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.ItemAspect;
-import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
@@ -306,6 +307,44 @@ public class ViewItemController extends PageController {
 			requirements=true;
 			
 			itemMap.put("strmod", field.toString());
+		}
+		
+		field = item.getProperty("Slotted:maxCount");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+			
+			List<EmbeddedEntity> slotItems = (List<EmbeddedEntity>) item.getProperty("Slotted:slotItems");
+			List<String> itemSlots = new ArrayList<String>();
+	        List<Map<String, Object>> savedSlot = new ArrayList <Map<String, Object>>();
+			
+			for (int i = 0; i< (int)field; i++) 
+			{
+			    EmbeddedEntity currentSlot = null;
+			    if(i < slotItems.size()) currentSlot = slotItems.get(i);
+			    
+			    if(currentSlot != null)
+			    {
+			        /* A caseswitch will be put here to go through
+			         * all the different gem possibilities and assign
+			         *  a value to slot.Name, slot.Image, etc
+			         */
+			    }
+			    else
+			    {
+			    	// Create a map to store information about the slot before saving it to the List
+			        Map <String, Object> unsavedSlot = new HashMap <String, Object>();
+			        String slotName = "Empty slot";
+			        unsavedSlot.put("name", slotName);
+			        String slotTooltip = "This is an empty slot where gems can be socketed for stat bonuses.";
+			        unsavedSlot.put("tooltip", slotTooltip);
+			        Boolean slotIsEmpty = true;
+			        unsavedSlot.put("tooltip", slotIsEmpty);
+			        savedSlot.add(unsavedSlot);
+			    }
+		        
+			}
+			itemMap.put("slots", savedSlot);zz
 		}
 		
 		field = item.getProperty("intelligenceModifier");

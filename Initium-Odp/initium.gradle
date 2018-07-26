@@ -8,6 +8,7 @@ sourceSets {
 dependencies {
     compile project(':GEFCommon')
     compile project(':CachedDatastore')
+	compile project(':GEFJson')
 
 	// https://mvnrepository.com/artifact/javax.servlet/jstl
 	compile group: 'javax.servlet', name: 'jstl', version: '1.2'

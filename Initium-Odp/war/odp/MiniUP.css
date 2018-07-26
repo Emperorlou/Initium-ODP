@@ -5269,4 +5269,23 @@ div#buildingObject {
 	margin:0px;
 }
 
+.socket-base
+{
+    display:inline-block;
+    margin-right:2px;
+    position:relative;
+    width:14px;
+    height:14px;
+    background-image:url(https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg);
+}
 
+.socket-item
+{
+    position:absolute;
+    top:1px;
+    left:1px;
+    max-width:12px;
+    max-height:12px;
+    background-position:center center;
+    background-repeat:no-repeat;
+}
