@@ -253,8 +253,8 @@ function scaleTiles(event, onCenter) {
         var scaledCursorWidth = cursorWidth * map2dScale * .4;
         cursorObject.div.style.width = cursorWidth * map2dScale * .4 + "px";
         cursorObject.div.style.height = cursorHeight * map2dScale * .4 + "px";
-        cursorObject.div.style.top = cursorTop + "px";
-        cursorObject.div.style.left = cursorLeft + "px";
+        cursorObject.div.style.top = (cursorTop-15) + "px";
+        cursorObject.div.style.left = (cursorLeft-15) + "px";
         cursorSubObjects = cursorObject.div.children;
         for (i=0; i<cursorSubObjects.length; i++) {
             if (cursorSubObjects[i].style.top != "") {
@@ -809,7 +809,7 @@ function updateCursor(gridRow, gridColumn) {
     var scaledGridCellWidth = gridCellWidth * map2dScale;
     var scaledGridCellHeight = gridCellHeight * map2dScale;
     
-    var cursorTop = (gridRow * scaledGridCellHeight);
+    var cursorTop = (gridRow * scaledGridCellHeight)-15;
     var cursorLeft = (gridColumn * scaledGridCellWidth);
     var scaledCursorHeight = cursorHeight * map2dScale * .4;
     var scaledCursorWidth = cursorWidth * map2dScale * .4;
@@ -994,6 +994,7 @@ function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
 }
 
 function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursorWidth, scaledGridCellHeight, scaledGridCellWidth) {
+	cursorTop-=15;
     htmlString = "<div id=\"cursorObject\"" + " class=\"cursorObject\"";
     htmlString += " style=\"";
     htmlString += " top:" + cursorTop + "px;";
@@ -1004,7 +1005,7 @@ function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursor
     htmlString += "<div id=\"topLeftCursor\"" + " class=\"cursorSubObject\"";
     htmlString += " style=\"";
     htmlString += " z-index:" + 1000000 + ";";
-    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " background:url(" + $picUrlPath + "images/newCombat/selector1.png);";
     htmlString += " width:50%;";
     htmlString += " height:50%;";
     htmlString += " background-size:100% 100%;";
@@ -1014,7 +1015,7 @@ function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursor
     htmlString += "<div id=\"topRightCursor\"" + " class=\"cursorSubObject\"";
     htmlString += " style=\"";
     htmlString += " z-index:" + 1000000 + ";";
-    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " background:url(" + $picUrlPath + "images/newCombat/selector1.png);";
     htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
     htmlString += " width:50%;";
     htmlString += " height:50%;";
@@ -1024,7 +1025,7 @@ function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursor
     htmlString += "<div id=\"bottomRightCursor\"" + " class=\"cursorSubObject\"";
     htmlString += " style=\"";
     htmlString += " z-index:" + 1000000 + ";";
-    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " background:url(" + $picUrlPath + "images/newCombat/selector1.png);";
     htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
     htmlString += " left:" + (scaledGridCellWidth + scaledCursorWidth/2) + "px;";
     htmlString += " width:50%;";
@@ -1037,7 +1038,7 @@ function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursor
     htmlString += "<div id=\"bottomLeftCursor\"" + " class=\"cursorSubObject\"";
     htmlString += " style=\"";
     htmlString += " z-index:" + 1000000 + ";";
-    htmlString += " background:url(" + $picUrlPath + "selector1.png);";
+    htmlString += " background:url(" + $picUrlPath + "images/newCombat/selector1.png);";
     htmlString += " top:" + (scaledGridCellHeight + scaledCursorHeight/2) + "px;";
     htmlString += " width:50%;";
     htmlString += " height:50%;";
