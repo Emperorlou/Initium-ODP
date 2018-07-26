@@ -344,7 +344,7 @@ public class ViewItemController extends PageController {
 			    }
 		        
 			}
-			itemMap.put("slots", savedSlot);zz
+			itemMap.put("slots", savedSlot);
 		}
 		
 		field = item.getProperty("intelligenceModifier");
