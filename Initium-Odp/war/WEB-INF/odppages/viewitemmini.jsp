@@ -45,7 +45,10 @@
 				<c:if test="${item.warmth != null}"><div name='warmth' class='item-popup-field' title='The amount of warmth this item provides the wearer.'>Warmth: <div class='main-item-subnote'>${item.warmth} units</div></div></c:if>
 				<c:if test="${item.durability != null}"><div name='durability' class='item-popup-field' title='The number of uses this item still has left. Once it reaches 0, the item is destroyed.'>Durability: <div class='main-item-subnote'>${item.durability}</div></div></c:if>
 				<c:if test="${item.aspectList != null}"><div class='simple-aspect-list'>${item.aspectList}</div></c:if>
-				<c:if test="${item. }<div class='socket-base'><div class='socket-item' style='background-image:url(https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg);'></div></div>
+				
+				<c:forEach items="${item.slots}" var="slot">
+				<c:if test="${slot.slotIsEmpty = true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
+				</c:forEach>
 			</div>
 			<c:if test="${item.modifiers!=null}">
 				<br>

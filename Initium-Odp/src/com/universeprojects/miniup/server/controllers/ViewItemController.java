@@ -317,6 +317,8 @@ public class ViewItemController extends PageController {
 			
 			List<EmbeddedEntity> slotItems = (List<EmbeddedEntity>) item.getProperty("Slotted:slotItems");
 			List<String> itemSlots = new ArrayList<String>();
+	        List<Map<String, Object>> savedSlot = new ArrayList <Map<String, Object>>();
+			
 			for (int i = 0; i< (int)field; i++) 
 			{
 			    EmbeddedEntity currentSlot = null;
@@ -324,13 +326,26 @@ public class ViewItemController extends PageController {
 			    
 			    if(currentSlot != null)
 			    {
-			        // Output existing slot.
+			        /* A caseswitch will be put here to go through
+			         * all the different gem possibilities and assign
+			         *  a value to slot.Name, slot.Image, etc.
+			         */
 			    }
 			    else
 			    {
-			        // Handle empty slot.
+			    	// Create a map to store information about the slot before saving it to the List
+			        Map <String, Object> unsavedSlot = new HashMap <String, Object>();
+			        String slotName = "Empty slot";
+			        unsavedSlot.put("name", slotName);
+			        String slotTooltip = "This is an empty slot where gems can be socketed for stat bonuses.";
+			        unsavedSlot.put("tooltip", slotTooltip);
+			        Boolean slotIsEmpty = true;
+			        unsavedSlot.put("tooltip", slotIsEmpty);
+			        savedSlot.add(unsavedSlot);
 			    }
+		        itemMap.put("slots", savedSlot);
 			}
+		}
 		
 		field = item.getProperty("intelligenceModifier");
 		if (field!=null && field.toString().trim().equals("")==false)
