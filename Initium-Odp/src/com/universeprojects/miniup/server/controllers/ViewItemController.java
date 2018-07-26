@@ -313,7 +313,6 @@ public class ViewItemController extends PageController {
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
 			requirements=true;
-			itemMap.put("slotCount", field.toString());
 			
 			List<EmbeddedEntity> slotItems = (List<EmbeddedEntity>) item.getProperty("Slotted:slotItems");
 			List<String> itemSlots = new ArrayList<String>();
@@ -343,8 +342,9 @@ public class ViewItemController extends PageController {
 			        unsavedSlot.put("tooltip", slotIsEmpty);
 			        savedSlot.add(unsavedSlot);
 			    }
-		        itemMap.put("slots", savedSlot);
+		        
 			}
+			itemMap.put("slots", savedSlot);zz
 		}
 		
 		field = item.getProperty("intelligenceModifier");
