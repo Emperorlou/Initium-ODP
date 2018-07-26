@@ -136,7 +136,7 @@ public class ViewItemController extends PageController {
 	 * @param isComparison
 	 * @return
 	 */
-	private Map<String,Object> getItemStats(ODPDBAccess db, CachedEntity currentChar, CachedEntity item, boolean isComparisonItem)
+	private Map<String,Object> getItemStats(ODPDBAccess db, CachedEntity currentChar, itemSlots, CachedEntity item, boolean isComparisonItem)
 	{
 		if(item == null) return null;
 		
@@ -307,7 +307,29 @@ public class ViewItemController extends PageController {
 			
 			itemMap.put("strmod", field.toString());
 		}
-		
+
+		field = item.getProperty("Slotted:maxCount");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+
+			int[] itemSlots = new int[6];
+			int incrementArrayValue = 0;
+			for (int i = 0; i < (int)field; i++) {
+				int newItemSlots[] = new int[itemSlots.length + 1];
+				field = field--
+			}
+
+			itemMap.put("slotCount", field);
+
+			for(EmbeddedEntity slotItem:slotItems)
+			{
+				List<EmbeddedEntity> slotItems = item.getProperty("Slotted:slotItems");
+				<div class='socket-base'><div class='socket-item' style='background-image:url(https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg);' title='This is a socket which you can put Gems in for stat bonuses.'></div></div>
+			}
+
+		}
+
 		field = item.getProperty("intelligenceModifier");
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
