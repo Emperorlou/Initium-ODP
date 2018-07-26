@@ -315,13 +315,12 @@ public class ViewItemController extends PageController {
 			requirements=true;
 			
 			List<EmbeddedEntity> slotItems = (List<EmbeddedEntity>) item.getProperty("Slotted:slotItems");
-			List<String> itemSlots = new ArrayList<String>();
 	        List<Map<String, Object>> savedSlot = new ArrayList <Map<String, Object>>();
 			
-			for (int i = 0; i< (int)field; i++) 
+			for (int i = 0; i< (long)field; i++) 
 			{
 			    EmbeddedEntity currentSlot = null;
-			    if(i < slotItems.size()) currentSlot = slotItems.get(i);
+			    if(slotItems!=null && i < slotItems.size()) currentSlot = slotItems.get(i);
 			    
 			    if(currentSlot != null)
 			    {
@@ -339,7 +338,7 @@ public class ViewItemController extends PageController {
 			        String slotTooltip = "This is an empty slot where gems can be socketed for stat bonuses.";
 			        unsavedSlot.put("tooltip", slotTooltip);
 			        Boolean slotIsEmpty = true;
-			        unsavedSlot.put("tooltip", slotIsEmpty);
+			        unsavedSlot.put("slotIsEmpty", slotIsEmpty);
 			        savedSlot.add(unsavedSlot);
 			    }
 		        
