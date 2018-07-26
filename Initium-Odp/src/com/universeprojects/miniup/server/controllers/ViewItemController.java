@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -20,8 +21,8 @@ import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.ItemAspect;
-import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
+import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
@@ -307,6 +308,29 @@ public class ViewItemController extends PageController {
 			
 			itemMap.put("strmod", field.toString());
 		}
+		
+		field = item.getProperty("Slotted:maxCount");
+		if (field!=null && field.toString().trim().equals("")==false)
+		{
+			requirements=true;
+			itemMap.put("slotCount", field.toString());
+			
+			List<EmbeddedEntity> slotItems = (List<EmbeddedEntity>) item.getProperty("Slotted:slotItems");
+			List<String> itemSlots = new ArrayList<String>();
+			for (int i = 0; i< (int)field; i++) 
+			{
+			    EmbeddedEntity currentSlot = null;
+			    if(i < slotItems.size()) currentSlot = slotItems.get(i);
+			    
+			    if(currentSlot != null)
+			    {
+			        // Output existing slot.
+			    }
+			    else
+			    {
+			        // Handle empty slot.
+			    }
+			}
 		
 		field = item.getProperty("intelligenceModifier");
 		if (field!=null && field.toString().trim().equals("")==false)
