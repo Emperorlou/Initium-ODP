@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PropertyContainer;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
@@ -316,7 +317,10 @@ public class ViewItemController extends PageController {
 			
 			List<EmbeddedEntity> slotItems = (List<EmbeddedEntity>) item.getProperty("Slotted:slotItems");
 	        List<Map<String, Object>> savedSlot = new ArrayList <Map<String, Object>>();
+			ModifierService mService = new ModifierService(db);
 			
+	        
+	        
 			for (int i = 0; i< (long)field; i++) 
 			{
 			    EmbeddedEntity currentSlot = null;
@@ -324,19 +328,41 @@ public class ViewItemController extends PageController {
 			    
 			    if(currentSlot != null)
 			    {
-			        /* A caseswitch will be put here to go through
-			         * all the different gem possibilities and assign
-			         *  a value to slot.Name, slot.Image, etc
-			         */
+			    	Map <String, Object> unsavedSlot = new HashMap <String, Object>();
+			    	
+			    	Object slotName = currentSlot.getProperty("name");
+			    	unsavedSlot.put("slotName", slotName);
+			    	
+			    	String typeLookup = (String)item.getProperty("itemType");
+			    	if (typeLookup == "Armor") {
+			    		Object slotTooltip = currentSlot.getProperty("SlottableArmor:modifiers");
+				    	unsavedSlot.put("slotTooltip", slotTooltip);
+			    	}
+			    	else if (typeLookup == "Shield") {
+			    		List<String> modifiers = mService.getFullModifierLines(currentSlot);
+			    		
+			    	}
+			    	
+			    	else if (typeLookup == "Weapon") {
+			    		Object slotTooltip = currentSlot.getProperty("SlottableWeapon:modifiers");
+				    	unsavedSlot.put("slotTooltip", slotTooltip);
+			    	}
+			    	else {
+			    		Object slotTooltip = currentSlot.getProperty("Slottable:modifiers");
+				    	unsavedSlot.put("slotTooltip", slotTooltip);
+			    	}
+			    	
+			    	Boolean slotIsEmpty = false;
+			        unsavedSlot.put("slotIsEmpty", slotIsEmpty);
 			    }
 			    else
 			    {
 			    	// Create a map to store information about the slot before saving it to the List
 			        Map <String, Object> unsavedSlot = new HashMap <String, Object>();
 			        String slotName = "Empty slot";
-			        unsavedSlot.put("name", slotName);
+			        unsavedSlot.put("slotName", slotName);
 			        String slotTooltip = "This is an empty slot where gems can be socketed for stat bonuses.";
-			        unsavedSlot.put("tooltip", slotTooltip);
+			        unsavedSlot.put("slotTooltip", slotTooltip);
 			        Boolean slotIsEmpty = true;
 			        unsavedSlot.put("slotIsEmpty", slotIsEmpty);
 			        savedSlot.add(unsavedSlot);
