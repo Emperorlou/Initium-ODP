@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 
@@ -65,7 +66,20 @@ public class ModifierService extends Service
 	public List<String> getFullModifierLines(CachedEntity modifierEntity)
 	{
 		Object rawModifiers = modifierEntity.getProperty("modifiers");
-		if (rawModifiers==null) return null;
+		return getFullModifierLines((List<String>)rawModifiers);
+	}
+
+	
+	public List<String> getFullModifierLines(EmbeddedEntity modifierEntity)
+	{
+		Object rawModifiers = modifierEntity.getProperty("modifiers");
+		return getFullModifierLines((List<String>)rawModifiers);
+	}
+
+	
+	
+	public List<String> getFullModifierLines(List<String> rawModifiers)
+	{
 		List<String> modifiers = new ArrayList<>((List<String>)rawModifiers);
 		
 		for(int i = 0; i<modifiers.size(); i++)
