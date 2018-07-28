@@ -48,6 +48,7 @@
 				
 				<c:forEach items="${item.slots}" var="slot">
 				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
+				<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base'></div><div class = 'socket-item' <img src='${slot.slotIcon}'/> minitip='${slot.slotName}<br>${slot.slotModifiers}'></div></c:if>
 				</c:forEach>
 			</div>
 			<c:if test="${item.modifiers!=null}">

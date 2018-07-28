@@ -333,27 +333,16 @@ public class ViewItemController extends PageController {
 			    	Object slotName = currentSlot.getProperty("name");
 			    	unsavedSlot.put("slotName", slotName);
 			    	
-			    	String typeLookup = (String)item.getProperty("itemType");
-			    	if (typeLookup == "Armor") {
-			    		Object slotTooltip = currentSlot.getProperty("SlottableArmor:modifiers");
-				    	unsavedSlot.put("slotTooltip", slotTooltip);
-			    	}
-			    	else if (typeLookup == "Shield") {
-			    		List<String> modifiers = mService.getFullModifierLines(currentSlot);
-			    		
-			    	}
+			    	Object slotIcon = currentSlot.getProperty("icon");
+			    	unsavedSlot.put("slotName", slotIcon);
 			    	
-			    	else if (typeLookup == "Weapon") {
-			    		Object slotTooltip = currentSlot.getProperty("SlottableWeapon:modifiers");
-				    	unsavedSlot.put("slotTooltip", slotTooltip);
-			    	}
-			    	else {
-			    		Object slotTooltip = currentSlot.getProperty("Slottable:modifiers");
-				    	unsavedSlot.put("slotTooltip", slotTooltip);
-			    	}
+			    	List<String> rawModifiers = mService.getFullModifierLines(currentSlot);
+			    	List<String> slotModifiers = mService.getFullModifierLines(rawModifiers);
+			    	unsavedSlot.put("slotModifiers", slotModifiers);
 			    	
 			    	Boolean slotIsEmpty = false;
 			        unsavedSlot.put("slotIsEmpty", slotIsEmpty);
+			        savedSlot.add(unsavedSlot);
 			    }
 			    else
 			    {
