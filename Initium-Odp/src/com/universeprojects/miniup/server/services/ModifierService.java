@@ -66,10 +66,10 @@ public class ModifierService extends Service
 	public List<String> getFullModifierLines(CachedEntity modifierEntity)
 	{
 		Object rawModifiers = modifierEntity.getProperty("modifiers");
+		if (rawModifiers==null) return null;
 		return getFullModifierLines((List<String>)rawModifiers);
 	}
-
-	
+ 	
 	public List<String> getFullModifierLines(EmbeddedEntity modifierEntity)
 	{
 		Object rawModifiers = modifierEntity.getProperty("modifiers");
