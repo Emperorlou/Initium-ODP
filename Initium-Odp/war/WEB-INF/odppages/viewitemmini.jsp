@@ -11,6 +11,15 @@
 			<div class='icon'>
 				<c:if test="${item.quantity != null}"><div name='itemQuantity' class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>${item.quantity}</div></div></c:if>
 				<img src='${item.icon}' border='0'/>
+				<c:forEach items="${item.slots}" var="slot">
+				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
+				<c:if test="${slot.slotIsEmpty == false}">
+				<div class='socket-base'></div><div class = 'socket-item' <img src='${slot.slotIcon}'/> minitip='${slot.slotName}<br>
+				<c:forEach items="${slot.slotModifiers}" var="slotMod">
+						<div>${slotMod}</div>
+					</c:forEach>'></div>
+				</c:if>
+				</c:forEach>
 			</div>
 			<div style='width:230px'>
 				<span name='itemName' class='${item.quality}'>${item.name}</span>
@@ -45,11 +54,6 @@
 				<c:if test="${item.warmth != null}"><div name='warmth' class='item-popup-field' title='The amount of warmth this item provides the wearer.'>Warmth: <div class='main-item-subnote'>${item.warmth} units</div></div></c:if>
 				<c:if test="${item.durability != null}"><div name='durability' class='item-popup-field' title='The number of uses this item still has left. Once it reaches 0, the item is destroyed.'>Durability: <div class='main-item-subnote'>${item.durability}</div></div></c:if>
 				<c:if test="${item.aspectList != null}"><div class='simple-aspect-list'>${item.aspectList}</div></c:if>
-				
-				<c:forEach items="${item.slots}" var="slot">
-				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
-				<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base'></div><div class = 'socket-item' <img src='${slot.slotIcon}'/> minitip='${slot.slotName}<br>${slot.slotModifiers}'></div></c:if>
-				</c:forEach>
 			</div>
 			<c:if test="${item.modifiers!=null}">
 				<br>

@@ -335,13 +335,10 @@ public class ViewItemController extends PageController {
 			    	
 			    	Object slotIcon = currentSlot.getProperty("icon");
 			    	unsavedSlot.put("slotName", slotIcon);
-			    	
-			    	List<String> rawModifiers = mService.getFullModifierLines(currentSlot);
-			    	List<String> slotModifiers = mService.getFullModifierLines(rawModifiers);
+			    	List<String> slotModifiers = mService.getFullModifierLines(currentSlot);
 			    	unsavedSlot.put("slotModifiers", slotModifiers);
 			    	
-			    	Boolean slotIsEmpty = false;
-			        unsavedSlot.put("slotIsEmpty", slotIsEmpty);
+			        unsavedSlot.put("slotIsEmpty", false);
 			        savedSlot.add(unsavedSlot);
 			    }
 			    else
@@ -352,8 +349,8 @@ public class ViewItemController extends PageController {
 			        unsavedSlot.put("slotName", slotName);
 			        String slotTooltip = "This is an empty slot where gems can be socketed for stat bonuses.";
 			        unsavedSlot.put("slotTooltip", slotTooltip);
-			        Boolean slotIsEmpty = true;
-			        unsavedSlot.put("slotIsEmpty", slotIsEmpty);
+			        
+			        unsavedSlot.put("slotIsEmpty", true);
 			        savedSlot.add(unsavedSlot);
 			    }
 		        
