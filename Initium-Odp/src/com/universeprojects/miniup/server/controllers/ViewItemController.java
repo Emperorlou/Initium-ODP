@@ -329,14 +329,23 @@ public class ViewItemController extends PageController {
 			    if(currentSlot != null)
 			    {
 			    	Map <String, Object> unsavedSlot = new HashMap <String, Object>();
-			    	
+			    	String slotModifierText = new String();
 			    	Object slotName = currentSlot.getProperty("name");
 			    	unsavedSlot.put("slotName", slotName);
 			    	
 			    	Object slotIcon = currentSlot.getProperty("icon");
 			    	unsavedSlot.put("slotName", slotIcon);
+			    	
 			    	List<String> slotModifiers = mService.getFullModifierLines(currentSlot);
-			    	unsavedSlot.put("slotModifiers", slotModifiers);
+			    	
+			    	for (int track = 0; track< slotModifiers.size(); track++) {
+			    		
+			    		String unsavedModifier = slotModifiers.get(track);
+			    		slotModifierText = unsavedModifier + "<br>";
+			    		
+			    	}
+			    	
+			    	unsavedSlot.put("slotModifiers", slotModifierText);
 			    	
 			        unsavedSlot.put("slotIsEmpty", false);
 			        savedSlot.add(unsavedSlot);

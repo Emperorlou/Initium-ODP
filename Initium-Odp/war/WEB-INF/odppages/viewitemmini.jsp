@@ -13,12 +13,7 @@
 				<img src='${item.icon}' border='0'/>
 				<c:forEach items="${item.slots}" var="slot">
 				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
-				<c:if test="${slot.slotIsEmpty == false}">
-				<div class='socket-base'></div><div class = 'socket-item' <img src='${slot.slotIcon}'/> minitip='${slot.slotName}<br>
-				<c:forEach items="${slot.slotModifiers}" var="slotMod">
-						<div>${slotMod}</div>
-					</c:forEach>'></div>
-				</c:if>
+				<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base'></div><div class = 'socket-item' <img src='${slot.slotIcon}'/> minitip='${slot.slotName} + ${slot.slotModifierText}'></div></c:if>
 				</c:forEach>
 			</div>
 			<div style='width:230px'>
