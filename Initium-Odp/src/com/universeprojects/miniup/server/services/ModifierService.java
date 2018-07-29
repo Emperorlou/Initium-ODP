@@ -80,6 +80,7 @@ public class ModifierService extends Service
 	
 	public List<String> getFullModifierLines(List<String> rawModifiers)
 	{
+		if (rawModifiers==null) return null;
 		List<String> modifiers = new ArrayList<>((List<String>)rawModifiers);
 		
 		for(int i = 0; i<modifiers.size(); i++)

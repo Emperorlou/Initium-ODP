@@ -5197,6 +5197,15 @@ body
 	/*background-size:100%;*/
 }
 
+#gridmap-inspect-button
+{
+	left: 50%;
+    margin-left: -61px;
+    bottom: 0px;
+    z-index: 10000;
+    cursor: pointer;
+}
+
 .gridBackground.gridSelected
 {
 	z-index:11 !important;

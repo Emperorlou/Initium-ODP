@@ -806,6 +806,7 @@ function getCoordOfMouse(event) {
     return new CoordObject(gridColumn, gridRow);
 }
 function updateCursor(gridRow, gridColumn) {
+	
     var scaledGridCellWidth = gridCellWidth * map2dScale;
     var scaledGridCellHeight = gridCellHeight * map2dScale;
     
@@ -834,6 +835,9 @@ function updateCursor(gridRow, gridColumn) {
             }
         }
     }
+    
+    
+    
 }
 
 function clickMap(event) {
@@ -1046,7 +1050,19 @@ function buildCursorHTML(cursorTop, cursorLeft, scaledCursorHeight, scaledCursor
     htmlString += " transform:scale(-1, -1);";
     htmlString += "\">";
     htmlString += "</div>";
+    
+    // the inspect button
+//    htmlString += "<div class='main-button cursorSubObject' id='gridmap-inspect-button' onclick='alert(0)'";
+//    htmlString += "style='";
+//    htmlString += " z-index:" + 1000000 + ";";
+//    htmlString += "'>Inspect";
+//    htmlString += "</div>";
+//    htmlString += "";
+//    htmlString += "";
+//    htmlString += "";
+    
     htmlString += "</div>";
+    
     return htmlString;
 }
 function updateGridOnUI() {

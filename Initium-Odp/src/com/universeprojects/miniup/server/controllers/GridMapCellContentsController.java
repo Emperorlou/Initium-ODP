@@ -18,9 +18,9 @@ import com.universeprojects.miniup.server.services.GridMapService;
 public class GridMapCellContentsController extends InitiumPageController
 {
 
-	public GridMapCellContentsController(String pageName)
+	public GridMapCellContentsController()
 	{
-		super(pageName);
+		super("gridmapcellcontents");
 	}
 
 	@Override
