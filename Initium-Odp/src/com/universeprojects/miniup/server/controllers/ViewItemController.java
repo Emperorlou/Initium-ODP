@@ -338,13 +338,15 @@ public class ViewItemController extends PageController {
 			    	
 			    	List<String> slotModifiers = mService.getFullModifierLines(currentSlot);
 			    	
+			    	if(slotModifiers!=null) {
+			    	
 			    	for (int track = 0; track< slotModifiers.size(); track++) {
 			    		
 			    		String unsavedModifier = slotModifiers.get(track);
 			    		slotModifierText = unsavedModifier + "<br>";
 			    		
 			    	}
-			    	
+			    	}
 			    	unsavedSlot.put("slotModifiers", slotModifierText);
 			    	
 			        unsavedSlot.put("slotIsEmpty", false);
