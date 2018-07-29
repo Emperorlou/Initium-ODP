@@ -75,7 +75,8 @@ public class ModifierService extends Service
 		Object rawModifiers = modifierEntity.getProperty("modifiers");
 		return getFullModifierLines((List<String>)rawModifiers);
 	}
- 	
+
+	
 	
 	public List<String> getFullModifierLines(List<String> rawModifiers)
 	{
