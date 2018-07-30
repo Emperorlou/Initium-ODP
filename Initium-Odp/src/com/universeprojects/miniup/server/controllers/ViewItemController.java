@@ -352,8 +352,8 @@ public class ViewItemController extends PageController {
 			    	Object slotName = currentSlot.getProperty("name");
 			    	unsavedSlot.put("slotName", slotName);
 			    	
-			    	Object slotIcon = currentSlot.getProperty("icon");
-			    	unsavedSlot.put("slotName", slotIcon);
+			    	Object slotIcon = GameUtils.getResourceUrl(currentSlot.getProperty("icon"));
+			    	unsavedSlot.put("slotIcon", slotIcon);
 			    	
 			    	List<String> slotModifiers = mService.getFullModifierLines(currentSlot);
 			    	

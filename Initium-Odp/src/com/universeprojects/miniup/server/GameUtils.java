@@ -926,7 +926,12 @@ public class GameUtils
 		    		sb.append("<br>");
 		    		sb.append("<div class=\"simple-aspect-list\">");
 		    		for(InitiumAspect aspect:obj.getAspects())
-		    			sb.append(aspect.aspectId).append(" ");
+		    		{
+		    			ItemAspect iAspect = ((ItemAspect)aspect);
+		    			String tag = iAspect.getPopupTag();
+		    			if (tag!=null)
+		    				sb.append(tag).append(" ");
+		    		}
 		    		sb.append("</div>");
 		    	}
 		    	
