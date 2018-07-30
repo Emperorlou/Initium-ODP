@@ -30,6 +30,7 @@ import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
 import com.universeprojects.miniup.server.services.ContainerService;
+import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.miniup.server.services.ModifierService;
 import com.universeprojects.miniup.server.services.QuestService;
 import com.universeprojects.miniup.server.services.ScriptService;
@@ -55,9 +56,17 @@ public class ViewItemController extends PageController {
 	    CachedEntity character = db.getCurrentCharacter(); 
 	    
 	    Long itemId = WebUtils.getLongParam(request, "itemId");
-		if (itemId==null) return null;
-		Key itemKey = KeyFactory.createKey("Item", itemId);
-		CachedEntity item = db.getEntity(itemKey); 
+	    String proceduralKey = WebUtils.getStrParam(request, "proceduralKey");
+	    CachedEntity item = null;
+		if (itemId!=null)
+		{
+			Key itemKey = KeyFactory.createKey("Item", itemId);
+			item = db.getEntity(itemKey); 
+		}
+		else if (proceduralKey!=null)
+		{
+			item = GridMapService.generateSingleItemFromProceduralKey(db, db.getCharacterLocation(character), proceduralKey);
+		}
 		if (item==null)
 		{
 			response.sendError(404);
@@ -107,7 +116,11 @@ public class ViewItemController extends PageController {
 		
 		request.setAttribute("isItemOwner", GameUtils.equals(item.getProperty("containerKey"), character.getKey()));
 		request.setAttribute("item", getItemStats(db, character, item, false));
-		request.setAttribute("itemKey", KeyFactory.keyToString(item.getKey()));
+		if (item.getKey().isComplete())
+			request.setAttribute("itemKey", KeyFactory.keyToString(item.getKey()));
+		else
+			request.setAttribute("proceduralKey", proceduralKey);
+			
 		
 		ds.beginBulkWriteMode();
 		
@@ -257,12 +270,18 @@ public class ViewItemController extends PageController {
 			itemMap.put("isContainer", false);
 
 		
-		String iconUrl = (String)item.getProperty("icon");
-		if (iconUrl!=null && iconUrl.startsWith("http://"))
-			iconUrl = "https://"+iconUrl.substring(7);
-		else if (iconUrl!=null && iconUrl.startsWith("http")==false)
-			iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
+		boolean isGridMapObjectImage = false;
+		String iconUrl = GameUtils.getResourceUrl(item.getProperty("icon"));
+		if (iconUrl==null)
+		{
+			// Check if we can get the image some other way...
+			iconUrl = GameUtils.getResourceUrl(item.getProperty("GridMapObject:image"));
+			if (iconUrl!=null)
+				isGridMapObjectImage = true;
+		}
 		
+		
+		itemMap.put("isGridMapObjectImage", isGridMapObjectImage);
 		itemMap.put("icon", iconUrl);
 		if (item.getProperty("quantity")!=null)
 			itemMap.put("quantity", GameUtils.formatNumber((Long)item.getProperty("quantity")));

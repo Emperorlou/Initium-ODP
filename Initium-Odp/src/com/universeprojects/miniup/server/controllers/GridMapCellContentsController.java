@@ -14,8 +14,11 @@ import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.GridMapService;
+import com.universeprojects.web.Controller;
+import com.universeprojects.web.PageController;
 
-public class GridMapCellContentsController extends InitiumPageController
+@Controller
+public class GridMapCellContentsController extends PageController
 {
 
 	public GridMapCellContentsController()
@@ -24,7 +27,7 @@ public class GridMapCellContentsController extends InitiumPageController
 	}
 
 	@Override
-	protected String processInitiumRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	protected String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
@@ -40,7 +43,7 @@ public class GridMapCellContentsController extends InitiumPageController
 		
 		List<String> itemsFormatted = new ArrayList<>();
 		for(CachedEntity item:items)
-			itemsFormatted.add(GameUtils.renderItem(item));
+			itemsFormatted.add(GameUtils.renderItem(db, request, db.getCurrentCharacter(), item, false, false, (String)item.getAttribute("proceduralKey")));
 		
 		request.setAttribute("items", itemsFormatted);
 		

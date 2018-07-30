@@ -1525,3 +1525,11 @@ function mapPlaceCity(event) {
     buildingObject.div.style.width = buildingObject.width * map2dScale * buildingObject.scale + "px";
     buildingObject.div.style.height = buildingObject.height * map2dScale * buildingObject.scale + "px";
 }
+
+
+function inspectCellContents()
+{
+	var gridCoord = currentCoord();
+	
+	makeIntoPopupFromUrl("/odp/gridmapcellcontents?tileX="+gridCoord.xGridCoord+"&tileY="+gridCoord.yGridCoord, "Items Here", true);	
+}

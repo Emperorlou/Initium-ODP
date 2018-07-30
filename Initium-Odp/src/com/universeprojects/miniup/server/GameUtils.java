@@ -954,8 +954,13 @@ public class GameUtils
     {
     	return renderItem(db, null, character, item, false, false);
     }
-    
+
     public static String renderItem(ODPDBAccess db, HttpServletRequest request, CachedEntity character, CachedEntity item, boolean popupEmbedded, boolean smallMode)
+    {
+    	return renderItem(db, request, character, item, popupEmbedded, smallMode, null);
+    }
+    
+    public static String renderItem(ODPDBAccess db, HttpServletRequest request, CachedEntity character, CachedEntity item, boolean popupEmbedded, boolean smallMode, String proceduralKey)
     {
 		if (item==null)
 			return "";
@@ -997,11 +1002,17 @@ public class GameUtils
 			lowDurabilityClass = "very-low-durability ";
 		
 		String qualityClass = determineQuality(item.getProperties());
-		String label = (String)item.getProperty("label"); 
+		String label = (String)item.getProperty("label");
+		if (smallMode) label = null;
 		if (label==null || label.trim().equals("") || (label=WebUtils.htmlSafe(label).trim()).equals(""))
 			label = (String)item.getProperty("name");
 
 		String iconUrl = getResourceUrl(item.getProperty("icon"));
+		if (iconUrl==null)
+		{
+			// Check if we can get the image some other way...
+			iconUrl = getResourceUrl(item.getProperty("GridMapObject:image"));
+		}
 		
 		Long quantity = (Long)item.getProperty("quantity");
 		String quantityDiv = "";
@@ -1017,10 +1028,12 @@ public class GameUtils
 		}
 		
 		String result = null;
-		if (popupEmbedded)
-			result = "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+		if (proceduralKey!=null)
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?proceduralKey="+proceduralKey+"'><div class='main-item-image-backing'>"+quantityDiv+"<img style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+		else if (popupEmbedded)
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img style='max-width:26px; max-height:26px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		
 		if (result.toLowerCase().contains("<script") || result.toLowerCase().contains("javascript:")) throw new RuntimeException("CODENK1 Item("+item.getId()+")");
 		

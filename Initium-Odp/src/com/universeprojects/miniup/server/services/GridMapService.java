@@ -17,6 +17,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
 import com.universeprojects.miniup.server.model.GridObject;
+import com.universeprojects.miniup.server.services.GridMapService.ProceduralKeyData;
 
 public class GridMapService {
 
@@ -25,6 +26,14 @@ public class GridMapService {
 		Procedural,
 		ProceduralDeleted,
 		Database
+	}
+
+	public static class ProceduralKeyData
+	{
+		public Long locationId;
+		public Integer tileX;
+		public Integer tileY;
+		public Integer index;
 	}
 	
 	public static double GLOBAL_SCALE = 0.4;
@@ -193,6 +202,7 @@ public class GridMapService {
 		
 		List<CachedEntity> result = new ArrayList<>();;
 		//TODO: if one of the items generated takes up the entire tile then we should skip generating the rest of the items
+		int index = 0;
 		for(CachedEntity itemDef:naturalItemsMap.keySet())
 		{
 			Double odds = naturalItemsMap.get(itemDef);
@@ -204,7 +214,10 @@ public class GridMapService {
 			if (rnd.nextDouble()*100<lessThan100SpawnOdds)
 			{
 				//TODO: Consider using a fresh Random and adding an index number to the seed so we can regenerate this item without having to generate the whole tile
-				result.add(generateItem(rnd, itemDef, tileX, tileY));
+				CachedEntity item = generateItem(rnd, itemDef, tileX, tileY);
+				item.setAttribute("proceduralKey", generateProceduralKey(location.getId(), tileX, tileY, index));
+				index++;
+				result.add(item);
 			}
 			
 			if (spawnCount>0)
@@ -213,7 +226,10 @@ public class GridMapService {
 			for(int i = 0; i<spawnCount; i++)
 			{
 				//TODO: Consider using a fresh Random and adding an index number to the seed so we can regenerate this item without having to generate the whole tile
-				result.add(generateItem(rnd, itemDef, tileX, tileY));
+				CachedEntity item = generateItem(rnd, itemDef, tileX, tileY);
+				item.setAttribute("proceduralKey", generateProceduralKey(location.getId(), tileX, tileY, index));
+				index++;
+				result.add(item);
 			}
 		}
 		
@@ -550,6 +566,47 @@ public class GridMapService {
 				
 				elements.put(key, dblValue);
 			}
+	}
+	
+	public String generateProceduralKey(Long locationId, int tileX, int tileY, int index)
+	{
+		return "PKA"+locationId+"TX"+tileX+"TY"+tileY+"-"+index;
+	}
+	
+	public ProceduralKeyData getProceduralKeyData(String proceduralKey)
+	{
+		if (proceduralKey==null || proceduralKey.matches("PKA\\d+TX\\d+TY\\d+-\\d+")==false)
+			throw new IllegalArgumentException("Invalid procedural key: "+proceduralKey);
+		
+		String[] parts = proceduralKey.split("(PKA|TX|TY|-)");
+		
+		ProceduralKeyData pkd = new ProceduralKeyData();
+		pkd.locationId = Long.parseLong(parts[1]);
+		pkd.tileX = Integer.parseInt(parts[2]);
+		pkd.tileY = Integer.parseInt(parts[3]);
+		pkd.index = Integer.parseInt(parts[4]);
+		
+		return pkd;
+	}
+
+	public static CachedEntity generateSingleItemFromProceduralKey(ODPDBAccess db, CachedEntity location, String proceduralKey)
+	{
+		GridMapService gms = new GridMapService(db, location);
+		
+		ProceduralKeyData data = gms.getProceduralKeyData(proceduralKey);
+		
+		Random rnd = gms.getRandomForTile(data.tileX, data.tileY);
+		
+		List<CachedEntity> items = gms.generateTileItems(rnd, data.tileX, data.tileY);
+		
+		if (items==null || items.size()-1<data.index) return null;
+		
+		CachedEntity entity = items.get(data.index);
+		
+		if (proceduralKey.equals(entity.getAttribute("proceduralKey")))
+			return entity;
+		
+		return null;
 	}
 	
 }

@@ -10,10 +10,17 @@
 		<div class='item-popup-header'>
 			<div class='icon'>
 				<c:if test="${item.quantity != null}"><div name='itemQuantity' class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>${item.quantity}</div></div></c:if>
-				<img src='${item.icon}' border='0'/>
+		
+				<c:if test="${item.isGridMapObjectImage==true}">
+					<img src='${item.icon}' style='max-width:32px; max-height:48px;' border='0'/>
+				</c:if>
+				<c:if test="${item.isGridMapObjectImage==false}">
+					<img src='${item.icon}' border='0'/>
+				</c:if>
+		
 				<c:forEach items="${item.slots}" var="slot">
-				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
-				<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base' minitip='${slot.slotName} <br> ${slot.slotModifierText}'></div><div class = 'socket-item' <img src='${slot.slotIcon}'>></div></c:if>
+					<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName} &lt;br&gt; ${slot.slotTooltip}'></div></c:if>
+					<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base' minitip='${slot.slotName} &lt;br&gt; ${slot.slotModifierText}'></div><div class='socket-item' style='background-image:url(${slot.slotIcon})'></div></c:if>
 				</c:forEach>
 			</div>
 			<div style='width:230px'>
