@@ -12,8 +12,8 @@
 				<c:if test="${item.quantity != null}"><div name='itemQuantity' class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>${item.quantity}</div></div></c:if>
 				<img src='${item.icon}' border='0'/>
 				<c:forEach items="${item.slots}" var="slot">
-				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName}<br>${slot.slotTooltip}'></div></c:if>
-				<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base' minitip='${slot.slotName} <br> ${slot.slotModifierText}'></div><div class = 'socket-item' <img src='${slot.slotIcon}'>></div></c:if>
+				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName} ${slot.slotTooltip}'></div></c:if>
+				<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base' minitip='${slot.slotName} ${slot.slotModifierText}'></div><div> class = 'socket-item' <img src='${slot.slotIcon}'></div></c:if>
 				</c:forEach>
 			</div>
 			<div style='width:230px'>
