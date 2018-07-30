@@ -18,15 +18,15 @@
 					<img src='${item.icon}' border='0'/>
 				</c:if>
 		
-				<c:forEach items="${item.slots}" var="slot">
-					<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName} &lt;br&gt; ${slot.slotTooltip}'></div></c:if>
-					<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base' minitip='${slot.slotName} &lt;br&gt; ${slot.slotModifierText}'></div><div class='socket-item' style='background-image:url(${slot.slotIcon})'></div></c:if>
-				</c:forEach>
 			</div>
 			<div style='width:230px'>
 				<span name='itemName' class='${item.quality}'>${item.name}</span>
 				<div name='itemClass' class='main-highlight' style='font-size:14px'>${item.itemClass}</div>
 			</div>
+			<c:forEach items="${item.slots}" var="slot">
+				<c:if test="${slot.slotIsEmpty == true}"><div class='socket-base' minitip='${slot.slotName} &lt;br&gt; ${slot.slotTooltip}'></div></c:if>
+				<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base' minitip='${slot.slotName} &lt;br&gt; ${slot.slotModifierText}'><div class='socket-item' style='background-image:url(${slot.slotIcon})'></div></div></c:if>
+			</c:forEach>
 		</div>
 		<div>
 			<p>${item.itemSlot}</p>
