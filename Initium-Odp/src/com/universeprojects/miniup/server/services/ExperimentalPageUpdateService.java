@@ -170,6 +170,8 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("var mapData = '" + gridMapData + "';");
 		newHtml.append("var gridTileWidth = "+gridMapService.getGridWidth()+";");
 		newHtml.append("var gridTileHeight = "+gridMapService.getGridHeight()+";");
+		newHtml.append("var gridTileOffsetX = "+gridMapService.getRowStart()+";");
+		newHtml.append("var gridTileOffsetY = "+gridMapService.getColumnStart()+";");
 		newHtml.append("$(document).on('click', '#somebutton', function() { pressedButton(); });");
 		newHtml.append("</script>");
 		

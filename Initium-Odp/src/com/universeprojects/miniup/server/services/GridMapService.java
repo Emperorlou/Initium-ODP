@@ -236,22 +236,22 @@ public class GridMapService {
 		return result;
 	}
 	
-	private int getRowStart()
+	public int getRowStart()
 	{
 		return 500-locationWidth/2;
 	}
 	
-	private int getRowEnd()
+	public int getRowEnd()
 	{
 		return (int)Math.ceil(500d+locationWidth.doubleValue()/2);
 	}
 	
-	private int getColumnStart()
+	public int getColumnStart()
 	{
 		return 500-locationHeight/2;
 	}
 	
-	private int getColumnEnd()
+	public int getColumnEnd()
 	{
 		return (int)Math.ceil(500d+locationHeight.doubleValue()/2);
 	}

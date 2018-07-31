@@ -1,3 +1,6 @@
+var selectedTileX = null;
+var selectedTileY = null;
+
 var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
 var menu = document.getElementById("menu");
@@ -806,6 +809,10 @@ function getCoordOfMouse(event) {
     return new CoordObject(gridColumn, gridRow);
 }
 function updateCursor(gridRow, gridColumn) {
+	selectedTileX = gridRow+gridTileOffsetX;
+	selectedTileY = gridColumn+gridTileOffsetY;
+	
+	console.log(selectedTileX+" - "+selectedTileY);
 	
     var scaledGridCellWidth = gridCellWidth * map2dScale;
     var scaledGridCellHeight = gridCellHeight * map2dScale;
@@ -1529,7 +1536,7 @@ function mapPlaceCity(event) {
 
 function inspectCellContents()
 {
-	var gridCoord = currentCoord();
+	if (selectedTileX==null || selectedTileY==null) return;
 	
-	makeIntoPopupFromUrl("/odp/gridmapcellcontents?tileX="+gridCoord.xGridCoord+"&tileY="+gridCoord.yGridCoord, "Items Here", true);	
+	makeIntoPopupFromUrl("/odp/gridmapcellcontents?tileX="+selectedTileX+"&tileY="+selectedTileY, "Items Here", true);	
 }

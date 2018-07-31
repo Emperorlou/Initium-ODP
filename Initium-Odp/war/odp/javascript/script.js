@@ -3020,7 +3020,7 @@ function makeIntoPopupFromUrl(url, title, disableGlass)
 	window.scrollTo(0,0);
 	if (disableGlass!=true)
 		$(".make-popup-root").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
-	$(".make-popup-root").append("<div style='position:absolute; left:50%; top:10%;z-index:100000000;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>" +
+	$(".make-popup-root").append("<div style='position:absolute; left:50%; top:10%;z-index:10000000;'><div class='main-buttonbox v3-window3 make-popup make-popup-html' style='position:relative; margin-left:-50%!important;left:0px;'>" +
 			"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
 			"	<h4>"+title+"</h4>" +
 			"<div id='make-popup-url-contents'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div></div></div>");
