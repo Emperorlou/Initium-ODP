@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.TransactionCommand;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -49,8 +50,10 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 		if(item == null)
 			throw new UserErrorMessage("Item does not exist");
 		
-		long depositAmount = Long.parseLong(parameters.get("amount").replace(",", ""));
-		if(depositAmount < 0)
+		Long depositAmount = GameUtils.fromShorthandNumber(parameters.get("amount").replace(",", ""));
+		if(depositAmount == null)
+			throw new UserErrorMessage("Please type a valid gold amount.");
+		else if(depositAmount < 0)
 			throw new UserErrorMessage("Cannot deposit a negative amount");
 
 		Long characterCoins = (Long)character.getProperty("dogecoins");

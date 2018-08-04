@@ -43,6 +43,8 @@ public class GameUtils
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
+	final static Pattern shorthandRegex = Pattern.compile("^([-]?\\d*(?:[.]\\d*)?)([kKmMbB]?)$");
+	final static String[] shorthandSuffixes = {" ", "k", "m", "b"};
 	final static DecimalFormat singleDigitFormat = new DecimalFormat("#,##0.0");
 	final static DecimalFormat doubleDigitFormat = new DecimalFormat("#,##0.00");
 	final static DecimalFormat noDigitFormat = new DecimalFormat("#,###");
@@ -54,6 +56,43 @@ public class GameUtils
 		
 	}
 
+    public static String shorthandNumber(Long value)
+    {
+        int numZeros = (int)(Math.log10(value.doubleValue())); 
+        int idx = Math.min(numZeros/3, shorthandSuffixes.length - 1);
+        double shorthandValue = value.doubleValue() * Math.pow(10, -idx*3);
+        String newValue = numZeros%3 == 0 ? singleDigitFormat.format(shorthandValue) : noDigitFormat.format(shorthandValue);
+        return newValue + shorthandSuffixes[idx];
+    }
+    
+    public static Long fromShorthandNumber(String value)
+    {
+        if(value == null || value.trim().equals(""))
+            return null;
+        
+        // Could potentially have shorthand, but need to ensure at least 1 digit present.
+        if(value.matches(".*\\d+.*"))
+        {
+            Matcher numMatches = shorthandRegex.matcher(value);
+            if(numMatches.matches())
+            {
+                Double number = new Double(numMatches.group(1));
+                String shorthand = numMatches.group(2).toLowerCase();
+                if(shorthand.length() > 0)
+                    for(int idx = 0; idx < shorthandSuffixes.length; idx++)
+                        if(shorthandSuffixes[idx].equals(shorthand))
+                        {
+                            number = number * Math.pow(10, idx*3);
+                            break;
+                        }
+                
+                return number.longValue();
+            }
+        }
+        
+        return null;
+    }
+    
 	public static String formatNumber(Object value)
 	{
 		return formatNumber(value, true);
@@ -1023,10 +1062,8 @@ public class GameUtils
 		String quantityDiv = "";
 		if (quantity!=null)
 		{
-			if (quantity>=10000L && smallMode)
-				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+noDigitFormat.format(quantity.doubleValue()/1000D)+"k</div></div>";
-			else if (quantity>=1000L && smallMode)
-				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+singleDigitFormat.format(quantity.doubleValue()/1000D)+"k</div></div>";
+			if (quantity>=1000L && smallMode)
+				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='"+formatNumber(quantity)+"'>"+shorthandNumber(quantity)+"</div></div>";
 			else
 				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div></div>";
 				
