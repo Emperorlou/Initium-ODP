@@ -34,7 +34,7 @@ public class LongOperationCollectCollectable extends LongOperation {
 		if (ODPDBAccess.CHARACTER_MODE_COMBAT.equals(db.getCurrentCharacter().getProperty("mode")))
 			throw new UserErrorMessage("You cannot collect stuff right now because you are currently in combat.");
 		if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(db.getCurrentCharacter().getProperty("mode")))
-			throw new UserErrorMessage("You cannot collect stuff right now because you are currently vending.");
+			throw new UserErrorMessage("You cannot collect stuff right now because you are currently vending. <a onclick='closeAllPopups();storeDisabledNew(event);'>Click here</a> to close your store.");
 		if (ODPDBAccess.CHARACTER_MODE_TRADING.equals(db.getCurrentCharacter().getProperty("mode")))
 			throw new UserErrorMessage("You cannot collect stuff right now because you are currently trading.");
 		if (db.getCurrentCharacter().getProperty("mode")==null || "".equals(db.getCurrentCharacter().getProperty("mode")) || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(db.getCurrentCharacter().getProperty("mode")))
