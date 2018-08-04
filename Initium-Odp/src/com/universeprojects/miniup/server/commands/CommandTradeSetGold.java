@@ -33,11 +33,12 @@ public class CommandTradeSetGold extends Command {
         Long dogecoin = null;
         try {
         	dogecoinStr = dogecoinStr.replace(",", "");
-            dogecoin = Long.parseLong(dogecoinStr);
-        	}
-        	catch (Exception e){
-        		new UserErrorMessage("Please type a valid gold amount.");
-        	}
+            dogecoin = GameUtils.fromShorthandNumber(dogecoinStr);
+            if(dogecoin == null) throw new Exception();
+    	}
+    	catch (Exception e){
+    		new UserErrorMessage("Please type a valid gold amount.");
+    	}
         	
 		TradeObject tradeObject = TradeObject.getTradeObjectFor(ds, character);
 		if (tradeObject==null || tradeObject.isCancelled())
