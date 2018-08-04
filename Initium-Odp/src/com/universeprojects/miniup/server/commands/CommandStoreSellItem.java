@@ -10,6 +10,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -30,9 +31,11 @@ public class CommandStoreSellItem extends Command {
 	@Override
 public void run(Map<String,String> parameters) throws UserErrorMessage {
 		
-		Long amount = Long.parseLong(parameters.get("amount").trim());
+		Long amount = GameUtils.fromShorthandNumber(parameters.get("amount").trim());
 		Long itemId = Long.parseLong(parameters.get("itemId"));
 		
+		if (amount == null)
+			new UserErrorMessage("Please type a valid gold amount.");
 		if (amount<0)
 			throw new UserErrorMessage("You cannot sell an item for less than 0 gold.");
 		
