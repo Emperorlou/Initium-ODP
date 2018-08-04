@@ -39,16 +39,10 @@ public class CommandStoreRepriceItem extends Command
 			UserRequestIncompleteException 
 	{
 		Long saleItemId = Long.parseLong(parameters.get("saleItemId"));
-		Long amount = null;
-		try
-		{
-			amount = Long.parseLong(parameters.get("amount").trim());
-		}
-		catch(Exception e)
-		{
-			throw new UserErrorMessage("Invalid number. Please specify a whole number (no decimal places).");
-		}
+		Long amount = GameUtils.fromShorthandNumber(parameters.get("amount").trim());
 
+		if (amount == null)
+			new UserErrorMessage("Please type a valid gold amount.");
 		if (amount<0)
 			throw new UserErrorMessage("You cannot sell an item for less than 0 gold.");
 		
