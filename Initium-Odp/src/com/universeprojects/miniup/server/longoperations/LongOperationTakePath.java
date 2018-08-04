@@ -73,7 +73,7 @@ public class LongOperationTakePath extends LongOperation {
 				throw new UserErrorMessage("You cannot move right now because you are currently in combat.");
 			}
 			if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(character.getProperty("mode")))
-				throw new UserErrorMessage("You cannot move right now because you are currently vending.");
+				throw new UserErrorMessage("You cannot move right now because you are currently vending. <a onclick='closeAllPopups();storeDisabledNew(event);'>Click here</a> to close your store.");
 			if (ODPDBAccess.CHARACTER_MODE_TRADING.equals(character.getProperty("mode")))
 				throw new UserErrorMessage("You cannot move right now because you are currently trading.");
 			if (GameUtils.isPlayerIncapacitated(character))
