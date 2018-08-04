@@ -265,7 +265,7 @@ public class LongOperationTakePath extends LongOperation {
 			CachedEntity guardToAttack = guardService.tryToEnterLocation(character, destinationKey, allowAttack);
 			if (guardToAttack!=null)
 			{
-				combatService.enterCombat(character, guardToAttack, true);
+				combatService.enterCombat(character, guardToAttack, true, true);
 				
 				throw new GameStateChangeException(); // If we've been interrupted, we'll just get out and not actually travel to the location
 				

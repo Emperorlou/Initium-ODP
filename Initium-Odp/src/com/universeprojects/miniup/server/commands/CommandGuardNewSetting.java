@@ -43,7 +43,7 @@ public class CommandGuardNewSetting extends Command
 			if (guard!=null)
 			{
 				CombatService combatService = new CombatService(db);
-				combatService.enterCombat(db.getCurrentCharacter(), guard, true);
+				combatService.enterCombat(db.getCurrentCharacter(), guard, true, true);
 				
 				MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
 				mpus.updateFullPage_shortcut();

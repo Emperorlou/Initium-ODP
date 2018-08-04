@@ -4298,7 +4298,13 @@ public class ODPDBAccess
                 {
 					Double hitpoints = (Double)sourceCharacter.getProperty("hitpoints");
 					Double maxHitpoints = (Double)sourceCharacter.getProperty("maxHitpoints");
-					if (hitpoints<maxHitpoints)
+					Double guardStartHP = (Double)sourceCharacter.getProperty("guardStartHP");
+					if (guardStartHP!=null && hitpoints<guardStartHP)
+					{
+						sourceCharacter.setProperty("hitpoints", guardStartHP);
+						sourceCharacter.setProperty("guardStartHP", null);
+					}
+					else if (hitpoints<maxHitpoints)
 						sourceCharacter.setProperty("hitpoints", maxHitpoints);
                 }
                 
@@ -6349,8 +6355,16 @@ public class ODPDBAccess
 				{
 					Double hitpoints = (Double)monster.getProperty("hitpoints");
 					Double maxHitpoints = (Double)monster.getProperty("maxHitpoints");
-					if (hitpoints<maxHitpoints)
+					Double guardStartHP = (Double)monster.getProperty("guardStartHP");
+					if (guardStartHP!=null && hitpoints<guardStartHP)
+					{
+						monster.setProperty("hitpoints", guardStartHP);
+						monster.setProperty("guardStartHP", null);
+					}
+					else if (hitpoints<maxHitpoints)
+					{
 						monster.setProperty("hitpoints", maxHitpoints);
+					}
 					
 					monster.setProperty("mode", CHARACTER_MODE_NORMAL);
 					monster.setProperty("combatant", null);

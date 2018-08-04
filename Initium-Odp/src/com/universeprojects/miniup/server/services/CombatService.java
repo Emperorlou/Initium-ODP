@@ -2,12 +2,12 @@ package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
-import com.universeprojects.miniup.server.NotificationType;
 import com.universeprojects.miniup.server.ODPDBAccess;
 
 public class CombatService extends Service
@@ -34,8 +34,14 @@ public class CombatService extends Service
 		}
 		
 	}
-	
+
 	public void enterCombat(CachedEntity attacker, CachedEntity defender, boolean autoAttack)
+	{
+		enterCombat(attacker, defender, autoAttack, false);
+	}
+	
+	
+	public void enterCombat(CachedEntity attacker, CachedEntity defender, boolean autoAttack, boolean isDefenderGuarding)
 	{
 		if (GameUtils.equals(attacker.getKey(), defender.getKey())) throw new RuntimeException("You cannot attack yourself.");
 		
@@ -50,6 +56,11 @@ public class CombatService extends Service
 		
 		attacker.setProperty("combatType", null);
 		defender.setProperty("combatType", null);
+		
+		if (isDefenderGuarding)
+		{
+			defender.setProperty("guardStartHP", defender.getProperty("hitpoints"));
+		}
 		
 		CachedDatastoreService ds = db.getDB();
 
