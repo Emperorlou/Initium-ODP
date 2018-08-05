@@ -11,6 +11,7 @@ import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 /**
@@ -61,7 +62,13 @@ public class CommandToggleStorefront extends Command
 		
 		db.doCharacterTimeRefresh(ds, character);	// This is saving the character, so no need to save after this
 		
-		updateHtml("#"+parameters.get("buttonId"), HtmlComponents.generateToggleStorefront(character));
+		if (parameters.get("buttonId")==null || parameters.get("buttonId").equals("") ||  parameters.get("buttonId").equals("undefined") || parameters.get("buttonId").equals("null"))
+		{
+			MainPageUpdateService mpus = new MainPageUpdateService(db, db.getCurrentUser(), character, db.getCharacterLocation(character), this);
+			mpus.updateButtonBar();
+		}
+		else
+			updateHtml("#"+parameters.get("buttonId"), HtmlComponents.generateToggleStorefront(character));
 		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}

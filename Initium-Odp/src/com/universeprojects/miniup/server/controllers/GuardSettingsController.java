@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,13 +14,10 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.cacheddatastore.EntityPool;
-import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.dbentities.GuardSetting;
-import com.universeprojects.miniup.server.dbentities.GuardSetting.GuardExclusion;
 import com.universeprojects.miniup.server.dbentities.GuardSetting.GuardType;
 import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.web.Controller;
@@ -50,8 +46,7 @@ public class GuardSettingsController extends PageController {
 	    Key locationKey = null;
 	    if (locationKeyStr!=null)
 	    	locationKey = KeyFactory.stringToKey(locationKeyStr);
-	    if (locationKey==null) locationKey = 
-	    		(Key)character.getProperty("locationKey");
+	    if (locationKey==null) locationKey = db.getCharacterLocationKey(character);
 	    
 	    
 	    List<GuardSetting> guardSettings = null;
@@ -107,6 +102,8 @@ public class GuardSettingsController extends PageController {
 	    request.setAttribute("guardSettings", formattedGuardSettings);
 	    
 	    request.setAttribute("locationKey", locationKey.toString());
+	    
+	    request.setAttribute("guardRunHitpoints", character.getProperty("guardRunHitpoints"));
 	    
 		return "/WEB-INF/odppages/ajax_guardsettings.jsp";
 	}

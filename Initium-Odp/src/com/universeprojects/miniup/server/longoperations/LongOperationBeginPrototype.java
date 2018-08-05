@@ -209,7 +209,7 @@ public class LongOperationBeginPrototype extends LongOperation
 		else if (CommonChecks.checkCharacterIsInCombat(character))
 			throw new UserErrorMessage("You cannot experiment right now. You're currently in combat.");
 		else if (CommonChecks.checkCharacterIsVending(character))
-			throw new UserErrorMessage("You cannot experiment right now. You're currently maning your store.");
+			throw new UserErrorMessage("You cannot experiment right now. You're currently maning your store. <br><a onclick='closeAllPopups(); toggleStorefront();'>Shutdown Store</a>");
 		else if (CommonChecks.checkCharacterIsUnconscious(character))
 			throw new UserErrorMessage("You cannot experiment right now. You're currently unconscious, lol.");
 		else if (CommonChecks.checkCharacterIsDead(character))
