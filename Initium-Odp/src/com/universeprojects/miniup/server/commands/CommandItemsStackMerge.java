@@ -125,7 +125,7 @@ public class CommandItemsStackMerge extends CommandItemsBase {
 		// Merge the keysets, so that newly added fields also get considered
 		Set<String> allKeys = new HashSet<String>(entity1Props.keySet());
 		allKeys.addAll(entity2Props.keySet());
-		allKeys.removeAll(Arrays.asList("movedTimestamp", "movedDate", "quantity", "createdDate"));
+		allKeys.removeAll(Arrays.asList("movedTimestamp", "movedDate", "quantity", "createdDate", "hardcoreMode"));
 		// If a field doesn't exist on one entity, then will resolve to null when checking the property
 		for (String checking : allKeys) {
 			if (!GameUtils.equals(entity1Props.get(checking), entity2Props.get(checking))) {
