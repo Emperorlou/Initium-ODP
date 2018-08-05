@@ -50,19 +50,19 @@ public class CommandEatBerry extends Command {
 						ds.delete(buff);
 					if("Trick!".equals(buff.getProperty("name")))
 						ds.delete(buff);
-					db.awardBuff_Sick(ds, character);
+					db.awardBuffByName(ds, character, "Sick");
 				}
 			db.awardBuff_Candy(ds, character);
 			ds.delete(item);
 		}
 		else if("Strange Elixir".equals(item.getProperty("name"))==true){
-			if(db.awardBuff_Elixir(ds, character)==false)
+			if(db.awardBuffByName(ds, character, "Strange Elixir")==false)
 				throw new UserErrorMessage("Only one elixir buff can be active at a time");
 			ds.delete(item);
 			return;
 		}
 		else if ("Mysterious Berry".equals(item.getProperty("name"))==true){
-			if(db.awardBuff_Berry(ds,character)==false)
+			if(db.awardBuffByName(ds,character,"Mysterious Berry")==false)
 				throw new UserErrorMessage("Only one berry buff can be active at a time.");
 			ds.delete(item);
 			return;

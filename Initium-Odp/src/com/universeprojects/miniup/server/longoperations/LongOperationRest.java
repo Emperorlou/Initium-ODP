@@ -113,7 +113,7 @@ public class LongOperationRest extends LongOperation {
 					curBuffs.remove(i);
 				}
 			}
-			db.awardBuff_WellRested(ds, db.getCurrentCharacter());
+			db.awardBuffByName(ds, db.getCurrentCharacter(), "Well Rested");
 		}
 		else
 		{
@@ -137,7 +137,7 @@ public class LongOperationRest extends LongOperation {
 			
 			if (bestMinutesRemaining>=45)
 			{
-				db.awardBuff_WellRested(ds, db.getCurrentCharacter());
+				db.awardBuffByName(ds, db.getCurrentCharacter(), "Well Rested");
 			}
 		}
 		
