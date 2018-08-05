@@ -2002,7 +2002,7 @@ function viewContainer(containerId, title, closePopups)
 
 function renameCharacter(eventObject, currentCharName)
 {
-	promptPopup("Rename Character", "Ok, what will you call your character?", currentCharName, function(name){
+	promptPopup("Rename Character", "Ok, what will you call your character?<br/>Add ! to the end of the name for Hardcore Mode.", currentCharName, function(name){
 		doCommand(eventObject, "RenameUnnamedPlayer", {"newName":name});
 	});
 }
@@ -3080,7 +3080,7 @@ function createNewCharacter(event)
 {
 	clearMakeIntoPopup();
 	
-	promptPopup("New Character", "Give your new character a name:", "", function(name){
+	promptPopup("New Character", "Give your new character a name:<br/>Add ! to the end of the name for Hardcore Mode.", "", function(name){
 		doCommand(event, "NewCharacter", {name:name}, function(){
 			clearMakeIntoPopup();
 			$("#characterswitcher-container").remove();

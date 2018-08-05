@@ -898,6 +898,14 @@ public class GameUtils
 //    {
 //    	
 //    }
+
+	public static String cleanCharacterName(String name)
+	{
+		name = name.trim();
+		name = name.replaceAll("^(Dead\\s+)+", "");
+		name = name.replaceAll("\\s{2,}"," ");
+		return name;
+	}
     
     private static String getItemMiniTip(ODPDBAccess db, CachedEntity item) 
     {
@@ -1069,6 +1077,7 @@ public class GameUtils
 				
 		}
 		
+		if(CommonChecks.checkIsHardcore(item)) qualityClass += " hardcore";
 		String result = null;
 		if (proceduralKey!=null)
 			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?proceduralKey="+proceduralKey+"'><div class='main-item-image-backing'>"+quantityDiv+"<img style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
@@ -1115,12 +1124,14 @@ public class GameUtils
 		sb.append("<img src='" + iconUrl + "' border='0'/></div>\r\n");
 		sb.append("		<div style='width:230px'>\r\n");
 		
+		
 		String itemName = (String)item.getProperty("name");
 		if(itemName == null) itemName = "(null)";
 		String itemClass = (String)item.getProperty("itemClass");
 		if(itemClass == null) itemClass = "";
-		sb.append("			<span " + (isComparisonItem ? "" : "name='itemName' ") + "class='" + determineQuality(item.getProperties()) + "'>"+itemName+"</span>\r\n");
-		sb.append("			<div " + (isComparisonItem ? "" : "name='itemClass' ") + "class='main-highlight' style='font-size:14px'>"+itemClass+"</div>\r\n");
+		String hcmClass = CommonChecks.checkIsHardcore(item) ? " hardcore" : "";
+		sb.append("			<span " + (isComparisonItem ? "" : "name='itemName' ") + "class='" + determineQuality(item.getProperties()) + hcmClass +"'>"+itemName+"</span>\r\n");
+		sb.append("			<div " + (isComparisonItem ? "" : "name='itemClass' ") + "class='main-highlight" + hcmClass + "' style='font-size:14px'>"+itemClass+"</div>\r\n");
 		sb.append("		</div>\r\n");
 		sb.append("	</div>\r\n");
 		
@@ -1505,8 +1516,12 @@ public class GameUtils
     	}
     	
     	String nameClass = (String)character.getProperty("nameClass");
+    	if (nameClass==null) nameClass = "";
     	if ((nameClass==null || nameClass.equals("")) && userOfCharacter!=null && Boolean.TRUE.equals(userOfCharacter.getProperty("premium")))
     		nameClass = "premium-character-name";
+    	
+    	if(CommonChecks.checkIsHardcore(character))
+    		nameClass = (nameClass + " hardcore").trim();
     	
     	if (meStyle)
     		nameClass = "chatMessage-text";
@@ -1681,14 +1696,15 @@ public class GameUtils
 		int hitpointsPercentage = (int)((double)character.getProperty("hitpoints")/(double)character.getProperty("maxHitpoints")*100d);
 		int hitpoints = ((Double)character.getProperty("hitpoints")).intValue();
 		int maxHitpoints = ((Double)character.getProperty("maxHitpoints")).intValue();
+		String hcmClass = CommonChecks.checkIsHardcore(character) ? "hardcore" : "";
 		if (leftSide)
 			nameAndBars.append("<div class='character-display-box-info'>");
 		else
 			nameAndBars.append("<div class='character-display-box-info' style='text-align:right;max-width:100px; overflow: hidden;'>");
 		if (isSelf)
-			nameAndBars.append("	<a id='character-switcher' class='' onclick='viewCharacterSwitcher()' style='cursor:pointer'>"+characterName+"</a>");
+			nameAndBars.append("	<a id='character-switcher' class='" + hcmClass + "' onclick='viewCharacterSwitcher()' style='cursor:pointer'>"+characterName+"</a>");
 		else
-			nameAndBars.append("	<a>"+characterName+"</a>");
+			nameAndBars.append("	<a class='" + hcmClass + "'>"+characterName+"</a>");
 		nameAndBars.append("		<div id='hitpointsBar' style='position:relative; display:block; background-color:#777777; width:100px; height:12px;text-align:left'>");
 		nameAndBars.append("			<div style='position:absolute; display:inline-block; background-color:#FF0000; max-width:100px;width:"+hitpointsPercentage+"px; height:12px;'>");
 		nameAndBars.append("			</div>");
@@ -2061,7 +2077,6 @@ public class GameUtils
     	else
     		throw new IllegalArgumentException("Unsupported curve formula type: "+formula);
     }
-    
     
     public static String resolveFormulas(String text, boolean simpleMode, boolean editMode)
     {
