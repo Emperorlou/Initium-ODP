@@ -1458,7 +1458,7 @@ public class ODPDBAccess
 	{
 		if (characterName==null) throw new UserErrorMessage("Character name cannot be blank.");
 		characterName = characterName.trim();
-		if (characterName.length()<1 || characterName.length()>30 || !characterName.matches("^[A-Za-z ]+!"))
+		if (characterName.length()<1 || characterName.length()>30 || !characterName.matches("^[A-Za-z ]+[!]?$"))
 			throw new UserErrorMessage("Character name must contain only letters and spaces, and must be between 1 and 30 characters long.");
 		
 		if (characterName.startsWith("Dead "))
@@ -1969,6 +1969,20 @@ public class ODPDBAccess
 		}
 		return null;
 	}
+	
+	public boolean awardBuffByName(CachedDatastoreService ds, CachedEntity character, String buffName)
+	{
+		if (ds == null) ds = getDB();
+		
+		CachedEntity buff = awardBuffByDef(buffName, character.getKey());
+		
+		if (buff != null)
+		{ 
+			ds.put(buff);
+			return true;
+		}
+		return false;
+	}
 
 	private void addBuffToBuffsCache(Key parentKey, CachedEntity buff)
 	{
@@ -1990,61 +2004,6 @@ public class ODPDBAccess
 		CachedEntity buff = awardBuff(ds, attackingCharacter.getKey(), "images/small/Pixel_Art-Icons-Buffs-S_Buff14.png", "Pumped!",
 				"You're pumped! This buff is awarded when you kill a monster while still being full health. The effect lasts for 1 minute.", 60, "strength", "+10%", "dexterity", "+10%",
 				"intelligence", "+5%", 3);
-
-		if (buff != null) ds.put(buff);
-	}
-
-	public void awardBuff_Drunk(CachedDatastoreService ds, CachedEntity character)
-	{
-		if (ds == null) ds = getDB();
-
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Beer-Stein1.png", "Drunk",
-				"You're drunk! This effect is awarded when you drink at the Inn in Aera. The effect lasts for 20 minutes.", 1200, "strength", "+5%", "dexterity", "-10%",
-				"intelligence", "-10%", 6);
-
-		if (buff != null) ds.put(buff);
-	}
-
-	public void awardBuff_WellRested(CachedDatastoreService ds, CachedEntity character)
-	{
-		if (ds == null) ds = getDB();
-
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Armor-Icons-Moon1.png", "Well Rested",
-				"You are well rested. This happens when you rest in a nice location (like at a house). The effect lasts for 15 minutes.", 900, "strength", "+10%", "movementSpeed", "+40%", null, null,
-				1);
-
-		if (buff != null) ds.put(buff);
-	}
-	
-	public boolean awardBuff_Berry(CachedDatastoreService ds, CachedEntity character)
-	{
-		boolean buffApplied = false;
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/Pixel_Art-Food-Fruit-I_C_Mulberry.png","Mysterious Berry",
-				"You are feeling enlightened.  That berry you just ate has left your mind feeling extra sharp. The effect lasts for 1 hour.",3600,"intelligence","+35%",null,null,null,null,1);
-		if (buff != null){ 
-			ds.put(buff);
-			buffApplied = true;
-		}
-		return buffApplied;
-	}
-	
-	public boolean awardBuff_Elixir(CachedDatastoreService ds, CachedEntity character)
-	{
-		boolean buffApplied = false;
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Food-Strange_Elixir.png","Strange Elixir",
-				"You are filled with vigor. That elixir you just drank has left you feeling ready for combat, but your thoughts are hazy. This effect lasts for 1 hour.",3600,"strength","+15%","dexterity","+10%","intelligence","-10%",1);
-		if (buff != null){ 
-			ds.put(buff);
-			buffApplied = true;
-		}
-		return buffApplied;
-	}
-	
-	public void awardBuff_Sick(CachedDatastoreService ds, CachedEntity character)
-	{
-		CachedEntity buff = awardBuff(ds, character.getKey(), "images/small/Pixel_Art-Icons-Poison-S_Poison05.png", "Sick",
-				"You ate entirely too much candy, and now you're sick! You feel terrible, and couldn't possibly eat more candy for at least 30 minutes.",1800, "strength", "-5%", "dexterity", "-5%",
-				"intelligence", "-5%", 6);
 
 		if (buff != null) ds.put(buff);
 	}
@@ -2116,6 +2075,8 @@ public class ODPDBAccess
 				else if ("Weapon".equals(item1Type))
 				{
 					item1Max = ((Double)item1.getProperty("_weaponMaxDamage"));
+					if(item1Max == null)
+						item1.setProperty("_weaponMaxDamage", (item1Max = GameUtils.getWeaponMaxDamage(item1)));
 				}
 				
 				Double item2Max = 0.0d;
@@ -2126,6 +2087,8 @@ public class ODPDBAccess
 				else if ("Weapon".equals(item2Type))
 				{
 					item2Max = ((Double)item2.getProperty("_weaponMaxDamage"));
+					if(item2Max == null)
+						item2.setProperty("_weaponMaxDamage", (item2Max = GameUtils.getWeaponMaxDamage(item2)));
 				}
 
 				if (item1Type == null) item1Type = "";
@@ -2745,7 +2708,7 @@ public class ODPDBAccess
 		if (drunkCount>=6)
 			throw new UserErrorMessage("The bar tender thinks you've had enough to drink.");
 		
-		awardBuff_Drunk(ds, character);
+		awardBuffByName(ds, character, "Drunk");
 		
 	}
 
