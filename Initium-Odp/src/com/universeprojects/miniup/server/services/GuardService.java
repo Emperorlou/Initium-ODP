@@ -376,4 +376,22 @@ public class GuardService extends Service
 		List<Key> list = query.getFilteredList_Keys("GuardSetting", "characterKey", characterKey);
 		ds.delete(list);
 	}
+
+	public static boolean checkCharacterIsInCombatGuarding(CachedEntity character)
+	{
+		if (character==null) return false;
+		return character.getProperty("guardStartHP")!=null;
+	}
+
+	public static boolean checkIfGuardWantsToRun(CachedEntity character)
+	{
+		Double guardRunHitpoints = (Double)character.getProperty("guardRunHitpoints");
+		double targetCharacterHitpoints = (Double)character.getProperty("hitpoints");
+		if (checkCharacterIsInCombatGuarding(character) && guardRunHitpoints!=null && targetCharacterHitpoints<=guardRunHitpoints)
+		{
+			return true;
+		}
+		
+		return false;
+	}
 }

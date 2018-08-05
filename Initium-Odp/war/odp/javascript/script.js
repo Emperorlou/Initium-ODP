@@ -2219,7 +2219,10 @@ function storeEnabled()
 // BUTTON BAR TOGGLES
 function toggleStorefront(eventObject)
 {
-	doCommand(eventObject, "ToggleStorefront", {"buttonId" : eventObject.currentTarget.id});
+	if (eventObject!=null)
+		doCommand(eventObject, "ToggleStorefront", {"buttonId" : eventObject.currentTarget.id});
+	else
+		doCommand(eventObject, "ToggleStorefront");
 }
 
 function togglePartyJoins(eventObject)
@@ -5247,4 +5250,11 @@ function changeUITo(value)
 {
 	localStorage.setItem("selectUIStyle", value);
 	location.reload();
+}
+
+function changeGuardRunHitpoints(eventObject, current)
+{
+	promptPopup("Change Guard Run Hitpoints", "Enter the hitpoints you should have to trigger automatic running while guarding:", current, function(newValue) {
+		doCommand(eventObject, "GuardChangeRunHitpoints", {"value" : newValue});
+	});
 }

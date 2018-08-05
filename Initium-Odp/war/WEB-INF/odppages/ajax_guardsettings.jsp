@@ -21,3 +21,15 @@
 <br>
 <p><a onclick='doCommand(event, "GuardDeleteAllSettings", {});'> - Clear ALL your guard settings</a></p>
 <p><a onclick='doCommand(event, "GuardDeleteLocationSettings", {});'> - Clear your guard settings for this location</a></p>
+<br>
+<c:if test="${guardRunHitpoints!=null}">
+	You are currently set to attempt to run when your hitpoints reach <strong>${guardRunHitpoints}</strong> or below.
+</c:if>
+<c:if test="${guardRunHitpoints==null}">
+	You are currently set to fight to the death.  
+</c:if>
+<div>
+	<div class='main-item-controls'>
+		<a onclick='changeGuardRunHitpoints(event, "${guardRunHitpoints}")'>Change run settings</a>
+	</div>
+</div>

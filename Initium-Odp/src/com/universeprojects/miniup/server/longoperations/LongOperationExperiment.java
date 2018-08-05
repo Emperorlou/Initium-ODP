@@ -120,7 +120,7 @@ public class LongOperationExperiment extends LongOperation
 		else if ("COMBAT".equals(mode))
 			throw new UserErrorMessage("You cannot experiment right now. You're currently in combat.");
 		else if ("MERCHANT".equals(mode))
-			throw new UserErrorMessage("You cannot experiment right now. You're currently maning your store.");
+			throw new UserErrorMessage("You cannot experiment right now. You're currently maning your store. <br><a onclick='closeAllPopups(); toggleStorefront();'>Shutdown Store</a>");
 		else if ("UNCONSCIOUS".equals(mode))
 			throw new UserErrorMessage("You cannot experiment right now. You're currently unconscious, lol.");
 		else if ("DEAD".equals(mode))

@@ -6318,9 +6318,6 @@ public class ODPDBAccess
 			if (mode==null || mode.equals(ODPDBAccess.CHARACTER_MODE_COMBAT)==false)
 				throw new UserErrorMessage("Character must be in combat in order to attempt to escape.");
 			
-			if ("NPC".equals(monster.getProperty("type"))==false && isCharacterDefending(characterLocation, character))
-				throw new UserErrorMessage("You cannot escape while defending.");
-			
 			if (character.getProperty("partyCode")!=null && character.getProperty("partyCode").equals("")==false)
 			{
 				if ("TRUE".equals(character.getProperty("partyLeader"))==false)
@@ -6338,7 +6335,7 @@ public class ODPDBAccess
 			
 			
 			Random rnd = new Random();
-			if (rnd.nextDouble()*characterDex>rnd.nextDouble()*monsterDex)
+			if (rnd.nextDouble()*characterDex>rnd.nextDouble()*monsterDex || GuardService.checkIfGuardWantsToRun(monster))
 			{
 				List<CachedEntity> party = getParty(db, character);
 				

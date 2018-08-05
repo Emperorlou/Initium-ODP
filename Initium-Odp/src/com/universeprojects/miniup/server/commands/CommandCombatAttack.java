@@ -16,6 +16,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.CombatService;
+import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.OperationJSService;
 
@@ -41,11 +42,13 @@ public class CommandCombatAttack extends Command
 
 		CombatService cs = new CombatService(db);
 		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, user, character, location, this);
+		GuardService gs = new GuardService(db);
 
 		String status = null;
 		StringBuilder summaryStatus = null;
 		CachedEntity targetCharacter = null;
-		
+		String characterName = (String)character.getProperty("name");
+		String targetCharacterName = null;
 		
 		ds.beginBulkWriteMode();
 		try
@@ -74,6 +77,7 @@ public class CommandCombatAttack extends Command
 				return;
 			}
 			
+			targetCharacterName = (String)targetCharacter.getProperty("name");
 			CachedEntity targetLocation = db.getEntity((Key)targetCharacter.getProperty("locationKey"));
 			// Raid boss could possibly be in instance, so check for it
 			// explicitly even though isInCombatWith handles non-instance
@@ -123,13 +127,13 @@ public class CommandCombatAttack extends Command
 			
 			if (status==null)
 			{
-				status = "Your attack missed!";
+				status = characterName+"'s attack missed!";
 				characterMissed = true;
 			}
 			
 			if (characterMissed)
 			{
-				summaryStatus.append("Your attack missed. ");
+				summaryStatus.append(characterName).append("'s attack missed. ");
 				
 				doVisualEffect(hand, true, false, false);
 			}
@@ -160,77 +164,108 @@ public class CommandCombatAttack extends Command
 					summaryStatus.append("<span class='equipment-destroyed-notice'>Equipment was destroyed. </span>");
 				
 				if (CommonChecks.checkCharacterIsUnconscious(targetCharacter))
-					summaryStatus.append("<span style='color:#00bd00'>You win, your opponent is unconscious. </span>");
+					summaryStatus.append("<span style='color:#00bd00'>You win, "+targetCharacterName+" is unconscious. </span>");
 				else if (CommonChecks.checkCharacterIsDead(targetCharacter))
-					summaryStatus.append("<span style='color:#00bd00'>You win, your opponent is dead. </span>");
+					summaryStatus.append("<span style='color:#00bd00'>You win, "+targetCharacterName+" is dead. </span>");
 			}
 			
 			if (GameUtils.isPlayerIncapacitated(targetCharacter)==false)
 			{
-				boolean targetMissed = false;
-				boolean characterEquipmentDestroyed = false;
-				boolean targetCrit = false;
-				Double characterHp = (Double)character.getProperty("hitpoints");
-				// Now do the counter attack
-				String counterAttackStatus = db.doMonsterCounterAttack(auth, user, targetCharacter, character);
-		
-				status+="<br>";
-				status+="<strong>The "+targetCharacter.getProperty("name")+" counter attacks...</strong>";
-				
-				if (counterAttackStatus==null)
+				if (GuardService.checkIfGuardWantsToRun(targetCharacter))
 				{
-					status+="The "+targetCharacter.getProperty("name")+" missed!";
-					targetMissed = true;
-				}
-				else 
-				{
-					status+=counterAttackStatus;
-				}
-				
-				ds.putIfChanged(character, targetCharacter);
-				
-				if (((Double)targetCharacter.getProperty("hitpoints"))>0)
-				{
-					if (counterAttackStatus!=null) characterCrit = counterAttackStatus.contains("It's a critical hit!");
-					if (counterAttackStatus!=null) targetEquipmentDestroyed = counterAttackStatus.contains("equipment-destroyed-notice");
-					Double characterNewHp = (Double)character.getProperty("hitpoints");
+					// Guard is going to try to run
 					
-					if (targetMissed)
+					boolean success = db.doCharacterAttemptEscape(location, targetCharacter, character);
+					db.flagNotALooter(request);
+
+					status+="<br>";
+					status+="<strong>"+targetCharacterName+" attempts to run away...</strong>";
+					status+="<br>";
+
+					if(success)
 					{
-						summaryStatus.append("Their attack missed. ");
+						summaryStatus.append(targetCharacterName+" managed to escape! ");
+						status += targetCharacterName+" managed to escape!";
 					}
 					else
 					{
-						String hitType = "hit";
-						if (targetCrit)
-							hitType = "CRITICAL HIT";
+						summaryStatus.append(targetCharacterName+" tried to escape and failed! ");
+						status += targetCharacterName+" failed to escape!";
+					}
+
+					ds.putIfChanged(character, targetCharacter);
+					
+					gs.deleteAllGuardSettings(targetCharacter.getKey(), location.getKey());
+					
+					
+				}
+				else
+				{
+				
+					boolean targetMissed = false;
+					boolean characterEquipmentDestroyed = false;
+					boolean targetCrit = false;
+					Double characterHp = (Double)character.getProperty("hitpoints");
+					// Now do the counter attack
+					String counterAttackStatus = db.doMonsterCounterAttack(auth, user, targetCharacter, character);
+			
+					status+="<br>";
+					status+="<strong>The "+targetCharacterName+" counter attacks...</strong>";
+					
+					if (counterAttackStatus==null)
+					{
+						status+="The "+targetCharacterName+" missed!";
+						targetMissed = true;
+					}
+					else 
+					{
+						status+=counterAttackStatus;
+					}
+					
+					ds.putIfChanged(character, targetCharacter);
+					
+					if (((Double)targetCharacter.getProperty("hitpoints"))>0)
+					{
+						if (counterAttackStatus!=null) characterCrit = counterAttackStatus.contains("It's a critical hit!");
+						if (counterAttackStatus!=null) targetEquipmentDestroyed = counterAttackStatus.contains("equipment-destroyed-notice");
+						Double characterNewHp = (Double)character.getProperty("hitpoints");
 						
-						if (characterHp.equals(characterNewHp))
-							summaryStatus.append("They ").append(hitType).append(", but no damage was done. ");
+						if (targetMissed)
+						{
+							summaryStatus.append("Their attack missed. ");
+						}
 						else
-							summaryStatus.append("They ").append(hitType).append("! ").append(GameUtils.formatNumber(characterHp-characterNewHp)).append(" damage was done. ");
-						
-						if (characterEquipmentDestroyed)
-							summaryStatus.append("<span class='equipment-destroyed-notice'>Equipment was destroyed. </span>");
-						
-						if (CommonChecks.checkCharacterIsUnconscious(character))
-							summaryStatus.append("You are unconscious. ");
-						else if (CommonChecks.checkCharacterIsDead(character))
-							summaryStatus.append("You are dead. ");
+						{
+							String hitType = "hit";
+							if (targetCrit)
+								hitType = "CRITICAL HIT";
+							
+							if (characterHp.equals(characterNewHp))
+								summaryStatus.append("They ").append(hitType).append(", but no damage was done. ");
+							else
+								summaryStatus.append("They ").append(hitType).append("! ").append(GameUtils.formatNumber(characterHp-characterNewHp)).append(" damage was done. ");
+							
+							if (characterEquipmentDestroyed)
+								summaryStatus.append("<span class='equipment-destroyed-notice'>Equipment was destroyed. </span>");
+							
+							if (CommonChecks.checkCharacterIsUnconscious(character))
+								summaryStatus.append("You are unconscious. ");
+							else if (CommonChecks.checkCharacterIsDead(character))
+								summaryStatus.append("You are dead. ");
+						}
 					}
 				}
-			}
-		
-			// Now increase experience with the weapon used
-			if (weapon!=null)
-			{
-				if (db.increaseKnowledgeForEquipment100(weapon)==true)
+			
+				// Now increase experience with the weapon used
+				if (weapon!=null)
 				{
-					String weaponClass = (String)weapon.getProperty("itemClass");
-					summaryStatus.append("Your experience with the "+weaponClass+" has increased.");
+					if (db.increaseKnowledgeForEquipment100(weapon)==true)
+					{
+						String weaponClass = (String)weapon.getProperty("itemClass");
+						summaryStatus.append("Your experience with the "+weaponClass+" has increased.");
+					}
 				}
-			}
-		
+			}		
 		
 		
 
@@ -238,18 +273,8 @@ public class CommandCombatAttack extends Command
 		
 		
 			
-			if (GameUtils.isPlayerIncapacitated(character))
+			if (CommonChecks.checkCharacterIsInCombat(character)==false)
 			{
-				mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
-				mpus.updateFullPage_shortcut();
-				
-				db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
-				
-			}
-			else if (GameUtils.isPlayerIncapacitated(targetCharacter))
-			{
-	//			if (CommonChecks.checkLocationIsCombatSite(location)) location = ds.refetch(location);
-				// We're done with combat
 				mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 				mpus.updateFullPage_shortcut();
 				
@@ -283,6 +308,21 @@ public class CommandCombatAttack extends Command
 			html+="<div class='hiddenTooltip' id='hitDetails-"+randomId+"'>"+status+"</div>";
 			html+=summaryStatus.toString()+" <span class='hint' rel='#hitDetails-"+randomId+"' style='color:#FFFFFF'>[More..]</span>";
 			db.sendGameMessage(db.getDB(), character, html);
+			
+			// Also send a message to the opponent if they are a player...
+			if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
+			{
+				String opponentHtml = html;
+				
+				// Try to change the wording a bit
+				String opponentName = (String)character.getProperty("name");
+				opponentHtml.replace("You ", opponentName+" ");
+				opponentHtml.replace(" you ", " "+opponentName+" ");
+				opponentHtml.replace(" you.", " "+opponentName+".");
+				opponentHtml.replace(" you,", " "+opponentName+",");
+				
+				db.sendGameMessage(db.getDB(), targetCharacter, opponentHtml);
+			}
 		}
 		
 	}

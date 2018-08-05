@@ -492,4 +492,11 @@ public abstract class CommonChecks
 		return false;
 	}
 
+	public static boolean checkCharacterIsPlayer(CachedEntity character)
+	{
+		if (character==null) return false;
+		return "PC".equals(character.getProperty("type"));
+	}
+
+
 }
