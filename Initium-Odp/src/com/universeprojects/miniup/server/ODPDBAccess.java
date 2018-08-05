@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
@@ -118,6 +119,7 @@ public class ODPDBAccess
 		ownerHtml;
 	}
 
+	public static final Date HardcoreModeCutoffDate = new Date(2018, 8, 1);
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
 	public static final String CAMP_NAME_REGEX = "[A-Za-z0-9- ,'&]+";
 	public static final String GROUP_NAME_REGEX = "[A-Za-z ,'`]+";
@@ -1456,7 +1458,7 @@ public class ODPDBAccess
 	{
 		if (characterName==null) throw new UserErrorMessage("Character name cannot be blank.");
 		characterName = characterName.trim();
-		if (characterName.length()<1 || characterName.length()>30 || !characterName.matches("[A-Za-z ]+"))
+		if (characterName.length()<1 || characterName.length()>30 || !characterName.matches("^[A-Za-z ]+!"))
 			throw new UserErrorMessage("Character name must contain only letters and spaces, and must be between 1 and 30 characters long.");
 		
 		if (characterName.startsWith("Dead "))
@@ -1536,7 +1538,9 @@ public class ODPDBAccess
 		ContainerService cs = new ContainerService(this);
 		if (!character.getKey().equals(equipment.getProperty("containerKey")))
 			throw new IllegalArgumentException("The piece of equipment is not in the character's posession. Character: "+character.getKey());
-		
+
+		if(CommonChecks.checkIsHardcore(character) && CommonChecks.checkIsHardcore(equipment) == false)
+			throw new UserErrorMessage("You can only equip Hardcore Mode items.");
 		
 		destinationSlot = destinationSlot.trim(); // Clean it up, just in case
 		
@@ -4974,7 +4978,66 @@ public class ODPDBAccess
 			}
 		}
 		
-		
+		boolean setHardcoreModeItems = false;
+		if("NPC".equals(characterToDie.getProperty("type"))&&CommonChecks.checkIsHardcore(attackingCharacter))
+		{
+			// For now, only do HCM item drops. Do NOT save these entities, potential race conditions.
+			Map<String, String> damageMap = getValue_StringStringMap(characterToDie, "combatStatsDamageMap");
+			Map<String, Double> characterMap = new HashMap<String, Double>();
+        	if(damageMap != null)
+        	{
+        		// Lets get all the associated entities first, and damage for each key
+        		List<Key> damageKeys = new ArrayList<Key>();
+        		
+        		for(Entry<String,String> entry:damageMap.entrySet())
+        		{
+        			damageKeys.add(KeyFactory.stringToKey(entry.getKey()));
+        			Double curDamage = Double.valueOf(entry.getValue());
+        			characterMap.put(entry.getKey(), curDamage);
+        		}
+        		
+        		List<CachedEntity> damagers = getEntities(damageKeys);
+        		if(damagers.size() > 0)
+        		{
+	        		Double maxHitpoints = (Double)characterToDie.getProperty("maxHitpoints");
+	        		// We need to ensure the highest damage is from an HCM character, and that the total
+	        		// HCM damage is at least 50%.
+	        		Double maxSCM = 0d;
+	        		Double maxHCM = 0d;
+	        		Double totalDamage = 0d;
+	        		for(CachedEntity dmg:damagers)
+	        		{
+	        			if(dmg == null) continue;
+	        			Double curDamage = characterMap.get(dmg.getKey().toString());
+	        			
+	        			if(CommonChecks.checkIsHardcore(dmg))
+	        			{
+	        				totalDamage += curDamage;
+	        				maxHCM = Math.max(maxHCM, curDamage);
+	        			}
+	        			else
+	        				maxSCM = Math.max(maxSCM, curDamage);
+	        		}
+	        		
+	        		// HCM needs to be highest damage, and total HCM damage should be > half.
+	        		setHardcoreModeItems = maxHCM >= maxSCM && totalDamage >= (maxHitpoints/2.0);
+        		}
+        	}
+        	
+        	if(characterToDie.getProperty("hardcorePointValue") != null)
+        	{
+        		Double curCharDamage = characterMap.get(attackingCharacter.getKey().toString());
+        		if(curCharDamage != null && curCharDamage > 0d)
+        		{
+        			Long curPoints = (Long)attackingCharacter.getProperty("hardcoreRank");
+        			Long newPoints = (Long)characterToDie.getProperty("hardcorePointValue");
+        			if(curPoints == null) curPoints = 0L;
+        			Double earnedPoints = (curCharDamage / (Double)characterToDie.getProperty("maxHitpoints")) * newPoints;
+        			newPoints += earnedPoints.longValue();
+        			attackingCharacter.setProperty("hardcoreRank", newPoints);
+        		}
+        	}
+		}
 		// First, move all items in his inventory to the ground...
 		List<CachedEntity> items = getFilteredList("Item", "containerKey", characterToDie.getKey());
 		
@@ -4990,6 +5053,13 @@ public class ODPDBAccess
 			}
 			else
 			{
+				if(setHardcoreModeItems 
+						&& item.getProperty("createdDate") != null 
+						&& ((Date)item.getProperty("createdDate")).after(HardcoreModeCutoffDate))
+					item.setProperty("hardcoreMode", true);
+				else
+					item.setProperty("hardcoreMode", false);
+				
 				if (giveLootToAttacker==false)
 				{
 					item.setProperty("containerKey", location.getKey());
@@ -6955,13 +7025,15 @@ public class ODPDBAccess
         
         CachedEntity group = null;
         
-        name = name.replace("  ", " ");
+        name = name.replaceAll("\\s{2,}", " ").trim();
         
         Key homeTownKey = null;
         
         CachedEntity newCharacter = new CachedEntity("Character", ds.getPreallocatedIdFor("Character"));
+    	newCharacter.setProperty("hardcoreMode", name.endsWith("!"));
+    	newCharacter.setProperty("hardcoreRank", 0L);
         // Set the starting attributes
-        newCharacter.setProperty("name", name);
+        newCharacter.setProperty("name", name.replaceAll("!$", "").trim());
         newCharacter.setProperty("homeTownKey", homeTownKey);
 
         // Set some default attributes

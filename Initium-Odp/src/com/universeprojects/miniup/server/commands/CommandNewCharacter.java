@@ -63,7 +63,7 @@ public class CommandNewCharacter extends Command
 			throw new UserErrorMessage("Please login first before creating a new character.");
 		}
 		
-		name = db.cleanCharacterName(name);
+		name = GameUtils.cleanCharacterName(name);
 
 		db.isCharacterNameOk(request, name);
 			

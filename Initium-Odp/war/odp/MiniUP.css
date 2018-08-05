@@ -2316,6 +2316,11 @@ a.range-increment {
     color: #FF0000;
 }
 
+.hardcore
+{
+	font-style: italic;
+}
+
 .content-dev-nickname
 {
 	color: #757dca;

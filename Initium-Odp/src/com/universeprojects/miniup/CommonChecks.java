@@ -472,6 +472,14 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+	
+	public static boolean checkIsHardcore(CachedEntity entity)
+	{
+		if(entity != null && ("Item".equals(entity.getKind()) || "Character".equals(entity.getKind())))
+			return false;
+		
+		return GameUtils.booleanEquals(entity.getProperty("hardcoreMode"), true);
+	}
 
 	public static boolean checkItemIsNatural(CachedEntity item)
 	{

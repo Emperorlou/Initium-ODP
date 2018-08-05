@@ -14,6 +14,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.Transaction;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPAuthenticator;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -36,17 +37,19 @@ public class CommandDeleteAndRecreate extends Command {
 		final ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
         
-        String name = parameters.get("name");
+        String rawName = parameters.get("name");
+        String name = rawName.replaceAll("!$", "");
         if (name==null) throw new UserErrorMessage("Character name cannot be blank.");
         
         CachedEntity currentChar = db.getCurrentCharacter();
         if(currentChar == null) throw new RuntimeException("Current character entity is null");
+        if(CommonChecks.checkCharacterIsDead(currentChar)) throw new UserErrorMessage("You must respawn before you delete and recreate your character.");
         
         // Only sanitize if character name differs.
         if(name.equals(currentChar.getProperty("name"))==false)
         {
-	        name = db.cleanCharacterName(name);
-	        if (name.length()<1 || name.length()>30 || !name.matches("[A-Za-z ]+"))
+	        name = GameUtils.cleanCharacterName(name);
+	        if (name.length()<1 || name.length()>30 || !name.matches("^[A-Za-z ]+$"))
 	            throw new UserErrorMessage("Character name must contain only letters and spaces, and must be between 1 and 40 characters long.");
         }
 
@@ -90,6 +93,7 @@ public class CommandDeleteAndRecreate extends Command {
         	ds.commitBulkWrite();
         }
         
+        if(rawName.endsWith("!")) name += "!";
         final Key characterKey = currentChar.getKey();
         final Key userKey = (Key)currentChar.getProperty("userKey");
         final ODPAuthenticator auth = this.getAuthenticator();
