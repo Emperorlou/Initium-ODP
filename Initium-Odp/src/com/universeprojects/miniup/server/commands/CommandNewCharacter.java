@@ -55,7 +55,8 @@ public class CommandNewCharacter extends Command
 		ODPAuthenticator auth = getAuthenticator(); 
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		String name = WebUtils.getStrParam(request, "name", true);
+		String rawName = WebUtils.getStrParam(request, "name", true);
+		String name = rawName.replaceAll("!$", "");
 		CachedEntity user = db.getCurrentUser();
 		
 		if (user==null)
@@ -86,6 +87,7 @@ public class CommandNewCharacter extends Command
 		if (characterList.isEmpty())
 			isNewUser = true;
 		
+		if(rawName.endsWith("!")) name += "!";
 		CachedEntity character = db.newPlayerCharacter(null, auth, user, name, null);
 		
 		ds.put(character);
