@@ -2001,7 +2001,9 @@ public class ODPDBAccess
 	{
 		if (ds == null) ds = getDB();
 
-		CachedEntity buff = awardBuffByDef("Pumped!", attackingCharacter.getKey());
+		CachedEntity buff = awardBuff(ds, attackingCharacter.getKey(), "images/small/Pixel_Art-Icons-Buffs-S_Buff14.png", "Pumped!",
+				"You're pumped! This buff is awarded when you kill a monster while still being full health. The effect lasts for 1 minute.", 60, "strength", "+10%", "dexterity", "+10%",
+				"intelligence", "+5%", 3);
 
 		if (buff != null) ds.put(buff);
 	}
