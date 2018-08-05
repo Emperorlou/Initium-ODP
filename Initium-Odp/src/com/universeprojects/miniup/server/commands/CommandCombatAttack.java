@@ -145,13 +145,13 @@ public class CommandCombatAttack extends Command
 				
 				if (targetHp.equals(targetNewHp))
 				{
-					summaryStatus.append("You ").append(hitType).append(", but no damage was done. ");
+					summaryStatus.append(characterName).append(" ").append(hitType).append(", but no damage was done. ");
 					
 					doVisualEffect(hand, false, true, false);
 				}
 				else
 				{
-					summaryStatus.append("You ").append(hitType).append("! ").append(GameUtils.formatNumber(targetHp-targetNewHp)).append(" damage was done. ");
+					summaryStatus.append(characterName).append(" ").append(hitType).append("! ").append(GameUtils.formatNumber(targetHp-targetNewHp)).append(" damage was done. ");
 	
 					if (characterCrit)
 						doVisualEffect(hand, false, false, true);
@@ -164,9 +164,9 @@ public class CommandCombatAttack extends Command
 					summaryStatus.append("<span class='equipment-destroyed-notice'>Equipment was destroyed. </span>");
 				
 				if (CommonChecks.checkCharacterIsUnconscious(targetCharacter))
-					summaryStatus.append("<span style='color:#00bd00'>You win, "+targetCharacterName+" is unconscious. </span>");
+					summaryStatus.append("<span style='color:#00bd00'>"+characterName+" wins, "+targetCharacterName+" is unconscious. </span>");
 				else if (CommonChecks.checkCharacterIsDead(targetCharacter))
-					summaryStatus.append("<span style='color:#00bd00'>You win, "+targetCharacterName+" is dead. </span>");
+					summaryStatus.append("<span style='color:#00bd00'>"+characterName+" wins, "+targetCharacterName+" is dead. </span>");
 			}
 			
 			if (GameUtils.isPlayerIncapacitated(targetCharacter)==false)
@@ -193,9 +193,10 @@ public class CommandCombatAttack extends Command
 						status += targetCharacterName+" failed to escape!";
 					}
 
+					gs.doRunAndStopGuarding(targetCharacter, location.getKey());
+					
 					ds.putIfChanged(character, targetCharacter);
 					
-					gs.deleteAllGuardSettings(targetCharacter.getKey(), location.getKey());
 					
 					
 				}
@@ -241,17 +242,17 @@ public class CommandCombatAttack extends Command
 								hitType = "CRITICAL HIT";
 							
 							if (characterHp.equals(characterNewHp))
-								summaryStatus.append("They ").append(hitType).append(", but no damage was done. ");
+								summaryStatus.append(targetCharacterName).append(" ").append(hitType).append(", but no damage was done. ");
 							else
-								summaryStatus.append("They ").append(hitType).append("! ").append(GameUtils.formatNumber(characterHp-characterNewHp)).append(" damage was done. ");
+								summaryStatus.append(targetCharacterName).append(" ").append(hitType).append("! ").append(GameUtils.formatNumber(characterHp-characterNewHp)).append(" damage was done. ");
 							
 							if (characterEquipmentDestroyed)
 								summaryStatus.append("<span class='equipment-destroyed-notice'>Equipment was destroyed. </span>");
 							
 							if (CommonChecks.checkCharacterIsUnconscious(character))
-								summaryStatus.append("You are unconscious. ");
+								summaryStatus.append(characterName).append(" is unconscious. ");
 							else if (CommonChecks.checkCharacterIsDead(character))
-								summaryStatus.append("You are dead. ");
+								summaryStatus.append(characterName).append(" is dead. ");
 						}
 					}
 				}
@@ -262,7 +263,7 @@ public class CommandCombatAttack extends Command
 					if (db.increaseKnowledgeForEquipment100(weapon)==true)
 					{
 						String weaponClass = (String)weapon.getProperty("itemClass");
-						summaryStatus.append("Your experience with the "+weaponClass+" has increased.");
+						summaryStatus.append(characterName).append("'s experience with the "+weaponClass+" has increased.");
 					}
 				}
 			}		
@@ -277,8 +278,9 @@ public class CommandCombatAttack extends Command
 			{
 				mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 				mpus.updateFullPage_shortcut();
-				
-				db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
+
+				if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
+					db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
 				
 			}
 			else
@@ -288,6 +290,9 @@ public class CommandCombatAttack extends Command
 				mpus.updateInBannerCombatantWidget(targetCharacter);
 				mpus.updateButtonList();
 				mpus.updatePartyView();
+				
+				if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
+					db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateInBannerCombatantWidget", "updateInBannerCharacterWidget");
 			}
 
 			db.commitInventionEntities();
@@ -313,13 +318,6 @@ public class CommandCombatAttack extends Command
 			if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
 			{
 				String opponentHtml = html;
-				
-				// Try to change the wording a bit
-				String opponentName = (String)character.getProperty("name");
-				opponentHtml.replace("You ", opponentName+" ");
-				opponentHtml.replace(" you ", " "+opponentName+" ");
-				opponentHtml.replace(" you.", " "+opponentName+".");
-				opponentHtml.replace(" you,", " "+opponentName+",");
 				
 				db.sendGameMessage(db.getDB(), targetCharacter, opponentHtml);
 			}

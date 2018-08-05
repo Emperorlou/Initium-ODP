@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPAuthenticator;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -35,6 +36,8 @@ public class CommandCombatEscape extends Command {
 		
 		String userMessage = "";
 		CachedEntity targetCharacter = db.getCharacterCombatant(character);
+		String characterName = (String)character.getProperty("name");
+		String targetCharacterName = null;
 		
 		ds.beginBulkWriteMode();
 		try
@@ -46,6 +49,8 @@ public class CommandCombatEscape extends Command {
 				mpus.updateFullPage_shortcut();
 				return;
 			}
+			targetCharacterName = (String)targetCharacter.getProperty("name");
+			
 			
 			// Combat check depends on the opponent's location, not the character's.
 			CachedEntity targetLocation = db.getEntity((Key)targetCharacter.getProperty("locationKey"));
@@ -66,7 +71,7 @@ public class CommandCombatEscape extends Command {
 			
 			if(success)
 			{
-				userMessage = "You managed to escape!";
+				userMessage = characterName+" managed to escape!";
 			}
 			else
 			{
@@ -76,11 +81,11 @@ public class CommandCombatEscape extends Command {
 				if (((Double)targetCharacter.getProperty("hitpoints"))>0)
 	            {
 	                userMessage+="<br>";
-	                userMessage+="<strong>The "+targetCharacter.getProperty("name")+" attacks you as you're fleeing...</strong><br>";
+	                userMessage+="<strong>"+targetCharacterName+" attacks "+characterName+" as they were fleeing...</strong><br>";
 	
 	                if (counterAttackStatus==null)
 	                {
-	                    userMessage+="The "+targetCharacter.getProperty("name")+" missed!";
+	                    userMessage+=targetCharacterName+" missed!";
 	                }
 	                else 
 	                {
@@ -102,6 +107,9 @@ public class CommandCombatEscape extends Command {
 			{
 				// We're done with combat
 				mpus.updateFullPage_shortcut();
+				
+				if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
+					db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
 			}
 			else
 			{
@@ -109,6 +117,9 @@ public class CommandCombatEscape extends Command {
 				mpus.updateInBannerCharacterWidget();
 				mpus.updateInBannerCombatantWidget(targetCharacter);
 				mpus.updateButtonList();
+				
+				if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
+					db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateInBannerCombatantWidget", "updateInBannerCharacterWidget");
 			}
 			
 			
@@ -122,7 +133,11 @@ public class CommandCombatEscape extends Command {
 
 		
 		if(userMessage != null && userMessage.isEmpty() == false)
+		{
 			db.sendGameMessage(db.getDB(), character, userMessage);
+			if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
+				db.sendGameMessage(db.getDB(), targetCharacter, userMessage);
+		}
 	}
 
 }

@@ -6437,6 +6437,12 @@ public class ODPDBAccess
 					monster.setProperty("combatant", null);
 					monster.setProperty("combatType", null);
 					
+					if (GuardService.checkIfGuardWantsToRun(monster))
+					{
+						GuardService gs = new GuardService(this);
+						gs.doRunAndStopGuarding(monster, monsterLocation.getKey());
+					}
+					
 					db.put(monster);
 
 					setPartiedField(party, character, "mode", CHARACTER_MODE_NORMAL);

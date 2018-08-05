@@ -35,6 +35,13 @@ public class GuardService extends Service
 		return guardSettingsCache;
 	}
 	
+	public void doRunAndStopGuarding(CachedEntity guard, Key locationKey)
+	{
+		guard.setProperty("guardStartHP", null);
+		
+		deleteAllGuardSettings(guard.getKey(), locationKey);
+	}
+	
 	public void deleteAllGuardSettings(Key characterKey)
 	{
 		List<Key> list = query.getFilteredList_Keys("GuardSetting", 3000, "characterKey", characterKey);
@@ -324,6 +331,8 @@ public class GuardService extends Service
 		if (CommonChecks.checkCharacterIsInCombat(guard)) return false;
 		// Make sure the guard is not incapacitated
 		if (CommonChecks.checkCharacterIsIncapacitated(guard)) return false;
+		// Make sure the guard isn't set to run
+		if (GuardService.checkIfGuardWantsToRun(guard)) return false;
 		
 		return true;
 	}
