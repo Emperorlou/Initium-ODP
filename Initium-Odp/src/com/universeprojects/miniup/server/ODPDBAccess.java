@@ -5016,8 +5016,10 @@ public class ODPDBAccess
 			}
 			else
 			{
+				// Only set HCM on equippables.
 				if(setHardcoreModeItems 
 						&& item.getProperty("createdDate") != null 
+						&& CommonChecks.checkItemIsEquippable(item)
 						&& ((Date)item.getProperty("createdDate")).after(HardcoreModeCutoffDate))
 					item.setProperty("hardcoreMode", true);
 				else
