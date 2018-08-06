@@ -475,7 +475,7 @@ public abstract class CommonChecks
 	
 	public static boolean checkIsHardcore(CachedEntity entity)
 	{
-		if(entity != null && ("Item".equals(entity.getKind())==false || "Character".equals(entity.getKind())==false))
+		if(entity != null && "Item".equals(entity.getKind())==false && "Character".equals(entity.getKind())==false)
 			return false;
 		
 		return GameUtils.booleanEquals(entity.getProperty("hardcoreMode"), true);
