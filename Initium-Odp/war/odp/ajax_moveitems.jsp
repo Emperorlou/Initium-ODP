@@ -294,7 +294,7 @@
 					String closeFirstJs = "";
 					if (isViewingItem)
 						closeFirstJs = "closePagePopup();";
-					out.println("<a onclick='"+closeFirstJs+"pagePopup(\"/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
+					out.println("<a onclick='"+closeFirstJs+"pagePopup(\"/odp/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
 				}
 				out.println("</div>");
 				out.println("</div>");
@@ -384,7 +384,7 @@
 					String closeFirstJs = "";
 					if (isViewingItem)
 						closeFirstJs = "closePagePopup();";
-					out.println("<a onclick='"+closeFirstJs+"pagePopup(\"/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
+					out.println("<a onclick='"+closeFirstJs+"pagePopup(\"/odp/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
 				}
 				out.println("</div>");
 				out.println("</div>");
