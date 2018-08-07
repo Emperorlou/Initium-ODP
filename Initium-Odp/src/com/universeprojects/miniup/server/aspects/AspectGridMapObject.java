@@ -25,4 +25,14 @@ public class AspectGridMapObject extends ItemAspect
 		return null;
 	}
 
+	public boolean isAttached()
+	{
+		return "Attached".equals(getProperty("mode"));
+	}
+	
+	public boolean isLoose()
+	{
+		if (getProperty("mode")==null) return true;
+		return "Loose".equals(getProperty("mode"));
+	}
 }

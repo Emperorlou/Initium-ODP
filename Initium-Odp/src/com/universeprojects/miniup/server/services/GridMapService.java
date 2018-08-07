@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
@@ -77,6 +78,7 @@ public class GridMapService {
 		if (initialized) return;
 
 		// First get all the preset entities
+		@SuppressWarnings("unchecked")
 		List<Key> gridMapPresetKeys = (List<Key>)location.getProperty("gridMapPresets");
 		if (gridMapPresetKeys!=null)
 		{
@@ -345,7 +347,7 @@ public class GridMapService {
 	public Map<String, GridObject> generateGridObjects(int tileX, int tileY)
 	{
 		Random rnd = getRandomForTile(tileX, tileY);
-		List<CachedEntity> items = generateNaturalTileItems(rnd, tileX, tileY);
+		List<CachedEntity> items = generateTileItems(rnd, tileX, tileY);
 
 		if (items==null) return null;
 		
@@ -608,5 +610,66 @@ public class GridMapService {
 		
 		return null;
 	}
+
 	
+	protected EmbeddedEntity getGridMapTile(int tileX, int tileY)
+	{
+		initializeLocationData();
+		
+		return (EmbeddedEntity)locationData.getProperty(tileX+"x"+tileY);
+	}
+	
+	protected EmbeddedEntity getGridMapTileEntry(int tileX, int tileY, int index)
+	{
+		EmbeddedEntity gridMapTile = getGridMapTile(tileX, tileY);
+		if (gridMapTile!=null)
+		{
+			@SuppressWarnings("unchecked")
+			List<EmbeddedEntity> gridMapTileEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("items");
+			if (gridMapTileEntries!=null)
+				return gridMapTileEntries.get(index);
+		}
+		
+		return null;
+	}
+	
+	public boolean isStillProceduralEntity(String proceduralKey)
+	{
+		ProceduralKeyData data = getProceduralKeyData(proceduralKey);
+		
+		if (GameUtils.equals(location.getId(), data.locationId)==false)
+			throw new RuntimeException("The procedural key's location ("+data.locationId+") is not for the location ("+location.getId()+") this GridMapService is serving.");
+		
+		EmbeddedEntity gridMapTile = getGridMapTile(data.tileX, data.tileY);
+		
+		if (GameUtils.equals(gridMapTile.getProperty("clearedProceduralItems"), true)) return false;
+		
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> entries = (List<EmbeddedEntity>)gridMapTile.getProperty("items");
+		if (entries!=null && entries.size()<=data.index)
+			throw new RuntimeException("The procedural key index ("+data.index+") is larger than the entry list ("+entries.size()+").");
+			
+		if (entries==null) return true;
+		
+		EmbeddedEntity entry = getGridMapTileEntry(data.tileX, data.tileY, data.index);
+		
+		String status = (String)entry.getProperty("status");
+		Long expectedIndex = (Long)entry.getProperty("proceduralGenerationIndex");
+		
+		if (GameUtils.equals(expectedIndex, data.index)==false)
+			throw new RuntimeException("Something's not right. The expected index ("+expectedIndex+") was not the same as the actual index ("+data.index+").");
+		
+		if (GameUtils.equals(status, null) || GameUtils.equals(status, "Procedural"))
+			return true;
+		else
+			return false;
+	}
+	
+	public void removeProceduralEntity(String proceduralKey)
+	{
+		// 1. Check if the entity is already in the database - if it is, just leave
+		// 2. Generate the appropriate entry in the GridMapCell, but don't put it
+
+		
+	}
 }

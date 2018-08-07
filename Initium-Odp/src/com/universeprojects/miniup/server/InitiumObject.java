@@ -184,6 +184,12 @@ public class InitiumObject implements GameObject<Key>
 		if (aspects==null) return null;
 		return aspects.get(aspectName);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends InitiumAspect> T getAspect(Class<T> clazz)
+	{
+		return (T)getAspect(clazz.getSimpleName().substring(6));
+	}
 
 	@Override
 	public boolean hasAspect(String aspectName)
@@ -193,6 +199,13 @@ public class InitiumObject implements GameObject<Key>
 		
 		return false;
 	}
+	
+	public <T extends InitiumAspect> boolean hasAspect(Class<T> clazz)
+	{
+		return hasAspect(clazz.getSimpleName().substring(6));
+	}
+
+	
 
 	
 }

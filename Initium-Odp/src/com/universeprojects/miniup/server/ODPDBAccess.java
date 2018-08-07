@@ -1657,7 +1657,14 @@ public class ODPDBAccess
 
 	}
 
+	
 	public void doCharacterCollectItem(CachedEntity character, CachedEntity item) throws UserErrorMessage
+	{
+		doCharacterCollectItem(character, item, false);
+	}
+	
+	
+	public void doCharacterCollectItem(CachedEntity character, CachedEntity item, boolean overrideImmovable) throws UserErrorMessage
 	{
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
 		if (item == null) throw new UserErrorMessage("This item no longer exists.");

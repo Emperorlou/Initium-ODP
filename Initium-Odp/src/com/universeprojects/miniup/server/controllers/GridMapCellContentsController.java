@@ -2,7 +2,9 @@ package com.universeprojects.miniup.server.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -10,9 +12,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumAspect;
+import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.InitiumPageController;
+import com.universeprojects.miniup.server.ItemAspect;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.WebUtils;
+import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -43,7 +50,36 @@ public class GridMapCellContentsController extends PageController
 		
 		List<String> itemsFormatted = new ArrayList<>();
 		for(CachedEntity item:items)
-			itemsFormatted.add(GameUtils.renderItem(db, request, db.getCurrentCharacter(), item, false, false, (String)item.getAttribute("proceduralKey")));
+		{
+			String html = GameUtils.renderItem(db, request, db.getCurrentCharacter(), item, false, false, (String)item.getAttribute("proceduralKey"));
+			
+			html += "<div class='main-item-controls'>";
+			InitiumObject iObject = new InitiumObject(db, item);
+			if (iObject.hasAspects())
+			{
+				// Go through the aspects on this item and include any special links that it may have
+				for(InitiumAspect initiumAspect:iObject.getAspects())
+				{
+					if (initiumAspect instanceof ItemAspect)
+					{
+						ItemAspect itemAspect = (ItemAspect)initiumAspect;
+						
+						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
+						if(curEntries!=null)
+						{
+							for(ItemPopupEntry entry:curEntries)
+							{
+								html += "<a onclick='"+WebUtils.jsSafe(entry.clickJavascript)+"' minitip='"+WebUtils.jsSafe(entry.description)+"'>"+entry.name+"</a>";
+							}
+						}
+					}
+				}
+			}
+			
+			html += "</div>";
+			
+			itemsFormatted.add(html);
+		}
 		
 		request.setAttribute("items", itemsFormatted);
 		

@@ -29,6 +29,8 @@ public class CommandCollectItem extends Command
 		
 		db.doCharacterCollectItem(db.getCurrentCharacter(), item);
 		
+		ds.put(item);
+		
 	}
 
 }

@@ -809,8 +809,8 @@ function getCoordOfMouse(event) {
     return new CoordObject(gridColumn, gridRow);
 }
 function updateCursor(gridRow, gridColumn) {
-	selectedTileX = gridRow+gridTileOffsetX;
-	selectedTileY = gridColumn+gridTileOffsetY;
+	selectedTileX = gridColumn+gridTileOffsetX;
+	selectedTileY = gridRow+gridTileOffsetY;
 	
 	console.log(selectedTileX+" - "+selectedTileY);
 	

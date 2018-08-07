@@ -188,6 +188,9 @@ public abstract class CommonChecks
 		if (Boolean.TRUE.equals(item.getProperty("immovable")))
 			return false;
 		
+		if ("Attached".equals(item.getProperty("GridMapObject:mode")))
+			return false;
+		
 		return true;
 	}
 	
