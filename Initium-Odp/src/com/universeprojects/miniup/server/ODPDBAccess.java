@@ -4144,7 +4144,7 @@ public class ODPDBAccess
                 multiplier = (Double)targetCharacter.getProperty("experienceMultiplier");
             if (multiplier>5) multiplier = 5d;
             if (multiplier<0) multiplier = 0d;   
-            
+            if (CommonChecks.checkIsHardcore(sourceCharacter)) multiplier *= 4d;
             
             Double[] maxStats = getMaxCharacterStats(sourceCharacter.getKey());
             
@@ -5174,7 +5174,7 @@ public class ODPDBAccess
 			chance*=-1;
 			chance+=1;
 			
-			if (GameUtils.roll(chance))
+			if (CommonChecks.checkIsHardcore(character) || GameUtils.roll(chance))
 			{
 				character.setProperty("mode", CharacterMode.DEAD.toString());
 				

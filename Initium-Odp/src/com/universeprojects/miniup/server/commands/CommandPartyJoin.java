@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -64,6 +65,13 @@ public class CommandPartyJoin extends Command {
 		
 		if(partyCharacter == null)
 			throw new UserErrorMessage("Specified character is not in a group!");
+		
+		// Can only party with other HCM status characters.
+		if(CommonChecks.checkIsHardcore(character) != CommonChecks.checkIsHardcore(partyCharacter))
+		{
+			String hardcoreMode = CommonChecks.checkIsHardcore(character) ? "hardcore" : "non-hardcore";
+			throw new UserErrorMessage("You can only party with other " + hardcoreMode + " mode players.");
+		}
 		
 		ds.beginBulkWriteMode();
 		
