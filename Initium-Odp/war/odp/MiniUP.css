@@ -2319,6 +2319,8 @@ a.range-increment {
 .hardcore
 {
 	font-style: italic;
+	font-weight: bold;
+	text-decoration: underline overline;
 }
 
 .content-dev-nickname
