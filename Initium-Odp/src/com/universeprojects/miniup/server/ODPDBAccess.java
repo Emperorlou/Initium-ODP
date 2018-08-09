@@ -4961,7 +4961,7 @@ public class ODPDBAccess
         		
         		for(Entry<String,String> entry:damageMap.entrySet())
         		{
-        			damageKeys.add(GameUtils.parseKey((entry.getKey()));
+        			damageKeys.add(GameUtils.parseKey(entry.getKey()));
         			Double curDamage = Double.valueOf(entry.getValue());
         			characterMap.put(entry.getKey(), curDamage);
         		}
