@@ -119,7 +119,7 @@ public class ODPDBAccess
 		ownerHtml;
 	}
 
-	public static final Date HardcoreModeCutoffDate = new Date(2018, 8, 1);
+	public static final Date HardcoreModeCutoffDate = new GregorianCalendar(2018, 8, 1).getTime();
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
 	public static final String CAMP_NAME_REGEX = "[A-Za-z0-9- ,'&]+";
 	public static final String GROUP_NAME_REGEX = "[A-Za-z ,'`]+";
@@ -5025,8 +5025,8 @@ public class ODPDBAccess
 			{
 				// Only set HCM on equippables.
 				if(setHardcoreModeItems 
-						&& item.getProperty("createdDate") != null 
 						&& CommonChecks.checkItemIsEquippable(item)
+						&& item.getProperty("createdDate") != null 
 						&& ((Date)item.getProperty("createdDate")).after(HardcoreModeCutoffDate))
 					item.setProperty("hardcoreMode", true);
 				else
