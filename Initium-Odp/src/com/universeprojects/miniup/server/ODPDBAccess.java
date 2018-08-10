@@ -119,7 +119,7 @@ public class ODPDBAccess
 		ownerHtml;
 	}
 
-	public static final Date HardcoreModeCutoffDate = new GregorianCalendar(2018, 8, 1).getTime();
+	public static final Date HardcoreModeCutoffDate = new GregorianCalendar(2018, 7, 15).getTime();
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
 	public static final String CAMP_NAME_REGEX = "[A-Za-z0-9- ,'&]+";
 	public static final String GROUP_NAME_REGEX = "[A-Za-z ,'`]+";
@@ -5035,18 +5035,19 @@ public class ODPDBAccess
 			{
 				if(item.getProperty("hardcoreMode") == null)
 				{
-					Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING,
-							String.format("SetHardcore: %1$b; Equippable: %2$b; Created: %3$s; Cutoff: %4$tF", 
-									setHardcoreModeItems, 
-									CommonChecks.checkItemIsEquippable(item), 
-									item.getProperty("createdDate") == null ? "FALSE" : ((Date)item.getProperty("createdDate")).toString(), 
-									HardcoreModeCutoffDate));
+					if(this.isTestServer())
+						Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING,
+								String.format("SetHardcore: %1$b; Equippable: %2$b; Created: %3$s; Cutoff: %4$tF", 
+										setHardcoreModeItems, 
+										CommonChecks.checkItemIsEquippable(item), 
+										item.getProperty("createdDate") == null ? "FALSE" : ((Date)item.getProperty("createdDate")).toString(), 
+										HardcoreModeCutoffDate));
 					
 					// Only set HCM on equippables.
 					if(setHardcoreModeItems 
 							&& CommonChecks.checkItemIsEquippable(item)
 							&& item.getProperty("createdDate") != null 
-							&& ((Date)item.getProperty("createdDate")).after(HardcoreModeCutoffDate))
+							&& (this.isTestServer() || ((Date)item.getProperty("createdDate")).after(HardcoreModeCutoffDate)))
 						item.setProperty("hardcoreMode", true);
 					else
 						item.setProperty("hardcoreMode", false);
