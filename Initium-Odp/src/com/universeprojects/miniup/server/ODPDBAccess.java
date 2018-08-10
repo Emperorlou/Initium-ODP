@@ -1988,7 +1988,7 @@ public class ODPDBAccess
 		CachedEntity buff = awardBuffByDef(buffName, character.getKey());
 		
 		if (buff != null && buff.isUnsaved())
-			ds.put(buff)
+			ds.put(buff);
 			
 		return buff != null;
 	}
