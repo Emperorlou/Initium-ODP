@@ -113,15 +113,16 @@ public class ModifierService extends Service
 		if (rawModifiers==null) return startingValue;
 		List<String> modifiers = (List<String>)rawModifiers;
 		
+		Double buffValue = 0d;
 		for(String modifierLine:modifiers)
 		{
 			if (getModifierTypeFrom(modifierLine) == modifierType)
 			{
-				startingValue = modifyValue(startingValue, modifierType, modifierLine);
+				buffValue += modifyValue(startingValue, modifierType, modifierLine) - startingValue;
 			}
 		}
 		
-		return startingValue; 
+		return startingValue + buffValue; 
 	}
 	
 	public Long getAffectedValue(Long startingValue, CachedEntity modifierEntity, ModifierType modifierType)
