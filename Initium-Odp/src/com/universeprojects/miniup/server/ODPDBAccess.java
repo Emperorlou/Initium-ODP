@@ -5036,7 +5036,7 @@ public class ODPDBAccess
 				if(item.getProperty("hardcoreMode") == null)
 				{
 					Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING,
-							String.format("SetHardcore: %1$b; Equippable: %2$b; Created: %3$; Cutoff: %4$tF", 
+							String.format("SetHardcore: %1$b; Equippable: %2$b; Created: %3$s; Cutoff: %4$tF", 
 									setHardcoreModeItems, 
 									CommonChecks.checkItemIsEquippable(item), 
 									item.getProperty("createdDate") == null ? "FALSE" : ((Date)item.getProperty("createdDate")).toString(), 
