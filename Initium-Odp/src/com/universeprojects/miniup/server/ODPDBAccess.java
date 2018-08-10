@@ -1845,9 +1845,13 @@ public class ODPDBAccess
 	
 	public void fillCachedCharacterStats(CachedEntity character)
 	{
-		Double dex = getDoubleBuffableProperty(character, "dexterity");
-		Double tInt = getDoubleBuffableProperty(character, "intelligence");
-		Double str = getDoubleBuffableProperty(character, "strength");
+		Double baseDex = (Double)character.getProperty("dexterity");
+		Double baseInt = (Double)character.getProperty("intelligence");
+		Double baseStr = (Double)character.getProperty("strength");
+		
+		Double buffDex = getDoubleBuffableProperty(character, "dexterity") - baseDex;
+		Double buffInt = getDoubleBuffableProperty(character, "intelligence") - baseInt;
+		Double buffStr = getDoubleBuffableProperty(character, "strength") - baseStr;
 		
 		// Get all dexterity reducing armors and include that in the
 		// calculation...
@@ -1862,21 +1866,21 @@ public class ODPDBAccess
 			if (item == null) continue;
 			Long modifier = (Long) item.getProperty("dexterityPenalty");
 			if (modifier != null)
-				dex -= (dex * (modifier.doubleValue() / 100d));
-			
-			modifier = (Long) item.getProperty("strengthModifier");
-			if (modifier != null)
-				str += (str * (modifier.doubleValue() / 100d));
+				buffDex -= (baseDex * (modifier.doubleValue() / 100d));
 			
 			modifier = (Long) item.getProperty("intelligenceModifier");
 			if (modifier != null)
-				tInt += (tInt * (modifier.doubleValue() / 100d));
+				buffInt += (baseInt * (modifier.doubleValue() / 100d));
+			
+			modifier = (Long) item.getProperty("strengthModifier");
+			if (modifier != null)
+				buffStr += (baseStr * (modifier.doubleValue() / 100d));
 		}
 		
 		Map<String, Double> charMap = new HashMap<String, Double>();
-		charMap.put("dexterity", dex);
-		charMap.put("strength", str);
-		charMap.put("intelligence", tInt);
+		charMap.put("strength", baseStr + buffStr);
+		charMap.put("intelligence", baseInt + buffInt);
+		charMap.put("dexterity", baseDex + buffDex);
 		statsCache.put(character.getKey(), charMap);
 	}
 	
@@ -2182,6 +2186,7 @@ public class ODPDBAccess
 		if (startValue == null) return null;
 		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
 
+		Double buffAmount = 0d;
 		for (String effect : buffEffects)
 		{
 			effect = effect.replace("+", "");
@@ -2190,12 +2195,12 @@ public class ODPDBAccess
 				effect = effect.substring(0, effect.length() - 1);
 				double val = new Double(effect);
 				val /= 100;
-				startValue *= (1 + val);
+				buffAmount += startValue * val;
 			}
 			else
 			{
 				double val = new Double(effect);
-				startValue += val;
+				buffAmount += val;
 			}
 		}
 		
@@ -2207,13 +2212,11 @@ public class ODPDBAccess
 			for(CachedEntity equip:characterEquipment)
 			{
 				if(equip != null)
-					startValue = mService.getAffectedValue(startValue, equip, modifierType);
+					buffAmount += mService.getAffectedValue(startValue, equip, modifierType) - startValue;
 			}
 		}
 		
-		
-
-		return startValue;
+		return startValue + buffAmount;
 	}
 
 	public Double getDoubleBuffableProperty(CachedEntity entity, String fieldName)
@@ -2226,6 +2229,8 @@ public class ODPDBAccess
 		if (startValue == null) return null;
 		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
 
+		Double buffAmount = 0d;
+		Double statStart = startValue.doubleValue();
 		for (String effect : buffEffects)
 		{
 			effect = effect.replace("+", "");
@@ -2235,15 +2240,15 @@ public class ODPDBAccess
 				effect = effect.substring(0, effect.length() - 1);
 				double val = new Double(effect);
 				val /= 100;
-				startValue = Math.round(startValue.doubleValue() * val);
+				buffAmount += startStat * val;
 			}
 			else
 			{
 				double val = new Double(effect);
-				startValue = Math.round(startValue.doubleValue() + val);
+				buffAmount += val;
 			}
 		}
-
+		
 		
 		ModifierService mService = new ModifierService(this);
 		Collection<CachedEntity> characterEquipment = getCharacterEquipment(entity);
@@ -2252,12 +2257,11 @@ public class ODPDBAccess
 		{
 			for(CachedEntity equip:characterEquipment)
 			{
-				startValue = mService.getAffectedValue(startValue, equip, modifierType);
+				buffAmount += mService.getAffectedValue(startStat, equip, modifierType) - startStat;
 			}
 		}
 		
-		
-		return startValue;
+		return Math.round(startStat + buffAmount);
 	}
 
 	public Long getLongBuffableProperty(CachedEntity entity, String fieldName)
@@ -4992,22 +4996,28 @@ public class ODPDBAccess
 	        		// HCM needs to be highest damage, and total HCM damage should be > half.
 	        		setHardcoreModeItems = maxHCM >= maxSCM && totalDamage >= (maxHitpoints/2.0);
         		}
-        	}
-        	
-        	if(characterToDie.getProperty("hardcorePointValue") != null)
-        	{
-        		Double curCharDamage = characterMap.get(attackingCharacter.getKey().toString());
-        		if(curCharDamage != null && curCharDamage > 0d)
+        		
+            	if(setHardcoreModeItems)
         		{
-        			Long curPoints = (Long)attackingCharacter.getProperty("hardcoreRank");
-        			Long newPoints = (Long)characterToDie.getProperty("hardcorePointValue");
-        			if(curPoints == null) curPoints = 0L;
-        			Double earnedPoints = (curCharDamage / (Double)characterToDie.getProperty("maxHitpoints")) * newPoints;
-        			newPoints += earnedPoints.longValue();
+            		// Only if HCM alts were max damage, award points equal to a percentage
+            		// of total damage done by this alt.
+            		Double curCharDamage = characterMap.get(attackingCharacter.getKey().toString());
+            		Long curPoints = (Long)attackingCharacter.getProperty("hardcoreRank");
+            		if(curPoints == null) curPoints = 0L;
+            		Long newPoints = (Long)characterToDie.getProperty("hardcorePointValue");
+            		if(newPoints != null && curCharDamage != null && curCharDamage > 0d)
+            		{
+            			Double earnedPoints = (curCharDamage / (Double)characterToDie.getProperty("maxHitpoints")) * newPoints;
+            			newPoints += earnedPoints.longValue();
+                	}
+            		else
+            			newPoints = curPoints + 1L;
+
         			attackingCharacter.setProperty("hardcoreRank", newPoints);
         		}
         	}
 		}
+		
 		// First, move all items in his inventory to the ground...
 		List<CachedEntity> items = getFilteredList("Item", "containerKey", characterToDie.getKey());
 		
@@ -5023,14 +5033,24 @@ public class ODPDBAccess
 			}
 			else
 			{
-				// Only set HCM on equippables.
-				if(setHardcoreModeItems 
-						&& CommonChecks.checkItemIsEquippable(item)
-						&& item.getProperty("createdDate") != null 
-						&& ((Date)item.getProperty("createdDate")).after(HardcoreModeCutoffDate))
-					item.setProperty("hardcoreMode", true);
-				else
-					item.setProperty("hardcoreMode", false);
+				if(item.getProperty("hardcoreMode") == null)
+				{
+					Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING,
+							String.format("SetHardcore: %1$b; Equippable: %2$b; Created: %3b; Cutoff: %4F", 
+									setHardcoreModeItems, 
+									CommonChecks.checkItemIsEquippable(item), 
+									item.getProperty("createdDate"), 
+									HardcoreModeCutoffDate));
+					
+					// Only set HCM on equippables.
+					if(setHardcoreModeItems 
+							&& CommonChecks.checkItemIsEquippable(item)
+							&& item.getProperty("createdDate") != null 
+							&& ((Date)item.getProperty("createdDate")).after(HardcoreModeCutoffDate))
+						item.setProperty("hardcoreMode", true);
+					else
+						item.setProperty("hardcoreMode", false);
+				}
 				
 				if (giveLootToAttacker==false)
 				{
