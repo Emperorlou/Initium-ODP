@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -200,9 +201,11 @@ public class GridMapService {
 	private List<CachedEntity> generateNaturalTileItems(Random rnd, int tileX, int tileY)
 	{
 		initialize();
+		initializeLocationData();
 
+		getGridMapTile(tileX, tileY);
 		
-		List<CachedEntity> result = new ArrayList<>();;
+		List<CachedEntity> result = new ArrayList<>();
 		//TODO: if one of the items generated takes up the entire tile then we should skip generating the rest of the items
 		int index = 0;
 		for(CachedEntity itemDef:naturalItemsMap.keySet())
@@ -284,12 +287,11 @@ public class GridMapService {
 		if (gridMapTile==null) return tileItems;
 		
 		Boolean isProceduralItemsCleared = (Boolean)gridMapTile.getProperty("clearedProceduralItems"); 
-		Boolean hasDatabaseItems = (Boolean)gridMapTile.getProperty("hasDatabaseItems");
-		List<EmbeddedEntity> itemDBEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("items");
+		List<EmbeddedEntity> itemDBEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("dbItems");
 		
 		if (isProceduralItemsCleared) tileItems.clear();
 		
-		if (hasDatabaseItems && itemDBEntries!=null && itemDBEntries.isEmpty()==false)
+		if (itemDBEntries!=null && itemDBEntries.isEmpty()==false)
 		{
 			for(EmbeddedEntity entry:itemDBEntries)
 			{
@@ -619,18 +621,74 @@ public class GridMapService {
 		return (EmbeddedEntity)locationData.getProperty(tileX+"x"+tileY);
 	}
 	
-	protected EmbeddedEntity getGridMapTileEntry(int tileX, int tileY, int index)
+	protected EmbeddedEntity getOrCreateGridMapTile(int tileX, int tileY)
 	{
+		EmbeddedEntity tile = getGridMapTile(tileX, tileY);
+		
+		if (tile==null)
+		{
+			tile = new EmbeddedEntity();
+			long id = new Random().nextLong();
+			if (id<0) id+=Long.MAX_VALUE;
+			tile.setKey(KeyFactory.createKey("GridMapTile", id));
+			
+			setGridMapTile(tileX, tileY, tile);
+		}
+		
+		return tile;
+	}
+	
+	protected EmbeddedEntity getGridMapTileProceduralEntry(int tileX, int tileY, int index)
+	{
+		
 		EmbeddedEntity gridMapTile = getGridMapTile(tileX, tileY);
 		if (gridMapTile!=null)
 		{
 			@SuppressWarnings("unchecked")
-			List<EmbeddedEntity> gridMapTileEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("items");
+			List<EmbeddedEntity> gridMapTileEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("proceduralItems");
 			if (gridMapTileEntries!=null)
-				return gridMapTileEntries.get(index);
+				gridMapTile = gridMapTileEntries.get(index);
 		}
 		
-		return null;
+		
+		
+		return gridMapTile;
+	}
+	
+	protected EmbeddedEntity getOrCreateGridMapTileProceduralEntry(int tileX, int tileY, int index)
+	{
+		EmbeddedEntity entry = getGridMapTileProceduralEntry(tileX, tileY, index);
+		
+		if (entry==null)
+		{
+			entry = generateDefaultProceduralTileEntry(tileX, tileY, index);
+			
+			setGridMapTileProceduralEntry(tileX, tileY, index, entry);
+		}
+		
+		return entry;
+	}
+	
+	protected void setGridMapTileProceduralEntry(int tileX, int tileY, int index, EmbeddedEntity entity)
+	{
+		EmbeddedEntity gridMapTile = getOrCreateGridMapTile(tileX, tileY);
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> gridMapTileEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("proceduralItems");
+		if (gridMapTileEntries!=null)
+			gridMapTileEntries.set(index, entity);
+		else
+		{
+			List<CachedEntity> naturalTileItems = generateNaturalTileItems(getRandomForTile(tileX, tileY), tileX, tileY);
+			gridMapTileEntries = new ArrayList<EmbeddedEntity>(Arrays.asList(new EmbeddedEntity[naturalTileItems.size()]));
+			gridMapTileEntries.set(index, entity);
+		}
+		
+		setGridMapTile(tileX, tileY, gridMapTile);
+	}
+	
+	protected void setGridMapTile(int tileX, int tileY, EmbeddedEntity entity)
+	{
+		locationData.setProperty(tileX+"x"+tileY, entity);
 	}
 	
 	public boolean isStillProceduralEntity(String proceduralKey)
@@ -645,13 +703,15 @@ public class GridMapService {
 		if (GameUtils.equals(gridMapTile.getProperty("clearedProceduralItems"), true)) return false;
 		
 		@SuppressWarnings("unchecked")
-		List<EmbeddedEntity> entries = (List<EmbeddedEntity>)gridMapTile.getProperty("items");
+		List<EmbeddedEntity> entries = (List<EmbeddedEntity>)gridMapTile.getProperty("proceduralItems");
 		if (entries!=null && entries.size()<=data.index)
 			throw new RuntimeException("The procedural key index ("+data.index+") is larger than the entry list ("+entries.size()+").");
 			
 		if (entries==null) return true;
 		
-		EmbeddedEntity entry = getGridMapTileEntry(data.tileX, data.tileY, data.index);
+		EmbeddedEntity entry = getGridMapTileProceduralEntry(data.tileX, data.tileY, data.index);
+		
+		if (entry==null) return true;
 		
 		String status = (String)entry.getProperty("status");
 		Long expectedIndex = (Long)entry.getProperty("proceduralGenerationIndex");
@@ -670,6 +730,86 @@ public class GridMapService {
 		// 1. Check if the entity is already in the database - if it is, just leave
 		// 2. Generate the appropriate entry in the GridMapCell, but don't put it
 
+		if (isStillProceduralEntity(proceduralKey)) return;
+		
+		ProceduralKeyData data = getProceduralKeyData(proceduralKey);
+		
+		EmbeddedEntity entry = getOrCreateGridMapTileProceduralEntry(data.tileX, data.tileY, data.index);
+		
+		entry.setProperty("status", "ProceduralDeleted");
+		
+		setGridMapTileProceduralEntry(data.tileX, data.tileY, data.index, entry);
+		
+	}
+	
+	
+	protected EmbeddedEntity generateDefaultProceduralTileEntry(int tileX, int tileY, int index)
+	{
+		EmbeddedEntity entity = new EmbeddedEntity();
+		long id = new Random().nextLong();
+		if (id<0) id+=Long.MAX_VALUE;
+		
+		entity.setKey(KeyFactory.createKey("Item", id));
+		
+		entity.setProperty("proceduralGenerationIndex", index);
+		entity.setProperty("status", "Procedural");
+		
+		return entity;
+	}
+
+	public void removeEntity(CachedEntity itemEntity)
+	{
+		if (itemEntity.getAttribute("proceduralKey")!=null)
+		{
+			// It is procedurally generated and we need to remove it that way
+			removeProceduralEntity((String)itemEntity.getAttribute("proceduralKey"));
+		}
+		else if (itemEntity.getKey()!=null && itemEntity.getKey().isComplete())
+		{
+			Long tileX = (Long)itemEntity.getProperty("gridMapPositionX");
+			Long tileY = (Long)itemEntity.getProperty("gridMapPositionY");
+			if (tileX==null) tileX = 500L;
+			if (tileY==null) tileY = 500L;
+			
+			generateDBItemTileCache(tileX.intValue(), tileY.intValue());
+		}
+	}
+
+	private void removeDBEntity(CachedEntity itemEntity)
+	{
+		Long tileX = (Long)itemEntity.getProperty("gridMapPositionX");
+		Long tileY = (Long)itemEntity.getProperty("gridMapPositionY");
+		if (tileX==null) tileX = 500L;
+		if (tileY==null) tileY = 500L;
+		
+		EmbeddedEntity tile = getOrCreateGridMapTile(tileX.intValue(), tileY.intValue());
+		
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> tileEntries = (List<EmbeddedEntity>)tile.getProperty("dbItems");
+		
+		if (tileEntries!=null)
+			for(int i = tileEntries.size()-1;i>=0; i--)
+			{
+				EmbeddedEntity entry = tileEntries.get(i);
+				if (entry==null) continue;
+				
+				Key itemKey = (Key)entry.getProperty("itemKey");
+				if (GameUtils.equals(itemKey, itemEntity.getKey()))
+				{
+					tileEntries.remove(i);
+					tile.setProperty("dbItems", tileEntries);
+					return;
+				}
+			}
+	}
+	
+	private void generateDBItemTileCache(int tileX, int tileY)
+	{
+		// 1. Clear out the existing DB related items, but leave the procedural ones
+		// 2. Query for the items in that location (special consideration for tile 500x500 as it is the default tile and it's where everything  that has no tile position should be considered to be
+		// 3. Add up to 10 of the items to the cache and put it back
+		
+		EmbeddedEntity tile = getOrCreateGridMapTile(tileX, tileY);
 		
 	}
 }

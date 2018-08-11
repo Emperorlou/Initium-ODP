@@ -2238,7 +2238,7 @@ public class ODPDBAccess
 				effect = effect.substring(0, effect.length() - 1);
 				double val = new Double(effect);
 				val /= 100;
-				buffAmount += startStat * val;
+				buffAmount += statStart * val;
 			}
 			else
 			{
@@ -2255,11 +2255,11 @@ public class ODPDBAccess
 		{
 			for(CachedEntity equip:characterEquipment)
 			{
-				buffAmount += mService.getAffectedValue(startStat, equip, modifierType) - startStat;
+				buffAmount += mService.getAffectedValue(statStart, equip, modifierType) - statStart;
 			}
 		}
 		
-		return Math.round(startStat + buffAmount);
+		return Math.round(statStart + buffAmount);
 	}
 
 	public Long getLongBuffableProperty(CachedEntity entity, String fieldName)
