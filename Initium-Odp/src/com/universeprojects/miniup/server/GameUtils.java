@@ -2770,5 +2770,15 @@ public class GameUtils
 		else
 			throw new ContentDeveloperException("Curve scale power must be above 1 or below -1.");
 	}
+
 	
+	public static Random getSeededRandom(Number...seeds)
+	{
+		long seed = 0L;
+		for(Number s:seeds)
+		{
+			seed+=s.longValue();
+		}
+		return new Random(seed);
+	}
 }

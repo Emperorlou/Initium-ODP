@@ -76,7 +76,7 @@ public class AspectPickable extends ItemAspect
 		public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 		{
 			String itemKeyStr = parameters.get("itemKey");
-			String proceduralKeyStr = parameters.get("itemKey");
+			String proceduralKeyStr = parameters.get("proceduralKey");
 			CachedEntity itemEntity = null;
 			GridMapService gmService = null;
 			if (itemKeyStr!=null && itemKeyStr.equals("null")==false)
@@ -90,6 +90,7 @@ public class AspectPickable extends ItemAspect
 				gmService = new GridMapService(db, location);
 				itemEntity = gmService.generateSingleItemFromProceduralKey(db, location, proceduralKeyStr);
 			}
+			if (itemEntity==null) throw new UserErrorMessage("I couldn't find the thing you wanted to pick.");
 			InitiumObject item = new InitiumObject(db, itemEntity);
 			
 			// Check to make sure the item we're trying to pick actually has the aspects we require
@@ -103,6 +104,20 @@ public class AspectPickable extends ItemAspect
 			// Now that the entity has been saved, we need to update the location data
 			
 			gmService.removeEntity(itemEntity);
+			gmService.putLocationData(ds);
+			
+			
+			if (itemKeyStr!=null && itemKeyStr.equals("null")==false)
+			{
+				deleteHtml(".tileContentsItem[ref='"+itemKeyStr+"']");
+				deleteHtml(".gridObject[id*='"+itemKeyStr+"']");
+			}
+			else if (proceduralKeyStr!=null && proceduralKeyStr.equals("null")==false)
+			{
+				deleteHtml(".tileContentsItem[ref='"+proceduralKeyStr+"']");
+				deleteHtml(".gridObject[id*='"+proceduralKeyStr+"']");
+			}
+			
 		}
 		
 	}

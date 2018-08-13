@@ -1672,7 +1672,7 @@ public class ODPDBAccess
 		if (CommonChecks.checkCharacterIsIncapacitated(character))
 			throw new UserErrorMessage("You cannot do that right now. You're incapacitated.");
 		
-		if (CommonChecks.checkItemIsMovable(item)==false)
+		if (overrideImmovable==false && CommonChecks.checkItemIsMovable(item)==false)
 			throw new UserErrorMessage("You cannot pick up this item.");
 		
 		if (character.getProperty("locationKey").equals(item.getProperty("containerKey")) == false) throw new UserErrorMessage("The item is not here anymore. Perhaps someone else grabbed it.");
@@ -1693,7 +1693,6 @@ public class ODPDBAccess
 		item.setProperty("containerKey", character.getKey());
 		item.setProperty("movedTimestamp", new Date());
 
-		getDB().put(item);
 	}
 
 	public Long getCharacterWeight(CachedEntity character)

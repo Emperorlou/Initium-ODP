@@ -48,7 +48,7 @@ public class GridMapCellContentsController extends PageController
 		
 		List<CachedEntity> items = gmService.generateTileItems(tileX, tileY);
 		
-		List<String> itemsFormatted = new ArrayList<>();
+		List<Map<String,String>> itemsFormatted = new ArrayList<>();
 		for(CachedEntity item:items)
 		{
 			String html = GameUtils.renderItem(db, request, db.getCurrentCharacter(), item, false, false, (String)item.getAttribute("proceduralKey"));
@@ -78,7 +78,16 @@ public class GridMapCellContentsController extends PageController
 			
 			html += "</div>";
 			
-			itemsFormatted.add(html);
+			
+			Map<String,String> formattedItem = new HashMap<>();
+			
+			formattedItem.put("html", html);
+			if (item.getAttribute("proceduralKey")!=null)
+				formattedItem.put("id", (String)item.getAttribute("proceduralKey"));
+			else
+				formattedItem.put("id", item.getKey().toString());
+			
+			itemsFormatted.add(formattedItem);
 		}
 		
 		request.setAttribute("items", itemsFormatted);

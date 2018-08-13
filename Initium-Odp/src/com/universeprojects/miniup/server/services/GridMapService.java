@@ -11,6 +11,11 @@ import java.util.Random;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
@@ -19,7 +24,6 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
 import com.universeprojects.miniup.server.model.GridObject;
-import com.universeprojects.miniup.server.services.GridMapService.ProceduralKeyData;
 
 public class GridMapService {
 
@@ -43,6 +47,7 @@ public class GridMapService {
 	
 	final private ODPDBAccess db;
 	final private CachedDatastoreService ds;
+	final private QueryHelper query;
 	final private CachedEntity location;
 	private Integer locationWidth;
 	private Integer locationHeight;
@@ -50,12 +55,14 @@ public class GridMapService {
 	private boolean initializedLocationData = false;
 	private List<CachedEntity> locationPresets = null;
 	private Map<CachedEntity, Double> naturalItemsMap = null;
+	private CachedEntity locationDataEntity = null;
 	private EmbeddedEntity locationData = null;
 	
 	public GridMapService(ODPDBAccess db, CachedEntity location)
 	{
 		this.db = db;
 		this.ds = db.getDB();
+		this.query = new QueryHelper(ds);
 		this.location = location;
 		locationWidth = intVal(location.getProperty("gridMapWidth"));
 		locationHeight = intVal(location.getProperty("gridMapHeight"));
@@ -67,10 +74,15 @@ public class GridMapService {
 	{
 		if (initializedLocationData) return;
 		
-		CachedEntity locationDataEntity = db.getEntity(KeyFactory.createKey("GridMapLocationData", location.getId()));
+		locationDataEntity = db.getEntity(KeyFactory.createKey("GridMapLocationData", location.getId()));
 		if (locationDataEntity!=null)
 		{
 			locationData = (EmbeddedEntity)locationDataEntity.getProperty("gridMapTiles");
+		}
+		else
+		{
+			locationDataEntity = new CachedEntity("GridMapLocationData", location.getId());
+			locationData = new EmbeddedEntity();
 		}
 	}
 	
@@ -278,15 +290,22 @@ public class GridMapService {
 	{
 		initializeLocationData();
 		
-		List<CachedEntity> tileItems = generateNaturalTileItems(rnd, tileX, tileY);
-		
-		if (locationData==null) return tileItems;
 		
 		EmbeddedEntity gridMapTile = (EmbeddedEntity)locationData.getProperty(tileX+"x"+tileY);
+		Boolean isProceduralItemsCleared = false;
+		if (gridMapTile!=null)
+			isProceduralItemsCleared = (Boolean)gridMapTile.getProperty("clearedProceduralItems");
+		if (isProceduralItemsCleared==null) isProceduralItemsCleared = false;
 		
+		List<CachedEntity> tileItems = null;
+		if (isProceduralItemsCleared==false)
+			tileItems = generateNaturalTileItems(rnd, tileX, tileY);
+		else
+			tileItems = new ArrayList<>();
+		
+		if (locationData==null) return tileItems;
 		if (gridMapTile==null) return tileItems;
 		
-		Boolean isProceduralItemsCleared = (Boolean)gridMapTile.getProperty("clearedProceduralItems"); 
 		List<EmbeddedEntity> itemDBEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("dbItems");
 		
 		if (isProceduralItemsCleared) tileItems.clear();
@@ -397,7 +416,12 @@ public class GridMapService {
 			
 			
 			
-			String generatedKey = "Location:"+location.getKey().getId()+"-X:"+tileX+"-Y:"+tileY+"-Index:"+i;
+//			String generatedKey = "Location:"+location.getKey().getId()+"-X:"+tileX+"-Y:"+tileY+"-Index:"+i;
+			String generatedKey = null;
+			if (item.getKey().isComplete())
+				generatedKey = item.getKey().toString();
+			else
+				generatedKey = (String)item.getAttribute("proceduralKey");
 			
 			result.put(generatedKey, new GridObject(
 					generatedKey,
@@ -618,6 +642,8 @@ public class GridMapService {
 	{
 		initializeLocationData();
 		
+		if (locationData==null) return null;
+		
 		return (EmbeddedEntity)locationData.getProperty(tileX+"x"+tileY);
 	}
 	
@@ -689,6 +715,7 @@ public class GridMapService {
 	protected void setGridMapTile(int tileX, int tileY, EmbeddedEntity entity)
 	{
 		locationData.setProperty(tileX+"x"+tileY, entity);
+		locationDataEntity.setProperty("gridMapTiles", locationData);
 	}
 	
 	public boolean isStillProceduralEntity(String proceduralKey)
@@ -699,6 +726,8 @@ public class GridMapService {
 			throw new RuntimeException("The procedural key's location ("+data.locationId+") is not for the location ("+location.getId()+") this GridMapService is serving.");
 		
 		EmbeddedEntity gridMapTile = getGridMapTile(data.tileX, data.tileY);
+		
+		if (gridMapTile==null) return true;
 		
 		if (GameUtils.equals(gridMapTile.getProperty("clearedProceduralItems"), true)) return false;
 		
@@ -730,7 +759,7 @@ public class GridMapService {
 		// 1. Check if the entity is already in the database - if it is, just leave
 		// 2. Generate the appropriate entry in the GridMapCell, but don't put it
 
-		if (isStillProceduralEntity(proceduralKey)) return;
+		if (isStillProceduralEntity(proceduralKey)==false) return;
 		
 		ProceduralKeyData data = getProceduralKeyData(proceduralKey);
 		
@@ -811,5 +840,96 @@ public class GridMapService {
 		
 		EmbeddedEntity tile = getOrCreateGridMapTile(tileX, tileY);
 		
+//		Query q = new Query("Item").setFilter(
+//				CompositeFilterOperator.and(
+//						new FilterPredicate("containerKey", FilterOperator.EQUAL, location.getKey()),
+//						new FilterPredicate("gridMapPositionX", FilterOperator.EQUAL, (long)tileX),
+//						new FilterPredicate("gridMapPositionY", FilterOperator.EQUAL, (long)tileY)))
+//				.addSort("movedTimestamp", SortDirection.DESCENDING);
+		Query q = new Query("Item").setFilter(
+						new FilterPredicate("containerKey", FilterOperator.EQUAL, location.getKey()))
+				.addSort("movedTimestamp", SortDirection.DESCENDING);
+		List<CachedEntity> items = ds.fetchAsList(q, 50);
+		
+		List<EmbeddedEntity> dbItems = new ArrayList<>();
+		for(CachedEntity entity:items)
+		{
+			dbItems.add(generateTileEntryFromItem(entity));
+		}
+
+		tile.setProperty("dbItems", dbItems);
+		
+		setGridMapTile(tileX, tileY, tile);
+//		if (tileX==500 && tileY==500)
+//		{
+//			
+//		}
+//		else
+//		{
+//			
+//		}
+	}
+	
+	
+	private EmbeddedEntity generateTileEntryFromItem(CachedEntity item)
+	{
+		EmbeddedEntity entry = new EmbeddedEntity();
+
+		// Grab the GridMapObject values and overrides
+		String mode = (String)item.getProperty("GridMapObject:mode");
+		Long cellOffsetX = (Long)item.getProperty("gridMapCellOffsetX");
+		Long cellOffsetY = (Long)item.getProperty("gridMapCellOffsetY");
+		Long width = (Long)item.getProperty("GridMapObject:imageWidth");
+		Long height = (Long)item.getProperty("GridMapObject:imageHeight");
+		Long tileX = (Long)item.getProperty("gridMapPositionX");
+		Long tileY = (Long)item.getProperty("gridMapPositionY");
+		String image = (String)item.getProperty("GridMapObject:image");
+		
+		
+		// Process the values out...
+		if (tileX==null) tileX = 500L;
+		if (tileY==null) tileY = 500L;
+		Random rnd = GameUtils.getSeededRandom(item.getId(), tileX, tileY, location.getId());
+		if (image==null || image.trim().equals("")) image = (String)item.getProperty("icon");
+		if (cellOffsetX==null || cellOffsetY==null)
+		{
+			cellOffsetX = (long)rnd.nextInt(128)-64;
+			cellOffsetX = (long)rnd.nextInt(128)-64;			
+		}
+		if (width==null || height==null)
+		{
+			width = 32L;
+			height = 32L;
+		}
+
+		
+		
+		
+		// Set the values on the entry
+		Long id = rnd.nextLong();
+		if (id<=0) id+=Long.MAX_VALUE;
+		entry.setKey(KeyFactory.createKey("GridMapTileItemEntry", id));
+		entry.setProperty("status", "Database");
+		entry.setProperty("dbItemCellOffsetX", cellOffsetX);
+		entry.setProperty("dbItemCellOffsetY", cellOffsetY);
+		entry.setProperty("dbItemHeight", width);
+		entry.setProperty("dbItemWidth", height);
+		entry.setProperty("itemKey", item.getKey());
+		entry.setProperty("dbItemImage", image);
+		
+		return entry;
+	}
+
+	
+	public boolean isLocationDataChanged()
+	{
+		if (locationDataEntity==null) return false;
+		return locationDataEntity.isUnsaved();
+	}
+	
+	public void putLocationData(CachedDatastoreService ds)
+	{
+		if (locationDataEntity!=null)
+			ds.put(locationDataEntity);
 	}
 }

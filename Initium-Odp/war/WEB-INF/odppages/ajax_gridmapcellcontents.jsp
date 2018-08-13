@@ -3,5 +3,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <c:forEach var="item" items="${items}">
-	<div>${item }</div>
+	<div class='tileContentsItem' ref='${item.id}'>${item.html}</div>
 </c:forEach>

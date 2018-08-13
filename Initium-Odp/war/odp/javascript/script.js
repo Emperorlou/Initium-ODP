@@ -1742,21 +1742,21 @@ function newCharacterFromUnconscious()
 	});
 }
 
-function enterDefenceStructureSlot(slot)
-{
-	if (slot=="Defending1" || slot=="Defending2" || slot=="Defending3")
-	{
-		confirmPopup("Defend this structure?", "Are you sure you want to defend this structure? If you do this, other players will be able to attack and kill you.", function(){
-			enforceSingleAction();
-			window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode+"&char="+window.characterOverride;
-		});
-	}
-	else
-	{
-		enforceSingleAction();
-		window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode+"&char="+window.characterOverride;
-	}
-}
+//function enterDefenceStructureSlot(slot)
+//{
+//	if (slot=="Defending1" || slot=="Defending2" || slot=="Defending3")
+//	{
+//		confirmPopup("Defend this structure?", "Are you sure you want to defend this structure? If you do this, other players will be able to attack and kill you.", function(){
+//			enforceSingleAction();
+//			window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//		});
+//	}
+//	else
+//	{
+//		enforceSingleAction();
+//		window.location.href = "/ServletCharacterControl?type=setCharacterStatus&status="+slot+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//	}
+//}
 
 var popupStackCloseCallbackHandlers = [];
 var currentPopupStackIndex = 0;
@@ -2162,11 +2162,12 @@ function joinPartyCharacterName(eventObject, characterName) {
 }
 
 //Old leave party function
-function leaveParty()
+function leaveParty(eventObject)
 {
 	confirmPopup("Leave party", "Are you sure you want to leave your party?", function(){
-		enforceSingleAction();
-		location.href = "/ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+		doCommand(eventObject, "PartyLeave");
+//		enforceSingleAction();
+//		location.href = "/ServletCharacterControl?type=partyLeave"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	});
 }
 
@@ -2179,41 +2180,41 @@ function enforceSingleAction()
 	singleActionIssued = true;
 }
 
-function combatAttackWithLeftHand()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function combatAttackWithRightHand()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function combatEscape()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=escape"+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function combatAllowCharacterIn()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function storeDisabled()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function storeEnabled()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
+//function combatAttackWithLeftHand()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=attack&hand=LeftHand"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function combatAttackWithRightHand()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=attack&hand=RightHand"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function combatEscape()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=escape"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function combatAllowCharacterIn()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=allowCharacterIn"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function storeDisabled()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=storeDisabled"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function storeEnabled()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=storeEnabled"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
 
 ////////////////////////////////////////////////////////
 // BUTTON BAR TOGGLES
@@ -2246,23 +2247,23 @@ function toggleHideUserActivity(eventObject)
 	doCommand(eventObject, "ToggleHideUserActivity");
 }
 
-function campsiteDefend()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=defend"+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function leaveAndForgetCombatSite(pathId)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function forgetCombatSite(locationId)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
+//function campsiteDefend()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=defend"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function leaveAndForgetCombatSite(pathId)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=gotoAndForget&pathId="+pathId+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function forgetCombatSite(locationId)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=forgetCombatSite&locationId="+locationId+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
 
 function groupAcceptJoinGroupApplication(eventObject, characterId)
 {
@@ -2281,11 +2282,11 @@ function groupMemberKick(eventObject, characterId, characterName)
 	});
 }
 
-function groupMemberKickCancel(characterId)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
+//function groupMemberKickCancel(characterId)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=groupMemberCancelKick&characterId="+characterId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
 
 function groupRequestJoin(eventObject, groupId)
 {
@@ -2330,35 +2331,35 @@ function groupMergeCancelRequest(eventObject)
 	});
 }
 
-function tradeRemoveItem(itemId)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function tradeCancel()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function tradeReady(version)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function tradeAddItem(itemId)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
-
-function partyJoin(characterId)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
+//function tradeRemoveItem(itemId)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=removeTradeItem&itemId="+itemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function tradeCancel()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=tradeCancel"+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function tradeReady(version)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=tradeReady&ver="+version+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function tradeAddItem(itemId)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=addTradeItem&itemId="+itemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
+//
+//function partyJoin(characterId)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=partyJoin&characterId="+characterId+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
 
 function tradeStartTradeNew(eventObject,characterId)
 {
@@ -2441,11 +2442,11 @@ function tradeAddAllItemsNew(eventObject)
 }
 	
 
-function duelRequest(characterId)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode+"&char="+window.characterOverride;
-}
+//function duelRequest(characterId)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=duelRequest&characterId="+characterId+"&v="+window.verifyCode+"&char="+window.characterOverride;
+//}
 
 function viewManageStore()
 {
@@ -2481,36 +2482,36 @@ function logout()
 	location.href = "/ServletUserControl?type=logout"+"&v="+verifyCode;
 }
 
-function attackStructure()
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=attackStructure"+"&v="+verifyCode;
-}
+//function attackStructure()
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=attackStructure"+"&v="+verifyCode;
+//}
 
-function allowDuelRequests()
-{
-	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
-	return;
-	location.href = "/ServletCharacterControl?type=allowDuelRequests"+"&v="+verifyCode;
-}
-
-function disallowDuelRequests()
-{
-	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
-	return;
-	location.href = "/ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
-}
+//function allowDuelRequests()
+//{
+//	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
+//	return;
+//	location.href = "/ServletCharacterControl?type=allowDuelRequests"+"&v="+verifyCode;
+//}
+//
+//function disallowDuelRequests()
+//{
+//	popupMessage("SYSTEM", "Dueling has been disabled (and has been for months) because the current combat system doesn't work well with it. We will re-enable it once we have a solution.");
+//	return;
+//	location.href = "/ServletCharacterControl?type=disallowDuelRequests"+"&v="+verifyCode;
+//}
 
 function viewStore(characterId)
 {
 	pagePopup("/odp/ajax_viewstore.jsp?characterId="+characterId+"", null, "Merchant Store");
 }
 
-function setBlockadeRule(rule)
-{
-	enforceSingleAction();
-	location.href = "/ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
-}
+//function setBlockadeRule(rule)
+//{
+//	enforceSingleAction();
+//	location.href = "/ServletCharacterControl?type=setBlockadeRule&rule="+rule+"&v="+verifyCode;
+//}
 
 function doEatBerry(eventObject)
 {	
