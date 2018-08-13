@@ -1829,7 +1829,7 @@ function pagePopupHtml(title, html)
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><div class='page-popup-title'><h4>"+title+"</h4></div><div class='page-popup-content' id='"+pagePopupId+"-content'>"+html+"</div><div class='mobile-spacer'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><a class='page-popup-X' onclick='closePagePopup()'>X</a><div class='page-popup-title'><h4>"+title+"</h4></div><div class='page-popup-content' id='"+pagePopupId+"-content'>"+html+"</div><div class='mobile-spacer'></div></div>");
 	$("body").scrollTo("#buttonbar");
 }
 
