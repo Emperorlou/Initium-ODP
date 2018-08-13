@@ -2005,7 +2005,7 @@ public class ODPDBAccess
 		buffs.add(buff);
 	}
 
-	public void awardBuff_Pumped(CachedDatastoreService ds, CachedEntity attackingCharacter)
+	public boolean awardBuff_Pumped(CachedDatastoreService ds, CachedEntity attackingCharacter)
 	{
 		if (ds == null) ds = getDB();
 
@@ -2013,48 +2013,45 @@ public class ODPDBAccess
 				"You're pumped! This buff is awarded when you kill a monster while still being full health. The effect lasts for 1 minute.", 60, "strength", "+10%", "dexterity", "+10%",
 				"intelligence", "+5%", 3);
 
-		if (buff != null) ds.put(buff);
+		if (buff != null && buff.isUnsaved()) ds.put(buff);
+		return buff != null;
 	}
 	
-	public void awardBuff_Candy(CachedDatastoreService ds, CachedEntity character)
+	public boolean awardBuff_Candy(CachedDatastoreService ds, CachedEntity character)
 	{
 		Double buffDouble = Math.random();
-		
+		CachedEntity buff = null;
 		if(buffDouble <= 0.16){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 				"That was some good candy! You feel stronger!",600,"strength","+0.2",null,null,null,null,10);
-			if (buff != null) ds.put(buff);
 		}
 		if((buffDouble >= 0.17) && (buffDouble < 0.32)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
-					"That was some good candy! You feel more agile!",600,"dexterity","+0.2",null,null,null,null,10);
-			if (buff != null) ds.put(buff);
+			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+				"That was some good candy! You feel more agile!",600,"dexterity","+0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.32) && (buffDouble < 0.48)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
-					"That was some good candy! You feel smarter!",600,"Intelligence","+0.2",null,null,null,null,10);
-			if (buff != null) ds.put(buff);
+			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+				"That was some good candy! You feel smarter!",600,"Intelligence","+0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.48) && (buffDouble < 0.64)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
-					"That candy was terrible! You feel weaker!",600,"strength","-0.2",null,null,null,null,10);
-			if (buff != null) ds.put(buff);
+			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
+				"That candy was terrible! You feel weaker!",600,"strength","-0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.64) && (buffDouble < 0.80)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
-					"That candy was terrible! You feel slower!",600,"strength","-0.2",null,null,null,null,10);
-			if (buff != null) ds.put(buff);
+			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
+				"That candy was terrible! You feel slower!",600,"strength","-0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.80) && (buffDouble < 0.96)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
-					"That candy was terrible! You feel dumb!",600,"intelligence","-0.2",null,null,null,null,10);
-			if (buff != null) ds.put(buff);
+			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
+				"That candy was terrible! You feel dumb!",600,"intelligence","-0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.96)){
-			CachedEntity buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
-					"That was some good candy! You feel great!",600,"strength","+0.2","dexterity","+0.2","intelligence","+0.2",10);
-			if (buff != null) ds.put(buff);
-		}	
+			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+				"That was some good candy! You feel great!",600,"strength","+0.2","dexterity","+0.2","intelligence","+0.2",10);
+		}
+		
+		if (buff != null) ds.put(buff);
+		return buff != null;
 	}
 
 	//Sort sale items by Type --> Name --> Max Damage or Block Chance --> Cost
