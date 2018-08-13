@@ -165,6 +165,9 @@
 	        mouseOutClose: false,
 	        activation:"click",
 	        cluezIndex: 20000000,
+			ajaxSettings: {
+				beforeSend: function(xhr, ctip, ctipInner, settings) { settings.url += "&char=" + window.characterOverride; }
+			},
 	        onShow: function() {
 	            // close cluetip when users click outside of it
 	            $(document).click(function(e) {
