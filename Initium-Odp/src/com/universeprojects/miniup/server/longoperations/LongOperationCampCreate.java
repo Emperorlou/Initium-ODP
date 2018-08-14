@@ -67,7 +67,7 @@ public class LongOperationCampCreate extends LongOperation
 		if(location != null)
 			description = "Your camp has been created. Make sure to defend it and perhaps get others to help!";
 		
-		throw new GameStateChangeException(description);
+		throw new GameStateChangeException(description, true);
 	}
 
 	@Override
