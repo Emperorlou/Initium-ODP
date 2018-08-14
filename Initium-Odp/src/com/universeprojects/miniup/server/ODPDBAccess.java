@@ -4133,8 +4133,8 @@ public class ODPDBAccess
 
         
         
-        // Regardless of whether or not the attack is successful, give a stat increase
-        if (sourceCharacter.getProperty("type")==null || sourceCharacter.getProperty("type").equals("") || sourceCharacter.getProperty("type").equals("PC"))
+        // Regardless of whether or not the attack is successful, give a stat increase against NPCs only
+        if (CommonChecks.checkCharacterIsPlayer(sourceCharacter) && CommonChecks.checkCharacterIsPlayer(targetCharacter) == false)
         {
             // Get the stat increase multiplier...
             double multiplier = 1d;
