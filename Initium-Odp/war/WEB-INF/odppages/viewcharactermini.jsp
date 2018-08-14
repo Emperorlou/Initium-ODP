@@ -69,7 +69,7 @@
 
 	</div>
 	<div class='normal-container'>
-		<c:if test="${(isCloaked==false && type!='PC') || (isCloaked==true && isSelf==true)}">
+		<c:if test="${(isCloaked==false && type=='PC') || (isCloaked==true && isSelf==true)}">
 			<h5>Referral Stats</h5>
 			<div style='margin-left:10px'>
 				<p>
