@@ -393,7 +393,7 @@ public abstract class LongOperation extends OperationBase
 			cancelLongOperation(db, db.getCurrentCharacterKey());
 			
 			MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getEntity((Key)db.getCurrentCharacter().getProperty("locationKey")), this);
-			mpus.updateFullPage_shortcut();
+			mpus.updateFullPage_shortcut(e.refreshChat);
 
 			result.putAll(getStateData());
 			result.put("silentError", true);

@@ -506,7 +506,9 @@ public abstract class CommonChecks
 	public static boolean checkCharacterIsPlayer(CachedEntity character)
 	{
 		if (character==null) return false;
-		return "PC".equals(character.getProperty("type"));
+		return "".equals(character.getProperty("type")) || 
+				"PC".equals(character.getProperty("type")) || 
+				character.getProperty("type") == null;
 	}
 
 

@@ -295,7 +295,7 @@ public class LongOperationTakePath extends LongOperation {
 		try
 		{
 			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, 1, 0.5d))
-				throw new GameStateChangeException("While you were on your way, someone found you..");
+				throw new GameStateChangeException("While you were on your way, someone found you...", true);
 		}
 		finally
 		{
