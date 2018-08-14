@@ -106,7 +106,7 @@ public class CommandCombatEscape extends Command {
 			if (cs.isInCombat(character)==false || GameUtils.isPlayerIncapacitated(character))
 			{
 				// We're done with combat
-				mpus.updateFullPage_shortcut();
+				mpus.updateFullPage_shortcut(true);
 				
 				if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
 					db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
