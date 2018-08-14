@@ -41,13 +41,15 @@
         return;
     }
     
-    CommonEntities common = CommonEntities.getInstance(request);
-    
     Long characterId = WebUtils.getLongParam(request, "characterId");
     if (characterId==null)
         return;
     
-    if (common.getCharacter().getKey().getId() == characterId)
+    CachedEntity character = db.getCurrentCharacter();
+    if(character==null)
+    	return;
+    
+    if (character.getKey().getId() == characterId)
     {
         WebUtils.forceRedirectClientTo("/odp/ajax_managestore.jsp", request, response);
         return;
@@ -66,7 +68,7 @@
 		return;
 	}
 	
-	if (((Key)storeCharacter.getProperty("locationKey")).getId()!=common.getLocation().getKey().getId())
+	if (GameUtils.equals(storeCharacter.getProperty("locationKey"), character.getProperty("locationKey")==false)
 	{
 		out.println("The store you're trying to browse is not in your location.");
 		return;
@@ -178,7 +180,7 @@
 	        out.println("<h3>"+itemType+"</h3>");
 	        currentCategory = itemType;
 	    }
-	    out.println(HtmlComponents.generateStoreItemHtml(db,common.getCharacter(), storeCharacter,item,itemToSaleItemMap.get(item),request));
+	    out.println(HtmlComponents.generateStoreItemHtml(db, character, storeCharacter, item, itemToSaleItemMap.get(item), request));
 	}
 	%>
 	<center><a onclick="closePagePopup()" class="big-link">Leave Store</a></center>
