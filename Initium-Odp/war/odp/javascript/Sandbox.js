@@ -1413,6 +1413,7 @@ function addGridObjectToMap(gridObject) {
     var objectScale = gridObject.scale ? gridObject.scale : 1;
     var gridMapObjectWidth = gridObject.width * map2dScale * objectScale;
     var gridMapObjectHeight = gridObject.height * map2dScale * objectScale;
+    var objectRotation = gridObject.rotation ? gridObject.rotation : 0;
     
     var left = (gridObject.xGridCoord+1) * gridCellWidth - (gridObject.xImageOrigin * map2dScale) - (gridObject.xGridCellOffset * map2dScale);
     var topPos = gridObject.yGridCoord * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObject.yImageOrigin * map2dScale) - ((gridObject.yGridCellOffset)/2 * map2dScale/2);
@@ -1453,6 +1454,7 @@ function addGridObjectToMap(gridObject) {
     $hexBody += " width:" + (gridMapObjectWidth) + "px;";
     $hexBody += " height:" + (gridMapObjectHeight) + "px;";
     $hexBody += " z-index:" + (parseInt(objectZOffset) + parseInt(topZ)) + ";";
+    $hexBody += " transform: rotate("+objectRotation+"deg);";
     if (gridObject.key == "o1") {
         $hexBody += " background:url(" + $domain + gridObject.filename + ");";
     } else {

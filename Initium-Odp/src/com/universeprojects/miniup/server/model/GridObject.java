@@ -19,6 +19,7 @@ public class GridObject {
 	private static String height = "height";
 	private static String markForRemoval = "markForRemoval";
 	private static String markForDeletion = "markForDeletion";
+	private static String rotation = "rotation";
 	private JSONObject jsonObject;
 
 	public GridObject() {
@@ -36,7 +37,7 @@ public class GridObject {
 		setyGridCoord(yGridCoord);
 	}
 
-	public GridObject(String key, String filename, String name, Integer xGridCoord, Integer yGridCoord, Integer xGridCellOffset, Integer yGridCellOffset, Integer xImageOrigin,
+	public GridObject(String key, String filename, String name, Integer xGridCoord, Integer yGridCoord, Double rotation, Integer xGridCellOffset, Integer yGridCellOffset, Integer xImageOrigin,
 			Integer yImageOrigin, Integer width, Integer height, boolean markForRemoval, boolean markForDeletion) {
 		jsonObject = new JSONObject();
 		setKey(key);
@@ -44,6 +45,7 @@ public class GridObject {
 		setName(WebUtils.jsSafe(name));
 		setxGridCoord(xGridCoord);
 		setyGridCoord(yGridCoord);
+		setRotation(rotation);
 		setxGridCellOffset(xGridCellOffset);
 		setyGridCellOffset(yGridCellOffset);
 		setxImageOrigin(xImageOrigin);
@@ -84,6 +86,14 @@ public class GridObject {
 
 	public void setName(String name) {
 		jsonObject.put(this.name, name);
+	}
+
+	public Double getRotation() {
+		return (Double) jsonObject.get(this.rotation);
+	}
+
+	public void setRotation(Double value) {
+		jsonObject.put(this.rotation, value);
 	}
 
 	public Integer getxGridCoord() {

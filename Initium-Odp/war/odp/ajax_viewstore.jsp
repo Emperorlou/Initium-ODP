@@ -68,7 +68,7 @@
 		return;
 	}
 	
-	if (GameUtils.equals(storeCharacter.getProperty("locationKey"), character.getProperty("locationKey")==false)
+	if (GameUtils.equals(storeCharacter.getProperty("locationKey"), character.getProperty("locationKey"))==false)
 	{
 		out.println("The store you're trying to browse is not in your location.");
 		return;

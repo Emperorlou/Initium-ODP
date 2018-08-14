@@ -12,7 +12,6 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -58,6 +57,7 @@ public class GridMapService {
 	private CachedEntity locationDataEntity = null;
 	private EmbeddedEntity locationData = null;
 	
+	
 	public GridMapService(ODPDBAccess db, CachedEntity location)
 	{
 		this.db = db;
@@ -83,6 +83,8 @@ public class GridMapService {
 		{
 			locationDataEntity = new CachedEntity("GridMapLocationData", location.getId());
 			locationData = new EmbeddedEntity();
+			
+			generateDBItemTileCache(500, 500);
 		}
 	}
 	
@@ -210,47 +212,79 @@ public class GridMapService {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	private List<CachedEntity> generateNaturalTileItems(Random rnd, int tileX, int tileY)
 	{
 		initialize();
-		initializeLocationData();
 
-		getGridMapTile(tileX, tileY);
+		EmbeddedEntity gridMapTile = getGridMapTile(tileX, tileY);
+		Boolean isProceduralItemsCleared = false;
+		if (gridMapTile!=null) isProceduralItemsCleared = (Boolean)gridMapTile.getProperty("clearedProceduralItems");
+		if (isProceduralItemsCleared==null) isProceduralItemsCleared = false;
 		
+		List<CachedEntity> tileItems = new ArrayList<>();
 		List<CachedEntity> result = new ArrayList<>();
-		//TODO: if one of the items generated takes up the entire tile then we should skip generating the rest of the items
-		int index = 0;
-		for(CachedEntity itemDef:naturalItemsMap.keySet())
-		{
-			Double odds = naturalItemsMap.get(itemDef);
-			if (odds<=0) continue;
-			int spawnCount = (int)Math.floor(odds/100);
-			double lessThan100SpawnOdds = odds-(spawnCount*100);
+		
+		if (isProceduralItemsCleared==false)
+		{		
 			
-			
-			if (rnd.nextDouble()*100<lessThan100SpawnOdds)
+			//TODO: if one of the items generated takes up the entire tile then we should skip generating the rest of the items
+			int index = 0;
+			for(CachedEntity itemDef:naturalItemsMap.keySet())
 			{
-				//TODO: Consider using a fresh Random and adding an index number to the seed so we can regenerate this item without having to generate the whole tile
-				CachedEntity item = generateItem(rnd, itemDef, tileX, tileY);
-				item.setAttribute("proceduralKey", generateProceduralKey(location.getId(), tileX, tileY, index));
-				index++;
-				result.add(item);
+				Double odds = naturalItemsMap.get(itemDef);
+				if (odds<=0) continue;
+				int spawnCount = (int)Math.floor(odds/100);
+				double lessThan100SpawnOdds = odds-(spawnCount*100);
+				
+				
+				if (rnd.nextDouble()*100<lessThan100SpawnOdds)
+				{
+					//TODO: Consider using a fresh Random and adding an index number to the seed so we can regenerate this item without having to generate the whole tile
+					CachedEntity item = generateItem(rnd, itemDef, tileX, tileY);
+					item.setAttribute("proceduralKey", generateProceduralKey(location.getId(), tileX, tileY, index));
+					index++;
+					result.add(item);
+				}
+				
+				if (spawnCount>0)
+					spawnCount = rnd.nextInt(spawnCount+1);
+				
+				for(int i = 0; i<spawnCount; i++)
+				{
+					//TODO: Consider using a fresh Random and adding an index number to the seed so we can regenerate this item without having to generate the whole tile
+					CachedEntity item = generateItem(rnd, itemDef, tileX, tileY);
+					item.setAttribute("proceduralKey", generateProceduralKey(location.getId(), tileX, tileY, index));
+					index++;
+					result.add(item);
+				}
 			}
 			
-			if (spawnCount>0)
-				spawnCount = rnd.nextInt(spawnCount+1);
-			
-			for(int i = 0; i<spawnCount; i++)
-			{
-				//TODO: Consider using a fresh Random and adding an index number to the seed so we can regenerate this item without having to generate the whole tile
-				CachedEntity item = generateItem(rnd, itemDef, tileX, tileY);
-				item.setAttribute("proceduralKey", generateProceduralKey(location.getId(), tileX, tileY, index));
-				index++;
-				result.add(item);
-			}
 		}
 		
-		return result;
+		List<EmbeddedEntity> proceduralEntries = null;
+		if (gridMapTile!=null)
+			proceduralEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("proceduralItems");
+
+		// Go over all procedural items and remove the ones that were deleted 
+		if (proceduralEntries!=null)
+		{
+			for(int i = 0; i<result.size(); i++)
+			{
+				EmbeddedEntity entry = proceduralEntries.get(i);
+				
+				ItemEntryStatus status = parseIES(entry.getProperty("status"));
+				
+				if (status != ItemEntryStatus.ProceduralDeleted)
+					tileItems.add(result.get(i));
+			}
+		}
+		else
+		{
+			tileItems.addAll(result);
+		}
+		
+		return tileItems;
 	}
 	
 	public int getRowStart()
@@ -273,68 +307,45 @@ public class GridMapService {
 		return (int)Math.ceil(500d+locationHeight.doubleValue()/2);
 	}
 	
-	public List<CachedEntity> generateTileItems(int tileX, int tileY)
-	{
-		Random rnd = getRandomForTile(tileX, tileY);
-		
-		List<CachedEntity> items = generateTileItems(rnd, tileX, tileY);
-		
-		// Now remove any nulls
-		for(int i = items.size()-1; i>=0; i--) 
-			if (items.get(i)==null) items.remove(i);
-		
-		return items;
-	}
 	
-	private List<CachedEntity> generateTileItems(Random rnd, int tileX, int tileY)
+	@SuppressWarnings("unchecked")
+	public List<CachedEntity> generateTileItems(int tileX, int tileY)
 	{
 		initializeLocationData();
 		
+		Random rnd = getRandomForTile(tileX, tileY);
 		
-		EmbeddedEntity gridMapTile = (EmbeddedEntity)locationData.getProperty(tileX+"x"+tileY);
-		Boolean isProceduralItemsCleared = false;
-		if (gridMapTile!=null)
-			isProceduralItemsCleared = (Boolean)gridMapTile.getProperty("clearedProceduralItems");
-		if (isProceduralItemsCleared==null) isProceduralItemsCleared = false;
+		List<CachedEntity> tileItems = generateNaturalTileItems(rnd, tileX, tileY);
 		
-		List<CachedEntity> tileItems = null;
-		if (isProceduralItemsCleared==false)
-			tileItems = generateNaturalTileItems(rnd, tileX, tileY);
-		else
-			tileItems = new ArrayList<>();
-		
-		if (locationData==null) return tileItems;
-		if (gridMapTile==null) return tileItems;
-		
-		List<EmbeddedEntity> itemDBEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("dbItems");
-		
-		if (isProceduralItemsCleared) tileItems.clear();
-		
-		if (itemDBEntries!=null && itemDBEntries.isEmpty()==false)
+		// Now remove any nulls
+		for(int i = tileItems.size()-1; i>=0; i--) 
+			if (tileItems.get(i)==null) tileItems.remove(i);
+
+		EmbeddedEntity gridMapTile = getGridMapTile(tileX, tileY);
+			
+		// Go over all DB items 
+		List<EmbeddedEntity> itemDBEntries = null;
+		if (gridMapTile!=null) itemDBEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("dbItems");
+		if (itemDBEntries==null) 
 		{
-			for(EmbeddedEntity entry:itemDBEntries)
+			List<CachedEntity> dbItems = generateDBItemTileCache(tileX, tileY);
+			if (dbItems!=null)
 			{
-				Key itemKey = (Key)entry.getProperty("itemKey");
-				ItemEntryStatus status = parseIES(entry.getProperty("status"));
-				Integer proceduralGenerationIndex = null;
-				if (entry.getProperty("proceduralGenerationIndex")!=null) proceduralGenerationIndex = ((Long)entry.getProperty("proceduralGenerationIndex")).intValue();
-				
-				if (status == ItemEntryStatus.ProceduralDeleted && isProceduralItemsCleared==false)
-					tileItems.set(proceduralGenerationIndex, null);
-				else if (status == ItemEntryStatus.Database)
-				{
-					// TODO: I guess we... load it from the db here?
-				}
-				else if (status == ItemEntryStatus.Procedural)
-				{
-					// Do nothing here I suppose, we already generated everything
-				}
-				else
-					throw new RuntimeException("ItemEntryStatus type not handled: "+status);
+				tileItems.addAll(dbItems);
+				return tileItems;
 			}
 		}
+
+		List<Key> keysToFetch = new ArrayList<>();
+		for(EmbeddedEntity entry:itemDBEntries)
+		{
+			Key itemKey = (Key)entry.getProperty("itemKey");
+			keysToFetch.add(itemKey);
+		}
+		List<CachedEntity> dbEntities = db.getEntities(keysToFetch);
+		tileItems.addAll(dbEntities);
 		
-		
+
 		return tileItems;
 	}
 	
@@ -368,11 +379,10 @@ public class GridMapService {
 	public Map<String, GridObject> generateGridObjects(int tileX, int tileY)
 	{
 		Random rnd = getRandomForTile(tileX, tileY);
-		List<CachedEntity> items = generateTileItems(rnd, tileX, tileY);
+		List<CachedEntity> items = generateNaturalTileItems(rnd, tileX, tileY);
 
-		if (items==null) return null;
-		
 		Map<String, GridObject> result = new HashMap<>();
+		if (items!=null)
 		for(int i = 0; i<items.size(); i++)
 		{
 			boolean pileRandom = false;
@@ -381,13 +391,14 @@ public class GridMapService {
 			String imageUrl = null;
 			Integer cellOffsetX = null;
 			Integer cellOffsetY = null;
+			Double rotation = null;
 			Integer imageWidth = null;
 			Integer imageHeight = null;
 			if (item.getProperty("GridMapObject:image")==null || item.getProperty("GridMapObject:imageWidth")==null || item.getProperty("GridMapObject:imageHeight")==null) 
 			{
 				imageUrl = (String)item.getProperty("icon");
-				imageWidth = 8;
-				imageHeight = 8;
+				imageWidth = (int)Math.floor(32*GLOBAL_SCALE);
+				imageHeight = (int)Math.floor(32*GLOBAL_SCALE);
 				pileRandom = true;
 			}
 			else
@@ -399,6 +410,7 @@ public class GridMapService {
 			}
 			cellOffsetX = intVal(item.getProperty("gridMapCellOffsetX"));
 			cellOffsetY = intVal(item.getProperty("gridMapCellOffsetY"));
+			rotation = (Double)item.getProperty("gridMapRotation");
 
 			if (cellOffsetX==null || cellOffsetY==null || pileRandom)
 			{
@@ -408,6 +420,11 @@ public class GridMapService {
 				cellOffsetX = (offsetRnd.nextInt(64)+offsetRnd.nextInt(64))/2;
 				cellOffsetY = (offsetRnd.nextInt(64)+offsetRnd.nextInt(64))/2;
 			}
+			
+			if (rotation==null)
+			{
+				rotation = 0d;
+			}
 
 			
 //			double scale = 1-(rnd.nextDouble()*type.scaleVariance);
@@ -416,7 +433,6 @@ public class GridMapService {
 			
 			
 			
-//			String generatedKey = "Location:"+location.getKey().getId()+"-X:"+tileX+"-Y:"+tileY+"-Index:"+i;
 			String generatedKey = null;
 			if (item.getKey().isComplete())
 				generatedKey = item.getKey().toString();
@@ -428,9 +444,63 @@ public class GridMapService {
 					imageUrl,
 					"",
 					tileX-getRowStart(), tileY-getColumnStart(),
+					rotation,
 					cellOffsetX,
 					cellOffsetY,
 					(int)(imageWidth / 2), (int)(imageHeight*0.95), (int)(imageWidth), (int)(imageHeight), false, false));
+		}
+		
+		
+		EmbeddedEntity gridMapTile = getGridMapTile(tileX, tileY);
+		if (gridMapTile==null || gridMapTile.getProperty("dbItems")==null) 
+		{
+			generateDBItemTileCache(tileX, tileY);
+			
+			gridMapTile = getGridMapTile(tileX, tileY);
+			if (gridMapTile==null) return result;
+		}
+
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> dbItems = (List<EmbeddedEntity>)gridMapTile.getProperty("dbItems");
+		
+		if (dbItems!=null)
+		for(EmbeddedEntity item:dbItems)
+		{
+			
+			String generatedKey = "DK-"+((Key)item.getProperty("itemKey")).toString();
+			Long cellOffsetX = (Long)item.getProperty("dbItemCellOffsetX");
+			Long cellOffsetY = (Long)item.getProperty("dbItemCellOffsetY");
+			String imageUrl = GameUtils.getResourceUrl(item.getProperty("dbItemImage"));
+			Long imageWidth = (Long)item.getProperty("dbItemWidth");
+			Long imageHeight = (Long)item.getProperty("dbItemHeight");
+			Double rotation = (Double)item.getProperty("dbItemRotation");
+			
+			if (cellOffsetX==null || cellOffsetY==null)
+			{
+				cellOffsetX = 0L;
+				cellOffsetY = 0L;
+			}
+			
+			if (imageWidth==null || imageHeight==null)
+			{
+				imageWidth = (long)Math.floor(32d*GLOBAL_SCALE);
+				imageHeight = (long)Math.floor(32d*GLOBAL_SCALE);
+			}
+			
+			if (rotation==null)
+			{
+				rotation = rnd.nextDouble()*360;
+			}
+			
+			result.put(generatedKey, new GridObject(
+					generatedKey,
+					imageUrl,
+					"",
+					tileX-getRowStart(), tileY-getColumnStart(),
+					rotation,
+					cellOffsetX.intValue(),
+					cellOffsetY.intValue(),
+					(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false));
 		}
 		
 		return result;
@@ -625,7 +695,7 @@ public class GridMapService {
 		
 		Random rnd = gms.getRandomForTile(data.tileX, data.tileY);
 		
-		List<CachedEntity> items = gms.generateTileItems(rnd, data.tileX, data.tileY);
+		List<CachedEntity> items = gms.generateNaturalTileItems(rnd, data.tileX, data.tileY);
 		
 		if (items==null || items.size()-1<data.index) return null;
 		
@@ -832,8 +902,10 @@ public class GridMapService {
 			}
 	}
 	
-	private void generateDBItemTileCache(int tileX, int tileY)
+	private List<CachedEntity> generateDBItemTileCache(int tileX, int tileY)
 	{
+		if (tileX!=500 || tileY!=500)
+			return null;
 		// 1. Clear out the existing DB related items, but leave the procedural ones
 		// 2. Query for the items in that location (special consideration for tile 500x500 as it is the default tile and it's where everything  that has no tile position should be considered to be
 		// 3. Add up to 10 of the items to the cache and put it back
@@ -860,6 +932,8 @@ public class GridMapService {
 		tile.setProperty("dbItems", dbItems);
 		
 		setGridMapTile(tileX, tileY, tile);
+		
+		return items;
 //		if (tileX==500 && tileY==500)
 //		{
 //			
@@ -893,13 +967,13 @@ public class GridMapService {
 		if (image==null || image.trim().equals("")) image = (String)item.getProperty("icon");
 		if (cellOffsetX==null || cellOffsetY==null)
 		{
-			cellOffsetX = (long)rnd.nextInt(128)-64;
-			cellOffsetX = (long)rnd.nextInt(128)-64;			
+			cellOffsetX = (long)(rnd.nextInt(64)+rnd.nextInt(64))/2;
+			cellOffsetY = (long)(rnd.nextInt(64)+rnd.nextInt(64))/2;			
 		}
 		if (width==null || height==null)
 		{
-			width = 32L;
-			height = 32L;
+			width = (long)Math.floor(32d*GLOBAL_SCALE);
+			height = (long)Math.floor(32d*GLOBAL_SCALE);
 		}
 
 		

@@ -51,9 +51,21 @@ public class GridMapCellContentsController extends PageController
 		List<Map<String,String>> itemsFormatted = new ArrayList<>();
 		for(CachedEntity item:items)
 		{
+			String gridMapObjectMode = (String)item.getProperty("GridMapObject:mode");
+			if (gridMapObjectMode==null) gridMapObjectMode = "Loose";
 			String html = GameUtils.renderItem(db, request, db.getCurrentCharacter(), item, false, false, (String)item.getAttribute("proceduralKey"));
-			
+			html += "<br>";
 			html += "<div class='main-item-controls'>";
+
+			if (gridMapObjectMode.equals("Loose"))
+			{
+//	            if (item.getProperty("maxWeight")!=null)
+//	            	html+="<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"+character.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>";
+	            if (item.getProperty("dogecoins")!=null)
+	            	html+="<a shortcut='71' onclick='collectDogecoinsFromItem("+item.getId()+", event, false)'>Collect "+item.getProperty("dogecoins")+" gold</a>";
+	            html+="<a onclick='doCollectItem(event, "+item.getId()+")'>Collect</a>";
+			}
+								
 			InitiumObject iObject = new InitiumObject(db, item);
 			if (iObject.hasAspects())
 			{
