@@ -73,6 +73,8 @@ public class GridMapService {
 	private void initializeLocationData()
 	{
 		if (initializedLocationData) return;
+
+		initializedLocationData = true;
 		
 		locationDataEntity = db.getEntity(KeyFactory.createKey("GridMapLocationData", location.getId()));
 		if (locationDataEntity!=null)
@@ -337,11 +339,12 @@ public class GridMapService {
 		}
 
 		List<Key> keysToFetch = new ArrayList<>();
-		for(EmbeddedEntity entry:itemDBEntries)
-		{
-			Key itemKey = (Key)entry.getProperty("itemKey");
-			keysToFetch.add(itemKey);
-		}
+		if (itemDBEntries!=null)
+			for(EmbeddedEntity entry:itemDBEntries)
+			{
+				Key itemKey = (Key)entry.getProperty("itemKey");
+				keysToFetch.add(itemKey);
+			}
 		List<CachedEntity> dbEntities = db.getEntities(keysToFetch);
 		tileItems.addAll(dbEntities);
 		

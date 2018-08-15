@@ -1733,7 +1733,7 @@ a.range-increment {
 .chat-embedded-item a img
 {
 	vertical-align:text-bottom; 
-	max-height:18px;
+	max-height:18px!important;
 }
 .chat-embedded-item .main-item-image-backing
 {
