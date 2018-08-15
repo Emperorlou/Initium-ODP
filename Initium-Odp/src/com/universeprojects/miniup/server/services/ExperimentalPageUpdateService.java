@@ -148,6 +148,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("<div id='viewport' class='vp'>");
 
 		newHtml.append("<div class='main-button cursorSubObject' id='gridmap-inspect-button' onclick='inspectCellContents()'>Inspect</div>");
+		newHtml.append("<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
 		
 		newHtml.append("<div id='grid' class='grid'>");
 		newHtml.append("<div id='ui-layer' class='uiLayer'></div>");
@@ -173,6 +174,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("var gridTileOffsetX = "+gridMapService.getRowStart()+";");
 		newHtml.append("var gridTileOffsetY = "+gridMapService.getColumnStart()+";");
 		newHtml.append("$(document).on('click', '#somebutton', function() { pressedButton(); });");
+		newHtml.append("updateTallTreeButton();");
 		newHtml.append("</script>");
 		
 		return updateHtmlContents(".location-2d", newHtml.toString());

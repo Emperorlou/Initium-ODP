@@ -268,7 +268,7 @@ function scaleTiles(event, onCenter) {
             }
         }
     }
-
+    var tallTreesDisabled = isTallTreesDisabled();
     var scaledImgSizeX = imgSizeX * map2dScale;
     var scaledImgSizeY = imgSizeY * map2dScale;
     // Update all tiles
@@ -295,12 +295,18 @@ function scaleTiles(event, onCenter) {
                 for (var keyIndex = 0; keyIndex < gridCells[x][y].objectKeys.length; keyIndex++) {
                     var currKey = gridCells[x][y].objectKeys[keyIndex];
                     var top = gridObjects[currKey].yGridCoord * scaledGridCellHeight + (scaledGridCellHeight / 2) - (gridObjects[currKey].yImageOrigin * map2dScale) - (gridObjects[currKey].yGridCellOffset * map2dScale);
-                    var bottom =  gridObjects[currKey].yGridCoord * scaledGridCellHeight + (scaledGridCellHeight / 2) - ((gridObjects[currKey].height-gridObjects[currKey].yImageOrigin) * map2dScale) - (gridObjects[currKey].yGridCellOffset * map2dScale);
+                    var bottom =  gridObjects[currKey].yGridCoord * scaledGridCellHeight + (scaledGridCellHeight / 2) - (gridObjects[currKey].yGridCellOffset * map2dScale);
                     var left = gridObjects[currKey].xGridCoord * scaledGridCellWidth + (scaledGridCellWidth / 2) - (gridObjects[currKey].xImageOrigin * map2dScale) - (gridObjects[currKey].xGridCellOffset * map2dScale);
 
+                    bottom-=(gridTileHeight-1)*scaledGridCellHeight;
+                    left+=scaledGridCellWidth/2;
+                    
                     gridObjects[currKey].div.style.width = gridObjects[currKey].width * gridObjects[currKey].scale * map2dScale + "px";
                     gridObjects[currKey].div.style.height = gridObjects[currKey].height * gridObjects[currKey].scale * map2dScale + "px";
-                    gridObjects[currKey].div.style.height = (50*map2dScale)+"px";
+                    if (tallTreesDisabled && gridObjects[currKey].height>100)
+                    	gridObjects[currKey].div.style.maxHeight = (20*map2dScale)+"px";
+                    else
+                    	gridObjects[currKey].div.style.maxHeight = null;
                     gridObjects[currKey].div.style.margin = 0 + "px";
                     gridObjects[currKey].div.style.bottom = -bottom + "px";
                     gridObjects[currKey].div.style.left = left + "px";
@@ -375,29 +381,29 @@ function openMenu() {
 }
 
 function buildMenu() {
-    if (!menuBuilt) {
-        htmlString =
-            "<table> <tr>" +
-            "<td>" + "Zoom Rate: " + "</td><td>" + "<input type='text' id='zoom' value=.3 /> " + "</td>" +
-            "<td>" + "Zoom Delta: " + "</td><td>" + "<input type='text' id='zoomDelta' value=.25 /> " + "</td>" +
-            "</tr> <tr>" +
-            "<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
-            "<td>" + "Snap to Grid: <input type='checkbox' id='snapToGrid' checked> " + "</td>" +
-            "</tr> <tr>" +
-            "<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
-            "<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
-            "</tr> <tr>" +
-            "</tr> </table>" +
-            "<center>" + "<button id='somebutton'>Update</button>" + "</center>" +
-            "<br>";
-
-
-        jQuery('#menu').html(htmlString);
-        document.getElementById('menu').style.width = $(window).width() * (2 / 3) + "px";
-        document.getElementById('menu').style.left = $(window).width() * (1 / 6) + "px";
-        document.getElementById('menu').style.top = $(window).height() / 2 - menu.offsetHeight / 2 + "px";
-        menuBuilt = true;3
-    }
+//    if (!menuBuilt) {
+//        htmlString =
+//            "<table> <tr>" +
+//            "<td>" + "Zoom Rate: " + "</td><td>" + "<input type='text' id='zoom' value=.3 /> " + "</td>" +
+//            "<td>" + "Zoom Delta: " + "</td><td>" + "<input type='text' id='zoomDelta' value=.25 /> " + "</td>" +
+//            "</tr> <tr>" +
+//            "<td>" + "Drag Delta: " + "</td><td>" + "<input type='text' id='dragDelta' value=5 /> " + "</td>" +
+//            "<td>" + "Snap to Grid: <input type='checkbox' id='snapToGrid' checked> " + "</td>" +
+//            "</tr> <tr>" +
+//            "<td>" + "Grid Lines: <input type='checkbox' id='displayGridLines'> " + "</td>" +
+//            "<td>" + "Center on Selected: <input type='checkbox' id='keepSelectedCenter' checked> " + "</td>" +
+//            "</tr> <tr>" +
+//            "</tr> </table>" +
+//            "<center>" + "<button id='somebutton'>Update</button>" + "</center>" +
+//            "<br>";
+//
+//
+//        jQuery('#menu').html(htmlString);
+//        document.getElementById('menu').style.width = $(window).width() * (2 / 3) + "px";
+//        document.getElementById('menu').style.left = $(window).width() * (1 / 6) + "px";
+//        document.getElementById('menu').style.top = $(window).height() / 2 - menu.offsetHeight / 2 + "px";
+//        menuBuilt = true;3
+//    }
 }
 
 function buildMap(responseJson) {
@@ -487,7 +493,7 @@ function buildMap(responseJson) {
 
 window.onload = function() {
 
-    // Listen for mouse input
+    // Listen for mouse inputf
     document.onmousedown = startDrag;
     document.onmouseup = stopDrag;
 
@@ -885,10 +891,10 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
         for (i=0; i<previouslyUpdatedBackground.length; i++) {
             if (i>=20) break;
             if (i<0) break;
-            if (previouslyUpdatedBackground[i].filename.indexOf("http")==0)
-            	previouslyUpdatedBackground[i].backgroundDiv.style.background = "url(" + previouslyUpdatedBackground[i].filename + ") center center / 100% 100%";
-            else
-            	previouslyUpdatedBackground[i].backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground[i].filename + ") center center / 100% 100%";
+//            if (previouslyUpdatedBackground[i].filename.indexOf("http")==0)
+//            	previouslyUpdatedBackground[i].backgroundDiv.style.background = "url(" + previouslyUpdatedBackground[i].filename + ") center center / 100% 100%";
+//            else
+//            	previouslyUpdatedBackground[i].backgroundDiv.style.background = "url(" + $picUrlPath + previouslyUpdatedBackground[i].filename + ") center center / 100% 100%";
             if (selection) {
                 previouslyUpdatedBackground[i].backgroundDiv.className = previouslyUpdatedBackground[i].backgroundDiv.className.replace(/(?:^|\s)gridSelected(?!\S)/g, '');
             } else {
@@ -897,27 +903,27 @@ function removeHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects,
         }
     }
     for (i=0; i<previouslyUpdatedObjects.length; i++) {
-        if (previouslyUpdatedObjects[i].key.includes("tempKey:")) {
-        	if (previouslyUpdatedObjects[i].filename.indexOf("http")==0)
-        		previouslyUpdatedObjects[i].div.style.background = "url(" + previouslyUpdatedObjects[i].filename + ");";
-        	else
-        		previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
-        }
-        else if (previouslyUpdatedObjects[i].key == "o1") {
-            previouslyUpdatedObjects[i].div.style.background = "url(" + $domain + previouslyUpdatedObjects[i].filename + ")";
-        } else {
-            if (previouslyUpdatedObjects[i].filename == "house1_4.png") {
-                previouslyUpdatedObjects[i].div.style.background = "url(" + "http://opengameart.org/sites/default/files/" + previouslyUpdatedObjects[i].filename + ");";
-            } else if (previouslyUpdatedObjects[i].filename == "city.svg_.png") {
-                previouslyUpdatedObjects[i].div.style.background = "url(" + "http://opengameart.org/sites/default/files/city.svg_.png);";
-            } else {
-            	if (previouslyUpdatedObjects[i].filename.indexOf("http")==0)
-            		previouslyUpdatedObjects[i].div.style.background = "url(" + previouslyUpdatedObjects[i].filename + ");";
-            	else
-            		previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
-            }
-        }
-        previouslyUpdatedObjects[i].div.style.backgroundSize = "100% 100%";
+//        if (previouslyUpdatedObjects[i].key.includes("tempKey:")) {
+//        	if (previouslyUpdatedObjects[i].filename.indexOf("http")==0)
+//        		previouslyUpdatedObjects[i].div.style.background = "url(" + previouslyUpdatedObjects[i].filename + ");";
+//        	else
+//        		previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
+//        }
+//        else if (previouslyUpdatedObjects[i].key == "o1") {
+//            previouslyUpdatedObjects[i].div.style.background = "url(" + $domain + previouslyUpdatedObjects[i].filename + ")";
+//        } else {
+//            if (previouslyUpdatedObjects[i].filename == "house1_4.png") {
+//                previouslyUpdatedObjects[i].div.style.background = "url(" + "http://opengameart.org/sites/default/files/" + previouslyUpdatedObjects[i].filename + ");";
+//            } else if (previouslyUpdatedObjects[i].filename == "city.svg_.png") {
+//                previouslyUpdatedObjects[i].div.style.background = "url(" + "http://opengameart.org/sites/default/files/city.svg_.png);";
+//            } else {
+//            	if (previouslyUpdatedObjects[i].filename.indexOf("http")==0)
+//            		previouslyUpdatedObjects[i].div.style.background = "url(" + previouslyUpdatedObjects[i].filename + ");";
+//            	else
+//            		previouslyUpdatedObjects[i].div.style.background = "url(" + $picUrlPath + previouslyUpdatedObjects[i].filename + ");";
+//            }
+//        }
+//        fpreviouslyUpdatedObjects[i].div.style.backgroundSize = "100% 100%";
         previouslyUpdatedObjects[i].div.style.backgroundBlendMode = "";
         if (selection) {
             previouslyUpdatedObjects[i].div.className = previouslyUpdatedObjects[i].div.className.replace( /(?:^|\s)gridSelected(?!\S)/g , '' );
@@ -952,13 +958,13 @@ function updateHighlightsAtCoord(previouslyUpdatedBackground, previouslyUpdatedO
             previouslyUpdatedObjects.push(object);
         }
         // Update object list
-        if (selection) {
-            $("#selectedObjects").html(tmpString);
-        }
+//        if (selection) {
+//            $("#selectedObjects").html(tmpString);
+//        }
     } else {
-        if (selection) {
-            $("#selectedObjects").html('<br> No objects at this coordinate. </br>');
-        }
+//        if (selection) {
+//            $("#selectedObjects").html('<br> No objects at this coordinate. </br>');
+//        }
     }
     var updatedMap = new Object();
     updatedMap[0] = previouslyUpdatedBackground;
@@ -1453,28 +1459,24 @@ function addGridObjectToMap(gridObject) {
     $hexBody += " z-index:" + (parseInt(objectZOffset) + parseInt(topZ)) + ";";
     $hexBody += " bottom:" + bottomPos + "px;";
     $hexBody += " left:" + leftPos + "px;";
-    $hexBody += " margin:" + (scaledGridCellWidth / 2) + "px;";
     $hexBody += " width:" + (gridMapObjectWidth) + "px;";
     $hexBody += " height:" + (gridMapObjectHeight) + "px;";
     $hexBody += " z-index:" + (parseInt(objectZOffset) + parseInt(topZ)) + ";";
     $hexBody += " transform: rotate("+objectRotation+"deg);";
     if (gridObject.key == "o1") {
-        $hexBody += " background:url(" + $domain + gridObject.filename + ");";
+        $hexBody += " background-image:url(" + $domain + gridObject.filename + ");";
     } else {
         if (gridObject.filename == "house1_4.png") {
-            $hexBody += " background: url(&quot;http://opengameart.org/sites/default/files/house1_4.png&quot;) 0% 0% / 100% 100%;";
+            $hexBody += " background-image: url(&quot;http://opengameart.org/sites/default/files/house1_4.png&quot;);";
         } else if (gridObject.filename == "city.svg_.png") {
-            $hexBody += " background: url(&quot;http://opengameart.org/sites/default/files/city.svg_.png&quot;) 0% 0% / 100% 100%;";
+            $hexBody += " background-image: url(&quot;http://opengameart.org/sites/default/files/city.svg_.png&quot;);";
         } else {
         	if (gridObject.filename.indexOf("http")==0)
-        		$hexBody += " background:url(" + gridObject.filename + ");";
+        		$hexBody += " background-image:url(" + gridObject.filename + ");";
         	else
-        		$hexBody += " background:url(" + $picUrlPath + gridObject.filename + ");";
+        		$hexBody += " background-image:url(" + $picUrlPath + gridObject.filename + ");";
         }
     }
-    $hexBody += " background-size:cover;";
-    $hexBody += " background-repeat:no-repeat;";
-    $hexBody += " background-position:bottom;";
     $hexBody += "\"";
     $hexBody += " wtfz-index=\"" + (Number(objectZOffset) + Number(topZ)) + "\"";
     $hexBody += ">";
@@ -1546,4 +1548,37 @@ function inspectCellContents()
 	if (selectedTileX==null || selectedTileY==null) return;
 	
 	makeIntoPopupFromUrl("/odp/gridmapcellcontents?tileX="+selectedTileX+"&tileY="+selectedTileY, "Items Here", true);	
+}
+
+function isTallTreesDisabled()
+{
+	var disabled = localStorage.getItem("talltrees-disabled");
+	if (disabled==null) disabled = false;
+	if (disabled=="false") disabled = false;
+	if (disabled=="true") disabled = true;
+
+	return disabled;
+}
+
+function toggleTallTrees(event)
+{
+	var disabled = isTallTreesDisabled();
+	
+	localStorage.setItem("talltrees-disabled", !disabled);
+
+	updateTallTreeButton();
+	
+	scaleTiles();
+	
+	event.preventDefault();
+	event.stopPropagation();
+}
+
+function updateTallTreeButton()
+{
+	var button = $("#gridmap-talltrees-button");
+	if (isTallTreesDisabled())
+		button.addClass("disabled");
+	else
+		button.removeClass("disabled");
 }

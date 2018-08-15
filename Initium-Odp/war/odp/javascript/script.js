@@ -5259,3 +5259,4 @@ function changeGuardRunHitpoints(eventObject, current)
 		doCommand(eventObject, "GuardChangeRunHitpoints", {"value" : newValue});
 	});
 }
+

@@ -1732,8 +1732,8 @@ a.range-increment {
 }
 .chat-embedded-item a img
 {
-	vertical-align:text-bottom; 
-	max-height:18px!important;
+	vertical-align:baseline; 
+	max-height:20px!important;
 }
 .chat-embedded-item .main-item-image-backing
 {
@@ -5193,7 +5193,12 @@ body
 .gridObject {
 	position: absolute;
 	background-color: transparent;
-	background-size:100%;
+	background-size:cover;
+	background-position:bottom;
+	background-repeat: no-repeat;
+	
+	margin:0px;
+	
 }
 
 .cursorObject {
@@ -5215,6 +5220,22 @@ body
     bottom: 0px;
     z-index: 10000;
     cursor: pointer;
+}
+
+#gridmap-talltrees-button
+{
+	width:32px;
+	height:32px;
+	left: 0px;
+    bottom: 0px;
+    z-index: 10000;
+    cursor: pointer;
+    background-image:url(https://initium-resources.appspot.com/images/ui/talltrees-enabled.png);
+}
+
+#gridmap-talltrees-button.disabled
+{
+    background-image:url(https://initium-resources.appspot.com/images/ui/talltrees-disabled.png);
 }
 
 .gridBackground.gridSelected
