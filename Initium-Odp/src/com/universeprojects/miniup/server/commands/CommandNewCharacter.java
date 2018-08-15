@@ -87,7 +87,8 @@ public class CommandNewCharacter extends Command
 		if (characterList.isEmpty())
 			isNewUser = true;
 		
-		if(rawName.endsWith("!")) name += "!";
+		// Hardcore mode. Do not allow Unnamed to be HCM, for ranking purposes.
+		if(rawName.endsWith("!") && "Unnamed".equals(name) == false) name += "!";
 		CachedEntity character = db.newPlayerCharacter(null, auth, user, name, null);
 		
 		ds.put(character);
