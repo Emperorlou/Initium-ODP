@@ -290,8 +290,11 @@ public class ViewItemController extends PageController {
 		if(itemName == null) itemName = "(null)";
 		String itemClass = (String)item.getProperty("itemClass");
 		if(itemClass == null) itemClass = "";
+		String itemQuality = GameUtils.determineQuality(item.getProperties());
+		if(itemQuality == null) itemQuality = "";
+		if(CommonChecks.checkIsHardcore(item)) itemQuality = (itemQuality + " hardcore").trim();
 		
-		itemMap.put("quality", GameUtils.determineQuality(item.getProperties()));
+		itemMap.put("quality", itemQuality);
 		itemMap.put("name", itemName);
 		itemMap.put("itemClass", itemClass);
 		
