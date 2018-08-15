@@ -43,7 +43,7 @@ public class CommandDeleteAndRecreate extends Command {
         
         CachedEntity currentChar = db.getCurrentCharacter();
         if(currentChar == null) throw new RuntimeException("Current character entity is null");
-        if(CommonChecks.checkCharacterIsDead(currentChar)) throw new UserErrorMessage("You must respawn before you delete and recreate your character.");
+        if(CommonChecks.checkCharacterIsIncapacitated(currentChar)) throw new UserErrorMessage("You must respawn before you delete and recreate your character.");
         
         // Only sanitize if character name differs.
         if(name.equals(currentChar.getProperty("name"))==false)
@@ -93,7 +93,8 @@ public class CommandDeleteAndRecreate extends Command {
         	ds.commitBulkWrite();
         }
         
-        if(rawName.endsWith("!")) name += "!";
+        //Hardcore mode. Do not allow Unnamed to be HCM, for ranking purposes.
+        if(rawName.endsWith("!") && "Unnamed".equals(name) == false) name += "!";
         final Key characterKey = currentChar.getKey();
         final Key userKey = (Key)currentChar.getProperty("userKey");
         final ODPAuthenticator auth = this.getAuthenticator();

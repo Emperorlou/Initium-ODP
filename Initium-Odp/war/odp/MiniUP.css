@@ -2318,9 +2318,13 @@ a.range-increment {
 
 .hardcore
 {
-	font-style: italic;
 	font-weight: bold;
-	text-decoration: underline overline;
+	text-decoration: underline;
+}
+
+.hardcore .minitip
+{
+	font-weight: normal;
 }
 
 .content-dev-nickname

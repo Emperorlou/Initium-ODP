@@ -2012,7 +2012,7 @@ function deleteAndRecreateCharacter(event, currentCharName)
 	confirmPopup("New Character", "Are you suuuure you want to delete your character and start over? It's permanent!", function(){
 		if (currentCharName==null)
 			currentCharName = "";
-		promptPopup("New Character", "Ok, what will you call your new character?", currentCharName, function(name){
+		promptPopup("New Character", "Ok, what will you call your new character?<br/><span style='font-size: 10px'>Add ! at the end for hardcore mode.</span>", currentCharName, function(name){
 			showBannerLoadingIcon();
 			closeAllPagePopups(true);
 			doCommand(event, "DeleteAndRecreate", {"name":name}, clearPopupPermanentOverlay);
@@ -3084,7 +3084,7 @@ function createNewCharacter(event)
 {
 	clearMakeIntoPopup();
 	
-	promptPopup("New Character", "Give your new character a name:", "", function(name){
+	promptPopup("New Character", "Give your new character a name:<br/><span style='font-size: 10px'>Add ! at the end for hardcore mode.</span>", "", function(name){
 		doCommand(event, "NewCharacter", {name:name}, function(){
 			clearMakeIntoPopup();
 			$("#characterswitcher-container").remove();
@@ -3095,7 +3095,7 @@ function createNewCharacter(event)
 function mustCreateNewCharacter()
 {
 	promptPopup("New Character", "It seems your character died a while ago and we no longer know " + 
-			"what your old character\'s name was. <br>Give your new character a name:", "", function(name){
+			"what your old character\'s name was. <br>Give your new character a name:<br/><span style='font-size: 10px'>Add ! at the end for hardcore mode.</span>", "", function(name){
 		doCommand(event, "NewCharacter", {name:name}, function(){
 		});
 	});
