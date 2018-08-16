@@ -905,7 +905,8 @@ public class GameUtils
 				.trim()
 				.replaceAll("^(Dead\\s+)+", "")
 				.replaceAll("!+$","")
-				.replaceAll("\\s{2,}"," ");
+				.replaceAll("\\s{2,}"," ")
+				.trim();
 		return name;
 	}
     

@@ -4998,16 +4998,17 @@ public class ODPDBAccess
             		Double curCharDamage = characterMap.get(attackingCharacter.getKey().toString());
             		Long curPoints = (Long)attackingCharacter.getProperty("hardcoreRank");
             		if(curPoints == null) curPoints = 0L;
+            		
             		Long newPoints = (Long)characterToDie.getProperty("hardcorePointValue");
             		if(newPoints != null && curCharDamage != null && curCharDamage > 0d)
             		{
-            			Double earnedPoints = (curCharDamage / (Double)characterToDie.getProperty("maxHitpoints")) * newPoints;
-            			newPoints += earnedPoints.longValue();
+            			Double earnedPoints = Math.min((curCharDamage / (Double)characterToDie.getProperty("maxHitpoints")),1d) * newPoints;
+            			newPoints = earnedPoints.longValue();
                 	}
             		else
-            			newPoints = curPoints + 1L;
+            			newPoints = 1L;
 
-        			attackingCharacter.setProperty("hardcoreRank", newPoints);
+        			attackingCharacter.setProperty("hardcoreRank", newPoints + curPoints);
         		}
         	}
 		}

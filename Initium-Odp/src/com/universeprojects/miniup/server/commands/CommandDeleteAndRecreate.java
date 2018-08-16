@@ -38,7 +38,7 @@ public class CommandDeleteAndRecreate extends Command {
 		CachedDatastoreService ds = getDS();
         
         String rawName = parameters.get("name");
-        String name = rawName.replaceAll("!+$", "");
+        String name = GameUtils.cleanCharacterName(rawName);
         if (name==null) throw new UserErrorMessage("Character name cannot be blank.");
         
         CachedEntity currentChar = db.getCurrentCharacter();
@@ -48,9 +48,7 @@ public class CommandDeleteAndRecreate extends Command {
         // Only sanitize if character name differs.
         if(name.equals(currentChar.getProperty("name"))==false)
         {
-	        name = GameUtils.cleanCharacterName(name);
-	        if (name.length()<1 || name.length()>30 || !name.matches("^[A-Za-z ]+$"))
-	            throw new UserErrorMessage("Character name must contain only letters and spaces, and must be between 1 and 40 characters long.");
+	        db.isCharacterNameOk(request, name);
         }
 
         // Check if the name is already in use
