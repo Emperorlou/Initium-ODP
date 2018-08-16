@@ -902,10 +902,10 @@ public class GameUtils
 	public static String cleanCharacterName(String name)
 	{
 		name = name
-				.trim()
 				.replaceAll("^(Dead\\s+)+", "")
 				.replaceAll("!+$","")
-				.replaceAll("\\s{2,}"," ");
+				.replaceAll("\\s{2,}"," ")
+				.trim();
 		return name;
 	}
     
