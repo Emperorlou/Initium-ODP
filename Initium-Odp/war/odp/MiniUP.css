@@ -595,14 +595,14 @@ a.main-highlight:HOVER
 
 .character-special
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
     color: #F9CC00;
 }
 
 .character-npc
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 0px 0px 4px rgba(200, 122, 50, 0.7);
     color: #DD7700;
 }
@@ -630,7 +630,7 @@ a.main-highlight:HOVER
 
 .backgroundcliptext .item-custom
 {
-	font-size:20px;
+	font-size:18px;
     text-shadow: 1px 1px 1px #004e00a1;
     color: transparent;
     background-color: #00BB00 !important;
@@ -640,7 +640,7 @@ a.main-highlight:HOVER
 
 .no-backgroundcliptext .item-custom
 {
-	font-size:20px;
+	font-size:18px;
 	text-shadow: 0px 0px 4px rgba(0, 200, 0, 0.7);
     color: #00BB00 !important;
 }
@@ -648,14 +648,14 @@ a.main-highlight:HOVER
 
 .no-backgroundcliptext .item-rare
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 0px 0px 4px rgba(200, 122, 50, 0.7);
     color: #DD7700 !important;
 }
 
 .no-backgroundcliptext .item-unique
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
     color: #F9CC00 !important;
 }
@@ -663,14 +663,14 @@ a.main-highlight:HOVER
 
 .no-backgroundcliptext .item-epic
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
     color: #AC54FF !important;
 }
 
 .no-backgroundcliptext .item-magic
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
     color: #2597FF !important;
 }
@@ -693,7 +693,7 @@ a.main-highlight:HOVER
 
 .backgroundcliptext .item-rare
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 1px 1px 0px #864800b0;
     color: transparent;
     background-color: #DD7700;
@@ -703,7 +703,7 @@ a.main-highlight:HOVER
 
 .backgroundcliptext .item-unique
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 1px 1px 1px #b38400c9;
     color: transparent;
 	background-color: #f9c000;
@@ -714,7 +714,7 @@ a.main-highlight:HOVER
 
 .backgroundcliptext .item-epic
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 1px 1px 0px #5e2e8cd4;
     color: transparent;
     background-color: #AC54FF;
@@ -724,7 +724,7 @@ a.main-highlight:HOVER
 
 .backgroundcliptext .item-magic
 {
-    font-size: 20px;
+    font-size: 18px;
     text-shadow: 1px 1px 1px #0b2e4e8a;
     color: transparent;
 	background-color: #2597FF;
@@ -2996,6 +2996,7 @@ position: absolute;
 	right:0px;
 	top:40px;
 	transform-origin: 100% 0%;
+	z-index:1000;
 }
 
 .minimap-locationname
@@ -3071,6 +3072,7 @@ position: absolute;
 	bottom: -5px;
 	left: 29%;	
 }
+
 
 
 
@@ -5215,9 +5217,13 @@ body
 
 #gridmap-inspect-button
 {
+	position:absolute;
+	background-image:url(https://initium-resources.appspot.com/images/ui3/inspectbutton1.png);
+	width:122px;
+	height:48px;
+	bottom: -5px;
 	left: 50%;
-    margin-left: -61px;
-    bottom: 0px;
+	margin-left:-61px;	
     z-index: 10000;
     cursor: pointer;
 }
@@ -5295,6 +5301,13 @@ div#buildingObject {
 .hoveringObject {
 	opacity: 0.5;
 }
+
+
+
+
+
+
+
 
 
 /*Chat minimization styles need to be later in the CSS so it overrides other styles*/

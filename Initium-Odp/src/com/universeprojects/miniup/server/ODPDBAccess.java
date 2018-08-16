@@ -5729,6 +5729,7 @@ public class ODPDBAccess
 		Key destinationKey = null;
 		// First get the character's current location
 		Key currentLocationKey = (Key)character.getProperty("locationKey");
+		CachedEntity currentLocation = null;
 		
 		// Then determine which location the character will end up on.
 		// If we find that the character isn't on either end of the path, we'll throw.
@@ -5739,7 +5740,21 @@ public class ODPDBAccess
 		else if (currentLocationKey.getId()==pathLocation2Key.getId())
 			destinationKey = pathLocation1Key;
 		else
-			throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
+		{
+			// We want to now allow players to travel between root locations easily so lets check if that's a possibility now...
+			currentLocation = getEntity(currentLocationKey);
+			if (CommonChecks.checkLocationIsRootLocation(currentLocation)==false)
+			{
+				CachedEntity rootLocation = getRootLocation(currentLocation);
+				if (GameUtils.equals(rootLocation.getKey(), pathLocation1Key))
+					destinationKey = pathLocation2Key;
+				else if (GameUtils.equals(rootLocation.getKey(), pathLocation2Key))
+					destinationKey = pathLocation1Key;
+			}
+			
+			if (destinationKey==null)
+				throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it.");
+		}
 		
 		if("Script".equals(destinationKey.getKind())) return null;
 		destination = getEntity(destinationKey);
@@ -7360,6 +7375,42 @@ public class ODPDBAccess
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public CachedEntity getRootLocation(CachedEntity location)
+	{
+		
+		if (CommonChecks.checkLocationIsRootLocation(location))
+		{
+			return location;
+		}
+		else
+		{
+			// Find the permanent location which functions as the "root" or the "major" location
+			for(int i = 0; i<4; i++)
+			{
+				CachedEntity parent = getParentLocation(ds, location);
+				if (parent==null) return location;
+				location = parent;
+				if (CommonChecks.checkLocationIsRootLocation(location))
+					return parent;
+			}
+		}
+		return null;
+	}
+
+	public List<Key> getLocationAlwaysVisiblePaths_KeysOnly(Key locationKey)
+	{
+		List<Key> alwaysVisiblePaths = query.getFilteredList_Keys("Path", 100, "location1Key", locationKey, "discoveryChance", 100d);
+		alwaysVisiblePaths.addAll(query.getFilteredList_Keys("Path", 100, "location2Key", locationKey, "discoveryChance", 100d));
+		return alwaysVisiblePaths;
+	}
+	
+	public List<CachedEntity> getLocationAlwaysVisiblePaths(Key locationKey)
+	{
+		List<CachedEntity> alwaysVisiblePaths = getFilteredList("Path", "location1Key", locationKey, "discoveryChance", 100d);
+		alwaysVisiblePaths.addAll(query.getFilteredList("Path", "location2Key", locationKey, "discoveryChance", 100d));
+		return alwaysVisiblePaths;
 	}
 	
 }

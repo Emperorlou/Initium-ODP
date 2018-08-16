@@ -492,6 +492,18 @@ Version: ${version}
 						${partyPanel}
 						</div>
 						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
+						
+						<div class='minimap-container'>
+							<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->
+							<div class='map-contents minimap-contents'>
+								${globalNavigationMap}
+							</div>
+							<div class='minimap-overlay'></div>
+							<div class='minimap-button minimap-button-map' onclick='viewGlobeNavigation()'></div>
+							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
+						</div>
+						
+						
 						<div class='map-contents global-navigation-map'>${globalNavigationMap}</div>
 						<div id='main-viewport-container' class='location-2d'>${location2D}</div>	
 											

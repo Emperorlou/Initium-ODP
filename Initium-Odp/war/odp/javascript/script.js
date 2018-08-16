@@ -5260,3 +5260,7 @@ function changeGuardRunHitpoints(eventObject, current)
 	});
 }
 
+function viewHCMLeaderboard()
+{
+	makeIntoPopupFromUrl("/odp/hcmleaderboard", "Hardcore Leaderboard", false);
+}

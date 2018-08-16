@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +54,11 @@ public class SublocationsController extends PageController {
 	    db.pool.addToQueue(locationKey);
 	    
 	    List<CachedEntity> discoveriesForCharacterAndLocation = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacterKey(), locationKey, showHidden);
-	    List<Key> pathKeys = new ArrayList<>();
+	    List<Key> alwaysVisiblePaths = db.getLocationAlwaysVisiblePaths_KeysOnly(locationKey);
+	    
+	    db.pool.addToQueue(alwaysVisiblePaths);
+	    
+	    Set<Key> pathKeys = new LinkedHashSet<>(alwaysVisiblePaths);
 	    for(CachedEntity discovery:discoveriesForCharacterAndLocation)
 	    {
 	    	db.pool.addToQueue(discovery.getProperty("location1Key"), discovery.getProperty("location2Key"), discovery.getProperty("entityKey"));
@@ -61,6 +66,17 @@ public class SublocationsController extends PageController {
 	    }
 	    
 	    db.pool.loadEntities();
+	    
+	    // Also load in the always-visible destination locations
+	    if (alwaysVisiblePaths.isEmpty()==false)
+	    {
+	    	for(Key key:alwaysVisiblePaths)
+	    	{
+	    		CachedEntity path = db.pool.get(key);
+		    	db.pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
+	    	}
+	    	db.pool.loadEntities();
+	    }
 	    
 	    CachedEntity currentLocation = db.pool.get(locationKey);
 	    
@@ -94,6 +110,18 @@ public class SublocationsController extends PageController {
 	    	
 	    });
 
+		for(int i = paths.size()-1; i>=0; i--)
+	    {
+			CachedEntity path = paths.get(i);
+	    	Key location1Key = (Key)path.getProperty("location1Key");
+	    	Key location2Key = (Key)path.getProperty("location2Key");
+	    	
+			if (GameUtils.equals(location1Key, locationKey)==false && "FromLocation1Only".equals(path.getProperty("forceOneWay")))
+				paths.remove(i);
+			else if (GameUtils.equals(location2Key, locationKey)==false && "FromLocation2Only".equals(path.getProperty("forceOneWay")))
+				paths.remove(i);    	
+	    }
+	    
 	    Set<Key> forgettableLocations = new HashSet<>();
 	    List<Key> locationKeys = new ArrayList<>();
 	    int forgettableCombatSites = 0;
@@ -141,7 +169,7 @@ public class SublocationsController extends PageController {
 	    	CachedEntity location = locations.get(i);
 	    	CachedEntity path = paths.get(i);
 	    	
-	    	if (GameUtils.equals(currentLocation.getProperty("mapComponentType"), "Global") && GameUtils.equals(location.getProperty("mapComponentType"), "Global"))
+	    	if (location==null || (GameUtils.equals(currentLocation.getProperty("mapComponentType"), "Global") && GameUtils.equals(location.getProperty("mapComponentType"), "Global")))
 	    		continue;
 	    	
 	    	

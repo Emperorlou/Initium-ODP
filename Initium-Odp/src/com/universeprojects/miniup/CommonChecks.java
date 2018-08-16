@@ -511,5 +511,14 @@ public abstract class CommonChecks
 				character.getProperty("type") == null;
 	}
 
+	public static boolean checkLocationIsRootLocation(CachedEntity location)
+	{
+		if (GameUtils.equals(location.getProperty("type"), "Permanent") || GameUtils.equals(location.getProperty("type"), "Town"))
+			if ("Global".equals(location.getProperty("mapComponentType")))
+				return true;
+		
+		return false;
+	}
+
 
 }

@@ -52,7 +52,7 @@ body[bannerstate='globe-navigation'] .global-navigation-map
 	display:block;
 }
 
-body[bannerstate='combat'] .major-banner-links
+body[bannerstate='combat'] .major-banner-links, body[bannerstate='combat'] .minimap-container
 {
 	display:none;
 }

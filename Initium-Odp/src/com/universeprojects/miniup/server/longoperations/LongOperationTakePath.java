@@ -87,6 +87,7 @@ public class LongOperationTakePath extends LongOperation {
 			Key destinationKey = null;
 			// First get the character's current location
 			Key currentLocationKey = db.getCharacterLocationKey(character);
+			CachedEntity currentLocation = null;
 			
 			
 			// Then determine which location the character will end up on.
@@ -98,7 +99,21 @@ public class LongOperationTakePath extends LongOperation {
 			else if (currentLocationKey.getId()==pathLocation2Key.getId())
 				destinationKey = pathLocation1Key;
 			else
-				throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+db.getCurrentCharacter().getKey().getId()+") Path("+path.getKey().getId()+")");
+			{
+				// We want to now allow players to travel between root locations easily so lets check if that's a possibility now...
+				currentLocation = db.getEntity(currentLocationKey);
+				if (CommonChecks.checkLocationIsRootLocation(currentLocation)==false)
+				{
+					CachedEntity rootLocation = db.getRootLocation(currentLocation);
+					if (GameUtils.equals(rootLocation.getKey(), pathLocation1Key))
+						destinationKey = pathLocation2Key;
+					else if (GameUtils.equals(rootLocation.getKey(), pathLocation2Key))
+						destinationKey = pathLocation1Key;
+				}
+				
+				if (destinationKey==null)
+					throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+db.getCurrentCharacter().getKey().getId()+") Path("+path.getKey().getId()+")");
+			}
 	
 			// Script paths have script as destination. Let them discover (with party),
 			// but don't let them take the path. Generated button has trigger script.

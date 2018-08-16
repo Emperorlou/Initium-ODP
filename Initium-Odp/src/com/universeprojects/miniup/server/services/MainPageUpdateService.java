@@ -214,8 +214,7 @@ public class MainPageUpdateService extends Service
 			
 			
 			//Automatically include any paths that have a discovery of 100
-			List<CachedEntity> alwaysVisiblePaths = db.getFilteredList("Path", "location1Key", location.getKey(), "discoveryChance", 100d);
-			alwaysVisiblePaths.addAll(db.getFilteredList("Path", "location2Key", location.getKey(), "discoveryChance", 100d));
+			List<CachedEntity> alwaysVisiblePaths = db.getLocationAlwaysVisiblePaths(location.getKey());
 			for(CachedEntity path:alwaysVisiblePaths)
 			{
 				if (paths.contains(path))
@@ -712,6 +711,36 @@ public class MainPageUpdateService extends Service
 		}
 		else
 		{
+			List<CachedEntity> paths = null;
+			List<CachedEntity> destLocations = null;
+			CachedEntity location = db.getRootLocation(this.location);
+			if (location==null || location.equals(this.location))
+			{
+				location = this.location;
+				paths = this.paths;
+				destLocations = this.destLocations;
+			}
+			else
+			{
+				// Load the paths and destLocations for the root location
+				paths = db.getPathsByLocation_PermanentOnly(location.getKey());
+				
+				// Go through the paths and get the destination locations pooled
+				for(CachedEntity path:paths)
+					db.pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
+				
+				db.pool.loadEntities();
+
+				destLocations = new ArrayList<>();
+				for(CachedEntity path:paths)
+				if (GameUtils.equals(location.getKey(), path.getProperty("location1Key")))
+					destLocations.add(db.pool.get(path.getProperty("location2Key")));
+				else if (GameUtils.equals(location.getKey(), path.getProperty("location2Key")))
+					destLocations.add(db.pool.get(path.getProperty("location1Key")));
+				else
+					destLocations.add(null);
+			}
+			
 			
 			Long shiftX = (Long)location.getProperty("mapComponentX");
 			Long shiftY = (Long)location.getProperty("mapComponentY");
@@ -719,31 +748,34 @@ public class MainPageUpdateService extends Service
 			if (shiftX!=null && shiftY!=null && "Global".equals(location.getProperty("mapComponentType")))
 			{
 					
-				addGlobalNavigationMapEntry(html, location, null, shiftX, shiftY);
+				addGlobalNavigationMapEntry(html, location, location, null, shiftX, shiftY);
 				
 				if (paths!=null)
 					for(int i = 0; i<paths.size(); i++)
 					{
 						CachedEntity path = paths.get(i);
-						CachedEntity location = destLocations.get(i);
-						String type = (String)location.getProperty("mapComponentType");
+						CachedEntity destLocation = destLocations.get(i);
+						String type = (String)destLocation.getProperty("mapComponentType");
 						if ("Global".equals(type))
 						{
-							addGlobalNavigationMapEntry(html, location, path, shiftX, shiftY);
+							addGlobalNavigationMapEntry(html, location, destLocation, path, shiftX, shiftY);
 						}
 						
 					}
 			}
 			else
 			{
-				html.append("<p>This location is not mapped yet. Complain to a content dev!</p>");
+				if (CommonChecks.checkLocationIsRootLocation(location))
+					html.append("<p>'"+location.getProperty("name")+"' is not mapped yet. Complain to a content dev!</p>");
+				else
+					html.append("<p>You might be too deep to easily navigate away. Try coming out of wherever you are.</p>");
 				html.append("<input type='hidden' id='blank-global-navigation' value='true'/>");
 			}
 		}
 		return updateHtmlContents(".map-contents", html.toString());
 	}
 	
-	private void addGlobalNavigationMapEntry(StringBuilder html, CachedEntity location, CachedEntity path, Long shiftX, Long shiftY)
+	private void addGlobalNavigationMapEntry(StringBuilder html, CachedEntity startLocation, CachedEntity location, CachedEntity path, Long shiftX, Long shiftY)
 	{
 		String imageUrl = GameUtils.getResourceUrl((String)location.getProperty("mapComponentImage"));
 		if (imageUrl==null) imageUrl = GameUtils.getResourceUrl("images/overheadmap/unavailable1.png");
@@ -763,8 +795,8 @@ public class MainPageUpdateService extends Service
 		html.append("<div class='overheadmap-cell-container-base'>"); 
 		if (path!=null)
 		{
-			Long currentPositionX = (Long)this.location.getProperty("mapComponentX");
-			Long currentPositionY = (Long)this.location.getProperty("mapComponentY");
+			Long currentPositionX = (Long)startLocation.getProperty("mapComponentX");
+			Long currentPositionY = (Long)startLocation.getProperty("mapComponentY");
 			String travelLine = "";
 			if (currentPositionX!=null && currentPositionY!=null)
 			{
