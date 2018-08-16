@@ -38,7 +38,7 @@ public class CommandDeleteAndRecreate extends Command {
 		CachedDatastoreService ds = getDS();
         
         String rawName = parameters.get("name");
-        String name = rawName.replaceAll("!$", "");
+        String name = rawName.replaceAll("!+$", "");
         if (name==null) throw new UserErrorMessage("Character name cannot be blank.");
         
         CachedEntity currentChar = db.getCurrentCharacter();

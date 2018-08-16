@@ -2327,6 +2327,11 @@ a.range-increment {
 	font-weight: normal;
 }
 
+.hardcore.premium-character-name
+{
+	text-shadow: none !important;
+}
+
 .content-dev-nickname
 {
 	color: #757dca;
