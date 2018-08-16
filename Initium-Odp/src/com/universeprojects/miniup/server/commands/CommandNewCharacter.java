@@ -56,7 +56,6 @@ public class CommandNewCharacter extends Command
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		String rawName = WebUtils.getStrParam(request, "name", true);
-		String name = rawName.replaceAll("!$", "");
 		CachedEntity user = db.getCurrentUser();
 		
 		if (user==null)
@@ -64,7 +63,7 @@ public class CommandNewCharacter extends Command
 			throw new UserErrorMessage("Please login first before creating a new character.");
 		}
 		
-		name = GameUtils.cleanCharacterName(name);
+		String name = GameUtils.cleanCharacterName(rawName);
 
 		db.isCharacterNameOk(request, name);
 			
