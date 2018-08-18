@@ -2,6 +2,28 @@
 <!doctype html>
 <html>
 <head>
+	<meta http-equiv="Content-Security-Policy" content="
+		default-src 'self'; 
+		connect-src 'self'
+			https://initium-resources.appspot.com
+			https://eventserver.universeprojects.com:8080
+			wss://eventserver.universeprojects.com:8080
+			https://www.google-analytics.com;
+		img-src 'self'
+			https://i.imgur.com
+			https://initium-resources.appspot.com
+			https://www.google-analytics.com; 
+		script-src 'self' 'unsafe-inline' 'unsafe-eval'
+			https://code.jquery.com 
+			https://cdnjs.cloudflare.com
+			https://code.createjs.com
+			https://ajax.googleapis.com
+			https://www.google.com
+			https://www.gstatic.com
+			https://www.google-analytics.com; 
+		style-src 'self' 'unsafe-inline' 
+			https://cdnjs.cloudflare.com;
+		">
 	<script type='text/javascript'>
 	window.paceOptions = {
 			ajax: false,
@@ -499,7 +521,7 @@ Version: ${version}
 								${globalNavigationMap}
 							</div>
 							<div class='minimap-overlay'></div>
-							<div class='minimap-button minimap-button-map' onclick='viewGlobeNavigation()'></div>
+							<div class='minimap-button minimap-button-map' onclick='toggleMovementState()'></div>
 							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
 						</div>
 						

@@ -755,6 +755,9 @@ public class MainPageUpdateService extends Service
 					{
 						CachedEntity path = paths.get(i);
 						CachedEntity destLocation = destLocations.get(i);
+						
+						if (destLocation==null) continue;
+						
 						String type = (String)destLocation.getProperty("mapComponentType");
 						if ("Global".equals(type))
 						{

@@ -9,8 +9,8 @@
 
 .minimap-container
 {
-	top:-18px!important;
-	right:-18px!important;
+	top:-10px!important;
+	right:-10px!important;
 }
 
 .global-navigation-map
@@ -29,6 +29,12 @@
     right: 0px;
     margin: -13px;
 
+}
+
+.global-navigation-map .page-popup-X
+{
+    right: -74px;
+    top: -63px;	
 }
 
 body[bannerstate='location-2d'] .location-2d
@@ -50,6 +56,11 @@ body[bannerstate='location-2d'] #partyPanel, body[bannerstate='location-2d'] #in
 body[bannerstate='globe-navigation'] .global-navigation-map
 {
 	display:block;
+}
+
+body[bannerstate='globe-navigation'] .minimap-container
+{
+	display:none;
 }
 
 body[bannerstate='combat'] .major-banner-links, body[bannerstate='combat'] .minimap-container

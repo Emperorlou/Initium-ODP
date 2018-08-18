@@ -2605,7 +2605,12 @@ public class GameUtils
 			relativeUrl = "https://"+relativeUrl.substring(7);
 		
 		if (relativeUrl.startsWith("https://"))
-			return relativeUrl;
+		{
+			if (relativeUrl.startsWith("https://i.imgur.com"))
+				return relativeUrl;
+			else
+				return "";
+		}
 		else if (relativeUrl.startsWith("/"))
 			return "https://initium-resources.appspot.com"+relativeUrl;
 		else

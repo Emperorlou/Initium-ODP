@@ -142,7 +142,6 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		StringBuilder newHtml = new StringBuilder();
 		
 		GridMapService gridMapService = new GridMapService(db, location);
-		
 		newHtml.append("<div id='viewportcontainer' class='vpcontainer'>");
 		newHtml.append("<div id='menu' class='menuContainer' style='visibility: hidden;'></div>");
 		newHtml.append("<div id='viewport' class='vp'>");
@@ -187,5 +186,14 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		
 		updateLocation2D();
 	}
-	
+
+	@Override
+	public String updateGlobalNavigationMap()
+	{
+		String html = super.updateGlobalNavigationMap();
+		
+		html = "<a class='page-popup-X' onclick='toggleMovementState()'>X</a>"+html;
+		
+		return updateHtmlContents(".map-contents", html);
+	}
 }

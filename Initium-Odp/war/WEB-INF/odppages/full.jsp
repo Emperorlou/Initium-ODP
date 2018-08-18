@@ -1,4 +1,27 @@
-<html class=" multiplebgs backgroundblendmode backgroundcliptext"><head>
+<html class=" multiplebgs backgroundblendmode backgroundcliptext">
+<head>
+	<meta http-equiv="Content-Security-Policy" content="
+		default-src 'self'; 
+		connect-src 'self'
+			https://initium-resources.appspot.com
+			https://eventserver.universeprojects.com:8080
+			wss://eventserver.universeprojects.com:8080
+			https://www.google-analytics.com;
+		img-src 'self'
+			https://i.imgur.com
+			https://initium-resources.appspot.com
+			https://www.google-analytics.com; 
+		script-src 'self' 'unsafe-inline' 'unsafe-eval'
+			https://code.jquery.com 
+			https://cdnjs.cloudflare.com
+			https://code.createjs.com
+			https://ajax.googleapis.com
+			https://www.google.com
+			https://www.gstatic.com
+			https://www.google-analytics.com; 
+		style-src 'self' 'unsafe-inline' 
+			https://cdnjs.cloudflare.com;
+		">	
 	<script async="" src="//www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/api2/r20171206132803/recaptcha__en.js"></script><script type="text/javascript">
 	window.paceOptions = {
 			ajax: false,
