@@ -628,51 +628,11 @@ a.main-highlight:HOVER
 	color:#999999;
 }
 
-.backgroundcliptext .item-custom
-{
-	font-size:18px;
-    text-shadow: 1px 1px 1px #004e00a1;
-    color: transparent;
-    background-color: #00BB00 !important;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
-}
-
-.no-backgroundcliptext .item-custom
-{
-	font-size:18px;
-	text-shadow: 0px 0px 4px rgba(0, 200, 0, 0.7);
-    color: #00BB00 !important;
-}
-
-
-.no-backgroundcliptext .item-rare
+.item-custom
 {
     font-size: 18px;
-    text-shadow: 0px 0px 4px rgba(200, 122, 50, 0.7);
-    color: #DD7700 !important;
-}
-
-.no-backgroundcliptext .item-unique
-{
-    font-size: 18px;
-    text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
-    color: #F9CC00 !important;
-}
-
-
-.no-backgroundcliptext .item-epic
-{
-    font-size: 18px;
-    text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
-    color: #AC54FF !important;
-}
-
-.no-backgroundcliptext .item-magic
-{
-    font-size: 18px;
-    text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
-    color: #2597FF !important;
+    text-shadow: -1px -1px 0px rgb(0, 148, 0);
+    color: #004e00;
 }
 
 .item-normal
@@ -691,45 +651,33 @@ a.main-highlight:HOVER
 }
 
 
-.backgroundcliptext .item-rare
+.item-rare
 {
-    font-size: 18px;
-    text-shadow: 1px 1px 0px #864800b0;
-    color: transparent;
-    background-color: #DD7700;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
+    font-size: 16px;
+    text-shadow: -1px -1px 0px #DD7700;
+    color: #864800;
 }
 
-.backgroundcliptext .item-unique
+.item-unique
 {
-    font-size: 18px;
-    text-shadow: 1px 1px 1px #b38400c9;
-    color: transparent;
-	background-color: #f9c000;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
+    font-size: 16px;
+    text-shadow: -1px -1px 0px hsla(46, 100%, 48%, 1);
+    color: hsla(44, 100%, 26%, 1);
 }
 
 
-.backgroundcliptext .item-epic
+.item-epic
 {
-    font-size: 18px;
-    text-shadow: 1px 1px 0px #5e2e8cd4;
-    color: transparent;
-    background-color: #AC54FF;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
+    font-size: 16px;
+    text-shadow: -1px -1px 0px #AC54FF;
+    color: #5e2e8c;
 }
 
-.backgroundcliptext .item-magic
+.item-magic
 {
-    font-size: 18px;
-    text-shadow: 1px 1px 1px #0b2e4e8a;
-    color: transparent;
-	background-color: #2597FF;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
+	font-size: 16px;
+    text-shadow: -1px -1px 0px hsla(209, 100%, 41%, 1);
+    color: hsla(209, 75%, 22%, 1);
 }
 	
 
@@ -2990,6 +2938,15 @@ position: absolute;
 {
 	max-height:50px;
 }
+
+.active-png-button
+{
+	-moz-filter: contrast(0) sepia(100%) hue-rotate(71deg) saturate(7) drop-shadow(0px 0px 4px #00FF0099)!important;
+	-webkit-filter: contrast(0) sepia(100%) hue-rotate(71deg) saturate(7) drop-shadow(0px 0px 4px #00FF0099)!important;
+	filter: contrast(0) sepia(100%) hue-rotate(71deg) saturate(7) drop-shadow(0px 0px 4px #00FF0099)!important;
+}
+
+
 
 /* Minimap */
 

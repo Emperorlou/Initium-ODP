@@ -836,24 +836,19 @@ function storeRenameNew(eventObject, oldName)
 function storeDisabledNew(eventObject)
 {
 	var clickedElement = $(eventObject.currentTarget);
-	doCommand(eventObject, "StoreDisable", null, function(data, error){
-		if (error) return;
-		clickedElement.replaceWith(data.html);
-	});
+	doCommand(eventObject, "StoreDisable");
 }
 
 function storeEnabledNew(eventObject)
 {
 	var clickedElement = $(eventObject.currentTarget);
-	doCommand(eventObject, "StoreEnable", null, function(data, error){
-		if (error) return;
-		clickedElement.replaceWith(data.html);
-	});
+	doCommand(eventObject, "StoreEnable");
 }
 
 function storeSetSaleNew(eventObject)
 {
-	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
+	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale)
+	{
 		if (sale!=null)
 		{
 			doCommand(eventObject,"StoreSetSale",{"sale":sale});

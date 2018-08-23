@@ -892,6 +892,15 @@ public class ODPDBAccess
 		db.put(location);
 		return location;
 	}
+	
+	private GridMapService gridMapService = null;
+	public GridMapService getGridMapService()
+	{
+		if (gridMapService==null)
+			gridMapService = new GridMapService(this, getCharacterLocation(getCurrentCharacter()));
+		
+		return gridMapService;
+	}
 
 	public Key getDefaultLocationKey()
 	{

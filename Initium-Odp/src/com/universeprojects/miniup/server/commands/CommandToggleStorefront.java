@@ -51,6 +51,7 @@ public class CommandToggleStorefront extends Command
 		if ("MERCHANT".equals(character.getProperty("mode")))
 		{
 			db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_NORMAL);
+			db.sendGameMessage("Storefront disabled. You are no longer vending.");
 		}
 		else
 		{
@@ -58,6 +59,7 @@ public class CommandToggleStorefront extends Command
 				throw new UserErrorMessage("You cannot setup shop while in combat.");
 			
 			db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_MERCHANT);
+			db.sendGameMessage("Storefront enabled. You are now vending.");
 		}
 		
 		db.doCharacterTimeRefresh(ds, character);	// This is saving the character, so no need to save after this
@@ -68,7 +70,10 @@ public class CommandToggleStorefront extends Command
 			mpus.updateButtonBar();
 		}
 		else
+		{
 			updateHtml("#"+parameters.get("buttonId"), HtmlComponents.generateToggleStorefront(character));
+			updateHtml("#manageStorefront", HtmlComponents.generateManageStoreButton(character));
+		}
 		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}

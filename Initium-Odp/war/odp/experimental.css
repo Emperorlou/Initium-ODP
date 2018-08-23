@@ -4,7 +4,7 @@
 }	
 .major-banner-links
 {
-	margin-left:-125px;
+	margin-left:-85px;
 }
 
 .minimap-container
@@ -68,7 +68,16 @@ body[bannerstate='combat'] .major-banner-links, body[bannerstate='combat'] .mini
 	display:none;
 }
 
+#monsterCountPanel
+{
+	position:relative;
+	margin-left:-50%;
+}
 
+#monsterCountPanel .main-description
+{
+	color:#FFFFFF!important;
+}
 
 
 

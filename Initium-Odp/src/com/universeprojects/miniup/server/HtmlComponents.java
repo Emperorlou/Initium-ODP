@@ -370,9 +370,21 @@ public class HtmlComponents {
 			return "<a id='"+buttonId+"' onclick='"+onClick+"'><img src='"+imgSource+"' border=0 /></a>";
 	}
 
-	public static String generateManageStoreButton()
+	public static String generateManageStoreButton(CachedEntity character)
 	{
-		return generateButtonBarItem("manageStore", "Manage your store", "viewManageStore()", "https://initium-resources.appspot.com/images/ui/manageStore.png");
+		if("MERCHANT".equals(character.getProperty("mode")))
+		{
+			return generateButtonBarItem("manageStorefront", "Manage your storefront", "viewManageStore(event)", "https://initium-resources.appspot.com/images/ui/storefrontEnabled.png");
+		}
+		else
+		{
+			return generateButtonBarItem("manageStorefront", "Manage your storefront", "viewManageStore(event)", "https://initium-resources.appspot.com/images/ui/storefrontDisabled.png");
+		}
+	}
+	
+	public static String generateGuardingButton()
+	{
+		return generateButtonBarItem("guardSettings", "View your guard settings", "viewGuardSettings()", "https://initium-resources.appspot.com/images/ui/guardsettings1.png");
 	}
 	
 	public static String generateToggleStorefront(CachedEntity character)
@@ -455,8 +467,8 @@ public class HtmlComponents {
 		sb.append("<span>" + generateQuestButton() + "</span>");
 		sb.append("<span>" + generateMapButton() + "</span>");
 		sb.append("<span>" + generateInventionButton() + "</span>");
-		sb.append("<span>" + generateManageStoreButton() + "</span>");
-		sb.append("<span>" + generateToggleStorefront(character) + "</span>");
+		sb.append("<span>" + generateGuardingButton() + "</span>");
+		sb.append("<span>" + generateManageStoreButton(character) + "</span>");
 		sb.append("<span>" + generateTogglePartyJoin(character) + "</span>");
 //		sb.append("<span>" + generateToggleDuel(character) + "</span>");
 		sb.append("<span>" + generateToggleCloak(character) + "</span>");
@@ -468,10 +480,10 @@ public class HtmlComponents {
 		sb.append("<p>This is your quest log. New players are given a set of quests to help them learn the game. Here is where you start new quests and complete ongoing ones.</p>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/invention1.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This opens the invention page. This page is where you initiate experiments, manage and implement your character's ideas, and construct items and buildings.</p>");
-		sb.append("<img src='https://initium-resources.appspot.com/images/ui/manageStore.png' border='0' style='float:left; padding:4px;'>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/storefrontEnabled.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This button will take you to your storefront management page. This page allows you to setup your storefront by specifying which items you would like to sell to other players and for how much. More help can be found in the storefront page itself.</p>");
-		sb.append("<img src='https://initium-resources.appspot.com/images/ui/storefrontEnabled.png' border='0' style='float:left;padding:4px;'>");
-		sb.append("<p>This button will turn on and off your storefront. Since you cannot move while vending, you will need to turn off your store before you go off adventuring. This button makes turning your store on and off quick and easy.</p>");
+		sb.append("<img src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' border='0' style='float:left;padding:4px;'>");
+		sb.append("<p>This takes you to your guard settings. Players can guard locations in different ways and you can control those ways here. By default, you are not guarding anything.</p>");
 		sb.append("<img src='https://initium-resources.appspot.com/images/ui/partyJoinsAllowed.png' border='0' style='float:left; padding:4px;'>");
 		sb.append("<p>This is the party join button. When enabled (without the red cross), other characters will be able to join you in a party. If you are not already in a party then when someone joins you, you will automatically become the party leader. <br>");
 		sb.append("More information on parties and how they work can be found in the <a href='odp/mechanics.jsp#parties'>game mechanics page</a>.</p>");

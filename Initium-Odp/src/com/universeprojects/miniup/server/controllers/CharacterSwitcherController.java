@@ -46,7 +46,7 @@ public class CharacterSwitcherController extends PageController {
 		List<CachedEntity> characters = query.getFilteredList("Character", "userKey", user.getKey());
 		List<Map<String,Object>> charactersData = new ArrayList<>();
 		
-		boolean useSimpleMode = db.getUserCharacterSlotCount(user)>24;
+		boolean useSimpleMode = db.getUserCharacterSlotCount(user)>40;
 		
 		EntityPool pool = new EntityPool(db.getDB());
 		if (useSimpleMode==false)

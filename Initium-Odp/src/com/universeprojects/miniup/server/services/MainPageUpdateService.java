@@ -827,7 +827,7 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img alt='Navigation' src='https://initium-resources.appspot.com/images/ui/compass1.png' style='max-width:32px'></a>");			
 		newHtml.append("<a id='globe-navigation-button' class='path-overlay-link' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img alt='Global navigation' src='https://initium-resources.appspot.com/images/ui/navigation-map-icon2.png' style='max-width:32px'></a>");			
 		newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
-		newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' style='max-width:32px'></a>");
+//		newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' style='max-width:32px'></a>");
 		
 		return newHtml.toString();
 	}
@@ -1017,9 +1017,9 @@ public class MainPageUpdateService extends Service
 			if (weapons.get(1)!=null)
 				rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
 			
-			newHtml.append(getHtmlForInBannerLinkCentered(45, 40, "<img src='"+leftIcon+"' alt='Left Hand' class='combat-button' />", "doCombatAttackLeftHand(event)"));
-			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)"));
-			newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)"));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 40, "<img src='"+leftIcon+"' alt='Left Hand' class='combat-button' />", "doCombatAttackLeftHand(event)", "1", 49));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)", "2", 50));
+			newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)", "3", 51));
 		}
 		
 		
@@ -1033,6 +1033,7 @@ public class MainPageUpdateService extends Service
 		}
 		
 		
+		
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
 	}
 	
@@ -1044,8 +1045,20 @@ public class MainPageUpdateService extends Service
 
 	protected String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs)
 	{
-		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>"+buttonCaption+"</a></div>";
+		return getHtmlForInBannerLinkCentered(top, left, buttonCaption, onclickJs, null, null);
+	}
+	
+	protected String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs, String shortcutKeyName, Integer shortcutCode)
+	{
+		String shortcutKeyHtml = "";
+		if (shortcutKeyName!=null)
+			shortcutKeyHtml = "<span style='top:-8px; left:-16px;' class='shortcut-key'>("+shortcutKeyName+")</span>";
 		
+		String shortcutCodeHtml = "";
+		if (shortcutCode!=null)
+			shortcutCodeHtml = " shortcut='"+shortcutCode+"' ";
+		
+		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a "+shortcutCodeHtml+" onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>"+shortcutKeyHtml+""+buttonCaption+"</a></div>";
 	}
 
 	public String updateButtonList(boolean showHidden){

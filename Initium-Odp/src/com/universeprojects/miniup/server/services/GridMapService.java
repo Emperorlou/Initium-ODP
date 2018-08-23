@@ -633,6 +633,13 @@ public class GridMapService {
 		return height.intValue();
 	}
 
+	/**
+	 * This sets the fields on subLocation that are used to determine how to procedurally generate the location. They are determined
+	 * from the parentLocation's settings. 
+	 * @param db
+	 * @param parentLocation
+	 * @param subLocation
+	 */
 	public void generateGridMapElementsFromParent(ODPDBAccess db, CachedEntity parentLocation, CachedEntity subLocation)
 	{
 		Map<String, Double> elements = new HashMap<>();

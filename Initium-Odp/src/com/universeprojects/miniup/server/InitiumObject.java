@@ -12,9 +12,11 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.gefcommon.shared.elements.GameAspect;
 import com.universeprojects.gefcommon.shared.elements.GameObject;
+import com.universeprojects.miniup.server.services.GridMapService;
 
 public class InitiumObject implements GameObject<Key>
 {
+	private GridMapService gms;
 	final protected ODPDBAccess db;
 	final protected CachedEntity entity;
 	protected Map<String, InitiumAspect> aspects;
@@ -205,7 +207,15 @@ public class InitiumObject implements GameObject<Key>
 		return hasAspect(clazz.getSimpleName().substring(6));
 	}
 
-	
+
+	public boolean isProcedural()
+	{
+		if (entity.getKey().isComplete()) return false;
+		
+		if (entity.getAttribute("proceduralKey")!=null) return true;
+		
+		return false;
+	}
 
 	
 }
