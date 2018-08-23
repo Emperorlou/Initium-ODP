@@ -1738,7 +1738,7 @@ public class MainPageUpdateService extends Service
 			else
 			{
 				if (maxMonsterCount>10 && 
-						GameUtils.booleanEquals(location.getProperty("hideMonsterActivity"), true)==false)
+						GameUtils.booleanEquals(location.getProperty("hideMonsterActivity"), false))
 				{
 					if (monsterCount<1) monsterCount = 0d;
 					double monsterPercent = monsterCount/maxMonsterCount;
