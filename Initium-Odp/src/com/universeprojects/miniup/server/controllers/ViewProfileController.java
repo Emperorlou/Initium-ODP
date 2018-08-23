@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.NotLoggedInException;
@@ -92,6 +93,7 @@ public class ViewProfileController extends PageController {
 			request.setAttribute("premium", false);
 		
 		request.setAttribute("charName", character.getProperty("name"));
+		request.setAttribute("hc", CommonChecks.checkIsHardcore(character) ? "!" : "");
 		request.setAttribute("hideUserActivity", user.getProperty("hideUserActivity"));
 		
 		if (totalDonations==null) totalDonations = 0L;
