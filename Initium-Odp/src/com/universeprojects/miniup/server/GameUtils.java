@@ -915,7 +915,7 @@ public class GameUtils
     	try
     	{
 	    	String itemType = (String)item.getProperty("itemType");
-	    	if (itemType != null && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
+	    	if (itemType != null && GameUtils.booleanEquals(item.getProperty("natural"), false) && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
 	    		
 	    		StringBuilder sb = new StringBuilder();
 		    	sb.append("minitip='");
@@ -2455,7 +2455,7 @@ public class GameUtils
 				throw new IllegalArgumentException("Invalid field value: "+fieldValue);
 		}
 		else if (fieldValue instanceof Boolean)
-			return (Boolean)fieldValue;
+			return (Boolean)fieldValue == bool;
 		else
 			throw new IllegalArgumentException("Invalid field value type.");
 		
@@ -2607,7 +2607,7 @@ public class GameUtils
 		if (relativeUrl.startsWith("https://"))
 		{
 			if (relativeUrl.startsWith("https://i.imgur.com"))
-				return relativeUrl;
+			return relativeUrl;
 			else
 				return "";
 		}
