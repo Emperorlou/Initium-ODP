@@ -1,3 +1,6 @@
+var selectedTileX = null;
+var selectedTileY = null;
+
 var uiStyle = localStorage.getItem("selectUIStyle");
 if (uiStyle==null) uiStyle = "classic";
 
@@ -3631,9 +3634,16 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
-		parameters = {"v":verifyCode};
+	{
+		parameters = {"v":verifyCode, "selected2DTileX":selectedTileX, "selected2DTileY":selectedTileY, "uiStyle": uiStyle};
+	}
 	else
+	{
 		parameters.v = verifyCode;
+		parameters.selected2DTileX = selectedTileX;
+		parameters.selected2DTileY = selectedTileY;
+		parameters.uiStyle = uiStyle;
+	}
 	
 	parameters.mainPageUrl = location.href;
 	
@@ -3879,9 +3889,16 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
-		parameters = {"v":verifyCode};
+	{
+		parameters = {"v":verifyCode, "selected2DTileX":selectedTileX, "selected2DTileY":selectedTileY, "uiStyle": uiStyle};
+	}
 	else
+	{
 		parameters.v = verifyCode;
+		parameters.selected2DTileX = selectedTileX;
+		parameters.selected2DTileY = selectedTileY;
+		parameters.uiStyle = uiStyle;
+	}
 	
 	parameters.mainPageUrl = location.href;
 	

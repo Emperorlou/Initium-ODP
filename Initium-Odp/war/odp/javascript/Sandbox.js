@@ -1582,3 +1582,8 @@ function updateTallTreeButton()
 	else
 		button.removeClass("disabled");
 }
+
+function refreshTile(event)
+{
+	doCommand(event, "RefreshTile");
+}

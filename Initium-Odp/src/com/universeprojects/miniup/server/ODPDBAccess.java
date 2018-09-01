@@ -1764,10 +1764,12 @@ public class ODPDBAccess
 	 * Performs the drop of the item from the character and saves the entity. 
 	 * Calls tryCharacterDropItem, which will throw if not successful. 
 	 */
-	public void doCharacterDropItem(CachedEntity character, CachedEntity item) throws UserErrorMessage
+	public void doCharacterDropItem(CachedEntity character, CachedEntity item, Long tileX, Long tileY) throws UserErrorMessage
 	{
-		tryCharacterDropItem(character, item, true);
+		tryCharacterDropItem(character, item, tileX, tileY, true);
 		getDB().put(item);
+		getGridMapService().putLocationData(getDB());
+		
 	}
 	
 	/**
@@ -1775,12 +1777,12 @@ public class ODPDBAccess
 	 * @return True if item was dropped, false only if throwError is false and the item is equipped or vending.
 	 * @throws UserErrorMessage Thrown if item is equipped or vending, and throwError parameter is true.
 	 */
-	public boolean tryCharacterDropItem(CachedEntity character, CachedEntity item, boolean throwError) throws UserErrorMessage
+	public boolean tryCharacterDropItem(CachedEntity character, CachedEntity item, Long tileX, Long tileY, boolean throwError) throws UserErrorMessage
 	{
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
 		if (item == null) throw new IllegalArgumentException("Item cannot be null.");
 
-		Key characterLocationKey = (Key) character.getProperty("locationKey");
+		CachedEntity location = getCharacterLocation(character);
 
 		if (checkCharacterHasItemEquipped(character, item.getKey())) {
 			if(throwError) throw new UserErrorMessage("Your character has this item equipped. You cannot drop it until it is unequipped.");
@@ -1791,9 +1793,8 @@ public class ODPDBAccess
 			if(throwError) throw new UserErrorMessage("The item you are trying to drop is currently in your store. You cannot drop an item that you plan on selling.");
 			return false;
 		}
-
-		item.setProperty("containerKey", characterLocationKey);
-		item.setProperty("movedTimestamp", new Date());
+		InitiumObject iObject = new InitiumObject(this, item);
+		iObject.moveItemToLocation(location, tileX, tileY);
 
 		return true;
 	}

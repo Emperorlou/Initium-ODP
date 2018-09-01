@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -12,6 +13,7 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.gefcommon.shared.elements.GameAspect;
 import com.universeprojects.gefcommon.shared.elements.GameObject;
+import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.GridMapService;
 
 public class InitiumObject implements GameObject<Key>
@@ -119,6 +121,11 @@ public class InitiumObject implements GameObject<Key>
 	{
 		return entity.getKey();
 	}
+	
+	public String getProceduralKey()
+	{
+		return (String)entity.getAttribute("proceduralKey");
+	}
 
 	@Override
 	public String getName()
@@ -154,6 +161,26 @@ public class InitiumObject implements GameObject<Key>
 	public void setDurability(Long value)
 	{
 		entity.setProperty("durability", value);
+	}
+	
+	public Key getContainerKey()
+	{
+		return (Key)entity.getProperty("containerKey");
+	}
+	
+	public void setContainerKey(Key newContainer)
+	{
+		entity.setProperty("containerKey", newContainer);
+	}
+	
+	public Date getMovedTimestamp()
+	{
+		return (Date)entity.getProperty("movedTimestamp");
+	}
+	
+	public void setMovedTimestamp()
+	{
+		entity.setProperty("movedTimestamp", new Date());
 	}
 
 	@Override
@@ -217,5 +244,44 @@ public class InitiumObject implements GameObject<Key>
 		return false;
 	}
 
+	private void moveItemTo(Key containerKey)
+	{
+		// TODO: Do some checks to make sure this is possible perhaps...
+		
+		
+		// Remove it from the procedural map if necessary
+		if (isProcedural())
+		{
+			GridMapService gms = db.getGridMapService();
+			if (gms.isForLocation(containerKey)==false)
+				throw new IllegalArgumentException("Unhandled situation. Unable to remove a procedural item from a location that the character isn't in (currently). This could change.");
+			
+			gms.removeProceduralEntity(getProceduralKey());
+		}
+		
+		// Now put it on the character and set the move timestamp
+		setContainerKey(containerKey);
+		setMovedTimestamp();
+	}
 	
+	public void moveItemToCharacter(CachedEntity character) throws UserErrorMessage
+	{
+		moveItemTo(character.getKey());
+	}
+
+	public void moveItemToContainer(CachedEntity containerItem) throws UserErrorMessage
+	{
+		moveItemTo(containerItem.getKey());
+	}
+	
+	public void moveItemToLocation(CachedEntity location, Long tileX, Long tileY) throws UserErrorMessage
+	{
+		moveItemTo(location.getKey());
+		
+		GridMapService gms = db.getGridMapService();
+		if (gms.isForLocation(location.getKey())==false)
+			gms = new GridMapService(db, location);
+		
+		gms.setItemPosition(entity, tileX, tileY);
+	}
 }

@@ -13,7 +13,8 @@
 			https://i.imgur.com
 			https://imgur.com
 			https://initium-resources.appspot.com
-			https://www.google-analytics.com; 
+			https://www.google-analytics.com
+			https://ajax.googleapis.com; 
 		script-src 'self' 'unsafe-inline' 'unsafe-eval'
 			https://code.jquery.com 
 			https://cdnjs.cloudflare.com
@@ -48,7 +49,6 @@
 <script type="text/javascript" src="/javascript/modernizr.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" onload="if (window.module!=null) window.$ = window.jQuery = module.exports;"></script>
 <script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>

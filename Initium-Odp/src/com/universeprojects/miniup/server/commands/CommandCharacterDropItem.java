@@ -12,6 +12,8 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ExperimentalPageUpdateService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
  * Drops the specified item to the characters current location. Item must be in character's inventory.
@@ -40,9 +42,12 @@ public class CommandCharacterDropItem extends Command {
 		if(CommonChecks.checkCharacterIsBusy(character))
 			throw new UserErrorMessage("Your character is currently busy and cannot drop items.");
 		
-		db.doCharacterDropItem(character, dropItem);
+		db.doCharacterDropItem(character, dropItem, getSelectedTileX(), getSelectedTileY());
+		
 		// Should simply empty out the inventory item, save an unnecessary get.
 		deleteHtml(".invItem[ref='"+itemId+"']");
+		
+		getMPUS().updateLocation2D();		
 	}
 
 }
