@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.google.appengine.api.datastore.DataTypeTranslator;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -18,6 +19,7 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.DBUtils;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
@@ -44,7 +46,7 @@ public class GridMapService {
 	}
 	
 	public static int MAX_ITEMS_PER_TILE = 10;
-	public static double GLOBAL_SCALE = 0.4;
+	public static double GLOBAL_ITEM_SCALE = 0.4;
 
 	
 	final private ODPDBAccess db;
@@ -391,6 +393,25 @@ public class GridMapService {
 		return item;
 	}
 	
+	public String generateGridObjectJson(int tileX, int tileY)
+	{
+		StringBuilder js = new StringBuilder();
+		
+		// First clear the cell of objects
+		js.append("removeTileObjects("+tileX+", "+tileY+");\n");
+		
+		Map<String, GridObject> gridObjects = generateGridObjects(tileX, tileY);
+		for(GridObject go:gridObjects.values())
+		{
+			js.append("addGridObjectToMap(")
+				.append(go.getJsonObject().toJSONString())
+				.append(");\n");
+		}
+		js.append("refreshPositions();\n");
+		
+		return js.toString();
+	}
+	
 	public Map<String, GridObject> generateGridObjects(int tileX, int tileY)
 	{
 		Random rnd = getRandomForTile(tileX, tileY);
@@ -413,15 +434,15 @@ public class GridMapService {
 			if (item.getProperty("GridMapObject:image")==null || item.getProperty("GridMapObject:imageWidth")==null || item.getProperty("GridMapObject:imageHeight")==null) 
 			{
 				imageUrl = (String)item.getProperty("icon");
-				imageWidth = (int)Math.floor(32*GLOBAL_SCALE);
-				imageHeight = (int)Math.floor(32*GLOBAL_SCALE);
+				imageWidth = (int)Math.floor(32*GLOBAL_ITEM_SCALE);
+				imageHeight = (int)Math.floor(32*GLOBAL_ITEM_SCALE);
 				pileRandom = true;
 			}
 			else
 			{
 				imageUrl = (String)item.getProperty("GridMapObject:image");
-				imageWidth = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageWidth"))*GLOBAL_SCALE);
-				imageHeight = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageHeight"))*GLOBAL_SCALE);
+				imageWidth = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageWidth"))*GLOBAL_ITEM_SCALE);
+				imageHeight = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageHeight"))*GLOBAL_ITEM_SCALE);
 				
 			}
 			cellOffsetX = intVal(item.getProperty("gridMapCellOffsetX"));
@@ -459,11 +480,12 @@ public class GridMapService {
 					generatedKey,
 					imageUrl,
 					"",
-					tileX-getRowStart(), tileY-getColumnStart(),
+					tileX, tileY,
 					rotation,
 					cellOffsetX,
 					cellOffsetY,
-					(int)(imageWidth / 2), (int)(imageHeight*0.95), (int)(imageWidth), (int)(imageHeight), false, false));
+					(int)(imageWidth / 2), (int)(imageHeight*0.95), (int)(imageWidth), (int)(imageHeight), false, false, 
+					getRowStart(), getColumnStart()));
 		}
 		
 		
@@ -499,8 +521,8 @@ public class GridMapService {
 			
 			if (imageWidth==null || imageHeight==null)
 			{
-				imageWidth = (long)Math.floor(32d*GLOBAL_SCALE);
-				imageHeight = (long)Math.floor(32d*GLOBAL_SCALE);
+				imageWidth = (long)Math.floor(32d*GLOBAL_ITEM_SCALE);
+				imageHeight = (long)Math.floor(32d*GLOBAL_ITEM_SCALE);
 			}
 			
 			if (rotation==null)
@@ -512,11 +534,12 @@ public class GridMapService {
 					generatedKey,
 					imageUrl,
 					"",
-					tileX-getRowStart(), tileY-getColumnStart(),
+					tileX, tileY,
 					rotation,
 					cellOffsetX.intValue(),
 					cellOffsetY.intValue(),
-					(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false));
+					(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false,
+					getRowStart(), getColumnStart()));
 		}
 		
 		return result;
@@ -808,6 +831,41 @@ public class GridMapService {
 		
 		setGridMapTileProceduralEntry(data.tileX, data.tileY, data.index, entry);
 		
+		checkIfAllProceduralEntitiesAreRemoved(data.tileX, data.tileY);
+			
+	}
+	
+	/**
+	 * This checks, and then sets the clearedProceduralItems flag to true if all procedural items have been removed.
+	 * 
+	 * Note: It doesn't unset the flag if the procedural items haven't been cleared but the flag was true.
+	 * 
+	 * @param tileX
+	 * @param tileY
+	 * @return
+	 */
+	private boolean checkIfAllProceduralEntitiesAreRemoved(int tileX, int tileY)
+	{
+		EmbeddedEntity gridMapTile = getGridMapTile(tileX, tileY);
+		if (gridMapTile==null) return false;
+		
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> gridMapTileEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("proceduralItems");
+		if (gridMapTileEntries==null) return false;
+		
+		
+		for(EmbeddedEntity entry:gridMapTileEntries)
+		{
+			if (entry==null) return false;
+			if (GameUtils.equals(entry.getProperty("status"), "ProceduralDeleted")==false)
+				return false;
+		}
+		
+		gridMapTile.setProperty("clearedProceduralItems", true);
+		
+		setGridMapTile(tileX, tileY, gridMapTile);
+		
+		return true;
 	}
 	
 	
@@ -897,7 +955,7 @@ public class GridMapService {
 		items = ds.fetchAsList(q, 10);
 
 		// if we're looking at the center of the map, then ALSO do another query that deals with legacy items
-		if (tileX==500 || tileY==500)
+		if (tileX==500 && tileY==500)
 		{
 			q = new Query("Item").setFilter(
 					new FilterPredicate("containerKey", FilterOperator.EQUAL, location.getKey()))
@@ -954,8 +1012,8 @@ public class GridMapService {
 		}
 		if (width==null || height==null)
 		{
-			width = (long)Math.floor(32d*GLOBAL_SCALE);
-			height = (long)Math.floor(32d*GLOBAL_SCALE);
+			width = (long)Math.floor(32d*GLOBAL_ITEM_SCALE);
+			height = (long)Math.floor(32d*GLOBAL_ITEM_SCALE);
 		}
 
 		
@@ -986,7 +1044,10 @@ public class GridMapService {
 	public void putLocationData(CachedDatastoreService ds)
 	{
 		if (locationDataEntity!=null)
+		{
+			System.out.println("Size: "+DBUtils.getEntitySize(locationDataEntity)+" bytes");
 			ds.put(locationDataEntity);
+		}
 	}
 
 	public void setItemPosition(CachedEntity item, Long tileX, Long tileY)

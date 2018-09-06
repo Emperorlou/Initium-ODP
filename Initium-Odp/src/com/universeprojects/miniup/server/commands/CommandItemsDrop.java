@@ -56,7 +56,7 @@ public class CommandItemsDrop extends CommandItemsBase {
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 		
 		
-		getMPUS().updateLocation2D();
+		addJavascriptToResponse(db.getGridMapService().generateGridObjectJson(getSelectedTileX().intValue(), getSelectedTileY().intValue()));
 	}
 
 }

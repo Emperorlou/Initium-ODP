@@ -11,6 +11,8 @@ public class GridObject {
 	private static String name = "name";
 	private static String xGridCoord = "xGridCoord";
 	private static String yGridCoord = "yGridCoord";
+	private static String xGridCoordLocal = "xGridCoordLocal";
+	private static String yGridCoordLocal = "yGridCoordLocal";
 	private static String xGridCellOffset = "xGridCellOffset";
 	private static String yGridCellOffset = "yGridCellOffset";
 	private static String xImageOrigin = "xImageOrigin";
@@ -31,20 +33,15 @@ public class GridObject {
 		setKey(key);
 	}
 	
-	public GridObject(Integer xGridCoord, Integer yGridCoord) {
-		jsonObject = new JSONObject();
-		setxGridCellOffset(xGridCoord);
-		setyGridCoord(yGridCoord);
-	}
-
 	public GridObject(String key, String filename, String name, Integer xGridCoord, Integer yGridCoord, Double rotation, Integer xGridCellOffset, Integer yGridCellOffset, Integer xImageOrigin,
-			Integer yImageOrigin, Integer width, Integer height, boolean markForRemoval, boolean markForDeletion) {
+			Integer yImageOrigin, Integer width, Integer height, boolean markForRemoval, boolean markForDeletion, 
+			Integer gridStartX, Integer gridStartY) {
 		jsonObject = new JSONObject();
 		setKey(key);
 		setfilename(filename);
 		setName(WebUtils.jsSafe(name));
-		setxGridCoord(xGridCoord);
-		setyGridCoord(yGridCoord);
+		setxGridCoord(xGridCoord, gridStartX);
+		setyGridCoord(yGridCoord, gridStartY);
 		setRotation(rotation);
 		setxGridCellOffset(xGridCellOffset);
 		setyGridCellOffset(yGridCellOffset);
@@ -100,16 +97,18 @@ public class GridObject {
 		return (Integer) jsonObject.get(this.xGridCoord);
 	}
 
-	public void setxGridCoord(Integer xGridCoord) {
+	public void setxGridCoord(Integer xGridCoord, Integer gridStartX) {
 		jsonObject.put(this.xGridCoord, xGridCoord);
+		jsonObject.put(this.xGridCoordLocal, xGridCoord-gridStartX);
 	}
 
 	public Integer getyGridCoord() {
 		return (Integer) jsonObject.get(this.yGridCoord);
 	}
 
-	public void setyGridCoord(Integer yGridCoord) {
+	public void setyGridCoord(Integer yGridCoord, Integer gridStartY) {
 		jsonObject.put(this.yGridCoord, yGridCoord);
+		jsonObject.put(this.yGridCoordLocal, yGridCoord-gridStartY);
 	}
 
 	public Integer getxGridCellOffset() {

@@ -47,7 +47,8 @@ public class CommandCharacterDropItem extends Command {
 		// Should simply empty out the inventory item, save an unnecessary get.
 		deleteHtml(".invItem[ref='"+itemId+"']");
 		
-		getMPUS().updateLocation2D();		
+		addJavascriptToResponse(db.getGridMapService().generateGridObjectJson(getSelectedTileX().intValue(), getSelectedTileY().intValue()));
+	
 	}
 
 }

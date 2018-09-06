@@ -31,7 +31,9 @@ public class CommandRefreshTile extends Command
 		
 		gms.putLocationData(ds);
 		
-		getMPUS().updateLocation2D();
+		addJavascriptToResponse(gms.generateGridObjectJson(tileX, tileY));
+		
+		
 	}
 
 }

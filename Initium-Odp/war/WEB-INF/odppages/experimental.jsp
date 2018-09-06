@@ -547,7 +547,8 @@ Version: ${version}
 						</div>							
 
 						<div style='position:absolute;bottom: 35px;left:50.0%;'><div class='path-overlay-link' id='monsterCountPanel'>${monsterCountPanel}</div></div>
-						
+
+						<div class="main-buttonbox v3-window3 mini-page-popup" style='display:none'></div>						
 				
 					</div>
 				</div>

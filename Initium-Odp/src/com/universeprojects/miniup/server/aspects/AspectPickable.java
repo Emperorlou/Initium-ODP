@@ -117,7 +117,8 @@ public class AspectPickable extends ItemAspect
 				deleteHtml(".tileContentsItem[ref='"+proceduralKeyStr+"']");
 				deleteHtml(".gridObject[id*='"+proceduralKeyStr+"']");
 			}
-			
+
+			addJavascriptToResponse(db.getGridMapService().generateGridObjectJson(getSelectedTileX().intValue(), getSelectedTileY().intValue()));
 		}
 		
 	}

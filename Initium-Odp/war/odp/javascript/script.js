@@ -3066,6 +3066,45 @@ function clearMakeIntoPopup()
 	$(".make-popup-removable").remove();
 }
 
+function clearMiniPagePopup()
+{
+	$(".mini-page-popup").html("").hide();
+}
+
+
+
+function miniPagePopup(url, title)
+{
+	window.scrollTo(0,0);
+	
+	var html = 
+			"<a class='mini-page-popup-X' onclick='clearMiniPagePopup()'>X</a>	\r\n" + 
+			"<h4>"+title+"</h4>\r\n" + 
+			"<div id='mini-page-popup-contents'>\r\n" + 
+			"	<img class='wait' src='/javascript/images/wait.gif' border='0'/>\r\n" + 
+			"</div>\r\n";
+	
+	$(".mini-page-popup").html(html).show();
+
+	$("#mini-page-popup-contents").load(url);
+}
+
+function getMiniPagePopupTitle()
+{
+	if ($(".mini-page-popup").is(':visible'))
+		return $(".mini-page-popup h4").text();
+	
+	return null;
+}
+
+function clearMiniPagePopup()
+{
+	$(".mini-page-popup").html("").hide();
+}
+
+
+
+
 function viewCharacterSwitcher()
 {
 	$("body").append("" +

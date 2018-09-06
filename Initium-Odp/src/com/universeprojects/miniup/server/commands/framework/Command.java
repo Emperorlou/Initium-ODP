@@ -186,7 +186,7 @@ public abstract class Command extends OperationBase
 	{
 		String str = request.getParameter("selected2DTileX");
 		if (str==null || str.equals("") || str.equals("null") || str.equals("undefined"))
-			return null;
+			return 500L;
 		
 		return Long.parseLong(str);
 	}
@@ -195,7 +195,7 @@ public abstract class Command extends OperationBase
 	{
 		String str = request.getParameter("selected2DTileY");
 		if (str==null || str.equals("") || str.equals("null") || str.equals("undefined"))
-			return null;
+			return 500L;
 		
 		return Long.parseLong(str);
 	}

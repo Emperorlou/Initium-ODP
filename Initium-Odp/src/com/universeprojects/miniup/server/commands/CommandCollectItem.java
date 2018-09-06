@@ -26,11 +26,22 @@ public class CommandCollectItem extends Command
 		Long itemId = tryParseId(parameters, "itemId");
 		
 		CachedEntity item = db.getEntity(KeyFactory.createKey("Item", itemId));
+
+		Long tileX = (Long)item.getProperty("gridMapPositionX");
+		Long tileY = (Long)item.getProperty("gridMapPositionY");
 		
 		db.doCharacterCollectItem(db.getCurrentCharacter(), item);
 		
 		if(item.isUnsaved())
 			ds.put(item);
+		
+		if (tileX!=null && tileY!=null)
+		{
+			db.getGridMapService().regenerateDBItemTileCache(tileX.intValue(), tileY.intValue());
+			addJavascriptToResponse(db.getGridMapService().generateGridObjectJson(tileX.intValue(), tileY.intValue()));
+			deleteHtml(".tileContentsItem[ref=Item\\("+itemId+"\\)]");
+		}
+		
 	}
 
 }
