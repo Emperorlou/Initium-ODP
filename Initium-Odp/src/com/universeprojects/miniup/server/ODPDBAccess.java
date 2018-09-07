@@ -1548,7 +1548,8 @@ public class ODPDBAccess
 		if (!character.getKey().equals(equipment.getProperty("containerKey")))
 			throw new IllegalArgumentException("The piece of equipment is not in the character's posession. Character: "+character.getKey());
 
-		if(CommonChecks.checkCharacterIsPlayer(character) == false && 
+		// Only prevent HCM equips for players
+		if(CommonChecks.checkCharacterIsPlayer(character) == true && 
 				CommonChecks.checkIsHardcore(character) == true && 
 				CommonChecks.checkIsHardcore(equipment) == false)
 			throw new UserErrorMessage("You can only equip Hardcore Mode items.");
