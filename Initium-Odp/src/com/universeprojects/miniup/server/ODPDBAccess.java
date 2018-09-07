@@ -1548,7 +1548,9 @@ public class ODPDBAccess
 		if (!character.getKey().equals(equipment.getProperty("containerKey")))
 			throw new IllegalArgumentException("The piece of equipment is not in the character's posession. Character: "+character.getKey());
 
-		if(CommonChecks.checkIsHardcore(character) && CommonChecks.checkIsHardcore(equipment) == false)
+		if(CommonChecks.checkCharacterIsPlayer(character) == false && 
+				CommonChecks.checkIsHardcore(character) == true && 
+				CommonChecks.checkIsHardcore(equipment) == false)
 			throw new UserErrorMessage("You can only equip Hardcore Mode items.");
 		
 		destinationSlot = destinationSlot.trim(); // Clean it up, just in case
@@ -4956,8 +4958,11 @@ public class ODPDBAccess
 			}
 		}
 		
+		// Only set HCM items for HCM mobs (or legacy mobs without an HCM flag specified). 
 		boolean setHardcoreModeItems = false;
-		if("NPC".equals(characterToDie.getProperty("type"))&&CommonChecks.checkIsHardcore(attackingCharacter))
+		if("NPC".equals(characterToDie.getProperty("type")) &&
+				(characterToDie.getProperty("hardcoreMode") == null || CommonChecks.checkIsHardcore(characterToDie)) && 
+				CommonChecks.checkIsHardcore(attackingCharacter))
 		{
 			// For now, only do HCM item drops. Do NOT save these entities, potential race conditions.
 			Map<String, String> damageMap = getValue_StringStringMap(characterToDie, "combatStatsDamageMap");
