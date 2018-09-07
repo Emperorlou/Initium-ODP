@@ -229,6 +229,9 @@ public class LongOperationTakePath extends LongOperation {
 							monster.setProperty("status", status);
 							monster.setProperty("monsterSpawnerKey", mobSpawner.getKey());
 							
+							// Clear HCM flag. Instance mobs/items should not limit HCM encounters.
+							monster.setProperty("hardcoreMode", null);
+							
 							ds.put(finalChar, monster);
 							
 							if(destination.isUnsaved())
