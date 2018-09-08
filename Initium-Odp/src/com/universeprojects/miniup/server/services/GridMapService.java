@@ -883,6 +883,30 @@ public class GridMapService {
 		return entity;
 	}
 
+	public void addEntity(CachedEntity item)
+	{
+		Long tileX = (Long)item.getProperty("gridMapPositionX");
+		Long tileY = (Long)item.getProperty("gridMapPositionY");
+		if (tileX==null) tileX = 500L;
+		if (tileY==null) tileY = 500L;
+		
+		EmbeddedEntity tile = getOrCreateGridMapTile(tileX.intValue(), tileY.intValue());
+		
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> tileEntries = (List<EmbeddedEntity>)tile.getProperty("dbItems");
+		
+		if (tileEntries==null) tileEntries = new ArrayList<>();
+		
+		EmbeddedEntity tileEntry = generateTileEntryFromItem(item);
+		tileEntries.add(0, tileEntry);
+		if (tileEntries.size()>MAX_ITEMS_PER_TILE)
+			tileEntries.remove(MAX_ITEMS_PER_TILE);
+		
+		tile.setProperty("dbItems", tileEntries);
+		
+		setGridMapTile(tileX.intValue(), tileY.intValue(), tile);
+	}
+	
 	public void removeEntity(CachedEntity itemEntity)
 	{
 		if (itemEntity.getAttribute("proceduralKey")!=null)
@@ -901,6 +925,8 @@ public class GridMapService {
 		}
 	}
 
+	
+	
 	private void removeDBEntity(CachedEntity itemEntity)
 	{
 		Long tileX = (Long)itemEntity.getProperty("gridMapPositionX");
@@ -998,6 +1024,8 @@ public class GridMapService {
 		Long tileX = (Long)item.getProperty("gridMapPositionX");
 		Long tileY = (Long)item.getProperty("gridMapPositionY");
 		String image = (String)item.getProperty("GridMapObject:image");
+		Double rotation = (Double)item.getProperty("gridMapRotation");
+		Double scale = (Double)item.getProperty("gridMapScale");
 		
 		
 		// Process the values out...
@@ -1010,10 +1038,19 @@ public class GridMapService {
 			cellOffsetX = (long)(rnd.nextInt(64)+rnd.nextInt(64))/2;
 			cellOffsetY = (long)(rnd.nextInt(64)+rnd.nextInt(64))/2;			
 		}
+		if (scale==null)
+		{
+			scale = 1d;
+		}
 		if (width==null || height==null)
 		{
-			width = (long)Math.floor(32d*GLOBAL_ITEM_SCALE);
-			height = (long)Math.floor(32d*GLOBAL_ITEM_SCALE);
+			width = (long)Math.floor(32d*GLOBAL_ITEM_SCALE*scale);
+			height = (long)Math.floor(32d*GLOBAL_ITEM_SCALE*scale);
+		}
+		else
+		{
+			width = (long)Math.floor(width*GLOBAL_ITEM_SCALE*scale);
+			height = (long)Math.floor(height*GLOBAL_ITEM_SCALE*scale);
 		}
 
 		
@@ -1030,6 +1067,7 @@ public class GridMapService {
 		entry.setProperty("dbItemWidth", height);
 		entry.setProperty("itemKey", item.getKey());
 		entry.setProperty("dbItemImage", image);
+		entry.setProperty("dbItemRotation", rotation);
 		
 		return entry;
 	}

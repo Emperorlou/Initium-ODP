@@ -28,6 +28,8 @@ import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.CaptchaService;
+import com.universeprojects.miniup.server.services.ExperimentalPageUpdateService;
+import com.universeprojects.miniup.server.services.FullPageUpdateService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 
@@ -479,5 +481,54 @@ public abstract class LongOperation extends OperationBase
 	{
 		return db.getEntity("LongOperation", getLongOperationDataEntityKey(characterKey));
 	}
+	
+	
+	public Long getSelectedTileX()
+	{
+		String str = parameters.get("selected2DTileX");
+		if (str==null || str.equals("") || str.equals("null") || str.equals("undefined"))
+			return 500L;
+		
+		return Long.parseLong(str);
+	}
+	
+	public Long getSelectedTileY()
+	{
+		String str = parameters.get("selected2DTileY");
+		if (str==null || str.equals("") || str.equals("null") || str.equals("undefined"))
+			return 500L;
+		
+		return Long.parseLong(str);
+	}
+
+	
+	private MainPageUpdateService mpus = null;
+	public MainPageUpdateService getMPUS()
+	{
+		if (mpus!=null)
+			return mpus;
+			
+		String uiStyle = parameters.get("uiStyle");
+		if (uiStyle==null || uiStyle.equals("") || uiStyle.equals("null") || uiStyle.equals("undefined"))
+			uiStyle = "classic";
+		
+		if (uiStyle.equals("classic"))
+		{
+			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
+		}
+		else if (uiStyle.equals("experimental"))
+		{
+			mpus = new ExperimentalPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
+		}
+		else if (uiStyle.equals("wow"))
+		{
+			mpus = new FullPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
+		}
+		else
+			throw new RuntimeException("Unhandled ui style: "+uiStyle);
+		
+		return mpus;
+	}
+	
 }
 

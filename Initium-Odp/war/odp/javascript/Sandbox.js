@@ -92,21 +92,19 @@ $('#viewportcontainer').on({'mouseup': function (event){
 });
 
 function zoomIn(event, additionalScale, onCenter) {
-    map2dScale += scaleRate*map2dScale*additionalScale;
+    var scale = map2dScale + scaleRate*map2dScale*additionalScale;
     if (maxZoom !== null && map2dScale > maxZoom) {
-        map2dScale = maxZoom;
+        scale = maxZoom;
     }
-    $("#grid").css("transform", "scale("+map2dScale+")");
-//    scaleTiles(event, onCenter);
+    setMapScale(scale);
 }
 
 function zoomOut(event, additionalScale, onCenter) {
-    map2dScale -= scaleRate*map2dScale*additionalScale;
+    var scale = map2dScale - scaleRate*map2dScale*additionalScale;
     if (minZoom !== null && map2dScale < minZoom) {
-        map2dScale = minZoom;
+        scale = minZoom;
     }
-    $("#grid").css("transform", "scale("+map2dScale+")");
-//    scaleTiles(event, onCenter);
+    setMapScale(scale);
 }
 
 function pressedButton() {
@@ -339,7 +337,7 @@ function loadMap() {
     dragDelta = ($("#dragDelta").val() == undefined) ? 10 : $("#dragDelta").val();
     var seed = isNaN(Number($("#seed").val())) ? 123456 : Number($("#seed").val());
     var forestry = isNaN(Number($("#forestry").val())) ? 2 : Number($("#forestry").val());
-    map2dScale = isNaN($("#zoom").val()) ? .3 : $("#zoom").val();
+    setMapScale(isNaN($("#zoom").val()) ? .3 : $("#zoom").val());
 
 //    var gridCellWidth = 64 * map2dScale;
 
@@ -584,15 +582,16 @@ function centerGridOnScreen(event) {
     widthScale = $(viewport).width() / actualGridWidth * 0.8;
     heightScale = $(viewport).height() / actualGridHeight * 0.8;
     if (widthScale < heightScale) {
-        map2dScale = widthScale;
+        setMapScale(widthScale); 
     } else {
-        map2dScale = heightScale;
+        setMapScale(heightScale);
     }
     refreshPositions(null, true);
     scaledGridWidth = (gridCellWidth * map2dScale  + (gridCellWidth * map2dScale * gridTileWidth));
     scaledGridHeight = (gridCellHeight * map2dScale + (gridCellHeight * map2dScale * gridTileHeight));
     grid.style.left = (($(viewport).width() - scaledGridWidth)/2) + "px";
     grid.style.top = (($(viewport).height() - scaledGridHeight)/2) + "px";
+
 }
 function keyUnpress(event) {
     if (event.keyCode == 32) {
@@ -1454,7 +1453,7 @@ function addGridObjectToMap(gridObject) {
     var scaledGridCellHeight = gridCellHeight * map2dScale;	
 
     var objectScale = gridObject.scale ? gridObject.scale : 1;
-    var gridMapObjectWidth = gridObject.width * map2dScale * objectScale;
+    var gridMapObjectWidth = gridObject.width * map2dScale * objectScale; 
     var gridMapObjectHeight = gridObject.height * map2dScale * objectScale;
     var objectRotation = gridObject.rotation ? gridObject.rotation : 0;
     
@@ -1579,6 +1578,12 @@ function mapPlow(event) {
 //    buildingObject.div.style.height = buildingObject.height * map2dScale * buildingObject.scale + "px";
 //}
 
+function setMapScale(scale)
+{
+	map2dScale = scale;
+    $("#grid").css("transform", "scale("+map2dScale+")");
+}
+
 
 function inspectCellContents()
 {
@@ -1609,7 +1614,7 @@ function toggleTallTrees(event)
 
 	updateTallTreeButton();
 	
-	scaleTiles();
+	refreshPositions();
 	
 	event.preventDefault();
 	event.stopPropagation();
@@ -1627,11 +1632,15 @@ function updateTallTreeButton()
 function removeTileObjects(tileX, tileY)
 {
 	$(".gridObjectAt"+tileX+"x"+tileY).remove();
+	// Below is how to remove the ground tiles too. Might need that later.
 //	$("#hex"+tileX+"-"+tileY+"Back").remove();
 //	$("#hex"+tileX+"-"+tileY).remove();
 }
 
 function refreshTile(event)
 {
-	doCommand(event, "RefreshTile");
+	doCommand(event, "RefreshTile", null, function(){
+		inspectCellContents();
+	});
+	
 }
