@@ -1523,7 +1523,7 @@ public class ODPDBAccess
 			boolean swapSlot = CommonChecks.checkCharacterIsPlayer(character) && 
 					("Shield".equals(equipment.getProperty("itemType")) || "Weapon".equals(equipment.getProperty("itemType")));
 			
-			for(int i = 0; i<equipSlotArr.length; i++)
+			for(int i = equipSlotArr.length-1; i>=0; i--)
 			{
 				String slotCheck = equipSlotArr[i].trim();
 				
