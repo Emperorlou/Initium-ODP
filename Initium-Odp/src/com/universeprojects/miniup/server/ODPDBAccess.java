@@ -1519,7 +1519,11 @@ public class ODPDBAccess
 			destinationSlot = equipSlotArr[0];
 		else if (equipSlotArr.length>1)
 		{
-			for(int i = equipSlotArr.length-1; i>=0; i--)
+			// Swap first matching slot if the slot matches and player is equipping.
+			boolean swapSlot = CommonChecks.checkCharacterIsPlayer(character) && 
+					("Shield".equals(equipment.getProperty("itemType")) || "Weapon".equals(equipment.getProperty("itemType")));
+			
+			for(int i = 0; i<equipSlotArr.length; i++)
 			{
 				String slotCheck = equipSlotArr[i].trim();
 				
@@ -1530,6 +1534,19 @@ public class ODPDBAccess
 				{
 					destinationSlot = slotCheck;
 					break;
+				}
+				
+				if(swapSlot && destinationSlot == null)
+				{
+					// If it's a shield/weapon type, find first swap slot.
+					CachedEntity currentSlotItem = db.get((Key)character.getProperty("equipment"+slotCheck));
+					
+					// Do not break out of the loop early, in case a "free" slot exists.
+					if(currentSlotItem != null && 
+						GameUtils.equals(equipment.getProperty("itemType"), currentSlotItem.getProperty("itemType")) &&
+							("Shield".equals(currentSlotItem.getProperty("itemType")) || 
+							"2Hands".equals(currentSlotItem.getProperty("equipSlot"))==false))
+						destinationSlot = slotCheck;
 				}
 			}
 			
