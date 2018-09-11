@@ -1539,7 +1539,7 @@ public class ODPDBAccess
 				if(swapSlot && destinationSlot == null)
 				{
 					// If it's a shield/weapon type, find first swap slot.
-					CachedEntity currentSlotItem = db.get((Key)character.getProperty("equipment"+slotCheck));
+					CachedEntity currentSlotItem = db.getIfExists((Key)character.getProperty("equipment"+slotCheck));
 					
 					// Do not break out of the loop early, in case a "free" slot exists.
 					if(currentSlotItem != null && 
