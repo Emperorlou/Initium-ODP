@@ -545,6 +545,7 @@ public class AspectFireplace extends ItemAspect
 			if (inventionService.getDeletedEntities() != null) for (Key deletedKey : inventionService.getDeletedEntities())
 				if (deletedKey.getKind().equals("Item")) deleteHtml(".deletable-Item" + deletedKey.getId());
 
+			updateSelectedTile();
 		}
 
 	}
@@ -608,6 +609,7 @@ public class AspectFireplace extends ItemAspect
 			if (inventionService.getDeletedEntities() != null) for (Key deletedKey : inventionService.getDeletedEntities())
 				if (deletedKey.getKind().equals("Item")) deleteHtml(".deletable-Item" + deletedKey.getId());
 
+			updateSelectedTile();
 		}
 
 	}

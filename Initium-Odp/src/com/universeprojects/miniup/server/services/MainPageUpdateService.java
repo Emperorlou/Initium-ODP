@@ -1017,8 +1017,8 @@ public class MainPageUpdateService extends Service
 			if (weapons.get(1)!=null)
 				rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
 			
-			newHtml.append(getHtmlForInBannerLinkCentered(45, 40, "<img src='"+leftIcon+"' alt='Left Hand' class='combat-button' />", "doCombatAttackLeftHand(event)", "1", 49));
-			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)", "2", 50));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 40, "<img src='"+leftIcon+"' alt='Left Hand' class='combat-button' />", "doCombatAttackLeftHand(event)", "2", 50));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)", "1", 49));
 			newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)", "3", 51));
 		}
 		
@@ -1342,6 +1342,11 @@ public class MainPageUpdateService extends Service
 		return updateLocationJs(false);
 	}	
 	
+	protected String getAdditionalLocationJs()
+	{
+		return "";
+	}
+	
 	public String updateLocationJs(boolean refreshChat)
 	{
 		StringBuilder js = new StringBuilder();
@@ -1428,7 +1433,7 @@ public class MainPageUpdateService extends Service
 		if (CommonChecks.checkCharacterIsInCombat(character))
 			js.append("if (window.onCombatBegin) onCombatBegin();");
 		else
-			js.append("if (window.onCombatComplete && $('body').attr('bannerstate')=='combat') onCombatComplete();");
+			js.append("if (window.onCombatComplete && $('body').attr('bannerstate').indexOf('combat')>-1) onCombatComplete();");
 		
 		
 		// Here we'll update the button bar
@@ -1436,6 +1441,7 @@ public class MainPageUpdateService extends Service
 		js.append("addType1Button(1, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
 		js.append("addType1Button(2, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
 		
+		js.append(getAdditionalLocationJs());
 		
 		return updateJavascript("ajaxJs", js.toString());
 	}

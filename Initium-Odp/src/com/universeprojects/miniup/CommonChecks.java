@@ -533,5 +533,13 @@ public abstract class CommonChecks
 		return false;
 	}
 
+	public static boolean checkNPCIs2DCombatMode(CachedEntity combatant)
+	{
+		if (combatant!=null && combatant.getProperty("gridMapImage")!=null && combatant.getProperty("gridMapImage").equals("")==false)
+			return true;
+		
+		return false;
+	}
+
 
 }

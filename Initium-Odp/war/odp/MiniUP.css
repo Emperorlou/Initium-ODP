@@ -186,6 +186,11 @@ hr:after {
 	margin-bottom:5px;
 }
 
+.glow-white
+{
+	filter: drop-shadow(0px 0px 12px #FFFFCC) brightness(1.6);	
+}
+
 #banner-loading-icon
 {
     position: absolute;
@@ -786,6 +791,20 @@ a.main-highlight:HOVER
 	font-size:15px;
 	color:#999999;
 	display:inline;
+}
+
+.comparestat-good
+{
+	color:#00BB00;
+	font-size:11px;
+	float:right;
+}
+
+.comparestat-bad
+{
+	color:#FF0000;
+	font-size:11px;	
+	float:right;
 }
 
 .main-item-name
@@ -2021,7 +2040,7 @@ a.range-increment {
 .item-popup-field
 {
 	display: inline-block;
-	margin-left:15px;
+	margin-left:5px;
 	font-size:17px;
 	margin-bottom:0px;
 }
@@ -3067,26 +3086,25 @@ position: absolute;
 
 .mini-page-popup
 {
-    display: inline-flex;
+display: inline-flex;
     flex-direction: column;
-    width:300px;
+    width: 300px;
     z-index: 10000000;
-	
-	position: absolute;
-	right: 0px;
-	top: 0px;
-	height: 100%;
-	margin: 0px;
-	border-top-width: 0px!important;
-	border-bottom-width: 0px!important;
-	border-right-width: 0px!important;
-	max-width: 50%;	
-}
+    
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    max-height: 100%;
+    margin: 0px;
+    border-bottom-width: 0px!important;
+    border-right-width: 0px!important;
+    max-width: 50%;}
 
 #mini-page-popup-contents
 {
 	overflow-y: auto;
 	height: 100%;	
+	padding-bottom:15px;
 }
 
 .mini-page-popup-X

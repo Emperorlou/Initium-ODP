@@ -409,6 +409,9 @@ public class GridMapService {
 		}
 		js.append("refreshPositions();\n");
 		
+		js.append("if (getMiniPagePopupTitle()=='Items Here')");
+		js.append("	inspectCellContents();");
+		
 		return js.toString();
 	}
 	
@@ -592,6 +595,16 @@ public class GridMapService {
 
 		return new GridMap(grid, objectMap);
 	}
+	
+	public GridMap buildNewGridForCombat(CachedEntity character, CachedEntity combatant)
+	{
+		GridMap gm = buildNewGrid();
+		
+		generateCombatCharacters(gm.getGridObjects(), character, combatant);
+		
+		return gm;
+	}
+	
 	
 	private Integer intVal(Object obj)
 	{
@@ -1111,5 +1124,47 @@ public class GridMapService {
 		tile.setProperty("dbItems", dbItems);
 		
 		setGridMapTile(tileX.intValue(), tileY.intValue(), tile);
+	}
+	
+	public void generateCombatCharacters(Map<String, GridObject> gridObjects, CachedEntity character, CachedEntity combatant)
+	{
+		if (CommonChecks.checkNPCIs2DCombatMode(combatant)==false)
+			throw new RuntimeException("Combatant isn't a valid 2D mode NPC.");
+		
+		String generatedKey = "DK-"+combatant.getKey().toString();
+		int tileX = 500;
+		int tileY = 500;
+		Long cellOffsetX = 32L;
+		Long cellOffsetY = 32L;
+		String imageUrl = GameUtils.getResourceUrl(combatant.getProperty("gridMapImage"));
+		Long imageWidth = (Long)combatant.getProperty("gridMapImageWidth");
+		Long imageHeight = (Long)combatant.getProperty("gridMapImageHeight");
+		Double imageScale = (Double)combatant.getProperty("gridMapImageScale");
+		Double rotation = 0d;
+		
+		if (imageScale==null)
+		{
+			imageScale = 1d;
+		}
+		
+		if (imageWidth==null || imageHeight==null)
+		{
+			imageWidth = 190L;
+			imageHeight = 190L;
+		}
+
+		imageWidth = Math.round(imageWidth.doubleValue()*GLOBAL_ITEM_SCALE*imageScale);
+		imageHeight = Math.round(imageHeight.doubleValue()*GLOBAL_ITEM_SCALE*imageScale);
+		
+		gridObjects.put(generatedKey, new GridObject(
+				generatedKey,
+				imageUrl,
+				"",
+				tileX, tileY,
+				rotation,
+				cellOffsetX.intValue(),
+				cellOffsetY.intValue(),
+				(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false,
+				getRowStart(), getColumnStart()));
 	}
 }

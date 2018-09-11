@@ -2696,7 +2696,7 @@ function createWelcomeWindow()
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +")'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +")'>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='closepopupMessage(" + popupsNum +");viewQuest(\"ag1zfnBsYXlpbml0aXVtchULEghRdWVzdERlZhiAgJD-ncrKCQw\");'>"+
@@ -2748,12 +2748,11 @@ function createDonationWindow()
 	windowHtml+="<h2 style='text-align:center;'>The cost of a full account will soon increase!</h2>" +
 			"<p>Currently, while Initium is still in development, you can get a full premium account for only <b>$5.00</b> however the cost for a premium account will " +
 			"increase once the game is officially launched. Take advantage of this pre-launch price by donating at least 5 dollars.</p>" +
-			"<p>" +
+			"<p>" + 
 			"Premium account features include:" +
 			"<ul>" +
-			"<li>The ability to be rescued from death</li>" +
-			"<li>Multiple characters on the same account</li>" +
-			"<li>Your characters will not forget their houses when they die</li>" +
+			"<li>Other players can rescue you if you go unconscious</li>" +
+			"<li>Multiple characters on the same account (8 character slots to start)</li>" +
 			"</ul>" +
 			"</p>" +
 			"<p>Getting a premium account now will ensure your account will be grandfathered in when the price structure changes!</p>" +
@@ -2784,7 +2783,7 @@ function createDonationWindow()
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='$(\"#donatequick\").submit(); closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
@@ -2836,9 +2835,8 @@ function createUpgradeToPremiumWindow()
 				"<p>" +
 				"Premium account features include:" +
 				"<ul>" +
-				"<li>The ability to be rescued from death</li>" +
-				"<li>Multiple characters on the same account</li>" +
-				"<li>Your characters will not forget their houses when they die</li>" +
+				"<li>Other players can rescue you if you go unconscious</li>" +
+				"<li>Multiple characters on the same account (8 character slots to start)</li>" +
 				"</ul>" +
 				"</p>" +
 				"<p>Getting a premium account now will ensure your account will be grandfathered in when the price structure changes!</p>" +
@@ -2871,7 +2869,7 @@ function createUpgradeToPremiumWindow()
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +"); '>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); '>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='$(\"#donatequick\").submit(); closepopupMessage(" + popupsNum +"); '>"+

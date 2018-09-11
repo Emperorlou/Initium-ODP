@@ -14,7 +14,8 @@
 			https://imgur.com
 			https://initium-resources.appspot.com
 			https://www.google-analytics.com
-			https://ajax.googleapis.com; 
+			https://ajax.googleapis.com
+			https://www.paypalobjects.com; 
 		script-src 'self' 'unsafe-inline' 'unsafe-eval'
 			https://code.jquery.com 
 			https://cdnjs.cloudflare.com
@@ -368,12 +369,22 @@ modifyMaxScreenWidth();
 function updateBannerSize()
 {
 	var win = $(window);
-	if (win.width()<=400)
-		$("#banner").css("height", (win.height()-309+40)+"px");
-	else if (win.width()<=480)
-		$("#banner").css("height", (win.height()-309)+"px");
+	
+	if (win.height()<600 && win.width()>win.height() && $("#chat_input").is(":focus")==false)
+	{
+		$("#banner").css("height", (win.height()-85)+"px");
+		$(".chat_box").hide();
+	}
 	else
-		$("#banner").css("height", (win.height()-333)+"px");
+	{
+		$(".chat_box").show();
+		if (win.width()<=400)
+			$("#banner").css("height", (win.height()-309+40)+"px");
+		else if (win.width()<=480)
+			$("#banner").css("height", (win.height()-309)+"px");
+		else
+			$("#banner").css("height", (win.height()-333)+"px");
+	}
 }
 $(window).resize(updateBannerSize);
 
@@ -426,9 +437,15 @@ function onCombatBegin()
 
 function onCombatComplete()
 {
-	if ($("body").attr("bannerstate")=="combat")
+	if ($("body").attr("bannerstate").indexOf("combat")>-1)
 		viewBannerDefault();
 }
+
+function onCombat2DBegin()
+{
+	$("body").attr("bannerstate", "combat-2d");
+}
+
 
 function toggleMovementState()
 {
@@ -513,13 +530,13 @@ Version: ${version}
 						<div id='banner-base' class='banner-daynight'></div>
 						<div id='banner-fx'></div>
 	<!-- 					<div id='main-viewport-container'></div> -->
-						<div id='immovablesPanel'>${immovablesPanel}</div>				
-						<div id='partyPanel'>
+						<div id='immovablesPanel' class='auto-animate'>${immovablesPanel}</div>				
+						<div id='partyPanel' class='auto-animate'>
 						${partyPanel}
 						</div>
 						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
 						
-						<div class='minimap-container'>
+						<div class='minimap-container auto-animate'>
 							<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->
 							<div class='map-contents minimap-contents'>
 								${globalNavigationMap}
@@ -530,20 +547,20 @@ Version: ${version}
 						</div>
 						
 						
-						<div class='map-contents global-navigation-map'>${globalNavigationMap}</div>
-						<div id='main-viewport-container' class='location-2d'>${location2D}</div>	
+						<div class='map-contents global-navigation-map auto-animate'>${globalNavigationMap}</div>
+						<div id='main-viewport-container' class='location-2d auto-animate'>${location2D}</div>	
 											
-						<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
+						<div id='inBannerCharacterWidget' class='characterWidgetContainer auto-animate'>
 							${inBannerCharacterWidget}
 						</div>
-						<div id='inBannerCombatantWidget' class='combatantWidgetContainer'>
+						<div id='inBannerCombatantWidget' class='combatantWidgetContainer auto-animate'>
 							${inBannerCombatantWidget }
 						</div>
 						
-						<div class="path-overlay-link major-banner-links" style="left:50%; top:15%;">
-							<a id="thisLocation-button" class="button-overlay-major" onclick="makeIntoPopup(&quot;.this-location-box&quot;)" style="right:0px;top:0px;"><img alt="Location actions" src="https://initium-resources.appspot.com/images/ui/magnifying-glass2.png"></a>
+						<div class="path-overlay-link major-banner-links auto-animate">
+							<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>
 							<a id="movement-button" class="button-overlay-major" onclick="toggleMovementState()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
-							<a id="2dview-button" class="button-overlay-major" onclick="view2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
+							<a id="twodview-button" class="button-overlay-major" onclick="view2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
 						</div>							
 
 						<div style='position:absolute;bottom: 35px;left:50.0%;'><div class='path-overlay-link' id='monsterCountPanel'>${monsterCountPanel}</div></div>

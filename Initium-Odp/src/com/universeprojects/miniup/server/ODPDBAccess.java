@@ -1519,7 +1519,7 @@ public class ODPDBAccess
 			destinationSlot = equipSlotArr[0];
 		else if (equipSlotArr.length>1)
 		{
-			for(int i = 0; i<equipSlotArr.length; i++)
+			for(int i = equipSlotArr.length-1; i>=0; i--)
 			{
 				String slotCheck = equipSlotArr[i].trim();
 				

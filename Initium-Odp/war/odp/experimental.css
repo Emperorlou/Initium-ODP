@@ -1,10 +1,28 @@
+.auto-animate
+{
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
 #buttonbar-main
 {
 	padding-top:5px;
 }	
 .major-banner-links
 {
-	margin-left:-85px;
+	top:0px;
+	left:50%;
+	margin-left: -125px;
+    background-image: url(https://initium-resources.appspot.com/images/ui3/major-tabs-backing1.png);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    width: 250px;
+    height: 67px;
+    text-align: center;
+    padding-top: 3px;
+    zoom: 1;
 }
 
 .minimap-container
@@ -35,41 +53,12 @@
 {
     right: -74px;
     top: -63px;	
-}
-
-body[bannerstate='location-2d'] .location-2d
-{
-	display:block;
-}
-
-body[bannerstate='location-2d'] #banner-text-overlay, body[bannerstate='location-2d'] #immovablesPanel, body[bannerstate='location-2d'] #immovablesPanel
-{
-	display:none;
-}
-
-body[bannerstate='location-2d'] #partyPanel, body[bannerstate='location-2d'] #inBannerCharacterWidget, body[bannerstate='location-2d'] .major-banner-links
-{
-	z-index:10000;
-}
-
-
-body[bannerstate='globe-navigation'] .global-navigation-map
-{
-	display:block;
-}
-
-body[bannerstate='globe-navigation'] .minimap-container
-{
-	display:none;
-}
-
-body[bannerstate='combat'] .major-banner-links, body[bannerstate='combat'] .minimap-container
-{
-	display:none;
-}
+} 
 
 #monsterCountPanel
 {
+	visibility:hidden;
+	opacity:0;
 	position:relative;
 	margin-left:-50%;
 }
@@ -79,7 +68,156 @@ body[bannerstate='combat'] .major-banner-links, body[bannerstate='combat'] .mini
 	color:#FFFFFF!important;
 }
 
+.button-overlay-major img
+{
+	max-height:50px;
+}
 
+#immovablesPanel
+{
+	position:absolute;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.location-2d, .global-navigation-map, .location-2d
+{
+	display:block;
+	opacity:0;
+	visibility:hidden;
+}
+
+#banner-text-overlay, #immovablesPanel, .minimap-container
+{
+	display:block;
+	opacity:1;
+	visibility:visible;
+	zoom:1;
+} 
+
+body[bannerstate=''] #monsterCountPanel
+{
+	opacity:1;
+	visibility:visible;
+}
+
+
+body[bannerstate='location-2d'] .location-2d
+{
+	opacity:1;
+	visibility:visible;
+}
+
+body[bannerstate='location-2d'] #banner-text-overlay, body[bannerstate='location-2d'] #immovablesPanel
+{
+	opacity:0;
+	visibility:hidden;
+}
+
+body[bannerstate='location-2d'] #partyPanel, body[bannerstate='location-2d'] #inBannerCharacterWidget, body[bannerstate='location-2d'] .major-banner-links
+{
+	z-index:10000;
+}
+
+body[bannerstate='location-2d'] #twodview-button
+{
+	filter: drop-shadow(0px 0px 12px #FFFFCC) brightness(1.6); 
+}
+
+body[bannerstate='combat-2d'] .location-2d
+{
+	opacity:1;
+	visibility:visible;
+}
+
+body[bannerstate='combat-2d'] #immovablesPanel, body[bannerstate='combat-2d'] #gridmap-inspect-button
+{
+	opacity:0;
+	visibility:hidden;
+}
+
+body[bannerstate='combat-2d'] .minimap-container
+{
+	opacity:0;
+	visibility:hidden;
+	zoom:0;	
+}
+
+body[bannerstate='combat-2d'] #banner-text-overlay div, body[bannerstate='combat-2d'] #banner-fx 
+{
+	z-index:10000;
+}
+
+body[bannerstate='combat-2d'] #partyPanel, body[bannerstate='combat-2d'] #inBannerCharacterWidget, body[bannerstate='combat-2d'] .major-banner-links
+{
+	z-index:10000;
+}
+
+body[bannerstate='combat-2d'] #twodview-button
+{
+	filter: drop-shadow(0px 0px 12px #FFFFCC) brightness(1.6); 
+}
+
+body[bannerstate='combat-2d'] .major-banner-links
+{
+	top:-55px;
+}
+
+
+
+
+
+
+
+body[bannerstate='globe-navigation'] .global-navigation-map
+{
+	display:block;
+	opacity:1;
+	visibility:visible;
+}
+
+body[bannerstate='globe-navigation'] .minimap-container
+{
+	opacity:0;
+	visibility:hidden;
+	zoom:0;
+}
+
+body[bannerstate='globe-navigation'] #movement-button
+{
+	filter: drop-shadow(0px 0px 12px #FFFFCC) brightness(1.6);
+}
+
+
+
+body[bannerstate='combat'] #immovablesPanel, body[bannerstate='combat'] .minimap-container
+{
+	opacity:0;
+	visibility:hidden;
+	zoom:0;
+}
+
+body[bannerstate='combat'] .major-banner-links
+{
+	top:-55px;
+}
 
 
 
@@ -172,16 +310,33 @@ body[bannerstate='combat'] .major-banner-links, body[bannerstate='combat'] .mini
 
 }
 
+@media (max-width:1000px)
+{
+	.major-banner-links
+	{
+		zoom:0.8;
+	}
+	
+}
+
 @media (max-width:720px)
 {
 	.major-banner-links
 	{
-		margin-left:-90px;
+		zoom:0.6;
 	}
 	
 	.global-navigation-map
 	{	
 		zoom:0.7;
+	}
+}
+
+@media (max-width:550px) 
+{
+	.major-banner-links
+	{
+		zoom:0.5;
 	}
 }
 

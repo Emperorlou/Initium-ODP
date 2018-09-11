@@ -91,6 +91,10 @@ $('#viewportcontainer').on({'mouseup': function (event){
 }
 });
 
+$(window).resize(function(){ 
+	centerGridOnScreen();
+});
+
 function zoomIn(event, additionalScale, onCenter) {
     var scale = map2dScale + scaleRate*map2dScale*additionalScale;
     if (maxZoom !== null && map2dScale > maxZoom) {
@@ -121,6 +125,31 @@ function pressedButton() {
 function scaleTiles(event, onCenter)
 {
 	//refreshPositions(event, onCenter);
+}
+
+function updateCursorScale()
+{
+    if (cursorObject != "") {
+        var scaledGridCellWidth = gridCellWidth * 1;
+        var scaledGridCellHeight = gridCellHeight * 1;
+        var cursorTop = (cursorObject.yGridCoordLocal * scaledGridCellHeight);
+        var cursorLeft = (cursorObject.xGridCoordLocal * scaledGridCellWidth);
+        var scaledCursorHeight = cursorHeight * 1 * .4;
+        var scaledCursorWidth = cursorWidth * 1 * .4;
+        cursorObject.div.style.width = cursorWidth * 1 * .4 + "px";
+        cursorObject.div.style.height = cursorHeight * 1 * .4 + "px";
+        cursorObject.div.style.top = (cursorTop-15) + "px";
+        cursorObject.div.style.left = (cursorLeft-15) + "px";
+        var cursorSubObjects = cursorObject.div.children;
+        for (i=0; i<cursorSubObjects.length; i++) {
+            if (cursorSubObjects[i].style.top != "") {
+                cursorSubObjects[i].style.top = (scaledGridCellHeight + scaledCursorHeight/2) + "px";
+            }
+            if (cursorSubObjects[i].style.left != "") {
+                cursorSubObjects[i].style.left = (scaledGridCellWidth + scaledCursorWidth/2) + "px";
+            }
+        }
+    }
 }
 
 function refreshPositions(event, onCenter) {
@@ -256,25 +285,8 @@ function refreshPositions(event, onCenter) {
         }
     }
 
-    if (cursorObject != "") {
-        var cursorTop = (cursorObject.yGridCoordLocal * scaledGridCellHeight);
-        var cursorLeft = (cursorObject.xGridCoordLocal * scaledGridCellWidth);
-        var scaledCursorHeight = cursorHeight * scaleModifier * .4;
-        var scaledCursorWidth = cursorWidth * scaleModifier * .4;
-        cursorObject.div.style.width = cursorWidth * scaleModifier * .4 + "px";
-        cursorObject.div.style.height = cursorHeight * scaleModifier * .4 + "px";
-        cursorObject.div.style.top = (cursorTop-15) + "px";
-        cursorObject.div.style.left = (cursorLeft-15) + "px";
-        cursorSubObjects = cursorObject.div.children;
-        for (i=0; i<cursorSubObjects.length; i++) {
-            if (cursorSubObjects[i].style.top != "") {
-                cursorSubObjects[i].style.top = (scaledGridCellHeight + scaledCursorHeight/2) + "px";
-            }
-            if (cursorSubObjects[i].style.left != "") {
-                cursorSubObjects[i].style.left = (scaledGridCellWidth + scaledCursorWidth/2) + "px";
-            }
-        }
-    }
+    updateCursorScale();
+    
     var tallTreesDisabled = isTallTreesDisabled();
     var scaledImgSizeX = imgSizeX * scaleModifier;
     var scaledImgSizeY = imgSizeY * scaleModifier;
@@ -567,8 +579,8 @@ function centerCellOnScreen(xCoord, yCoord) {
     // Move grid to center the currently selected cell
     scaledGridCellWidth = gridCellWidth * map2dScale;
     scaledGridCellHeight = gridCellHeight * map2dScale;
-    xGrid = xCoord * scaledGridCellWidth + scaledGridCellWidth;
-    yGrid = yCoord * scaledGridCellHeight + scaledGridCellHeight;
+    xGrid = (xCoord-1) * scaledGridCellWidth + scaledGridCellWidth;
+    yGrid = (yCoord-1) * scaledGridCellHeight + scaledGridCellHeight;
     xView = grid.offsetLeft + xGrid;
     yView = grid.offsetTop + yGrid;
     xGridOrigin = xView - $(viewportContainer).width()/2;
@@ -577,20 +589,27 @@ function centerCellOnScreen(xCoord, yCoord) {
     grid.style.top = (grid.offsetTop - yGridOrigin) + "px";
 }
 function centerGridOnScreen(event) {
+	// For smaller maps, we want to cap the zoom level
+	var zoomCap = maxZoom;
+	if (gridTileWidth<5 || gridTileHeight<5)
+		zoomCap = 2;
+	
     actualGridWidth = (gridCellWidth + (gridCellWidth * gridTileWidth));
     actualGridHeight = (gridCellHeight + (gridCellHeight * gridTileHeight));
-    widthScale = $(viewport).width() / actualGridWidth * 0.8;
-    heightScale = $(viewport).height() / actualGridHeight * 0.8;
+    widthScale = $(viewport).width() / actualGridWidth;
+    heightScale = $(viewport).height() / actualGridHeight;
     if (widthScale < heightScale) {
+    	if (widthScale>zoomCap) widthScale = zoomCap;
         setMapScale(widthScale); 
     } else {
+    	if (heightScale>zoomCap) heightScale = zoomCap;
         setMapScale(heightScale);
     }
     refreshPositions(null, true);
-    scaledGridWidth = (gridCellWidth * map2dScale  + (gridCellWidth * map2dScale * gridTileWidth));
-    scaledGridHeight = (gridCellHeight * map2dScale + (gridCellHeight * map2dScale * gridTileHeight));
-    grid.style.left = (($(viewport).width() - scaledGridWidth)/2) + "px";
-    grid.style.top = (($(viewport).height() - scaledGridHeight)/2) + "px";
+    scaledGridWidth = (gridCellWidth * map2dScale  + (gridCellWidth * gridTileWidth));
+    scaledGridHeight = (gridCellHeight * map2dScale + (gridCellHeight * gridTileHeight));
+    grid.style.left = ((($(viewport).width() - scaledGridWidth)/2)) + "px";
+    grid.style.top = ((($(viewport).height() - scaledGridHeight)/2)) + "px";
 
 }
 function keyUnpress(event) {
@@ -1005,6 +1024,7 @@ function updateHighlightsAtCoord(previouslyUpdatedBackground, previouslyUpdatedO
 }
 
 function updateHighlights(previouslyUpdatedBackground, previouslyUpdatedObjects, gridColumn, gridRow, selection, gridObject) {
+	updateCursorScale(); 
 	if (selection)
 	{
 		selectedTileX = gridColumn+gridTileOffsetX;
@@ -1486,8 +1506,13 @@ function addGridObjectToMap(gridObject) {
         }
     }
 
+    var deletemeClass = "";
+    if (key.indexOf("DK-Item")>-1)
+    {
+    	deletemeClass = "deletable-Item"+key.split("DK-Item(")[1].slice(0, -1);
+    }
     
-    $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key + "\" " + "class=\"gridObject gridObjectAt"+gridObject.xGridCoord + "x" + gridObject.yGridCoord+"\"";
+    $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key + "\" " + "class=\"gridObject gridObjectAt"+gridObject.xGridCoord + "x" + gridObject.yGridCoord+" "+deletemeClass+"\"";
     $hexBody += " data-key=\"" + key + "\"";
     $hexBody += " style=\"";
     $hexBody += " z-index:" + (parseInt(objectZOffset) + parseInt(topZ)) + ";";
@@ -1581,6 +1606,12 @@ function mapPlow(event) {
 function setMapScale(scale)
 {
 	map2dScale = scale;
+	
+	if (map2dScale>maxZoom)
+		map2dScale = maxZoom;
+	if (map2dScale<minZoom)
+		map2dScale = minZoom;
+	
     $("#grid").css("transform", "scale("+map2dScale+")");
 }
 

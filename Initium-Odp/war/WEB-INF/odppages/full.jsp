@@ -11,7 +11,9 @@
 			https://i.imgur.com
 			https://imgur.com
 			https://initium-resources.appspot.com
-			https://www.google-analytics.com; 
+			https://www.google-analytics.com
+			https://ajax.googleapis.com
+			https://www.paypalobjects.com; 
 		script-src 'self' 'unsafe-inline' 'unsafe-eval'
 			https://code.jquery.com 
 			https://cdnjs.cloudflare.com
@@ -23,7 +25,7 @@
 		style-src 'self' 'unsafe-inline' 
 			https://cdnjs.cloudflare.com
 			https://ajax.googleapis.com;
-		">	
+		">
 	<script async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/api2/r20171206132803/recaptcha__en.js"></script><script type="text/javascript">
 	window.paceOptions = {
 			ajax: false,

@@ -39,7 +39,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-83";
+	final public static String version = "0.5.9-93";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -1479,8 +1479,8 @@ public class GameUtils
     	
     	return "<a onclick='doCombatAttack" 
     		+ (leftHand ? "Left" : "Right") + "Hand(event)' class='v3-main-button' shortcut='" 
-    		+ (leftHand ? "49" : "50") + "'><span class='shortcut-key'>(" 
-    		+ (leftHand ? "1" : "2") + ")</span>" + attackText + "</a>";
+    		+ (leftHand ? "50" : "49") + "'><span class='shortcut-key'>(" 
+    		+ (leftHand ? "2" : "1") + ")</span>" + attackText + "</a>";
     }
 
     public static String renderCollectable(CachedEntity item)

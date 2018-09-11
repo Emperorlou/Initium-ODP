@@ -17,6 +17,7 @@ import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.services.ExperimentalPageUpdateService;
 import com.universeprojects.miniup.server.services.FullPageUpdateService;
+import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 public abstract class Command extends OperationBase
@@ -254,5 +255,16 @@ public abstract class Command extends OperationBase
 			return null;
 		
 		return Double.parseDouble(obj);
+	}
+	
+	protected void updateSelectedTile()
+	{
+		GridMapService gms = db.getGridMapService();
+		
+		gms.regenerateDBItemTileCache(getSelectedTileX().intValue(), getSelectedTileY().intValue());
+		
+		gms.putLocationData(ds);
+		
+		addJavascriptToResponse(gms.generateGridObjectJson(getSelectedTileX().intValue(), getSelectedTileY().intValue()));
 	}
 }
