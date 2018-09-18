@@ -7016,9 +7016,9 @@ public class ODPDBAccess
 		
 	}
 	
-	public void combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
+	public boolean combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
 	{
-		if (stackedItem.getProperty("quantity")==null) return;
+		if (stackedItem.getProperty("quantity")==null) return false;
 		
 		List<CachedEntity> inventory = query.getFilteredList("Item", "containerKey", characterKey, "name", stackedItem.getProperty("name"));
 		for(CachedEntity item:inventory)
@@ -7032,8 +7032,12 @@ public class ODPDBAccess
 				if (item.getKey().isComplete())
 					ds.delete(item);
 				ds.put(stackedItem);
+				
+				return true;
 			}
-		}		
+		}
+		
+		return false;
 	}
 	
 	public void doDeleteCharacter(Key key)

@@ -39,7 +39,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-93";
+	final public static String version = "0.5.9-107";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -2788,5 +2788,14 @@ public class GameUtils
 			seed+=s.longValue();
 		}
 		return new Random(seed);
+	}
+
+	public static String getRandomChoice(Random rnd, String...options)
+	{
+		if (options==null || options.length==0) return null;
+		
+		int index = rnd.nextInt(options.length);
+		
+		return options[index];
 	}
 }

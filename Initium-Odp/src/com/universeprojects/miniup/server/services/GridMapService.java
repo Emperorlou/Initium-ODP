@@ -71,8 +71,8 @@ public class GridMapService {
 		this.location = location;
 		locationWidth = intVal(location.getProperty("gridMapWidth"));
 		locationHeight = intVal(location.getProperty("gridMapHeight"));
-		if (locationWidth==null) locationWidth = 1;
-		if (locationHeight==null) locationHeight = 1;
+		if (locationWidth==null) locationWidth = 3;
+		if (locationHeight==null) locationHeight = 3;
 	}
 
 	public boolean isForLocation(Key locationKey)
@@ -586,7 +586,7 @@ public class GridMapService {
 					objectMap.putAll(objects);
 				
 				// Build background data for coordinate
-				grid[tileX-getRowStart()][tileY-getColumnStart()] = new GridCell("images/2d/floor/grass/tile-grass" + rnd.nextInt(7) + ".png",
+				grid[tileX-getRowStart()][tileY-getColumnStart()] = new GridCell(getFloorTileImage(rnd),
 						tileX-getRowStart(), tileY-getColumnStart(),
 						rnd.nextInt(10));
 			}
@@ -594,6 +594,51 @@ public class GridMapService {
 
 
 		return new GridMap(grid, objectMap);
+	}
+	
+	public String getFloorTileImage(Random rnd)
+	{
+		String biomeType = (String)location.getProperty("biomeType");
+		if (biomeType==null || biomeType.equals("")) biomeType = "Temperate";
+		
+		if (biomeType.equals("Temperate"))
+		{
+			return "images/2d/floor/grass/tile-grass" + rnd.nextInt(7) + ".png";
+		}
+		else if (biomeType.equals("Cave"))
+		{
+			return GameUtils.getRandomChoice(rnd, "images/2d/floor/dirt/dirt1.jpg",
+					"images/2d/floor/dirt/stony-dirt1.jpg",
+					"images/2d/floor/dirt/stony-dirt2.jpg",
+					"images/2d/floor/dirt/dirt1.jpg",
+					"images/2d/floor/dirt/dirt1.jpg"
+					);
+		}
+		else if (biomeType.equals("Dungeon"))
+		{
+			return GameUtils.getRandomChoice(rnd, "images/2d/floor/large-stone-tiles/large-stone-tiles-dark1.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-dark2.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-dark3.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light1.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light2.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light3.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light4.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light5.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light6.jpg"
+					);
+		}
+		else if (biomeType.equals("Desert"))
+		{
+			return "images/2d/floor/desert/tile-desert" + rnd.nextInt(7) + ".png";
+		}
+		else if (biomeType.equals("Snow"))
+		{
+			return "images/2d/floor/snow/tile-snow" + rnd.nextInt(7) + ".png";
+		}
+
+		
+		
+		return "images/2d/floor/dirt/dirt1.jpg";
 	}
 	
 	public GridMap buildNewGridForCombat(CachedEntity character, CachedEntity combatant)
@@ -616,14 +661,14 @@ public class GridMapService {
 	public int getGridWidth()
 	{
 		Long width = (Long)location.getProperty("gridMapWidth");
-		if (width==null || width<1) width = 1L;
+		if (width==null || width<1) width = 3L;
 		return width.intValue();
 	}
 	
 	public int getGridHeight()
 	{
 		Long height = (Long)location.getProperty("gridMapHeight");
-		if (height==null || height<1) height = 1L;
+		if (height==null || height<1) height = 3L;
 		return height.intValue();
 	}
 

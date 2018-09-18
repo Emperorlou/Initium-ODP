@@ -145,15 +145,16 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("<div id='viewportcontainer' class='vpcontainer'>");
 		newHtml.append("<div id='viewport' class='vp'>");
 
-		newHtml.append("<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
-		newHtml.append("<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
+		newHtml.append("	<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
+		newHtml.append("	<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
 		
-		newHtml.append("<div id='grid' class='grid'>");
-		newHtml.append("<div id='ui-layer' class='uiLayer'></div>");
-		newHtml.append("<div id='cell-layer' class='cellLayer'></div>");
-		newHtml.append("<div id='ground-layer' class='groundLayer'></div>");
-		newHtml.append("<div id='object-layer' class='objectLayer'></div>");
-		newHtml.append("</div>");
+		newHtml.append("	<div id='grid' class='grid'>");
+		newHtml.append("		<div id='ui-layer' class='uiLayer'></div>");
+		newHtml.append("		<div id='cell-layer' class='cellLayer'></div>");
+		newHtml.append("		<div id='ground-layer' class='groundLayer'></div>");
+		newHtml.append("		<div id='object-layer' class='objectLayer'></div>");
+		newHtml.append("	</div>");
+		newHtml.append("	<div class='banner-weather'></div>");
 		newHtml.append("</div>");
 		newHtml.append("</div>");
 //		newHtml.append("<button type='button' onclick='openMenu()'>Menu</button>");
@@ -198,7 +199,6 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)", "2", 50));
 			newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)", "3", 51));
 		}
-		
 		
 		
 		return updateHtmlContents(".location-2d", newHtml.toString());

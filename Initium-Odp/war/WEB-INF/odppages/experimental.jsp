@@ -536,6 +536,9 @@ Version: ${version}
 						</div>
 						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
 						
+						<div id='main-viewport-container' class='location-2d auto-animate'>${location2D}</div>
+							
+						
 						<div class='minimap-container auto-animate'>
 							<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->
 							<div class='map-contents minimap-contents'>
@@ -543,12 +546,12 @@ Version: ${version}
 							</div>
 							<div class='minimap-overlay'></div>
 							<div class='minimap-button minimap-button-map' onclick='toggleMovementState()'></div>
+							<div class='minimap-button minimap-button-localplaces standard-button-highlight' onclick='viewLocalNavigation(event)'></div>
 							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
 						</div>
 						
 						
 						<div class='map-contents global-navigation-map auto-animate'>${globalNavigationMap}</div>
-						<div id='main-viewport-container' class='location-2d auto-animate'>${location2D}</div>	
 											
 						<div id='inBannerCharacterWidget' class='characterWidgetContainer auto-animate'>
 							${inBannerCharacterWidget}

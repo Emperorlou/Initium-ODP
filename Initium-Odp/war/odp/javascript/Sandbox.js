@@ -293,10 +293,24 @@ function refreshPositions(event, onCenter) {
     // Update all tiles
     for (var x = 0; x < gridTileWidth; x++) {
         for (var y = 0; y < gridTileHeight; y++) {
-
             // Update all grid cells, and background images
             var top = y * scaledGridCellHeight;
             var left = x * scaledGridCellWidth;
+
+            var adjustmentWidth = 0;
+            var adjustmentHeight = 0;
+            var adjustmentLeft = 0;
+            var adjustmentTop = 0;
+            
+            if (gridCells[x][y].filename.endsWith(".jpg"))
+            {
+
+                adjustmentWidth = -(imgSizeX/2)*scaleModifier;
+                adjustmentHeight = -(imgSizeY/2)*scaleModifier;
+                adjustmentTop = (scaledGridCellHeight/2);
+                adjustmentLeft = (scaledGridCellWidth/2);
+            }
+
 
             gridCells[x][y].cellDiv.style.width = scaledGridCellWidth + "px";
             gridCells[x][y].cellDiv.style.height = scaledGridCellHeight + "px";
@@ -304,10 +318,10 @@ function refreshPositions(event, onCenter) {
             gridCells[x][y].cellDiv.style.top = top + "px";
             gridCells[x][y].cellDiv.style.left = left + "px";
 
-            gridCells[x][y].backgroundDiv.style.width = scaledImgSizeX + "px";
-            gridCells[x][y].backgroundDiv.style.height = scaledImgSizeY + "px";
-            gridCells[x][y].backgroundDiv.style.top = top + "px";
-            gridCells[x][y].backgroundDiv.style.left = left + "px";
+            gridCells[x][y].backgroundDiv.style.width = (scaledImgSizeX+adjustmentWidth) + "px";
+            gridCells[x][y].backgroundDiv.style.height = (scaledImgSizeY+adjustmentHeight) + "px";
+            gridCells[x][y].backgroundDiv.style.top = (top+adjustmentTop) + "px";
+            gridCells[x][y].backgroundDiv.style.left = (left+adjustmentLeft) + "px";
 
             // Update all objects
             if (gridCells[x][y].objectKeys.length > 0) {
@@ -592,7 +606,7 @@ function centerGridOnScreen(event) {
 	// For smaller maps, we want to cap the zoom level
 	var zoomCap = maxZoom;
 	if (gridTileWidth<5 || gridTileHeight<5)
-		zoomCap = 2;
+		zoomCap = 2.6;
 	
     actualGridWidth = (gridCellWidth + (gridCellWidth * gridTileWidth));
     actualGridHeight = (gridCellHeight + (gridCellHeight * gridTileHeight));

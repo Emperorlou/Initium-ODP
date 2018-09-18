@@ -3478,7 +3478,7 @@ function viewThisLocationWindow()
 
 function viewLocalNavigation(event, showHidden)
 {
-	makeIntoPopupFromUrl("/odp/sublocations?showHidden="+showHidden, "Local Navigation", true);
+	miniPagePopup("/odp/sublocations?showHidden="+showHidden, "Local Places");
 }
 
 function showLootPopup()

@@ -774,6 +774,8 @@ public class MainPageUpdateService extends Service
 					html.append("<p>You might be too deep to easily navigate away. Try coming out of wherever you are.</p>");
 				html.append("<input type='hidden' id='blank-global-navigation' value='true'/>");
 			}
+			
+			html.append("<div class='global-navigation-button local-places standard-button-highlight' onclick='viewLocalNavigation(event)'></div>");
 		}
 		return updateHtmlContents(".map-contents", html.toString());
 	}
@@ -1440,6 +1442,9 @@ public class MainPageUpdateService extends Service
 		//addType1Button(position, imageUrl, shortcut, javascript)
 		js.append("addType1Button(1, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
 		js.append("addType1Button(2, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
+		
+		// Here we'll update the "Local Places" mini page if it is open
+		js.append("if (getMiniPagePopupTitle()=='Local Places') viewLocalNavigation();");
 		
 		js.append(getAdditionalLocationJs());
 		

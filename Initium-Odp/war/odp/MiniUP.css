@@ -475,19 +475,18 @@ hr:after {
 	box-shadow: inset 0px 0px 43px 2px #000000;
 	
 }
-/*.banner-daynight
+.banner-weather
 {
-	position:absolute; 
-	width:728px;
-	height:211px;
-	
-	background-color: rgba(45,55,125,0.8);
-	-webkit-background-size: cover;
-	background-size: cover;
-
-	background-blend-mode: overlay, normal;
-	-webkit-background-blend-mode: overlay, normal;	
-}*/
+	position: absolute;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    
+	background-blend-mode:screen;
+	background-size:cover!important;
+	mix-blend-mode:multiply;
+	pointer-events:none;
+}
 .path-overlay-link
 {
 	position:absolute; 
@@ -2041,7 +2040,7 @@ a.range-increment {
 {
 	display: inline-block;
 	margin-left:5px;
-	font-size:17px;
+	font-size:15px;
 	margin-bottom:0px;
 }
 
@@ -3048,6 +3047,15 @@ position: absolute;
 .minimap-button-cancel
 {
 	background-image:url(https://initium-resources.appspot.com/images/ui4/button-cancel1.png);
+	width:122px;
+	height:48px;
+	bottom: -5px;
+	left: 29%;	
+}
+
+.minimap-button-localplaces
+{
+	background-image:url(https://initium-resources.appspot.com/images/ui3/local-places1.png);
 	width:122px;
 	height:48px;
 	bottom: -5px;
@@ -4874,6 +4882,17 @@ body
 	color: #3e3323;
 }
 
+.global-navigation-button.local-places
+{
+	position: absolute;
+    background-image: url(https://initium-resources.appspot.com/images/ui3/local-places1.png);
+    width: 122px;
+    height: 48px;
+    bottom: -56px;
+    right: -28px;
+}
+
+
 .location-2d
 {
 	display:none;
@@ -5312,6 +5331,7 @@ body
 }
 
 .vpcontainer {
+	background-image: url(https://initium-resources.appspot.com/images/2d/viewport-background1.jpg);	
 	height: 100%;
 	width: 100%;
 	top:0px;left:0px;
@@ -5380,3 +5400,30 @@ div#buildingObject {
     background-repeat: no-repeat;
     background-size: contain;
 }
+
+#light-grid
+{
+	position:relative;
+	pointer-events:none;
+}
+
+.light-effect-container
+{
+	
+}
+
+.fire-light-effect
+{
+    position: absolute;
+    background: url(https://i.imgur.com/X66iOjJ.png);
+    background-size: 100% 100%;
+    top: 485px;
+    left: 883px;
+    width: 300px;
+    height: 150px;
+    mix-blend-mode: color-dodge;
+    z-index: 11600000;
+    pointer-events: none;
+}
+
+

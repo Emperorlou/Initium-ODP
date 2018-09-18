@@ -103,6 +103,7 @@ function updateDayNightCycle(forceRefresh)
 	night = amount;
 	
 	var banner = $(".banner-shadowbox, .banner1");
+	var banner2 = $(".banner-weather");
 	
 	if (Modernizr.backgroundblendmode==false)
 	{
@@ -189,6 +190,11 @@ function updateDayNightCycle(forceRefresh)
 			banner.css("background-blend-mode", "screen, color-dodge");
 			banner.css("background-size", "cover");
 			
+			var bg2=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
+			bg2+=	"rgba(230, 230, 230, "+lightning+")";
+			banner2.css("background", bg2);
+			banner2.css("mix-blend-mode", "color-dodge");
+			
 			previousR = null;
 			previousG = null;
 			previousB = null;
@@ -226,6 +232,12 @@ function updateDayNightCycle(forceRefresh)
 			banner.css("background", bg);
 			banner.css("background-blend-mode", "screen, multiply");
 			banner.css("background-size", "cover");
+
+			var bg2="url('https://initium-resources.appspot.com/images/effects/light-sandstorm1.gif') no-repeat center center, ";
+			bg2+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
+			banner2.css("background", bg2);
+			banner2.css("mix-blend-mode", "hard-light");
+			
 		}
 		else if (rainStrength>0.65 && window.biome=="Snow")
 		{
@@ -236,6 +248,12 @@ function updateDayNightCycle(forceRefresh)
 			banner.css("background", bg);
 			banner.css("background-blend-mode", "screen, multiply");
 			banner.css("background-size", "cover");
+
+			var bg2=	"";
+			bg2+="url('https://initium-resources.appspot.com/images/effects/medium-snow1.gif') no-repeat center center, ";
+			bg2+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
+			banner2.css("background", bg2);
+			banner2.css("mix-blend-mode", "screen");
 		}
 		else if (rainStrength>0.65)
 		{
@@ -247,12 +265,20 @@ function updateDayNightCycle(forceRefresh)
 			banner.css("background", bg);
 			banner.css("background-blend-mode", "screen, multiply");
 			banner.css("background-size", "cover");
+
+			var bg2=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
+			bg2+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
+			banner2.css("background", bg2);
+			banner2.css("mix-blend-mode", "hard-light");
 		}
 		else
 		{
 			banner.css("background", "url('"+bannerUrl+"') no-repeat center center, rgba("+r+", "+g+", "+b+", "+amount+")");
 			banner.css("background-blend-mode", "multiply, normal");
 			banner.css("background-size", "cover");
+
+			banner2.css("background", "rgba("+r+", "+g+", "+b+", "+amount+")");
+			banner2.css("mix-blend-mode", "hard-light");
 		}
 	}
 	else
@@ -274,6 +300,9 @@ function updateDayNightCycle(forceRefresh)
 		banner.css("background", "url('"+bannerUrl+"') no-repeat center center, rgba(30, 43, 83, "+amount+")");
 		banner.css("background-blend-mode", "multiply, normal");
 		banner.css("background-size", "cover");
+
+		banner2.css("background", "rgba(30, 43, 83, "+amount+")");
+		banner2.css("mix-blend-mode", "hard-light");
 	}
 }
 
@@ -334,6 +363,10 @@ function updateBannerWeatherSystem()
 			banner.css("background", "url('"+window.bannerUrl+"') no-repeat center center");
 			banner.css("background-blend-mode", "normal");
 			banner.css("background-size", "cover");
+			
+			var banner2 = $(".banner-daynight");
+			banner2.css("background", "none");
+
 		}
 	}
 }
