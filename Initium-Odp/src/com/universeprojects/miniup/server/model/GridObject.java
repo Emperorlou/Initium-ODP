@@ -35,7 +35,7 @@ public class GridObject {
 	
 	public GridObject(String key, String filename, String name, Integer xGridCoord, Integer yGridCoord, Double rotation, Integer xGridCellOffset, Integer yGridCellOffset, Integer xImageOrigin,
 			Integer yImageOrigin, Integer width, Integer height, boolean markForRemoval, boolean markForDeletion, 
-			Integer gridStartX, Integer gridStartY) {
+			Integer gridStartX, Integer gridStartY, Double lightLevel) {
 		jsonObject = new JSONObject();
 		setKey(key);
 		setfilename(filename);
@@ -51,6 +51,12 @@ public class GridObject {
 		setHeight(height);
 		setMarkForRemoval(markForRemoval);
 		setMarkForDeletion(markForDeletion);
+		setLightLevel(lightLevel);
+	}
+	
+	public void setLightLevel(Double level)
+	{
+		jsonObject.put("lightLevel", level);
 	}
 
 	public boolean getMarkForDeletion() { return (boolean) jsonObject.get(this.markForDeletion);}

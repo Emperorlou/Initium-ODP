@@ -5403,27 +5403,29 @@ div#buildingObject {
 
 #light-grid
 {
-	position:relative;
-	pointer-events:none;
-}
-
-.light-effect-container
-{
-	
+	position: absolute;
+    transform: scale(0.841841);
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    mix-blend-mode: color-dodge;
+    pointer-events: none;    
 }
 
 .fire-light-effect
 {
-    position: absolute;
-    background: url(https://i.imgur.com/X66iOjJ.png);
+	position: absolute;
+    background: url(https://i.imgur.com/VYD0yH6.png);
     background-size: 100% 100%;
-    top: 485px;
-    left: 883px;
     width: 300px;
     height: 150px;
-    mix-blend-mode: color-dodge;
     z-index: 11600000;
     pointer-events: none;
+    filter: brightness(0.84);
+    transform: translate(-50%, 50%);
 }
 
 

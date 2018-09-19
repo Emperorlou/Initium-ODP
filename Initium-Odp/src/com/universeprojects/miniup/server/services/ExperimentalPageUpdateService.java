@@ -155,6 +155,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("		<div id='object-layer' class='objectLayer'></div>");
 		newHtml.append("	</div>");
 		newHtml.append("	<div class='banner-weather'></div>");
+		newHtml.append("	<div id='light-grid'></div>");
 		newHtml.append("</div>");
 		newHtml.append("</div>");
 //		newHtml.append("<button type='button' onclick='openMenu()'>Menu</button>");

@@ -23,7 +23,9 @@ import com.universeprojects.cacheddatastore.DBUtils;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.aspects.AspectFireplace;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
 import com.universeprojects.miniup.server.model.GridObject;
@@ -434,6 +436,18 @@ public class GridMapService {
 			Double rotation = null;
 			Integer imageWidth = null;
 			Integer imageHeight = null;
+			Double lightLevel = null;
+			if (item.getProperty("Fireplace:fuelDepletionDate")!=null)
+			{
+				InitiumObject fireplace = new InitiumObject(db, item);
+				AspectFireplace fp = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
+				Long firePercentComplete = fp.getMinutesUntilExpired(System.currentTimeMillis());
+				if (firePercentComplete!=null)
+				{
+					if (firePercentComplete>=45)
+						lightLevel = 300d;
+				}
+			}
 			if (item.getProperty("GridMapObject:image")==null || item.getProperty("GridMapObject:imageWidth")==null || item.getProperty("GridMapObject:imageHeight")==null) 
 			{
 				imageUrl = (String)item.getProperty("icon");
@@ -488,7 +502,8 @@ public class GridMapService {
 					cellOffsetX,
 					cellOffsetY,
 					(int)(imageWidth / 2), (int)(imageHeight*0.95), (int)(imageWidth), (int)(imageHeight), false, false, 
-					getRowStart(), getColumnStart()));
+					getRowStart(), getColumnStart(),
+					lightLevel));
 		}
 		
 		
@@ -515,6 +530,7 @@ public class GridMapService {
 			Long imageWidth = (Long)item.getProperty("dbItemWidth");
 			Long imageHeight = (Long)item.getProperty("dbItemHeight");
 			Double rotation = (Double)item.getProperty("dbItemRotation");
+			Double lightLevel = (Double)item.getProperty("dbLightLevel");
 			
 			if (cellOffsetX==null || cellOffsetY==null)
 			{
@@ -542,7 +558,8 @@ public class GridMapService {
 					cellOffsetX.intValue(),
 					cellOffsetY.intValue(),
 					(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false,
-					getRowStart(), getColumnStart()));
+					getRowStart(), getColumnStart(),
+					lightLevel));
 		}
 		
 		return result;
@@ -1084,6 +1101,19 @@ public class GridMapService {
 		String image = (String)item.getProperty("GridMapObject:image");
 		Double rotation = (Double)item.getProperty("gridMapRotation");
 		Double scale = (Double)item.getProperty("gridMapScale");
+		Double lightLevel = null;
+		if (item.getProperty("Fireplace:fuelDepletionDate")!=null)
+		{
+			InitiumObject fireplace = new InitiumObject(db, item);
+			AspectFireplace fp = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
+			Long firePercentComplete = fp.getMinutesUntilExpired(System.currentTimeMillis());
+			if (firePercentComplete!=null)
+			{
+				if (firePercentComplete>=45)
+					lightLevel = 300d;
+			}
+		}
+		
 		
 		
 		// Process the values out...
@@ -1126,6 +1156,7 @@ public class GridMapService {
 		entry.setProperty("itemKey", item.getKey());
 		entry.setProperty("dbItemImage", image);
 		entry.setProperty("dbItemRotation", rotation);
+		entry.setProperty("dbLightLevel", lightLevel);
 		
 		return entry;
 	}
@@ -1186,6 +1217,7 @@ public class GridMapService {
 		Long imageHeight = (Long)combatant.getProperty("gridMapImageHeight");
 		Double imageScale = (Double)combatant.getProperty("gridMapImageScale");
 		Double rotation = 0d;
+		Double lightLevel = null;
 		
 		if (imageScale==null)
 		{
@@ -1210,6 +1242,7 @@ public class GridMapService {
 				cellOffsetX.intValue(),
 				cellOffsetY.intValue(),
 				(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false,
-				getRowStart(), getColumnStart()));
+				getRowStart(), getColumnStart(),
+				lightLevel));
 	}
 }

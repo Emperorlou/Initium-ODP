@@ -39,7 +39,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-107";
+	final public static String version = "0.5.9-108";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -1058,7 +1058,6 @@ public class GameUtils
 		
 		String qualityClass = determineQuality(item.getProperties());
 		String label = (String)item.getProperty("label");
-		if (smallMode) label = null;
 		if (label==null || label.trim().equals("") || (label=WebUtils.htmlSafe(label).trim()).equals(""))
 			label = (String)item.getProperty("name");
 

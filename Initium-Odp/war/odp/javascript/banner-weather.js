@@ -182,6 +182,9 @@ function updateDayNightCycle(forceRefresh)
 		
 		if (lightning>0)
 		{
+			// Disable the light effects layer during lightning strikes
+			$("#light-grid").css("filter", "brightness(0)");
+			
 			var rainGif = "hd-light-rain1.gif";
 			var bg=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
@@ -217,6 +220,10 @@ function updateDayNightCycle(forceRefresh)
 			
 		}
 
+		// Update the light effects layer
+		$("#light-grid").css("filter", "brightness("+night+")");
+		
+		
 		previousR = r;
 		previousG = g;
 		previousB = b;

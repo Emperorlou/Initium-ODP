@@ -5,6 +5,7 @@ var viewportContainer = document.getElementById("viewportcontainer");
 var viewport = document.getElementById("viewport");
 var menu = document.getElementById("menu");
 var grid = document.getElementById("grid");
+var lightGrid = document.getElementById("light-grid");
 var gridCellLayer = document.getElementById("cell-layer");
 var objects = document.getElementsByClassName('gridObject');
 var dragDelta = 10;
@@ -170,8 +171,12 @@ function refreshPositions(event, onCenter) {
     currGridHeight = totalGridHeight;
     diffGridWidth = totalGridWidth - prevGridWidth;
     diffGridHeight = totalGridWidth - prevGridHeight;
+    
     grid.style.height = currGridHeight + "px";
     grid.style.width = currGridWidth + "px";
+    lightGrid.style.height = currGridHeight + "px";
+    lightGrid.style.width = currGridWidth + "px";
+    
     originX = grid.getBoundingClientRect().left;
     originY = grid.getBoundingClientRect().top + -$(window).scrollTop();
 
@@ -261,9 +266,11 @@ function refreshPositions(event, onCenter) {
     if (!firstLoad) {
         if (newY < ($(window).height() * 1.5) && newY > (-1.5 * $(grid).height())) {
             grid.style.top = newY + "px";
+            lightGrid.style.top = newY + "px";
         }
         if (newX < ($(window).width() * 1.5) && newX > (-1.5 * $(grid).width())) {
             grid.style.left = newX + "px";
+            lightGrid.style.left = newX + "px";
         }
     } else {
         firstLoad = false;
@@ -343,6 +350,11 @@ function refreshPositions(event, onCenter) {
                     gridObjects[currKey].div.style.margin = 0 + "px";
                     gridObjects[currKey].div.style.bottom = -bottom + "px";
                     gridObjects[currKey].div.style.left = left + "px";
+                    if (gridObjects[currKey].lightEffect!=null)
+                    {
+	                    gridObjects[currKey].lightEffect.style.bottom = -bottom + "px";
+	                    gridObjects[currKey].lightEffect.style.left = left + "px";
+                    }
                 }
             }
         }
@@ -375,6 +387,10 @@ function loadMap() {
     grid.style.width = totalGridHeight + "px";
     grid.style.top = offsetY + "px";
     grid.style.left = offsetX + "px";
+    lightGrid.style.height = totalGridWidth + "px";
+    lightGrid.style.width = totalGridHeight + "px";
+    lightGrid.style.top = offsetY + "px";
+    lightGrid.style.left = offsetX + "px";
 
     document.getElementById("main-viewport-container").appendChild(viewportContainer);
 
@@ -382,6 +398,7 @@ function loadMap() {
     jQuery('#cell-layer').html('');
     jQuery('#ground-layer').html('');
     jQuery('#object-layer').html('');
+    jQuery("#light-grid").html("");
 
     buildMap(JSON.parse(mapData));
 
@@ -571,6 +588,8 @@ function currentCoord() {
 function panGrid(xOffset, yOffset) {
     grid.style.left = grid.offsetLeft + xOffset + 'px';
     grid.style.top = grid.offsetTop + yOffset + 'px';
+    lightGrid.style.left = lightGrid.offsetLeft + xOffset + 'px';
+    lightGrid.style.top = lightGrid.offsetTop + yOffset + 'px';
 }
 function moveCellOnScreen(xCoord, yCoord) {
     scaledGridCellWidth = gridCellWidth * map2dScale;
@@ -599,8 +618,11 @@ function centerCellOnScreen(xCoord, yCoord) {
     yView = grid.offsetTop + yGrid;
     xGridOrigin = xView - $(viewportContainer).width()/2;
     yGridOrigin = yView - $(viewportContainer).height()/2;
+
     grid.style.left = (grid.offsetLeft - xGridOrigin) + "px" ;
     grid.style.top = (grid.offsetTop - yGridOrigin) + "px";
+    lightGrid.style.left = (lightGrid.offsetLeft - xGridOrigin) + "px" ;
+    lightGrid.style.top = (lightGrid.offsetTop - yGridOrigin) + "px";
 }
 function centerGridOnScreen(event) {
 	// For smaller maps, we want to cap the zoom level
@@ -622,8 +644,11 @@ function centerGridOnScreen(event) {
     refreshPositions(null, true);
     scaledGridWidth = (gridCellWidth * map2dScale  + (gridCellWidth * gridTileWidth));
     scaledGridHeight = (gridCellHeight * map2dScale + (gridCellHeight * gridTileHeight));
+
     grid.style.left = ((($(viewport).width() - scaledGridWidth)/2)) + "px";
     grid.style.top = ((($(viewport).height() - scaledGridHeight)/2)) + "px";
+    lightGrid.style.left = ((($(viewport).width() - scaledGridWidth)/2)) + "px";
+    lightGrid.style.top = ((($(viewport).height() - scaledGridHeight)/2)) + "px";
 
 }
 function keyUnpress(event) {
@@ -1221,12 +1246,14 @@ function dragDiv(event) {
     if (Math.abs(deltaX) > dragDelta || Math.abs(deltaY) > dragDelta) {
         if (updatedX < $(window).width() && ((updatedX > coordX) || updatedX > (-1 * $(grid).width()))) {
             grid.style.left = coordX + userLocX - offsetX + 'px';
+            lightGrid.style.left = coordX + userLocX - offsetX + 'px';
             if (placingBuilding) {
                 buildingObject.div.style.left = buildingCoordX + userLocX - offsetX + 'px';
             }
         }
         if (updatedY < $(window).height() && ((updatedY > coordY) || (updatedY > (-1 * $(grid).height())))) {
             grid.style.top = coordY + userLocY - offsetY + 'px';
+            lightGrid.style.top = coordY + userLocY - offsetY + 'px';
             if (placingBuilding) {
                 buildingObject.div.style.top = buildingCoordY + userLocY - offsetY + 'px';
             }
@@ -1329,9 +1356,10 @@ function GridCell(backgroundDiv, cellDiv, filename, zindex, objectKeys, xGridCoo
     this.yGridCoordLocal = yGridCoordLocal;
 }
 
-function GridObject(key, div, filename, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xGridCoordLocal, yGridCoordLocal, xImageOrigin, yImageOrigin, xFootprint, yFootprint, width, height, scale) {
+function GridObject(key, div, filename, name, xGridCellOffset, yGridCellOffset, xGridCoord, yGridCoord, xGridCoordLocal, yGridCoordLocal, xImageOrigin, yImageOrigin, xFootprint, yFootprint, width, height, scale, lightEffect) {
     this.key = key;
     this.div = div;
+    this.lightEffect = lightEffect;
     this.filename = filename;
     this.name = name;
     this.xGridCellOffset = xGridCellOffset;
@@ -1483,18 +1511,18 @@ function addGridObjectToMap(gridObject) {
 	if (gridObject.xGridCoordLocal<0 || gridObject.xGridCoordLocal>gridTileWidth || gridObject.yGridCoordLocal<0 || gridObject.yGridCoordLocal>gridTileHeight)
 		return;	
 	
-	var scaledGridCellWidth = gridCellWidth * map2dScale;
-    var scaledGridCellHeight = gridCellHeight * map2dScale;	
+	var scaledGridCellWidth = gridCellWidth;
+    var scaledGridCellHeight = gridCellHeight;	
 
     var objectScale = gridObject.scale ? gridObject.scale : 1;
-    var gridMapObjectWidth = gridObject.width * map2dScale * objectScale; 
-    var gridMapObjectHeight = gridObject.height * map2dScale * objectScale;
+    var gridMapObjectWidth = gridObject.width * objectScale; 
+    var gridMapObjectHeight = gridObject.height * objectScale;
     var objectRotation = gridObject.rotation ? gridObject.rotation : 0;
     
-    var left = (gridObject.xGridCoordLocal+1) * gridCellWidth - (gridObject.xImageOrigin * map2dScale) - (gridObject.xGridCellOffset * map2dScale);
-    var topPos = gridObject.yGridCoordLocal * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObject.yImageOrigin * map2dScale) - ((gridObject.yGridCellOffset)/2 * map2dScale/2);
-    var bottomPos = gridObject.yGridCoordLocal * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObject.yImageOrigin * map2dScale) - ((gridObject.yGridCellOffset)/2 * map2dScale/2) - (gridObject.height * map2dScale);
-    var leftPos = gridObject.xGridCoordLocal * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.xImageOrigin * map2dScale) - ((gridObject.xGridCellOffset) * map2dScale);
+    var left = (gridObject.xGridCoordLocal+1) * gridCellWidth - (gridObject.xImageOrigin) - (gridObject.xGridCellOffset);
+    var topPos = gridObject.yGridCoordLocal * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObject.yImageOrigin) - ((gridObject.yGridCellOffset)/2);
+    var bottomPos = gridObject.yGridCoordLocal * scaledGridCellHeight + scaledGridCellHeight / 2 - (gridObject.yImageOrigin) - ((gridObject.yGridCellOffset)/2) - (gridObject.height);
+    var leftPos = gridObject.xGridCoordLocal * scaledGridCellWidth + scaledGridCellWidth / 2 - (gridObject.xImageOrigin) - ((gridObject.xGridCellOffset));
     var topZ = topPos + gridMapObjectHeight;
     var key = gridObject.key;
 
@@ -1525,8 +1553,10 @@ function addGridObjectToMap(gridObject) {
     {
     	deletemeClass = "deletable-Item"+key.split("DK-Item(")[1].slice(0, -1);
     }
+
+    var gridObjectId = "gridObjectAt"+gridObject.xGridCoord + "x" + gridObject.yGridCoord;
     
-    $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key + "\" " + "class=\"gridObject gridObjectAt"+gridObject.xGridCoord + "x" + gridObject.yGridCoord+" "+deletemeClass+"\"";
+    $hexBody = "<div id=\"object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key + "\" " + "class=\"gridObject "+gridObjectId+" "+deletemeClass+"\"";
     $hexBody += " data-key=\"" + key + "\"";
     $hexBody += " style=\"";
     $hexBody += " z-index:" + (parseInt(objectZOffset) + parseInt(topZ)) + ";";
@@ -1556,7 +1586,19 @@ function addGridObjectToMap(gridObject) {
     $hexBody += "</div>";
 
     $('#object-layer').append($hexBody);
+    
+    
+    // Add the lighting effect if necessary
+    if (gridObject.lightLevel!=null)
+    {
+        var bottom =  gridObject.yGridCoordLocal * scaledGridCellHeight + (scaledGridCellHeight / 2) - (gridObject.yGridCellOffset);
+        var left = gridObject.xGridCoordLocal * scaledGridCellWidth + (scaledGridCellWidth / 2) - (gridObject.xImageOrigin) - (gridObject.xGridCellOffset);
+    	var lightHighlight = "<div id='lightEffect" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key+"' style='width:"+gridObject.lightLevel+"px; height:"+(gridObject.lightLevel/2)+"px; left:"+(left)+"px; bottom:"+(bottom)+"px;' class='fire-light-effect "+deletemeClass+" "+gridObjectId+"'></div>";
+    	$("#light-grid").append(lightHighlight);
+    }
+    
     objectDiv = document.getElementById("object" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key); 
+    var lightEffectDiv = document.getElementById("lightEffect" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key); 
 
     var cgridObject = new GridObject(
         gridObject.key,
@@ -1575,7 +1617,8 @@ function addGridObjectToMap(gridObject) {
         gridObject.yFootprint ? gridObject.yFootprint : 1,
         gridObject.width,
         gridObject.height,
-        objectScale);
+        objectScale,
+        lightEffectDiv);
     gridObjects[key] = cgridObject;
 
     return $hexBody;
@@ -1626,7 +1669,7 @@ function setMapScale(scale)
 	if (map2dScale<minZoom)
 		map2dScale = minZoom;
 	
-    $("#grid").css("transform", "scale("+map2dScale+")");
+    $("#grid,#light-grid").css("transform", "scale("+map2dScale+")");
 }
 
 
