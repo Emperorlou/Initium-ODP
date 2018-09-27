@@ -93,8 +93,7 @@ public class Location extends EntityWrapper {
 					items.add(new Item(item, this.db, this));
 			}
 			
-			_itemsHere = new Item[items.size()];
-			_itemsHere = items.toArray(_itemsHere);
+			_itemsHere = items.toArray(new Item[items.size()]);
 		}
 		return _itemsHere;
 	}
@@ -120,6 +119,50 @@ public class Location extends EntityWrapper {
 		}
 		
 		return _charactersHere;
+	}
+	
+	private Path[] _pathsTo = null;
+	private Path[] getPathsTo()
+	{
+		if(_pathsTo == null)
+		{
+			List<Path> paths = new ArrayList<Path>();
+			QueryHelper qh = new QueryHelper(db.getDB());
+			List<CachedEntity> dbChars = qh.getFilteredList("Path", 1000, null, "location2Key", FilterOperator.EQUAL, this.getKey());
+			for(CachedEntity pathEnt:dbChars)
+			{
+				if(pathEnt != null)
+				{
+					paths.add(new Path(pathEnt, this.db));
+				}
+			}
+			
+			_pathsTo = paths.toArray(new Path[paths.size()]);
+		}
+		
+		return _pathsTo;
+	}
+	
+	private Path[] _pathsFrom = null;
+	private Path[] getPathsFrom()
+	{
+		if(_pathsFrom == null)
+		{
+			List<Path> paths = new ArrayList<Path>();
+			QueryHelper qh = new QueryHelper(db.getDB());
+			List<CachedEntity> dbChars = qh.getFilteredList("Path", 1000, null, "location1Key", FilterOperator.EQUAL, this.getKey());
+			for(CachedEntity pathEnt:dbChars)
+			{
+				if(pathEnt != null)
+				{
+					paths.add(new Path(pathEnt, this.db));
+				}
+			}
+			
+			_pathsFrom = paths.toArray(new Path[paths.size()]);
+		}
+		
+		return _pathsFrom;
 	}
 	
 	public Character[] charactersHere()
@@ -149,5 +192,27 @@ public class Location extends EntityWrapper {
 		}
 		
 		return chars.toArray(new Character[chars.size()]);
+	}
+	
+	public Path[] pathsTo()
+	{
+		List<Path> paths = new ArrayList<Path>();
+		for(Path pathTo:getPathsTo())
+		{
+			paths.add(pathTo);
+		}
+		
+		return paths.toArray(new Path[paths.size()]);
+	}
+	
+	public Path[] pathsFrom()
+	{
+		List<Path> paths = new ArrayList<Path>();
+		for(Path pathFrom:getPathsFrom())
+		{
+			paths.add(pathFrom);
+		}
+		
+		return paths.toArray(new Path[paths.size()]);
 	}
 }
