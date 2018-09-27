@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -147,6 +148,28 @@ public class DBAccessor {
 		CachedEntity ent = db.getEntity("Location", locationId);
 		if(ent == null) return null;
 		return new Location(ent, db);
+	}
+	
+	public Location[] getLocationsByParentKey(Key locationKey)
+	{
+		List<Location> childLocs = new ArrayList<Location>();
+		QueryHelper qh = new QueryHelper(db.getDB());
+		List<CachedEntity> dbLocs = qh.getFilteredList("Location", 1000, null, "parentLocationKey", FilterOperator.EQUAL, locationKey);
+		for(CachedEntity locEnt:dbLocs)
+		{
+			if(locEnt != null)
+			{
+				childLocs.add(new Location(locEnt, this.db));
+			}
+		}
+		
+		Location[] wrapped = new Location[childLocs.size()];
+		return childLocs.toArray(wrapped);
+	}
+	
+	public Location[] getLocationsByParentId(Long locationId)
+	{
+		return getLocationsByParentKey(getKey("Location", locationId));
 	}
 	
 	public Item getItemByKey(Key itemKey)
@@ -359,6 +382,11 @@ public class DBAccessor {
 		EntityWrapper newItem = ScriptService.wrapEntity(item, db);
 		newItem.isNewEntity = true;
 		return newItem;
+	}
+	
+	public Double[] getCharacterMax(Character character)
+	{
+		return db.getMaxCharacterStats(character.getKey());
 	}
 	
 	public boolean clearBuffFromCache(Buff buff)

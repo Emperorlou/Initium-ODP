@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -86,7 +88,7 @@ public class LongOperationTakePath extends LongOperation {
 			CachedEntity destination = null;
 			Key destinationKey = null;
 			// First get the character's current location
-			Key currentLocationKey = db.getCharacterLocationKey(character);
+			java.security.Key currentLocationKey = db.getCharacterLocationKey(character);
 			CachedEntity currentLocation = null;
 			
 			
@@ -141,6 +143,14 @@ public class LongOperationTakePath extends LongOperation {
 			
 			if(isInParty && db.getParty(ds, character).size() > 4)
 				throw new UserErrorMessage("You have too many members in your party!");
+			
+			// Log taken path.
+			Logger.getLogger(this.getClass().getSimpleName()).log(
+					Level.WARNING, 
+					String.format("%s taking %s from %s", 
+							character.getKey(),
+							path.getKey(),
+							currentLocationKey));
 			
 			// Do the territory interruption now
 			doTerritoryInterruption(destination, path, allowAttack, isInParty);
