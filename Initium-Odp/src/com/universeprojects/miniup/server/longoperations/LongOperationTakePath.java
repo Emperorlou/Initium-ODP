@@ -88,7 +88,7 @@ public class LongOperationTakePath extends LongOperation {
 			CachedEntity destination = null;
 			Key destinationKey = null;
 			// First get the character's current location
-			java.security.Key currentLocationKey = db.getCharacterLocationKey(character);
+			Key currentLocationKey = db.getCharacterLocationKey(character);
 			CachedEntity currentLocation = null;
 			
 			
