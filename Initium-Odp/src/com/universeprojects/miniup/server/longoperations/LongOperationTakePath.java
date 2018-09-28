@@ -318,31 +318,36 @@ public class LongOperationTakePath extends LongOperation {
 	@Override
 	String doComplete() throws UserErrorMessage {
 		CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
+		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
+		if (path==null)
+			throw new UserErrorMessage("The path you were attempting to take no longer exists.");
 		
 		db.getDB().beginBulkWriteMode();
 		try
 		{
 			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, 1, 0.5d))
+			{
+				// Create discovery for character, and optionally unhide it (unsaved = already exists);
+				CachedEntity discovery = db.newDiscovery(null, db.getCurrentCharacter(), path);
+				if(discovery != null && discovery.isUnsaved())
+				{
+					discovery.setProperty("hidden", false);
+					db.getDB().put(discovery);
+				}
 				throw new GameStateChangeException("While you were on your way, someone found you...", true);
+			}
 		}
 		finally
 		{
 			db.getDB().commitBulkWrite();
 		}
 			
-		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
 		Boolean attack = (Boolean)getDataProperty("attack");
 		if (attack==null) attack = false;
 	
-		if (path==null)
-			throw new UserErrorMessage("The path you were attempting to take no longer exists.");
-		
 		CachedEntity newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
-		
-
 		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
 		update.updateFullPage_shortcut(true);
-
 		
 		return "You have arrived at "+newLocation.getProperty("name")+".";
 	}
