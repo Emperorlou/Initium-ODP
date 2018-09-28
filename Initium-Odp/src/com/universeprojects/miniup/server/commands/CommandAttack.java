@@ -110,7 +110,7 @@ public class CommandAttack extends Command {
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
-		CachedEntity location = null;
+		
 		ds.beginTransaction();
 		try {
 			// Verify parameter sanity
@@ -120,7 +120,7 @@ public class CommandAttack extends Command {
 			
 			// Check if monster can be attacked
 			CachedEntity character = db.getCurrentCharacter();
-			location = db.getEntity((Key)character.getProperty("locationKey"));
+			CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 			canAttackHelper(ds, location, character, monster);
 
 			character.setProperty("mode", "COMBAT");
@@ -151,7 +151,7 @@ public class CommandAttack extends Command {
 			ds.rollbackIfActive();
 		}
 		
-		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
+		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getEntity((Key)character.getProperty("locationKey")), this);
 		update.updateFullPage_shortcut(false);
 	}
 
