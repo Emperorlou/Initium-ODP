@@ -151,7 +151,7 @@ public class CommandAttack extends Command {
 			ds.rollbackIfActive();
 		}
 		
-		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getEntity((Key)character.getProperty("locationKey")), this);
+		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
 		update.updateFullPage_shortcut(false);
 	}
 
