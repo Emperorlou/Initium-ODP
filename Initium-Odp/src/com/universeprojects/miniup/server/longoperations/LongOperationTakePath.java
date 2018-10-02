@@ -329,7 +329,7 @@ public class LongOperationTakePath extends LongOperation {
 			{
 				// Create discovery for character, and optionally unhide it (unsaved = already exists);
 				CachedEntity discovery = db.newDiscovery(null, db.getCurrentCharacter(), path);
-				if(discovery != null && discovery.isUnsaved())
+				if(discovery != null && discovery.getKey().isComplete())
 				{
 					discovery.setProperty("hidden", false);
 					db.getDB().put(discovery);
