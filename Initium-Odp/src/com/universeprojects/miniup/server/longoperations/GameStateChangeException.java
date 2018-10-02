@@ -14,6 +14,7 @@ public class GameStateChangeException extends RuntimeException {
 	
 	public GameStateChangeException(String message, boolean resetChat)
 	{
+		super(message);
 		this.refreshChat = resetChat;
 	}
 
