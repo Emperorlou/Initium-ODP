@@ -352,8 +352,8 @@ function refreshPositions(event, onCenter) {
                     gridObjects[currKey].div.style.left = left + "px";
                     if (gridObjects[currKey].lightEffect!=null)
                     {
-	                    gridObjects[currKey].lightEffect.style.bottom = -bottom + "px";
-	                    gridObjects[currKey].lightEffect.style.left = left + "px";
+	                    gridObjects[currKey].lightEffect.style.bottom = (-bottom+(gridObjects[currKey].height*0.1)) + "px";
+	                    gridObjects[currKey].lightEffect.style.left = (left+(gridObjects[currKey].width/2)) + "px";
                     }
                 }
             }
@@ -1592,7 +1592,7 @@ function addGridObjectToMap(gridObject) {
     if (gridObject.lightLevel!=null)
     {
         var bottom =  gridObject.yGridCoordLocal * scaledGridCellHeight + (scaledGridCellHeight / 2) - (gridObject.yGridCellOffset);
-        var left = gridObject.xGridCoordLocal * scaledGridCellWidth + (scaledGridCellWidth / 2) - (gridObject.xImageOrigin) - (gridObject.xGridCellOffset);
+        var left = 200+gridObject.xGridCoordLocal * scaledGridCellWidth - (scaledGridCellWidth / 2) - (gridObject.xImageOrigin) + (gridObject.xGridCellOffset);
     	var lightHighlight = "<div id='lightEffect" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key+"' style='width:"+gridObject.lightLevel+"px; height:"+(gridObject.lightLevel/2)+"px; left:"+(left)+"px; bottom:"+(bottom)+"px;' class='fire-light-effect "+deletemeClass+" "+gridObjectId+"'></div>";
     	$("#light-grid").append(lightHighlight);
     }

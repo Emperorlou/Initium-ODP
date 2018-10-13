@@ -49,6 +49,25 @@ public class InitiumObject implements GameObject<Key>
 		}
 	}
 	
+	public void initialize()
+	{
+		if (hasAspects())
+			for(InitiumAspect aspect:getAspects())
+				aspect.initialize();
+	}
+	
+	public boolean update()
+	{
+		boolean changed = false;
+		if (hasAspects())
+			for(InitiumAspect aspect:getAspects())
+			{
+				if (aspect.update())
+					changed = true;
+			}
+		return changed;
+	}
+	
 	public static List<InitiumObject> wrap(ODPDBAccess db, List<CachedEntity> entities)
 	{
 		List<InitiumObject> result = new ArrayList<InitiumObject>();
@@ -283,5 +302,11 @@ public class InitiumObject implements GameObject<Key>
 			gms = new GridMapService(db, location);
 		
 		gms.setItemPosition(entity, tileX, tileY);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return entity.toString();
 	}
 }

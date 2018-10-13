@@ -34,8 +34,10 @@ public class CommandConstructItemSkillForget extends Command
 		if (CommonChecks.checkIdeaIsCharacters(skill, db.getCurrentCharacterKey())==false)
 			throw new UserErrorMessage("This skill is not your skill to forget.");
 		
-		
-		db.getDB().delete((Key)skill.getProperty("item"), skill.getKey());
+		if (skill.getProperty("item")!=null)
+			db.getDB().delete((Key)skill.getProperty("item"), skill.getKey());
+		else
+			db.getDB().delete(skill.getKey());
 
 		deleteHtml("#skill-id-"+skillKey.getId());
 	}

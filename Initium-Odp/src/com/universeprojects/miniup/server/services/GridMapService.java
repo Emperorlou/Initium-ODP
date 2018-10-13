@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
-import com.google.appengine.api.datastore.DataTypeTranslator;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -25,6 +26,7 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.aspects.AspectFireplace;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
@@ -63,6 +65,31 @@ public class GridMapService {
 	private Map<CachedEntity, Double> naturalItemsMap = null;
 	private CachedEntity locationDataEntity = null;
 	private EmbeddedEntity locationData = null;
+	
+	private Set<TileCoordinate> tilesChanged = null;
+	public class TileCoordinate
+	{
+		int x; 
+		int y;
+		
+		public TileCoordinate(int x, int y)
+		{
+			this.x = x;
+			this.y = y;
+		}
+	
+		@Override
+		public String toString()
+		{
+			return x+"-"+y;
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return toString().hashCode();
+		}
+	};
 	
 	
 	public GridMapService(ODPDBAccess db, CachedEntity location)
@@ -620,7 +647,7 @@ public class GridMapService {
 		
 		if (biomeType.equals("Temperate"))
 		{
-			return "images/2d/floor/grass/tile-grass" + rnd.nextInt(7) + ".png";
+			return "images/2d/floor/grass/tile-grass" + rnd.nextInt(3) + ".png";
 		}
 		else if (biomeType.equals("Cave"))
 		{
@@ -853,6 +880,9 @@ public class GridMapService {
 	{
 		locationData.setProperty(tileX+"x"+tileY, entity);
 		locationDataEntity.setProperty("gridMapTiles", locationData);
+		
+		if (tilesChanged==null) tilesChanged = new HashSet<>();
+		tilesChanged.add(new TileCoordinate(tileX, tileY));
 	}
 	
 	public boolean isStillProceduralEntity(String proceduralKey)
@@ -1151,8 +1181,8 @@ public class GridMapService {
 		entry.setProperty("status", "Database");
 		entry.setProperty("dbItemCellOffsetX", cellOffsetX);
 		entry.setProperty("dbItemCellOffsetY", cellOffsetY);
-		entry.setProperty("dbItemHeight", width);
-		entry.setProperty("dbItemWidth", height);
+		entry.setProperty("dbItemHeight", height);
+		entry.setProperty("dbItemWidth", width);
 		entry.setProperty("itemKey", item.getKey());
 		entry.setProperty("dbItemImage", image);
 		entry.setProperty("dbItemRotation", rotation);
@@ -1166,6 +1196,12 @@ public class GridMapService {
 	{
 		if (locationDataEntity==null) return false;
 		return locationDataEntity.isUnsaved();
+	}
+	
+	public void putLocationDataIfChanged(CachedDatastoreService ds)
+	{
+		if (isLocationDataChanged())
+			putLocationData(ds);
 	}
 	
 	public void putLocationData(CachedDatastoreService ds)
@@ -1244,5 +1280,63 @@ public class GridMapService {
 				(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false,
 				getRowStart(), getColumnStart(),
 				lightLevel));
+	}
+
+	public boolean updateEntity(CachedEntity item)
+	{
+		Long tileX = (Long)item.getProperty("gridMapPositionX");
+		Long tileY = (Long)item.getProperty("gridMapPositionY");
+		if (tileX==null) tileX = 500L;
+		if (tileY==null) tileY = 500L;
+		
+		EmbeddedEntity tile = getOrCreateGridMapTile(tileX.intValue(), tileY.intValue());
+		
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> tileEntries = (List<EmbeddedEntity>)tile.getProperty("dbItems");
+		
+		if (tileEntries==null) tileEntries = new ArrayList<>();
+		
+		// Find the index of the existing item if it's there
+		int index = -1;
+		for(EmbeddedEntity tileEntry:tileEntries)
+		{
+			index++;
+			if (tileEntry.getProperty("itemKey")!=null && GameUtils.equals(tileEntry.getProperty("itemKey"), item.getKey()))
+				break;
+		}
+		
+		if (index==-1) return false;
+		
+		EmbeddedEntity tileEntry = generateTileEntryFromItem(item);
+		tileEntries.add(0, tileEntry);
+		if (tileEntries.size()>MAX_ITEMS_PER_TILE)
+			tileEntries.remove(MAX_ITEMS_PER_TILE);
+		
+		tile.setProperty("dbItems", tileEntries);
+		
+		setGridMapTile(tileX.intValue(), tileY.intValue(), tile);
+		
+		return true;
+	}
+	
+	public void updateTileGraphics(OperationBase command, int tileX, int tileY)
+	{
+		command.addJavascriptToResponse(generateGridObjectJson(tileX, tileY));
+	}
+	
+	/**
+	 * This looks at all the tiles that have changed in this request and automatically sends the changed tile graphics
+	 * along with the response for commands/long-operations.
+	 * 
+	 * @param command
+	 */
+	public void updateChangedTileGraphics(OperationBase command)
+	{
+		if (tilesChanged==null) return;
+		for(TileCoordinate tileChanged:tilesChanged)
+		{
+			command.addJavascriptToResponse(generateGridObjectJson(tileChanged.x, tileChanged.y));
+		}
+		tilesChanged.clear();
 	}
 }

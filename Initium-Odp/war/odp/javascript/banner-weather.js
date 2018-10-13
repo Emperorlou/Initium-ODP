@@ -221,7 +221,7 @@ function updateDayNightCycle(forceRefresh)
 		}
 
 		// Update the light effects layer
-		$("#light-grid").css("filter", "brightness("+night+")");
+		$("#light-grid").css("filter", "brightness("+amount+")");
 		
 		
 		previousR = r;
@@ -274,7 +274,7 @@ function updateDayNightCycle(forceRefresh)
 			banner.css("background-size", "cover");
 
 			var bg2=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
-			bg2+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
+			bg2+=	"rgba("+r+", "+g+", "+b+", "+amount*2+") ";
 			banner2.css("background", bg2);
 			banner2.css("mix-blend-mode", "hard-light");
 		}
