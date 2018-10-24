@@ -993,7 +993,7 @@ function loadLocationItems()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("/odp/ajax_moveitems.jsp?preset=location", null, "Nearby Items");
+	pagePopup("/odp/ajax_moveitems?preset=location", null, "Nearby Items");
 //	$("#main-itemlist").load("locationitemlist.jsp");
 //	$("#main-itemlist").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby items</h4></div>");
@@ -1993,9 +1993,9 @@ function viewContainer(containerId, title, closePopups)
 	}
 	
 	if(containerId == null)
-		pagePopup("/odp/ajax_moveitems.jsp?preset=location", null, title || "Nearby Items");
+		pagePopup("/odp/ajax_moveitems?preset=location", null, title || "Nearby Items");
 	else
-		pagePopup("/odp/ajax_moveitems.jsp?selfSide=Character_"+window.characterId+"&otherSide=Item_"+containerId, null, title);
+		pagePopup("/odp/ajax_moveitems?selfSide=Character_"+window.characterId+"&otherSide=Item_"+containerId, null, title);
 }
 
 function renameCharacter(eventObject, currentCharName)
