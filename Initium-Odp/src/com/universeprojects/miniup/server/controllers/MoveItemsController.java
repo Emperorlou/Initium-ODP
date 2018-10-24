@@ -110,14 +110,14 @@ public class MoveItemsController extends PageController {
 		List<CachedEntity> selfSideList = db.getItemContentsFor(selfSideKey, false); // Self-side is always character, don't allow otherwise.
 		List<CachedEntity> otherSideList = db.getItemContentsFor(otherSideKey, isInOwnedHouse);
 		// And sort them... (but only if they're NOT a location)
-		if (selfSide.getKey().getKind().equals("Location")==false || isInOwnedHouse)	
+		if (selfSide.getKind().equals("Location")==false || isInOwnedHouse)	
 			selfSideList = db.sortSaleItemList(selfSideList);
-		if (otherSide.getKey().getKind().equals("Location")==false || isInOwnedHouse)	
+		if (otherSide.getKind().equals("Location")==false || isInOwnedHouse)	
 			otherSideList = db.sortSaleItemList(otherSideList);
 		
 		// Handle self side headers here.
 		String header = "";
-		if (selfSide.getKey().getKind().equals("Location"))
+		if (selfSide.getKind().equals("Location"))
 		{
 			header = "<h5>"+selfSide.getProperty("name")+"</h5>"; 
 			if (selfSide.getProperty("banner")!=null)
@@ -125,17 +125,17 @@ public class MoveItemsController extends PageController {
 				header += "<img src='https://initium-resources.appspot.com/"+selfSide.getProperty("banner")+"' border=0 style='width:80%'/>";
 			}
 		}
-		else if (selfSide.getKey().getKind().equals("Character"))
+		else if (selfSide.getKind().equals("Character"))
 		{
 			header = GameUtils.renderCharacterWidget(request, db, selfSide, user, true); 
 		}
-		else if (selfSide.getKey().getKind().equals("Item"))
+		else if (selfSide.getKind().equals("Item"))
 		{
 			header = GameUtils.renderItem(selfSide);
 		}
 		request.setAttribute("selfSideHeader", header);
 		
-		if (otherSide.getKey().getKind().equals("Location"))
+		if (otherSide.getKind().equals("Location"))
 		{
 			header = "<h5>"+otherSide.getProperty("name")+"</h5>";
 			if (otherSide.getProperty("banner")!=null)
@@ -143,11 +143,11 @@ public class MoveItemsController extends PageController {
 				header += "<img src='https://initium-resources.appspot.com/"+otherSide.getProperty("banner")+"' border=0 style='width:80%'/>";
 			}
 		}
-		else if (otherSide.getKey().getKind().equals("Character"))
+		else if (otherSide.getKind().equals("Character"))
 		{
 			header = GameUtils.renderCharacterWidget(request, db, otherSide, null, false);
 		}
-		else if (otherSide.getKey().getKind().equals("Item"))
+		else if (otherSide.getKind().equals("Item"))
 		{
 			header = GameUtils.renderItem(otherSide);
 		}
@@ -224,7 +224,7 @@ public class MoveItemsController extends PageController {
 		}
 		request.setAttribute("selfSideItems", selfItems);
 		
-		boolean disableCategories = "Location".equals(otherSide.getKind());
+		boolean disableCategories = "Location".equals(otherSide.getKind()) && isInOwnedHouse == false;
 		currentCategory = "";
 		for(CachedEntity item:otherSideList)
 		{
@@ -233,7 +233,7 @@ public class MoveItemsController extends PageController {
 			String itemType = (String)item.getProperty("itemType");
 			if (itemType==null) itemType = "";
 			
-			if (currentCategory.equals(itemType)==false)
+			if (disableCategories == false && currentCategory.equals(itemType)==false)
 			{
 				currentItem = "<h3>"+itemType+"</h3>";
 				currentCategory = itemType;
@@ -258,7 +258,7 @@ public class MoveItemsController extends PageController {
 		if (item!=null)
 		{
 			itemName = (String)item.getProperty("name");
-			itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'";
+			itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='/odp/viewitemmini?itemId="+item.getId()+"'";
 			itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
 		}
 
@@ -279,7 +279,7 @@ public class MoveItemsController extends PageController {
 			String closeFirstJs = "";
 			if (isViewingItem)
 				closeFirstJs = "closePagePopup();";
-			curItem.append("<a onclick='"+closeFirstJs+"pagePopup(\"/odp/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
+			curItem.append("<a onclick='"+closeFirstJs+"pagePopup(\"/odp/ajax_moveitems?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
 		}
 		curItem.append("</div>");
 		curItem.append("</div>");

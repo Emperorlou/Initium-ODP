@@ -98,7 +98,7 @@ public class NearbyItemsController extends PageController
 	    	sb.append("<br>");
 	    	sb.append("<div class='main-item-controls'>");
             if (item.getProperty("maxWeight")!=null)
-            	sb.append("<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"+character.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
+            	sb.append("<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"+character.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
             if (item.getProperty("dogecoins")!=null)
             	sb.append("<a shortcut='71' onclick='collectDogecoinsFromItem("+item.getId()+", event, false)'>Collect "+item.getProperty("dogecoins")+" gold</a>");
             sb.append("<a onclick='doCollectItem(event, "+item.getId()+")'>Collect</a>");
