@@ -5113,7 +5113,7 @@ public class ODPDBAccess
 							loot+="			<a onclick='characterDropItem(event, "+item.getKey().getId()+", loadInventory)' >Drop on ground</a>";
 							if (item.getProperty("maxWeight")!=null)
 							{
-								loot+="<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
+								loot+="<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
 							}
 							loot+="		</div>";
 							loot+="</div>";
