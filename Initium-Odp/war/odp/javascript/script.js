@@ -4492,6 +4492,16 @@ function updateMinimizeChat()
 	});
 }
 
+function isChatMinimized()
+{
+	var chatbox = $(".chat_box");
+	
+	if (chatbox.hasClass("minimized-chat"))
+		return true;
+	
+	return false;
+}
+
 function toggleMinimizeChat(forceHide)
 {
 	$("#chat_tab").toggle();
@@ -4511,6 +4521,8 @@ function toggleMinimizeChat(forceHide)
 		$("#chatbox-container").addClass("chat-hide");
 		$(".minimize-chat-button").text(">");
 	}
+	
+	if (window.updateBannerSize) updateBannerSize();
 }
 
 function toggleMinimizeSoldItems()
@@ -4526,6 +4538,8 @@ function updateMinimizeBox(buttonElement, selector)
 			minimizeBox({target:$(buttonElement)}, selector);
 		else
 			maximizeBox({target:$(buttonElement)}, selector);
+		
+		if (window.updateBannerSize) updateBannerSize();
 	});
 }
 
@@ -4542,12 +4556,14 @@ function minimizeBox(event, selector)
 {
 	$(selector).addClass("minimized-chat");
 	localStorage.setItem("minimizeBox"+selector, "true");
+	if (window.updateBannerSize) updateBannerSize();
 }
 
 function maximizeBox(event, selector)
 {
 	$(selector).removeClass("minimized-chat");
 	localStorage.setItem("minimizeBox"+selector, "false");
+	if (window.updateBannerSize) updateBannerSize();
 }
 
 function isBoxMinimized(selector)

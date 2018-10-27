@@ -1684,10 +1684,12 @@ public class MainPageUpdateService extends Service
 			{
 				String iconUrl = (String)item.getProperty("icon2");
 				if (iconUrl==null || iconUrl.trim().length()==0) iconUrl = (String)item.getProperty("icon");
+				if (iconUrl==null || iconUrl.trim().length()==0) iconUrl = (String)item.getProperty("GridMapObject:image");
 				if (iconUrl!=null && iconUrl.startsWith("http://"))
 					iconUrl = "https://"+iconUrl.substring(7);
 				else if (iconUrl!=null && iconUrl.startsWith("http")==false)
 					iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
+				
 				html.append("<div class='clue' rel='/odp/viewitemmini?itemId=").append(item.getKey().getId()).append("'>");
 				html.append("<img src='").append(iconUrl).append("' border=0/>");
 				html.append("</div>");

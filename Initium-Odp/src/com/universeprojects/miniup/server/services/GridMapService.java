@@ -472,7 +472,10 @@ public class GridMapService {
 				if (firePercentComplete!=null)
 				{
 					if (firePercentComplete>=45)
-						lightLevel = 300d;
+					{
+						lightLevel = (Double)item.getProperty("Fireplace:lightRadius");
+						if (lightLevel==null) lightLevel = 300d;
+					}
 				}
 			}
 			if (item.getProperty("GridMapObject:image")==null || item.getProperty("GridMapObject:imageWidth")==null || item.getProperty("GridMapObject:imageHeight")==null) 
@@ -1140,7 +1143,10 @@ public class GridMapService {
 			if (firePercentComplete!=null)
 			{
 				if (firePercentComplete>=45)
-					lightLevel = 300d;
+				{
+					lightLevel = (Double)item.getProperty("Fireplace:lightRadius");
+					if (lightLevel==null) lightLevel = 300d;
+				}
 			}
 		}
 		

@@ -1593,7 +1593,7 @@ function addGridObjectToMap(gridObject) {
     {
         var bottom =  gridObject.yGridCoordLocal * scaledGridCellHeight + (scaledGridCellHeight / 2) - (gridObject.yGridCellOffset);
         var left = 200+gridObject.xGridCoordLocal * scaledGridCellWidth - (scaledGridCellWidth / 2) - (gridObject.xImageOrigin) + (gridObject.xGridCellOffset);
-    	var lightHighlight = "<div id='lightEffect" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key+"' style='width:"+gridObject.lightLevel+"px; height:"+(gridObject.lightLevel/2)+"px; left:"+(left)+"px; bottom:"+(bottom)+"px;' class='fire-light-effect "+deletemeClass+" "+gridObjectId+"'></div>";
+    	var lightHighlight = "<div id='lightEffect" + gridObject.xGridCoord + "_" + gridObject.yGridCoord + "_" + key+"' style='animation-delay:-"+(Math.random()*15000)+"ms;width:"+gridObject.lightLevel+"px; height:"+(gridObject.lightLevel/2)+"px; left:"+(left)+"px; bottom:"+(bottom)+"px;' class='fire-light-effect "+deletemeClass+" "+gridObjectId+"'></div>";
     	$("#light-grid").append(lightHighlight);
     }
     

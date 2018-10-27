@@ -98,6 +98,9 @@ function updateDayNightCycle(forceRefresh)
 	amount*=3.0;
 	amount-=1.56;
 	
+	if (window.isOutside=="FALSE" || window.isOutside==false)
+		amount = 0;
+	
 	if (amount>1) amount = 1;
 	if (amount<0) amount = 0;
 	night = amount;
@@ -358,6 +361,7 @@ function updateBannerWeatherSystem()
 	}
 	else
 	{
+		$("#light-grid").css("filter", "brightness(0)");
 		if (bannerWeatherUpdateTimerId!=null)
 		{
 			clearInterval(bannerWeatherUpdateTimerId);

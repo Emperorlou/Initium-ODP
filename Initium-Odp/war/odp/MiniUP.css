@@ -2790,6 +2790,12 @@ position: absolute;
 	display:inline-block;
 }
 
+#immovablesPanel img
+{
+	max-height:28px;
+	max-width:32px;
+}
+
 .revealTutorial-blockout
 {
 	position:fixed;
@@ -5415,6 +5421,159 @@ div#buildingObject {
     pointer-events: none;    
 }
 
+@keyframes fireflicker {
+	 2% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 4% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 6% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 8% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 10% {
+		 transform: translate(-50%, 50%) scale(1.1);
+	}
+	 12% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 14% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 16% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 18% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 20% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 22% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 24% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 26% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 28% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 30% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 32% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 34% {
+		 transform: translate(-50%, 50%) scale(1.1);
+	}
+	 36% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 38% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 40% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 42% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 44% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 46% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 48% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 50% {
+		 transform: translate(-50%, 50%) scale(1.1);
+	}
+	 52% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 54% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 56% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 58% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 60% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 62% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 64% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 66% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 68% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 70% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 72% {
+		 transform: translate(-50%, 50%) scale(1.06);
+	}
+	 74% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 76% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 78% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 80% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 82% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 84% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 86% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 88% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 90% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 92% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 94% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 96% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 98% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 100% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+}
+
 .fire-light-effect
 {
 	position: absolute;
@@ -5424,8 +5583,12 @@ div#buildingObject {
     height: 150px;
     z-index: 11600000;
     pointer-events: none;
-    filter: brightness(0.84);
+    filter: brightness(0.91);
     transform: translate(-50%, 50%);
+    animation: fireflicker 5s infinite alternate;
+    
 }
+
+
 
 

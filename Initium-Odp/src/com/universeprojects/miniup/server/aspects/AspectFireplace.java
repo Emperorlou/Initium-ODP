@@ -633,6 +633,8 @@ public class AspectFireplace extends ItemAspect
 
 				fireplaceAspect.addFuel(inventionService, fuel, "Flammable material");
 
+				fireplaceAspect.updateFireProgress(false);
+				
 				ds.put(fireplace.getEntity());
 				db.getGridMapService().putLocationDataIfChanged(ds);
 

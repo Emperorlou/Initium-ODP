@@ -377,13 +377,17 @@ function updateBannerSize()
 	}
 	else
 	{
+		var chatSizeAdjust = 0;
+		if (isChatMinimized())
+			chatSizeAdjust = 217;
+		
 		$(".chat_box").show();
 		if (win.width()<=400)
-			$("#banner").css("height", (win.height()-309+40)+"px");
+			$("#banner").css("height", (win.height()-309+40+chatSizeAdjust)+"px");
 		else if (win.width()<=480)
-			$("#banner").css("height", (win.height()-309)+"px");
+			$("#banner").css("height", (win.height()-309+chatSizeAdjust)+"px");
 		else
-			$("#banner").css("height", (win.height()-333)+"px");
+			$("#banner").css("height", (win.height()-333+chatSizeAdjust)+"px");
 	}
 }
 $(window).resize(updateBannerSize);
