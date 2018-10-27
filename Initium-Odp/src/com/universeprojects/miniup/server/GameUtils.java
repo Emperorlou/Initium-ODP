@@ -1455,7 +1455,7 @@ public class GameUtils
 			sb.append("				<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
 		sb.append("				<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
 		if (item.getProperty("maxWeight") != null) {
-			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"
+			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"
 										+ character.getId()
 										+ "&otherSide=Item_"
 										+ item.getKey().getId() + "\")'>Open</a>");

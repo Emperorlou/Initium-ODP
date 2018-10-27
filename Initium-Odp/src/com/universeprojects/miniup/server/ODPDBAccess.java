@@ -2109,9 +2109,12 @@ public class ODPDBAccess
 				}
 				else if ("Weapon".equals(item1Type))
 				{
-					item1Max = ((Double)item1.getProperty("_weaponMaxDamage"));
+					item1Max = (Double)item1.getProperty("_weaponMaxDamage");
 					if(item1Max == null)
-						item1.setProperty("_weaponMaxDamage", (item1Max = GameUtils.getWeaponMaxDamage(item1)));
+					{
+						item1Max = GameUtils.getWeaponMaxDamage(item1);
+						item1.setProperty("_weaponMaxDamage", item1Max);
+					}
 				}
 				
 				Double item2Max = 0.0d;
@@ -2121,9 +2124,12 @@ public class ODPDBAccess
 				}
 				else if ("Weapon".equals(item2Type))
 				{
-					item2Max = ((Double)item2.getProperty("_weaponMaxDamage"));
+					item2Max = (Double)item2.getProperty("_weaponMaxDamage");
 					if(item2Max == null)
-						item2.setProperty("_weaponMaxDamage", (item2Max = GameUtils.getWeaponMaxDamage(item2)));
+					{
+						item2Max = GameUtils.getWeaponMaxDamage(item2);
+						item2.setProperty("_weaponMaxDamage", item2Max);
+					}
 				}
 
 				if (item1Type == null) item1Type = "";
@@ -2132,22 +2138,17 @@ public class ODPDBAccess
 				if (item2Name == null) item2Name = "";
 				if (item1Cost == null) item1Cost = 0l;
 				if (item2Cost == null) item2Cost = 0l;
-				if (item1Type.compareTo(item2Type) == 0)
-				{
-					if (item1Name.compareTo(item2Name) == 0)
-					{
-						if (item1Max.compareTo(item2Max) == 0)
-						{
-							return item1Cost.compareTo(item2Cost);
-						}
-						else
-							return item1Max.compareTo(item2Max);
-					}
-					else
-						return item1Name.compareTo(item2Name);
-				}
-				else
-					return item1Type.compareTo(item2Type);
+				if (item1Max == null) item1Max = 0d;
+				if (item2Max == null) item2Max = 0d;
+				
+				int compValue = item1Type.compareTo(item2Type);
+				if (compValue != 0) return compValue;
+				compValue = item1Name.compareTo(item2Name);
+				if (compValue != 0) return compValue;
+				compValue = item1Max.compareTo(item2Max);
+				if (compValue != 0) return compValue;
+				// If all other comparisons equal, compare costs.
+				return item1Cost.compareTo(item2Cost);
 			}
 
 		});
@@ -5112,7 +5113,7 @@ public class ODPDBAccess
 							loot+="			<a onclick='characterDropItem(event, "+item.getKey().getId()+", loadInventory)' >Drop on ground</a>";
 							if (item.getProperty("maxWeight")!=null)
 							{
-								loot+="<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
+								loot+="<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
 							}
 							loot+="		</div>";
 							loot+="</div>";
