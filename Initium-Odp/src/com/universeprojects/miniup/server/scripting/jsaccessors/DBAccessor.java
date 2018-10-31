@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.wrappers.Buff;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
+import com.universeprojects.miniup.server.scripting.wrappers.Discovery;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
 import com.universeprojects.miniup.server.scripting.wrappers.Path;
@@ -422,6 +424,31 @@ public class DBAccessor {
 		if(location == null) return false;
 		character.wrappedEntity.setProperty("homeTownKey", location.getKey());
 		return true;
+	}
+	
+	public EntityWrapper newDiscovery(Character character, Path path)
+	{
+		CachedEntity discovery = null;
+		if (path.getKey().isComplete() && character.getKey().isComplete())
+		{
+			CachedEntity oldDiscovery = getDiscoveryByEntity(character.getKey(), entity.getKey());
+			if (oldDiscovery != null) discovery = oldDiscovery;
+		}
+
+		if(discovery==null)
+		{
+			CachedEntity discovery = new CachedEntity("Discovery");
+			// Set the starting attributes
+			discovery.setProperty("characterKey", character.getKey());
+			discovery.setProperty("entityKey", path.getKey());
+			discovery.setProperty("kind", path.getKind());
+			discovery.setProperty("location1Key", path.getLocation1Key());
+			discovery.setProperty("location2Key", path.getLocation2Key());
+			discovery.setProperty("hidden", false);
+			discovery.setProperty("createdDate", new Date());
+		}
+		
+		return new Discovery(discovery, db);
 	}
 	
 	/*################# COMBAT ###################*/

@@ -137,11 +137,12 @@ public class MoveItemsController extends PageController {
 		
 		if (otherSide.getKind().equals("Location"))
 		{
-			header = "<h5>"+otherSide.getProperty("name")+"</h5>";
+			header = "<div class='location-heading-style'><h5>"+otherSide.getProperty("name")+"</h5>";
 			if (otherSide.getProperty("banner")!=null)
 			{
-				header += "<img src='https://initium-resources.appspot.com/"+otherSide.getProperty("banner")+"' border=0 style='width:80%'/>";
+				header += "<div class='banner-background-image' style='width:80%;background-image:url(\"https://initium-resources.appspot.com"+otherSide.getProperty("banner")+"\")' border=0></div>";
 			}
+			header += "</div>";
 		}
 		else if (otherSide.getKind().equals("Character"))
 		{
@@ -265,12 +266,12 @@ public class MoveItemsController extends PageController {
 		if (CommonChecks.checkItemIsMovable(item))
 		{
 			if(isSelfSide)
-				curItem.append("<a onclick='moveItem(event, "+item.getId()+", \""+otherSide.getKind()+"\", "+otherSide.getId()+")' class='move-left'>&xrarr;</a>");
+				curItem.append("<a onclick='moveItem(event, "+item.getId()+", \""+otherSide.getKind()+"\", "+otherSide.getId()+")' class='move-left'>--&gt;</a>");
 			else
-				curItem.append("<a onclick='moveItem(event, "+item.getId()+", \""+selfSide.getKind()+"\", "+selfSide.getId()+")' class='move-right'>&xlarr;</a>");
+				curItem.append("<a onclick='moveItem(event, "+item.getId()+", \""+selfSide.getKind()+"\", "+selfSide.getId()+")' class='move-right'>&lt;--</a>");
 		}
 		curItem.append("<div class='main-item'>");
-		curItem.append(GameUtils.renderItem(db, character, item));				
+		curItem.append(GameUtils.renderItem(db, character, item));
 		curItem.append("<div class='main-item-controls'>");
 		if (item.getProperty("maxWeight")!=null)
 		{
