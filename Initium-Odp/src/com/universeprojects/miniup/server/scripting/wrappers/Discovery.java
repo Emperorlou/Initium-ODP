@@ -50,4 +50,14 @@ public class Discovery extends Path
 	{
 		return GameUtils.booleanEquals(this.getProperty("hidden"), true);
 	}
+	
+	public boolean setHidden(boolean isHidden)
+	{
+		if(this.isHidden() ^ isHidden)
+		{
+			this.setProperty("hidden", isHidden);
+			return true;
+		}
+		return false;
+	}
 }
