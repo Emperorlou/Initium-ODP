@@ -122,7 +122,7 @@ public class MoveItemsController extends PageController {
 			header = "<h5>"+selfSide.getProperty("name")+"</h5>"; 
 			if (selfSide.getProperty("banner")!=null)
 			{
-				header += "<img src='https://initium-resources.appspot.com/"+selfSide.getProperty("banner")+"' border=0 style='width:80%'/>";
+				header += "<img src='"+GameUtils.getResourceUrl(selfSide.getProperty("banner"))+"' border=0 style='width:80%'/>";
 			}
 		}
 		else if (selfSide.getKind().equals("Character"))
@@ -140,7 +140,7 @@ public class MoveItemsController extends PageController {
 			header = "<div class='location-heading-style'><h5>"+otherSide.getProperty("name")+"</h5>";
 			if (otherSide.getProperty("banner")!=null)
 			{
-				header += "<div class='banner-background-image' style='width:80%;background-image:url(\"https://initium-resources.appspot.com"+otherSide.getProperty("banner")+"\")' border=0></div>";
+				header += "<div class='banner-background-image' style='width:80%;background-image:url(\""+GameUtils.getResourceUrl(otherSide.getProperty("banner"))+"\")' border=0></div>";
 			}
 			header += "</div>";
 		}
@@ -163,7 +163,7 @@ public class MoveItemsController extends PageController {
 		{
 			commands.append("<div style='height:30px;'>");
 			commands.append("<span>");
-			commands.append("<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' border=0/>"+GameUtils.formatNumber(selfSide.getProperty("dogecoins")));
+			commands.append("<img src='" + GameUtils.getResourceUrl("images/dogecoin-18px.png") + "' border=0/>"+GameUtils.formatNumber(selfSide.getProperty("dogecoins")));
 			commands.append("</span>");
 			commands.append("<div class='main-item-controls' style='float:right;margin:3px; margin-right:39px;'>");
 			commands.append("<a onclick='depositDogecoinsToItem("+otherSide.getId()+", event)'>Deposit gold &xrarr;</a>");
@@ -183,7 +183,7 @@ public class MoveItemsController extends PageController {
 			{
 				commands.append("<div style='height:30px;'>");
 				commands.append("<span style='float:right'>");
-				commands.append("<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' border=0/>"+GameUtils.formatNumber(otherSide.getProperty("dogecoins")));
+				commands.append("<img src='" + GameUtils.getResourceUrl("images/dogecoin-18px.png") + "' border=0/>"+GameUtils.formatNumber(otherSide.getProperty("dogecoins")));
 				commands.append("</span>");
 				commands.append("<div class='main-item-controls'>");
 				commands.append("<a onclick='collectDogecoinsFromItem("+otherSide.getId()+", event)'>&xlarr; Collect gold</a>");
@@ -260,7 +260,7 @@ public class MoveItemsController extends PageController {
 		{
 			itemName = (String)item.getProperty("name");
 			itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='/odp/viewitemmini?itemId="+item.getId()+"'";
-			itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
+			itemIconElement = "<img src='"+GameUtils.getResourceUrl(item.getProperty("icon"))+"' border=0/>"; 
 		}
 
 		if (CommonChecks.checkItemIsMovable(item))
