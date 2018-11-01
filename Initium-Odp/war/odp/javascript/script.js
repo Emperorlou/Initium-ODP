@@ -2108,24 +2108,25 @@ function orderInstantNameFlavorCustomization(eventObject, itemId, itemName, flav
 	});
 }
 
-function doTriggerGlobal(event, globalId, attributes, entities)
+function doTriggerGlobal(event, globalId, attributes, entities, closeTools)
 {
-	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities);
+	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities, closeTools);
 }
 
-function doTriggerLocation(event, effectId, locationId, attributes)
+function doTriggerLocation(event, effectId, locationId, attributes, closeTools)
 {
-	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes);
+	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, closeTools);
 }
 
-function doTriggerItem(event, effectId, itemId, attributes)
+function doTriggerItem(event, effectId, itemId, attributes, closeTools)
 {
-	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes);
+	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, closeTools);
 }
 
-function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities)
+function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools)
 {
-	closeAllTooltips();
+	if(closeTools == null || closeTools)
+		closeAllTooltips();
 	var params = {};
 	params[sourceType + "Id"] = sourceId;
 	if(effectId) params["scriptId"] = effectId;
