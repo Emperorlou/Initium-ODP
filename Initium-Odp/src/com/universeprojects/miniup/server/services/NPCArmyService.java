@@ -147,7 +147,7 @@ public class NPCArmyService extends Service
 				deadNPCs.add(npcs.get(i).getKey());
 				npcs.remove(i);
 			}
-			else if(npcs.get(i).getProperty("combatantKey") != null)
+			else if(npcs.get(i).getProperty("combatant") != null)
 				npcs.remove(i);
 		}
 		
