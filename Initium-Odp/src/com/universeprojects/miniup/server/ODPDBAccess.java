@@ -2088,6 +2088,17 @@ public class ODPDBAccess
 	public List<CachedEntity> sortSaleItemList(List<CachedEntity> items)
 	{
 		List<CachedEntity> sorted = new ArrayList<CachedEntity>(items);
+		
+		// Adding a computed value for weapons/armor/shields for sort.
+		for(CachedEntity item:sorted)
+		{
+			String itemType = (String)item.getProperty("itemType");
+			if("Armor".equals(itemType) || "Shield".equals(itemType))
+				item.setProperty("_sortMax", ((Long)item.getProperty("blockChance")).doubleValue());
+			else if("Weapon".equals(itemType))
+				item.setProperty("_sortMax", GameUtils.getWeaponMaxDamage(item));
+		}
+		
 		Collections.sort(sorted, new Comparator<CachedEntity>()
 		{
 			@Override
@@ -2099,51 +2110,31 @@ public class ODPDBAccess
 				String item1Name = (String) item1.getProperty("name");
 				String item2Name = (String) item2.getProperty("name");
 
+				String item1Label = (String) item1.getProperty("label");
+				String item2Label = (String) item2.getProperty("label");
+
 				Long item1Cost = (Long) item1.getProperty("store-dogecoins");
 				Long item2Cost = (Long) item2.getProperty("store-dogecoins");
 				
-				Double item1Max = 0.0d;
-				if ("Armor".equals(item1Type) || "Shield".equals(item1Type))
-				{
-					item1Max = ((Long)item1.getProperty("blockChance")).doubleValue();
-				}
-				else if ("Weapon".equals(item1Type))
-				{
-					item1Max = (Double)item1.getProperty("_weaponMaxDamage");
-					if(item1Max == null)
-					{
-						item1Max = GameUtils.getWeaponMaxDamage(item1);
-						item1.setProperty("_weaponMaxDamage", item1Max);
-					}
-				}
-				
-				Double item2Max = 0.0d;
-				if ("Armor".equals(item2Type) || "Shield".equals(item2Type))
-				{
-					item2Max = ((Long)item2.getProperty("blockChance")).doubleValue();
-				}
-				else if ("Weapon".equals(item2Type))
-				{
-					item2Max = (Double)item2.getProperty("_weaponMaxDamage");
-					if(item2Max == null)
-					{
-						item2Max = GameUtils.getWeaponMaxDamage(item2);
-						item2.setProperty("_weaponMaxDamage", item2Max);
-					}
-				}
+				Double item1Max = item1.getProperty("_sortMax");
+				Double item2Max = item2.getProperty("_sortMax");
 
 				if (item1Type == null) item1Type = "";
 				if (item2Type == null) item2Type = "";
 				if (item1Name == null) item1Name = "";
 				if (item2Name == null) item2Name = "";
-				if (item1Cost == null) item1Cost = 0l;
-				if (item2Cost == null) item2Cost = 0l;
+				if (item1Label == null) item1Label = "";
+				if (item2Label == null) item2Label = "";
 				if (item1Max == null) item1Max = 0d;
 				if (item2Max == null) item2Max = 0d;
+				if (item1Cost == null) item1Cost = 0l;
+				if (item2Cost == null) item2Cost = 0l;
 				
 				int compValue = item1Type.compareTo(item2Type);
 				if (compValue != 0) return compValue;
 				compValue = item1Name.compareTo(item2Name);
+				if (compValue != 0) return compValue;
+				compValue = item1Label.compareTo(item2Label);
 				if (compValue != 0) return compValue;
 				compValue = item1Max.compareTo(item2Max);
 				if (compValue != 0) return compValue;
