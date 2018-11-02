@@ -38,6 +38,24 @@ public class AspectPassiveChange extends InitiumAspect
 	public void setPassiveChanges(List<EmbeddedEntity> passiveChanges)
 	{
 		setProperty("passiveChanges", passiveChanges);
+		
+		// Update the nextUpdate field according to these new passive changes
+		Date lowestDate = null;
+		if (passiveChanges!=null)
+			for(EmbeddedEntity passiveChangeEntry:passiveChanges)
+			{
+				Date changeDate = (Date)passiveChangeEntry.getProperty("changeDatetime");
+				if (changeDate==null) continue;
+				if (lowestDate==null) 
+				{
+					lowestDate = changeDate;
+				}
+				else if (changeDate.before(lowestDate))
+				{
+					lowestDate = changeDate;
+				}
+			}
+		setNextUpdateDate(lowestDate);
 	}
 	
 	
@@ -64,6 +82,9 @@ public class AspectPassiveChange extends InitiumAspect
 					changeOccurred = true;
 				}
 			}
+
+			setPassiveChanges(passiveChanges);
+			
 			releaseLock();
 		}
 		catch(PassiveChangeLocked e)
@@ -123,6 +144,16 @@ public class AspectPassiveChange extends InitiumAspect
 		if (changeDate==null) return true;
 		
 		return getCurrentDate().after(changeDate);
+	}
+	
+	public Date getNextUpdateDate()
+	{
+		return (Date)this.getProperty("nextUpdate");
+	}
+	
+	public void setNextUpdateDate(Date date)
+	{
+		setProperty("nextUpdate", date);
 	}
 	
 

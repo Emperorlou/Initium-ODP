@@ -37,6 +37,11 @@ public abstract class InitiumAspect implements GameAspect<Key>
 		update();
 	}
 	
+	public InitiumObject getInitiumObject()
+	{
+		return object;
+	}
+	
 	/**
 	 * This is called whenever it's time to adjust values and generally update values on the item. This may result in needing to be saved to the DB
 	 * or have realtime updates sent to people, so we return true if the object changed.

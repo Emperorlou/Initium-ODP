@@ -431,13 +431,13 @@ public class DBAccessor {
 		CachedEntity discovery = null;
 		if (path.getKey().isComplete() && character.getKey().isComplete())
 		{
-			CachedEntity oldDiscovery = getDiscoveryByEntity(character.getKey(), entity.getKey());
+			CachedEntity oldDiscovery = db.getDiscoveryByEntity(character.getKey(), path.getKey());
 			if (oldDiscovery != null) discovery = oldDiscovery;
 		}
 
 		if(discovery==null)
 		{
-			CachedEntity discovery = new CachedEntity("Discovery");
+			discovery = new CachedEntity("Discovery");
 			// Set the starting attributes
 			discovery.setProperty("characterKey", character.getKey());
 			discovery.setProperty("entityKey", path.getKey());
