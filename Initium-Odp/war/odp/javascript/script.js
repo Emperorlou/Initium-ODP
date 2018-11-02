@@ -1733,7 +1733,7 @@ function newPremiumToken()
 	});
 }
 
-function newCharacterFromUnconscious()
+function newCharacterFromUnconscious(event)
 {
 	confirmPopup("Create a new character?", "Are you Sure? If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
 		doCommand(event, "CharacterRespawn");
