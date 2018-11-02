@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 
@@ -137,9 +139,20 @@ public class NPCArmyService extends Service
 				"locationKey", getLocationKey(), 
 				"_definitionKey", getNpcDefKey());
 		
+		List<Key> deadNPCs = new ArrayList<Key>();
 		for(int i = npcs.size()-1; i>=0; i--)
+		{
 			if (npcs.get(i)==null || npcs.get(i).getProperty("hitpoints")==null || (Double)npcs.get(i).getProperty("hitpoints")<1d)
+			{
+				deadNPCs.add(npcs.get(i).getKey());
 				npcs.remove(i);
+			}
+			else if(npcs.get(i).getProperty("combatantKey") != null)
+				npcs.remove(i);
+		}
+		
+		if(deadNPCs.isEmpty()==false)
+			db.getDB().delete(deadNPCs);
 		
 		return npcs;
 	}
@@ -242,6 +255,7 @@ public class NPCArmyService extends Service
 				else
 					pathsToLocations.put(path, (Key)path.getProperty("location1Key"));
 			}
+			List<CachedEntity> locationEntities = db.getEntities(new ArrayList(pathsToLocations.values()));
 
 			log.info("Number of paths: "+paths.size());
 			// Choose a path. Paths are already shuffled so we'll just choose at random
@@ -266,13 +280,12 @@ public class NPCArmyService extends Service
 						break;
 					}
 				
-				
-				
 				// If there is no army at the next location, we will create one. If there is, we'll add a propagation value to it
 				if (npcArmyAtNextLocation==null)
 				{
-					CachedEntity locationEntity = db.getEntity(locationToPropagateTo);
+					CachedEntity locationEntity = locationEntities.get(i);
 					if (locationEntity==null) continue; // Cancel propagation to here, the location is deleted
+					if (isValidPropogateLocation(locationEntity) == false) return;
 					log.info("Propagating to a new location: "+locationToPropagateTo);
 					CachedEntity newNpcArmy = new CachedEntity("NPCArmy");
 					newNpcArmy.setProperty("maxSpawnCount", db.solveCurve_Long(getPropagatedMaxSpawnCount()));
@@ -308,8 +321,14 @@ public class NPCArmyService extends Service
 					
 				}
 			}			
-			
 		}
+	}
+	
+	public boolean isValidPropogateLocation(CachedEntity location)
+	{
+		return location != null && 
+				"Script".equals(location.getKind()) == false &&
+				CommonChecks.checkLocationIsInstance(location) == false;
 	}
 	
 	
