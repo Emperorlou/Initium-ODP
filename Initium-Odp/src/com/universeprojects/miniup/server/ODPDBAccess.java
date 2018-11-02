@@ -2116,8 +2116,8 @@ public class ODPDBAccess
 				Long item1Cost = (Long) item1.getProperty("store-dogecoins");
 				Long item2Cost = (Long) item2.getProperty("store-dogecoins");
 				
-				Double item1Max = item1.getProperty("_sortMax");
-				Double item2Max = item2.getProperty("_sortMax");
+				Double item1Max = (Double)item1.getProperty("_sortMax");
+				Double item2Max = (Double)item2.getProperty("_sortMax");
 
 				if (item1Type == null) item1Type = "";
 				if (item2Type == null) item2Type = "";
