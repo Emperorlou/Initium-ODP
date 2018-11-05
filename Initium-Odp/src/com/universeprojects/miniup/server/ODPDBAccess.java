@@ -2144,7 +2144,7 @@ public class ODPDBAccess
 				if (compValue != 0) return compValue;
 				compValue = item1Label.compareTo(item2Label);
 				if (compValue != 0) return compValue;
-				compValue = item1Max.compareTo(item2Max);
+				compValue = -item1Max.compareTo(item2Max);
 				if (compValue != 0) return compValue;
 				// If all other comparisons equal, compare costs.
 				return item1Cost.compareTo(item2Cost);
