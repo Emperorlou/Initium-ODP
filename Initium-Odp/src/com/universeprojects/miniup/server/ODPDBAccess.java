@@ -2094,9 +2094,17 @@ public class ODPDBAccess
 		{
 			String itemType = (String)item.getProperty("itemType");
 			if("Armor".equals(itemType) || "Shield".equals(itemType))
-				item.setProperty("_sortMax", ((Long)item.getProperty("blockChance")).doubleValue());
+			{
+				Double sortMax = ((Long)item.getProperty("blockChance")).doubleValue());
+				sortMax += Math.abs(((Long)item.getProperty("damageReduction")).doubleValue() / 1000.0d);
+				item.setProperty("_sortMax", sortMax);
+			}
 			else if("Weapon".equals(itemType))
-				item.setProperty("_sortMax", GameUtils.getWeaponMaxDamage(item));
+			{
+				Double sortMax = GameUtils.getWeaponMaxDamage(item);
+				sortMax += Math.abs(GameUtils.getWeaponAverageDamage(item) / 1000.0d);
+				item.setProperty("_sortMax", sortMax);
+			}
 		}
 		
 		Collections.sort(sorted, new Comparator<CachedEntity>()
@@ -4486,17 +4494,20 @@ public class ODPDBAccess
 		            for(int i = 0; i<blockingArmor.size();i++)
 		            {
 		                if (i>0) 
-				{
-				    if (blockingArmor.size() == 2)
-					armorNames += " and ";
-				    else 
-					armorNames+=", ";
-				}
-		                if (i==blockingArmor.size()-1 && i>0)
-		                    armorNames+="and ";
-		                armorNames+=(String)blockingArmor.get(i).getProperty("name");
+						{
+						    if (blockingArmor.size() == 2)
+						    	armorNames += " and ";
+						    else 
+						    	armorNames+=", ";
+						    
+						    // Only need the "final" case when we have more than 2 elements
+						    if (blockingArmor.size()>2 && i==blockingArmor.size()-1)
+			                    armorNames+="and ";
+						}
 		                
+		                armorNames+=(String)blockingArmor.get(i).getProperty("name");
 		            }
+		            
 		            long damageReduction = 0l;
 		            if ((Long)blockResult.get("damageReduction")!=null)
 		                damageReduction = (Long)blockResult.get("damageReduction");
