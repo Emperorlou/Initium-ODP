@@ -15,6 +15,7 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
@@ -187,6 +188,23 @@ public class DBAccessor {
 		CachedEntity ent = db.getEntity("Item", itemId);
 		if(ent == null) return null;
 		return new Item(ent, db);
+	}
+	
+	public Item[] getItemsByName(String itemName)
+	{
+		List<Item> foundItems = new ArrayList<Item>();
+		QueryHelper qh = new QueryHelper(db.getDB());
+		List<CachedEntity> dbItems = qh.getFilteredList("Item", 1000, null, "name", FilterOperator.EQUAL, itemName);
+		for(CachedEntity itemEnt:dbItems)
+		{
+			if(itemEnt != null)
+			{
+				foundItems.add(new Item(itemEnt, this.db));
+			}
+		}
+		
+		Item[] wrapped = new Item[foundItems.size()];
+		return foundItems.toArray(wrapped);
 	}
 
 	public Path getPathByKey(Key pathKey)
