@@ -2095,7 +2095,7 @@ public class ODPDBAccess
 			String itemType = (String)item.getProperty("itemType");
 			if("Armor".equals(itemType) || "Shield".equals(itemType))
 			{
-				Double sortMax = ((Long)item.getProperty("blockChance")).doubleValue());
+				Double sortMax = ((Long)item.getProperty("blockChance")).doubleValue();
 				sortMax += Math.abs(((Long)item.getProperty("damageReduction")).doubleValue() / 1000.0d);
 				item.setProperty("_sortMax", sortMax);
 			}
