@@ -2115,12 +2115,12 @@ function doTriggerGlobal(event, globalId, attributes, entities, closeTools)
 
 function doTriggerLocation(event, effectId, locationId, attributes, closeTools)
 {
-	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, closeTools);
+	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, null, closeTools);
 }
 
 function doTriggerItem(event, effectId, itemId, attributes, closeTools)
 {
-	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, closeTools);
+	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, null, closeTools);
 }
 
 function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools)
