@@ -427,6 +427,11 @@ public class Character extends EntityWrapper
 		return db.getValue_StringStringMap(this.wrappedEntity, "combatStatsDamageMap");
 	}
 	
+	public String getDamageMapRaw()
+	{
+		return (String)getProperty("combatStatsDamageMap");
+	}
+	
 	/*################# GROUPS ###################*/
 	public Group getGroup()
 	{
