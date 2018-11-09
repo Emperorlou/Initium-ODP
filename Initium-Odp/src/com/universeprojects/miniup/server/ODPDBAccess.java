@@ -2096,13 +2096,15 @@ public class ODPDBAccess
 			if("Armor".equals(itemType) || "Shield".equals(itemType))
 			{
 				Double sortMax = ((Long)item.getProperty("blockChance")).doubleValue();
-				sortMax += Math.abs(((Long)item.getProperty("damageReduction")).doubleValue() / 1000.0d);
+				if(sortMax != null && item.getProperty("damageReduction") != null)
+					sortMax += Math.abs(((Long)item.getProperty("damageReduction")).doubleValue() / 1000.0d);
 				item.setProperty("_sortMax", sortMax);
 			}
 			else if("Weapon".equals(itemType))
 			{
 				Double sortMax = GameUtils.getWeaponMaxDamage(item);
-				sortMax += Math.abs(GameUtils.getWeaponAverageDamage(item) / 1000.0d);
+				if(sortMax != null)
+					sortMax += Math.abs(GameUtils.getWeaponAverageDamage(item) / 1000.0d);
 				item.setProperty("_sortMax", sortMax);
 			}
 		}
