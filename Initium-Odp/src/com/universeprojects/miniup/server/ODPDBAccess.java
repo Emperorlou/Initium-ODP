@@ -4831,23 +4831,21 @@ public class ODPDBAccess
 					{
 						characterToDieFinal.setProperty("mode", "UNCONSCIOUS");
 						
-						// If character dies in a rest area, heal him to 1 hp
-						/*
-				        if ("RestSite".equals(locationFinal.getProperty("type")) || 
-				        		"CampSite".equals(location.getProperty("type")))
-				        {
-				        	characterToDieFinal.setProperty("hitpoints", 1d);
-			                 
+						// If we didn't die, and player is in a good rest site (Inn, owned house), 
+						// then revive but drop all items.
+						if(doCharacterDieChance(characterToDieFinal) == false &&
+								CommonChecks.checkLocationIsGoodRestSite(locationFinal))
+						{
+							// Died in good rest spot, heal to 1hp
+							characterToDieFinal.setProperty("hitpoints", 1d);
+				        	
 			                // Also unequip all of his equipment. 
 			                for(String slot:EQUIPMENT_SLOTS)
 			                	characterToDieFinal.setProperty("equipment"+slot, null);
-			                 
+			                
 			                // Reset his mode to normal
 			                characterToDieFinal.setProperty("mode", CHARACTER_MODE_NORMAL);
-				        }
-				        else
-				        */
-			        	doCharacterDieChance(characterToDieFinal);
+						}
 					}
 					
 					// If the attacking character was at full health when he killed his opponent, award a buff
