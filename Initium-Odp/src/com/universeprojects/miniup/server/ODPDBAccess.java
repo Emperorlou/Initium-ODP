@@ -2095,7 +2095,9 @@ public class ODPDBAccess
 			String itemType = (String)item.getProperty("itemType");
 			if("Armor".equals(itemType) || "Shield".equals(itemType))
 			{
-				Double sortMax = ((Long)item.getProperty("blockChance")).doubleValue();
+				Double sortMax = 0.0d;
+				if(item.getProperty("blockChance") != null)
+					sortMax = ((Long)item.getProperty("blockChance")).doubleValue();
 				if(sortMax != null && item.getProperty("damageReduction") != null)
 					sortMax += Math.abs(((Long)item.getProperty("damageReduction")).doubleValue() / 1000.0d);
 				item.setProperty("_sortMax", sortMax);
@@ -4831,7 +4833,23 @@ public class ODPDBAccess
 					{
 						characterToDieFinal.setProperty("mode", "UNCONSCIOUS");
 						
-						doCharacterDieChance(characterToDieFinal);
+						// If character dies in a rest area, heal him to 1 hp
+						/*
+				        if ("RestSite".equals(locationFinal.getProperty("type")) || 
+				        		"CampSite".equals(location.getProperty("type")))
+				        {
+				        	characterToDieFinal.setProperty("hitpoints", 1d);
+			                 
+			                // Also unequip all of his equipment. 
+			                for(String slot:EQUIPMENT_SLOTS)
+			                	characterToDieFinal.setProperty("equipment"+slot, null);
+			                 
+			                // Reset his mode to normal
+			                characterToDieFinal.setProperty("mode", CHARACTER_MODE_NORMAL);
+				        }
+				        else
+				        */
+			        	doCharacterDieChance(characterToDieFinal);
 					}
 					
 					// If the attacking character was at full health when he killed his opponent, award a buff
