@@ -3699,6 +3699,8 @@ public class ODPDBAccess
 		return 0L;
 	}
 	
+	
+	
 	/**
 	 * Method stub placeholder for ODP. 
 	 *
@@ -7454,6 +7456,24 @@ public class ODPDBAccess
 		List<CachedEntity> alwaysVisiblePaths = getFilteredList("Path", "location1Key", locationKey, "discoveryChance", 100d);
 		alwaysVisiblePaths.addAll(query.getFilteredList("Path", "location2Key", locationKey, "discoveryChance", 100d));
 		return alwaysVisiblePaths;
+	}
+
+	public Object solveCurve(Random rnd, String curve)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Long solveCurve_Long(Random rnd, String curve)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Double solveCurve_Double(Random rnd, String curve)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
