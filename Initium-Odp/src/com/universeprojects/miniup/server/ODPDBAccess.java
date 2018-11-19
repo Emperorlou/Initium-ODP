@@ -5169,6 +5169,9 @@ public class ODPDBAccess
 		if (loot.equals(""))
 			loot = null;
 		
+		// Clear guard settings on death.
+		GuardService gService = new GuardService(this);
+		gService.deleteAllGuardSettings(characterToDie.getKey(), location.getKey());
 		
 		// Finally, lets update the character that was passed into this method so further processing will have
 		// the updated field values
