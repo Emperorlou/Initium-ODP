@@ -4975,6 +4975,11 @@ public class ODPDBAccess
 		if (location.getProperty("territoryKey")!=null)
 			giveLootToAttacker = true;
 		
+		// If loot preference for NPC is CollectNone, do not loot the items.
+		if("NPC".equals(attackingCharacter.getProperty("type")) && giveLootToAttacker &&
+				"CollectNone".equals(attackingCharacter.getProperty("lootPreference")))
+			giveLootToAttacker = false;
+		
 		// If the character was defending a defence structure, then refresh the leader on that structure
 		if (giveLootToAttacker)
 		{
