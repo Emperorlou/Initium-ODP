@@ -462,7 +462,13 @@ body
 }
 
 
-
+#banner-text-overlay
+{
+    position: absolute;
+    margin-top: 100px;
+    width: 100%;
+    height: 57%;	
+}
 
 
 

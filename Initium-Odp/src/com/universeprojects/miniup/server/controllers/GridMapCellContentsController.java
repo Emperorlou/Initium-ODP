@@ -51,6 +51,8 @@ public class GridMapCellContentsController extends PageController
 		List<Map<String,String>> itemsFormatted = new ArrayList<>();
 		for(CachedEntity item:items)
 		{
+			if (item==null) continue;
+			
 			String gridMapObjectMode = (String)item.getProperty("GridMapObject:mode");
 			if (gridMapObjectMode==null) gridMapObjectMode = "Loose";
 			String html = GameUtils.renderItem(db, request, db.getCurrentCharacter(), item, false, false, (String)item.getAttribute("proceduralKey"));

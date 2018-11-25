@@ -29,11 +29,30 @@ public abstract class InitiumAspect implements GameAspect<Key>
 	/**
 	 * This method is called when the aspect class is instantiated. Use this to set
 	 * default field values.
+	 * 
+	 * This is called once when the object is created but before it is first saved.
 	 */
 	protected void initialize()
 	{
-		
+		update();
 	}
+	
+	public InitiumObject getInitiumObject()
+	{
+		return object;
+	}
+	
+	/**
+	 * This is called whenever it's time to adjust values and generally update values on the item. This may result in needing to be saved to the DB
+	 * or have realtime updates sent to people, so we return true if the object changed.
+	 * 
+	 * @return True is returned if anything changed.
+	 */
+	protected boolean update()
+	{
+		return false;
+	}
+	
 
 	@Override
 	public void setProperty(String fieldName, Object value)

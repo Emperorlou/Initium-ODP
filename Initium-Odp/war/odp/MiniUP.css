@@ -186,6 +186,11 @@ hr:after {
 	margin-bottom:5px;
 }
 
+.glow-white
+{
+	filter: drop-shadow(0px 0px 12px #FFFFCC) brightness(1.6);	
+}
+
 #banner-loading-icon
 {
     position: absolute;
@@ -470,19 +475,18 @@ hr:after {
 	box-shadow: inset 0px 0px 43px 2px #000000;
 	
 }
-/*.banner-daynight
+.banner-weather
 {
-	position:absolute; 
-	width:728px;
-	height:211px;
-	
-	background-color: rgba(45,55,125,0.8);
-	-webkit-background-size: cover;
-	background-size: cover;
-
-	background-blend-mode: overlay, normal;
-	-webkit-background-blend-mode: overlay, normal;	
-}*/
+	position: absolute;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    
+	background-blend-mode:screen;
+	background-size:cover!important;
+	mix-blend-mode:multiply;
+	pointer-events:none;
+}
 .path-overlay-link
 {
 	position:absolute; 
@@ -628,51 +632,11 @@ a.main-highlight:HOVER
 	color:#999999;
 }
 
-.backgroundcliptext .item-custom
-{
-	font-size:18px;
-    text-shadow: 1px 1px 1px #004e00a1;
-    color: transparent;
-    background-color: #00BB00 !important;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
-}
-
-.no-backgroundcliptext .item-custom
-{
-	font-size:18px;
-	text-shadow: 0px 0px 4px rgba(0, 200, 0, 0.7);
-    color: #00BB00 !important;
-}
-
-
-.no-backgroundcliptext .item-rare
+.item-custom
 {
     font-size: 18px;
-    text-shadow: 0px 0px 4px rgba(200, 122, 50, 0.7);
-    color: #DD7700 !important;
-}
-
-.no-backgroundcliptext .item-unique
-{
-    font-size: 18px;
-    text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
-    color: #F9CC00 !important;
-}
-
-
-.no-backgroundcliptext .item-epic
-{
-    font-size: 18px;
-    text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
-    color: #AC54FF !important;
-}
-
-.no-backgroundcliptext .item-magic
-{
-    font-size: 18px;
-    text-shadow: 0px 0px 4px rgba(200, 150, 0, 0.7);
-    color: #2597FF !important;
+    text-shadow: -1px -1px 0px rgb(0, 148, 0);
+    color: #004e00;
 }
 
 .item-normal
@@ -691,45 +655,33 @@ a.main-highlight:HOVER
 }
 
 
-.backgroundcliptext .item-rare
+.item-rare
 {
-    font-size: 18px;
-    text-shadow: 1px 1px 0px #864800b0;
-    color: transparent;
-    background-color: #DD7700;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
+    font-size: 16px;
+    text-shadow: -1px -1px 0px #DD7700;
+    color: #864800;
 }
 
-.backgroundcliptext .item-unique
+.item-unique
 {
-    font-size: 18px;
-    text-shadow: 1px 1px 1px #b38400c9;
-    color: transparent;
-	background-color: #f9c000;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
+    font-size: 16px;
+    text-shadow: -1px -1px 0px hsla(46, 100%, 48%, 1);
+    color: hsla(44, 100%, 26%, 1);
 }
 
 
-.backgroundcliptext .item-epic
+.item-epic
 {
-    font-size: 18px;
-    text-shadow: 1px 1px 0px #5e2e8cd4;
-    color: transparent;
-    background-color: #AC54FF;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
+    font-size: 16px;
+    text-shadow: -1px -1px 0px #AC54FF;
+    color: #5e2e8c;
 }
 
-.backgroundcliptext .item-magic
+.item-magic
 {
-    font-size: 18px;
-    text-shadow: 1px 1px 1px #0b2e4e8a;
-    color: transparent;
-	background-color: #2597FF;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
+	font-size: 16px;
+    text-shadow: -1px -1px 0px hsla(209, 100%, 41%, 1);
+    color: hsla(209, 75%, 22%, 1);
 }
 	
 
@@ -838,6 +790,20 @@ a.main-highlight:HOVER
 	font-size:15px;
 	color:#999999;
 	display:inline;
+}
+
+.comparestat-good
+{
+	color:#00BB00;
+	font-size:11px;
+	float:right;
+}
+
+.comparestat-bad
+{
+	color:#FF0000;
+	font-size:11px;	
+	float:right;
 }
 
 .main-item-name
@@ -2073,8 +2039,8 @@ a.range-increment {
 .item-popup-field
 {
 	display: inline-block;
-	margin-left:15px;
-	font-size:17px;
+	margin-left:5px;
+	font-size:15px;
 	margin-bottom:0px;
 }
 
@@ -2824,6 +2790,12 @@ position: absolute;
 	display:inline-block;
 }
 
+#immovablesPanel img
+{
+	max-height:28px;
+	max-width:32px;
+}
+
 .revealTutorial-blockout
 {
 	position:fixed;
@@ -2991,6 +2963,15 @@ position: absolute;
 	max-height:50px;
 }
 
+.active-png-button
+{
+	-moz-filter: contrast(0) sepia(100%) hue-rotate(71deg) saturate(7) drop-shadow(0px 0px 4px #00FF0099)!important;
+	-webkit-filter: contrast(0) sepia(100%) hue-rotate(71deg) saturate(7) drop-shadow(0px 0px 4px #00FF0099)!important;
+	filter: contrast(0) sepia(100%) hue-rotate(71deg) saturate(7) drop-shadow(0px 0px 4px #00FF0099)!important;
+}
+
+
+
 /* Minimap */
 
 .minimap-container
@@ -3078,6 +3059,15 @@ position: absolute;
 	left: 29%;	
 }
 
+.minimap-button-localplaces
+{
+	background-image:url(https://initium-resources.appspot.com/images/ui3/local-places1.png);
+	width:122px;
+	height:48px;
+	bottom: -5px;
+	left: 29%;	
+}
+
 
 
 
@@ -3102,6 +3092,52 @@ position: absolute;
 
 
 
+
+/*/////////////////////////////////////////////////////
+// Mini page popup
+*/
+
+
+.mini-page-popup
+{
+display: inline-flex;
+    flex-direction: column;
+    width: 300px;
+    z-index: 10000000;
+    
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    max-height: 100%;
+    margin: 0px;
+    border-bottom-width: 0px!important;
+    border-right-width: 0px!important;
+    max-width: 50%;}
+
+#mini-page-popup-contents
+{
+	overflow-y: auto;
+	height: 100%;	
+	padding-bottom:15px;
+}
+
+.mini-page-popup-X
+{
+	position: absolute;
+    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    color: #e2b766;
+    width: 57px;
+    height: 46px;
+    text-align: center;
+    padding-top: 13px;
+    padding-left: 1px;
+    z-index: 1100001;
+    font-family: dos;
+    font-size: 26px;
+	top: -12px;
+    right: -9px;
+    transform: scale(0.7);
+}
 
 
 
@@ -3468,6 +3504,13 @@ position: absolute;
 		font-size:11px;
 		width: 35%;
 	}
+	
+	.mini-page-popup-X
+	{
+		top: -16px;
+	    right: -12px;
+	    transform: scale(0.6);
+	}	
 	
 	
 	.make-popup
@@ -4690,7 +4733,7 @@ body
 .quest-container
 {
 	position:relative;
-	margin-left:9px;
+	margin-left:25px;
 }
 
 
@@ -4844,6 +4887,17 @@ body
 	display:none;
 	color: #3e3323;
 }
+
+.global-navigation-button.local-places
+{
+	position: absolute;
+    background-image: url(https://initium-resources.appspot.com/images/ui3/local-places1.png);
+    width: 122px;
+    height: 48px;
+    bottom: -56px;
+    right: -28px;
+}
+
 
 .location-2d
 {
@@ -5083,6 +5137,8 @@ body
 		font-family: sans-serif;
 		font-size:10px;
 	}
+	
+	
 }
 
 @media (max-width:400px)
@@ -5281,6 +5337,7 @@ body
 }
 
 .vpcontainer {
+	background-image: url(https://initium-resources.appspot.com/images/2d/viewport-background1.jpg);	
 	height: 100%;
 	width: 100%;
 	top:0px;left:0px;
@@ -5349,3 +5406,189 @@ div#buildingObject {
     background-repeat: no-repeat;
     background-size: contain;
 }
+
+#light-grid
+{
+	position: absolute;
+    transform: scale(0.841841);
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    mix-blend-mode: color-dodge;
+    pointer-events: none;    
+}
+
+@keyframes fireflicker {
+	 2% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 4% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 6% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 8% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 10% {
+		 transform: translate(-50%, 50%) scale(1.1);
+	}
+	 12% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 14% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 16% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 18% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 20% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 22% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 24% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 26% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 28% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 30% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 32% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 34% {
+		 transform: translate(-50%, 50%) scale(1.1);
+	}
+	 36% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 38% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 40% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 42% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 44% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 46% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 48% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 50% {
+		 transform: translate(-50%, 50%) scale(1.1);
+	}
+	 52% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 54% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 56% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 58% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 60% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 62% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 64% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 66% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 68% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 70% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 72% {
+		 transform: translate(-50%, 50%) scale(1.06);
+	}
+	 74% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 76% {
+		 transform: translate(-50%, 50%) scale(0.92);
+	}
+	 78% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 80% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 82% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+	 84% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 86% {
+		 transform: translate(-50%, 50%) scale(0.94);
+	}
+	 88% {
+		 transform: translate(-50%, 50%) scale(1);
+	}
+	 90% {
+		 transform: translate(-50%, 50%) scale(1.08);
+	}
+	 92% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 94% {
+		 transform: translate(-50%, 50%) scale(0.98);
+	}
+	 96% {
+		 transform: translate(-50%, 50%) scale(1.04);
+	}
+	 98% {
+		 transform: translate(-50%, 50%) scale(0.96);
+	}
+	 100% {
+		 transform: translate(-50%, 50%) scale(1.02);
+	}
+}
+
+.fire-light-effect
+{
+	position: absolute;
+    background: url(https://i.imgur.com/VYD0yH6.png);
+    background-size: 100% 100%;
+    width: 300px;
+    height: 150px;
+    z-index: 11600000;
+    pointer-events: none;
+    filter: brightness(0.91);
+    transform: translate(-50%, 50%);
+    animation: fireflicker 5s infinite alternate;
+    
+}
+
+
+
+

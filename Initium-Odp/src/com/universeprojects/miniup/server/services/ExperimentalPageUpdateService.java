@@ -143,28 +143,34 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		
 		GridMapService gridMapService = new GridMapService(db, location);
 		newHtml.append("<div id='viewportcontainer' class='vpcontainer'>");
-		newHtml.append("<div id='menu' class='menuContainer' style='visibility: hidden;'></div>");
 		newHtml.append("<div id='viewport' class='vp'>");
 
-		newHtml.append("<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
-		newHtml.append("<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
+		newHtml.append("	<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
+		newHtml.append("	<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
 		
-		newHtml.append("<div id='grid' class='grid'>");
-		newHtml.append("<div id='ui-layer' class='uiLayer'></div>");
-		newHtml.append("<div id='cell-layer' class='cellLayer'></div>");
-		newHtml.append("<div id='ground-layer' class='groundLayer'></div>");
-		newHtml.append("<div id='object-layer' class='objectLayer'></div>");
-		newHtml.append("</div>");
+		newHtml.append("	<div id='grid' class='grid'>");
+		newHtml.append("		<div id='ui-layer' class='uiLayer'></div>");
+		newHtml.append("		<div id='cell-layer' class='cellLayer'></div>");
+		newHtml.append("		<div id='ground-layer' class='groundLayer'></div>");
+		newHtml.append("		<div id='object-layer' class='objectLayer'></div>");
+		newHtml.append("	</div>");
+		newHtml.append("	<div class='banner-weather'></div>");
+		newHtml.append("	<div id='light-grid'></div>");
 		newHtml.append("</div>");
 		newHtml.append("</div>");
 //		newHtml.append("<button type='button' onclick='openMenu()'>Menu</button>");
 //		newHtml.append("<button type='button' onclick='mapPlow(event)'>Plow</button>");
 //		newHtml.append("<button type='button' onclick='mapPlaceHouse(event)' style='position:relative'>Place House</button>");
 //		newHtml.append("<button type='button' onclick='mapPlaceCity(event)' style='position:relative'>Place City</button>");
-		newHtml.append("<center><p id='selectedObjects' class='selectedObjectList'></p></center>");
 		newHtml.append("<script type='text/javascript' src='/odp/javascript/Sandbox.js?v="+GameUtils.version+"'></script>");
 		newHtml.append("<script>");
-		GridMap gridMap = gridMapService.buildNewGrid();
+		
+		GridMap gridMap = null;
+		if (CommonChecks.checkCharacterIsInCombat(character) && CommonChecks.checkNPCIs2DCombatMode(getCombatant()))
+			gridMap = gridMapService.buildNewGridForCombat(character, getCombatant());
+		else
+			gridMap = gridMapService.buildNewGrid();
+		
 		String gridMapData = "";
 		if (gridMap!=null) gridMapData = gridMap.toString();
 		newHtml.append("var mapData = '" + gridMapData + "';");
@@ -175,6 +181,26 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("$(document).on('click', '#somebutton', function() { pressedButton(); });");
 		newHtml.append("updateTallTreeButton();");
 		newHtml.append("</script>");
+		
+		
+		
+		// We're in combat, lets throw up some handy buttons
+		if (CommonChecks.checkCharacterIsInCombat(character))
+		{
+			List<CachedEntity> weapons = db.getEntities((Key)character.getProperty("equipmentLeftHand"), (Key)character.getProperty("equipmentRightHand"));
+			String leftIcon = GameUtils.getResourceUrl("images/small/Pixel_Art-Weapons-Other-Natural-Natural2.png"); 
+			if (weapons.get(0)!=null)
+				leftIcon = GameUtils.getResourceUrl(weapons.get(0).getProperty(GameUtils.getItemIconToUseFor("equipmentLeftHand", weapons.get(0))));
+			
+			String rightIcon = GameUtils.getResourceUrl("images/small/Pixel_Art-Weapons-Other-Natural-Natural2.png");
+			if (weapons.get(1)!=null)
+				rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
+			
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 40, "<img src='"+leftIcon+"' alt='Left Hand' class='combat-button' />", "doCombatAttackLeftHand(event)", "1", 49));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)", "2", 50));
+			newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)", "3", 51));
+		}
+		
 		
 		return updateHtmlContents(".location-2d", newHtml.toString());
 	}
@@ -195,5 +221,18 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		html = "<a class='page-popup-X' onclick='toggleMovementState()'>X</a>"+html;
 		
 		return updateHtmlContents(".map-contents", html);
+	}
+	
+	@Override
+	protected String getAdditionalLocationJs()
+	{
+		StringBuilder js = new StringBuilder();
+		
+		if (CommonChecks.checkCharacterIsInCombat(character) && 
+				CommonChecks.checkCharacterIsIncapacitated(character)==false && 
+				CommonChecks.checkNPCIs2DCombatMode(getCombatant()))
+			js.append("onCombat2DBegin();");
+		
+		return js.toString();
 	}
 }

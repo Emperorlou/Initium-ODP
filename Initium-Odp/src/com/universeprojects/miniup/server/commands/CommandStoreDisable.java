@@ -37,6 +37,7 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 			db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_NORMAL);
 			db.doCharacterTimeRefresh(ds, character);
 		}
-		addCallbackData("html", HtmlComponents.generateToggleStorefront(character));
+		updateHtml("#toggleStorefront", HtmlComponents.generateToggleStorefront(character));
+		updateHtml("#manageStorefront", HtmlComponents.generateManageStoreButton(character));
 	}
 }

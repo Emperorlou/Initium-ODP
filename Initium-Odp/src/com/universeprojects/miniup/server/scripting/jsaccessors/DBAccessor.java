@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -22,6 +26,7 @@ import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.wrappers.Buff;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
+import com.universeprojects.miniup.server.scripting.wrappers.Discovery;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
 import com.universeprojects.miniup.server.scripting.wrappers.Path;
@@ -149,6 +154,28 @@ public class DBAccessor {
 		return new Location(ent, db);
 	}
 	
+	public Location[] getLocationsByParentKey(Key locationKey)
+	{
+		List<Location> childLocs = new ArrayList<Location>();
+		QueryHelper qh = new QueryHelper(db.getDB());
+		List<CachedEntity> dbLocs = qh.getFilteredList("Location", 1000, null, "parentLocationKey", FilterOperator.EQUAL, locationKey);
+		for(CachedEntity locEnt:dbLocs)
+		{
+			if(locEnt != null)
+			{
+				childLocs.add(new Location(locEnt, this.db));
+			}
+		}
+		
+		Location[] wrapped = new Location[childLocs.size()];
+		return childLocs.toArray(wrapped);
+	}
+	
+	public Location[] getLocationsByParentId(Long locationId)
+	{
+		return getLocationsByParentKey(getKey("Location", locationId));
+	}
+	
 	public Item getItemByKey(Key itemKey)
 	{
 		CachedEntity ent = db.getEntity(itemKey);
@@ -161,6 +188,23 @@ public class DBAccessor {
 		CachedEntity ent = db.getEntity("Item", itemId);
 		if(ent == null) return null;
 		return new Item(ent, db);
+	}
+	
+	public Item[] getItemsByName(String itemName)
+	{
+		List<Item> foundItems = new ArrayList<Item>();
+		QueryHelper qh = new QueryHelper(db.getDB());
+		List<CachedEntity> dbItems = qh.getFilteredList("Item", 1000, null, "name", FilterOperator.EQUAL, itemName);
+		for(CachedEntity itemEnt:dbItems)
+		{
+			if(itemEnt != null)
+			{
+				foundItems.add(new Item(itemEnt, this.db));
+			}
+		}
+		
+		Item[] wrapped = new Item[foundItems.size()];
+		return foundItems.toArray(wrapped);
 	}
 
 	public Path getPathByKey(Key pathKey)
@@ -361,6 +405,11 @@ public class DBAccessor {
 		return newItem;
 	}
 	
+	public Double[] getCharacterMax(Character character)
+	{
+		return db.getMaxCharacterStats(character.getKey());
+	}
+	
 	public boolean clearBuffFromCache(Buff buff)
 	{
 		if(buff.parentEntityKey() == null) return false;
@@ -393,6 +442,31 @@ public class DBAccessor {
 		if(location == null) return false;
 		character.wrappedEntity.setProperty("homeTownKey", location.getKey());
 		return true;
+	}
+	
+	public EntityWrapper newDiscovery(Character character, Path path)
+	{
+		CachedEntity discovery = null;
+		if (path.getKey().isComplete() && character.getKey().isComplete())
+		{
+			CachedEntity oldDiscovery = db.getDiscoveryByEntity(character.getKey(), path.getKey());
+			if (oldDiscovery != null) discovery = oldDiscovery;
+		}
+
+		if(discovery==null)
+		{
+			discovery = new CachedEntity("Discovery");
+			// Set the starting attributes
+			discovery.setProperty("characterKey", character.getKey());
+			discovery.setProperty("entityKey", path.getKey());
+			discovery.setProperty("kind", path.getKind());
+			discovery.setProperty("location1Key", path.getLocation1Key());
+			discovery.setProperty("location2Key", path.getLocation2Key());
+			discovery.setProperty("hidden", false);
+			discovery.setProperty("createdDate", new Date());
+		}
+		
+		return new Discovery(discovery, db);
 	}
 	
 	/*################# COMBAT ###################*/

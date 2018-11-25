@@ -1,3 +1,6 @@
+var selectedTileX = null;
+var selectedTileY = null;
+
 var uiStyle = localStorage.getItem("selectUIStyle");
 if (uiStyle==null) uiStyle = "classic";
 
@@ -836,24 +839,19 @@ function storeRenameNew(eventObject, oldName)
 function storeDisabledNew(eventObject)
 {
 	var clickedElement = $(eventObject.currentTarget);
-	doCommand(eventObject, "StoreDisable", null, function(data, error){
-		if (error) return;
-		clickedElement.replaceWith(data.html);
-	});
+	doCommand(eventObject, "StoreDisable");
 }
 
 function storeEnabledNew(eventObject)
 {
 	var clickedElement = $(eventObject.currentTarget);
-	doCommand(eventObject, "StoreEnable", null, function(data, error){
-		if (error) return;
-		clickedElement.replaceWith(data.html);
-	});
+	doCommand(eventObject, "StoreEnable");
 }
 
 function storeSetSaleNew(eventObject)
 {
-	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale){
+	promptPopup("Store-wide Price Adjustment", "Enter the percentage you would like to adjust the value of all your wares. For example, 25 will case all the items in your store to sell at 25% of the original value. Another example, 100 will cause your items to sell at full price.", 100, function(sale)
+	{
 		if (sale!=null)
 		{
 			doCommand(eventObject,"StoreSetSale",{"sale":sale});
@@ -995,7 +993,7 @@ function loadLocationItems()
 	closeAllPagePopups();
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup("/odp/ajax_moveitems.jsp?preset=location", null, "Nearby Items");
+	pagePopup("/odp/ajax_moveitems?preset=location", null, "Nearby Items");
 //	$("#main-itemlist").load("locationitemlist.jsp");
 //	$("#main-itemlist").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4 id='main-itemlist-close'>Nearby items</h4></div>");
@@ -1735,7 +1733,7 @@ function newPremiumToken()
 	});
 }
 
-function newCharacterFromUnconscious()
+function newCharacterFromUnconscious(event)
 {
 	confirmPopup("Create a new character?", "Are you Sure? If you do this, your unconscious character will be die immediately and you will be given a new character of the same name instead.\n\nAre you SURE you want to start a new character?", function(){
 		doCommand(event, "CharacterRespawn");
@@ -1995,9 +1993,9 @@ function viewContainer(containerId, title, closePopups)
 	}
 	
 	if(containerId == null)
-		pagePopup("/odp/ajax_moveitems.jsp?preset=location", null, title || "Nearby Items");
+		pagePopup("/odp/ajax_moveitems?preset=location", null, title || "Nearby Items");
 	else
-		pagePopup("/odp/ajax_moveitems.jsp?selfSide=Character_"+window.characterId+"&otherSide=Item_"+containerId, null, title);
+		pagePopup("/odp/ajax_moveitems?selfSide=Character_"+window.characterId+"&otherSide=Item_"+containerId, null, title);
 }
 
 function renameCharacter(eventObject, currentCharName)
@@ -2110,24 +2108,25 @@ function orderInstantNameFlavorCustomization(eventObject, itemId, itemName, flav
 	});
 }
 
-function doTriggerGlobal(event, globalId, attributes, entities)
+function doTriggerGlobal(event, globalId, attributes, entities, closeTools)
 {
-	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities);
+	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities, closeTools);
 }
 
-function doTriggerLocation(event, effectId, locationId, attributes)
+function doTriggerLocation(event, effectId, locationId, attributes, closeTools)
 {
-	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes);
+	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, null, closeTools);
 }
 
-function doTriggerItem(event, effectId, itemId, attributes)
+function doTriggerItem(event, effectId, itemId, attributes, closeTools)
 {
-	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes);
+	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, null, closeTools);
 }
 
-function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities)
+function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools)
 {
-	closeAllTooltips();
+	if(closeTools == null || closeTools)
+		closeAllTooltips();
 	var params = {};
 	params[sourceType + "Id"] = sourceId;
 	if(effectId) params["scriptId"] = effectId;
@@ -2698,7 +2697,7 @@ function createWelcomeWindow()
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +")'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +")'>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='closepopupMessage(" + popupsNum +");viewQuest(\"ag1zfnBsYXlpbml0aXVtchULEghRdWVzdERlZhiAgJD-ncrKCQw\");'>"+
@@ -2750,12 +2749,11 @@ function createDonationWindow()
 	windowHtml+="<h2 style='text-align:center;'>The cost of a full account will soon increase!</h2>" +
 			"<p>Currently, while Initium is still in development, you can get a full premium account for only <b>$5.00</b> however the cost for a premium account will " +
 			"increase once the game is officially launched. Take advantage of this pre-launch price by donating at least 5 dollars.</p>" +
-			"<p>" +
+			"<p>" + 
 			"Premium account features include:" +
 			"<ul>" +
-			"<li>The ability to be rescued from death</li>" +
-			"<li>Multiple characters on the same account</li>" +
-			"<li>Your characters will not forget their houses when they die</li>" +
+			"<li>Other players can rescue you if you go unconscious</li>" +
+			"<li>Multiple characters on the same account (8 character slots to start)</li>" +
 			"</ul>" +
 			"</p>" +
 			"<p>Getting a premium account now will ensure your account will be grandfathered in when the price structure changes!</p>" +
@@ -2786,7 +2784,7 @@ function createDonationWindow()
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='$(\"#donatequick\").submit(); closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
@@ -2838,9 +2836,8 @@ function createUpgradeToPremiumWindow()
 				"<p>" +
 				"Premium account features include:" +
 				"<ul>" +
-				"<li>The ability to be rescued from death</li>" +
-				"<li>Multiple characters on the same account</li>" +
-				"<li>Your characters will not forget their houses when they die</li>" +
+				"<li>Other players can rescue you if you go unconscious</li>" +
+				"<li>Multiple characters on the same account (8 character slots to start)</li>" +
 				"</ul>" +
 				"</p>" +
 				"<p>Getting a premium account now will ensure your account will be grandfathered in when the price structure changes!</p>" +
@@ -2873,7 +2870,7 @@ function createUpgradeToPremiumWindow()
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(http://imgur.com/h3Fr3sx.png);' onclick='closepopupMessage(" + popupsNum +"); '>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); '>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='$(\"#donatequick\").submit(); closepopupMessage(" + popupsNum +"); '>"+
@@ -3067,6 +3064,45 @@ function clearMakeIntoPopup()
 	$(".make-popup-X").remove();
 	$(".make-popup-removable").remove();
 }
+
+function clearMiniPagePopup()
+{
+	$(".mini-page-popup").html("").hide();
+}
+
+
+
+function miniPagePopup(url, title)
+{
+	window.scrollTo(0,0);
+	
+	var html = 
+			"<a class='mini-page-popup-X' onclick='clearMiniPagePopup()'>X</a>	\r\n" + 
+			"<h4>"+title+"</h4>\r\n" + 
+			"<div id='mini-page-popup-contents'>\r\n" + 
+			"	<img class='wait' src='/javascript/images/wait.gif' border='0'/>\r\n" + 
+			"</div>\r\n";
+	
+	$(".mini-page-popup").html(html).show();
+
+	$("#mini-page-popup-contents").load(url);
+}
+
+function getMiniPagePopupTitle()
+{
+	if ($(".mini-page-popup").is(':visible'))
+		return $(".mini-page-popup h4").text();
+	
+	return null;
+}
+
+function clearMiniPagePopup()
+{
+	$(".mini-page-popup").html("").hide();
+}
+
+
+
 
 function viewCharacterSwitcher()
 {
@@ -3443,7 +3479,7 @@ function viewThisLocationWindow()
 
 function viewLocalNavigation(event, showHidden)
 {
-	makeIntoPopupFromUrl("/odp/sublocations?showHidden="+showHidden, "Local Navigation", true);
+	miniPagePopup("/odp/sublocations?showHidden="+showHidden, "Local Places");
 }
 
 function showLootPopup()
@@ -3636,9 +3672,16 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
-		parameters = {"v":verifyCode};
+	{
+		parameters = {"v":verifyCode, "selected2DTileX":selectedTileX, "selected2DTileY":selectedTileY, "uiStyle": uiStyle};
+	}
 	else
+	{
 		parameters.v = verifyCode;
+		parameters.selected2DTileX = selectedTileX;
+		parameters.selected2DTileY = selectedTileY;
+		parameters.uiStyle = uiStyle;
+	}
 	
 	parameters.mainPageUrl = location.href;
 	
@@ -3884,9 +3927,16 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
-		parameters = {"v":verifyCode};
+	{
+		parameters = {"v":verifyCode, "selected2DTileX":selectedTileX, "selected2DTileY":selectedTileY, "uiStyle": uiStyle};
+	}
 	else
+	{
 		parameters.v = verifyCode;
+		parameters.selected2DTileX = selectedTileX;
+		parameters.selected2DTileY = selectedTileY;
+		parameters.uiStyle = uiStyle;
+	}
 	
 	parameters.mainPageUrl = location.href;
 	
@@ -4443,6 +4493,16 @@ function updateMinimizeChat()
 	});
 }
 
+function isChatMinimized()
+{
+	var chatbox = $(".chat_box");
+	
+	if (chatbox.hasClass("minimized-chat"))
+		return true;
+	
+	return false;
+}
+
 function toggleMinimizeChat(forceHide)
 {
 	$("#chat_tab").toggle();
@@ -4462,6 +4522,8 @@ function toggleMinimizeChat(forceHide)
 		$("#chatbox-container").addClass("chat-hide");
 		$(".minimize-chat-button").text(">");
 	}
+	
+	if (window.updateBannerSize) updateBannerSize();
 }
 
 function toggleMinimizeSoldItems()
@@ -4477,6 +4539,8 @@ function updateMinimizeBox(buttonElement, selector)
 			minimizeBox({target:$(buttonElement)}, selector);
 		else
 			maximizeBox({target:$(buttonElement)}, selector);
+		
+		if (window.updateBannerSize) updateBannerSize();
 	});
 }
 
@@ -4493,12 +4557,14 @@ function minimizeBox(event, selector)
 {
 	$(selector).addClass("minimized-chat");
 	localStorage.setItem("minimizeBox"+selector, "true");
+	if (window.updateBannerSize) updateBannerSize();
 }
 
 function maximizeBox(event, selector)
 {
 	$(selector).removeClass("minimized-chat");
 	localStorage.setItem("minimizeBox"+selector, "false");
+	if (window.updateBannerSize) updateBannerSize();
 }
 
 function isBoxMinimized(selector)

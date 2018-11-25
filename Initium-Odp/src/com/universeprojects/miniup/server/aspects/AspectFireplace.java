@@ -37,9 +37,17 @@ public class AspectFireplace extends ItemAspect
 	}
 
 	@Override
+	protected boolean update()
+	{
+		return updateFireProgress(true);
+	}
+	
+	@Override
 	protected void initialize()
 	{
-
+		super.initialize();
+		
+		updateFireProgress(true);
 	}
 
 	@Override
@@ -49,7 +57,7 @@ public class AspectFireplace extends ItemAspect
 		long currentTimeMs = System.currentTimeMillis();
 		if (isFireActive(currentTimeMs) && isFireExpired(currentTimeMs) || isFireActive(currentTimeMs) && getMinutesSinceLastUpdate(currentTimeMs) >= 5)
 		{
-			updateFireProgress();
+			updateFireProgress(false);
 		}
 
 		StringBuilder text = new StringBuilder();
@@ -161,7 +169,7 @@ public class AspectFireplace extends ItemAspect
 		inventionService.consumeItems(firewoodEntitiesToUse, quantityLimit, gerName);
 	}
 
-	public void updateFireProgress()
+	public boolean updateFireProgress(boolean doNotPutToDB)
 	{
 		long currentTime = System.currentTimeMillis();
 		if (isFireActive(currentTime))
@@ -192,17 +200,19 @@ public class AspectFireplace extends ItemAspect
 				setFuelDepletionDate(null);
 			}
 
-			setIconPostfix();
+			boolean changed = setIconPostfix();
 
-			db.getDB().put(entity);
+			if (doNotPutToDB==false)
+				db.getDB().put(entity);
+			return changed;
 		}
+		
+		return false;
 	}
 
-	private void setIconPostfix()
+	private boolean setIconPostfix()
 	{
-		if (entity.getProperty("icon") == null) return;
-
-		String oldIcon = (String) entity.getProperty("icon");
+		boolean changed = false;
 
 		long currentTimeMs = System.currentTimeMillis();
 
@@ -210,38 +220,40 @@ public class AspectFireplace extends ItemAspect
 		{
 			long minutes = getMinutesUntilExpired(currentTimeMs);
 			if (minutes < 20)
-				setIconToSmokeLight();
+				changed = setIconToSmokeLight();
 			else if (minutes < 45)
-				setIconToSmokeHeavy();
+				changed = setIconToSmokeHeavy();
 			else
-				setIconToLit();
+				changed = setIconToLit();
 		}
 		else
 		{
-			setIconToUnlit();
+			changed = setIconToUnlit();
 		}
 
-		String newIcon = (String) entity.getProperty("icon");
-
-		if (GameUtils.equals(oldIcon, newIcon) == false)
+		if (changed)
 		{
 			Key locationKey = (Key) entity.getProperty("containerKey");
 			db.sendMainPageUpdateForLocation(locationKey, db.getDB(), new String[]
 			{
 				"updateImmovablesPanel"
 			});
+			
+			// Also update the grid map cell if applicable
+			db.getGridMapService().updateEntity(entity);
 		}
-
+		
+		return changed;
 	}
 
-	private void setIconPostfix(String postfix)
+	private boolean setIconPostfix(String postfix)
 	{
+		boolean changed = false;
+		
 		String icon = (String) entity.getProperty("icon");
 
-		if (icon != null)
+		if (icon != null && icon.endsWith(postfix)==false)
 		{
-			if (icon.endsWith(postfix)) return;
-
 			if (icon.contains("-lit.gif"))
 				icon = icon.replace("-lit.gif", "");
 			else if (icon.contains("-smoke-heavy.gif"))
@@ -252,27 +264,51 @@ public class AspectFireplace extends ItemAspect
 
 			icon += postfix;
 			entity.setProperty("icon", icon);
+			
+			changed = true;
 		}
+		
+		
+		// Now updating the 2D image if it applies
+		icon = (String) entity.getProperty("GridMapObject:image");
+
+		if (icon != null && icon.endsWith(postfix)==false)
+		{
+			if (icon.contains("-lit.gif"))
+				icon = icon.replace("-lit.gif", "");
+			else if (icon.contains("-smoke-heavy.gif"))
+				icon = icon.replace("-smoke-heavy.gif", "");
+			else if (icon.contains("-smoke-light.gif"))
+				icon = icon.replace("-smoke-light.gif", "");
+			else if (icon.contains("-unlit.gif")) icon = icon.replace("-unlit.gif", "");
+
+			icon += postfix;
+			entity.setProperty("GridMapObject:image", icon);
+			
+			changed = true;
+		}
+		
+		return changed;
 	}
 
-	public void setIconToLit()
+	public boolean setIconToLit()
 	{
-		setIconPostfix("-lit.gif");
+		return setIconPostfix("-lit.gif");
 	}
 
-	public void setIconToSmokeLight()
+	public boolean setIconToSmokeLight()
 	{
-		setIconPostfix("-smoke-light.gif");
+		return setIconPostfix("-smoke-light.gif");
 	}
 
-	public void setIconToSmokeHeavy()
+	public boolean setIconToSmokeHeavy()
 	{
-		setIconPostfix("-smoke-heavy.gif");
+		return setIconPostfix("-smoke-heavy.gif");
 	}
 
-	public void setIconToUnlit()
+	public boolean setIconToUnlit()
 	{
-		setIconPostfix("-unlit.gif");
+		return setIconPostfix("-unlit.gif");
 	}
 
 	/**
@@ -466,7 +502,7 @@ public class AspectFireplace extends ItemAspect
 
 			try
 			{
-				fireplaceAspect.updateFireProgress();
+				fireplaceAspect.updateFireProgress(false);
 
 				if (fireplaceAspect.isFireActive(System.currentTimeMillis())) throw new UserErrorMessage("You cannot light a fire that is already lit.");
 
@@ -530,6 +566,11 @@ public class AspectFireplace extends ItemAspect
 				inventionService.useItem(firestarter.get(0), 1L);
 
 				ds.put(fireplace.getEntity());
+				if (db.getGridMapService().isLocationDataChanged())
+				{
+					db.getGridMapService().putLocationData(ds);
+					db.getGridMapService().updateChangedTileGraphics(this);
+				}
 				
 				CachedEntity createCampfireSkillDef = db.getEntity("ConstructItemIdeaDef", 4988291556573184L);// This is the create campfire skill
 				if (inventionService.getKnowledgeService().increaseKnowledgeFor(createCampfireSkillDef, 5, 80))
@@ -576,7 +617,7 @@ public class AspectFireplace extends ItemAspect
 			ds.beginBulkWriteMode();
 			try
 			{
-				fireplaceAspect.updateFireProgress();
+				fireplaceAspect.updateFireProgress(false);
 
 				if (fireplaceAspect.isFireActive(System.currentTimeMillis()) == false) throw new UserErrorMessage("You can only add fuel to a fire that is already started.");
 
@@ -592,7 +633,10 @@ public class AspectFireplace extends ItemAspect
 
 				fireplaceAspect.addFuel(inventionService, fuel, "Flammable material");
 
+				fireplaceAspect.updateFireProgress(false);
+				
 				ds.put(fireplace.getEntity());
+				db.getGridMapService().putLocationDataIfChanged(ds);
 
 				CachedEntity createCampfireSkillDef = db.getEntity("ConstructItemIdeaDef", 4988291556573184L);// This is the create campfire skill
 				if (inventionService.getKnowledgeService().increaseKnowledgeFor(createCampfireSkillDef, 1, 20))
@@ -608,6 +652,7 @@ public class AspectFireplace extends ItemAspect
 			if (inventionService.getDeletedEntities() != null) for (Key deletedKey : inventionService.getDeletedEntities())
 				if (deletedKey.getKind().equals("Item")) deleteHtml(".deletable-Item" + deletedKey.getId());
 
+			db.getGridMapService().updateChangedTileGraphics(this);
 		}
 
 	}

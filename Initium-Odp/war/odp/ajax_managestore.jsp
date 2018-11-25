@@ -59,10 +59,11 @@
 	
 	Double storeSale = (Double)common.getCharacter().getProperty("storeSale");
 	if (storeSale==null) storeSale = 100d;
-	request.setAttribute("storeSale", storeSale);
+	request.setAttribute("storeSale", GameUtils.formatNumber(storeSale));
 	String storeName = (String)common.getCharacter().getProperty("storeName");
-	if(storeName != null) storeName = storeName.replaceAll("'","\\\\'");
-	request.setAttribute("storeName", storeName);
+	if(storeName != null) storeName = WebUtils.jsSafe(storeName);
+	if (storeName==null) storeName = "(not set)";
+	request.setAttribute("storeName", WebUtils.jsSafe(storeName));
 	
 	
 	List<CachedEntity> buyOrders = db.getFilteredList("BuyItem", "characterKey", common.getCharacter().getKey());
@@ -74,15 +75,21 @@
 	
 	request.setAttribute("buyOrders", buyOrdersFormatted);
 	request.setAttribute("hasBuyOrders", !buyOrdersFormatted.isEmpty());
+	request.setAttribute("toggleStoreButton", HtmlComponents.generateToggleStorefront(common.getCharacter())); 
+	
 %>
 
 		<div class='main-splitScreen'>
-		<div class='boldbox'>
-		<div style="cursor:pointer" onclick="storeRenameNew(event, '${storeName}')">Store name: <%=common.getCharacter().getProperty("storeName")%></div>
-		<br><br>
-		<div>Store-wide price is currently: ${storeSale}%</div>
+		<div class='boldbox'> 
+		<div style="cursor:pointer" onclick="storeRenameNew(event, '${storeName}')">Store name: <div class='main-item-subnote'>${storeName}</div></div>
+		<div>Store-wide price is currently: <div class='main-item-subnote'>${storeSale}%</div></div>
+		<br>
+		<center>
+			${toggleStoreButton}
+			<a style='margin-left:15px;' onclick="storeRenameNew(event, '${storeName}')" minitip='Rename your store'><img src='https://initium-resources.appspot.com/images/ui/renameButton1.png' alt='Rename' border='0'/></a>
+			<a style='margin-left:15px;' onclick='storeSetSaleNew(event)' minitip='Set store-wide discounts or price hikes'><img src='https://initium-resources.appspot.com/images/ui/storeDiscountButton1.png' alt='Discount' border='0'/></a>
+		</center>
 		<div>
-		<a onclick='storeSetSaleNew(event)' title='Use this feature to set a store-wide sale on all items (or even a store-wide price hike)'>Click here to change your store sale/adjustment value</a>
 		</div>
 		</div>
 		<div class='boldbox selection-root'>

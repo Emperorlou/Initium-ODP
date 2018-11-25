@@ -892,6 +892,15 @@ public class ODPDBAccess
 		db.put(location);
 		return location;
 	}
+	
+	private GridMapService gridMapService = null;
+	public GridMapService getGridMapService()
+	{
+		if (gridMapService==null)
+			gridMapService = new GridMapService(this, getCharacterLocation(getCurrentCharacter()));
+		
+		return gridMapService;
+	}
 
 	public Key getDefaultLocationKey()
 	{
@@ -1510,7 +1519,11 @@ public class ODPDBAccess
 			destinationSlot = equipSlotArr[0];
 		else if (equipSlotArr.length>1)
 		{
-			for(int i = 0; i<equipSlotArr.length; i++)
+			// Swap first matching slot if the slot matches and player is equipping.
+			boolean swapSlot = CommonChecks.checkCharacterIsPlayer(character) && 
+					("Shield".equals(equipment.getProperty("itemType")) || "Weapon".equals(equipment.getProperty("itemType")));
+			
+			for(int i = equipSlotArr.length-1; i>=0; i--)
 			{
 				String slotCheck = equipSlotArr[i].trim();
 				
@@ -1521,6 +1534,19 @@ public class ODPDBAccess
 				{
 					destinationSlot = slotCheck;
 					break;
+				}
+				
+				if(swapSlot && destinationSlot == null)
+				{
+					// If it's a shield/weapon type, find first swap slot.
+					CachedEntity currentSlotItem = db.getIfExists((Key)character.getProperty("equipment"+slotCheck));
+					
+					// Do not break out of the loop early, in case a "free" slot exists.
+					if(currentSlotItem != null && 
+						GameUtils.equals(equipment.getProperty("itemType"), currentSlotItem.getProperty("itemType")) &&
+							("Shield".equals(currentSlotItem.getProperty("itemType")) || 
+							"2Hands".equals(currentSlotItem.getProperty("equipSlot"))==false))
+						destinationSlot = slotCheck;
 				}
 			}
 			
@@ -1539,7 +1565,10 @@ public class ODPDBAccess
 		if (!character.getKey().equals(equipment.getProperty("containerKey")))
 			throw new IllegalArgumentException("The piece of equipment is not in the character's posession. Character: "+character.getKey());
 
-		if(CommonChecks.checkIsHardcore(character) && CommonChecks.checkIsHardcore(equipment) == false)
+		// Only prevent HCM equips for players
+		if(CommonChecks.checkCharacterIsPlayer(character) == true && 
+				CommonChecks.checkIsHardcore(character) == true && 
+				CommonChecks.checkIsHardcore(equipment) == false)
 			throw new UserErrorMessage("You can only equip Hardcore Mode items.");
 		
 		destinationSlot = destinationSlot.trim(); // Clean it up, just in case
@@ -1755,10 +1784,12 @@ public class ODPDBAccess
 	 * Performs the drop of the item from the character and saves the entity. 
 	 * Calls tryCharacterDropItem, which will throw if not successful. 
 	 */
-	public void doCharacterDropItem(CachedEntity character, CachedEntity item) throws UserErrorMessage
+	public void doCharacterDropItem(CachedEntity character, CachedEntity item, Long tileX, Long tileY) throws UserErrorMessage
 	{
-		tryCharacterDropItem(character, item, true);
+		tryCharacterDropItem(character, item, tileX, tileY, true);
 		getDB().put(item);
+		getGridMapService().putLocationData(getDB());
+		
 	}
 	
 	/**
@@ -1766,12 +1797,12 @@ public class ODPDBAccess
 	 * @return True if item was dropped, false only if throwError is false and the item is equipped or vending.
 	 * @throws UserErrorMessage Thrown if item is equipped or vending, and throwError parameter is true.
 	 */
-	public boolean tryCharacterDropItem(CachedEntity character, CachedEntity item, boolean throwError) throws UserErrorMessage
+	public boolean tryCharacterDropItem(CachedEntity character, CachedEntity item, Long tileX, Long tileY, boolean throwError) throws UserErrorMessage
 	{
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
 		if (item == null) throw new IllegalArgumentException("Item cannot be null.");
 
-		Key characterLocationKey = (Key) character.getProperty("locationKey");
+		CachedEntity location = getCharacterLocation(character);
 
 		if (checkCharacterHasItemEquipped(character, item.getKey())) {
 			if(throwError) throw new UserErrorMessage("Your character has this item equipped. You cannot drop it until it is unequipped.");
@@ -1782,9 +1813,8 @@ public class ODPDBAccess
 			if(throwError) throw new UserErrorMessage("The item you are trying to drop is currently in your store. You cannot drop an item that you plan on selling.");
 			return false;
 		}
-
-		item.setProperty("containerKey", characterLocationKey);
-		item.setProperty("movedTimestamp", new Date());
+		InitiumObject iObject = new InitiumObject(this, item);
+		iObject.moveItemToLocation(location, tileX, tileY);
 
 		return true;
 	}
@@ -2058,6 +2088,29 @@ public class ODPDBAccess
 	public List<CachedEntity> sortSaleItemList(List<CachedEntity> items)
 	{
 		List<CachedEntity> sorted = new ArrayList<CachedEntity>(items);
+		
+		// Adding a computed value for weapons/armor/shields for sort.
+		for(CachedEntity item:sorted)
+		{
+			String itemType = (String)item.getProperty("itemType");
+			if("Armor".equals(itemType) || "Shield".equals(itemType))
+			{
+				Double sortMax = 0.0d;
+				if(item.getProperty("blockChance") != null)
+					sortMax = ((Long)item.getProperty("blockChance")).doubleValue();
+				if(sortMax != null && item.getProperty("damageReduction") != null)
+					sortMax += Math.abs(((Long)item.getProperty("damageReduction")).doubleValue() / 1000.0d);
+				item.setProperty("_sortMax", sortMax);
+			}
+			else if("Weapon".equals(itemType))
+			{
+				Double sortMax = GameUtils.getWeaponMaxDamage(item);
+				if(sortMax != null)
+					sortMax += Math.abs(GameUtils.getWeaponAverageDamage(item) / 1000.0d);
+				item.setProperty("_sortMax", sortMax);
+			}
+		}
+		
 		Collections.sort(sorted, new Comparator<CachedEntity>()
 		{
 			@Override
@@ -2069,55 +2122,36 @@ public class ODPDBAccess
 				String item1Name = (String) item1.getProperty("name");
 				String item2Name = (String) item2.getProperty("name");
 
+				String item1Label = (String) item1.getProperty("label");
+				String item2Label = (String) item2.getProperty("label");
+
 				Long item1Cost = (Long) item1.getProperty("store-dogecoins");
 				Long item2Cost = (Long) item2.getProperty("store-dogecoins");
 				
-				Double item1Max = 0.0d;
-				if ("Armor".equals(item1Type) || "Shield".equals(item1Type))
-				{
-					item1Max = ((Long)item1.getProperty("blockChance")).doubleValue();
-				}
-				else if ("Weapon".equals(item1Type))
-				{
-					item1Max = ((Double)item1.getProperty("_weaponMaxDamage"));
-					if(item1Max == null)
-						item1.setProperty("_weaponMaxDamage", (item1Max = GameUtils.getWeaponMaxDamage(item1)));
-				}
-				
-				Double item2Max = 0.0d;
-				if ("Armor".equals(item2Type) || "Shield".equals(item2Type))
-				{
-					item2Max = ((Long)item2.getProperty("blockChance")).doubleValue();
-				}
-				else if ("Weapon".equals(item2Type))
-				{
-					item2Max = ((Double)item2.getProperty("_weaponMaxDamage"));
-					if(item2Max == null)
-						item2.setProperty("_weaponMaxDamage", (item2Max = GameUtils.getWeaponMaxDamage(item2)));
-				}
+				Double item1Max = (Double)item1.getProperty("_sortMax");
+				Double item2Max = (Double)item2.getProperty("_sortMax");
 
 				if (item1Type == null) item1Type = "";
 				if (item2Type == null) item2Type = "";
 				if (item1Name == null) item1Name = "";
 				if (item2Name == null) item2Name = "";
+				if (item1Label == null) item1Label = "";
+				if (item2Label == null) item2Label = "";
+				if (item1Max == null) item1Max = 0d;
+				if (item2Max == null) item2Max = 0d;
 				if (item1Cost == null) item1Cost = 0l;
 				if (item2Cost == null) item2Cost = 0l;
-				if (item1Type.compareTo(item2Type) == 0)
-				{
-					if (item1Name.compareTo(item2Name) == 0)
-					{
-						if (item1Max.compareTo(item2Max) == 0)
-						{
-							return item1Cost.compareTo(item2Cost);
-						}
-						else
-							return item1Max.compareTo(item2Max);
-					}
-					else
-						return item1Name.compareTo(item2Name);
-				}
-				else
-					return item1Type.compareTo(item2Type);
+				
+				int compValue = item1Type.compareTo(item2Type);
+				if (compValue != 0) return compValue;
+				compValue = item1Name.compareTo(item2Name);
+				if (compValue != 0) return compValue;
+				compValue = item1Label.compareTo(item2Label);
+				if (compValue != 0) return compValue;
+				compValue = -item1Max.compareTo(item2Max);
+				if (compValue != 0) return compValue;
+				// If all other comparisons equal, compare costs.
+				return item1Cost.compareTo(item2Cost);
 			}
 
 		});
@@ -3667,6 +3701,8 @@ public class ODPDBAccess
 		return 0L;
 	}
 	
+	
+	
 	/**
 	 * Method stub placeholder for ODP. 
 	 *
@@ -4464,17 +4500,20 @@ public class ODPDBAccess
 		            for(int i = 0; i<blockingArmor.size();i++)
 		            {
 		                if (i>0) 
-				{
-				    if (blockingArmor.size() == 2)
-					armorNames += " and ";
-				    else 
-					armorNames+=", ";
-				}
-		                if (i==blockingArmor.size()-1 && i>0)
-		                    armorNames+="and ";
-		                armorNames+=(String)blockingArmor.get(i).getProperty("name");
+						{
+						    if (blockingArmor.size() == 2)
+						    	armorNames += " and ";
+						    else 
+						    	armorNames+=", ";
+						    
+						    // Only need the "final" case when we have more than 2 elements
+						    if (blockingArmor.size()>2 && i==blockingArmor.size()-1)
+			                    armorNames+="and ";
+						}
 		                
+		                armorNames+=(String)blockingArmor.get(i).getProperty("name");
 		            }
+		            
 		            long damageReduction = 0l;
 		            if ((Long)blockResult.get("damageReduction")!=null)
 		                damageReduction = (Long)blockResult.get("damageReduction");
@@ -4794,7 +4833,21 @@ public class ODPDBAccess
 					{
 						characterToDieFinal.setProperty("mode", "UNCONSCIOUS");
 						
-						doCharacterDieChance(characterToDieFinal);
+						// If we didn't die, and player is in a good rest site (Inn, owned house), 
+						// then revive but drop all items.
+						if(doCharacterDieChance(characterToDieFinal) == false &&
+								CommonChecks.checkLocationIsGoodRestSite(locationFinal))
+						{
+							// Died in good rest spot, heal to 1hp
+							characterToDieFinal.setProperty("hitpoints", 1d);
+				        	
+			                // Also unequip all of his equipment. 
+			                for(String slot:EQUIPMENT_SLOTS)
+			                	characterToDieFinal.setProperty("equipment"+slot, null);
+			                
+			                // Reset his mode to normal
+			                characterToDieFinal.setProperty("mode", CHARACTER_MODE_NORMAL);
+						}
 					}
 					
 					// If the attacking character was at full health when he killed his opponent, award a buff
@@ -4922,6 +4975,11 @@ public class ODPDBAccess
 		if (location.getProperty("territoryKey")!=null)
 			giveLootToAttacker = true;
 		
+		// If loot preference for NPC is CollectNone, do not loot the items.
+		if("NPC".equals(attackingCharacter.getProperty("type")) && giveLootToAttacker &&
+				"CollectNone".equals(attackingCharacter.getProperty("lootPreference")))
+			giveLootToAttacker = false;
+		
 		// If the character was defending a defence structure, then refresh the leader on that structure
 		if (giveLootToAttacker)
 		{
@@ -4946,8 +5004,11 @@ public class ODPDBAccess
 			}
 		}
 		
+		// Only set HCM items for HCM mobs (or legacy mobs without an HCM flag specified). 
 		boolean setHardcoreModeItems = false;
-		if("NPC".equals(characterToDie.getProperty("type"))&&CommonChecks.checkIsHardcore(attackingCharacter))
+		if("NPC".equals(characterToDie.getProperty("type")) &&
+				(characterToDie.getProperty("hardcoreMode") == null || CommonChecks.checkIsHardcore(characterToDie)) && 
+				CommonChecks.checkIsHardcore(attackingCharacter))
 		{
 			// For now, only do HCM item drops. Do NOT save these entities, potential race conditions.
 			Map<String, String> damageMap = getValue_StringStringMap(characterToDie, "combatStatsDamageMap");
@@ -5079,7 +5140,7 @@ public class ODPDBAccess
 							loot+="			<a onclick='characterDropItem(event, "+item.getKey().getId()+", loadInventory)' >Drop on ground</a>";
 							if (item.getProperty("maxWeight")!=null)
 							{
-								loot+="<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
+								loot+="<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"+attackingCharacterFinal.getKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>";
 							}
 							loot+="		</div>";
 							loot+="</div>";
@@ -5113,6 +5174,9 @@ public class ODPDBAccess
 		if (loot.equals(""))
 			loot = null;
 		
+		// Clear guard settings on death.
+		GuardService gService = new GuardService(this);
+		gService.deleteAllGuardSettings(characterToDie.getKey(), location.getKey());
 		
 		// Finally, lets update the character that was passed into this method so further processing will have
 		// the updated field values
@@ -6983,9 +7047,9 @@ public class ODPDBAccess
 		
 	}
 	
-	public void combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
+	public boolean combineStackedItemWithFirstStack(CachedEntity stackedItem, Key characterKey)
 	{
-		if (stackedItem.getProperty("quantity")==null) return;
+		if (stackedItem.getProperty("quantity")==null) return false;
 		
 		List<CachedEntity> inventory = query.getFilteredList("Item", "containerKey", characterKey, "name", stackedItem.getProperty("name"));
 		for(CachedEntity item:inventory)
@@ -6999,8 +7063,12 @@ public class ODPDBAccess
 				if (item.getKey().isComplete())
 					ds.delete(item);
 				ds.put(stackedItem);
+				
+				return true;
 			}
-		}		
+		}
+		
+		return false;
 	}
 	
 	public void doDeleteCharacter(Key key)
@@ -7412,6 +7480,24 @@ public class ODPDBAccess
 		List<CachedEntity> alwaysVisiblePaths = getFilteredList("Path", "location1Key", locationKey, "discoveryChance", 100d);
 		alwaysVisiblePaths.addAll(query.getFilteredList("Path", "location2Key", locationKey, "discoveryChance", 100d));
 		return alwaysVisiblePaths;
+	}
+
+	public Object solveCurve(Random rnd, String curve)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Long solveCurve_Long(Random rnd, String curve)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Double solveCurve_Double(Random rnd, String curve)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

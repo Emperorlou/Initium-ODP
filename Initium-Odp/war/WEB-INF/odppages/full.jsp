@@ -9,8 +9,11 @@
 			https://www.google-analytics.com;
 		img-src 'self'
 			https://i.imgur.com
+			https://imgur.com
 			https://initium-resources.appspot.com
-			https://www.google-analytics.com; 
+			https://www.google-analytics.com
+			https://ajax.googleapis.com
+			https://www.paypalobjects.com; 
 		script-src 'self' 'unsafe-inline' 'unsafe-eval'
 			https://code.jquery.com 
 			https://cdnjs.cloudflare.com
@@ -20,9 +23,10 @@
 			https://www.gstatic.com
 			https://www.google-analytics.com; 
 		style-src 'self' 'unsafe-inline' 
-			https://cdnjs.cloudflare.com;
-		">	
-	<script async="" src="//www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/api2/r20171206132803/recaptcha__en.js"></script><script type="text/javascript">
+			https://cdnjs.cloudflare.com
+			https://ajax.googleapis.com;
+		">
+	<script async="" src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" async="" src="https://www.gstatic.com/recaptcha/api2/r20171206132803/recaptcha__en.js"></script><script type="text/javascript">
 	window.paceOptions = {
 			ajax: false,
 			restartOnRequestAfter: false
@@ -58,7 +62,9 @@
 
 <script type="text/javascript" src="/javascript/modernizr.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" onload="if (window.module!=null) window.$ = window.jQuery = module.exports;"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
+<script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/sockjs.min.js"></script>
@@ -94,7 +100,7 @@
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
   ga('create', 'UA-62104245-1', 'auto');
   ga('send', 'pageview');

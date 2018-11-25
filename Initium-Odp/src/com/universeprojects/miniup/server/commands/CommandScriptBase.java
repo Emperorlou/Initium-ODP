@@ -58,6 +58,8 @@ public abstract class CommandScriptBase extends Command {
 		// Get the entity for which the script will run
 		Key entityKey = getSourceEntityKey(parameters);
 		CachedEntity entitySource = db.getEntity(entityKey);
+		if(entitySource == null)
+			throw new RuntimeException("Source Entity does not exist");
 		
 		CachedEntity scriptSource = null;
 		//// SECURITY CHECKS

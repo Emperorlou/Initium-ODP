@@ -2,7 +2,9 @@ package com.universeprojects.miniup.server.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PropertyContainer;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
@@ -40,6 +41,14 @@ import com.universeprojects.web.PageController;
 @Controller
 public class ViewItemController extends PageController {
 
+	// This is a list of stat names where being more negative is better
+	public HashSet<String> negativeStatIsGood_Names = new HashSet<>(Arrays.asList(new String[] {
+		"strReq",
+		"dexpen",
+		"weight",
+		"space"
+	}));
+	
 	public ViewItemController() {
 		super("viewitemmini");
 	}
@@ -115,7 +124,8 @@ public class ViewItemController extends PageController {
 			request.setAttribute("showRelatedSkills", true);
 		
 		request.setAttribute("isItemOwner", GameUtils.equals(item.getProperty("containerKey"), character.getKey()));
-		request.setAttribute("item", getItemStats(db, character, item, false));
+		Map<String, Object> itemStats = getItemStats(db, character, item, false);
+		request.setAttribute("item", itemStats);
 		if (item.getKey().isComplete())
 			request.setAttribute("itemKey", KeyFactory.keyToString(item.getKey()));
 		else
@@ -124,6 +134,7 @@ public class ViewItemController extends PageController {
 		
 		ds.beginBulkWriteMode();
 		
+		List<CachedEntity> comparisonEquipment = new ArrayList<>();
 		List<Map<String,Object>> comparisons = new ArrayList<Map<String,Object>>();
 		String equipSlot = (String)item.getProperty("equipSlot");
 		if (equipSlot!=null)
@@ -134,17 +145,77 @@ public class ViewItemController extends PageController {
 			{
 				CachedEntity equipment = db.getEntity((Key)character.getProperty("equipment"+slot));
 				if (equipment!=null)
+				{
+					comparisonEquipment.add(equipment);
 					comparisons.add(getItemStats(db, character, equipment, true));
+				}
 			}
 		}
 		
 		ds.commitBulkWrite();
 		
 		if(comparisons.isEmpty() == false)
+		{
 			request.setAttribute("comparisons", comparisons);
+			
+			Map<String,String> statComparisons = generateInlineStatComparisons(item, comparisonEquipment, itemStats, comparisons);
+			
+			request.setAttribute("statComp", statComparisons);
+			
+		}
 		
 		return "/WEB-INF/odppages/viewitemmini.jsp";
 	}
+	private Map<String, String> generateInlineStatComparisons(CachedEntity item, List<CachedEntity> comparisonEquipment, Map<String, Object> itemStats,
+			List<Map<String, Object>> comparisons)
+	{
+		for(int i = comparisonEquipment.size()-1; i>=0; i--)
+		{
+			if (GameUtils.equals(item.getProperty("itemType"), comparisonEquipment.get(i).getProperty("itemType")))
+			{
+				Map<String, Object> compStats = comparisons.get(i);
+				Map<String, String> deltaStats = new HashMap<>();
+				for(String fieldName:itemStats.keySet())
+				{
+					Double itemStatValue = null;
+					Double compStatValue = null;
+					try
+					{
+						itemStatValue = Double.parseDouble((String)itemStats.get(fieldName));
+						compStatValue = Double.parseDouble((String)compStats.get(fieldName));
+					}
+					catch(Exception e)
+					{
+						continue;
+					}
+					
+					double delta = itemStatValue-compStatValue;
+					
+					String value = GameUtils.formatNumber(delta);
+					if (delta==0) continue;
+					if (delta>0) 
+					{
+						if (negativeStatIsGood_Names.contains(fieldName))
+							value = "<span class='comparestat-bad'>+"+value+"</span>";
+						else
+							value = "<span class='comparestat-good'>+"+value+"</span>";
+					}
+					else
+					{
+						if (negativeStatIsGood_Names.contains(fieldName))
+							value = "<span class='comparestat-good'>"+value+"</span>";
+						else
+							value = "<span class='comparestat-bad'>"+value+"</span>";
+					}
+					deltaStats.put(fieldName, value);
+				}
+				return deltaStats;
+			}
+		}
+		return new HashMap<>();
+	}
+
+
 	/**
 	 * Returns a map of stat:data for the item.
 	 * @param item
@@ -312,7 +383,6 @@ public class ViewItemController extends PageController {
 		if (field!=null && field.toString().trim().equals("")==false)
 		{
 			requirements=true;
-			
 			itemMap.put("strReq", GameUtils.formatNumber(field));
 		}
 		

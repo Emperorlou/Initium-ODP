@@ -98,6 +98,7 @@ public abstract class OperationBase
 		htmlUpdates.add(htmlData);
 	}
 	
+	
 	/**
 	 * When the command returns to the browser, the element that has the given elementId 
 	 * will be deleted.

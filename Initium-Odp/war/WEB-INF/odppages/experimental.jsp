@@ -11,8 +11,11 @@
 			https://www.google-analytics.com;
 		img-src 'self'
 			https://i.imgur.com
+			https://imgur.com
 			https://initium-resources.appspot.com
-			https://www.google-analytics.com; 
+			https://www.google-analytics.com
+			https://ajax.googleapis.com
+			https://www.paypalobjects.com; 
 		script-src 'self' 'unsafe-inline' 'unsafe-eval'
 			https://code.jquery.com 
 			https://cdnjs.cloudflare.com
@@ -22,7 +25,8 @@
 			https://www.gstatic.com
 			https://www.google-analytics.com; 
 		style-src 'self' 'unsafe-inline' 
-			https://cdnjs.cloudflare.com;
+			https://cdnjs.cloudflare.com
+			https://ajax.googleapis.com;
 		">
 	<script type='text/javascript'>
 	window.paceOptions = {
@@ -45,7 +49,8 @@
 
 <script type="text/javascript" src="/javascript/modernizr.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" onload="if (window.module!=null) window.$ = window.jQuery = module.exports;"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
+<script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/sockjs.min.js"></script>
@@ -81,7 +86,7 @@
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
   ga('create', 'UA-62104245-1', 'auto');
   ga('send', 'pageview');
@@ -364,12 +369,26 @@ modifyMaxScreenWidth();
 function updateBannerSize()
 {
 	var win = $(window);
-	if (win.width()<=400)
-		$("#banner").css("height", (win.height()-309+40)+"px");
-	else if (win.width()<=480)
-		$("#banner").css("height", (win.height()-309)+"px");
+	
+	if (win.height()<600 && win.width()>win.height() && $("#chat_input").is(":focus")==false)
+	{
+		$("#banner").css("height", (win.height()-85)+"px");
+		$(".chat_box").hide();
+	}
 	else
-		$("#banner").css("height", (win.height()-333)+"px");
+	{
+		var chatSizeAdjust = 0;
+		if (isChatMinimized())
+			chatSizeAdjust = 217;
+		
+		$(".chat_box").show();
+		if (win.width()<=400)
+			$("#banner").css("height", (win.height()-309+40+chatSizeAdjust)+"px");
+		else if (win.width()<=480)
+			$("#banner").css("height", (win.height()-309+chatSizeAdjust)+"px");
+		else
+			$("#banner").css("height", (win.height()-333+chatSizeAdjust)+"px");
+	}
 }
 $(window).resize(updateBannerSize);
 
@@ -422,9 +441,15 @@ function onCombatBegin()
 
 function onCombatComplete()
 {
-	if ($("body").attr("bannerstate")=="combat")
+	if ($("body").attr("bannerstate").indexOf("combat")>-1)
 		viewBannerDefault();
 }
+
+function onCombat2DBegin()
+{
+	$("body").attr("bannerstate", "combat-2d");
+}
+
 
 function toggleMovementState()
 {
@@ -509,51 +534,46 @@ Version: ${version}
 						<div id='banner-base' class='banner-daynight'></div>
 						<div id='banner-fx'></div>
 	<!-- 					<div id='main-viewport-container'></div> -->
-						<div id='immovablesPanel'>${immovablesPanel}</div>				
-						<div id='partyPanel'>
+						<div id='immovablesPanel' class='auto-animate'>${immovablesPanel}</div>				
+						<div id='partyPanel' class='auto-animate'>
 						${partyPanel}
 						</div>
 						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
 						
-						<div class='minimap-container'>
+						<div id='main-viewport-container' class='location-2d auto-animate'>${location2D}</div>
+							
+						
+						<div class='minimap-container auto-animate'>
 							<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->
 							<div class='map-contents minimap-contents'>
 								${globalNavigationMap}
 							</div>
 							<div class='minimap-overlay'></div>
 							<div class='minimap-button minimap-button-map' onclick='toggleMovementState()'></div>
+							<div class='minimap-button minimap-button-localplaces standard-button-highlight' onclick='viewLocalNavigation(event)'></div>
 							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
 						</div>
 						
 						
-						<div class='map-contents global-navigation-map'>${globalNavigationMap}</div>
-						<div id='main-viewport-container' class='location-2d'>${location2D}</div>	
+						<div class='map-contents global-navigation-map auto-animate'>${globalNavigationMap}</div>
 											
-						<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
+						<div id='inBannerCharacterWidget' class='characterWidgetContainer auto-animate'>
 							${inBannerCharacterWidget}
 						</div>
-						<div id='inBannerCombatantWidget' class='combatantWidgetContainer'>
+						<div id='inBannerCombatantWidget' class='combatantWidgetContainer auto-animate'>
 							${inBannerCombatantWidget }
 						</div>
 						
-						<div class="path-overlay-link major-banner-links" style="left:50%; top:15%;">
-							<a id="thisLocation-button" class="button-overlay-major" onclick="makeIntoPopup(&quot;.this-location-box&quot;)" style="right:0px;top:0px;"><img alt="Location actions" src="https://initium-resources.appspot.com/images/ui/magnifying-glass2.png"></a>
+						<div class="path-overlay-link major-banner-links auto-animate">
+							<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>
 							<a id="movement-button" class="button-overlay-major" onclick="toggleMovementState()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
-							<a id="guard-button" class="button-overlay-major" onclick="viewGuardSettings()" style="right:4px;top:142px;"><img alt="Guard settings" src="https://initium-resources.appspot.com/images/ui/guardsettings1.png"></a>
-							<a id="2dview-button" class="button-overlay-major" onclick="view2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
+							<a id="twodview-button" class="button-overlay-major" onclick="view2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
 						</div>							
 
-<!-- 
-						<div class='minimap-container'>
-							<div class='map-contents minimap-contents'>
-								${globalNavigationMap}
-							</div>
-							<div class='minimap-overlay'></div>
-							<div class='minimap-button minimap-button-map' onclick='viewGlobeNavigation()'></div>
-							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
-						</div>
- -->						
-						
+						<div style='position:absolute;bottom: 35px;left:50.0%;'><div class='path-overlay-link' id='monsterCountPanel'>${monsterCountPanel}</div></div>
+
+						<div class="main-buttonbox v3-window3 mini-page-popup" style='display:none'></div>						
+				
 					</div>
 				</div>
 			</div>

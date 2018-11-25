@@ -13,6 +13,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 
 /**
@@ -109,6 +110,7 @@ public class CommandAttack extends Command {
 	{
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
+		
 		ds.beginTransaction();
 		try {
 			// Verify parameter sanity
@@ -148,8 +150,9 @@ public class CommandAttack extends Command {
 		} finally {
 			ds.rollbackIfActive();
 		}
-		setJavascriptResponse(JavascriptResponse.FullPageRefresh);
 		
+		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
+		update.updateFullPage_shortcut(false);
 	}
 
 }

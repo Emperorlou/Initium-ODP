@@ -774,6 +774,8 @@ public class MainPageUpdateService extends Service
 					html.append("<p>You might be too deep to easily navigate away. Try coming out of wherever you are.</p>");
 				html.append("<input type='hidden' id='blank-global-navigation' value='true'/>");
 			}
+			
+			html.append("<div class='global-navigation-button local-places standard-button-highlight' onclick='viewLocalNavigation(event)'></div>");
 		}
 		return updateHtmlContents(".map-contents", html.toString());
 	}
@@ -827,7 +829,7 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img alt='Navigation' src='https://initium-resources.appspot.com/images/ui/compass1.png' style='max-width:32px'></a>");			
 		newHtml.append("<a id='globe-navigation-button' class='path-overlay-link' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img alt='Global navigation' src='https://initium-resources.appspot.com/images/ui/navigation-map-icon2.png' style='max-width:32px'></a>");			
 		newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
-		newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' style='max-width:32px'></a>");
+//		newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' style='max-width:32px'></a>");
 		
 		return newHtml.toString();
 	}
@@ -1017,9 +1019,9 @@ public class MainPageUpdateService extends Service
 			if (weapons.get(1)!=null)
 				rightIcon = GameUtils.getResourceUrl(weapons.get(1).getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", weapons.get(1))));
 			
-			newHtml.append(getHtmlForInBannerLinkCentered(45, 40, "<img src='"+leftIcon+"' alt='Left Hand' class='combat-button' />", "doCombatAttackLeftHand(event)"));
-			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)"));
-			newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)"));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 40, "<img src='"+leftIcon+"' alt='Left Hand' class='combat-button' />", "doCombatAttackLeftHand(event)", "2", 50));
+			newHtml.append(getHtmlForInBannerLinkCentered(45, 60, "<img src='"+rightIcon+"' alt='Right Hand' class='combat-button' />", "doCombatAttackRightHand(event)", "1", 49));
+			newHtml.append(getHtmlForInBannerLinkCentered(70, 50, "<span style='padding:5px;z-index:2000002;'>RUN!</span>", "doCombatEscape(event)", "3", 51));
 		}
 		
 		
@@ -1033,6 +1035,7 @@ public class MainPageUpdateService extends Service
 		}
 		
 		
+		
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
 	}
 	
@@ -1044,8 +1047,20 @@ public class MainPageUpdateService extends Service
 
 	protected String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs)
 	{
-		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>"+buttonCaption+"</a></div>";
+		return getHtmlForInBannerLinkCentered(top, left, buttonCaption, onclickJs, null, null);
+	}
+	
+	protected String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs, String shortcutKeyName, Integer shortcutCode)
+	{
+		String shortcutKeyHtml = "";
+		if (shortcutKeyName!=null)
+			shortcutKeyHtml = "<span style='top:-8px; left:-16px;' class='shortcut-key'>("+shortcutKeyName+")</span>";
 		
+		String shortcutCodeHtml = "";
+		if (shortcutCode!=null)
+			shortcutCodeHtml = " shortcut='"+shortcutCode+"' ";
+		
+		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a "+shortcutCodeHtml+" onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>"+shortcutKeyHtml+""+buttonCaption+"</a></div>";
 	}
 
 	public String updateButtonList(boolean showHidden){
@@ -1329,6 +1344,11 @@ public class MainPageUpdateService extends Service
 		return updateLocationJs(false);
 	}	
 	
+	protected String getAdditionalLocationJs()
+	{
+		return "";
+	}
+	
 	public String updateLocationJs(boolean refreshChat)
 	{
 		StringBuilder js = new StringBuilder();
@@ -1415,7 +1435,7 @@ public class MainPageUpdateService extends Service
 		if (CommonChecks.checkCharacterIsInCombat(character))
 			js.append("if (window.onCombatBegin) onCombatBegin();");
 		else
-			js.append("if (window.onCombatComplete && $('body').attr('bannerstate')=='combat') onCombatComplete();");
+			js.append("if (window.onCombatComplete && $('body').attr('bannerstate').indexOf('combat')>-1) onCombatComplete();");
 		
 		
 		// Here we'll update the button bar
@@ -1423,6 +1443,10 @@ public class MainPageUpdateService extends Service
 		js.append("addType1Button(1, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
 		js.append("addType1Button(2, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
 		
+		// Here we'll update the "Local Places" mini page if it is open
+		js.append("if (getMiniPagePopupTitle()=='Local Places') viewLocalNavigation();");
+		
+		js.append(getAdditionalLocationJs());
 		
 		return updateJavascript("ajaxJs", js.toString());
 	}
@@ -1660,10 +1684,12 @@ public class MainPageUpdateService extends Service
 			{
 				String iconUrl = (String)item.getProperty("icon2");
 				if (iconUrl==null || iconUrl.trim().length()==0) iconUrl = (String)item.getProperty("icon");
+				if (iconUrl==null || iconUrl.trim().length()==0) iconUrl = (String)item.getProperty("GridMapObject:image");
 				if (iconUrl!=null && iconUrl.startsWith("http://"))
 					iconUrl = "https://"+iconUrl.substring(7);
 				else if (iconUrl!=null && iconUrl.startsWith("http")==false)
 					iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
+				
 				html.append("<div class='clue' rel='/odp/viewitemmini?itemId=").append(item.getKey().getId()).append("'>");
 				html.append("<img src='").append(iconUrl).append("' border=0/>");
 				html.append("</div>");
@@ -1738,7 +1764,7 @@ public class MainPageUpdateService extends Service
 			else
 			{
 				if (maxMonsterCount>10 && 
-						GameUtils.booleanEquals(location.getProperty("hideMonsterActivity"), true)==false)
+						GameUtils.booleanEquals(location.getProperty("hideMonsterActivity"), false))
 				{
 					if (monsterCount<1) monsterCount = 0d;
 					double monsterPercent = monsterCount/maxMonsterCount;

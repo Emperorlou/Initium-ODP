@@ -4,28 +4,36 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.DBUtils;
 import com.universeprojects.cacheddatastore.QueryHelper;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.OperationBase;
+import com.universeprojects.miniup.server.aspects.AspectFireplace;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
 import com.universeprojects.miniup.server.model.GridObject;
 
 public class GridMapService {
-
+	
 	public enum ItemEntryStatus
 	{
 		Procedural,
@@ -41,7 +49,8 @@ public class GridMapService {
 		public Integer index;
 	}
 	
-	public static double GLOBAL_SCALE = 0.4;
+	public static int MAX_ITEMS_PER_TILE = 10;
+	public static double GLOBAL_ITEM_SCALE = 0.4;
 
 	
 	final private ODPDBAccess db;
@@ -57,6 +66,31 @@ public class GridMapService {
 	private CachedEntity locationDataEntity = null;
 	private EmbeddedEntity locationData = null;
 	
+	private Set<TileCoordinate> tilesChanged = null;
+	public class TileCoordinate
+	{
+		int x; 
+		int y;
+		
+		public TileCoordinate(int x, int y)
+		{
+			this.x = x;
+			this.y = y;
+		}
+	
+		@Override
+		public String toString()
+		{
+			return x+"-"+y;
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return toString().hashCode();
+		}
+	};
+	
 	
 	public GridMapService(ODPDBAccess db, CachedEntity location)
 	{
@@ -66,10 +100,15 @@ public class GridMapService {
 		this.location = location;
 		locationWidth = intVal(location.getProperty("gridMapWidth"));
 		locationHeight = intVal(location.getProperty("gridMapHeight"));
-		if (locationWidth==null) locationWidth = 1;
-		if (locationHeight==null) locationHeight = 1;
+		if (locationWidth==null) locationWidth = 3;
+		if (locationHeight==null) locationHeight = 3;
 	}
 
+	public boolean isForLocation(Key locationKey)
+	{
+		return GameUtils.equals(location.getKey(), locationKey);
+	}
+	
 	private void initializeLocationData()
 	{
 		if (initializedLocationData) return;
@@ -275,10 +314,14 @@ public class GridMapService {
 			{
 				EmbeddedEntity entry = proceduralEntries.get(i);
 				
-				ItemEntryStatus status = parseIES(entry.getProperty("status"));
+				ItemEntryStatus status = null;
+				if (entry!=null)
+					status = parseIES(entry.getProperty("status"));
 				
 				if (status != ItemEntryStatus.ProceduralDeleted)
 					tileItems.add(result.get(i));
+				else
+					tileItems.add(null);
 			}
 		}
 		else
@@ -370,13 +413,35 @@ public class GridMapService {
 	private CachedEntity generateItem(Random rnd, CachedEntity itemDef, int tileX, int tileY)
 	{
 		CachedEntity item = db.generateNewObject(rnd, itemDef, "Item", false);
-		item.setProperty("gridMapPositionX", tileX);
-		item.setProperty("gridMapPositionY", tileY);
-		item.setProperty("gridMapCellOffsetX", rnd.nextInt(64));
-		item.setProperty("gridMapCellOffsetY", rnd.nextInt(64));
+		item.setProperty("gridMapPositionX", (long)tileX);
+		item.setProperty("gridMapPositionY", (long)tileY);
+		item.setProperty("gridMapCellOffsetX", (long)rnd.nextInt(64));
+		item.setProperty("gridMapCellOffsetY", (long)rnd.nextInt(64));
 		item.setProperty("containerKey", location.getKey());
 		
 		return item;
+	}
+	
+	public String generateGridObjectJson(int tileX, int tileY)
+	{
+		StringBuilder js = new StringBuilder();
+		
+		// First clear the cell of objects
+		js.append("removeTileObjects("+tileX+", "+tileY+");\n");
+		
+		Map<String, GridObject> gridObjects = generateGridObjects(tileX, tileY);
+		for(GridObject go:gridObjects.values())
+		{
+			js.append("addGridObjectToMap(")
+				.append(go.getJsonObject().toJSONString())
+				.append(");\n");
+		}
+		js.append("refreshPositions();\n");
+		
+		js.append("if (getMiniPagePopupTitle()=='Items Here')");
+		js.append("	inspectCellContents();");
+		
+		return js.toString();
 	}
 	
 	public Map<String, GridObject> generateGridObjects(int tileX, int tileY)
@@ -391,24 +456,40 @@ public class GridMapService {
 			boolean pileRandom = false;
 			
 			CachedEntity item = items.get(i);
+			if (item==null) continue;
 			String imageUrl = null;
 			Integer cellOffsetX = null;
 			Integer cellOffsetY = null;
 			Double rotation = null;
 			Integer imageWidth = null;
 			Integer imageHeight = null;
+			Double lightLevel = null;
+			if (item.getProperty("Fireplace:fuelDepletionDate")!=null)
+			{
+				InitiumObject fireplace = new InitiumObject(db, item);
+				AspectFireplace fp = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
+				Long firePercentComplete = fp.getMinutesUntilExpired(System.currentTimeMillis());
+				if (firePercentComplete!=null)
+				{
+					if (firePercentComplete>=45)
+					{
+						lightLevel = (Double)item.getProperty("Fireplace:lightRadius");
+						if (lightLevel==null) lightLevel = 300d;
+					}
+				}
+			}
 			if (item.getProperty("GridMapObject:image")==null || item.getProperty("GridMapObject:imageWidth")==null || item.getProperty("GridMapObject:imageHeight")==null) 
 			{
 				imageUrl = (String)item.getProperty("icon");
-				imageWidth = (int)Math.floor(32*GLOBAL_SCALE);
-				imageHeight = (int)Math.floor(32*GLOBAL_SCALE);
+				imageWidth = (int)Math.floor(32*GLOBAL_ITEM_SCALE);
+				imageHeight = (int)Math.floor(32*GLOBAL_ITEM_SCALE);
 				pileRandom = true;
 			}
 			else
 			{
 				imageUrl = (String)item.getProperty("GridMapObject:image");
-				imageWidth = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageWidth"))*GLOBAL_SCALE);
-				imageHeight = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageHeight"))*GLOBAL_SCALE);
+				imageWidth = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageWidth"))*GLOBAL_ITEM_SCALE);
+				imageHeight = (int)Math.floor(intVal(item.getProperty("GridMapObject:imageHeight"))*GLOBAL_ITEM_SCALE);
 				
 			}
 			cellOffsetX = intVal(item.getProperty("gridMapCellOffsetX"));
@@ -446,11 +527,13 @@ public class GridMapService {
 					generatedKey,
 					imageUrl,
 					"",
-					tileX-getRowStart(), tileY-getColumnStart(),
+					tileX, tileY,
 					rotation,
 					cellOffsetX,
 					cellOffsetY,
-					(int)(imageWidth / 2), (int)(imageHeight*0.95), (int)(imageWidth), (int)(imageHeight), false, false));
+					(int)(imageWidth / 2), (int)(imageHeight*0.95), (int)(imageWidth), (int)(imageHeight), false, false, 
+					getRowStart(), getColumnStart(),
+					lightLevel));
 		}
 		
 		
@@ -477,6 +560,7 @@ public class GridMapService {
 			Long imageWidth = (Long)item.getProperty("dbItemWidth");
 			Long imageHeight = (Long)item.getProperty("dbItemHeight");
 			Double rotation = (Double)item.getProperty("dbItemRotation");
+			Double lightLevel = (Double)item.getProperty("dbLightLevel");
 			
 			if (cellOffsetX==null || cellOffsetY==null)
 			{
@@ -486,8 +570,8 @@ public class GridMapService {
 			
 			if (imageWidth==null || imageHeight==null)
 			{
-				imageWidth = (long)Math.floor(32d*GLOBAL_SCALE);
-				imageHeight = (long)Math.floor(32d*GLOBAL_SCALE);
+				imageWidth = (long)Math.floor(32d*GLOBAL_ITEM_SCALE);
+				imageHeight = (long)Math.floor(32d*GLOBAL_ITEM_SCALE);
 			}
 			
 			if (rotation==null)
@@ -499,11 +583,13 @@ public class GridMapService {
 					generatedKey,
 					imageUrl,
 					"",
-					tileX-getRowStart(), tileY-getColumnStart(),
+					tileX, tileY,
 					rotation,
 					cellOffsetX.intValue(),
 					cellOffsetY.intValue(),
-					(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false));
+					(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false,
+					getRowStart(), getColumnStart(),
+					lightLevel));
 		}
 		
 		return result;
@@ -547,70 +633,70 @@ public class GridMapService {
 					objectMap.putAll(objects);
 				
 				// Build background data for coordinate
-				grid[tileX-getRowStart()][tileY-getColumnStart()] = new GridCell("images/2d/floor/grass/tile-grass" + rnd.nextInt(7) + ".png",
+				grid[tileX-getRowStart()][tileY-getColumnStart()] = new GridCell(getFloorTileImage(rnd),
 						tileX-getRowStart(), tileY-getColumnStart(),
 						rnd.nextInt(10));
 			}
 		}
 
-		// Dummy object data for testing 
-//		int dumpX = 8;
-//		int dumpY = 12;
-//		int attachX = -15;
-//		int attachY = -15;
-//		int width = 30;
-//		int height = 30;
-//		int offsetX = 30;
-//		int offsetY = 30;
-//		Random gausRx = new Random();
-//		Random gausRy = new Random();
-//		objectMap.put("images/small2/Pixel_Art-Armor-Chest-elvenhunter.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small2/Pixel_Art-Armor-Chest-elvenhunter.png",
-//						"Norwood Cloak", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30), (int) Math.round(gausRy.nextGaussian() * 10 + 30),
-//						attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small2/Pixel_Art-Armor-Hardenedleatherboots_Old.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small2/Pixel_Art-Armor-Hardenedleatherboots_Old.png",
-//						"Leather Shin Protectors", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30),
-//						(int) Math.round(gausRy.nextGaussian() * 10 + 30), attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small/Pixel_Art-Tools-Shovel1.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small/Pixel_Art-Tools-Shovel1.png",
-//						"Ogre-Sized Shovel", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30), (int) Math.round(gausRy.nextGaussian() * 10 + 30),
-//						attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small2/Pixel_Art-Gems-Topaz_Perfect.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small2/Pixel_Art-Gems-Topaz_Perfect.png",
-//						"Perfect Topaz", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30), (int) Math.round(gausRy.nextGaussian() * 10 + 30),
-//						attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small2/Pixel_Art-Weapon-Energy-Blade.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small2/Pixel_Art-Weapon-Energy-Blade.png",
-//						"Energy Blade", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30), (int) Math.round(gausRy.nextGaussian() * 10 + 30),
-//						attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small/Pixel_Art-Weapons-Chain-W_Mace005.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small/Pixel_Art-Weapons-Chain-W_Mace005.png",
-//						"Flail of the Desert Prince", dumpY, dumpX, offsetX, (int) Math.round(gausRy.nextGaussian() * 10 + 30), attachY, attachX, width,
-//						height, false, false));
-//		objectMap.put("images/small2/Pixel-Art-Armor-Gladiator-gauntlets.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small2/Pixel-Art-Armor-Gladiator-gauntlets.png",
-//						"Gladiator's Gauntlets", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30),
-//						(int) Math.round(gausRy.nextGaussian() * 10 + 30), attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small2/Pixel_Art-Gems-Sapphire_Flawed.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small2/Pixel_Art-Gems-Sapphire_Flawed.png",
-//						"Flawed Sapphire", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30), (int) Math.round(gausRy.nextGaussian() * 10 + 30),
-//						attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small/Pixel_Art-Tools-Pick1.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small/Pixel_Art-Tools-Pick1.png",
-//						"Orcish Pick", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30), (int) Math.round(gausRy.nextGaussian() * 10 + 30),
-//						attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small2/Pixel_Art-Weapon-Chieftains-Axe.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small2/Pixel_Art-Weapon-Chieftains-Axe.png",
-//						"Ogre Chieftain's Axe", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30),
-//						(int) Math.round(gausRy.nextGaussian() * 10 + 30), attachY, attachX, width, height, false, false));
-//		objectMap.put("images/small2/Pixel_Art-Armor-Head-Santa-Hat.png" + "tempKey:o1",
-//				new GridObject("o1", "images/small2/Pixel_Art-Armor-Head-Santa-Hat.png",
-//						"Fake Santa Hat", dumpY, dumpX, (int) Math.round(gausRx.nextGaussian() * 10 + 30), (int) Math.round(gausRy.nextGaussian() * 10 + 30),
-//						attachY, attachX, width, height, false, false));
 
 		return new GridMap(grid, objectMap);
 	}
+	
+	public String getFloorTileImage(Random rnd)
+	{
+		String biomeType = (String)location.getProperty("biomeType");
+		if (biomeType==null || biomeType.equals("")) biomeType = "Temperate";
+		
+		if (biomeType.equals("Temperate"))
+		{
+			return "images/2d/floor/grass/tile-grass" + rnd.nextInt(3) + ".png";
+		}
+		else if (biomeType.equals("Cave"))
+		{
+			return GameUtils.getRandomChoice(rnd, "images/2d/floor/dirt/dirt1.jpg",
+					"images/2d/floor/dirt/stony-dirt1.jpg",
+					"images/2d/floor/dirt/stony-dirt2.jpg",
+					"images/2d/floor/dirt/dirt1.jpg",
+					"images/2d/floor/dirt/dirt1.jpg"
+					);
+		}
+		else if (biomeType.equals("Dungeon"))
+		{
+			return GameUtils.getRandomChoice(rnd, "images/2d/floor/large-stone-tiles/large-stone-tiles-dark1.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-dark2.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-dark3.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light1.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light2.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light3.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light4.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light5.jpg",
+					"images/2d/floor/large-stone-tiles/large-stone-tiles-light6.jpg"
+					);
+		}
+		else if (biomeType.equals("Desert"))
+		{
+			return "images/2d/floor/desert/tile-desert" + rnd.nextInt(7) + ".png";
+		}
+		else if (biomeType.equals("Snow"))
+		{
+			return "images/2d/floor/snow/tile-snow" + rnd.nextInt(7) + ".png";
+		}
+
+		
+		
+		return "images/2d/floor/dirt/dirt1.jpg";
+	}
+	
+	public GridMap buildNewGridForCombat(CachedEntity character, CachedEntity combatant)
+	{
+		GridMap gm = buildNewGrid();
+		
+		generateCombatCharacters(gm.getGridObjects(), character, combatant);
+		
+		return gm;
+	}
+	
 	
 	private Integer intVal(Object obj)
 	{
@@ -622,17 +708,24 @@ public class GridMapService {
 	public int getGridWidth()
 	{
 		Long width = (Long)location.getProperty("gridMapWidth");
-		if (width==null || width<1) width = 1L;
+		if (width==null || width<1) width = 3L;
 		return width.intValue();
 	}
 	
 	public int getGridHeight()
 	{
 		Long height = (Long)location.getProperty("gridMapHeight");
-		if (height==null || height<1) height = 1L;
+		if (height==null || height<1) height = 3L;
 		return height.intValue();
 	}
 
+	/**
+	 * This sets the fields on subLocation that are used to determine how to procedurally generate the location. They are determined
+	 * from the parentLocation's settings. 
+	 * @param db
+	 * @param parentLocation
+	 * @param subLocation
+	 */
 	public void generateGridMapElementsFromParent(ODPDBAccess db, CachedEntity parentLocation, CachedEntity subLocation)
 	{
 		Map<String, Double> elements = new HashMap<>();
@@ -746,12 +839,12 @@ public class GridMapService {
 			@SuppressWarnings("unchecked")
 			List<EmbeddedEntity> gridMapTileEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("proceduralItems");
 			if (gridMapTileEntries!=null)
-				gridMapTile = gridMapTileEntries.get(index);
+				return gridMapTileEntries.get(index);
 		}
 		
 		
 		
-		return gridMapTile;
+		return null;
 	}
 	
 	protected EmbeddedEntity getOrCreateGridMapTileProceduralEntry(int tileX, int tileY, int index)
@@ -780,6 +873,7 @@ public class GridMapService {
 			List<CachedEntity> naturalTileItems = generateNaturalTileItems(getRandomForTile(tileX, tileY), tileX, tileY);
 			gridMapTileEntries = new ArrayList<EmbeddedEntity>(Arrays.asList(new EmbeddedEntity[naturalTileItems.size()]));
 			gridMapTileEntries.set(index, entity);
+			gridMapTile.setProperty("proceduralItems", gridMapTileEntries);
 		}
 		
 		setGridMapTile(tileX, tileY, gridMapTile);
@@ -789,6 +883,9 @@ public class GridMapService {
 	{
 		locationData.setProperty(tileX+"x"+tileY, entity);
 		locationDataEntity.setProperty("gridMapTiles", locationData);
+		
+		if (tilesChanged==null) tilesChanged = new HashSet<>();
+		tilesChanged.add(new TileCoordinate(tileX, tileY));
 	}
 	
 	public boolean isStillProceduralEntity(String proceduralKey)
@@ -842,6 +939,41 @@ public class GridMapService {
 		
 		setGridMapTileProceduralEntry(data.tileX, data.tileY, data.index, entry);
 		
+		checkIfAllProceduralEntitiesAreRemoved(data.tileX, data.tileY);
+			
+	}
+	
+	/**
+	 * This checks, and then sets the clearedProceduralItems flag to true if all procedural items have been removed.
+	 * 
+	 * Note: It doesn't unset the flag if the procedural items haven't been cleared but the flag was true.
+	 * 
+	 * @param tileX
+	 * @param tileY
+	 * @return
+	 */
+	private boolean checkIfAllProceduralEntitiesAreRemoved(int tileX, int tileY)
+	{
+		EmbeddedEntity gridMapTile = getGridMapTile(tileX, tileY);
+		if (gridMapTile==null) return false;
+		
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> gridMapTileEntries = (List<EmbeddedEntity>)gridMapTile.getProperty("proceduralItems");
+		if (gridMapTileEntries==null) return false;
+		
+		
+		for(EmbeddedEntity entry:gridMapTileEntries)
+		{
+			if (entry==null) return false;
+			if (GameUtils.equals(entry.getProperty("status"), "ProceduralDeleted")==false)
+				return false;
+		}
+		
+		gridMapTile.setProperty("clearedProceduralItems", true);
+		
+		setGridMapTile(tileX, tileY, gridMapTile);
+		
+		return true;
 	}
 	
 	
@@ -859,6 +991,30 @@ public class GridMapService {
 		return entity;
 	}
 
+	public void addEntity(CachedEntity item)
+	{
+		Long tileX = (Long)item.getProperty("gridMapPositionX");
+		Long tileY = (Long)item.getProperty("gridMapPositionY");
+		if (tileX==null) tileX = 500L;
+		if (tileY==null) tileY = 500L;
+		
+		EmbeddedEntity tile = getOrCreateGridMapTile(tileX.intValue(), tileY.intValue());
+		
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> tileEntries = (List<EmbeddedEntity>)tile.getProperty("dbItems");
+		
+		if (tileEntries==null) tileEntries = new ArrayList<>();
+		
+		EmbeddedEntity tileEntry = generateTileEntryFromItem(item);
+		tileEntries.add(0, tileEntry);
+		if (tileEntries.size()>MAX_ITEMS_PER_TILE)
+			tileEntries.remove(MAX_ITEMS_PER_TILE);
+		
+		tile.setProperty("dbItems", tileEntries);
+		
+		setGridMapTile(tileX.intValue(), tileY.intValue(), tile);
+	}
+	
 	public void removeEntity(CachedEntity itemEntity)
 	{
 		if (itemEntity.getAttribute("proceduralKey")!=null)
@@ -877,6 +1033,8 @@ public class GridMapService {
 		}
 	}
 
+	
+	
 	private void removeDBEntity(CachedEntity itemEntity)
 	{
 		Long tileX = (Long)itemEntity.getProperty("gridMapPositionX");
@@ -905,26 +1063,47 @@ public class GridMapService {
 			}
 	}
 	
+	public void regenerateDBItemTileCache(int tileX, int tileY)
+	{
+		generateDBItemTileCache(tileX, tileY);
+	}
+	
 	private List<CachedEntity> generateDBItemTileCache(int tileX, int tileY)
 	{
-		if (tileX!=500 || tileY!=500)
-			return null;
+//		if (tileX!=500 || tileY!=500)
+//			return null;
 		// 1. Clear out the existing DB related items, but leave the procedural ones
 		// 2. Query for the items in that location (special consideration for tile 500x500 as it is the default tile and it's where everything  that has no tile position should be considered to be
 		// 3. Add up to 10 of the items to the cache and put it back
 		
 		EmbeddedEntity tile = getOrCreateGridMapTile(tileX, tileY);
 		
-//		Query q = new Query("Item").setFilter(
-//				CompositeFilterOperator.and(
-//						new FilterPredicate("containerKey", FilterOperator.EQUAL, location.getKey()),
-//						new FilterPredicate("gridMapPositionX", FilterOperator.EQUAL, (long)tileX),
-//						new FilterPredicate("gridMapPositionY", FilterOperator.EQUAL, (long)tileY)))
-//				.addSort("movedTimestamp", SortDirection.DESCENDING);
+		List<CachedEntity> items = null;
 		Query q = new Query("Item").setFilter(
-						new FilterPredicate("containerKey", FilterOperator.EQUAL, location.getKey()))
+				CompositeFilterOperator.and(
+						new FilterPredicate("containerKey", FilterOperator.EQUAL, location.getKey()),
+						new FilterPredicate("gridMapPositionX", FilterOperator.EQUAL, (long)tileX),
+						new FilterPredicate("gridMapPositionY", FilterOperator.EQUAL, (long)tileY)))
 				.addSort("movedTimestamp", SortDirection.DESCENDING);
-		List<CachedEntity> items = ds.fetchAsList(q, 50);
+
+		items = ds.fetchAsList(q, 10);
+
+		// if we're looking at the center of the map, then ALSO do another query that deals with legacy items
+		if (tileX==500 && tileY==500)
+		{
+			q = new Query("Item").setFilter(
+					new FilterPredicate("containerKey", FilterOperator.EQUAL, location.getKey()))
+					.addSort("movedTimestamp", SortDirection.DESCENDING);
+			
+			
+			List<CachedEntity> legacyItems = ds.fetchAsList(q, 50);
+			for(CachedEntity legacyItem:legacyItems)
+			{
+				if (CommonChecks.checkItemIsLegacyGridMapItem(legacyItem)==true)
+					items.add(legacyItem);
+			}
+			
+		}
 		
 		List<EmbeddedEntity> dbItems = new ArrayList<>();
 		for(CachedEntity entity:items)
@@ -937,14 +1116,6 @@ public class GridMapService {
 		setGridMapTile(tileX, tileY, tile);
 		
 		return items;
-//		if (tileX==500 && tileY==500)
-//		{
-//			
-//		}
-//		else
-//		{
-//			
-//		}
 	}
 	
 	
@@ -961,6 +1132,24 @@ public class GridMapService {
 		Long tileX = (Long)item.getProperty("gridMapPositionX");
 		Long tileY = (Long)item.getProperty("gridMapPositionY");
 		String image = (String)item.getProperty("GridMapObject:image");
+		Double rotation = (Double)item.getProperty("gridMapRotation");
+		Double scale = (Double)item.getProperty("gridMapScale");
+		Double lightLevel = null;
+		if (item.getProperty("Fireplace:fuelDepletionDate")!=null)
+		{
+			InitiumObject fireplace = new InitiumObject(db, item);
+			AspectFireplace fp = (AspectFireplace)fireplace.getInitiumAspect("Fireplace");
+			Long firePercentComplete = fp.getMinutesUntilExpired(System.currentTimeMillis());
+			if (firePercentComplete!=null)
+			{
+				if (firePercentComplete>=45)
+				{
+					lightLevel = (Double)item.getProperty("Fireplace:lightRadius");
+					if (lightLevel==null) lightLevel = 300d;
+				}
+			}
+		}
+		
 		
 		
 		// Process the values out...
@@ -973,10 +1162,19 @@ public class GridMapService {
 			cellOffsetX = (long)(rnd.nextInt(64)+rnd.nextInt(64))/2;
 			cellOffsetY = (long)(rnd.nextInt(64)+rnd.nextInt(64))/2;			
 		}
+		if (scale==null)
+		{
+			scale = 1d;
+		}
 		if (width==null || height==null)
 		{
-			width = (long)Math.floor(32d*GLOBAL_SCALE);
-			height = (long)Math.floor(32d*GLOBAL_SCALE);
+			width = (long)Math.floor(32d*GLOBAL_ITEM_SCALE*scale);
+			height = (long)Math.floor(32d*GLOBAL_ITEM_SCALE*scale);
+		}
+		else
+		{
+			width = (long)Math.floor(width*GLOBAL_ITEM_SCALE*scale);
+			height = (long)Math.floor(height*GLOBAL_ITEM_SCALE*scale);
 		}
 
 		
@@ -989,10 +1187,12 @@ public class GridMapService {
 		entry.setProperty("status", "Database");
 		entry.setProperty("dbItemCellOffsetX", cellOffsetX);
 		entry.setProperty("dbItemCellOffsetY", cellOffsetY);
-		entry.setProperty("dbItemHeight", width);
-		entry.setProperty("dbItemWidth", height);
+		entry.setProperty("dbItemHeight", height);
+		entry.setProperty("dbItemWidth", width);
 		entry.setProperty("itemKey", item.getKey());
 		entry.setProperty("dbItemImage", image);
+		entry.setProperty("dbItemRotation", rotation);
+		entry.setProperty("dbLightLevel", lightLevel);
 		
 		return entry;
 	}
@@ -1004,9 +1204,145 @@ public class GridMapService {
 		return locationDataEntity.isUnsaved();
 	}
 	
+	public void putLocationDataIfChanged(CachedDatastoreService ds)
+	{
+		if (isLocationDataChanged())
+			putLocationData(ds);
+	}
+	
 	public void putLocationData(CachedDatastoreService ds)
 	{
 		if (locationDataEntity!=null)
+		{
+			System.out.println("Size: "+DBUtils.getEntitySize(locationDataEntity)+" bytes");
 			ds.put(locationDataEntity);
+		}
+	}
+
+	public void setItemPosition(CachedEntity item, Long tileX, Long tileY)
+	{
+		if (tileX==null) tileX = 500L;
+		if (tileY==null) tileY = 500L;
+		
+		item.setProperty("gridMapPositionX", tileX);
+		item.setProperty("gridMapPositionY", tileY);
+		
+		EmbeddedEntity tile = getOrCreateGridMapTile(tileX.intValue(), tileY.intValue());
+		
+		List<EmbeddedEntity> dbItems = (List<EmbeddedEntity>)tile.getProperty("dbItems");
+		if (dbItems==null) dbItems = new ArrayList<>();
+		
+		EmbeddedEntity tileEntry = generateTileEntryFromItem(item);
+		
+		dbItems.add(tileEntry);
+		
+		if (dbItems.size()>10)
+			dbItems.remove(0);
+
+		tile.setProperty("dbItems", dbItems);
+		
+		setGridMapTile(tileX.intValue(), tileY.intValue(), tile);
+	}
+	
+	public void generateCombatCharacters(Map<String, GridObject> gridObjects, CachedEntity character, CachedEntity combatant)
+	{
+		if (CommonChecks.checkNPCIs2DCombatMode(combatant)==false)
+			throw new RuntimeException("Combatant isn't a valid 2D mode NPC.");
+		
+		String generatedKey = "DK-"+combatant.getKey().toString();
+		int tileX = 500;
+		int tileY = 500;
+		Long cellOffsetX = 32L;
+		Long cellOffsetY = 32L;
+		String imageUrl = GameUtils.getResourceUrl(combatant.getProperty("gridMapImage"));
+		Long imageWidth = (Long)combatant.getProperty("gridMapImageWidth");
+		Long imageHeight = (Long)combatant.getProperty("gridMapImageHeight");
+		Double imageScale = (Double)combatant.getProperty("gridMapImageScale");
+		Double rotation = 0d;
+		Double lightLevel = null;
+		
+		if (imageScale==null)
+		{
+			imageScale = 1d;
+		}
+		
+		if (imageWidth==null || imageHeight==null)
+		{
+			imageWidth = 190L;
+			imageHeight = 190L;
+		}
+
+		imageWidth = Math.round(imageWidth.doubleValue()*GLOBAL_ITEM_SCALE*imageScale);
+		imageHeight = Math.round(imageHeight.doubleValue()*GLOBAL_ITEM_SCALE*imageScale);
+		
+		gridObjects.put(generatedKey, new GridObject(
+				generatedKey,
+				imageUrl,
+				"",
+				tileX, tileY,
+				rotation,
+				cellOffsetX.intValue(),
+				cellOffsetY.intValue(),
+				(int)(imageWidth / 2), (int)(imageHeight*0.95), imageWidth.intValue(), imageHeight.intValue(), false, false,
+				getRowStart(), getColumnStart(),
+				lightLevel));
+	}
+
+	public boolean updateEntity(CachedEntity item)
+	{
+		Long tileX = (Long)item.getProperty("gridMapPositionX");
+		Long tileY = (Long)item.getProperty("gridMapPositionY");
+		if (tileX==null) tileX = 500L;
+		if (tileY==null) tileY = 500L;
+		
+		EmbeddedEntity tile = getOrCreateGridMapTile(tileX.intValue(), tileY.intValue());
+		
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> tileEntries = (List<EmbeddedEntity>)tile.getProperty("dbItems");
+		
+		if (tileEntries==null) tileEntries = new ArrayList<>();
+		
+		// Find the index of the existing item if it's there
+		int index = -1;
+		for(EmbeddedEntity tileEntry:tileEntries)
+		{
+			index++;
+			if (tileEntry.getProperty("itemKey")!=null && GameUtils.equals(tileEntry.getProperty("itemKey"), item.getKey()))
+				break;
+		}
+		
+		if (index==-1) return false;
+		
+		EmbeddedEntity tileEntry = generateTileEntryFromItem(item);
+		tileEntries.add(0, tileEntry);
+		if (tileEntries.size()>MAX_ITEMS_PER_TILE)
+			tileEntries.remove(MAX_ITEMS_PER_TILE);
+		
+		tile.setProperty("dbItems", tileEntries);
+		
+		setGridMapTile(tileX.intValue(), tileY.intValue(), tile);
+		
+		return true;
+	}
+	
+	public void updateTileGraphics(OperationBase command, int tileX, int tileY)
+	{
+		command.addJavascriptToResponse(generateGridObjectJson(tileX, tileY));
+	}
+	
+	/**
+	 * This looks at all the tiles that have changed in this request and automatically sends the changed tile graphics
+	 * along with the response for commands/long-operations.
+	 * 
+	 * @param command
+	 */
+	public void updateChangedTileGraphics(OperationBase command)
+	{
+		if (tilesChanged==null) return;
+		for(TileCoordinate tileChanged:tilesChanged)
+		{
+			command.addJavascriptToResponse(generateGridObjectJson(tileChanged.x, tileChanged.y));
+		}
+		tilesChanged.clear();
 	}
 }

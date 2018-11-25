@@ -50,6 +50,7 @@ public class CommandTransmuteItems extends Command {
 		ContainerService cs = new ContainerService(db);
 		Long containerId = tryParseId(parameters, "containerId");
 		final Key containerKey = KeyFactory.createKey("Item", containerId);
+		
 		CachedEntity container = db.getEntity(containerKey);
 		
 		if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), container)==false)
@@ -101,6 +102,8 @@ public class CommandTransmuteItems extends Command {
 				iter.remove();
 		}
 		
+		// Get a reference to Character entity, for potential HCM item creation.
+		final CachedEntity character = db.getCurrentCharacter();
 		// perform the actual transmutation of the items
 		if (recipes.size() == 0) {
 			cs.doUse(ds, container, 1);
@@ -117,6 +120,21 @@ public class CommandTransmuteItems extends Command {
 					@Override
 					public CachedEntity doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
 						CachedEntity container = db.getEntity(containerKey);
+						boolean hcm = CommonChecks.checkIsHardcore(character);
+						
+						// Remove the transmuted materials from player first
+						for (CachedEntity item:materials) 
+						{
+							CachedEntity rfItem = refetch(item);
+							
+							rfItem.setProperty("containerKey", null);
+							rfItem.setProperty("movedTimestamp", new Date());
+							// For any equipable items, check if they are HCM. This will determine HCM status of resulting items.
+							if(hcm && CommonChecks.checkItemIsEquippable(rfItem) && CommonChecks.checkIsHardcore(rfItem) == false)
+								hcm = false;
+							
+							ds.put(rfItem);
+						}
 						
 						for (CachedEntity result:results) 
 						{
@@ -128,18 +146,10 @@ public class CommandTransmuteItems extends Command {
 							if(resultItem.getProperty("durability") != null)
 								resultItem.setProperty("maxDurability", resultItem.getProperty("durability"));
 							
+							if(CommonChecks.checkItemIsEquippable(resultItem))
+								resultItem.setProperty("hardcoreMode", hcm);
+							
 							ds.put(resultItem);
-						}
-						
-						// now remove the transmuted materials from player
-						for (CachedEntity item:materials) 
-						{
-							CachedEntity rfItem = refetch(item);
-							
-							rfItem.setProperty("containerKey", null);
-							rfItem.setProperty("movedTimestamp", new Date());
-							
-							ds.put(rfItem);
 						}
 						
 						return container;

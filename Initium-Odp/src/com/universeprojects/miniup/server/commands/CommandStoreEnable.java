@@ -25,7 +25,8 @@ public class CommandStoreEnable extends Command {
 	}
 	
 	@Override
-public void run(Map<String,String> parameters) throws UserErrorMessage {
+	public void run(Map<String,String> parameters) throws UserErrorMessage 
+	{
 		
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
@@ -40,6 +41,8 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_MERCHANT);
 		db.doCharacterTimeRefresh(ds, character);	// This is saving the character, so no need to save after this
 		
-		addCallbackData("html", HtmlComponents.generateToggleStorefront(character));
+		updateHtml("#toggleStorefront", HtmlComponents.generateToggleStorefront(character));
+		updateHtml("#manageStorefront", HtmlComponents.generateManageStoreButton(character));
+
 	}
 }

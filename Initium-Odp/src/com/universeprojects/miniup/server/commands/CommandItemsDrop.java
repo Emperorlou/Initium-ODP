@@ -13,7 +13,6 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
 
 /**
  * Extension of the CommandsItemBase abstract class.
@@ -44,16 +43,20 @@ public class CommandItemsDrop extends CommandItemsBase {
 			if(CommonChecks.checkCharacterIsBusy(character))
 				throw new UserErrorMessage("Your character is currently busy and cannot drop items.");
 			
-			if(db.tryCharacterDropItem(character, dropItem, false))
+			if(db.tryCharacterDropItem(character, dropItem, getSelectedTileX(), getSelectedTileY(), false))
 				saveEntities.add(dropItem);
 		}
 		
 		ds.beginBulkWriteMode();
 		ds.put(saveEntities);
+		db.getGridMapService().putLocationData(ds);
 		ds.commitBulkWrite();
 		
 		// Reload the popup to show the modified inventory.
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+		
+		
+		addJavascriptToResponse(db.getGridMapService().generateGridObjectJson(getSelectedTileX().intValue(), getSelectedTileY().intValue()));
 	}
 
 }

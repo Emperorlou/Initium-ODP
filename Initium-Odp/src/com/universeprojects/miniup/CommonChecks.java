@@ -520,5 +520,26 @@ public abstract class CommonChecks
 		return false;
 	}
 
+	public static boolean checkItemIsLegacyGridMapItem(CachedEntity legacyItem)
+	{
+		Key containerKey = (Key)legacyItem.getProperty("containerKey");
+		Long tileX = (Long)legacyItem.getProperty("gridMapPositionX");
+		Long tileY = (Long)legacyItem.getProperty("gridMapPositionY");
+		if (containerKey!=null && containerKey.getKind().equals("Location"))
+		{
+			if (tileX==null || tileY==null)
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean checkNPCIs2DCombatMode(CachedEntity combatant)
+	{
+		if (combatant!=null && combatant.getProperty("gridMapImage")!=null && combatant.getProperty("gridMapImage").equals("")==false)
+			return true;
+		
+		return false;
+	}
+
 
 }

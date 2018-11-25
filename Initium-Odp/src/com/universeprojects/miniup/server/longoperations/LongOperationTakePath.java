@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -142,6 +144,14 @@ public class LongOperationTakePath extends LongOperation {
 			if(isInParty && db.getParty(ds, character).size() > 4)
 				throw new UserErrorMessage("You have too many members in your party!");
 			
+			// Log taken path.
+			Logger.getLogger(this.getClass().getSimpleName()).log(
+					Level.WARNING, 
+					String.format("%s taking %s from %s", 
+							character.getKey(),
+							path.getKey(),
+							currentLocationKey));
+			
 			// Do the territory interruption now
 			doTerritoryInterruption(destination, path, allowAttack, isInParty);
 			
@@ -229,6 +239,9 @@ public class LongOperationTakePath extends LongOperation {
 							monster.setProperty("status", status);
 							monster.setProperty("monsterSpawnerKey", mobSpawner.getKey());
 							
+							// Clear HCM flag. Instance mobs/items should not limit HCM encounters.
+							monster.setProperty("hardcoreMode", null);
+							
 							ds.put(finalChar, monster);
 							
 							if(destination.isUnsaved())
@@ -305,31 +318,36 @@ public class LongOperationTakePath extends LongOperation {
 	@Override
 	String doComplete() throws UserErrorMessage {
 		CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
+		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
+		if (path==null)
+			throw new UserErrorMessage("The path you were attempting to take no longer exists.");
 		
 		db.getDB().beginBulkWriteMode();
 		try
 		{
 			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, 1, 0.5d))
+			{
+				// Create discovery for character, and optionally unhide it (unsaved = already exists);
+				CachedEntity discovery = db.newDiscovery(null, db.getCurrentCharacter(), path);
+				if(discovery != null && discovery.getKey().isComplete())
+				{
+					discovery.setProperty("hidden", false);
+					db.getDB().put(discovery);
+				}
 				throw new GameStateChangeException("While you were on your way, someone found you...", true);
+			}
 		}
 		finally
 		{
 			db.getDB().commitBulkWrite();
 		}
 			
-		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
 		Boolean attack = (Boolean)getDataProperty("attack");
 		if (attack==null) attack = false;
 	
-		if (path==null)
-			throw new UserErrorMessage("The path you were attempting to take no longer exists.");
-		
 		CachedEntity newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
-		
-
 		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
 		update.updateFullPage_shortcut(true);
-
 		
 		return "You have arrived at "+newLocation.getProperty("name")+".";
 	}

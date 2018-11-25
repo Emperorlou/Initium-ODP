@@ -39,7 +39,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-73";
+	final public static String version = "0.5.9-118";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -915,7 +915,7 @@ public class GameUtils
     	try
     	{
 	    	String itemType = (String)item.getProperty("itemType");
-	    	if (itemType != null && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
+	    	if (itemType != null && GameUtils.booleanEquals(item.getProperty("natural"), false) && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
 	    		
 	    		StringBuilder sb = new StringBuilder();
 		    	sb.append("minitip='");
@@ -1058,7 +1058,6 @@ public class GameUtils
 		
 		String qualityClass = determineQuality(item.getProperties());
 		String label = (String)item.getProperty("label");
-		if (smallMode) label = null;
 		if (label==null || label.trim().equals("") || (label=WebUtils.htmlSafe(label).trim()).equals(""))
 			label = (String)item.getProperty("name");
 
@@ -1456,7 +1455,7 @@ public class GameUtils
 			sb.append("				<a onclick='characterEquipItem(event, " + item.getId() + ")'>Equip</a>");
 		sb.append("				<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
 		if (item.getProperty("maxWeight") != null) {
-			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"
+			sb.append("				<a onclick='pagePopup(\"/odp/ajax_moveitems?selfSide=Character_"
 										+ character.getId()
 										+ "&otherSide=Item_"
 										+ item.getKey().getId() + "\")'>Open</a>");
@@ -1479,8 +1478,8 @@ public class GameUtils
     	
     	return "<a onclick='doCombatAttack" 
     		+ (leftHand ? "Left" : "Right") + "Hand(event)' class='v3-main-button' shortcut='" 
-    		+ (leftHand ? "49" : "50") + "'><span class='shortcut-key'>(" 
-    		+ (leftHand ? "1" : "2") + ")</span>" + attackText + "</a>";
+    		+ (leftHand ? "50" : "49") + "'><span class='shortcut-key'>(" 
+    		+ (leftHand ? "2" : "1") + ")</span>" + attackText + "</a>";
     }
 
     public static String renderCollectable(CachedEntity item)
@@ -2455,7 +2454,7 @@ public class GameUtils
 				throw new IllegalArgumentException("Invalid field value: "+fieldValue);
 		}
 		else if (fieldValue instanceof Boolean)
-			return (Boolean)fieldValue;
+			return (Boolean)fieldValue == bool;
 		else
 			throw new IllegalArgumentException("Invalid field value type.");
 		
@@ -2607,7 +2606,7 @@ public class GameUtils
 		if (relativeUrl.startsWith("https://"))
 		{
 			if (relativeUrl.startsWith("https://i.imgur.com"))
-				return relativeUrl;
+			return relativeUrl;
 			else
 				return "";
 		}
@@ -2788,5 +2787,14 @@ public class GameUtils
 			seed+=s.longValue();
 		}
 		return new Random(seed);
+	}
+
+	public static String getRandomChoice(Random rnd, String...options)
+	{
+		if (options==null || options.length==0) return null;
+		
+		int index = rnd.nextInt(options.length);
+		
+		return options[index];
 	}
 }

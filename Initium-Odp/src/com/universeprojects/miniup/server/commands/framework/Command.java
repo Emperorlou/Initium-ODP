@@ -15,6 +15,10 @@ import com.universeprojects.miniup.server.ODPAuthenticator;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
+import com.universeprojects.miniup.server.services.ExperimentalPageUpdateService;
+import com.universeprojects.miniup.server.services.FullPageUpdateService;
+import com.universeprojects.miniup.server.services.GridMapService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 public abstract class Command extends OperationBase
 {
@@ -179,6 +183,88 @@ public abstract class Command extends OperationBase
 		return callbackData;
 	}
 
+	public Long getSelectedTileX()
+	{
+		String str = request.getParameter("selected2DTileX");
+		if (str==null || str.equals("") || str.equals("null") || str.equals("undefined"))
+			return 500L;
+		
+		return Long.parseLong(str);
+	}
 	
+	public Long getSelectedTileY()
+	{
+		String str = request.getParameter("selected2DTileY");
+		if (str==null || str.equals("") || str.equals("null") || str.equals("undefined"))
+			return 500L;
+		
+		return Long.parseLong(str);
+	}
+
 	
+	private MainPageUpdateService mpus = null;
+	public MainPageUpdateService getMPUS()
+	{
+		if (mpus!=null)
+			return mpus;
+			
+		String uiStyle = request.getParameter("uiStyle");
+		if (uiStyle==null || uiStyle.equals("") || uiStyle.equals("null") || uiStyle.equals("undefined"))
+			uiStyle = "classic";
+		
+		if (uiStyle.equals("classic"))
+		{
+			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
+		}
+		else if (uiStyle.equals("experimental"))
+		{
+			mpus = new ExperimentalPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
+		}
+		else if (uiStyle.equals("wow"))
+		{
+			mpus = new FullPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
+		}
+		else
+			throw new RuntimeException("Unhandled ui style: "+uiStyle);
+		
+		return mpus;
+	}
+	
+	protected Long parseLong(String fieldName)
+	{
+		String obj = request.getParameter(fieldName);
+		if (obj==null || obj.equals("") || obj.equals("undefined") || obj.equals("null"))
+			return null;
+		
+		return Long.parseLong(obj);
+	}
+
+	protected Integer parseInteger(String fieldName)
+	{
+		String obj = request.getParameter(fieldName);
+		if (obj==null || obj.equals("") || obj.equals("undefined") || obj.equals("null"))
+			return null;
+		
+		return Integer.parseInt(obj);
+	}
+
+	protected Double parseDouble(String fieldName)
+	{
+		String obj = request.getParameter(fieldName);
+		if (obj==null || obj.equals("") || obj.equals("undefined") || obj.equals("null"))
+			return null;
+		
+		return Double.parseDouble(obj);
+	}
+	
+	protected void updateSelectedTile()
+	{
+		GridMapService gms = db.getGridMapService();
+		
+		gms.regenerateDBItemTileCache(getSelectedTileX().intValue(), getSelectedTileY().intValue());
+		
+		gms.putLocationData(ds);
+		
+		addJavascriptToResponse(gms.generateGridObjectJson(getSelectedTileX().intValue(), getSelectedTileY().intValue()));
+	}
 }
