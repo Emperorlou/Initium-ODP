@@ -51,6 +51,8 @@ public class CommandScriptGlobal extends CommandScriptBase {
 		throws UserErrorMessage 
 	{
 		String additionalEntities = parameters.get("entities");
+		if(additionalEntities == null || additionalEntities.isEmpty()) return;
+			
 		List<Key> entityFetch = new ArrayList<Key>();
 		
 		for(String str:additionalEntities.split(";"))
