@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.WebUtils;
@@ -34,6 +35,16 @@ public class CommandGuardNewSetting extends Command
 		boolean attack = WebUtils.getBoolParam(request, "attack", true);
 		GuardType type = GuardType.valueOf(parameters.get("type"));
 		Key entityKey = db.stringToKey(parameters.get("entityKey"));
+		
+		// Validate that they are not in a town.
+		CachedEntity curChar = db.getCurrentCharacter();
+		CachedEntity charLocation = ds.getIfExists((Key)curChar.getProperty("locationKey"));
+		if(charLocation == null)
+			throw new RuntimeException("Current character location is null");
+		if("Town".equals(charLocation.getProperty("type")))
+			throw new UserErrorMessage("You cannot guard in Towns!");
+		if(CommonChecks.checkLocationIsGoodRestSite(charLocation))
+			throw new UserErrorMessage("You cannot guard inns or owned houses!");
 		
 		GuardService gService = new GuardService(db);
 		
