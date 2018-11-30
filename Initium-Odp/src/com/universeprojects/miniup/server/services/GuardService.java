@@ -259,19 +259,19 @@ public class GuardService extends Service
 		
 		if (guardType == GuardType.NoTrespassers)
 		{
-			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards keeping you from tresspassing in "+entity.getProperty("name")+". Are you sure you want to attack?");
+			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" player guards keeping you from tresspassing in "+entity.getProperty("name")+". Are you sure you want to attack?");
 		}
 		else if (guardType == GuardType.NoGuarding)
 		{
-			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards keeping you from guarding anything in "+entity.getProperty("name")+". You will need to fight them off before you can guard anything here. Are you sure you want to attack?");
+			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" player guards keeping you from guarding anything in "+entity.getProperty("name")+". You will need to fight them off before you can guard anything here. Are you sure you want to attack?");
 		}
 		else if (guardType == GuardType.NoMoving)
 		{
-			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards keeping you from taking "+entity.getProperty("name")+". You will need to fight them off before you can take it. Are you sure you want to attack?");
+			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" player guards keeping you from taking "+entity.getProperty("name")+". You will need to fight them off before you can take it. Are you sure you want to attack?");
 		}
 		else if (guardType == GuardType.NoUsing)
 		{
-			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards keeping you from using "+entity.getProperty("name")+". You will need to fight them off before you can use it. Are you sure you want to attack?");
+			throw new ConfirmAttackException("<img style='float:left;' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'/>There are up to "+size+" guards player keeping you from using "+entity.getProperty("name")+". You will need to fight them off before you can use it. Are you sure you want to attack?");
 		}
 	}
 
