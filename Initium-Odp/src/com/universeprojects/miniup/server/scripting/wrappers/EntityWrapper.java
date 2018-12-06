@@ -1,13 +1,16 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
+import java.security.spec.DSAGenParameterSpec;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.ScriptService;
@@ -158,7 +161,6 @@ public class EntityWrapper extends BaseWrapper
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean addScript(String scriptName)
 	{
 		if(this.wrappedEntity.hasProperty("scripts")==false)
@@ -166,25 +168,56 @@ public class EntityWrapper extends BaseWrapper
 			ScriptService.log.log(Level.SEVERE, "Entity hasProperty(script) returned false for " + wrappedEntity.getKind());
 			return false;
 		}
-		List<CachedEntity> addScripts = db.getFilteredList("Script", "name", scriptName);
-		if(!addScripts.isEmpty())
+		
+		QueryHelper qh = new QueryHelper(db.getDB());
+		List<Key> addScripts = qh.getFilteredList_Keys("Script", 1, "name", scriptName);
+		if(addScripts.isEmpty())
 		{
-			CachedEntity newScript = addScripts.get(0);
-			Key newScriptKey = newScript.getKey();
+			ScriptService.log.log(Level.WARNING, "Script '" + scriptName + "' not found.");
+			return false;
+		}
+		
+		Key newScriptKey = addScripts.get(0);
+		return this.addScriptKey(newScriptKey);
+	}
+	
+	public boolean addScriptById(Long scriptId)
+	{
+		if(this.wrappedEntity.hasProperty("scripts")==false)
+		{
+			ScriptService.log.log(Level.SEVERE, "Entity hasProperty(script) returned false for " + wrappedEntity.getKind());
+			return false;
+		}
+		
+		return this.addScriptKey(KeyFactory.createKey("Script", scriptId));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public boolean addScriptKey(java.security.Key scriptKey)
+	{
+		CachedEntity newScript = db.getEntity(scriptKey);
+		if(this.wrappedEntity.hasProperty("scripts")==false)
+		{
+			ScriptService.log.log(Level.SEVERE, "Entity hasProperty(script) returned false for " + wrappedEntity.getKind());
+			return false;
+		}
+		
+		if(newScript != null)
+		{
 			List<Key> entityScripts = (List<Key>)this.getProperty("scripts");
 			if(entityScripts == null) entityScripts = new ArrayList<Key>();
 			for(Key script:entityScripts)
 			{
-				if(GameUtils.equals(script, newScriptKey))
+				if(GameUtils.equals(script, scriptKey))
 					return false;
 			}
-			entityScripts.add(newScriptKey);
+			entityScripts.add(scriptKey);
 			this.setProperty("scripts", entityScripts);
-			ScriptService.log.log(Level.WARNING, "Script '" + scriptName + "' associated to entity " + wrappedEntity.getKey().toString());
+			ScriptService.log.log(Level.WARNING, "Script '" + (String)newScript.getProperty("name") + "' [" + scriptKey.toString() + "] associated to entity " + wrappedEntity.getKey().toString());
 			return true;
 		}
 		else
-			ScriptService.log.log(Level.WARNING, "Script '" + scriptName + "' not found.");
+			ScriptService.log.log(Level.WARNING, "Script '" + scriptKey.toString() + "' not found.");
 		
 		return false;
 	}
