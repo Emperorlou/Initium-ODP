@@ -915,7 +915,7 @@ public class GameUtils
     	try
     	{
 	    	String itemType = (String)item.getProperty("itemType");
-	    	if (itemType != null && GameUtils.booleanEquals(item.getProperty("natural"), false) && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
+	    	if (itemType != null && GameUtils.booleanEquals(item.getProperty("naturalEquipment"), false) && (itemType.equals("Weapon") || itemType.equals("Shield") || itemType.equals("Armor") || itemType.equals("Jewelry"))) {
 	    		
 	    		StringBuilder sb = new StringBuilder();
 		    	sb.append("minitip='");
