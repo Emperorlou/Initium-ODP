@@ -193,7 +193,7 @@ public class EntityWrapper extends BaseWrapper
 	}
 	
 	@SuppressWarnings("unchecked")
-	public boolean addScriptKey(java.security.Key scriptKey)
+	public boolean addScriptKey(Key scriptKey)
 	{
 		CachedEntity newScript = db.getEntity(scriptKey);
 		if(this.wrappedEntity.hasProperty("scripts")==false)
