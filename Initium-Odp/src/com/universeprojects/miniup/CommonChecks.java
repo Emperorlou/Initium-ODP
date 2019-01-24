@@ -299,6 +299,18 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+	
+	public static boolean checkItemHasEquipSlot(CachedEntity item, String slot)
+	{
+		String equipSlot = (String)item.getProperty("equipSlot");
+		if(equipSlot == null || equipSlot == "") return false;
+		
+		for(String checkSlot:equipSlot.replaceAll(" and ", ",").replaceAll(" ", "").split(","))
+			if(slot.equals(checkSlot))
+				return true;
+		
+		return false;
+	}
 
 	public static boolean checkUserIsPremium(CachedEntity user)
 	{

@@ -291,8 +291,14 @@ public class DBAccessor {
 	
 	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)
 	{
+		return destroyItem(item, currentCharacter, currentCharacter.getName()+"'s "+item.getName()+" was so badly damaged it has been destroyed.");
+	}
+	
+	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter, String destroyMessage)
+	{
 		db.doDestroyEquipment(null, currentCharacter.wrappedEntity, item.wrappedEntity);
-		db.sendGameMessage(db.getDB(), currentCharacter.wrappedEntity, "<div class='equipment-destroyed-notice'>"+currentCharacter.getName()+"'s "+item.getName()+" was so badly damaged it has been destroyed.</div>");
+		if(destroyMessage != null && destroyMessage.length() > 0)
+			db.sendGameMessage(db.getDB(), currentCharacter.wrappedEntity, "<div class='equipment-destroyed-notice'>"+destroyMessage+"</div>");
 		return true;
 	}
 	
