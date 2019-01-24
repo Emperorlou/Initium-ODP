@@ -88,6 +88,8 @@ public class ModifierService extends Service
 			try
 			{
 				String modifierLine = modifiers.get(i);
+				if(modifierLine == null || modifierLine.length() == 0)
+					continue;
 				
 				ModifierType modifierType = getModifierTypeFrom(modifierLine);
 				String fullValue = getFullValue(modifierType, modifierLine);

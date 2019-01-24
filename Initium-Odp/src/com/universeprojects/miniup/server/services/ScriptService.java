@@ -16,6 +16,7 @@ import org.mozilla.javascript.Scriptable;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
@@ -53,8 +54,9 @@ public class ScriptService extends Service
 		try
 		{
 			jsContext = Context.enter();
-			// This sandboxes the engine by preventing access to non-standard objects and some reflexion objects
-	    	// This is the simplest way to prevent access to top-level packages
+			// If we're on the test server, we enable debug output on the errors, otherwise they
+			// must be specified.
+			jsContext.setGeneratingDebug(GameUtils.isTestServer(request));
 			jsScope = jsContext.initStandardObjects();
 			DBAccessor coreFunctions = new DBAccessor(db, request);
 			jsScope.put("core", jsScope, coreFunctions);
@@ -142,7 +144,7 @@ public class ScriptService extends Service
 		String scriptName = (String)scriptEntity.getProperty("internalName");
 	    try
 	    {
-	    	log.log(Level.WARNING, "Executing script: " + scriptEntity.getKey().getId());
+	    	log.log(Level.WARNING, "Executing script: " + scriptName + " (" + scriptEntity.getKey().getId() + ")");
 	    	// Create a new scope for every script execution call.
 	    	Scriptable currentScope = jsContext.newObject(jsScope);
 	    	currentScope.setPrototype(jsScope);

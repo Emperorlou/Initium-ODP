@@ -2465,6 +2465,9 @@ public class ODPDBAccess
 		Long itemQuantity = (Long)item.getProperty("quantity");
 		if (itemQuantity==null) itemQuantity = 1L;
 
+		log.log(Level.WARNING, String.format("Moving %s from %s to %s", 
+				item.getKey().toString(), startContainer.getKey().toString(), newContainer.getKey().toString()));
+		
 		// We fetch these values to use later in case of partial pickups
 		Long itemSingleWeight = (Long)item.getProperty("weight");
 		Long itemSingleSpace = (Long)item.getProperty("space");
@@ -5648,9 +5651,9 @@ public class ODPDBAccess
 				continue;
 			
 			// If the item is equipped (not in the left/right hand) then don't count it's weight against us
-			if ("LeftHand".equals(item.getProperty("equipSlot"))==false && 
-					"RightHand".equals(item.getProperty("equipSlot"))==false && 
-					"2Hands".equals(item.getProperty("equipSlot"))==false && 
+			if (CommonChecks.checkItemHasEquipSlot(item, "LeftHand")==false && 
+					CommonChecks.checkItemHasEquipSlot(item, "RightHand")==false && 
+					CommonChecks.checkItemHasEquipSlot(item, "2Hands")==false && 
 					checkCharacterHasItemEquipped(character, item.getKey()))
 				continue;
 			
