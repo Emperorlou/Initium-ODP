@@ -312,6 +312,8 @@ public class GridMapService {
 		{
 			for(int i = 0; i<result.size(); i++)
 			{
+				if (i>=proceduralEntries.size()) break;	//TODO: Verify that this is the right thing to do, I don't quite get the logic yet
+				
 				EmbeddedEntity entry = proceduralEntries.get(i);
 				
 				ItemEntryStatus status = null;
