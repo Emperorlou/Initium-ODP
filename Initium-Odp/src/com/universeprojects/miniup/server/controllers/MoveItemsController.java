@@ -164,7 +164,7 @@ public class MoveItemsController extends PageController {
 			commands.append("<div style='height:30px;'>");
 			commands.append("<span>");
 			commands.append("<img src='" + GameUtils.getResourceUrl("images/dogecoin-18px.png") + "' border=0/>"+GameUtils.formatNumber(selfSide.getProperty("dogecoins")));
-			commands.append("</span>");
+			commands.append("&nbsp;</span>");
 			commands.append("<div class='main-item-controls' style='float:right;margin:3px; margin-right:39px;'>");
 			commands.append("<a onclick='depositDogecoinsToItem("+otherSide.getId()+", event)'>Deposit gold &xrarr;</a>");
 			commands.append("</div>");
