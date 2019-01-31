@@ -184,7 +184,7 @@ public class MoveItemsController extends PageController {
 				commands.append("<div style='height:30px;'>");
 				commands.append("<span style='float:right'>");
 				commands.append("<img src='" + GameUtils.getResourceUrl("images/dogecoin-18px.png") + "' border=0/>"+GameUtils.formatNumber(otherSide.getProperty("dogecoins")));
-				commands.append("</span>");
+				commands.append("&nbsp;</span>");
 				commands.append("<div class='main-item-controls'>");
 				commands.append("<a onclick='collectDogecoinsFromItem("+otherSide.getId()+", event)'>&xlarr; Collect gold</a>");
 				commands.append("</div>");
