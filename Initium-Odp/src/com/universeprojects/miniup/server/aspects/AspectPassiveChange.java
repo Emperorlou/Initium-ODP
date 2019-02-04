@@ -6,6 +6,9 @@ import java.util.Random;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.gef.GEFUtils;
+import com.universeprojects.gef.PropertyContainerCachedEntity;
+import com.universeprojects.gef.PropertyContainerEmbeddedEntity;
 import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -113,8 +116,10 @@ public class AspectPassiveChange extends InitiumAspect
 			throw new PassiveChangeLocked();
 		
 		EmbeddedEntity changeMap = (EmbeddedEntity)passiveChange.getProperty("fieldChangesSelf");
-		
 		boolean selfChanged = db.applyFieldChanges(this.entity, changeMap);
+		
+		EmbeddedEntity entityModifier = (EmbeddedEntity)passiveChange.getProperty("selfModifier");
+		db.performModifierTypeOperation(new PropertyContainerCachedEntity(this.entity), new PropertyContainerEmbeddedEntity(this.entity, entityModifier, entityModifier.getKey().getKind(), "doesn't matter here"));
 		
 		return selfChanged;
 	}

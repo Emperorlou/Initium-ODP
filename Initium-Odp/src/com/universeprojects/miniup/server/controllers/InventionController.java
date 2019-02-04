@@ -202,7 +202,7 @@ public class InventionController extends PageController {
 			skillData.put("speed", skillSpeed);
 			skillData.put("id", skillId);
 			skillData.put("icon", iconUrl);
-			skillData.put("class", idea.getProperty("name"));
+			skillData.put("itemClass", idea.getProperty("name"));
 			
 			skills.add(skillData);
 		}

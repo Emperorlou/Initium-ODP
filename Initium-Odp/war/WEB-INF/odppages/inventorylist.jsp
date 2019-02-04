@@ -25,8 +25,8 @@
 		<c:if test="${isCarryingCharacters}">
 		<div class='main-description'>	
 			<h4>Characters</h4>
-			<c:forEach var="char" items="${carriedCharacters}">
-				${char}
+			<c:forEach var="chr" items="${carriedCharacters}">
+				${chr}
 			</c:forEach> 
 			<br/>
 			<div class='main-item-controls'>

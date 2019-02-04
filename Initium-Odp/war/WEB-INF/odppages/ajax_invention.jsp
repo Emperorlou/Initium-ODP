@@ -104,7 +104,7 @@
 						<a class='hint' rel='#skill-popup-1-${skill.id}'><img src='${skill.icon}' border=0/> 
 							<div class='generic-itemlike-name-container'>
 								<div class='generic-itemlike-name' id='skill-name-${skill.id}'>${skill.name}</div>
-								<div class='generic-itemlike-lowerline'>${skill.class}</div>
+								<div class='generic-itemlike-lowerline'>${skill.itemClass}</div>
 							</div>
 						</a>
 					</div>

@@ -42,6 +42,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
+import com.universeprojects.gef.PropertyContainerEntityBase;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -7502,5 +7503,10 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
+	public void performModifierTypeOperation(PropertyContainerEntityBase entityToChange, PropertyContainerEntityBase entityModifier)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
