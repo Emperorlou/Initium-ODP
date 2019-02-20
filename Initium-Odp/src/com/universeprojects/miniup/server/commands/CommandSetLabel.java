@@ -48,7 +48,7 @@ public class CommandSetLabel extends Command {
 		String label = parameters.get("label");
 		if (label!=null && label.length()>30)
 			throw new UserErrorMessage("Labels are limited to a maximum of 30 characters.");
-		if (label.length()>0 && label!=null && label.matches(ODPDBAccess.CAMP_NAME_REGEX)==false)
+		if (label!=null && label.length()>0 && label.matches(ODPDBAccess.CAMP_NAME_REGEX)==false)
 			throw new UserErrorMessage("Please only use letters, numbers, and the following special characters: - ,'&");
 
 		// Verify that the item is an actual storage item
