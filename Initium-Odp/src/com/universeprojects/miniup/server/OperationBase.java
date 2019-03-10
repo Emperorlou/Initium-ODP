@@ -202,4 +202,8 @@ public abstract class OperationBase
 		gridCellUpdates.addAll(toMerge.gridCellUpdates);
 		gridObjectUpdates.addAll(toMerge.gridObjectUpdates);
 	}
+	
+	public abstract Long getSelectedTileX();
+	public abstract Long getSelectedTileY();
+	
 }

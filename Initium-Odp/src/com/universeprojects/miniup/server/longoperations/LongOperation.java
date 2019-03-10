@@ -36,8 +36,8 @@ import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 public abstract class LongOperation extends OperationBase
 {
-	ODPDBAccess db;
-	CachedDatastoreService ds;
+	protected ODPDBAccess db;
+	protected CachedDatastoreService ds;
 	private Map<String,String> parameters;
 	private String userMessage = null;
 	private boolean fullRefresh = false;

@@ -66,5 +66,7 @@ public class CommandForgetAllCombatSites extends Command {
 			MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, db.getLocationById(characterLocationKey.getId()), this);
 			mpus.updateButtonList();
 		}
+		
+		setJavascriptResponse(JavascriptResponse.ReloadMiniPagePopup);
 	}
 }

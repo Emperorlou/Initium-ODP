@@ -1,14 +1,13 @@
 package com.universeprojects.miniup.server.aspects;
 
+import java.security.spec.DSAGenParameterSpec;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
+import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.gef.GEFUtils;
-import com.universeprojects.gef.PropertyContainerCachedEntity;
-import com.universeprojects.gef.PropertyContainerEmbeddedEntity;
 import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -84,42 +83,75 @@ public class AspectPassiveChange extends InitiumAspect
 		List<EmbeddedEntity> passiveChanges = getPassiveChanges();
 		if (passiveChanges==null) return false;
 		
-		boolean changeOccurred = false;
+		int lastChangeIndex = -1;
 		try
 		{
-			EmbeddedEntity passiveChange = passiveChanges.get(0);
+			boolean lockAcquired = false;
+			for(int i = 0; i<passiveChanges.size(); i++)
+			{
+				
+				EmbeddedEntity passiveChange = passiveChanges.get(i);
+
+				if (isTimeToUpdate(passiveChange)==false)
+					break;
+				if (i==0 && acquireLock()==false)
+					throw new PassiveChangeLocked();
+				else
+					lockAcquired = true;
+				
+				if (update(passiveChange)==true)
+				{
+					lastChangeIndex = i;
+					Date lastUpdate = getLastUpdate();
+					long newLastUpdateTime = lastUpdate.getTime() + getEntryWaitTimeSeconds(passiveChange)*1000;
+					setLastUpdate(new Date(newLastUpdateTime));
+				}
+				else
+					break;
+
+			}
 			
-			if (update(passiveChange)==true)
+			for (int i = 0; i<lastChangeIndex+1; i++)
 			{
 				passiveChanges.remove(0);
-				changeOccurred = true;
 			}
-
+			
 			setPassiveChanges(passiveChanges);
 			
-			releaseLock();
+			if (lockAcquired)
+				releaseLock();
 		}
 		catch(PassiveChangeLocked e)
 		{
 			// Lets just get out of here
 		}
 		
-		return changeOccurred;
+		return lastChangeIndex>-1;
 	}
 	
-	private boolean update(EmbeddedEntity passiveChange) throws PassiveChangeLocked
+	private boolean update(EmbeddedEntity passiveChange)
 	{
-		if (isTimeToUpdate(passiveChange)==false)
-			return false;
-		
-		if (acquireLock()==false)
-			throw new PassiveChangeLocked();
-		
+				
 		EmbeddedEntity changeMap = (EmbeddedEntity)passiveChange.getProperty("fieldChangesSelf");
 		boolean selfChanged = db.applyFieldChanges(this.entity, changeMap);
 		
-		EmbeddedEntity entityModifier = (EmbeddedEntity)passiveChange.getProperty("selfModifier");
-		db.performModifierTypeOperation(new PropertyContainerCachedEntity(this.entity), new PropertyContainerEmbeddedEntity(this.entity, entityModifier, entityModifier.getKey().getKind(), "doesn't matter here"));
+		EmbeddedEntity entityModifierEmbedded = (EmbeddedEntity)passiveChange.getProperty("selfModifierEmbedded");
+		if (entityModifierEmbedded!=null)
+		{
+			db.performModifierTypeOperation(this.entity, entityModifierEmbedded);
+			selfChanged = true;
+		}
+		
+		Key entityModifierKey = (Key)passiveChange.getProperty("selfModifier");
+		if (entityModifierKey!=null)
+		{
+			CachedEntity modifier = db.getDB().getIfExists(entityModifierKey);
+			if (modifier!=null)
+			{
+				db.performModifierTypeOperation(this.entity, modifier);
+				selfChanged = true;
+			}
+		}
 		
 		return selfChanged;
 	}

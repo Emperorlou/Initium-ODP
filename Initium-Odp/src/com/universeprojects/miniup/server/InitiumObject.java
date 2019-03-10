@@ -41,7 +41,8 @@ public class InitiumObject implements GameObject<Key>
 			this.aspects = new HashMap<String, InitiumAspect>();
 			
 			for(String aspectId:aspectIds)
-				aspects.put(aspectId, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId, this));
+				if (GameUtils.classExist("com.universeprojects.miniup.server.aspects.Aspect"+aspectId))
+					aspects.put(aspectId, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId, this));
 		}
 		else
 		{
@@ -302,6 +303,16 @@ public class InitiumObject implements GameObject<Key>
 			gms = new GridMapService(db, location);
 		
 		gms.setItemPosition(entity, tileX, tileY);
+	}
+
+	public Object getAttribute(String attributeKey)
+	{
+		return entity.getAttribute(attributeKey);
+	}
+	
+	public void setAttribute(String attributeKey, Object value)
+	{
+		entity.setAttribute(attributeKey, value);
 	}
 	
 	@Override

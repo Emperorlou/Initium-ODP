@@ -48,6 +48,9 @@ public class LongOperationExplore extends LongOperation {
 
 		CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
 		
+		CachedEntity permanentLocation = db.getParentPermanentLocation(location);
+		if (permanentLocation!=null) location = permanentLocation;
+		
 
 		if (findNaturalResources && CommonChecks.checkLocationIsGoodForNaturalResource(location)==false)
 			throw new UserErrorMessage("This is not somewhere that you can find natural resources. You generally need to use this option from a major location (like Aera Countryside and the likes).");
@@ -55,6 +58,7 @@ public class LongOperationExplore extends LongOperation {
 		setDataProperty("ignoreCombatSites", ignoreCombatSites);
 		setDataProperty("findNaturalResources", findNaturalResources);
 		setDataProperty("locationName", location.getProperty("name"));
+		setDataProperty("locationKey", location.getKey());
 		
 		return 6;
 	}
@@ -68,7 +72,7 @@ public class LongOperationExplore extends LongOperation {
 		Boolean findNaturalResources = (Boolean)getDataProperty("findNaturalResources");
 		if (findNaturalResources==null) findNaturalResources = false;
 		
-		Object oldLocaiton = db.getCharacterLocationKey(db.getCurrentCharacter());
+		Object oldLocaiton = ds.getIfExists((Key)getDataProperty("locationKey"));
 		Object oldCombatant = db.getCurrentCharacter().getProperty("combatant");
 		
 		String result = explore(db, ignoreCombatSites, findNaturalResources);
@@ -129,7 +133,7 @@ public class LongOperationExplore extends LongOperation {
 		ds.beginBulkWriteMode();
 		try
 		{
-			Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
+			Key locationKey = (Key)getDataProperty("locationKey");
 			CachedEntity location = db.getEntity(locationKey);
 			
 			// First get all the things that can be discovered at the character's current location

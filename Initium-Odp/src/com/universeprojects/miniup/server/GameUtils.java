@@ -39,7 +39,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-118";
+	final public static String version = "0.5.9-122";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -2502,7 +2502,7 @@ public class GameUtils
 		String[] dmgParts = damageFormula.toString().substring(2).toLowerCase().split("d");
 		double firstPart = Double.parseDouble(dmgParts[0]);
 		double secondPart = Double.parseDouble(dmgParts[1]);
-
+ 
 		
 		return firstPart*secondPart*critMultiplier;
 	}
@@ -2796,5 +2796,18 @@ public class GameUtils
 		int index = rnd.nextInt(options.length);
 		
 		return options[index];
+	}
+
+	public static boolean classExist(String fullClassPath)
+	{
+		try
+		{
+			Class.forName(fullClassPath);
+		}
+		catch(Exception e)
+		{
+			return false;
+		}
+		return true;
 	}
 }

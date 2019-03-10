@@ -26,7 +26,8 @@ public abstract class Command extends OperationBase
 	{
 		None,
 		FullPageRefresh,
-		ReloadPagePopup
+		ReloadPagePopup, 
+		ReloadMiniPagePopup
 	}
 	protected final ODPDBAccess db;
 	protected final CachedDatastoreService ds;

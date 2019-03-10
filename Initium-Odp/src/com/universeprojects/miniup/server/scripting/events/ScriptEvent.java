@@ -324,4 +324,16 @@ public abstract class ScriptEvent extends OperationBase
 	{
 		return deleteEntities.values();
 	}
+	
+	@Override
+	public Long getSelectedTileX()
+	{
+		throw new RuntimeException("Unimplemented method");
+	}
+	
+	@Override
+	public Long getSelectedTileY()
+	{
+		throw new RuntimeException("Unimplemented method");
+	}
 }

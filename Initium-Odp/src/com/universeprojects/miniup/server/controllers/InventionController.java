@@ -30,6 +30,34 @@ public class InventionController extends PageController {
 		super("invention");
 	}
 
+	public Long getSelectedTileX(HttpServletRequest request)
+	{
+		String str = request.getParameter("selected2DTileX");
+		if (str==null || str.equals("") || str.equals("null") || str.equals("undefined"))
+			return null;
+
+		String strY = request.getParameter("selected2DTileY");
+		
+		Long val = Long.parseLong(str);
+		if (val.equals(500L) && (strY==null || strY.equals("") || strY.equals("null") || strY.equals("undefined") || strY.equals("500"))) return null;
+		
+		return val;
+	}
+	
+	public Long getSelectedTileY(HttpServletRequest request)
+	{
+		String str = request.getParameter("selected2DTileY");
+		if (str==null || str.equals("") || str.equals("null") || str.equals("undefined"))
+			return null;
+
+		String strX = request.getParameter("selected2DTileX");
+		
+		Long val = Long.parseLong(str);
+		if (val.equals(500L) && (strX==null || strX.equals("") || strX.equals("null") || strX.equals("undefined") || strX.equals("500"))) return null;
+		
+		return val;
+	}
+	
 	@Override
 	protected final String processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{
@@ -158,6 +186,7 @@ public class InventionController extends PageController {
 	private void poolSkillPageData(EntityPool pool, List<CachedEntity> constructItemSkills)
 	{
 		// Level 1
+		if (constructItemSkills!=null)
 		for(CachedEntity skill:constructItemSkills)
 		{
 			pool.addToQueue(skill.getProperty("_definitionKey"));
@@ -175,37 +204,45 @@ public class InventionController extends PageController {
 		poolSkillPageData(pool, constructItemSkills);
 		
 		List<Map<String, Object>> skills = new ArrayList<Map<String, Object>>();
-		for(CachedEntity skill:constructItemSkills)
-		{
-			String skillName = (String)skill.getProperty("name");
-			String skillDescription = (String)skill.getProperty("skillDescription");
-			Long skillSpeed = (Long)skill.getProperty("skillConstructionSpeed");
-			Long skillId = skill.getId();
-			CachedEntity item = null;
-			String iconUrl = null;
-			if (skill.getProperty("item")!=null)
+		if (constructItemSkills!=null)
+			for(CachedEntity skill:constructItemSkills)
 			{
-				item = pool.get((Key)skill.getProperty("item"));
-				iconUrl = GameUtils.getResourceUrl(item.getProperty("icon"));
+				String skillName = (String)skill.getProperty("name");
+				String skillDescription = (String)skill.getProperty("skillDescription");
+				Long skillSpeed = (Long)skill.getProperty("skillConstructionSpeed");
+				Long skillId = skill.getId();
+				CachedEntity item = null;
+				String iconUrl = null;
+				if (skill.getProperty("item")!=null)
+				{
+					item = pool.get((Key)skill.getProperty("item"));
+					if (item==null)
+					{
+						// If we're here then we HAD an item for this skill to create but it was deleted so the skill is therefore no longer valid
+						// We'll just clean up and go to the next skill then.
+						db.getDB().delete(skill);
+						continue;
+					}
+					iconUrl = GameUtils.getResourceUrl(item.getProperty("icon"));
+				}
+				
+				// We'll also get the idea this skill came from
+				CachedEntity idea = pool.get((Key)skill.getProperty("_definitionKey"));
+				
+				if (idea==null)
+					continue;
+				
+				Map<String, Object> skillData = new HashMap<String, Object>();
+				
+				skillData.put("name", skillName);
+				skillData.put("description", skillDescription);
+				skillData.put("speed", skillSpeed);
+				skillData.put("id", skillId);
+				skillData.put("icon", iconUrl);
+				skillData.put("itemClass", idea.getProperty("name"));
+				
+				skills.add(skillData);
 			}
-			
-			// We'll also get the idea this skill came from
-			CachedEntity idea = pool.get((Key)skill.getProperty("_definitionKey"));
-			
-			if (idea==null)
-				continue;
-			
-			Map<String, Object> skillData = new HashMap<String, Object>();
-			
-			skillData.put("name", skillName);
-			skillData.put("description", skillDescription);
-			skillData.put("speed", skillSpeed);
-			skillData.put("id", skillId);
-			skillData.put("icon", iconUrl);
-			skillData.put("itemClass", idea.getProperty("name"));
-			
-			skills.add(skillData);
-		}
 		request.setAttribute("constructItemSkills", skills);
 		boolean hasSkills = true;
 		if (skills.isEmpty())
@@ -216,7 +253,7 @@ public class InventionController extends PageController {
 	private void populateExperimentPageData(HttpServletRequest request, ODPDBAccess db, ODPInventionService invention, EntityPool pool)
 	{
 		// Get all available items (but only unique by name) that you have access to...
-		List<CachedEntity> allAvailableItems = invention.getAvailableItems();
+		List<CachedEntity> allAvailableItems = invention.getAvailableItems(getSelectedTileX(request), getSelectedTileY(request));
 		Map<String, CachedEntity> allAvailableUniqueItems = new HashMap<String, CachedEntity>();
 		for(CachedEntity e:allAvailableItems)
 			allAvailableUniqueItems.put((String)e.getProperty("name"), e);
@@ -226,7 +263,10 @@ public class InventionController extends PageController {
 		{
 			Map<String,Object> availableItemData = new HashMap<String,Object>();
 			availableItemData.put("html", GameUtils.renderItem(db, db.getCurrentCharacter(), item));
-			availableItemData.put("id", item.getId());
+			if (item.getAttribute("proceduralKey")!=null)
+				availableItemData.put("id", item.getAttribute("proceduralKey"));
+			else
+				availableItemData.put("id", item.getId());
 			
 			availableItemsData.add(availableItemData);
 		}

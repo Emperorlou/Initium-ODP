@@ -532,6 +532,17 @@ public abstract class CommonChecks
 		return false;
 	}
 
+	public static boolean checkLocationIsPermanentLocation(CachedEntity location)
+	{
+		if (GameUtils.equals(location.getProperty("type"), "Permanent") || 
+				GameUtils.equals(location.getProperty("type"), "Town") ||
+				GameUtils.equals(location.getProperty("type"), "RestSite") ||
+				GameUtils.equals(location.getProperty("type"), "CityHall"))
+			return true;
+		
+		return false;
+	}
+
 	public static boolean checkItemIsLegacyGridMapItem(CachedEntity legacyItem)
 	{
 		Key containerKey = (Key)legacyItem.getProperty("containerKey");

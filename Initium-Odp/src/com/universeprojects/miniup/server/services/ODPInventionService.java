@@ -39,7 +39,7 @@ public abstract class ODPInventionService extends Service
 	 * 
 	 * @return
 	 */
-	public List<CachedEntity> getAvailableItems()
+	public List<CachedEntity> getAvailableItems(Long tileX, Long tileY)
 	{
 		return null;
 	}
@@ -56,7 +56,7 @@ public abstract class ODPInventionService extends Service
 	 * 
 	 * @return
 	 */
-	public List<Key> getAvailableItemKeys()
+	public List<Object> getAvailableItemKeys(Long tileX, Long tileY)
 	{
 		return null;
 	}
@@ -107,7 +107,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public CachedEntity attemptToDiscoverIdea(List<Key> availableItemKeys, EntityPool pool)
+	public CachedEntity attemptToDiscoverIdea(Long tileX, Long tileY, List availableItemKeys, EntityPool pool)
 	{
 		// TODO Auto-generated method stub
 		return null;
@@ -132,7 +132,7 @@ public abstract class ODPInventionService extends Service
 	}
 
 
-	public List<CachedEntity> getItemCandidatesFor(EntityPool pool, CachedEntity genericEntityRequirement)
+	public List<CachedEntity> getItemCandidatesFor(Long tileX, Long tileY, EntityPool pool, CachedEntity genericEntityRequirement)
 	{
 		// TODO Auto-generated method stub
 		return null;
@@ -193,7 +193,7 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
-	public Set<CachedEntity> getItemCandidatesFor(EntityPool pool, List<CachedEntity> genericEntityRequirementsList)
+	public Set<CachedEntity> getItemCandidatesFor(Long tileX, Long tileY, EntityPool pool, List<CachedEntity> genericEntityRequirementsList)
 	{
 		// TODO Auto-generated method stub
 		return null;

@@ -671,8 +671,6 @@ function keyPress(event) {
     if (!hoveringOverViewport) {
         return;
     }
-    // Prevent normal key presses
-    event.preventDefault();
     if (usingKeys || !keepSelectedCenter) {
         currCoord = currentCoord();
     } else {
@@ -690,6 +688,8 @@ function keyPress(event) {
     switch(event.which) {
         case 32:
             spacePressed = true;
+            // Prevent normal key presses
+            event.preventDefault();
             break;
         case 13: // enter
             if (isShift) {
@@ -704,6 +704,8 @@ function keyPress(event) {
                 	inspectCellContents();
                 }
             }
+            // Prevent normal key presses
+            event.preventDefault();
             break;
         case 37: // left
             if (isShift) {
@@ -721,6 +723,8 @@ function keyPress(event) {
                     moveCellOnScreen(newXCoord, newYCoord);
                 }
             }
+            // Prevent normal key presses
+            event.preventDefault();
             break;
         case 38: // up
             if (isShift) {
@@ -738,6 +742,8 @@ function keyPress(event) {
                     moveCellOnScreen(newXCoord, newYCoord);
                 }
             }
+            // Prevent normal key presses
+            event.preventDefault();
             break;
         case 39: // right
             if (isShift) {
@@ -759,6 +765,8 @@ function keyPress(event) {
                     moveCellOnScreen(newXCoord, newYCoord);
                 }
             }
+            // Prevent normal key presses
+            event.preventDefault();
             break;
         case 40: // down
             if (isShift) {
@@ -776,6 +784,8 @@ function keyPress(event) {
                     moveCellOnScreen(newXCoord, newYCoord);
                 }
             }
+            // Prevent normal key presses
+            event.preventDefault();
             break;
 
         default: return;

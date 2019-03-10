@@ -42,7 +42,6 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
-import com.universeprojects.gef.PropertyContainerEntityBase;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -207,11 +206,28 @@ public class ODPDBAccess
 			
 			protected boolean putEventHandler(CachedEntity entity) 
 			{
-				if (entity!=null && entity.getKind().equals("Character"))
+				if (entity!=null)
 				{
-					// Always update the locationEntryDatetime timestamp
-					entity.setProperty("locationEntryDatetime", new Date());
+					if (entity.getKind().equals("Character"))
+					{
+						// Always update the locationEntryDatetime timestamp
+						entity.setProperty("locationEntryDatetime", new Date());
+					}
+					else if (entity.getKind().equals("Item"))
+					{
+						// If this is a procedural entity then we need to turn it into a proper one first
+						String proceduralKey = (String)entity.getAttribute("proceduralKey");
+						if (proceduralKey!=null)
+						{
+							GridMapService gms = getGridMapService();
+							if (gms.isStillProceduralEntity(proceduralKey))
+							{
+								gms.convertFromProceduralToDBItem(entity);
+							}
+						}
+					}
 				}
+				
 				
 				return true;
 			}
@@ -1719,7 +1735,7 @@ public class ODPDBAccess
 				throw new UserErrorMessage("You cannot carry any more stuff! You are currently carrying " + GameUtils.formatNumber(carrying) + " grams and can carry a maximum of "
 						+ GameUtils.formatNumber(maxCarrying) + " grams.");
 		}
-
+		//TODO: stack stackable items with an existing stack
 		item.setProperty("containerKey", character.getKey());
 		item.setProperty("movedTimestamp", new Date());
 
@@ -7472,6 +7488,28 @@ public class ODPDBAccess
 		return null;
 	}
 
+	public CachedEntity getParentPermanentLocation(CachedEntity location)
+	{
+		
+		if (CommonChecks.checkLocationIsPermanentLocation(location))
+		{
+			return location;
+		}
+		else
+		{
+			// Find the permanent location which functions as the "root" or the "major" location
+			for(int i = 0; i<4; i++)
+			{
+				CachedEntity parent = getParentLocation(ds, location);
+				if (parent==null) return location;
+				location = parent;
+				if (CommonChecks.checkLocationIsPermanentLocation(location))
+					return parent;
+			}
+		}
+		return null;
+	}
+
 	public List<Key> getLocationAlwaysVisiblePaths_KeysOnly(Key locationKey)
 	{
 		List<Key> alwaysVisiblePaths = query.getFilteredList_Keys("Path", 100, "location1Key", locationKey, "discoveryChance", 100d);
@@ -7504,9 +7542,67 @@ public class ODPDBAccess
 		return null;
 	}
 
-	public void performModifierTypeOperation(PropertyContainerEntityBase entityToChange, PropertyContainerEntityBase entityModifier)
+	public void performModifierTypeOperation(CachedEntity entityToChange, EmbeddedEntity entityModifier)
 	{
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void performModifierTypeOperation(CachedEntity entityToChange, CachedEntity entityModifier)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public boolean performModifierTypeOperation(CachedEntity entityToChange, CachedEntity configEntity, String modifierKeyFieldName, String modifierEmbeddedFieldName)
+	{
+		boolean changed = false;
+		Object entityModifierEmbeddedObj = configEntity.getProperty(modifierEmbeddedFieldName);
+		if (entityModifierEmbeddedObj!=null)
+		{
+			if (entityModifierEmbeddedObj instanceof Collection)
+			{
+				for(EmbeddedEntity e:(Collection<EmbeddedEntity>)entityModifierEmbeddedObj)
+				{
+					performModifierTypeOperation(entityToChange, e);
+					changed = true;
+				}
+			}
+			else if (entityModifierEmbeddedObj instanceof EmbeddedEntity)
+			{
+				performModifierTypeOperation(entityToChange, (EmbeddedEntity)entityModifierEmbeddedObj);
+				changed = true;
+			}
+			else throw new RuntimeException("Unhandled type: "+entityModifierEmbeddedObj.getClass().getSimpleName());
+			
+		}
+		
+		Object entityModifierObj = (Object)configEntity.getProperty(modifierKeyFieldName);
+		if (entityModifierObj!=null)
+		{
+			if (entityModifierObj instanceof Key)
+			{
+				CachedEntity modifier = getDB().getIfExists((Key)entityModifierObj);
+				
+				performModifierTypeOperation(entityToChange, modifier);
+				changed = true;
+			}
+			else if (entityModifierObj instanceof Collection)
+			{
+				
+				Collection<CachedEntity> list = getDB().get((Collection<Key>)entityModifierObj);
+
+				for(CachedEntity modifier:list)
+				{
+					performModifierTypeOperation(entityToChange, modifier);
+					changed = true;
+				}
+				
+			}
+			else throw new RuntimeException("Unhandled type: "+entityModifierObj.getClass().getSimpleName());
+		}
+		
+		return changed;
+	}
+	
 }

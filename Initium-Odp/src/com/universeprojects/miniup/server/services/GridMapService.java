@@ -28,6 +28,7 @@ import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.aspects.AspectFireplace;
+import com.universeprojects.miniup.server.aspects.AspectPickable.CommandPickablePick;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
 import com.universeprojects.miniup.server.model.GridObject;
@@ -799,10 +800,47 @@ public class GridMapService {
 		
 		CachedEntity entity = items.get(data.index);
 		
-		if (proceduralKey.equals(entity.getAttribute("proceduralKey")))
+		if (entity==null || proceduralKey.equals(entity.getAttribute("proceduralKey")))
 			return entity;
 		
 		return null;
+	}
+	
+	public static List<CachedEntity> generateItemsFromProceduralKeys(ODPDBAccess db, CachedEntity location, Collection<String> proceduralKeys, boolean allowNulls)
+	{
+		List<CachedEntity> result = new ArrayList<>();
+		
+		GridMapService gms = new GridMapService(db, location);
+		Map<String, List<CachedEntity>> tileItemsMap = new HashMap<>();
+		
+		for(String proceduralKey:proceduralKeys)
+		{
+			ProceduralKeyData data = gms.getProceduralKeyData(proceduralKey);
+			
+			List<CachedEntity> tileItems = tileItemsMap.get(data.tileX+"x"+data.tileY);
+			if (tileItems!=null)
+			{
+				CachedEntity entity = tileItems.get(data.index);
+				if (entity!=null && proceduralKey.equals(entity.getAttribute("proceduralKey")))
+					result.add(entity);
+				else if (allowNulls)
+					result.add(null);
+			}
+			else
+			{
+				Random rnd = gms.getRandomForTile(data.tileX, data.tileY);
+				List<CachedEntity> items = gms.generateNaturalTileItems(rnd, data.tileX, data.tileY);
+				
+				if (allowNulls && (items==null || items.size()-1<data.index)) result.add(null);
+				CachedEntity entity = items.get(data.index);
+				
+				if (entity!=null && proceduralKey.equals(entity.getAttribute("proceduralKey")))
+					result.add(entity);
+				else if (allowNulls)
+					result.add(null);
+			}
+		}
+		return result;
 	}
 
 	
@@ -915,7 +953,7 @@ public class GridMapService {
 		if (entry==null) return true;
 		
 		String status = (String)entry.getProperty("status");
-		Long expectedIndex = (Long)entry.getProperty("proceduralGenerationIndex");
+		Integer expectedIndex = (Integer)entry.getProperty("proceduralGenerationIndex");
 		
 		if (GameUtils.equals(expectedIndex, data.index)==false)
 			throw new RuntimeException("Something's not right. The expected index ("+expectedIndex+") was not the same as the actual index ("+data.index+").");
@@ -1346,5 +1384,31 @@ public class GridMapService {
 			command.addJavascriptToResponse(generateGridObjectJson(tileChanged.x, tileChanged.y));
 		}
 		tilesChanged.clear();
+	}
+
+	public void regenerateTile(OperationBase command)
+	{
+		regenerateDBItemTileCache(command.getSelectedTileX().intValue(), command.getSelectedTileY().intValue());
+		putLocationData(ds);
+		updateChangedTileGraphics(command);
+	}
+
+	public static boolean isProceduralItem(CachedEntity item)
+	{
+		if (item.getKey().isComplete()==false && item.getAttribute("proceduralKey")!=null)
+			return true;
+		
+		return false;
+	}
+	
+	public static boolean isProceduralKey(String proceduralKey)
+	{
+		return proceduralKey.matches("PKA\\d+TX\\d+TY\\d+-\\d+");
+	}
+	
+	public void convertFromProceduralToDBItem(CachedEntity entity)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

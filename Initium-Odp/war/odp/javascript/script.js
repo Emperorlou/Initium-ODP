@@ -1793,8 +1793,10 @@ function decrementStackIndex()
 	return currentPopupStackIndex;
 }
 
-function pagePopup(url, closeCallback, title)
+function pagePopup(url, closeCallback, title, refreshFunctionJs)
 {
+	if (refreshFunctionJs==null)
+		refreshFunctionJs = "reloadPagePopup()";
 	
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
@@ -1810,7 +1812,7 @@ function pagePopup(url, closeCallback, title)
 	var pagePopupId = "page-popup"+stackIndex;
 	
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a><div class='page-popup-title'><h4>"+title+"</h4></div><div class='page-popup-content' id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><a class='page-popup-Reload' onclick='"+refreshFunctionJs+"'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a><div class='page-popup-title'><h4>"+title+"</h4></div><div class='page-popup-content' id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	$("body").scrollTo("#buttonbar");
 	
@@ -2893,7 +2895,9 @@ function createUpgradeToPremiumWindow()
 
 function viewInvention()
 {
-	pagePopup("/odp/invention", null, "Invention");
+	closeAllPagePopups();
+	var params = "?selected2DTileX="+selectedTileX+"&selected2DTileY="+selectedTileY; 
+	pagePopup("/odp/invention"+params, null, "Invention", "viewInvention()");
 }
 
 function combineChippedTokens(event, itemId)
@@ -3077,6 +3081,7 @@ function miniPagePopup(url, title)
 	window.scrollTo(0,0);
 	
 	var html = 
+			"<a class='mini-page-popup-reload' onclick='reloadMiniPagePopup()'>&#8635;</a>	\r\n" + 
 			"<a class='mini-page-popup-X' onclick='clearMiniPagePopup()'>X</a>	\r\n" + 
 			"<h4>"+title+"</h4>\r\n" + 
 			"<div id='mini-page-popup-contents'>\r\n" + 
@@ -3085,22 +3090,31 @@ function miniPagePopup(url, title)
 	
 	$(".mini-page-popup").html(html).show();
 
-	$("#mini-page-popup-contents").load(url);
+	$("#mini-page-popup-contents").load(url).attr("url", url);
 }
 
 function getMiniPagePopupTitle()
 {
-	if ($(".mini-page-popup").is(':visible'))
+	if (isMiniPagePopupActive())
 		return $(".mini-page-popup h4").text();
 	
 	return null;
 }
 
-function clearMiniPagePopup()
+function isMiniPagePopupActive()
 {
-	$(".mini-page-popup").html("").hide();
+	return $(".mini-page-popup").is(':visible');
 }
 
+function reloadMiniPagePopup()
+{
+	if (isMiniPagePopupActive())
+	{
+		var url = $("#mini-page-popup-contents").attr("url");
+		if (url==null) return;
+		$("#mini-page-popup-contents").load(url);
+	}
+}
 
 
 
@@ -3739,6 +3753,8 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 		}
 		else if (data.javascriptResponse == "ReloadPagePopup")
 			reloadPagePopup();
+		else if (data.javascriptResponse == "ReloadMiniPagePopup")
+			reloadMiniPagePopup();
 
 		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);

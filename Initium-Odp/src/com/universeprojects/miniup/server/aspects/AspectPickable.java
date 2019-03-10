@@ -7,8 +7,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ItemAspect;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -19,6 +21,11 @@ import com.universeprojects.miniup.server.services.GridMapService;
 
 public class AspectPickable extends ItemAspect
 {
+	enum Type
+	{
+		PickPlant,
+		CollectGeneric
+	}
 
 	public AspectPickable(InitiumObject object)
 	{
@@ -28,6 +35,8 @@ public class AspectPickable extends ItemAspect
 	@Override
 	public List<ItemPopupEntry> getItemPopupEntries()
 	{
+		if (isEnabled()==false) return null;
+		
 		AspectGridMapObject gmoAspect = getObject().getAspect(AspectGridMapObject.class);
 		List<ItemPopupEntry> result = null;
 		if (gmoAspect!=null && gmoAspect.isAttached())
@@ -40,10 +49,21 @@ public class AspectPickable extends ItemAspect
 				proceduralKey = (String)getObject().getEntity().getAttribute("proceduralKey");
 			
 			result = new ArrayList<>();
-			ItemPopupEntry ipe = new ItemPopupEntry("Pick", 
-					"You can pick this plant from the ground, it will go into your inventory when you do.", 
-					"doCommand(event, 'PickablePick', {itemKey:'"+itemKey+"', proceduralKey:'"+proceduralKey+"'});");
-			result.add(ipe);
+			
+			if (getType()==Type.PickPlant)
+			{
+				ItemPopupEntry ipe = new ItemPopupEntry("Pick", 
+						"You can pick this plant from the ground, it will go into your inventory when you do.", 
+						"doCommand(event, 'PickablePick', {itemKey:'"+itemKey+"', proceduralKey:'"+proceduralKey+"'});");
+				result.add(ipe);
+			}
+			else if (getType()==Type.CollectGeneric)
+			{
+				ItemPopupEntry ipe = new ItemPopupEntry("Collect", 
+						"You can collect this, it will go into your inventory when you do.", 
+						"doCommand(event, 'PickablePick', {itemKey:'"+itemKey+"', proceduralKey:'"+proceduralKey+"'});");
+				result.add(ipe);
+			}
 		}
 		return result;
 	}
@@ -51,9 +71,18 @@ public class AspectPickable extends ItemAspect
 	@Override
 	public String getPopupTag()
 	{
-		AspectGridMapObject gmoAspect = getObject().getAspect(AspectGridMapObject.class);
-		if (gmoAspect!=null && gmoAspect.isAttached())
-			return "Pickable";
+		if (isEnabled()==false) return null;
+		
+		if (getType()==Type.PickPlant)
+		{
+			AspectGridMapObject gmoAspect = getObject().getAspect(AspectGridMapObject.class);
+			if (gmoAspect!=null && gmoAspect.isAttached())
+				return "Pickable";
+		}
+		else if (getType()==Type.CollectGeneric)
+		{
+			return "Collectable";
+		}
 		
 		return null;
 	}
@@ -75,10 +104,13 @@ public class AspectPickable extends ItemAspect
 		@Override
 		public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 		{
+			String message = "";
+			boolean isProceduralPick = false;
 			String itemKeyStr = parameters.get("itemKey");
 			String proceduralKeyStr = parameters.get("proceduralKey");
 			CachedEntity itemEntity = null;
-			GridMapService gmService = null;
+			CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
+			GridMapService gmService = new GridMapService(db, location);
 			if (itemKeyStr!=null && itemKeyStr.equals("null")==false)
 			{
 				Key itemKey = db.stringToKey(itemKeyStr);
@@ -86,40 +118,161 @@ public class AspectPickable extends ItemAspect
 			}
 			else if (proceduralKeyStr!=null && proceduralKeyStr.equals("null")==false)
 			{
-				CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
-				gmService = new GridMapService(db, location);
 				itemEntity = gmService.generateSingleItemFromProceduralKey(db, location, proceduralKeyStr);
+				isProceduralPick = true;
 			}
-			if (itemEntity==null) throw new UserErrorMessage("I couldn't find the thing you wanted to pick.");
+			if (itemEntity==null) throw new UserErrorMessage("I couldn't find the thing you wanted to pick/collect.");
 			InitiumObject item = new InitiumObject(db, itemEntity);
 			
 			// Check to make sure the item we're trying to pick actually has the aspects we require
 			if (item.hasAspect(AspectGridMapObject.class)==false || item.hasAspect(AspectPickable.class)==false)
 				throw new UserErrorMessage("You cannot pick this object.");
 			
-			db.doCharacterCollectItem(db.getCurrentCharacter(), itemEntity, true);
+			AspectPickable pickable = item.getAspect(AspectPickable.class);
 			
-			ds.put(itemEntity);
-
-			// Now that the entity has been saved, we need to update the location data
+			if (pickable.isEnabled()==false)
+				throw new UserErrorMessage("You cannot pick/collect this object. At least not in it's current state.");
 			
-			gmService.removeEntity(itemEntity);
-			gmService.putLocationData(ds);
+			// Here we'll pick up the entity - if we're supposed to...
 			
-			
-			if (itemKeyStr!=null && itemKeyStr.equals("null")==false)
+			if (pickable.isToDelete())
 			{
-				deleteHtml(".tileContentsItem[ref='"+itemKeyStr+"']");
-				deleteHtml(".gridObject[id*='"+itemKeyStr+"']");
+				if (isProceduralPick)
+				{
+					gmService.removeProceduralEntity(proceduralKeyStr);
+				}
+				else
+					ds.delete(itemEntity);
 			}
-			else if (proceduralKeyStr!=null && proceduralKeyStr.equals("null")==false)
+			
+			if (pickable.isNotActuallyPickingUpEntity()==false)
 			{
-				deleteHtml(".tileContentsItem[ref='"+proceduralKeyStr+"']");
-				deleteHtml(".gridObject[id*='"+proceduralKeyStr+"']");
+				db.doCharacterCollectItem(db.getCurrentCharacter(), itemEntity, true);
+				ds.put(itemEntity);
+				
+				message = addToCollectedMessage(message, itemEntity);
 			}
 
-			addJavascriptToResponse(db.getGridMapService().generateGridObjectJson(getSelectedTileX().intValue(), getSelectedTileY().intValue()));
+			// Now modify the entity, if we're supposed to
+			if (pickable.isToDelete()==false)
+			{
+				boolean changed = db.performModifierTypeOperation(itemEntity, itemEntity, "entityModifier", "entityModifierEmbedded");
+				
+				if (changed && isProceduralPick)
+				{
+					gmService.removeProceduralEntity(proceduralKeyStr);
+					ds.put(item.getEntity());
+					gmService.addEntity(item.getEntity());
+				}
+			}
+			// Now create the additional entities, if we're supposed to
+			if (pickable.getAdditionalItems()!=null)
+			{
+				List<CachedEntity> newItems = new ArrayList<>();
+				List<CachedEntity> list = ds.get(pickable.getAdditionalItems());
+				for(CachedEntity itemDef:list)
+				{
+					Integer multiplier = (int)Math.round((Double)pickable.getAdditionalItemsQuantityMultiplier());
+					CachedEntity newItem = db.generateNewObject(itemDef, "Item");
+					newItem.setProperty("containerKey", location.getKey());
+					newItem.setProperty("gridMapPositionX", getSelectedTileX());
+					newItem.setProperty("gridMapPositionY", getSelectedTileY());
+					
+					if (newItem.getProperty("quantity")!=null)
+					{
+						Long quantity = (Long)newItem.getProperty("quantity");
+						Long newQuantity = quantity*multiplier;
+						
+						if (newQuantity<=0) continue;	// If we're about to create a thing with <1 quantity, lets not create it
+						
+						newItem.setProperty("quantity", newQuantity);
+					}
+					
+					db.doCharacterCollectItem(db.getCurrentCharacter(), newItem);
+					
+					newItems.add(newItem);
+
+					message = addToCollectedMessage(message, newItem);
+				}
+				
+				ds.put(newItems);
+			}
+
+			gmService.regenerateTile(this);
+		}
+
+		private String addToCollectedMessage(String message, CachedEntity itemEntity)
+		{
+			if (message==null || message.equals(""))
+			{
+				message = "You collected ";
+				message += GameUtils.renderItem(itemEntity);
+			}
+			else
+			{
+				message += ", "+GameUtils.renderItem(itemEntity);
+			}
+			
+			return message;
 		}
 		
 	}
+	
+	
+	
+	public Type getType()
+	{
+		if (getProperty("type")==null) return Type.PickPlant;
+		
+		return Type.valueOf((String)getProperty("type"));
+	}
+	
+	public double getAdditionalItemsQuantityMultiplier()
+	{
+		String rawCurve = (String)getProperty("additionalItemsQuantityMultiplier");
+		if (rawCurve==null || rawCurve.equals("")) return 1d;
+		Double solvedCurve = (Double)db.solveCurve(rawCurve);
+		if (solvedCurve==null) return 1d;
+		
+		return solvedCurve;
+		
+	}
+
+	public List<Key> getAdditionalItems()
+	{
+		return (List<Key>)getProperty("additionalItems");
+	}
+	
+	public boolean isNotActuallyPickingUpEntity()
+	{
+		if (getProperty("doNotActuallyPickupEntity")==null) return false;
+		
+		return (Boolean)getProperty("doNotActuallyPickupEntity");
+	}
+	
+	public boolean isEnabled()
+	{
+		if (getProperty("enabled")==null) return true;
+		
+		return (Boolean)getProperty("enabled");
+	}
+	
+	public boolean isToDelete()
+	{
+		if (getProperty("deleteEntity")==null) return true;
+		
+		return (Boolean)getProperty("deleteEntity");
+	}
+	
+	public Key getEntityModifier()
+	{
+		return (Key)getProperty("entityModifier");
+	}
+	
+	public EmbeddedEntity getEntityModifierEmbedded()
+	{
+		return (EmbeddedEntity)getProperty("entityModifierEmbedded");
+	}
+	
+	
 }

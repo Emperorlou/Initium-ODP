@@ -1,17 +1,22 @@
 package com.universeprojects.miniup.server.longoperations;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 
@@ -40,7 +45,7 @@ public class LongOperationExperiment extends LongOperation
 		
 		
 		// All the items that were selected to experiment with...
-		List<Key> itemKeys = null;
+		List itemKeys = null;
 		String itemIdsStr = parameters.get("itemIds");
 		if (itemIdsStr!=null)
 		{
@@ -52,11 +57,19 @@ public class LongOperationExperiment extends LongOperation
 
 		ODPInventionService inventionService = db.getInventionService(character, null);
 		
+		Long selectedTileX = getSelectedTileX();
+		Long selectedTileY = getSelectedTileY();
+		if (GameUtils.equals(selectedTileX, 500L)) selectedTileX = null;
+		if (GameUtils.equals(selectedTileY, 500L)) selectedTileY = null;
+		
+		
 		// If no items were selected, we'll default to all items
 		if (itemKeys==null || itemKeys.isEmpty())
-			itemKeys = inventionService.getAvailableItemKeys();
+			itemKeys = inventionService.getAvailableItemKeys(selectedTileX, selectedTileY);
 		
 		setDataProperty("selectedItems", itemKeys);
+		setDataProperty("selectedTileX", selectedTileX);
+		setDataProperty("selectedTileY", selectedTileY);
 		
 		
 		return 5;
@@ -69,32 +82,56 @@ public class LongOperationExperiment extends LongOperation
 		CachedEntity character = db.getCurrentCharacter();
 		doChecks(character);
 		
+		CachedEntity location = db.getCharacterLocation(character);
+		
 		ODPKnowledgeService knowledgeService = db.getKnowledgeService(character.getKey());
 		ODPInventionService inventionService = db.getInventionService(character, knowledgeService);
+		GridMapService gms = db.getGridMapService();
+		
+		Long selectedTileX = (Long)getDataProperty("selectedTileX");
+		Long selectedTileY = (Long)getDataProperty("selectedTileY");
 		
 		EntityPool pool = new EntityPool(ds);
 		String message = "";
 		
 		// Research one of the available items at random
 		@SuppressWarnings("unchecked")
-		List<Key> selectedItems = (List<Key>)getDataProperty("selectedItems");
+		List selectedItems = (List<Key>)getDataProperty("selectedItems");
 		if (selectedItems==null)
-			selectedItems = inventionService.getAvailableItemKeys();
+			selectedItems = inventionService.getAvailableItemKeys(selectedTileX, selectedTileY);
 		Collections.shuffle(selectedItems);
-		pool.loadEntities(selectedItems);
+		
+		for(Object k:selectedItems)
+		{
+			if (k instanceof Key)
+				pool.addToQueue(k);
+		}
+		pool.loadEntities();
 		
 		// Gain some experience with one of the items available
-		for(Key itemKey:selectedItems)
+		for(Object itemKey:selectedItems)
 		{
-			if (knowledgeService.increaseKnowledgeFor(pool.get(itemKey), new Random().nextInt(2)+1, 10))
+			if (itemKey instanceof Key)
 			{
-				message = "You've gained some experience with the "+pool.get(itemKey).getProperty("name")+".";
-				break;
+				if (knowledgeService.increaseKnowledgeFor(pool.get(itemKey), new Random().nextInt(2)+1, 10))
+				{
+					message = "You've gained some experience with the "+pool.get(itemKey).getProperty("name")+".";
+					break;
+				}
+			}
+			else if (itemKey instanceof String)
+			{
+				CachedEntity item = gms.generateSingleItemFromProceduralKey(db, location, (String)itemKey);
+				if (knowledgeService.increaseKnowledgeFor(item, new Random().nextInt(2)+1, 10))
+				{
+					message = "You've gained some experience with the "+item.getProperty("name")+".";
+					break;
+				}
 			}
 		}
 		
 		// Attempt to learn a new idea
-		CachedEntity idea = inventionService.attemptToDiscoverIdea(selectedItems, pool);
+		CachedEntity idea = inventionService.attemptToDiscoverIdea(selectedTileX, selectedTileY, selectedItems, pool);
 		if (idea!=null)
 		{
 			message="<div class='message-newidea'>You have a new idea to "+idea.getProperty("name")+"!</div>"+message;

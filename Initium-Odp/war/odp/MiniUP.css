@@ -3134,8 +3134,26 @@ display: inline-flex;
     z-index: 1100001;
     font-family: dos;
     font-size: 26px;
-	top: -12px;
+	top: -17px;
     right: -9px;
+    transform: scale(0.7);
+}
+
+.mini-page-popup-reload
+{
+	position: absolute;
+    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    color: #e2b766;
+    width: 57px;
+    height: 46px;
+    text-align: center;
+    padding-top: 13px;
+    padding-left: 1px;
+    z-index: 1100001;
+    font-family: dos;
+    font-size: 26px;
+	top: -18px;
+    left: -17px;
     transform: scale(0.7);
 }
 
