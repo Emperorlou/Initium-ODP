@@ -14,6 +14,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumEntityPool;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.GridMapService;
@@ -91,7 +92,7 @@ public class LongOperationExperiment extends LongOperation
 		Long selectedTileX = (Long)getDataProperty("selectedTileX");
 		Long selectedTileY = (Long)getDataProperty("selectedTileY");
 		
-		EntityPool pool = new EntityPool(ds);
+		InitiumEntityPool pool = new InitiumEntityPool(ds, db.getGridMapService());
 		String message = "";
 		
 		// Research one of the available items at random

@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.miniup.server.InitiumKey;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
@@ -138,7 +139,7 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public void checkIdeaWithSelectedItems(EntityPool pool, CachedEntity idea, Map<Key, List<Key>> itemRequirementsToItems) throws UserErrorMessage
+	public void checkIdeaWithSelectedItems(EntityPool pool, CachedEntity idea, Map<Key, List<InitiumKey>> itemRequirementsToItems) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
@@ -169,25 +170,25 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public void checkSkillWithSelectedItems(EntityPool pool, CachedEntity skill, Map<Key, List<Key>> itemRequirementsToItems, Integer repetitionCount) throws UserErrorMessage
+	public void checkSkillWithSelectedItems(EntityPool pool, CachedEntity skill, Map<Key, List<InitiumKey>> itemRequirementsToItems, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	public CachedEntity doCreateConstructItemPrototype(CachedEntity idea, Map<Key, List<Key>> itemRequirementsToItems, EntityPool pool, Integer repetitionCount) throws UserErrorMessage
+	public CachedEntity doCreateConstructItemPrototype(CachedEntity idea, Map<Key, List<InitiumKey>> itemRequirementsToItems, EntityPool pool, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public CachedEntity doConstructItemSkill(CachedEntity skill, Map<Key, List<Key>> itemRequirementsToItems, EntityPool pool, Integer repetitionCount) throws UserErrorMessage
+	public CachedEntity doConstructItemSkill(CachedEntity skill, Map<Key, List<InitiumKey>> itemRequirementsToItems, EntityPool pool, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void processConstructItemSkillForProcessVariables(CachedEntity skill, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
+	public void processConstructItemSkillForProcessVariables(CachedEntity skill, Map<Key, List<InitiumKey>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
@@ -199,50 +200,50 @@ public abstract class ODPInventionService extends Service
 		return null;
 	}
 
-	public Map<Key, List<Key>> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, List<Key>> selectedItems, Integer repetitionCount) throws UserErrorMessage
+	public Map<Key, List<InitiumKey>> resolveGerSlotsToGers(EntityPool pool, CachedEntity entity, Map<String, List<InitiumKey>> selectedItems, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void poolGerSlotsAndSelectedItems(EntityPool pool, CachedEntity entity, Map<String, List<Key>> selectedItems)
+	public void poolGerSlotsAndSelectedItems(EntityPool pool, CachedEntity entity, Map<String, List<InitiumKey>> selectedItems)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void checkGersMatchItems(EntityPool pool, Map<Key, List<Key>> gerToItemMap, Integer repetitionCount) throws UserErrorMessage
+	public void checkGersMatchItems(EntityPool pool, Map<Key, List<InitiumKey>> gerToItemMap, Integer repetitionCount) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void checkRequiredItemsAreAccountedFor(Object ideagenericEntityRequirementFieldValue, Map<Key, List<Key>> itemRequirementsToItems, String categoryName) throws UserErrorMessage
+	public void checkRequiredItemsAreAccountedFor(Object ideagenericEntityRequirementFieldValue, Map<Key, List<InitiumKey>> itemRequirementsToItems, String categoryName) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void processCollectableResult(EntityPool pool, CachedEntity collectableDef, Map<Key, List<Key>> itemRequirementsToItems, CachedEntity resultingItem, Integer repetitionCount)
+	public void processCollectableResult(EntityPool pool, CachedEntity collectableDef, Map<Key, List<InitiumKey>> itemRequirementsToItems, CachedEntity resultingItem, Integer repetitionCount)
 			throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void beginCollectableProcess(CachedEntity collectableDef, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
+	public void beginCollectableProcess(CachedEntity collectableDef, Map<Key, List<InitiumKey>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void poolItemRequirementsToItems(EntityPool pool, Map<Key, List<Key>> itemRequirementsToItems)
+	public void poolItemRequirementsToItems(EntityPool pool, Map<Key, List<InitiumKey>> itemRequirementsToItems)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void modifyFieldsOn(Object genericEntityRequirementFieldValue, Map<Key, List<Key>> itemRequirementsToItems, EntityPool pool, Integer repetitionCount)
+	public void modifyFieldsOn(Object genericEntityRequirementFieldValue, Map<Key, List<InitiumKey>> itemRequirementsToItems, EntityPool pool, Integer repetitionCount)
 	{
 		// TODO Auto-generated method stub
 		
@@ -273,7 +274,7 @@ public abstract class ODPInventionService extends Service
 		
 	}
 
-	public void processPrototypeItemSkillForProcessVariables(CachedEntity ideaDef, Map<Key, List<Key>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
+	public void processPrototypeItemSkillForProcessVariables(CachedEntity ideaDef, Map<Key, List<InitiumKey>> itemRequirementsToItems, Map<String, Object> processVariables, EntityPool pool) throws UserErrorMessage
 	{
 		// TODO Auto-generated method stub
 		

@@ -1031,7 +1031,7 @@ public class MainPageUpdateService extends Service
 				CommonChecks.checkLocationIsInstance(location)==false && 
 				CommonChecks.checkCharacterIsBusy(character)==false)
 		{
-			newHtml.append(getHtmlForInBannerLinkCentered(50, 50, "Explore", "doExplore(event);"));
+			newHtml.append(getHtmlForInBannerLinkCentered(16, 50, "Explore", "doExplore(event);", null, null, "auto-explore-link"));
 		}
 		
 		
@@ -1052,6 +1052,12 @@ public class MainPageUpdateService extends Service
 	
 	protected String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs, String shortcutKeyName, Integer shortcutCode)
 	{
+		return getHtmlForInBannerLinkCentered(top, left, buttonCaption, onclickJs, shortcutKeyName, shortcutCode, null);
+	}
+	
+	
+	protected String getHtmlForInBannerLinkCentered(double top, double left, String buttonCaption, String onclickJs, String shortcutKeyName, Integer shortcutCode, String extraClasses)
+	{
 		String shortcutKeyHtml = "";
 		if (shortcutKeyName!=null)
 			shortcutKeyHtml = "<span style='top:-8px; left:-16px;' class='shortcut-key'>("+shortcutKeyName+")</span>";
@@ -1060,7 +1066,11 @@ public class MainPageUpdateService extends Service
 		if (shortcutCode!=null)
 			shortcutCodeHtml = " shortcut='"+shortcutCode+"' ";
 		
-		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a "+shortcutCodeHtml+" onclick='"+onclickJs.replace("'", "\\'")+"' class='path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>"+shortcutKeyHtml+""+buttonCaption+"</a></div>";
+		String classes = "";
+		if (extraClasses!=null)
+			classes = extraClasses+" ";
+		
+		return "<div style='position:absolute;top:"+top+"%;left:"+left+"%;'><a "+shortcutCodeHtml+" onclick='"+onclickJs.replace("'", "\\'")+"' class='"+classes+"path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>"+shortcutKeyHtml+""+buttonCaption+"</a></div>";
 	}
 
 	public String updateButtonList(boolean showHidden){
@@ -1101,11 +1111,11 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<a id='main-explore' href='#' class='v3-main-button' shortcut='69' onclick='doExplore(event, false)'><span class='shortcut-key'>(E)</span>Explore "+location.getProperty("name")+"</a>");
 		newHtml.append("<br>");
 		newHtml.append("<a id='main-explore-ignorecombatsites' class='v3-main-button' href='#' shortcut='87' onclick='doExplore(event, true)'><span class='shortcut-key'>(W)</span>Explore (no old sites)</a>");
-		if (CommonChecks.checkLocationIsGoodForNaturalResource(location)) 
-		{
+//		if (CommonChecks.checkLocationIsGoodForNaturalResource(location)) 
+//		{
 			newHtml.append("<br>");
 			newHtml.append("<a id='main-explore' href='#' class='v3-main-button' onclick='doExplore(event, false, true)'><span class='shortcut-key'></span>Find Natural Resources</a>");
-		}
+//		}
 		
 		newHtml.append("<br>");
 		newHtml.append("<div id='main-merchantlist' class='v3-main-button-half' onclick='loadLocationMerchants()' shortcut='83'>");

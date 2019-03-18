@@ -237,7 +237,10 @@ hr:after {
 	cursor:pointer;
 }
 
-
+.shortcut-overlay-2d
+{
+	visibility:visible;
+}
 .no-loggedin-header
 {
 	height:20px;
@@ -3265,6 +3268,11 @@ display: inline-flex;
 
 @media (max-width:735px)
 {
+	#gridmap-inspect-button
+	{
+		zoom: 0.7;
+	}
+	
 	.minimap-container
 	{
 		transform:scale(0.5);

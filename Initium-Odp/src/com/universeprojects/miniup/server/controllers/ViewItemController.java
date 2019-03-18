@@ -41,6 +41,16 @@ import com.universeprojects.web.PageController;
 @Controller
 public class ViewItemController extends PageController {
 
+	public String[] toolStatNames = new String[] {
+			"Strength",
+			"Complexity",
+			"Ease Of Use",
+			"Efficiency",
+			"Precision",
+			"Reliability",
+			"Beauty",
+	};
+	
 	// This is a list of stat names where being more negative is better
 	public HashSet<String> negativeStatIsGood_Names = new HashSet<>(Arrays.asList(new String[] {
 		"strReq",
@@ -471,6 +481,22 @@ public class ViewItemController extends PageController {
 
 		itemMap.put("requirements", requirements);
 		
+		// For tools
+		boolean hasToolStats = false;
+		for(String nameRaw:toolStatNames)
+		{
+			String name = nameRaw.replaceAll(" ", "");
+			String fieldName = "attribute"+name;
+			field = item.getProperty(fieldName);
+			if (field!=null && field.toString().trim().equals("")==false)
+			{
+				hasToolStats = true;
+				itemMap.put(name, GameUtils.formatNumber(field));
+			}
+		}	
+		itemMap.put("hasToolStats", hasToolStats);
+		
+		
 		// For Weapons
 		field = item.getProperty("weaponDamage");
 		if (field!=null && field.toString().trim().equals("")==false)
@@ -544,6 +570,8 @@ public class ViewItemController extends PageController {
 			field = item.getProperty("blockSlashingCapability");
 		if (field!=null && field.toString().trim().equals("")==false)
 			itemMap.put("blockSlashingCapability", field.toString());
+		
+		
 		
 		// For storage items
 		field = item.getProperty("maxSpace");

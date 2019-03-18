@@ -805,6 +805,11 @@ public class GridMapService {
 		
 		return null;
 	}
+
+	public List<CachedEntity> generateItemsFromProceduralKeys(Collection<String> proceduralKeys, boolean allowNulls)
+	{
+		return GridMapService.generateItemsFromProceduralKeys(db, location, proceduralKeys, allowNulls);
+	}
 	
 	public static List<CachedEntity> generateItemsFromProceduralKeys(ODPDBAccess db, CachedEntity location, Collection<String> proceduralKeys, boolean allowNulls)
 	{
@@ -1393,6 +1398,13 @@ public class GridMapService {
 		updateChangedTileGraphics(command);
 	}
 
+	public void regenerateTile(OperationBase command, int tileX, int tileY)
+	{
+		regenerateDBItemTileCache(tileX, tileY);
+		putLocationData(ds);
+		updateChangedTileGraphics(command);
+	}
+
 	public static boolean isProceduralItem(CachedEntity item)
 	{
 		if (item.getKey().isComplete()==false && item.getAttribute("proceduralKey")!=null)
@@ -1406,9 +1418,15 @@ public class GridMapService {
 		return proceduralKey.matches("PKA\\d+TX\\d+TY\\d+-\\d+");
 	}
 	
+	public CachedEntity generateSingleItemFromProceduralKey(String proceduralKey)
+	{
+		return GridMapService.generateSingleItemFromProceduralKey(db, location, proceduralKey);
+	}
+	
 	public void convertFromProceduralToDBItem(CachedEntity entity)
 	{
 		// TODO Auto-generated method stub
 		
 	}
+
 }

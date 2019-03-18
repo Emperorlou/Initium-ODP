@@ -19,6 +19,8 @@ import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.Convert;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumEntityPool;
+import com.universeprojects.miniup.server.InitiumKey;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ItemAspect;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -515,12 +517,12 @@ public class AspectFireplace extends ItemAspect
 				List<String> slots = new ArrayList<String>(gerSlotsToItem.slots.keySet());
 				Collections.sort(slots);
 
-				List<Key> tinderKey = gerSlotsToItem.slots.get("genericEntityRequirements1:0");
-				List<Key> kindlingKey = gerSlotsToItem.slots.get("genericEntityRequirements1:1");
-				List<Key> firestarterKey = gerSlotsToItem.slots.get("genericEntityRequirements1:2");
-				List<Key> additionalFirewoodKey = gerSlotsToItem.slots.get("genericEntityRequirements2:0");
+				List<InitiumKey> tinderKey = gerSlotsToItem.slots.get("genericEntityRequirements1:0");
+				List<InitiumKey> kindlingKey = gerSlotsToItem.slots.get("genericEntityRequirements1:1");
+				List<InitiumKey> firestarterKey = gerSlotsToItem.slots.get("genericEntityRequirements1:2");
+				List<InitiumKey> additionalFirewoodKey = gerSlotsToItem.slots.get("genericEntityRequirements2:0");
 
-				EntityPool pool = new EntityPool(db.getDB());
+				InitiumEntityPool pool = new InitiumEntityPool(db.getDB(), db.getGridMapService());
 
 				List<Key> gers1 = (List<Key>) fireplaceLight.getProperty("genericEntityRequirements1");
 				List<Key> gers2 = (List<Key>) fireplaceLight.getProperty("genericEntityRequirements2");
@@ -544,7 +546,7 @@ public class AspectFireplace extends ItemAspect
 
 				if (firestarter == null || firestarter.isEmpty()) throw new UserErrorMessage("You need a firestarter to start a fire.");
 
-				Map<Key, List<Key>> gerToItems = inventionService.resolveGerSlotsToGers(pool, fireplaceLight, gerSlotsToItem.slots, 1);
+				Map<Key, List<InitiumKey>> gerToItems = inventionService.resolveGerSlotsToGers(pool, fireplaceLight, gerSlotsToItem.slots, 1);
 
 				inventionService.checkGersMatchItems(pool, gerToItems, 1);
 
@@ -614,6 +616,7 @@ public class AspectFireplace extends ItemAspect
 			ODPInventionService inventionService = db.getInventionService(db.getCurrentCharacter(), db.getKnowledgeService(db.getCurrentCharacterKey()));
 
 			CachedDatastoreService ds = db.getDB();
+			InitiumEntityPool pool = new InitiumEntityPool(ds, db.getGridMapService());
 			ds.beginBulkWriteMode();
 			try
 			{
@@ -626,10 +629,11 @@ public class AspectFireplace extends ItemAspect
 				GenericEntityRequirementResult gerSlotsToItem = new ConfirmGenericEntityRequirementsBuilder("1", db, this,
 						"doAddFuelToFireplace(null, '" + KeyFactory.keyToString(fireplaceKey) + "')", fireplaceFuel).addGenericEntityRequirements("Material", "genericEntityRequirements1").go();
 
-				Collection<List<Key>> fuelList = gerSlotsToItem.slots.values();
-				List<Key> fuelKey = fuelList.iterator().next();
+				Collection<List<InitiumKey>> fuelList = gerSlotsToItem.slots.values();
+				List<InitiumKey> fuelKey = fuelList.iterator().next();
 
-				List<CachedEntity> fuel = db.getEntities(fuelKey);
+				List<CachedEntity> fuel = new ArrayList<>();
+				fuel.addAll(pool.loadEntities(fuelKey).values());
 
 				fireplaceAspect.addFuel(inventionService, fuel, "Flammable material");
 

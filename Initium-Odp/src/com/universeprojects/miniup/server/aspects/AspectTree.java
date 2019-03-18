@@ -1,16 +1,20 @@
 package com.universeprojects.miniup.server.aspects;
 
-
 import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 
-public class AspectBuilding extends InitiumAspect
+public class AspectTree extends InitiumAspect
 {
 
-	protected AspectBuilding(InitiumObject object)
+	protected AspectTree(InitiumObject object)
 	{
 		super(object);
 	}
 
+	@Override
+	protected void initialize()
+	{
+
+	}
 
 }

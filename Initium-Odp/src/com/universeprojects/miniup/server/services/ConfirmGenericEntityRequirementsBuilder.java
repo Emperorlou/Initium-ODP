@@ -12,6 +12,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.miniup.server.InitiumKey;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 
@@ -82,14 +83,14 @@ public class ConfirmGenericEntityRequirementsBuilder extends UserRequestBuilder<
 				String[] keysArray = itemKeys.split(",");
 				Set<String> keySet = new HashSet<String>();
 				
-				List<Key> keys = new ArrayList<Key>(); 
+				List<InitiumKey> keys = new ArrayList<>(); 
 				for(String keyStr:keysArray)
 					if (keyStr!=null && keyStr.equals("")==false)
 					{
 						keyStr = keyStr.trim();
 						if (keySet.contains(keyStr)) throw new RuntimeException("Duplicate item keys found in the same slot.");
 						keySet.add(keyStr);
-						keys.add(KeyFactory.stringToKey(keyStr));
+						keys.add(InitiumKey.fromString(keyStr));
 					}
 				
 				result.slots.put(gerFieldNameAndSlotIndex, keys);

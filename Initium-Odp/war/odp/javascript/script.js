@@ -432,9 +432,9 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 
 	var content = "";
 	
-	if (isAnimationsEnabled())
+	if (isAnimationsEnabled() && uiStyle!="experimental" && uiStyle!="wowlike")
 	{
-	
+	 
 		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 	
 		if (biome=="Dungeon")
@@ -1798,6 +1798,10 @@ function pagePopup(url, closeCallback, title, refreshFunctionJs)
 	if (refreshFunctionJs==null)
 		refreshFunctionJs = "reloadPagePopup()";
 	
+	if (currentPopupStackIndex==0)
+		if (typeof window.panGrid === "function" && $(window).width()>=1200)
+			panGrid(-$(window).width()/4, 0);
+	
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
 	else
@@ -1859,7 +1863,11 @@ function closePagePopup(doNotCallback)
 	decrementStackIndex();
 	
 	if (currentPopupStackIndex==0)
+	{
+		if (typeof window.panGrid === "function" && $(window).width()>=1200)
+			panGrid($(window).width()/4, 0);
 		$(".half-page-variant").hide();
+	}
 	
 	if (doNotCallback!=true)
 	{
@@ -3256,9 +3264,9 @@ function viewGlobeNavigation()
 	createMapWindow(html);
 }
 
-function view2DView()
+function view2DView(forcedMode)
 {
-	if ($("body").attr("bannerstate")==="location-2d")
+	if (forcedMode==false || (forcedMode==null && $("body").attr("bannerstate")==="location-2d"))
 		viewBannerDefault();
 	else
 	{
@@ -4353,11 +4361,47 @@ function doCollectCollectable(event, collectableId, userRequestId)
 }
 
 
+function doAutoExplore(event)
+{
+	var lastExploreState = localStorage.getItem("auto-explore");
+	if (lastExploreState==null) lastExploreState = "explore";
+	
+	if (lastExploreState=="explore")
+		doExplore(event, false, false);
+	else if (lastExploreState=="ignoreCombatSites")
+		doExplore(event, true, false);
+	else if (lastExploreState == "findNaturalResources")
+		doExplore(event, false, true);
+}
 
+function updateAutoExploreButton()
+{
+	var exploreState = localStorage.getItem("auto-explore");
+	if (exploreState == "ignoreCombatSites")
+		exploreState = "Explore (no old sites)";
+	else if (exploreState == "findNaturalResources")
+		exploreState = "Find Natural Resources";
+	else
+		exploreState = "Explore";
+	
+	$(".auto-explore-link").text(exploreState);
+}
 
 
 function doExplore(event, ignoreCombatSites, findNaturalResources)
 {
+	var exploreState = null;
+	if (ignoreCombatSites==true)
+		exploreState = "ignoreCombatSites";
+	else if (findNaturalResources==true)
+		exploreState = "findNaturalResources";
+	else
+		exploreState = "explore";
+	localStorage.setItem("auto-explore", exploreState);
+	
+	updateAutoExploreButton();
+	
+	
 	clearMakeIntoPopup();
 	
 	if (ignoreCombatSites == null)

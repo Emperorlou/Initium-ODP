@@ -180,7 +180,10 @@ body[bannerstate='combat-2d'] .major-banner-links
 	top:-55px;
 }
 
-
+body[bannerstate='combat-2d'] .shortcut-overlay-2d
+{
+	visibility:hidden;
+}
 
 
 

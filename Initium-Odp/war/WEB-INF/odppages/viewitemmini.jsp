@@ -38,6 +38,17 @@
 				<c:if test="${item.strmod != null}"><div name='strengthModifier' class='item-popup-field' title='This is the percentage that the wearer`s strength will be modified when making strength based rolls. Strength modifiers stack.'>Strength modifier: <div class='main-item-subnote'>${item.strmod}%</div></div>${statComp.strmod}<br/></c:if>
 				<c:if test="${item.intmod != null}"><div name='intelligenceModifier' class='item-popup-field' title='This is the percentage that the wearer`s intelligence will be modified when making intelligence based rolls. Intelligence modifiers stack.'>Intelligence modifier: <div class='main-item-subnote'>${item.intmod}%</div></div>${statComp.intmod}<br/></c:if>
 				<c:if test="${item.requirements}"><br/></c:if>
+
+				<!-- Tool stats -->
+				<c:if test="${item.EaseOfUse != null}"><div name='attributeEaseOfUse' class='item-popup-field' title='This stat is used to compare how easy it is to use this tool compared to other tools that are similar.'>Ease of Use: <div class='main-item-subnote'>${item.EaseOfUse}</div></div>${statComp.EaseOfUse}<br/></c:if>
+				<c:if test="${item.Strength != null}"><div name='attributeStrength' class='item-popup-field' title='This stat is used to compare how strong this item is compared to others that are similar.'>Strength: <div class='main-item-subnote'>${item.Strength}</div></div>${statComp.Strength}<br/></c:if>
+				<c:if test="${item.Reliability != null}"><div name='attributeReliability' class='item-popup-field' title='This stat is used to compare how reliable this item is compared to others that are similar.'>Reliability: <div class='main-item-subnote'>${item.Reliability}</div></div>${statComp.Reliability}<br/></c:if>
+				<c:if test="${item.Efficiency != null}"><div name='attributeEfficiency' class='item-popup-field' title='This stat is used to compare how efficient this item is at doing it`s job compared to others that are similar.'>Efficiency: <div class='main-item-subnote'>${item.Efficiency}</div></div>${statComp.Efficiency}<br/></c:if>
+				<c:if test="${item.Complexity != null}"><div name='attributeComplexity' class='item-popup-field' title='This stat is used to compare how complex this item is compared to others that are similar. Generally lower complexity is better.'>Complexity: <div class='main-item-subnote'>${item.Complexity}</div></div>${statComp.Complexity}<br/></c:if>
+				<c:if test="${item.Precision != null}"><div name='attributePrecision' class='item-popup-field' title='This stat is used to compare how precise this tool is compared to others that are similar.'>Precision: <div class='main-item-subnote'>${item.Precision}</div></div>${statComp.Precision}<br/></c:if>
+				<c:if test="${item.Beauty != null}"><div name='attributeBeauty' class='item-popup-field' title='This is a stat for how beautiful this item is to behold.'>Beauty: <div class='main-item-subnote'>${item.Beauty}</div></div>${statComp.Beauty}<br/></c:if>
+				<c:if test="${item.hasToolStats}"><br/></c:if>
+				
 				<!-- Damage -->
 				<c:if test="${item.weaponDamage != null}"><div name='weaponDamage' class='item-popup-field'>Weapon damage: <div class='main-item-subnote'>${item.weaponDamage}</div></div></c:if>
 				<c:if test="${item.weaponCriticalChance != null}"><div name='weaponDamageCriticalChance' class='item-popup-field'> - Critical chance: <div class='main-item-subnote'>${item.weaponCriticalChance}% <span title='This is the total crit chance after your character`s crit chance has been taken into account.'>(${item.weaponCriticalChanceBuffed}%)</span></div></div>${statComp.weaponCriticalChance}<br/></c:if>
@@ -155,6 +166,17 @@
 					<c:if test="${comparison.strmod != null}"><div class='item-popup-field' title='This is the percentage that the wearer`s strength will be modified when making strength based rolls. Strength modifiers stack.'>Strength modifier: <div class='main-item-subnote'>${comparison.strmod}%</div></div></c:if>
 					<c:if test="${comparison.intmod != null}"><div class='item-popup-field' title='This is the percentage that the wearer`s intelligence will be modified when making intelligence based rolls. Intelligence modifiers stack.'>Intelligence modifier: <div class='main-item-subnote'>${comparison.intmod}%</div></div></c:if>
 					<c:if test="${comparison.requirements}"><br/><br/></c:if>
+
+					<!-- Tool stats -->
+					<c:if test="${comparison.EaseOfUse != null}"><div class='item-popup-field' title='This stat is used to compare how easy it is to use this tool compared to other tools that are similar.'>Ease of Use: <div class='main-item-subnote'>${comparison.EaseOfUse}</div></div><br/></c:if>
+					<c:if test="${comparison.Strength != null}"><div class='item-popup-field' title='This stat is used to compare how strong this item is compared to others that are similar.'>Strength: <div class='main-item-subnote'>${comparison.Strength}</div></div><br/></c:if>
+					<c:if test="${comparison.Reliability != null}"><div class='item-popup-field' title='This stat is used to compare how reliable this item is compared to others that are similar.'>Reliability: <div class='main-item-subnote'>${comparison.Reliability}</div></div><br/></c:if>
+					<c:if test="${comparison.Efficiency != null}"><div class='item-popup-field' title='This stat is used to compare how efficient this item is at doing it`s job compared to others that are similar.'>Efficiency: <div class='main-item-subnote'>${comparison.Efficiency}</div></div><br/></c:if>
+					<c:if test="${comparison.Complexity != null}"><div class='item-popup-field' title='This stat is used to compare how complex this item is compared to others that are similar. Generally lower complexity is better.'>Complexity: <div class='main-item-subnote'>${comparison.Complexity}</div></div><br/></c:if>
+					<c:if test="${comparison.Precision != null}"><div class='item-popup-field' title='This stat is used to compare how precise this tool is compared to others that are similar.'>Precision: <div class='main-item-subnote'>${comparison.Precision}</div></div><br/></c:if>
+					<c:if test="${comparison.Beauty != null}"><div class='item-popup-field' title='This is a stat for how beautiful this item is to behold.'>Beauty: <div class='main-item-subnote'>${comparison.Beauty}</div></div><br/></c:if>
+					<c:if test="${comparison.hasToolStats}"><br/></c:if>
+					
 					<!-- Damage -->
 					<c:if test="${comparison.weaponDamage != null}"><div class='item-popup-field'>Weapon damage: <div class='main-item-subnote'>${comparison.weaponDamage}</div></div></c:if>
 					<c:if test="${comparison.weaponCriticalChance != null}"><div class='item-popup-field'> - Critical chance: <div class='main-item-subnote'>${comparison.weaponCriticalChance}% <span title='This is the total crit chance after your character`s crit chance has been taken into account.'>(${comparison.weaponCriticalChanceBuffed}%)</span></div></div></c:if>

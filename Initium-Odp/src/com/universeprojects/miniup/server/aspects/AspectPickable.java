@@ -144,6 +144,10 @@ public class AspectPickable extends ItemAspect
 				else
 					ds.delete(itemEntity);
 			}
+			else
+			{
+				pickable.setProperty("enabled", false);
+			}
 			
 			if (pickable.isNotActuallyPickingUpEntity()==false)
 			{

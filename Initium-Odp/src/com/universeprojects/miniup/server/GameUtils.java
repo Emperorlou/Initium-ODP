@@ -39,7 +39,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-122";
+	final public static String version = "0.5.9-125";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -1021,7 +1021,7 @@ public class GameUtils
 			return "";
 		
 		// Update passive changes
-		if (AspectPassiveChange.update(db, item)==true)
+		if (db!=null && AspectPassiveChange.update(db, item)==true)
 			db.getDB().put(item);
 		
 		boolean hasRequiredStrength = true;

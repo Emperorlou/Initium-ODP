@@ -8,6 +8,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.ODPDBAccess.LocationSubType;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class PropertiesService extends Service {
@@ -31,8 +32,8 @@ public class PropertiesService extends Service {
 		if (dogecoins < cost)
 			throw new UserErrorMessage("You do not have enough gold to buy a house at this time. You have " + dogecoins + " but require at least " + cost + ". Come back when you have " + (cost - dogecoins) + " more.");
 		
-		ds.beginTransaction();
 		CachedEntity playerHouse = null;
+		ds.beginBulkWriteMode();
 		try {
 			character.refetch(ds);
 			// Get the path from the city hall, we will create the house branching from the other end of it...
@@ -50,17 +51,15 @@ public class PropertiesService extends Service {
 			} else {
 				cityLocation = location1Key;
 			}
+			
+			CachedEntity cityLocationEntity = ds.getIfExists(cityLocation);
 
 			// House = Location, so create that here, with the city as the parent location
-			playerHouse = new CachedEntity("Location");
+			playerHouse = db.newLocation(ds, 
+					"https://initium-resources.appspot.com/images/special-house2.jpg", 
+					houseName, "This is " + character.getProperty("name") + "'s property called '" + houseName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!", 
+					-1d, "RestSite", cityLocationEntity, user.getKey(), 7, LocationSubType.PlayerHouse);
 			// Set the starting attributes
-			playerHouse.setProperty("banner", "https://initium-resources.appspot.com/images/special-house2.jpg");
-			playerHouse.setProperty("name", houseName);
-			playerHouse.setProperty("description", "This is " + character.getProperty("name") + "'s property called '" + houseName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!");
-			playerHouse.setProperty("discoverAnythingChance", -1d);
-			playerHouse.setProperty("type", "RestSite");
-			playerHouse.setProperty("parentLocationKey", cityLocation);
-			playerHouse.setProperty("ownerKey", user.getKey());
 			playerHouse.setProperty("isOutside", "FALSE");
 			playerHouse.setProperty("supportsCampfires", 1L);
 			playerHouse.setProperty("createdDate", new Date());
@@ -80,8 +79,6 @@ public class PropertiesService extends Service {
 			
 			ds.put(character, pathToHouse);
 
-			ds.commit();
-			
 			// Give all the player alts the discovery of the path now...			
 			List<CachedEntity> userCharacters = db.getFilteredList("Character", "userKey", user.getKey());
 			for(CachedEntity characterEntity:userCharacters)
@@ -89,10 +86,10 @@ public class PropertiesService extends Service {
 				// If discovery already exists, nothing happens
 				db.doCharacterDiscoverEntity(ds, characterEntity, pathToHouse);
 			}
+			ds.commitBulkWrite();
+			
 		} catch (Exception e) {
 			throw e;
-		} finally {
-			ds.rollbackIfActive();
 		}
 		
 		return playerHouse;

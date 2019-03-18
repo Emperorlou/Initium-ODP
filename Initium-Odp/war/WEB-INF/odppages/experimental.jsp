@@ -441,8 +441,8 @@ function onCombatBegin()
 
 function onCombatComplete()
 {
-	if ($("body").attr("bannerstate").indexOf("combat")>-1)
-		viewBannerDefault();
+//	if ($("body").attr("bannerstate").indexOf("combat")>-1)
+//		viewBannerDefault();
 }
 
 function onCombat2DBegin()

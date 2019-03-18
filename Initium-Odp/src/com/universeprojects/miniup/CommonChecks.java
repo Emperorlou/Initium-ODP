@@ -5,6 +5,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
+import com.universeprojects.miniup.server.ODPDBAccess.LocationSubType;
 
 public abstract class CommonChecks
 {
@@ -263,7 +264,8 @@ public abstract class CommonChecks
 	 */
 	public static boolean checkLocationIsCombatSite(CachedEntity location)
 	{
-		if (location != null && "CombatSite".equals(location.getProperty("type")))
+		if (location != null && "CombatSite".equals(location.getProperty("type")) && 
+				(GameUtils.equals(location.getProperty("subType"), null) || GameUtils.enumEquals(location.getProperty("subType"), LocationSubType.CombatSite)))
 			return true;
 		
 		return false;
@@ -562,6 +564,11 @@ public abstract class CommonChecks
 			return true;
 		
 		return false;
+	}
+
+	public static boolean checkLocationIsNaturalResourceSite(CachedEntity location)
+	{
+		return GameUtils.equals(location.getProperty("subType"), "ResourceSite");
 	}
 
 

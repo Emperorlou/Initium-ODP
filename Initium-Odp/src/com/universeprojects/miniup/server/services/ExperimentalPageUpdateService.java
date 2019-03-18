@@ -156,6 +156,11 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("	</div>");
 		newHtml.append("	<div class='banner-weather'></div>");
 		newHtml.append("	<div id='light-grid'></div>");
+
+		newHtml.append("	<div class='shortcut-overlay-2d'>");
+		newHtml.append("		<div style='position:absolute;top:15.0%;left:50.0%;'><a onclick='doAutoExplore(event);' class='auto-explore-link path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>Explore</a></div>");
+		newHtml.append("	</div>");
+		
 		newHtml.append("</div>");
 		newHtml.append("</div>");
 //		newHtml.append("<button type='button' onclick='openMenu()'>Menu</button>");
@@ -180,6 +185,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("var gridTileOffsetY = "+gridMapService.getColumnStart()+";");
 		newHtml.append("$(document).on('click', '#somebutton', function() { pressedButton(); });");
 		newHtml.append("updateTallTreeButton();");
+		newHtml.append("updateAutoExploreButton();");
 		newHtml.append("</script>");
 		
 		
@@ -232,6 +238,11 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 				CommonChecks.checkCharacterIsIncapacitated(character)==false && 
 				CommonChecks.checkNPCIs2DCombatMode(getCombatant()))
 			js.append("onCombat2DBegin();");
+		else if (CommonChecks.checkCharacterIsIncapacitated(character)==false && 
+				CommonChecks.checkLocationIsCombatSite(location))
+			js.append("view2DView(true);");
+		else if (CommonChecks.checkLocationIsNaturalResourceSite(location))
+			js.append("view2DView(true);");
 		
 		return js.toString();
 	}

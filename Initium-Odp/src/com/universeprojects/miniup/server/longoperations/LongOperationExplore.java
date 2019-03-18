@@ -223,10 +223,10 @@ public class LongOperationExplore extends LongOperation {
 				}			
 				
 				// Now discover collection sites...
-				if (db.randomCollectionDiscovery(ds, db.getCurrentCharacter(), location, 1, 1d))
-				{
-					return "Ohhh, you found something interesting here. You might be able to use this..";
-				}
+//				if (db.randomCollectionDiscovery(ds, db.getCurrentCharacter(), location, 1, 1d))
+//				{
+//					return "Ohhh, you found something interesting here. You might be able to use this..";
+//				}
 				
 				// Now try to discover other, non-combat sites...
 				if (findNaturalResources==false)

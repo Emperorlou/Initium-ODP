@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
@@ -49,6 +50,7 @@ public class CommandCombatAttack extends Command
 		CachedEntity targetCharacter = null;
 		String characterName = (String)character.getProperty("name");
 		String targetCharacterName = null;
+		boolean targetKilled = false;
 		
 		ds.beginBulkWriteMode();
 		try
@@ -266,7 +268,23 @@ public class CommandCombatAttack extends Command
 						summaryStatus.append(characterName).append("'s experience with the "+weaponClass+" has increased.");
 					}
 				}
-			}		
+			}
+			else if (CommonChecks.checkCharacterIsDead(targetCharacter))
+			{
+				// If we're here then the target died, we'll create a token in that case
+				CachedEntity defeatedTokenDef = db.getEntity("ItemDef", 6239650208546816L);
+				if (defeatedTokenDef!=null)
+				{
+					CachedEntity defeatedToken = db.generateNewObject(defeatedTokenDef, "Item");
+					defeatedToken.setProperty("containerKey", location.getKey());
+					defeatedToken.setProperty("name", "Defeated: "+targetCharacter.getProperty("name").toString().substring(5));
+					String description = (String)defeatedToken.getProperty("description");
+					defeatedToken.setProperty("description", description+"<br><br>Slain by: "+characterName);
+					ds.put(defeatedToken);
+					
+					targetKilled = true;
+				}
+			}
 		
 		
 
@@ -321,6 +339,11 @@ public class CommandCombatAttack extends Command
 				
 				db.sendGameMessage(db.getDB(), targetCharacter, opponentHtml);
 			}
+		}
+		
+		if (targetKilled)
+		{
+			db.getGridMapService().regenerateTile(this, 500, 500);
 		}
 		
 	}

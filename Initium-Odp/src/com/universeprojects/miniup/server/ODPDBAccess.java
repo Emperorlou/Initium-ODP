@@ -71,6 +71,13 @@ public class ODPDBAccess
 	final QueryHelper query;
 	
 	private Map<Key,Set<String>> mpusSendQueue = null;
+
+	public enum LocationSubType
+	{
+		ResourceSite,
+		PlayerHouse,
+		CombatSite
+	}
 	
 	public enum CharacterMode
 	{
@@ -884,7 +891,7 @@ public class ODPDBAccess
 	 *            can even roll to discover something)
 	 * @return
 	 */
-	public CachedEntity newLocation(CachedDatastoreService db, String banner, String name, String description, Double discoverAnythingChance, String type, CachedEntity parentLocation, Key ownerKey, int gridMapSize)
+	public CachedEntity newLocation(CachedDatastoreService db, String banner, String name, String description, Double discoverAnythingChance, String type, CachedEntity parentLocation, Key ownerKey, int gridMapSize, LocationSubType subType)
 	{
 		if (db == null) db = getDB();
 
