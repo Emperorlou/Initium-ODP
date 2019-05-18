@@ -33,13 +33,8 @@ public class NPCArmyService extends Service
 		this.npcArmyKey = npcArmy.getKey();
 		this.npcArmy = npcArmy;
 		
-		if(npcArmy.getProperty("excludedLocations") != null)
-		{
-			@SuppressWarnings("unchecked")
-			List<Key> exclude = (List<Key>)npcArmy.getProperty("excludedLocations");
-			for(Key location:exclude)
-				excludedPropagateLocations.add(location.getId());
-		}
+		for(Key location:this.getExcludedPropagateLocations())
+			excludedPropagateLocations.add(location.getId());
 	}
 	
 	public String getUniqueId()
@@ -142,7 +137,7 @@ public class NPCArmyService extends Service
 	public List<Key> getExcludedPropagateLocations()
 	{
 		@SuppressWarnings("unchecked")
-		List<Key> excludedLocations = (List<Key>)npcArmy.getProperty("excludedLocations");
+		List<Key> excludedLocations = (List<Key>)npcArmy.getProperty("excludeLocations");
 		if(excludedLocations == null) excludedLocations = new ArrayList<Key>();
 		return excludedLocations;
 	}
@@ -276,6 +271,7 @@ public class NPCArmyService extends Service
 				if(this.excludedPropagateLocations.contains(nextLocation.getId()))
 				{
 					log.info(nextLocation.toString() + ": spawner excluded location to propagate");
+					continue;
 				}
 				pathsToLocations.put(path, nextLocation);
 			}
@@ -321,7 +317,7 @@ public class NPCArmyService extends Service
 					newNpcArmy.setProperty("locationKey", locationToPropagateTo);
 					newNpcArmy.setProperty("uniqueId", getUniqueId());
 					newNpcArmy.setProperty("name", getUniqueId()+": "+locationEntity.getProperty("name")+"(max: "+newNpcArmy.getProperty("maxSpawnCount")+")");
-					newNpcArmy.setProperty("excludedLocations", getExcludedPropagateLocations());
+					newNpcArmy.setProperty("excludeLocations", getExcludedPropagateLocations());
 	
 					setPropagationCount(getPropagationCount()-1);
 
