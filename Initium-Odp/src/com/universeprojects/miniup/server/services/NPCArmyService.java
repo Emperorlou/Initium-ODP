@@ -3,8 +3,10 @@ package com.universeprojects.miniup.server.services;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +24,7 @@ public class NPCArmyService extends Service
 	
 	
 	List<CachedEntity> npcs = null;
-	
+	Set<Long> excludedPropagateLocations = new HashSet<Long>();  
 	
 	
 	public NPCArmyService(ODPDBAccess db, CachedEntity npcArmy)
@@ -31,6 +33,13 @@ public class NPCArmyService extends Service
 		this.npcArmyKey = npcArmy.getKey();
 		this.npcArmy = npcArmy;
 		
+		if(npcArmy.getProperty("excludedLocations") != null)
+		{
+			@SuppressWarnings("unchecked")
+			List<Key> exclude = (List<Key>)npcArmy.getProperty("excludedLocations");
+			for(Key location:exclude)
+				excludedPropagateLocations.add(location.getId());
+		}
 	}
 	
 	public String getUniqueId()
@@ -128,6 +137,14 @@ public class NPCArmyService extends Service
 	public NPCArmyService(ODPDBAccess db, Key npcArmyKey)
 	{
 		this(db, db.getEntity(npcArmyKey));
+	}
+	
+	public List<Key> getExcludedPropagateLocations()
+	{
+		@SuppressWarnings("unchecked")
+		List<Key> excludedLocations = (List<Key>)npcArmy.getProperty("excludedLocations");
+		if(excludedLocations == null) excludedLocations = new ArrayList<Key>();
+		return excludedLocations;
 	}
 
 	public List<CachedEntity> getNPCs()
@@ -250,10 +267,17 @@ public class NPCArmyService extends Service
 			Map<CachedEntity, Key> pathsToLocations = new HashMap<CachedEntity, Key>();
 			for(CachedEntity path:paths)
 			{
+				Key nextLocation = null;
 				if (GameUtils.equals(path.getProperty("location1Key"), getLocationKey()))
-					pathsToLocations.put(path, (Key)path.getProperty("location2Key"));
+					nextLocation = (Key)path.getProperty("location2Key");
 				else
-					pathsToLocations.put(path, (Key)path.getProperty("location1Key"));
+					nextLocation = (Key)path.getProperty("location1Key");
+				
+				if(this.excludedPropagateLocations.contains(nextLocation.getId()))
+				{
+					log.info(nextLocation.toString() + ": spawner excluded location to propagate");
+				}
+				pathsToLocations.put(path, nextLocation);
 			}
 			List<CachedEntity> locationEntities = db.getEntities(new ArrayList(pathsToLocations.values()));
 
@@ -297,6 +321,7 @@ public class NPCArmyService extends Service
 					newNpcArmy.setProperty("locationKey", locationToPropagateTo);
 					newNpcArmy.setProperty("uniqueId", getUniqueId());
 					newNpcArmy.setProperty("name", getUniqueId()+": "+locationEntity.getProperty("name")+"(max: "+newNpcArmy.getProperty("maxSpawnCount")+")");
+					newNpcArmy.setProperty("excludedLocations", getExcludedPropagateLocations());
 	
 					setPropagationCount(getPropagationCount()-1);
 
