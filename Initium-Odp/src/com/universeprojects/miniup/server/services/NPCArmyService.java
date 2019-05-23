@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -35,6 +37,45 @@ public class NPCArmyService extends Service
 		
 		for(Key location:this.getExcludedPropagateLocations())
 			excludedPropagateLocations.add(location.getId());
+	}
+	
+	public Date getStartDate()
+	{
+		return (Date)npcArmy.getProperty("startDate");
+	}
+	
+	public boolean hasStarted()
+	{
+		Date start = this.getStartDate();
+		return start == null || start.before(new Date());
+	}
+	
+	public Date getExpiryDate()
+	{
+		return (Date)npcArmy.getProperty("expiryDate");
+	}
+	
+	public boolean hasExpired()
+	{
+		Date expiry = this.getExpiryDate();
+		return expiry != null && expiry.before(new Date());
+	}
+	
+	public Key getRareNpcDefKey()
+	{
+		return (Key)npcArmy.getProperty("rareNpcDefKey");
+	}
+	
+	public Double getRareNpcSpawnChance()
+	{
+		return (Double)npcArmy.getProperty("rareNpcSpawnChance");
+	}
+	
+	public String getRareNpcUniqueId()
+	{
+		String uniqueId = (String)npcArmy.getProperty("rareNpcUniqueId"); 
+		if(uniqueId != null && uniqueId.trim().length() == 0) return null;
+		return uniqueId.trim();
 	}
 	
 	public String getUniqueId()
@@ -174,11 +215,15 @@ public class NPCArmyService extends Service
 	 */
 	public void doTick()
 	{
+		// If a start date has been specified, and its not time yet, then don't do anything.
+		if(hasStarted() == false) return;
+		
 		// Check if we need to propagate
 		attemptToPropagate();
 
 		// Check if there are NO npcs left and seed is NOT set. If so, we'll delete the army as it has been defeated
-		if (isSeed()==false && getNPCs().size()==0)
+		// If the army has expired, then delete the army entity.
+		if (hasExpired() || (isSeed()==false && getNPCs().size()==0))
 		{
 			deleteNPCArmy();
 			return;
@@ -206,9 +251,8 @@ public class NPCArmyService extends Service
 		
 		if (getSpawnsPerTick()<=0d) return;
 		
-		if (getNPCs().size()>=getMaxSpawnCount()) return;
-		
-		
+		long amountToSpawn = getMaxSpawnCount() - getNPCs().size();
+		if (amountToSpawn <= 0) return;
 		
 		if (isSeed())
 		{
@@ -224,6 +268,8 @@ public class NPCArmyService extends Service
 		}
 		else if (getSpawnsPerTick()<1 && GameUtils.roll(getSpawnsPerTick())==true)
 		{
+			// Don't need to check whether we can spawn, that was already handled above since
+			// we know amountToSpawn >= 1 and we're only ever spawning 1.
 			CachedEntity npcDef = db.getEntity(getNpcDefKey());
 			db.doCreateMonster(npcDef, getLocationKey());
 		}
@@ -231,8 +277,45 @@ public class NPCArmyService extends Service
 		{
 			CachedEntity npcDef = db.getEntity(getNpcDefKey());
 			long spawnCount = Math.round(getSpawnsPerTick());
-			for(int i = 0; i<spawnCount; i++)
+			
+			for(int i = 0; i < spawnCount && i < amountToSpawn; i++)
 				db.doCreateMonster(npcDef, getLocationKey());
+		}
+		else
+		{
+			// Exit, meaning we didn't spawn anything. This case means we don't consider the rare spawn chance at all.
+			return;
+		}
+		
+		log.info("Attempting to spawn rare NPC for army " + npcArmy.getKey().toString());
+		if(getRareNpcDefKey() != null)
+		{
+			// We require a spawn chance to consider a rare spawn at all.
+			Double spawnChance = getRareNpcSpawnChance();
+			if(spawnChance == null || GameUtils.roll(spawnChance) == false) return;
+			
+			CachedEntity npcDef = db.getEntity(getRareNpcDefKey());
+			if(npcDef == null) return;
+			
+			String uniqueId = getRareNpcUniqueId(); 
+			if(uniqueId != null && uniqueId.length() > 0)
+			{
+				List<CachedEntity> rareMobs = db.getFilteredList("Character", 
+						"_definitionKey", npcDef.getKey(),
+						"internalName", uniqueId);
+				
+				for(CachedEntity mob:rareMobs)
+				{
+					// If any of this rare mob exist (and alive) with the unique ID as the internal name, then
+					// we can't create, and must return.
+					if(mob != null && GameUtils.isPlayerIncapacitated(mob) == false)
+						return;
+				}
+			}
+			
+			// We can create the NPC now.
+			CachedEntity npc = db.doCreateMonster(npcDef, getLocationKey());
+			npc.setProperty("internalName", uniqueId);
 		}
 	}
 	
@@ -318,6 +401,11 @@ public class NPCArmyService extends Service
 					newNpcArmy.setProperty("uniqueId", getUniqueId());
 					newNpcArmy.setProperty("name", getUniqueId()+": "+locationEntity.getProperty("name")+"(max: "+newNpcArmy.getProperty("maxSpawnCount")+")");
 					newNpcArmy.setProperty("excludeLocations", getExcludedPropagateLocations());
+					newNpcArmy.setProperty("startDate", getStartDate());
+					newNpcArmy.setProperty("expiryDate", getExpiryDate());
+					newNpcArmy.setProperty("rareNpcDefKey", getRareNpcDefKey());
+					newNpcArmy.setProperty("rareNpcSpawnChance", getRareNpcSpawnChance());
+					newNpcArmy.setProperty("rareNpcUniqueId", getRareNpcUniqueId());
 	
 					setPropagationCount(getPropagationCount()-1);
 
