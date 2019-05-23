@@ -49,8 +49,8 @@ public class MoveItemsController extends PageController {
 		CachedEntity otherSide = null;
 		// used for additional functionality related to group/player houses.
 		// Either player owns the house, or is in a group house he's a member of
-		boolean isInOwnedHouse = ps.doesUserOwnHouse(location, user) ||
-				(gs.characterHasGroup() && ps.doesUserOwnHouse(location, gs.getCharacterGroup()));
+		boolean isInOwnedHouse = location != null && (ps.doesUserOwnHouse(location, user) ||
+				(gs.characterHasGroup() && ps.doesUserOwnHouse(location, gs.getCharacterGroup())));
 		
 		// Determine which containers we're going to be using
 		String selfSideParam = WebUtils.getStrParam(request, "selfSide");
