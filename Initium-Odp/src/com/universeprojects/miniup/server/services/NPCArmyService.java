@@ -399,7 +399,7 @@ public class NPCArmyService extends Service
 					newNpcArmy.setProperty("npcDefKey", getNpcDefKey());
 					newNpcArmy.setProperty("locationKey", locationToPropagateTo);
 					newNpcArmy.setProperty("uniqueId", getUniqueId());
-					newNpcArmy.setProperty("name", getUniqueId()+": "+locationToPropagateTo.getProperty("name")+"(max: "+newNpcArmy.getProperty("maxSpawnCount")+")");
+					newNpcArmy.setProperty("name", getUniqueId()+": "+locationEntity.getProperty("name")+"(max: "+newNpcArmy.getProperty("maxSpawnCount")+")");
 					newNpcArmy.setProperty("excludeLocations", getExcludedPropagateLocations());
 					newNpcArmy.setProperty("startDate", getStartDate());
 					newNpcArmy.setProperty("expiryDate", getExpiryDate());
