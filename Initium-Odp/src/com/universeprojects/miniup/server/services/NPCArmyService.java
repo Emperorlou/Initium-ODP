@@ -74,7 +74,7 @@ public class NPCArmyService extends Service
 	public String getRareNpcUniqueId()
 	{
 		String uniqueId = (String)npcArmy.getProperty("rareNpcUniqueId"); 
-		if(uniqueId != null && uniqueId.trim().length() == 0) return null;
+		if(uniqueId == null || uniqueId.trim().length() == 0) return null;
 		return uniqueId.trim();
 	}
 	
