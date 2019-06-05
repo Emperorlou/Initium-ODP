@@ -35,6 +35,7 @@ public class Buff extends EntityWrapper {
 		for(String fieldName:entity.getProperties().keySet())
 			ce.setProperty(fieldName, entity.getProperty(fieldName));
 		ce.setAttribute("entity", entity);
+		return ce;
 	}
 	
 	public Date expiry()
