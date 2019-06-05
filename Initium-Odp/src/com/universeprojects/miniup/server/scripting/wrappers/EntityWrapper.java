@@ -72,27 +72,31 @@ public class EntityWrapper extends BaseWrapper
 	
 	public Buff[] getBuffs()
 	{
-		List<EmbeddedEntity> entityBuffs = db.getBuffsFor(this.getKey());
 		List<Buff> buffs = new ArrayList<Buff>();
-		for(EmbeddedEntity buff:entityBuffs)
+		if(this.isEmbeddedEntity == false)
 		{
-			if(GameUtils.equals(buff.getProperty("parentKey"), this.getKey()))
-				buffs.add(new Buff(buff, this.db, this));
+			List<EmbeddedEntity> entityBuffs = db.getBuffsFor(this.wrappedEntity);
+			for(EmbeddedEntity buff:entityBuffs)
+			{
+				if(GameUtils.equals(buff.getProperty("parentKey"), this.getKey()))
+					buffs.add(new Buff(buff, this.db, this));
+			}
 		}
-		
 		return buffs.toArray(new Buff[buffs.size()]);
 	}
 	
 	public Buff[] getBuffsOfType(String buffName)
 	{
-		List<EmbeddedEntity> entityBuffs = db.getBuffsFor(this.getKey());
 		List<Buff> buffs = new ArrayList<Buff>();
-		for(EmbeddedEntity buff:entityBuffs)
+		if(this.isEmbeddedEntity == false)
 		{
-			if(buff.getProperty("name").equals(buffName) && GameUtils.equals(buff.getProperty("parentKey"), this.getKey()))
-				buffs.add(new Buff(buff, this.db, this));
+			List<EmbeddedEntity> entityBuffs = db.getBuffsFor(this.wrappedEntity);
+			for(EmbeddedEntity buff:entityBuffs)
+			{
+				if(buff.getProperty("name").equals(buffName) && GameUtils.equals(buff.getProperty("parentKey"), this.getKey()))
+					buffs.add(new Buff(buff, this.db, this));
+			}
 		}
-		
 		return buffs.toArray(new Buff[buffs.size()]);
 	}
 	

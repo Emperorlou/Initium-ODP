@@ -29,7 +29,7 @@ public class Buff extends EntityWrapper {
 		this(WrapEmbeddedEntity(entity), db, parentEntity);
 	}
 	
-	private CachedEntity WrapEmbeddedEntity(EmbeddedEntity entity)
+	private static CachedEntity WrapEmbeddedEntity(EmbeddedEntity entity)
 	{
 		CachedEntity ce = new CachedEntity(entity.getKey());
 		for(String fieldName:entity.getProperties().keySet())
