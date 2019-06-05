@@ -102,8 +102,9 @@ public class EntityWrapper extends BaseWrapper
 	
 	public Buff addBuff(String buffDefName)
 	{
+		if(this.isEmbeddedEntity) return null;
 		ScriptService.log.log(Level.INFO, "Adding BuffDef by name to " + this.getKeyName() + ": " + buffDefName);
-		EmbeddedEntity newBuff = db.awardBuffByDef(buffDefName, this.getKey());
+		EmbeddedEntity newBuff = db.awardBuffByDef(buffDefName, this.wrappedEntity);
 		if(newBuff != null)
 		{
 			Buff buff = new Buff(newBuff, db, this);
@@ -118,7 +119,7 @@ public class EntityWrapper extends BaseWrapper
 	public Buff addManualBuff(String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
 			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
 	{
-		EmbeddedEntity newBuff = (EmbeddedEntity)db.awardBuff(null, this.getEntity(), icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
+		EmbeddedEntity newBuff = (EmbeddedEntity)db.awardBuff(null, this.wrappedEntity, icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
 		if(newBuff != null)
 		{
 			Buff buff = new Buff(newBuff, db, this);
