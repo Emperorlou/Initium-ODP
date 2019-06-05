@@ -387,6 +387,7 @@ function random(start, end)
 
 function clearPopupPermanentOverlay()
 {
+	hideLongOperationProgress();
 	cancelTravelLine();
 	$("#banner-text-overlay").show();
 	$("#banner-base").html("");
@@ -3278,6 +3279,19 @@ function view2DView(forcedMode)
 
 }
 
+function ensureNotInCombatView()
+{
+	var val = $("body").attr("bannerstate");
+	if (val=="combat-2d")
+		$("body").attr("bannerstate", "location-2d");
+}
+
+function setBannerSizeMode(mode)
+{
+	bannerSizeMode = mode;
+	updateBannerWeatherSystem();
+}
+
 function drawTravelLine(event, startX, startY, x, y, seconds)
 {
 	$(".minimap-button-cancel").show();
@@ -3511,6 +3525,7 @@ function showLootPopup()
 	var html = "";
 	html += "<div id='locationQuickList-contents'>";
 	html += "<div><h4>Loot</h4></div>";
+	html += "<p style='text-align:center'><a onclick='clearMakeIntoPopup();doAutoExplore();'>Explore</a></p>";
 	if (window.singleLeavePathId!=null)
 		html += "<p><a onclick='clearMakeIntoPopup();doGoto(event, window.singleLeavePathId, false);' style='float:right'>Leave</a></p>";
 	html += "<p><a onclick='clearMakeIntoPopup();window.btnLeaveAndForget.click()' style='float:left'>Leave and forget</a></p>";
@@ -3886,16 +3901,29 @@ function doTerritorySetDefense(eventObject, line)
 
 
 var longOperationCountdownTimer = null;
-function startLongOperationCountdown(timeLeftSeconds)
+function startLongOperationCountdown(data)
 {
+	var startTimeSeconds = data.startTime/1000;
+	var endTimeSeconds = data.endTime/1000;
+	var totalSeconds = endTimeSeconds-startTimeSeconds;
+	var timeLeftSeconds = data.timeLeft;
 	lastLongOperationDueTime = new Date().getTime()+((timeLeftSeconds+1)*1000);
+	lastLongOperationStartTime = data.startTime;
 	updateLongOperationTimeLeft();
+	
+	stopLongOperationCountdown();
 	longOperationCountdownTimer = setInterval(updateLongOperationTimeLeft, 1000);
+	
+	showLongOperationProgress();
+	setLongOperationProgress(totalSeconds-timeLeftSeconds/totalSeconds, data.longOperationName, data.longOperationDescription);
 }
 function stopLongOperationCountdown()
 {
 	if (window.longOperationCountdownTimer!=null)
+	{
 		clearInterval(longOperationCountdownTimer);
+		longOperationCountdownTimer = null;
+	}
 }
 
 function updateLongOperationTimeLeft()
@@ -3904,12 +3932,72 @@ function updateLongOperationTimeLeft()
 	{
 		var currentTime = new Date().getTime();
 		var dueTime = lastLongOperationDueTime;
+		var totalMs = dueTime-lastLongOperationStartTime;
+		var totalSecs = totalMs/1000;
 		var timeLeft = (dueTime-currentTime)/1000;
+		var timeSpent = totalSecs-timeLeft;
+		
+		var percent = timeSpent/totalSecs*100;
+		if (percent>100) percent = 100;
+		if (percent<0) percent = 0;
+		// Here we're making the progress bar only go from 2% to 98% because of the progress bar graphic's specific requirements to fit properly
+		var percentCorrected = 2;
+		percentCorrected += percent*0.96;
+		
 		if (timeLeft<0)
 			$("#long-operation-timeleft").text("0 seconds remaining.");
 		else
-			$("#long-operation-timeleft").text(Math.floor(timeLeft)+" seconds remaining.");
+			$("#long-operation-timeleft").text(secondsToTimeString(timeLeft)+" remaining.");
+		
+		var loProgressBar = $("#long-operation-status");
+		if (loProgressBar.length>0)
+		{
+			loProgressBar.find(".progress-bar-text").text(secondsToTimeString(timeLeft));
+			loProgressBar.find(".progress-bar-fill").css("width", percentCorrected+"%"); 
+		}
 	}
+}
+
+function secondsToTimeString(seconds)
+{
+	if (seconds<0) return "100%";
+	
+	var days = Math.floor(seconds/86400);
+	seconds -= (days*86400);
+
+	var hours = Math.floor(seconds/3600);
+	seconds -= (hours*3600);
+	
+	var minutes = Math.floor(seconds/60);
+	seconds -= (minutes*60);
+	
+	var result = "";
+	
+	if (days>0) 
+	{
+		result+=days+" days ";
+		result+=hours+" hours ";
+	}
+	else if (hours>0) 
+	{
+		result+=hours+" hours ";
+		result+=minutes+" minutes ";
+	}
+	else if (minutes>0) 
+	{
+		result+=minutes+" minutes ";
+		result+=Math.round(seconds)+" seconds";
+	}
+	else if (seconds>0)
+	{
+		result+=Math.round(seconds)+" seconds";
+	}
+	else
+		result+="100%";
+	
+	
+	return result;
+	
 }
 
 
@@ -3935,6 +4023,7 @@ function longOperation_fullPageRefresh(eventObject, operationName, operationDesc
 var lastLongOperationTimer = null;
 var lastLongOperationDueTime = null;
 var lastLongOperationEventObject = null;
+var lastLongOperationStartTime = null;
 /**
  * 
  * @param eventObject
@@ -4059,7 +4148,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		// Here we handle the special: UserRequestBuilder page popup mechanism
 		if (data.pagePopupUrl!=null)
 		{
-			handleUserRequest(data);
+			handleUserRequest(data, parameters.autoStart);
 			return;
 		}
 
@@ -4073,24 +4162,28 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		
 		if (data.isComplete==false)
 		{
-			if (data.timeLeft>=0)
+			if (data.timeLeft>0)
 			{
 				lastLongOperationTimer = setTimeout(recallFunction, (data.timeLeft+1)*1000);
 				if (data.timeLeft>=5)
 					popupPremiumReminder();
+
+				startLongOperationCountdown( data);
+				
+				window.scrollTo(0,0);
+			}
+			else
+			{
+				lastLongOperationTimer = setTimeout(recallFunction, 0);
 			}
 		}
 		else
 		{
+			hideLongOperationProgress();
 			if (data.description!=null)
 				$("#long-operation-complete-text").html(data.description);
 		}
 		
-		// And at the end of it all, we'll update the time left, but only if we're supposed to show it...
-		if (data.isShowingTimeLeft)
-		{
-			startLongOperationCountdown(data.timeLeft);
-		}
 		
 		
 		lastLongOperationEventObject = null;
@@ -4122,6 +4215,7 @@ function cancelLongOperations(eventObject)
 	if (window.commandInProgress)
 		return;
 	
+	stopLongOperationCountdown();
 	longOperation(eventObject, "cancelLongOperations", null, function(){
 		clearPopupPermanentOverlay();
 		if (lastLongOperationTimer!=null)
@@ -4183,6 +4277,12 @@ function doGoto(event, pathId, attack)
 				}
 				else if (action.isComplete)
 				{
+					// If we're in the 2D view when we arrive, lets get out of there
+					var bannerstate = $("body").attr("bannerstate");
+					if (bannerstate == "location-2d")
+						$("body").attr("bannerstate", "");
+					
+					
 					clearPopupPermanentOverlay(); 
 					updateBannerWeatherSystem();
 					setAudioDescriptor(locationAudioDescriptor, locationAudioDescriptorPreset, isOutside);
@@ -4205,10 +4305,11 @@ function doGoto(event, pathId, attack)
 
 
 
-function doExperiment(event)
+function doExperiment(event, itemId)
 {
 	var checkedIds = $(".experiment-item-checkbox:checked").map(function(){return $(this).attr('id');}).get();
 	if (checkedIds.length==0) checkedIds = null;
+	if (itemId!=null) checkIds = [itemId];
 	
 	showBannerLoadingIcon();
 	longOperation(event, "InventionExperimentNew", {itemIds:checkedIds}, 
@@ -4254,11 +4355,24 @@ function repeatConfirmRequirementsButton(repsUniqueId)
 	return false;
 }
 
-function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId)
+function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId, autoStart)
 {
+	if (autoStart)
+	{
+		var btn = $("#gridmap-repeatinvention-button");
+		if (btn.length>0)
+		{
+			btn.off("click");
+			btn.on("click", function(event){
+				doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId, autoStart);
+			});
+			btn.show();
+		}
+	}
+	
 	showBannerLoadingIcon();
 	//BeginPrototype
-	longOperation(event, "InventionPrototypeNew", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId}, 
+	longOperation(event, "InventionPrototypeNew", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId, autoStart:autoStart}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
@@ -4291,13 +4405,26 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId)
 	
 }
 
-function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId)
+function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId, autoStart)
 {
+	if (autoStart)
+	{
+		var btn = $("#gridmap-repeatinvention-button");
+		if (btn.length>0)
+		{
+			btn.off("click");
+			btn.on("click", function(event){
+				doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId, autoStart);
+			});
+			btn.show();
+		}
+	}
+	
 	closeAllTooltips();
 	
 	showBannerLoadingIcon();
 	//DoSkillConstructItem
-	longOperation(event, "InventionConstructItemSkillNew", {skillName:skillName, constructItemSkillId:skillId,repsUniqueId:repsUniqueId}, 
+	longOperation(event, "InventionConstructItemSkillNew", {skillName:skillName, constructItemSkillId:skillId,repsUniqueId:repsUniqueId, autoStart:autoStart}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
@@ -4391,14 +4518,20 @@ function updateAutoExploreButton()
 function doExplore(event, ignoreCombatSites, findNaturalResources)
 {
 	var exploreState = null;
-	if (ignoreCombatSites==true)
-		exploreState = "ignoreCombatSites";
-	else if (findNaturalResources==true)
-		exploreState = "findNaturalResources";
-	else
-		exploreState = "explore";
-	localStorage.setItem("auto-explore", exploreState);
 	
+	if (ignoreCombatSites!=null && findNaturalResources != null)
+	{
+		if (ignoreCombatSites==true)
+			exploreState = "ignoreCombatSites";
+		else if (findNaturalResources==true)
+			exploreState = "findNaturalResources";
+		else
+			exploreState = "explore";
+		localStorage.setItem("auto-explore", exploreState);
+	}
+	else
+		localStorage.setItem("auto-explore", "explore");
+
 	updateAutoExploreButton();
 	
 	
@@ -4511,12 +4644,12 @@ function doCampCreate(campName)
 		});
 }
 
-function handleUserRequest(data)
+function handleUserRequest(data, autoStart)
 {
 	if (data.pagePopupUrl.indexOf("?")>=0)
-		data.pagePopupUrl+="&userRequestId="+data.userRequestId+"&"+data.urlParameters;
+		data.pagePopupUrl+="&userRequestId="+data.userRequestId+"&"+data.urlParameters+"&autoStart="+autoStart;
 	else
-		data.pagePopupUrl+="?userRequestId="+data.userRequestId+"&"+data.urlParameters;
+		data.pagePopupUrl+="?userRequestId="+data.userRequestId+"&"+data.urlParameters+"&autoStart="+autoStart;
 	
 	// Add the exta request data to the url..
 	
@@ -5390,3 +5523,270 @@ function viewHCMLeaderboard()
 {
 	makeIntoPopupFromUrl("/odp/hcmleaderboard", "Hardcore Leaderboard", false);
 }
+
+
+
+function showLongOperationProgress()
+{
+	$("body").attr("longoperation", "true");
+}
+
+function hideLongOperationProgress()
+{
+	$("body").attr("longoperation", "");
+	$(".progress-bar-fill").removeAttr("style");
+	
+	stopLongOperationCountdown();
+}
+
+function setLongOperationProgress(percent, title, description)
+{
+	var statusDiv = $("#long-operation-status");
+	if (title!=null)
+	{
+		statusDiv.find(".long-operation-status-title").text(title);
+	}
+	if (description!=null)
+	{
+		statusDiv.find(".long-operation-status-description").text(description);
+	}
+	
+	percent *= 0.96;
+	percent += 2;
+	
+	statusDiv.find(".progress-bar-fill").css("width", percent+"%");
+}
+
+function removeTileObjects()
+{
+	// Not implemented here
+}
+
+function addGridObjectToMap()
+{
+	// Not implemented here
+}
+
+function refreshPositions()
+{
+	// Not implemented here
+}
+
+function inspectCellContents()
+{
+	// Not implemented here
+}
+
+function petFeedExecute(event, petId, itemId)
+{
+//	confirmPopup("Feed pet", "Are you sure you want to feed this to your pet? <br>(If you want to feed only a partial amount, you will have to split the stack first in your inventory)", function(){
+		doCommand(event, "PetFeed", {petId:petId, itemId:[itemId]}, function(data){
+			// Refresh the popup 
+//			$("#petfoodcompatibleitemslist-container").html(
+//					"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+//					"	<h4>Item picker</h4>" +
+//					"	<div id='petfoodcompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>");
+//			$("#petfoodcompatibleitemslist").load("/odp/petfoodcompatibleitemslist?petId="+petId+"&char="+window.characterOverride);
+		});
+//	});
+}
+
+function petFeedExecuteAll(event, petId)
+{
+	var itemIds = [];
+	var items = $("#petfoodcompatibleitemslist").children(".selectable");
+	for(var i = 0; (i<items.length && i<20); i++)
+	{
+		var id = items.get(i).id;
+		itemIds.push(parseInt(id));
+	}
+	
+	confirmPopup("Feed pet", "Are you sure you want to give this pet EVERYTHING you are holding, to eat? Note: They will only eat what they like to eat.<br>(Only the first 20 in this list will be given)", function(){
+		doCommand(event, "PetFeed", {petId:petId, itemId:itemIds}, function(data){
+//			$("#petfoodcompatibleitemslist-container").html(
+//					"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+//					"	<h4>Item picker</h4>" +
+//					"	<div id='buyordercompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>");
+//			$("#petfoodcompatibleitemslist").load("/odp/petfoodcompatibleitemslist?petId="+petId+"&char="+window.characterOverride);
+		});
+	});
+}
+
+function viewPetFoodOptions(event, petId)
+{
+	$("body").append("" +
+			"<div id='petfoodcompatibleitemslist-container' class='main-buttonbox v3-window3 make-popup make-popup-removable'>" +
+			"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+			"	<h4>Item picker</h4>" +
+			"	<div id='petfoodcompatibleitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>" +
+			"</div>" +
+			"<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+	$("#petfoodcompatibleitemslist").load("/odp/petfoodcompatibleitemslist?petId="+petId+"&char="+window.characterOverride);
+	closeAllTooltips();
+}
+
+function updateItemImage(itemId, image)
+{
+	 var elements = $('.item-icon-img-'+itemId);
+	 
+	 for(var i = 0; i<elements.length; i++)
+	 {
+		 if (elements[i].nodeName == "IMG")
+		 {
+			 $(elements[i]).attr("src", image);
+		 }
+		 else if (elements[i].nodeName == "DIV")
+		 {
+			 $(elements[i]).css("background-image", "url('"+image+"')");
+		 }
+	 }
+}
+
+function updatePetImage(petId, image)
+{
+	updateItemImage(petId, image);
+}
+
+function updateNeededPetFood(amount)
+{
+	$("#petFoodMaxKg").text(amount);
+}
+
+window.petFeedAnimTimeoutIds = {};
+function doFeedPetAnimation(petId, feedAnimation, animLengthMs, regularImage)
+{
+	if (window.petFeedAnimTimeoutIds["ID"+petId]!=null)
+		clearTimeout(window.petFeedAnimTimeoutIds["ID"+petId]);
+	
+	var originalSrc = regularImage;
+	
+	var timeoutId = setTimeout(function(){
+		updatePetImage(petId, originalSrc);
+		window.petFeedAnimTimeoutIds["ID"+petId] = null;
+	}, animLengthMs,
+	originalSrc, petId);
+	
+	updatePetImage(petId, feedAnimation);
+	
+	window.petFeedAnimTimeoutIds["ID"+petId] = timeoutId;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * 
+ * 
+ * Confirm requirements JSP scripts
+ * 
+ * 
+ */
+
+var crSelectedRequirementSlotIndex = null;
+function selectRequirement(event, requirementSlotIndex, gerKeyList)
+{
+	crSelectedRequirementSlotIndex = requirementSlotIndex.split(":").join("\\:");
+	$(".confirm-requirements-requirement").removeClass("confirm-requirements-selected");
+	$(event.target).closest(".confirm-requirements-requirement").addClass("confirm-requirements-selected");
+	doCommand(event, "ConfirmRequirementsUpdate", {slotIndex:requirementSlotIndex, gerKeyList:gerKeyList});	
+}
+
+function selectAll(event)
+{
+	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementSlotIndex);
+
+	var itemVisual = $("#item-candidates").find(".confirm-requirements-item-candidate");
+	itemVisual.detach();
+	itemPanelForRequirement.append(itemVisual);
+	itemVisual.hide();
+	itemVisual.fadeIn("slow");
+	event.stopPropagation();
+}
+
+function selectItem(event, itemId)
+{
+	// Check that we're not trying to select an item that is already chosen as a requirement. It doesn't work that way.
+	if ($(event.target).closest(".confirm-requirements-requirement").length>0)
+		return;
+	
+	//unselectItem(null);
+	
+	
+	$("#"+crSelectedRequirementSlotIndex).val(itemId);
+	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementSlotIndex);
+	var itemVisual = $(event.target).closest(".confirm-requirements-item-candidate");
+	itemVisual.detach();
+	itemPanelForRequirement.append(itemVisual);
+	itemVisual.hide();
+	itemVisual.fadeIn("slow");
+	event.stopPropagation();
+}
+
+function unselectItem(event)
+{
+	var candidatesContainer = $("#item-candidates");
+	var container = $("#requirement-container-"+crSelectedRequirementSlotIndex);
+	var currentSelectedItem = container.find(".itemToSelect");
+	if (currentSelectedItem.length==0)
+		return; 	// Nothing is selected
+
+	// Get all .confirm-requirements-item-candidate divs and find one that is empty for reuse
+	container.children("input").val("");
+	var e = container.find(".itemToSelect").detach();
+	candidatesContainer.children(".list").prepend(e);
+	e.hide();
+	e.fadeIn("slow");
+	
+	if (event!=null)
+		event.stopPropagation();
+}
+
+function confirmRequirements_collectChoices(event)
+{
+	var result = {};
+	result.slots = {};
+	result.repetitionCount = null;
+	var requirementsContainers = $("#requirement-categories").find(".confirm-requirements-entry");
+	for(var i = 0; i<requirementsContainers.length; i++)
+	{
+		var requirementsContainer = $(requirementsContainers[i]);
+
+		var itemsSelected = requirementsContainer.find(".itemToSelect");
+		if (itemsSelected.length>0)
+		{
+			var val = "";
+			var firstTime = true;
+			for(var ii = 0; ii<itemsSelected.length; ii++)
+			{
+				if (firstTime)
+					firstTime = false;
+				else
+					val+=",";
+				
+				val+=$(itemsSelected[ii]).attr("itemKey");
+			}
+			
+			result.slots[requirementsContainer.attr("slotName")] = val;
+		}
+	}
+	
+	if ($("#repetitionCount").length>0)
+		result.repetitionCount = $("#repetitionCount").val();
+	
+	return result;
+}
+

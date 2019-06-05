@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -54,10 +55,10 @@ public class CommandRavenPayRespects extends Command {
 			throw new UserErrorMessage("You cannot do that here.");
 		
 		// Get all buffs and check for Blessing of the Raven
-		List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
+		List<EmbeddedEntity> buffs = db.getBuffsFor(character);
 		if (buffs!=null && buffs.isEmpty()==false)
 		{
-			for(CachedEntity buff:buffs)
+			for(EmbeddedEntity buff:buffs)
 			{
 				if ("Blessing of the Ebon Raven".equals(buff.getProperty("name")))
 				{
@@ -85,7 +86,7 @@ public class CommandRavenPayRespects extends Command {
 		Double maxHp = (Double)character.getProperty("maxHitpoints");
 		if (curHp!=null && maxHp!=null && curHp>0 && curHp<maxHp)
 		{
-			ds.put(db.awardBuff(ds, character.getKey(), "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you restored.", 1800, null, null, null, null, null, null, 1));
+			db.awardBuff(ds, character, "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you restored.", 1800, null, null, null, null, null, null, 1);
 			character.setProperty("hitpoints", maxHp);
 			ds.put(character);
 			return;
@@ -95,7 +96,7 @@ public class CommandRavenPayRespects extends Command {
 		Long dogecoins = (Long)character.getProperty("dogecoins");
 		if (dogecoins!=null && dogecoins<1000)
 		{
-			ds.put(db.awardBuff(ds, character.getKey(), "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you enriched.", 3600, null, null, null, null, null, null, 1));
+			db.awardBuff(ds, character, "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you enriched.", 3600, null, null, null, null, null, null, 1);
 			character.setProperty("dogecoins", dogecoins+1000);
 			ds.put(character);
 			return;
@@ -106,7 +107,7 @@ public class CommandRavenPayRespects extends Command {
 		{
 			boolean trigger1 = false;
 			boolean trigger2 = false;
-			for(CachedEntity buff:buffs)
+			for(EmbeddedEntity buff:buffs)
 			{
 				String name = (String)buff.getProperty("name");
 				if ("Well Rested".equals(name))
@@ -116,7 +117,7 @@ public class CommandRavenPayRespects extends Command {
 			}
 			if (trigger1 && trigger2)
 			{
-				ds.put(db.awardBuff(ds, character.getKey(), "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you enchanted.", 1200, "strength", "+1", "dexterity", "+1", "intelligence", "+1", 1));
+				db.awardBuff(ds, character, "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you enchanted.", 1200, "strength", "+1", "dexterity", "+1", "intelligence", "+1", 1);
 				return;
 			}
 		}
@@ -126,13 +127,13 @@ public class CommandRavenPayRespects extends Command {
 		int stat = rnd.nextInt(3);
 		switch (stat) {
 		case 0:
-			ds.put(db.awardBuff(ds, character.getKey(), "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you empowered.", 1800, "strength", "+1", null, null, null, null, 1));
+			db.awardBuff(ds, character, "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you empowered.", 1800, "strength", "+1", null, null, null, null, 1);
 			return;
 		case 1:
-			ds.put(db.awardBuff(ds, character.getKey(), "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you invigorated.", 1800, "dexterity", "+1", null, null, null, null, 1));
+			db.awardBuff(ds, character, "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you invigorated.", 1800, "dexterity", "+1", null, null, null, null, 1);
 			return;
 		case 2:
-			ds.put(db.awardBuff(ds, character.getKey(), "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you enlightened.", 1800, "intelligence", "+1", null, null, null, null, 1));
+			db.awardBuff(ds, character, "https://initium-resources.appspot.com/images/small/Pixel_Art-Icons-Holy-S_Holy07.png", "Blessing of the Ebon Raven", "The spirit of the Ebon Raven has blessed you. It left you enlightened.", 1800, "intelligence", "+1", null, null, null, null, 1);
 			return;
 		}
 		

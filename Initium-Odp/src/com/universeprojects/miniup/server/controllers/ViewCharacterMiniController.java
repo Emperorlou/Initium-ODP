@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -108,7 +109,7 @@ public class ViewCharacterMiniController extends PageController {
 		if (character.getProperty("partyCode")!=null && character.getProperty("partyCode").equals("")==false)
 			request.setAttribute("isPartied", true);
 		
-		List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
+		List<EmbeddedEntity> buffs = db.getBuffsFor(character);
 		if (buffs!=null && buffs.isEmpty()==false)
 			request.setAttribute("buffs", true);
 	
@@ -170,7 +171,7 @@ public class ViewCharacterMiniController extends PageController {
 		// Printing buffs
 		StringBuilder sb = new StringBuilder();
 		
-		for(CachedEntity buff:buffs)
+		for(EmbeddedEntity buff:buffs)
 		{
 			String iconUrl = GameUtils.getResourceUrl(buff.getProperty("icon"));
 			sb.append("<img src='" + iconUrl + "' border='0'>");
@@ -193,19 +194,21 @@ public class ViewCharacterMiniController extends PageController {
 		sb = new StringBuilder();
 		
 		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
+		{
+			CachedEntity item = db.getEntity((Key)character.getProperty("equipment"+slot));
+			if (item==null && slot.equals("Pet")) continue;
+			
+			sb.append("<div class='main-item'>"+slot+": ");
+			if(item == null)
+				sb.append("None");
+			else
 			{
-				sb.append("<div class='main-item'>"+slot+": ");
-				CachedEntity item = db.getEntity((Key)character.getProperty("equipment"+slot));
-				if(item == null)
-					sb.append("None");
-				else
-				{
-					sb.append(" <div class='main-item-container'>");
-					sb.append(GameUtils.renderItem(db, request, null, item, true, false));
-					sb.append("</div>");
-				}
-				sb.append("</div>\n");
+				sb.append(" <div class='main-item-container'>");
+				sb.append(GameUtils.renderItem(db, request, null, item, true, false));
+				sb.append("</div>");
 			}
+			sb.append("</div>\n");
+		}
 		request.setAttribute("equipList", sb.toString());
 		
 		// Starting a chat	

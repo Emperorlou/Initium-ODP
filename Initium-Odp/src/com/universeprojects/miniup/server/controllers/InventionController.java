@@ -18,6 +18,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 import com.universeprojects.web.Controller;
@@ -157,8 +158,8 @@ public class InventionController extends PageController {
 			
 			if (ideaDef==null) continue;
 			
-			String ideaName = (String)ideaDef.getProperty("name");
-			String ideaDescription = (String)ideaDef.getProperty("ideaDescription");
+			String ideaName = WebUtils.jsSafe((String)ideaDef.getProperty("name"));
+			String ideaDescription = WebUtils.jsSafe((String)ideaDef.getProperty("ideaDescription"));
 			Long ideaId = idea.getId();
 			CachedEntity itemDef = pool.get((Key)ideaDef.getProperty("itemDef"));
 			String iconUrl = null;
@@ -203,12 +204,21 @@ public class InventionController extends PageController {
 		List<CachedEntity> constructItemSkills = invention.getAllItemConstructionSkills();
 		poolSkillPageData(pool, constructItemSkills);
 		
+		String characterName = (String)db.getCurrentCharacter().getProperty("name");
+		
 		List<Map<String, Object>> skills = new ArrayList<Map<String, Object>>();
 		if (constructItemSkills!=null)
 			for(CachedEntity skill:constructItemSkills)
 			{
 				String skillName = (String)skill.getProperty("name");
-				String skillDescription = (String)skill.getProperty("skillDescription");
+				
+				// Remove the character's name if applicable
+				if (skillName.startsWith(characterName+"'s "))
+					skillName = skillName.substring(characterName.length()+3);
+				
+				skillName = WebUtils.jsSafe(skillName);
+				
+				String skillDescription = WebUtils.jsSafe((String)skill.getProperty("skillDescription"));
 				Long skillSpeed = (Long)skill.getProperty("skillConstructionSpeed");
 				Long skillId = skill.getId();
 				CachedEntity item = null;

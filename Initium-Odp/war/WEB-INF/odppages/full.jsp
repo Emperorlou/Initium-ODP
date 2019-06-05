@@ -4,8 +4,8 @@
 		default-src 'self'; 
 		connect-src 'self'
 			https://initium-resources.appspot.com
-			https://eventserver.universeprojects.com:8080
-			wss://eventserver.universeprojects.com:8080
+			https://initium-eventserver.universeprojects.com
+			wss://initium-eventserver.universeprojects.com
 			https://www.google-analytics.com;
 		img-src 'self'
 			https://i.imgur.com
@@ -302,7 +302,7 @@
 	}
 </script>
 
-<script type="text/javascript" src="/odp/javascript/messager-impl.js?v=35"></script>
+<script type="text/javascript" src="/odp/javascript/messager-impl.js?v=54"></script>
 
 
 <script type="text/javascript">

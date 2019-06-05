@@ -85,8 +85,12 @@ public class CommandPartyJoin extends Command {
 		
 		List<CachedEntity> party = db.getParty(ds, character);
 		// Not sure how this happens. Just create a new list with the two chars
-		if(party == null)
+		if (party==null)
 			party = Arrays.asList(character, partyCharacter);
+		else
+			party.add(character);
+		db.setPartyCache(party);
+		
 		
 		ds.commitBulkWrite();
 		
@@ -97,6 +101,7 @@ public class CommandPartyJoin extends Command {
 		
 		if(partyKeys.isEmpty()==false)
 			db.sendMainPageUpdateForCharacters(ds, partyKeys, "updatePartyView");
+		
 		
 	}
 }

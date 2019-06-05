@@ -820,6 +820,12 @@ public class GridMapService {
 		
 		for(String proceduralKey:proceduralKeys)
 		{
+			if (allowNulls && proceduralKey==null)
+			{
+				result.add(null);
+				continue;
+			}
+			
 			ProceduralKeyData data = gms.getProceduralKeyData(proceduralKey);
 			
 			List<CachedEntity> tileItems = tileItemsMap.get(data.tileX+"x"+data.tileY);

@@ -71,109 +71,17 @@
 	}
 </style>
 <script type='text/javascript'>
-var crSelectedRequirementSlotIndex = null;
-function selectRequirement(event, requirementSlotIndex, gerKeyList)
-{
-	crSelectedRequirementSlotIndex = requirementSlotIndex.split(":").join("\\:");
-	$(".confirm-requirements-requirement").removeClass("confirm-requirements-selected");
-	$(event.target).closest(".confirm-requirements-requirement").addClass("confirm-requirements-selected");
-	doCommand(event, "ConfirmRequirementsUpdate", {slotIndex:requirementSlotIndex, gerKeyList:gerKeyList});	
-}
 
-function selectAll(event)
-{
-	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementSlotIndex);
-
-	var itemVisual = $("#item-candidates").find(".confirm-requirements-item-candidate");
-	itemVisual.detach();
-	itemPanelForRequirement.append(itemVisual);
-	itemVisual.hide();
-	itemVisual.fadeIn("slow");
-	event.stopPropagation();
-}
-
-function selectItem(event, itemId)
-{
-	// Check that we're not trying to select an item that is already chosen as a requirement. It doesn't work that way.
-	if ($(event.target).closest(".confirm-requirements-requirement").length>0)
-		return;
-	
-	//unselectItem(null);
-	
-	
-	$("#"+crSelectedRequirementSlotIndex).val(itemId);
-	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementSlotIndex);
-	var itemVisual = $(event.target).closest(".confirm-requirements-item-candidate");
-	itemVisual.detach();
-	itemPanelForRequirement.append(itemVisual);
-	itemVisual.hide();
-	itemVisual.fadeIn("slow");
-	event.stopPropagation();
-}
-
-function unselectItem(event)
-{
-	var candidatesContainer = $("#item-candidates");
-	var container = $("#requirement-container-"+crSelectedRequirementSlotIndex);
-	var currentSelectedItem = container.find(".itemToSelect");
-	if (currentSelectedItem.length==0)
-		return; 	// Nothing is selected
-
-	// Get all .confirm-requirements-item-candidate divs and find one that is empty for reuse
-	container.children("input").val("");
-	var e = container.find(".itemToSelect").detach();
-	candidatesContainer.children(".list").prepend(e);
-	e.hide();
-	e.fadeIn("slow");
-	
-	if (event!=null)
-		event.stopPropagation();
-}
-
-function confirmRequirements_collectChoices(event)
-{
-	var result = {};
-	result.slots = {};
-	result.repetitionCount = null;
-	var requirementsContainers = $("#requirement-categories").find(".confirm-requirements-entry");
-	for(var i = 0; i<requirementsContainers.length; i++)
-	{
-		var requirementsContainer = $(requirementsContainers[i]);
-
-		var itemsSelected = requirementsContainer.find(".itemToSelect");
-		if (itemsSelected.length>0)
-		{
-			var val = "";
-			var firstTime = true;
-			for(var ii = 0; ii<itemsSelected.length; ii++)
-			{
-				if (firstTime)
-					firstTime = false;
-				else
-					val+=",";
-				
-				val+=$(itemsSelected[ii]).attr("itemKey");
-			}
-			
-			result.slots[requirementsContainer.attr("slotName")] = val;
-		}
-	}
-	
-	if ($("#repetitionCount").length>0)
-		result.repetitionCount = $("#repetitionCount").val();
-	
-	return result;
-}
 </script>
 <div class='center' style='margin-bottom:15px'>
 	<c:if test="${type=='IdeaToPrototype'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCreatePrototype(event, ${ideaId}, "<c:out value="${ideaName}"/>", "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Start Prototyping</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' data='startbutton-${ideaId}' onclick='doCreatePrototype(event, ${ideaId}, "<c:out value="${ideaName}"/>", "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Start Prototyping</a>
 	</c:if>
 	<c:if test="${type=='ConstructItemSkill'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doConstructItemSkill(event, ${skillId}, "<c:out value="${skillName}"/>", "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Begin</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' data='startbutton-${skillId}' onclick='doConstructItemSkill(event, ${skillId}, "<c:out value="${skillName}"/>", "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Begin</a>
 	</c:if>
 	<c:if test="${type=='CollectCollectable'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Begin</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' data='startbutton-${collectableId}' onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Begin</a>
 	</c:if>
 	<c:if test="${type=='GenericCommand'}">
 		<a id='confirmRequirementsButton-${repsUniqueId}' onclick='doCommand(event, "${commandName}", ${commandParameters}, null, "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Okay</a>
@@ -200,7 +108,7 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 			<div class='hiddenTooltip' id='requirementHelp-${requirement.slotName }'><h4>${requirement.name}</h4></h2><c:out value="${requirement.description}"/></div>
 			<div id='requirement-container-${requirement.slotName}' slotName='${requirement.slotName}' onclick='selectRequirement(event, "${requirement.slotName}", "${requirement.gerKeyList}")' class='confirm-requirements-entry confirm-requirements-requirement'>
 				<div class='hint questionmark' rel='#requirementHelp-${requirement.slotName}'>?</div><div><c:out value="${requirement.name}"/></div>
-				<div id='itemHtmlForRequirement${requirement.slotName}'></div>
+				<div id='itemHtmlForRequirement${requirement.slotName}'>${requirement.defaultItem}</div>
 			</div>
 		</c:forEach>
 	</c:forEach>
@@ -217,3 +125,15 @@ How many times do you want to do this: <input type='number' id='repetitionCount'
 		</div>
 	</c:if>
 </div> 
+<c:if test="${type=='IdeaToPrototype' && autoStart==true}">
+	<script type='text/javascript'>
+		$("[data='startbutton-${ideaId}']").click();
+		closePagePopup();
+	</script>
+</c:if>
+<c:if test="${type=='ConstructItemSkill' && autoStart==true}">
+	<script type='text/javascript'>
+		$("[data='startbutton-${skillId}']").click();
+		closePagePopup();
+	</script>
+</c:if>

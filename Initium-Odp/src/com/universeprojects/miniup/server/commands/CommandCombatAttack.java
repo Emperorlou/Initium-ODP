@@ -271,18 +271,22 @@ public class CommandCombatAttack extends Command
 			}
 			else if (CommonChecks.checkCharacterIsDead(targetCharacter))
 			{
-				// If we're here then the target died, we'll create a token in that case
-				CachedEntity defeatedTokenDef = db.getEntity("ItemDef", 6239650208546816L);
-				if (defeatedTokenDef!=null)
+				// If we're here then the target died, we'll create a token in that case (if applicable)
+
+				if (CommonChecks.checkLocationIsInstance(targetLocation)==false)
 				{
-					CachedEntity defeatedToken = db.generateNewObject(defeatedTokenDef, "Item");
-					defeatedToken.setProperty("containerKey", location.getKey());
-					defeatedToken.setProperty("name", "Defeated: "+targetCharacter.getProperty("name").toString().substring(5));
-					String description = (String)defeatedToken.getProperty("description");
-					defeatedToken.setProperty("description", description+"<br><br>Slain by: "+characterName);
-					ds.put(defeatedToken);
-					
-					targetKilled = true;
+					CachedEntity defeatedTokenDef = db.getEntity("ItemDef", 6239650208546816L);
+					if (defeatedTokenDef!=null)
+					{
+						CachedEntity defeatedToken = db.generateNewObject(defeatedTokenDef, "Item");
+						defeatedToken.setProperty("containerKey", location.getKey());
+						defeatedToken.setProperty("name", "Defeated: "+targetCharacter.getProperty("name").toString().substring(5));
+						String description = (String)defeatedToken.getProperty("description");
+						defeatedToken.setProperty("description", description+"<br><br>Slain by: "+characterName);
+						ds.put(defeatedToken);
+						
+						targetKilled = true;
+					}
 				}
 			}
 		

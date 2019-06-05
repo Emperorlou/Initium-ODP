@@ -1561,7 +1561,8 @@ function addGridObjectToMap(gridObject) {
     var deletemeClass = "";
     if (key.indexOf("DK-Item")>-1)
     {
-    	deletemeClass = "deletable-Item"+key.split("DK-Item(")[1].slice(0, -1);
+    	var itemId = key.split("DK-Item(")[1].slice(0, -1);
+    	deletemeClass = "deletable-Item"+itemId+" item-icon-img-"+itemId;
     }
 
     var gridObjectId = "gridObjectAt"+gridObject.xGridCoord + "x" + gridObject.yGridCoord;

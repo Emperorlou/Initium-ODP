@@ -33,13 +33,13 @@ public class AspectPickable extends ItemAspect
 	}
 
 	@Override
-	public List<ItemPopupEntry> getItemPopupEntries()
+	public List<ItemPopupEntry> getItemPopupEntries(CachedEntity currentCharacter)
 	{
 		if (isEnabled()==false) return null;
 		
 		AspectGridMapObject gmoAspect = getObject().getAspect(AspectGridMapObject.class);
 		List<ItemPopupEntry> result = null;
-		if (gmoAspect!=null && gmoAspect.isAttached())
+		if (gmoAspect!=null && gmoAspect.isAttached() && this.isEnabled())
 		{
 			String itemKey = null;
 			String proceduralKey = null;
@@ -132,6 +132,12 @@ public class AspectPickable extends ItemAspect
 			
 			if (pickable.isEnabled()==false)
 				throw new UserErrorMessage("You cannot pick/collect this object. At least not in it's current state.");
+			
+			if (item.getAspect(AspectGridMapObject.class).isLoose())
+				throw new UserErrorMessage("You cannot pick/collect this item. Perhaps try just picking it up the regular way?");
+			
+			// Right away lets set this to not pickable since we're going to be picking it now
+			pickable.setProperty("enabled", false);
 			
 			// Here we'll pick up the entity - if we're supposed to...
 			

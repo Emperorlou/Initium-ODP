@@ -51,6 +51,9 @@ public class LongOperationCampCreate extends LongOperation
 		
 		setDataProperty("name", parameters.get("name"));
 		
+		setLongOperationName("Creating camp..");
+		setLongOperationDescription("You are attempting to create a campsite. Monsters are attracted to your activity so beware!");
+		
 		return 2;
 	}
 
@@ -102,6 +105,7 @@ public class LongOperationCampCreate extends LongOperation
 			campsite.setProperty("discoverAnythingChance", 100d);
 			campsite.setProperty("createdDate", new Date());
 			campsite.setProperty("type", "CampSite");
+			campsite.setProperty("subType", "CampSite");
 			campsite.setProperty("decayRate", 100l);
 			campsite.setProperty("parentLocationKey", parentLocation.getKey());
 			campsite.setProperty("isOutside", "TRUE");

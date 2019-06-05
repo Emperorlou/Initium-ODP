@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.services;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.ServletException;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -21,6 +24,7 @@ import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.aspects.AspectFireplace;
+import com.universeprojects.miniup.server.longoperations.LongOperation;
 
 public class MainPageUpdateService extends Service 
 {
@@ -103,6 +107,9 @@ public class MainPageUpdateService extends Service
 	private CachedEntity combatantCache = null;
 	protected CachedEntity getCombatant()
 	{
+		if (character.getProperty("combatant")==null)
+			return null;
+		
 		if (combatantCache==null)
 		{
 			Key combatantKey = (Key)character.getProperty("combatant");
@@ -116,6 +123,7 @@ public class MainPageUpdateService extends Service
 				ds.put(character);
 			}
 		}
+		
 		return combatantCache;
 	}
 
@@ -499,6 +507,10 @@ public class MainPageUpdateService extends Service
 	}
 	
 	private List<CachedEntity> partyMembers = null;
+	public void flushPartyCache()
+	{
+		partyMembers = null;
+	}
 	public List<CachedEntity> getParty()
 	{
 		if (isInParty() && partyMembers==null)
@@ -1376,7 +1388,7 @@ public class MainPageUpdateService extends Service
 		}
 		js.append("		window.newChatIdToken= '"+db.getChatToken()+"';");
 		js.append("		$('.chat_messages').html('');");
-		js.append("		messager.reconnect('https://eventserver.universeprojects.com:8080/', window.newChatIdToken);");
+		js.append("		messager.reconnect('https://initium-eventserver.universeprojects.com/', window.newChatIdToken);");
 	   	
 		
 		if (refreshChat==false)
@@ -1455,6 +1467,21 @@ public class MainPageUpdateService extends Service
 		
 		// Here we'll update the "Local Places" mini page if it is open
 		js.append("if (getMiniPagePopupTitle()=='Local Places') viewLocalNavigation();");
+		
+		Map<String, Object> loData = LongOperation.getLongOperationData(db, character.getKey());
+		if (loData!=null)
+		{
+			try
+			{
+				boolean continuing = LongOperation.continueLongOperationIfActive(db, character.getKey(), db.getRequest(), null);
+			}
+			catch (Exception e)
+			{
+				
+			}
+		}
+		
+		js.append("updateAutoExploreButton();");
 		
 		js.append(getAdditionalLocationJs());
 		

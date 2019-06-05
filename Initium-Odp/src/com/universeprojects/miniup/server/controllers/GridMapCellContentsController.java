@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
@@ -19,6 +21,7 @@ import com.universeprojects.miniup.server.ItemAspect;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
+import com.universeprojects.miniup.server.aspects.AspectGridMapObject;
 import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.web.Controller;
@@ -65,7 +68,15 @@ public class GridMapCellContentsController extends PageController
 //	            	html+="<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"+character.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>";
 	            if (item.getProperty("dogecoins")!=null)
 	            	html+="<a shortcut='71' onclick='collectDogecoinsFromItem("+item.getId()+", event, false)'>Collect "+item.getProperty("dogecoins")+" gold</a>";
-	            html+="<a onclick='doCollectItem(event, "+item.getId()+")'>Collect</a>";
+	            
+	            if (CommonChecks.checkItemIsAccessible(item, db.getCurrentCharacter()) && CommonChecks.checkItemIsMovable(item))
+	            {
+	            	if (GridMapService.isProceduralItem(item) && CommonChecks.checkItemHasAspect(item, AspectGridMapObject.class)==false)
+	            		html+="<a onclick='doCommand(event, \"PickablePick\", {proceduralKey:\""+item.getAttribute("proceduralKey")+"\"});'>Collect</a>";
+	            	else
+	            		html+="<a onclick='doCollectItem(event, "+item.getId()+")'>Collect</a>";
+	            }
+	            
 			}
 								
 			InitiumObject iObject = new InitiumObject(db, item);
@@ -78,9 +89,10 @@ public class GridMapCellContentsController extends PageController
 					{
 						ItemAspect itemAspect = (ItemAspect)initiumAspect;
 						
-						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
+						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries(db.getCurrentCharacter());
 						if(curEntries!=null)
 						{
+							curEntries.removeAll(Collections.singleton(null));
 							for(ItemPopupEntry entry:curEntries)
 							{
 								html += "<a onclick='"+WebUtils.jsSafe(entry.clickJavascript)+"' minitip='"+WebUtils.jsSafe(entry.description)+"'>"+entry.name+"</a>";

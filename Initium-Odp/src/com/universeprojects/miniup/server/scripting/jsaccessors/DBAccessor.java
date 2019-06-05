@@ -416,24 +416,6 @@ public class DBAccessor {
 		return db.getMaxCharacterStats(character.getKey());
 	}
 	
-	public boolean clearBuffFromCache(Buff buff)
-	{
-		if(buff.parentEntityKey() == null) return false;
-		List<CachedEntity> buffList = db.buffsCache.get(buff.parentEntityKey());
-		if(buffList == null) return false;
-		
-		for(int i = 0; i < buffList.size(); i++)
-			if(buffList.get(i) != null && GameUtils.equals(buff.getKey(), buffList.get(i).getKey()))
-				return buffList.remove(i) != null;
-		
-		return false;
-	}
-	
-	public void clearBuffsCache()
-	{
-		db.buffsCache = new HashMap<Key, List<CachedEntity>>();
-	}
-	
 	public double getServerDayNight()
 	{
 		return GameUtils.getDayNight();

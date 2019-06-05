@@ -6,8 +6,8 @@
 		default-src 'self'; 
 		connect-src 'self'
 			https://initium-resources.appspot.com
-			https://eventserver.universeprojects.com:8080
-			wss://eventserver.universeprojects.com:8080
+			https://initium-eventserver.universeprojects.com
+			wss://initium-eventserver.universeprojects.com
 			https://www.google-analytics.com;
 		img-src 'self'
 			https://i.imgur.com
@@ -23,6 +23,7 @@
 			https://ajax.googleapis.com
 			https://www.google.com
 			https://www.gstatic.com
+			https://cdn.rawgit.com/
 			https://www.google-analytics.com; 
 		style-src 'self' 'unsafe-inline' 
 			https://cdnjs.cloudflare.com
@@ -64,7 +65,7 @@
 <link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">
 
 
-
+<script type="text/javascript" src="https://cdn.rawgit.com/leafo/sticky-kit/v1.1.2/jquery.sticky-kit.min.js"></script>
 <script type="text/javascript" src="/odp/javascript/messager.js?v=70"></script>
 
 <script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
@@ -293,12 +294,9 @@
 	}
 </script>
 
-<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=53'></script>
+<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=54'></script>
 
 
-<script type='text/javascript'>
-${longOperationRecallJs}
-</script>
 
 <script type='text/javascript'>
 	/*Antibot stuff*/
@@ -467,18 +465,39 @@ function toggleMovementState()
 	}
 }
 
+function popupPermanentOverlay(title, content, popupClassOverride) 
+{
+	// No more of this in experimental
+}
+
+function popupPermanentOverlay_WalkingBase()
+{
+	// Not in experimental mode	
+}
+
+function setBannerOverlayText()
+{
+	// Not in experimental mode
+}
+
+function popupPermanentOverlay_Experiment()
+{
+	// Not in experimental mode
+}
+
 
 function popupPermanentOverlay_Walking(locationName)
 {
 	if (bannerUrl!=null && window.previousBannerUrl!=bannerUrl)
 		window.previousBannerUrl = bannerUrl;
-	popupPermanentOverlay_WalkingBase("Walking to "+locationName);
+//	popupPermanentOverlay_WalkingBase("Walking to "+locationName);
 	$("#banner-base").html("");
 }
 
 
 
 </script>
+
 
 <link rel="stylesheet" href="/odp/experimental.css?t=${version}"/>
 
@@ -497,7 +516,7 @@ http://github.com/Emperorlou/Initium-ODP
 
 Version: ${version}
                                            -->
-<body bannerstate=''>
+<body bannerstate='' longoperation=''>
 <!-- Fixes a bug with chrome regarding mix-blending -->
 <div id='mix-blending-fix'></div>
 <div id='popups'></div>
@@ -535,13 +554,13 @@ Version: ${version}
 						<div id='banner-fx'></div>
 	<!-- 					<div id='main-viewport-container'></div> -->
 						<div id='immovablesPanel' class='auto-animate'>${immovablesPanel}</div>				
-						<div id='partyPanel' class='auto-animate'>
-						${partyPanel}
-						</div>
-						<div id='banner-text-overlay'>${bannerTextOverlay}</div>
+						<div class='auto-animate' id='banner-text-overlay'>${bannerTextOverlay}</div>
 						
 						<div id='main-viewport-container' class='location-2d auto-animate'>${location2D}</div>
 							
+						<div id='partyPanel' class='auto-animate'>
+						${partyPanel}
+						</div>
 						
 						<div class='minimap-container auto-animate'>
 							<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->
@@ -568,11 +587,20 @@ Version: ${version}
 							<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>
 							<a id="movement-button" class="button-overlay-major" onclick="toggleMovementState()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
 							<a id="twodview-button" class="button-overlay-major" onclick="view2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
-						</div>							
+						</div>			
+						
+						<div style='position:absolute;bottom: 35px;left:50.0%;'><div class='path-overlay-link auto-animate' id='monsterCountPanel'>${monsterCountPanel}</div></div>
+						
+						<div id='long-operation-status' class='long-operation-status auto-animate'>
+							<h2 class='long-operation-status-title'></h2>
+							<p class='long-operation-status-description text-shadow'></p>
+							<div class='progress-bar1'>
+						    	<div class='progress-bar-fill auto-animate-1s-linear'></div><div class='progress-bar-text text-shadow'></div>
+						    </div>
+						    <p><a class='text-shadow' style='pointer-events: auto;' onclick='cancelLongOperations(event)'>Cancel</a></p>
+						</div>
 
-						<div style='position:absolute;bottom: 35px;left:50.0%;'><div class='path-overlay-link' id='monsterCountPanel'>${monsterCountPanel}</div></div>
-
-						<div class="main-buttonbox v3-window3 mini-page-popup" style='display:none'></div>						
+						<div class="main-buttonbox mini-page-popup" style='display:none;'></div>						
 				
 					</div>
 				</div>
@@ -762,8 +790,6 @@ Version: ${version}
 				</div>
 			</c:if>
 	
-			<div id='instanceRespawnWarning'></div>
-			
 			<div id='midMessagePanel'>
 				${midMessagePanel}
 			</div>
@@ -814,6 +840,11 @@ Version: ${version}
 	<script id='ajaxJs' type='text/javascript'>
 	${bannerJs}
 	</script>
+	
+	<script type='text/javascript'>
+	${longOperationRecallJs}
+	</script>
+		
 	
 	<div id='test-panel'>
 	${testPanel}

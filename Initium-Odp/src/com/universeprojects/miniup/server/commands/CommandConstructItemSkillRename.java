@@ -18,7 +18,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class CommandConstructItemSkillRename extends Command
 {
-	final public String nameRegex = "[A-Za-z0-9.'\\-#\\(\\) ]+";
+	final public String nameRegex = "[A-Za-z0-9.'\\-#\\(\\): ]+";
 	public CommandConstructItemSkillRename(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
 		super(db, request, response);
@@ -42,6 +42,8 @@ public class CommandConstructItemSkillRename extends Command
 		if (CommonChecks.checkIdeaIsCharacters(skill, db.getCurrentCharacterKey())==false)
 			throw new UserErrorMessage("This skill is not your skill to rename.");
 
+		newName = db.getCurrentCharacter().getProperty("name")+"'s "+newName;
+		
 		// Check to see if this skill name is used anywhere else already
 		QueryHelper query = new QueryHelper(db.getDB());
 		if (query.getFilteredList_Count("ConstructItemSkill", "name", FilterOperator.EQUAL, newName)>0)

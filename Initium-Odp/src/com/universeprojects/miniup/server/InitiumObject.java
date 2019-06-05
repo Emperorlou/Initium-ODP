@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.gefcommon.shared.elements.GameAspect;
 import com.universeprojects.gefcommon.shared.elements.GameObject;
+import com.universeprojects.miniup.server.aspects.AspectPet.CommandPetFeed;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.GridMapService;
 
@@ -74,7 +75,10 @@ public class InitiumObject implements GameObject<Key>
 		List<InitiumObject> result = new ArrayList<InitiumObject>();
 		
 		for(CachedEntity entity:entities)
+		{
+			if (entity==null) continue;
 			result.add(new InitiumObject(db, entity));
+		}
 		
 		return result;
 	}
@@ -319,5 +323,25 @@ public class InitiumObject implements GameObject<Key>
 	public String toString()
 	{
 		return entity.toString();
+	}
+
+	public Long getMaxDurability()
+	{
+		return (Long)entity.getProperty("maxDurability");
+	}
+
+	public String getIcon()
+	{
+		return (String)entity.getProperty("icon");
+	}
+
+	public void setIcon(String imageUrl)
+	{
+		entity.setProperty("icon", imageUrl);
+	}
+
+	public void liveUpdateIcon(OperationBase command)
+	{
+		command.addJavascriptToResponse("updateItemImage("+getKey().getId()+", '"+GameUtils.getResourceUrl(getIcon())+"');");
 	}
 }

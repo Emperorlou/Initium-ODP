@@ -15,6 +15,7 @@ public class ModifierService extends Service
 		intelligence,
 		dexterity,
 		
+		physicalDamage,
 		bludgeoningDamage,
 		slashingDamage,
 		piercingDamage,
@@ -23,6 +24,9 @@ public class ModifierService extends Service
 		slashingDamageReduction,
 		piercingDamageReduction,
 		
+		movementSpeed,	
+		skillExecutionSpeed,
+		avoidDetection,		
 	}
 	public ModifierService(ODPDBAccess db)
 	{

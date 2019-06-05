@@ -223,4 +223,10 @@ public class Convert
 		if (value==null) return null;
 		return value.intValue();
 	}
+
+	public static Calendar LongToCalendar(Long endTime)
+	{
+		if (endTime==null) return null;
+		return DateToCalendar(new Date(endTime));
+	}
 }

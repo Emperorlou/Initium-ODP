@@ -1,11 +1,15 @@
 package com.universeprojects.miniup;
 
+import java.util.List;
+
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
 import com.universeprojects.miniup.server.ODPDBAccess.LocationSubType;
+import com.universeprojects.miniup.server.aspects.AspectGridMapObject;
 
 public abstract class CommonChecks
 {
@@ -524,6 +528,12 @@ public abstract class CommonChecks
 				"PC".equals(character.getProperty("type")) || 
 				character.getProperty("type") == null;
 	}
+	
+	public static boolean checkCharacterIs2DCapable(CachedEntity character)
+	{
+		if (character==null) return false;
+		return character.getProperty("gridMapImage")!=null;
+	}
 
 	public static boolean checkLocationIsRootLocation(CachedEntity location)
 	{
@@ -539,7 +549,8 @@ public abstract class CommonChecks
 		if (GameUtils.equals(location.getProperty("type"), "Permanent") || 
 				GameUtils.equals(location.getProperty("type"), "Town") ||
 				GameUtils.equals(location.getProperty("type"), "RestSite") ||
-				GameUtils.equals(location.getProperty("type"), "CityHall"))
+				GameUtils.equals(location.getProperty("type"), "CityHall") ||
+				GameUtils.equals(location.getProperty("subType"), "CampSite"))
 			return true;
 		
 		return false;
@@ -569,6 +580,24 @@ public abstract class CommonChecks
 	public static boolean checkLocationIsNaturalResourceSite(CachedEntity location)
 	{
 		return GameUtils.equals(location.getProperty("subType"), "ResourceSite");
+	}
+
+	public static boolean checkLocationIsTopdownMode(CachedEntity location)
+	{
+		if (GameUtils.equals(location.getProperty("topdownMode"), true))
+			return true;
+		
+		return false;
+	}
+
+	public static boolean checkItemHasAspect(CachedEntity item, Class<? extends InitiumAspect> clazz)
+	{
+		List<String> list = (List<String>)item.getProperty("_aspects");
+		
+		if (list.contains(clazz.getSimpleName().substring(6)))
+			return true;
+		
+		return false;
 	}
 
 

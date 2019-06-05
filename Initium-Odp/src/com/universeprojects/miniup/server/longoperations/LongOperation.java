@@ -42,6 +42,9 @@ public abstract class LongOperation extends OperationBase
 	private String userMessage = null;
 	private boolean fullRefresh = false;
 	
+	private String longOperationName = null;
+	private String longOperationDescription = null;
+	
 	CachedEntity longOperationDataEntity = null;
 	Map<String, Object> data = null; 
 	
@@ -126,9 +129,11 @@ public abstract class LongOperation extends OperationBase
 		
 		if (data==null) return false;
 		
-		request.setAttribute("longOperationRecall", data.get("pageRefreshJavascriptCall"));	
+		request.setAttribute("longOperationRecallJs", data.get("pageRefreshJavascriptCall"));	
 		
-		WebUtils.forceRedirectClientTo("main.jsp", request, response, "You can't do that right now because you're still performing an action.");
+		if (response!=null)
+			WebUtils.forceRedirectClientTo("main.jsp", request, response, "You can't do that right now because you're still performing an action.");
+		
 		return true;
 	}
 	
@@ -167,14 +172,12 @@ public abstract class LongOperation extends OperationBase
 		else
 			longOperationDataEntity.setProperty("data", DBUtils.serializeObjectToString(data));
 		
-		Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING, "Putting long operation: "+longOperationDataEntity.getKey());
 		db.getDB().put(longOperationDataEntity);
 	}
 	
 	public void cancelLongOperation(ODPDBAccess db, Key characterKey)
 	{
 		if (longOperationDataEntity==null) return;
-		Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING, "Cancelling long operation: "+longOperationDataEntity.getKey());
 		longOperationDataEntity.setProperty("data", null);
 		
 		setDataProperty("cancelled", true);
@@ -201,12 +204,10 @@ public abstract class LongOperation extends OperationBase
 	{
 		if (data==null)
 			return false;
-		Date endTime = (Date)data.get("endTime");
+		Long endTime = (Long)data.get("endTime");
 		if (endTime==null) return false;
 		
-		long endMillisecond = endTime.getTime();
-		
-		if (endMillisecond<System.currentTimeMillis())
+		if (endTime<System.currentTimeMillis())
 			return true;
 		
 		return false;
@@ -238,10 +239,25 @@ public abstract class LongOperation extends OperationBase
 		
 		Calendar endTime = new GregorianCalendar();
 		endTime.add(Calendar.SECOND, operationSeconds);
-		data.put("endTime", endTime.getTime());
+		data.put("endTime", endTime.getTime().getTime());
+		data.put("startTime", new GregorianCalendar().getTime().getTime());
 
+		if (longOperationName==null) throw new RuntimeException("The long operation name was never set. Call setLongOperationName() in the doBegin() method from the class that inherited LongOperation.");
+		if (longOperationDescription==null) throw new RuntimeException("The long operation description was never set. Call setLongOperationDescription() in the doBegin() method from the class that inherited LongOperation.");
+		
+		data.put("longOperationName", longOperationName);
+		data.put("longOperationDescription", longOperationDescription);
+	}
+
+	protected void setLongOperationName(String caption)
+	{
+		longOperationName = caption;
 	}
 	
+	protected void setLongOperationDescription(String description)
+	{
+		longOperationDescription = description;
+	}
 	
 	public String complete() throws UserErrorMessage, UserRequestIncompleteException, ContinuationException
 	{
@@ -293,11 +309,14 @@ public abstract class LongOperation extends OperationBase
 	{
 		Map<String,Object> result = new HashMap<String,Object>();
 		
-		Date endTime = (Date)getDataProperty("endTime");
+		Long endTime = (Long)getDataProperty("endTime");
+		Long startTime = (Long)getDataProperty("startTime");
+		String longOperationName = (String)getDataProperty("longOperationName");
+		String longOperationDescription = (String)getDataProperty("longOperationDescription");
 		
 		long timeLeft = 0;
 		if (endTime!=null)
-			timeLeft = GameUtils.elapsed(Convert.DateToCalendar(endTime), new GregorianCalendar(), Calendar.SECOND);
+			timeLeft = GameUtils.elapsed(Convert.LongToCalendar(endTime), new GregorianCalendar(), Calendar.SECOND);
 		
 		result.put("timeLeft", timeLeft);
 		result.put("isComplete", isComplete());
@@ -306,6 +325,9 @@ public abstract class LongOperation extends OperationBase
 		result.put("_2dViewportUpdates", getMapUpdateJSON());
 		result.put("isShowingTimeLeft", isShowingTimeLeft());
 		result.put("hasNewGameMessages", db.hasNewGameMessages());
+		result.put("startTime", startTime);
+		result.put("longOperationName", longOperationName);
+		result.put("longOperationDescription", longOperationDescription);
 		
 		
 		result.put("refresh", fullRefresh);
@@ -371,7 +393,9 @@ public abstract class LongOperation extends OperationBase
 				
 			Calendar endTime = new GregorianCalendar();
 			endTime.add(Calendar.SECOND, e.seconds);
-			setDataProperty("endTime", endTime.getTime());
+			setDataProperty("endTime", endTime.getTime().getTime());
+			setDataProperty("startTime", new GregorianCalendar().getTime().getTime());
+
 			
 			
 			result.put("continuation", e.seconds);

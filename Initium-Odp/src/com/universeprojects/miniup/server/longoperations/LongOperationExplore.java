@@ -60,6 +60,9 @@ public class LongOperationExplore extends LongOperation {
 		setDataProperty("locationName", location.getProperty("name"));
 		setDataProperty("locationKey", location.getKey());
 		
+		setLongOperationName("Exploring "+location.getProperty("name"));
+		setLongOperationDescription("You are searching for anything that might be of interest.");
+		
 		return 6;
 	}
 
@@ -135,6 +138,7 @@ public class LongOperationExplore extends LongOperation {
 		{
 			Key locationKey = (Key)getDataProperty("locationKey");
 			CachedEntity location = db.getEntity(locationKey);
+			db.getCurrentCharacter().setProperty("locationKey", locationKey);
 			
 			// First get all the things that can be discovered at the character's current location
 			List<CachedEntity> discoverablePaths_PermanentOnly = null;

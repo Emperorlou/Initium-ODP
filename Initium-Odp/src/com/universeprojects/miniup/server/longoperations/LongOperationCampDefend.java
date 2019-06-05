@@ -39,6 +39,9 @@ public class LongOperationCampDefend extends LongOperation
 		if(monsterCount == null || monsterCount < 1)
 			throw new UserErrorMessage("There is no monster activity threatening this camp. You can rest easy.");
 		
+		setLongOperationName("Defending Camp");
+		setLongOperationDescription("You are patroling the camp in search of nearby attackers.");
+		
 		return 1;
 	}
 

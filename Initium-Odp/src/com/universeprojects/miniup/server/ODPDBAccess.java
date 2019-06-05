@@ -27,6 +27,7 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PropertyContainer;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -43,6 +44,7 @@ import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.aspects.AspectBuffable;
 import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
@@ -126,6 +128,15 @@ public class ODPDBAccess
 		ownerHtml;
 	}
 
+	public enum StaticBuffables
+	{
+		movementSpeed,	// Possibly implemented
+		skillExecutionSpeed,
+		avoidDetection,	// Implemented
+		physicalDamage	// Implemented, for the most part
+	}
+	
+	
 	public static final Date HardcoreModeCutoffDate = new GregorianCalendar(2018, 7, 15).getTime();
 	public static final String STORE_NAME_REGEX = "[A-Za-z0-9- _/.,%:!?+*&'\"~\\(\\)]+";
 	public static final String CAMP_NAME_REGEX = "[A-Za-z0-9- ,'&]+";
@@ -136,13 +147,14 @@ public class ODPDBAccess
 	public static final String CHARACTER_MODE_TRADING = "TRADING";
 	public static final String[] EQUIPMENT_SLOTS = new String[]
 	{
+			"Pet", 
 			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck",
 			"Cosmetic1", "Cosmetic2", "Cosmetic3"
 	};
 
 	private CachedDatastoreService ds = null;
 
-	public Map<Key, List<CachedEntity>> buffsCache = new HashMap<Key, List<CachedEntity>>();
+	public Map<Key, List<PropertyContainer>> buffsCache = new HashMap<>();
 	public Map<Key, Map<String, Double>> statsCache = new HashMap<Key, Map<String, Double>>(); 
 
 	public EntityPool pool = null;
@@ -1705,7 +1717,6 @@ public class ODPDBAccess
 		{
 			character.setProperty("hitpoints", hitpoints);
 
-			getDB().put(character);
 		}
 
 	}
@@ -1959,20 +1970,51 @@ public class ODPDBAccess
 		}
 		charMap.put(stat, value);
 	}
+	
+	@SuppressWarnings("unchecked")
+	private void addBuffTo(CachedEntity entity, EmbeddedEntity buff)
+	{
+		if (entity.getKind().equals("Character"))
+		{
+			List<EmbeddedEntity> buffs = (List<EmbeddedEntity>)entity.getProperty("buffs");
+			if (buffs==null) buffs = new ArrayList<>();
+			buffs.add(buff);
+			entity.setProperty("buffs", buffs);
+		}
+		else if (entity.getKind().equals("Item"))
+		{
+			if (((List<String>)entity.getProperty("_aspects")).contains("Buffable")==false)
+				throw new IllegalArgumentException("The item '"+entity.getProperty("name")+"' is not buffable. It's missing the Buffable aspect.");
+				
+			List<EmbeddedEntity> buffs = (List<EmbeddedEntity>)entity.getProperty("Buffable:buffs");
+			if (buffs==null) buffs = new ArrayList<>();
+			buffs.add(buff);
+			entity.setProperty("Buffable:buffs", buffs);
+		}
+		else throw new IllegalArgumentException("Unhandled kind: "+entity.getKind());
+	}
+	
+	public void markBuffToDelete(PropertyContainer buff)
+	{
+		if (buff==null) return;
 
-	public CachedEntity awardBuff(CachedDatastoreService ds, Key parentKey, String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
+		buff.setProperty("_todelete", true);
+	}
+
+	public PropertyContainer awardBuff(CachedDatastoreService ds, CachedEntity parent, String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
 			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
 	{
-		List<CachedEntity> buffsAlreadyOn = getBuffsFor(parentKey);
+		List<EmbeddedEntity> buffsAlreadyOn = getBuffsFor(parent);
 
 		int existingCount = 0;
-		for (CachedEntity b : buffsAlreadyOn)
+		for (PropertyContainer b : buffsAlreadyOn)
 			if (name.equals(b.getProperty("name"))) existingCount++;
 
 		if (existingCount >= maximumCount) return null;
-		CachedEntity buff = new CachedEntity("Buff");
+		EmbeddedEntity buff = new EmbeddedEntity();
+		buff.setKey(KeyFactory.createKey("Buff", GameUtils.rnd.nextLong()));
 
-		buff.setProperty("parentKey", parentKey);
+		buff.setProperty("parentKey", parent.getKey());
 		buff.setProperty("icon", icon);
 		buff.setProperty("name", name);
 		buff.setProperty("description", description);
@@ -1986,11 +2028,12 @@ public class ODPDBAccess
 		buff.setProperty("field3Name", field3Name);
 		buff.setProperty("field3Effect", field3Effect);
 
-		addBuffToBuffsCache(parentKey, buff);
+		addBuffTo(parent, buff);
+		
 		return buff;
 	}
 	
-	public CachedEntity awardBuffByDef(String buffDefName, Key characterKey)
+	public EmbeddedEntity awardBuffByDef(String buffDefName, CachedEntity character)
 	{
 		List<CachedEntity> buffDefs = getFilteredList("BuffDef", "name", buffDefName);
 		if(buffDefs.size() > 1)
@@ -2006,14 +2049,14 @@ public class ODPDBAccess
 			{
 				Long maximumCount = (Long)def.getProperty("maxCount");
 				int existingCount = 0;
-				List<CachedEntity> buffs = getBuffsFor(characterKey);
-				for(CachedEntity appliedBuff:buffs)
+				List<EmbeddedEntity> buffs = getBuffsFor(character);
+				for(EmbeddedEntity appliedBuff:buffs)
 					if(buffDefName.equals(appliedBuff.getProperty("name")))
 						existingCount++;
 				if (existingCount >= maximumCount) return null;
 			}
 			
-			CachedEntity newBuff = generateNewObject(def, "Buff");
+			EmbeddedEntity newBuff = generateNewEmbeddedObject(def, "Buff");
 			if(newBuff != null)
 			{
 				if (newBuff.getProperty("expiry")!=null)
@@ -2023,11 +2066,10 @@ public class ODPDBAccess
 					cal.add(Calendar.SECOND, expiry);
 					newBuff.setProperty("expiry", cal.getTime());
 				}
-				newBuff.setProperty("parentKey", characterKey);
-				addBuffToBuffsCache(characterKey, newBuff);
+				newBuff.setProperty("parentKey", character.getKey());
+				
+				addBuffTo(character, newBuff);
 			}
-			
-			ds.put(newBuff);
 			
 			return newBuff;
 		}
@@ -2038,73 +2080,58 @@ public class ODPDBAccess
 	{
 		if (ds == null) ds = getDB();
 		
-		CachedEntity buff = awardBuffByDef(buffName, character.getKey());
+		EmbeddedEntity buff = awardBuffByDef(buffName, character);
 		
-		if (buff != null && buff.isUnsaved())
-			ds.put(buff);
-			
 		return buff != null;
 	}
 
-	private void addBuffToBuffsCache(Key parentKey, CachedEntity buff)
-	{
-		List<CachedEntity> buffs = buffsCache.get(parentKey);
-
-		if (buffs == null)
-		{
-			buffs = new ArrayList<CachedEntity>();
-			buffsCache.put(parentKey, buffs);
-		}
-
-		buffs.add(buff);
-	}
 
 	public boolean awardBuff_Pumped(CachedDatastoreService ds, CachedEntity attackingCharacter)
 	{
 		if (ds == null) ds = getDB();
 
-		CachedEntity buff = awardBuff(ds, attackingCharacter.getKey(), "images/small/Pixel_Art-Icons-Buffs-S_Buff14.png", "Pumped!",
-				"You're pumped! This buff is awarded when you kill a monster while still being full health. The effect lasts for 1 minute.", 60, "strength", "+10%", "dexterity", "+10%",
+		PropertyContainer buff = awardBuff(ds, attackingCharacter, "images/small/Pixel_Art-Icons-Buffs-S_Buff14.png", "Pumped!",
+				"You're pumped! This buff is awarded when you kill a monster while still being full health. The effect lasts for 1 minute.", 60, 
+				"strength", "+10%", 
+				"dexterity", "+10%",
 				"intelligence", "+5%", 3);
 
-		if (buff != null && buff.isUnsaved()) ds.put(buff);
 		return buff != null;
 	}
 	
 	public boolean awardBuff_Candy(CachedDatastoreService ds, CachedEntity character)
 	{
 		Double buffDouble = Math.random();
-		CachedEntity buff = null;
+		PropertyContainer buff = null;
 		if(buffDouble <= 0.16){
-			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+			buff = awardBuff(ds, character, "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 				"That was some good candy! You feel stronger!",600,"strength","+0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.17) && (buffDouble < 0.32)){
-			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+			buff = awardBuff(ds, character, "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 				"That was some good candy! You feel more agile!",600,"dexterity","+0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.32) && (buffDouble < 0.48)){
-			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+			buff = awardBuff(ds, character, "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 				"That was some good candy! You feel smarter!",600,"Intelligence","+0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.48) && (buffDouble < 0.64)){
-			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
+			buff = awardBuff(ds, character, "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 				"That candy was terrible! You feel weaker!",600,"strength","-0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.64) && (buffDouble < 0.80)){
-			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
+			buff = awardBuff(ds, character, "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 				"That candy was terrible! You feel slower!",600,"strength","-0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.80) && (buffDouble < 0.96)){
-			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
+			buff = awardBuff(ds, character, "images/small2/Pixel_Art-Misc-Buff_Trick.png","Trick!",
 				"That candy was terrible! You feel dumb!",600,"intelligence","-0.2",null,null,null,null,10);
 		}
 		if((buffDouble >= 0.96)){
-			buff = awardBuff(ds, character.getKey(), "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
+			buff = awardBuff(ds, character, "images/small2/Pixel_Art-Misc-Buff_Treat.png","Treat!",
 				"That was some good candy! You feel great!",600,"strength","+0.2","dexterity","+0.2","intelligence","+0.2",10);
 		}
 		
-		if (buff != null) ds.put(buff);
 		return buff != null;
 	}
 
@@ -2233,10 +2260,60 @@ public class ODPDBAccess
 		return false;
 	}
 
+	
+	
+	
+	
+	
+	
+	///////////////////////////////////
+	// BUFFS
+	//
+	// All this buff stuff should go in it's own service for goodness sake
+	///////////////////////////////////
+	
+	
+	
+	
+	
+	
+	
+	
+	public void reduceBuffCharges(CachedEntity item)
+	{
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> buffs = (List<EmbeddedEntity>)item.getProperty("Buffable:buffs");
+		
+		if (buffs!=null)
+		{
+			for(int i = buffs.size()-1; i>=0; i--)
+			{
+				Long charges = (Long)buffs.get(i).getProperty("charges");
+				if (charges!=null)
+				{
+					charges -= 1;
+					if (charges<=0)
+					{
+						buffs.get(i).setProperty("_todelete", true);
+						buffs.remove(i);
+					}
+					else
+						buffs.get(i).setProperty("charges", charges);
+				}
+			}
+		}
+		
+	}
+	
+	public Double getDoubleBuffableValue(CachedEntity entity, StaticBuffables fieldName, Double startValue)
+	{
+		return getDoubleBuffableValue(entity, fieldName.toString(), startValue);
+	}	
+	
 	public Double getDoubleBuffableValue(CachedEntity entity, String fieldName, Double startValue)
 	{
 		if (startValue == null) return null;
-		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
+		List<String> buffEffects = getBuffEffectsFor(entity, fieldName);
 
 		Double buffAmount = 0d;
 		for (String effect : buffEffects)
@@ -2276,10 +2353,15 @@ public class ODPDBAccess
 		return getDoubleBuffableValue(entity, fieldName, (Double)entity.getProperty(fieldName));
 	}
 
+	public Long getLongBuffableValue(CachedEntity entity, StaticBuffables fieldName, Long startValue)
+	{
+		return getLongBuffableValue(entity, fieldName.toString(), startValue);
+	}
+	
 	public Long getLongBuffableValue(CachedEntity entity, String fieldName, Long startValue)
 	{
 		if (startValue == null) return null;
-		List<String> buffEffects = getBuffEffectsFor(entity.getKey(), fieldName);
+		List<String> buffEffects = getBuffEffectsFor(entity, fieldName);
 
 		Double buffAmount = 0d;
 		Double statStart = startValue.doubleValue();
@@ -2321,12 +2403,12 @@ public class ODPDBAccess
 		return getLongBuffableValue(entity, fieldName, (Long)entity.getProperty(fieldName));
 	}
 
-	public List<String> getBuffEffectsFor(Key entityKey, String fieldName)
+	public List<String> getBuffEffectsFor(CachedEntity entity, String fieldName)
 	{
 		List<String> result = new ArrayList<String>();
-		List<CachedEntity> buffs = getBuffsFor(entityKey);
+		List<EmbeddedEntity> buffs = getBuffsFor(entity);
 
-		for (CachedEntity buff : buffs)
+		for (EmbeddedEntity buff : buffs)
 		{
 			for (int i = 1; i <= 3; i++)
 			{
@@ -2356,45 +2438,169 @@ public class ODPDBAccess
 		return result;
 	}
 
-	private void cleanUpBuffs(List<CachedEntity> buffs)
+	public List<String> getBuffEffectsFor(CachedEntity entity)
 	{
-		if (buffs == null) return;
-		CachedDatastoreService ds = getDB();
+		List<String> result = new ArrayList<String>();
+		List<EmbeddedEntity> buffs = getBuffsFor(entity);
 
-		for (int i = buffs.size() - 1; i >= 0; i--)
+		for (EmbeddedEntity buff : buffs)
 		{
-			CachedEntity buff = buffs.get(i);
-			if (buff==null)
+			for (int i = 1; i <= 3; i++)
 			{
-				buffs.remove(i);
-				continue;
+				if (buff.getProperty("field" + i + "Name")!=null)
+				{
+					String buffName = (String)buff.getProperty("name");
+					String effect = (String) buff.getProperty("field" + i + "Effect");
+					effect = effect.trim();
+					if (effect != null && effect.matches("[-+][0-9.]+%?")) 
+					{
+						effect+=" "+GameUtils.camelCaseToSpaced((String)buff.getProperty("field" + i + "Name"))+" from "+buffName+" effect";
+						result.add(effect);
+					}
+				}
 			}
-			Date expiry = (Date) buff.getProperty("expiry");
-			if (expiry != null && expiry.before(new Date()))
-			{
-				ds.delete(buff);
-				buffs.remove(i);
-			}
+
 		}
+
+		Collections.sort(result, new Comparator<String>()
+		{
+			@Override
+			public int compare(String o1, String o2)
+			{
+				if (o1.endsWith(("%")))
+					return 1;
+				else
+					return -1;
+			}
+
+		});
+
+		return result;
 	}
 
-	public List<CachedEntity> getBuffsFor(Key entityKey)
+	private boolean isBuffExpired(PropertyContainer buff)
 	{
-		List<CachedEntity> buffs = buffsCache.get(entityKey);
-
-		if (buffs == null)
+		if (buff==null)
+			return true;
+		Date expiry = (Date) buff.getProperty("expiry");
+		if (expiry != null && expiry.before(new Date()))
+			return true;
+		
+		if (GameUtils.equals(buff.getProperty("_todelete"), true))
+			return true;
+		
+		if (buff.getProperty("charges")!=null)
 		{
-			buffs = getFilteredList("Buff", "parentKey", entityKey);
-			if (buffs == null) buffs = new ArrayList<CachedEntity>();
-
-			buffsCache.put(entityKey, buffs);
+			if ((Long)buff.getProperty("charges")<=0)
+				return true;
 		}
-
-		cleanUpBuffs(buffs);
+		
+		return false;
+	}
+	
+	public List<EmbeddedEntity> getBuffsFor(CachedEntity entity)
+	{
+		List<EmbeddedEntity> buffs = new ArrayList<>();
+		
+		if (entity.getKind().equals("Character"))
+			buffs = getBuffsForCharacter(entity);
+		else if (entity.getKind().equals("Item"))
+			getBuffs(entity, buffs);
 
 		return buffs;
 	}
+	
+	public List<EmbeddedEntity> getBuffsForCharacter(CachedEntity character)
+	{
+		ArrayList<EmbeddedEntity> buffs = new ArrayList<>();
+		
+		getBuffs(character, buffs);
+		
+		Collection<CachedEntity> characterEquipment = getCharacterEquipment(character);
+		for(CachedEntity equipment:characterEquipment)
+		{
+			getBuffs(equipment, buffs);
+		}
+		
+		return buffs;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void getBuffs(CachedEntity entity, List<EmbeddedEntity> buffs)
+	{
+		if (GameUtils.equals(entity.getKind(), "Item"))
+		{
+			if (entity.getProperty("_aspects")!=null && ((List<String>)entity.getProperty("_aspects")).contains("Buffable"))
+			{
+				InitiumObject item = new InitiumObject(this, entity);
+				AspectBuffable buffable = item.getAspect(AspectBuffable.class);
+				if (buffable!=null)
+				{
+					List<EmbeddedEntity> list = buffable.getBuffs();
+					boolean buffsRemoved = false;
+					if (list!=null)
+						for(int i = list.size()-1; i>=0; i--)
+							if (isBuffExpired(list.get(i)))
+							{
+								list.remove(i);
+								buffsRemoved = true;
+							}
 
+					if (buffsRemoved)
+						buffable.setBuffs(list);
+					
+					if (list!=null)
+						buffs.addAll(list);
+				}
+			}
+		}
+		else if (GameUtils.equals(entity.getKind(), "Character"))
+		{
+			List<EmbeddedEntity> list = (List<EmbeddedEntity>)entity.getProperty("buffs");
+			boolean buffsRemoved = false;
+			if (list!=null)
+				for(int i = list.size()-1; i>=0; i--)
+					if (isBuffExpired(list.get(i)))
+					{
+						list.remove(i);
+						buffsRemoved = true;
+					}
+
+			if (buffsRemoved)
+				entity.setProperty("buffs", list);
+			
+			if (list!=null)
+				buffs.addAll(list);
+		}
+		else
+			throw new RuntimeException("Unsupported type");
+	}
+
+	
+	
+	
+	///////////////////////////////////
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public void shuffleCharactersByAttackOrder(List<CachedEntity> characters)
 	{
 		Collections.shuffle(characters); // We first shuffle so that characters
@@ -2763,11 +2969,11 @@ public class ODPDBAccess
 		if (ds==null)
 			ds = getDB();
 		
-		List<CachedEntity> buffs = getBuffsFor(character.getKey());
+		List<EmbeddedEntity> buffs = getBuffsFor(character);
 		
 		// Look at the existing buffs to see if we're already maxed out on drinking
 		int drunkCount = 0;
-		for(CachedEntity buff:buffs)
+		for(PropertyContainer buff:buffs)
 			if ("Drunk".equals(buff.getProperty("name")))
 				drunkCount++;
 		
@@ -3586,7 +3792,15 @@ public class ODPDBAccess
 	}
 	
 	
-	private List<CachedEntity> cachedParty = null;
+	List<CachedEntity> cachedParty = null;
+	/**
+	 * Don't do this unless you really need to.
+	 * @param cachedParty
+	 */
+	public void setPartyCache(List<CachedEntity> cachedParty)
+	{
+		this.cachedParty = cachedParty;
+	}
 	/**
 	 * Returns all party members belonging to the party that the selfCharacter belongs to.
 	 * 
@@ -3906,6 +4120,19 @@ public class ODPDBAccess
 		return null;
 	}
 
+	public EmbeddedEntity generateNewEmbeddedObject(CachedEntity definition, String destinationKind)
+	{
+		Random rnd = new Random();
+		long id = rnd.nextLong();
+		if (id<0) id*=-1;
+		Key generatedEntityKey = KeyFactory.createKey(destinationKind, id);
+		return generateNewEmbeddedObject(rnd, definition, generatedEntityKey);
+	}
+	
+	public EmbeddedEntity generateNewEmbeddedObject(Random rnd, CachedEntity definition, Key generatedEntityKey)
+	{
+		return null;
+	}
 	
 	/**
 	 * This is a placeholder since the actual implementation is not in the ODP.
@@ -4439,6 +4666,7 @@ public class ODPDBAccess
 		str*=2d;
 		strengthDamageBonus = new Double(GameUtils.rnd.nextDouble()*str).intValue();
 		if (strengthDamageBonus<0) strengthDamageBonus=0;
+
 		
 		
 		String weaponName = "bare hands";
@@ -4463,6 +4691,10 @@ public class ODPDBAccess
 		        else
 		        {
 		            weapon.setProperty("durability", durability-1);
+
+					// Also reduce the charges for any buff that the weapon might have that has charges on it
+		            reduceBuffCharges(weapon);
+		            
 		            db.put(weapon);
 		        }
 		    }
@@ -4500,15 +4732,34 @@ public class ODPDBAccess
 		    int oldDamage = attackResult.damage+strengthDamageBonus;
 		    attackResult.damage*=critMultiplier;
 		    attackResult.damage += strengthDamageBonus;
-		    
-		    attackResult.status += "It's a critical hit! "+oldDamage+" damage ("+strengthDamageBonus+" was from strength) was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+". But because of the critical hit, an additional "+(attackResult.damage-oldDamage)+" damage was done for a total of "+attackResult.damage+" damage."; 
+
+			// Now include any physical damage bonuses
+			int physicalDamageBonus = -attackResult.damage;
+			attackResult.damage = getLongBuffableValue(sourceCharacter, StaticBuffables.physicalDamage, (long)attackResult.damage).intValue();
+			physicalDamageBonus += attackResult.damage;
+
+			String physicalDamageBonusLine = "";
+			if (physicalDamageBonus>0)
+				physicalDamageBonusLine = ", "+physicalDamageBonus+" was from physical damage bonus effects";
+
+		    attackResult.status += "It's a critical hit! "+oldDamage+" damage ("+strengthDamageBonus+" was from strength"+physicalDamageBonusLine+") was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+". But because of the critical hit, an additional "+(attackResult.damage-oldDamage)+" damage was done for a total of "+attackResult.damage+" damage."; 
 		}
 		else
 		{
 		    // Regular hit
 			attackResult.damage+=strengthDamageBonus;
-			attackResult.status += "The attack hit! "+attackResult.damage+" damage ("+strengthDamageBonus+" was from strength) was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+".";
+			
+			// Now include any physical damage bonuses
+			int physicalDamageBonus = -attackResult.damage;
+			attackResult.damage = getLongBuffableValue(sourceCharacter, StaticBuffables.physicalDamage, (long)attackResult.damage).intValue();
+			physicalDamageBonus += attackResult.damage;
+			String physicalDamageBonusLine = "";
+			if (physicalDamageBonus>0)
+				physicalDamageBonusLine = ", "+physicalDamageBonus+" was from physical damage bonus effects";
+			
+			attackResult.status += "The attack hit! "+attackResult.damage+" damage ("+strengthDamageBonus+" was from strength"+physicalDamageBonusLine+") was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+".";
 		}
+		
 		
 		
 		// Try blocking the damage if there is any damage...
@@ -4683,6 +4934,10 @@ public class ODPDBAccess
 			else
 			{
 				blockingEntity.setProperty("durability", durability - 1);
+				
+				// Also reduce the charges for any buff that the equipment might have that has charges on it
+				reduceBuffCharges(blockingEntity);
+				
 				getDB().put(blockingEntity);
 			}
 		}
@@ -7310,7 +7565,7 @@ public class ODPDBAccess
 		// Start with the original travel time.
 		Double workingAmount = travelTime.doubleValue();
 		double modifyFactor = 1.0d;
-		List<String> buffs = getBuffEffectsFor(character.getKey(), "movementSpeed");
+		List<String> buffs = getBuffEffectsFor(character, "movementSpeed");
 		for (String effect : buffs)
 		{
 			effect = effect.replace("+", "");

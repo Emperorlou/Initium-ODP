@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -44,7 +45,7 @@ public class LongOperationRest extends LongOperation {
 			
 			boolean hasDrunk = false;
 			boolean hasWellRested = false;
-			for(CachedEntity buff:db.getBuffsFor(db.getCurrentCharacterKey()))
+			for(EmbeddedEntity buff:db.getBuffsFor(db.getCurrentCharacter()))
 			{
 				if("Well Rested".equals(buff.getProperty("name")))
 					hasWellRested = true;
@@ -88,6 +89,12 @@ public class LongOperationRest extends LongOperation {
 		int waitTime = 5 + Math.max(0, hitpointsToRegain.intValue());
 		setDataProperty("description", "It will take "+waitTime+" seconds to regain your health.");
 		
+		setLongOperationName("Resting");
+		if (CommonChecks.checkLocationIsGoodRestSite(location))
+			setLongOperationDescription("You hitpoints will be restored and certain ill effects can be removed with a good rest. This is a good rest site, you will be well rested here.");
+		else
+			setLongOperationDescription("You hitpoints will be restored and certain ill effects can be removed with a good rest.");
+		
 		return waitTime;
 	}
 
@@ -103,13 +110,13 @@ public class LongOperationRest extends LongOperation {
 		// ie. If this is a player house, then it should be a RestSite and have an owner.
 		if (CommonChecks.checkLocationIsGoodRestSite(location))
 		{
-			List<CachedEntity> curBuffs = db.getBuffsFor(db.getCurrentCharacterKey());
+			List<EmbeddedEntity> curBuffs = db.getBuffsFor(db.getCurrentCharacter());
 			for(int i = curBuffs.size()-1; i>=0; i--)
 			{
-				CachedEntity buff = curBuffs.get(i);
+				EmbeddedEntity buff = curBuffs.get(i);
 				if(buff != null && "Drunk".equals(buff.getProperty("name")))
 				{
-					ds.delete(buff);
+					db.markBuffToDelete(buff);
 					curBuffs.remove(i);
 				}
 			}
@@ -140,6 +147,9 @@ public class LongOperationRest extends LongOperation {
 				db.awardBuffByName(ds, db.getCurrentCharacter(), "Well Rested");
 			}
 		}
+		
+		ds.put(db.getCurrentCharacter());
+		
 		
 		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), location, this);
 		// Update character widget

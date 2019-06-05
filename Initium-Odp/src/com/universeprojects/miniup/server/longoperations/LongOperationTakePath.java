@@ -60,7 +60,6 @@ public class LongOperationTakePath extends LongOperation {
 
 		try
 		{
-			
 			CachedEntity character = db.getCurrentCharacter();
 			String forceOneWay = (String)path.getProperty("forceOneWay");
 			if ("FromLocation1Only".equals(forceOneWay) && GameUtils.equals(character.getProperty("locationKey"), path.getProperty("location2Key")))
@@ -91,6 +90,7 @@ public class LongOperationTakePath extends LongOperation {
 			Key currentLocationKey = db.getCharacterLocationKey(character);
 			CachedEntity currentLocation = null;
 			
+			currentLocation = db.getEntity(currentLocationKey);
 			
 			// Then determine which location the character will end up on.
 			// If we find that the character isn't on either end of the path, we'll throw.
@@ -103,7 +103,6 @@ public class LongOperationTakePath extends LongOperation {
 			else
 			{
 				// We want to now allow players to travel between root locations easily so lets check if that's a possibility now...
-				currentLocation = db.getEntity(currentLocationKey);
 				if (CommonChecks.checkLocationIsRootLocation(currentLocation)==false)
 				{
 					CachedEntity rootLocation = db.getRootLocation(currentLocation);
@@ -298,12 +297,23 @@ public class LongOperationTakePath extends LongOperation {
 				throw new GameStateChangeException(); // If we've been interrupted, we'll just get out and not actually travel to the location
 				
 			}
+
+			
+			CachedEntity rootDestination = db.getRootLocation(destination);
+			CachedEntity rootCurrentLocation = db.getRootLocation(currentLocation);
+			boolean longDistanceTravel = GameUtils.equals(rootDestination, rootCurrentLocation)==false;
 			
 			// Ok, lets begin then...
 			setDataProperty("locationName", destination.getProperty("name"));
 			
-			Long buffedTravel = db.getPathTravelTime(path, character);
+			Long buffedTravel = 0L;
+			if ((path.getProperty("travelTime")!=null && ((Long)path.getProperty("travelTime"))>0) || longDistanceTravel)
+				buffedTravel = db.getPathTravelTime(path, character);
+			
 			setDataProperty("secondsToWait", buffedTravel);
+			
+			setLongOperationName("Walking to "+destination.getProperty("name"));
+			setLongOperationDescription("You're traveling between 2 major locations.");
 			
 			return buffedTravel.intValue();
 		}

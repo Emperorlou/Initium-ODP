@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.controllers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -132,6 +133,8 @@ public class ViewItemController extends PageController {
 		
 		if (CommonChecks.checkItemIsAccessible(item, character))
 			request.setAttribute("showRelatedSkills", true);
+
+		ds.beginBulkWriteMode();
 		
 		request.setAttribute("isItemOwner", GameUtils.equals(item.getProperty("containerKey"), character.getKey()));
 		Map<String, Object> itemStats = getItemStats(db, character, item, false);
@@ -142,7 +145,6 @@ public class ViewItemController extends PageController {
 			request.setAttribute("proceduralKey", proceduralKey);
 			
 		
-		ds.beginBulkWriteMode();
 		
 		List<CachedEntity> comparisonEquipment = new ArrayList<>();
 		List<Map<String,Object>> comparisons = new ArrayList<Map<String,Object>>();
@@ -236,6 +238,9 @@ public class ViewItemController extends PageController {
 	{
 		if(item == null) return null;
 		
+		if (new InitiumObject(db, item).update()==true)   // Honestly the whole controller should be using InitiumObject instead of CachedEntity
+			db.getDB().put(item);
+			
 		Map<String,Object> itemMap = new HashMap<String,Object>();
 		itemMap.put("itemId", item.getId());
 		
@@ -314,9 +319,12 @@ public class ViewItemController extends PageController {
 								aspectList.append(popupTag);
 						}
 						
-						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
+						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries(currentChar);
 						if(curEntries != null)
+						{
+							curEntries.removeAll(Collections.singleton(null));
 							itemPopupEntries.addAll(curEntries);
+						}
 					}
 				}
 				
@@ -378,6 +386,26 @@ public class ViewItemController extends PageController {
 		itemMap.put("quality", itemQuality);
 		itemMap.put("name", itemName);
 		itemMap.put("itemClass", itemClass);
+
+		// Buff stuff
+		List<EmbeddedEntity> buffs = db.getBuffsFor(item);
+		if (buffs!=null && buffs.isEmpty()==false)
+			itemMap.put("buffs", true);
+		
+		// Printing buffs
+		StringBuilder sb = new StringBuilder();
+		
+		for(EmbeddedEntity buff:buffs)
+		{
+			String iUrl = GameUtils.getResourceUrl(buff.getProperty("icon"));
+			sb.append("<img src='" + iUrl + "' border='0'>");
+		}
+		itemMap.put("printBuff", sb.toString());
+		
+		// Buff list
+		itemMap.put("buffList", GameUtils.renderBuffsList(buffs));	
+		
+		
 		
 		String itemSlot = (String)item.getProperty("equipSlot");
 		String itemType = (String)item.getProperty("itemType");
@@ -659,6 +687,12 @@ public class ViewItemController extends PageController {
 		// Modifiers
 		ModifierService mService = new ModifierService(db);
 		List<String> modifiers = mService.getFullModifierLines(item);
+
+		// Also buff effects are shown in the same format as modifiers
+		List<String> buffEffects = db.getBuffEffectsFor(item);
+		if (modifiers==null) modifiers = new ArrayList<>();
+		if (buffEffects!=null) modifiers.addAll(buffEffects);
+		
 		itemMap.put("modifiers", modifiers);
 		
 		return itemMap;

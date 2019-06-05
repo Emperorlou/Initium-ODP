@@ -1,6 +1,7 @@
 package com.universeprojects.miniup.server;
 
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -128,9 +129,9 @@ public class ServletEventServer extends HttpServlet
 					return;
 				
 
-				List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
+				List<EmbeddedEntity> buffs = db.getBuffsFor(character);
 				int drunkLevel = 0;
-				for(CachedEntity buff:buffs)
+				for(EmbeddedEntity buff:buffs)
 					if ("Drunk".equals(buff.getProperty("name")))
 						drunkLevel++;
 

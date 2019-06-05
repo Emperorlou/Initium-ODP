@@ -369,6 +369,7 @@ hr:after {
 	position: relative;
     z-index: 1000100;
     min-height:103px;
+    background-color:#000000;
 }
 
 .main-banner-container
@@ -2932,13 +2933,14 @@ position: absolute;
     bottom: 2px;
     margin: 0px;
     text-shadow: 1px 1px 2px #000;
-    text-align: right;    
+    text-align: right;
+    font-size:16px;    
 }
 
 .sublocation-display
 {
     width: 100%;
-    height: 50px;
+    height: 36px;
     background-position: center center;
     background-size: cover;
     border-top-left-radius: 8px;
@@ -3103,19 +3105,22 @@ position: absolute;
 
 .mini-page-popup
 {
-display: inline-flex;
+	padding-left:7px;
+	background-color:rgba(25,24,23,0.62);
+	display: inline-flex;
     flex-direction: column;
-    width: 300px;
+    /*width: 300px;*/
     z-index: 10000000;
     
     position: absolute;
     right: 0px;
     bottom: 0px;
-    max-height: 100%;
+    max-height: 50%;
     margin: 0px;
     border-bottom-width: 0px!important;
     border-right-width: 0px!important;
-    max-width: 50%;}
+    max-width: 39%;
+ }
 
 #mini-page-popup-contents
 {
@@ -3160,7 +3165,24 @@ display: inline-flex;
     transform: scale(0.7);
 }
 
+.pet-backing
+{
+	display: inline-block;
+    padding: 0px;
+    width: 40px;
+    height: 22px;
+    margin-top: 0px;
+    margin-left: 5px;
+    padding: 2px;
+    width: 22px;
+    background-color: #222222;
+}
 
+.pet-backing img
+{
+	max-height:22px;
+	max-width:22px;
+}
 
 
 
@@ -3555,6 +3577,13 @@ display: inline-flex;
 		max-height:32px;
 	}
 
+}
+@media (max-width:500px)
+{
+	.progress-bar1
+	{
+		zoom: 0.8;
+	}
 }
 @media (max-width:480px)
 {
@@ -5169,6 +5198,10 @@ body
 
 @media (max-width:400px)
 {
+	.progress-bar1
+	{
+		zoom: 0.64;
+	}
 	.minimap-container
 	{
 		transform:scale(0.5);
@@ -5326,6 +5359,20 @@ body
     background-image:url(https://initium-resources.appspot.com/images/ui/talltrees-enabled.png);
 }
 
+#gridmap-repeatinvention-button
+{
+	display:none;
+	width:32px;
+	height:32px;
+	left: 0px;
+    z-index: 10000;
+    cursor: pointer;
+
+    bottom: 33px;
+    background-image: url(https://initium-resources.appspot.com/images/ui/begin-icon1.png);
+}
+
+
 #gridmap-talltrees-button.disabled
 {
     background-image:url(https://initium-resources.appspot.com/images/ui/talltrees-disabled.png);
@@ -5393,7 +5440,85 @@ div#buildingObject {
 
 
 
+/* Long operation state and style */
 
+/*Make things disappear that shouldn't be visible during long operations*/
+body[longoperation='true'] #monsterCountPanel
+{
+	visibility:hidden!important;
+	opacity:0!important;
+}
+
+body[longoperation='true'] #banner-text-overlay
+{
+	visibility:hidden;
+	opacity:0;
+}
+
+#partyPanel
+{
+	display: table-cell;
+}
+
+.classic-ui #partyPanel
+{
+	display:block;
+}
+
+.long-operation-status
+{
+	position: absolute;
+	top: 38%;
+	width:100%;
+	text-align: center;
+	visibility:hidden;
+	opacity:0;	
+	pointer-events: none;
+}
+
+body[longoperation='true'] .long-operation-status
+{
+	visibility:visible;
+	opacity:1;	
+}
+
+.long-operation-status-title
+{
+	width: 100%;
+	margin-left: 0%;
+	position: relative;
+}
+
+
+.progress-bar1 
+{
+    background-image: url(https://initium-resources.appspot.com/images/ui4/progress-bar1-backing.png);
+	width: 498px;
+	height: 60px;
+	position: relative;
+	margin: 0 auto;
+}
+
+.progress-bar1 .progress-bar-fill 
+{
+    background-image: url(https://initium-resources.appspot.com/images/ui4/progress-bar1-fill.png);
+    height: 60px;
+    width: 2%;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-right: 0px;
+}
+
+.progress-bar1 .progress-bar-text
+{
+    width: 100%;
+    text-align: center;
+    position: relative;
+    top: -39px;
+    font-size: 13px;
+    color: #ceac48;
+    text-shadow: 1px 1px 1px #000;
+}
 
 
 

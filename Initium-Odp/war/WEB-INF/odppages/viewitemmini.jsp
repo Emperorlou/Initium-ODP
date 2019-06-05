@@ -29,6 +29,17 @@
 					<c:if test="${slot.slotIsEmpty == false}"><div class='socket-base' minitip='${slot.slotName} &lt;br&gt; ${slot.slotModifierText}'><div class='socket-item' style='background-image:url(${slot.slotIcon})'></div></div></c:if>
 				</c:forEach>
 			</div>
+			<div>
+			<c:if test="${item.buffs==true}">
+				<div class='buff-pane' onclick='$(this).hide(); $("#buffsList${item.itemId}").show();'>
+				${item.printBuff}
+				</div>
+				<div id='buffsList${item.itemId}' style='display:none;'>
+				<h5>Buffs/debuffs</h5>
+				${item.buffList}
+				</div>
+			</c:if>
+			</div>
 		</div>
 		<div>
 			<p>${item.itemSlot}</p>
@@ -134,6 +145,12 @@
 	</c:if>
 	
 	<div style='text-align:center'>
+		<c:if test="${itemKey!=null }">
+			<a onclick='doExperiment(event, "${itemKey}")' minitip='Experiment on this item'><img src='https://initium-resources.appspot.com/images/ui/tab-experiments-button.png'/></a>
+		</c:if>
+		<c:if test="${proceduralKey!=null }">
+			<a onclick='doExperiment(event, "${proceduralKey}")' minitip='Experiment on this item'><img src='https://initium-resources.appspot.com/images/ui/tab-experiments-button.png'/></a>
+		</c:if>
 		<a onclick='loadRelatedSkills("${itemKey}")' minitip='Show skills that you have that related to this item'><img src='https://initium-resources.appspot.com/images/ui/invention1.png'/></a>
 		<c:if test="${comparisons != null}">
 			<span id='item-comparison-link'><a onclick='$("#item-comparisons").show(); $("#item-comparison-link").hide();' minitip='Compare with existing equipment'><img src='https://initium-resources.appspot.com/images/ui/compare-equipment1.png'/></a></span>
@@ -207,7 +224,8 @@
 				</c:if>
 				<br/>
 				<c:if test="${comparison.description != null}"><br/>
-				<div class='item-flavor-description'>${comparison.description}</div></c:if>
+					<div class='item-flavor-description'>${comparison.description}</div>
+				</c:if>
 			</div>
 		</div>
 		</c:forEach>

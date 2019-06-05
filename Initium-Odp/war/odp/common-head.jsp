@@ -44,7 +44,7 @@
 <script type="text/javascript" src="/odp/javascript/script.js?v=${version}"></script>
 <link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">
 
-
+<script type="text/javascript" src="https://cdn.rawgit.com/leafo/sticky-kit/v1.1.2/jquery.sticky-kit.min.js"></script>
 
 <script type="text/javascript" src="/odp/javascript/messager.js?v=70"></script>
 

@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.aspects;
 
 import java.util.List;
 
+import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ItemAspect;
 
@@ -22,7 +23,7 @@ public class AspectFlammable extends ItemAspect
 	}
 
 	@Override
-	public List<ItemPopupEntry> getItemPopupEntries()
+	public List<ItemPopupEntry> getItemPopupEntries(CachedEntity currentCharacter)
 	{
 		return null;
 	}

@@ -1,4 +1,4 @@
-//const eventServerUrl = "https://eventserver.universeprojects.com:8080/";
+//const eventServerUrl = "https://initium-eventserver.universeprojects.com/";
 //var socket;
 //if (!window.console) window.console = {};
 //if (!window.console.log) window.console.log = function () { };
@@ -142,7 +142,7 @@
 //{
 //	var that = this;
 //	
-//	const eventServerUrl = "https://eventserver.universeprojects.com:8080/";
+//	const eventServerUrl = "https://initium-eventserver.universeprojects.com/";
 //	var socket;
 //	if (!window.console) window.console = {};
 //	if (!window.console.log) window.console.log = function () { };

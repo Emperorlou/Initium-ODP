@@ -147,7 +147,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 
 		newHtml.append("	<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
 		newHtml.append("	<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
-		
+		newHtml.append("	<div class='cursorSubObject' id='gridmap-repeatinvention-button' onclick=''></div>");
 		newHtml.append("	<div id='grid' class='grid'>");
 		newHtml.append("		<div id='ui-layer' class='uiLayer'></div>");
 		newHtml.append("		<div id='cell-layer' class='cellLayer'></div>");
@@ -238,12 +238,39 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 				CommonChecks.checkCharacterIsIncapacitated(character)==false && 
 				CommonChecks.checkNPCIs2DCombatMode(getCombatant()))
 			js.append("onCombat2DBegin();");
+		else if (CommonChecks.checkCharacterIsInCombat(character) && 
+				CommonChecks.checkCharacterIsIncapacitated(character)==false && 
+				CommonChecks.checkNPCIs2DCombatMode(getCombatant())==false)
+			js.append("onCombatBegin();");
+		else if (CommonChecks.checkCharacterIsIncapacitated(character)==false && 
+				CommonChecks.checkLocationIsCombatSite(location))
+			js.append("view2DView(true);");
 		else if (CommonChecks.checkCharacterIsIncapacitated(character)==false && 
 				CommonChecks.checkLocationIsCombatSite(location))
 			js.append("view2DView(true);");
 		else if (CommonChecks.checkLocationIsNaturalResourceSite(location))
 			js.append("view2DView(true);");
+//		else if (CommonChecks.checkCharacterIsInCombat(character)==false)
+//			js.append("ensureNotInCombatView();");
+		else 
+			js.append("viewBannerDefault();");
+		
+		if (CommonChecks.checkLocationIsTopdownMode(location))
+			js.append("setBannerSizeMode('contain');");
+		else
+			js.append("setBannerSizeMode('cover');");
 		
 		return js.toString();
+	}
+	
+	@Override
+	public String updateMonsterCountPanel()
+	{
+		if (CommonChecks.checkLocationIsInstance(location))
+		{
+			return updateHtmlContents("#monsterCountPanel", "<div id='instanceRespawnWarning'></div>");
+		}
+		else
+			return super.updateMonsterCountPanel();
 	}
 }

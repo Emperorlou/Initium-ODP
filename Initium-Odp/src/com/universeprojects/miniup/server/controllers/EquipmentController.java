@@ -37,8 +37,11 @@ public class EquipmentController extends PageController {
 		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.append("<div class='main-item equip-item'><span class='equip-slot'>"+slot+": </span>");
 			CachedEntity item = db.getEntity((Key)character.getProperty("equipment"+slot));
+			
+			if (item==null && slot.equals("Pet")) continue;
+			
+			sb.append("<div class='main-item equip-item'><span class='equip-slot'>"+slot+": </span>");
 			// Allow updating specific slots via commands.
 			// Selector would be ".equip-item span[rel='RightHand']"
 			sb.append("<span rel='" + slot + "'>");

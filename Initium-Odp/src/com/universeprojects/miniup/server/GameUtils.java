@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -24,8 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.cheffo.jeplite.JEP;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PropertyContainer;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
@@ -39,7 +42,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-125";
+	final public static String version = "0.5.9-163";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -1082,11 +1085,11 @@ public class GameUtils
 		if(CommonChecks.checkIsHardcore(item)) qualityClass += " hardcore";
 		String result = null;
 		if (proceduralKey!=null)
-			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?proceduralKey="+proceduralKey+"'><div class='main-item-image-backing'>"+quantityDiv+"<img style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?proceduralKey="+proceduralKey+"'><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else if (popupEmbedded)
-			result = "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img style='max-width:26px; max-height:26px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:26px; max-height:26px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		
 		if (result.toLowerCase().contains("<script") || result.toLowerCase().contains("javascript:")) throw new RuntimeException("CODENK1 Item("+item.getId()+")");
 		
@@ -1123,7 +1126,7 @@ public class GameUtils
 		sb.append("		<div class='icon'>");
 		if (item.getProperty("quantity")!=null)
 			sb.append("<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+GameUtils.formatNumber((Long)item.getProperty("quantity"))+"</div></div>");
-		sb.append("<img src='" + iconUrl + "' border='0'/></div>\r\n");
+		sb.append("<img class='item-icon-img-"+item.getKey().getId()+"' src='" + iconUrl + "' border='0'/></div>\r\n");
 		sb.append("		<div style='width:230px'>\r\n");
 		
 		
@@ -1393,9 +1396,12 @@ public class GameUtils
 								aspectList.append(popupTag);
 						}
 						
-						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries();
+						List<ItemPopupEntry> curEntries = itemAspect.getItemPopupEntries(currentChar);
 						if(curEntries != null)
+						{
+							curEntries.removeAll(Collections.singleton(null));
 							itemPopupEntries.addAll(curEntries);
+						}
 					}
 				}
 				
@@ -1564,7 +1570,8 @@ public class GameUtils
 						(Key)character.getProperty("equipmentGloves"),
 						(Key)character.getProperty("equipmentLeftHand"),
 						(Key)character.getProperty("equipmentRightHand"),
-						(Key)character.getProperty("equipmentShirt"));
+						(Key)character.getProperty("equipmentShirt"),
+    					(Key)character.getProperty("equipmentPet"));
     	pool.addToQueue(equipmentKeys);
     	pool.loadEntities();
     	
@@ -1660,6 +1667,14 @@ public class GameUtils
 		if (equipmentShirt!=null)
 			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty(GameUtils.getItemIconToUseFor("equipmentShirt", equipmentShirt)));
 
+		
+		CachedEntity equipmentPet = equipment.get(8);
+		if (character.getProperty("equipmentPet")!=null && equipmentPet==null)
+		{
+			hasInvalidEquipment=true;
+			character.setProperty("equipmentPet", null);
+		}
+		
 		for (int i = 0; i < equipment.size(); i++)
 		{
 			if (equipment.get(i) != null && isDurabilityVeryLow(equipment.get(i)))
@@ -1808,12 +1823,20 @@ public class GameUtils
 		// Show the buffs
 		if (showBuffs)
 		{
-			List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
+			sb.append("<div></div>");	// Just to make sure the buff-pane is below the widget and not above
+			if (equipmentPet!=null)
+			{
+				sb.append("<div rel='/odp/viewitemmini?itemId="+equipmentPet.getId()+"' class='clue pet-backing'>");
+				sb.append("<img src='"+GameUtils.getResourceUrl(equipmentPet.getProperty("icon"))+"'/>");
+				sb.append("</div>");
+			}
+			List<EmbeddedEntity> buffs = db.getBuffsFor(character);
 			if (buffs!=null && buffs.isEmpty()==false)
 			{
-				sb.append("<div></div>");	// Just to make sure the buff-pane is below the widget and not above
+				
+				
 				sb.append("<div class='buff-pane hint' rel='#buffDetails'>");
-				for(CachedEntity buff:buffs)
+				for(PropertyContainer buff:buffs)
 				{
 					sb.append("<img src='"+GameUtils.getResourceUrl(buff.getProperty("icon"))+"' border='0'>");
 				}
@@ -1881,10 +1904,10 @@ public class GameUtils
     
     
     
-    public static String renderBuffsList(List<CachedEntity> buffs)
+    public static String renderBuffsList(List<EmbeddedEntity> buffs)
     {
     	StringBuilder sb = new StringBuilder();
-		for(CachedEntity buff:buffs)
+		for(EmbeddedEntity buff:buffs)
 		{
 			sb.append("<div class='buff-detail'>");
 			sb.append("<img src='" + getResourceUrl(buff.getProperty("icon"))+"' border='0'/>");
@@ -2810,4 +2833,13 @@ public class GameUtils
 		}
 		return true;
 	}
+	
+	public static String camelCaseToSpaced(String camelCaseString)
+	{
+		if (camelCaseString==null) return null;
+		camelCaseString = camelCaseString.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase();
+		
+		return camelCaseString;
+	}
+
 }

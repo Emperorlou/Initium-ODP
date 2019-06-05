@@ -53,9 +53,11 @@ public class AspectFireplace extends ItemAspect
 	}
 
 	@Override
-	public List<ItemPopupEntry> getItemPopupEntries()
+	public List<ItemPopupEntry> getItemPopupEntries(CachedEntity currentCharacter)
 	{
-		List<ItemPopupEntry> itemPopupEntries = new ArrayList<ItemPopupEntry>();
+		ArrayList<ItemPopupEntry> itemPopupEntries = new ArrayList<>();
+		
+		
 		long currentTimeMs = System.currentTimeMillis();
 		if (isFireActive(currentTimeMs) && isFireExpired(currentTimeMs) || isFireActive(currentTimeMs) && getMinutesSinceLastUpdate(currentTimeMs) >= 5)
 		{
@@ -72,8 +74,11 @@ public class AspectFireplace extends ItemAspect
 
 		itemPopupEntries.add(new ItemPopupEntry("", text.toString(), ""));
 
-		itemPopupEntries.add(new ItemPopupEntry("Light Fire", "Using kindling and something to start the fire, this command will light a fire here.", "doFireplaceLight(event, '"
-				+ entity.getUrlSafeKey() + "');"));
+		if (isFireActive(currentTimeMs)==false)
+			itemPopupEntries.add(createPopupEntryFromSkill(currentCharacter.getKey(), KeyFactory.createKey("ConstructItemIdeaDef", 4655692968624128L)));
+		
+//		itemPopupEntries.add(new ItemPopupEntry("Light Fire", "Using kindling and something to start the fire, this command will light a fire here.", "doFireplaceLight(event, '"
+//				+ entity.getUrlSafeKey() + "');"));
 
 		itemPopupEntries.add(new ItemPopupEntry("Add Fuel", "Add something flammable to the fire to keep it going.", "doFireplaceAddFuel(event, '" + entity.getUrlSafeKey() + "');"));
 

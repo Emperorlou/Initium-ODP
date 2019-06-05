@@ -38,10 +38,10 @@
 				<div class='buff-pane' onclick='$(this).hide(); $("#buffsList").show();'>
 				${printBuff}
 				</div>
-					<div id='buffsList' style='display:none;'>
-					<h5>Buffs/debuffs</h5>
-					${buffList}
-					</div>
+				<div id='buffsList' style='display:none;'>
+				<h5>Buffs/debuffs</h5>
+				${buffList}
+				</div>
 			</c:if>
 			<c:if test="${hasAchievements==true}">
 				<div></div>

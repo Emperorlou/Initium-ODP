@@ -6,6 +6,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
+import com.google.appengine.api.datastore.PropertyContainer;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
@@ -36,11 +38,11 @@ public class CommandEatBerry extends Command {
 		if (GameUtils.equals(item.getProperty("containerKey"),character.getKey())==false)
 			throw new UserErrorMessage("You cannot consume this item. It must be in your inventory!");
 
-		List<CachedEntity> buffs = db.getBuffsFor(character.getKey());
+		List<EmbeddedEntity> buffs = db.getBuffsFor(character);
 		boolean appliedBuff = false;
 		if ("Old Candy".equals(item.getProperty("name"))==true){
 			int candyCount = 0;
-			for (CachedEntity buff:buffs){
+			for (PropertyContainer buff:buffs){
 				if("Treat!".equals(buff.getProperty("name")))
 					candyCount ++;
 				if("Trick!".equals(buff.getProperty("name")))
@@ -51,11 +53,11 @@ public class CommandEatBerry extends Command {
 			
 			if (candyCount>=10)
 			{
-				for (CachedEntity buff:buffs){
+				for (PropertyContainer buff:buffs){
 					if("Treat!".equals(buff.getProperty("name")) ||
 						"Trick!".equals(buff.getProperty("name")))
 					{
-						ds.delete(buff);
+						db.markBuffToDelete(buff);
 						appliedBuff |= db.awardBuffByName(ds, character, "Sick");
 					}
 				}
