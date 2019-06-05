@@ -119,6 +119,7 @@ public class EntityWrapper extends BaseWrapper
 	public Buff addManualBuff(String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
 			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
 	{
+		if(this.isEmbeddedEntity) return null;
 		EmbeddedEntity newBuff = (EmbeddedEntity)db.awardBuff(null, this.wrappedEntity, icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
 		if(newBuff != null)
 		{
