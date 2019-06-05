@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -230,6 +231,11 @@ public abstract class ScriptEvent extends OperationBase
 		ScriptService.log.log(Level.INFO, "SaveEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
+			if(entity.isEmbeddedEntity)
+			{
+				throw new RuntimeException("Cannot save embedded entity! Please save the parent entity instead.");
+			}
+			
 			if(!saveEntities.containsKey(entity.getKey()))
 			{
 				ScriptService.log.log(Level.INFO, "Saving " + entity.getKind() + ":" + entity.getId() + " entity.");
@@ -282,6 +288,13 @@ public abstract class ScriptEvent extends OperationBase
 		ScriptService.log.log(Level.INFO, "DeleteEntity called with " + entities.length + " entities.");
 		for(EntityWrapper entity:entities)
 		{
+			if(entity.isEmbeddedEntity)
+			{
+				EmbeddedEntity embed = (EmbeddedEntity)entity.wrappedEntity.getAttribute("entity");
+				embed.setProperty("_todelete", true);
+				continue;
+			}
+			
 			if(!deleteEntities.containsKey(entity.getKey())) 
 			{
 				ScriptService.log.log(Level.INFO, "Deleting " + entity.getKind() + ":"+ entity.getId() + " entity.");

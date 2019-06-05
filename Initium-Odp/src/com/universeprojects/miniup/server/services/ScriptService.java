@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
@@ -74,25 +75,44 @@ public class ScriptService extends Service
 	 * @param db DB instance, needed for entity specific functions (moving items, getting buffs, etc).
 	 * @return
 	 */
-	public static EntityWrapper wrapEntity(CachedEntity entity, ODPDBAccess db)
+	public static EntityWrapper wrapEntity(Object entity, ODPDBAccess db)
 	{
 		// We want to allow null wrappers to be returned, in cases such as GlobalEvent,
 		// where we pass a null CachedEntity for the currentCharacter parameter.
 		if(entity == null) return null;
-		switch(entity.getKind())
+		
+		CachedEntity ce = null 
+		if(entity instanceof EmbeddedEntity)
+		{
+			EmbeddedEntity ent = (EmbeddedEntity)entity;
+			ce = new CachedEntity(ent.getKey());
+			for(String fieldName:ent.getProperties().keySet())
+				ce.setProperty(fieldName, ent.getProperty(fieldName));
+			ce.setAttribute("entity", entity);
+		}
+		else if(entity instanceof CachedEntity)
+		{
+			ce = (CachedEntity)entity;
+		}
+		else
+		{
+			throw new RuntimeException("Entity does not support scripting.");
+		}
+		
+		switch(ce.getKind())
 		{
 			case "Item":
-				return new Item(entity, db);
+				return new Item(ce, db);
 			case "Character":
-				return new Character(entity, db);
+				return new Character(ce, db);
 			case "Location":
-				return new Location(entity, db);
+				return new Location(ce, db);
 			case "Buff":
-				return new Buff(entity, db);
+				return new Buff(ce, db);
 			case "Path":
-				return new Path(entity, db);
+				return new Path(ce, db);
 			case "Discovery":
-				return new Discovery(entity, db);
+				return new Discovery(ce, db);
 			default: 
 				throw new RuntimeException("Entity does not support scripting.");
 		}

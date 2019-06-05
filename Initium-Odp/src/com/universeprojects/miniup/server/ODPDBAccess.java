@@ -2964,7 +2964,7 @@ public class ODPDBAccess
 		doMoveItem(ds, character, item, newContainer, null);
 	}
 
-	public void doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
+	public boolean doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
 	{
 		if (ds==null)
 			ds = getDB();
@@ -2980,8 +2980,7 @@ public class ODPDBAccess
 		if (drunkCount>=6)
 			throw new UserErrorMessage("The bar tender thinks you've had enough to drink.");
 		
-		awardBuffByName(ds, character, "Drunk");
-		
+		return awardBuffByName(ds, character, "Drunk");
 	}
 
 	

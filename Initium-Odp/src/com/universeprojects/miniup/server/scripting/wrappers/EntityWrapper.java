@@ -6,8 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PropertyContainer;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
@@ -26,12 +28,14 @@ public class EntityWrapper extends BaseWrapper
 {
 	protected ODPDBAccess db;
 	public boolean isNewEntity = false;
+	public boolean isEmbeddedEntity = false;
 	
 	public EntityWrapper(CachedEntity entity, ODPDBAccess db)
 	{
 		this.db = db;
 		this.wrappedEntity = entity;
 		this.isNewEntity = !entity.getKey().isComplete();
+		this.isEmbeddedEntity = wrappedEntity.getAttribute("entity") != null;
 	}
 	
 	public boolean hasCharges()
@@ -66,9 +70,65 @@ public class EntityWrapper extends BaseWrapper
 		return false;
 	}
 	
+	public Buff[] getBuffs()
+	{
+		List<EmbeddedEntity> entityBuffs = db.getBuffsFor(this.getKey());
+		List<Buff> buffs = new ArrayList<Buff>();
+		for(EmbeddedEntity buff:entityBuffs)
+		{
+			if(GameUtils.equals(buff.getProperty("parentKey"), this.getKey()))
+				buffs.add(new Buff(buff, this.db, this));
+		}
+		
+		return buffs.toArray(new Buff[buffs.size()]);
+	}
+	
+	public Buff[] getBuffsOfType(String buffName)
+	{
+		List<EmbeddedEntity> entityBuffs = db.getBuffsFor(this.getKey());
+		List<Buff> buffs = new ArrayList<Buff>();
+		for(EmbeddedEntity buff:entityBuffs)
+		{
+			if(buff.getProperty("name").equals(buffName) && GameUtils.equals(buff.getProperty("parentKey"), this.getKey()))
+				buffs.add(new Buff(buff, this.db, this));
+		}
+		
+		return buffs.toArray(new Buff[buffs.size()]);
+	}
+	
+	public Buff addBuff(String buffDefName)
+	{
+		ScriptService.log.log(Level.INFO, "Adding BuffDef by name to " + this.getKeyName() + ": " + buffDefName);
+		EmbeddedEntity newBuff = db.awardBuffByDef(buffDefName, this.getKey());
+		if(newBuff != null)
+		{
+			Buff buff = new Buff(newBuff, db, this);
+			buff.isNewEntity = true;
+			return buff;
+		}
+		else
+			ScriptService.log.log(Level.SEVERE, "Unable to create buff via BuffDef: " + buffDefName);
+		return null;
+	}
+	
+	public Buff addManualBuff(String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
+			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
+	{
+		EmbeddedEntity newBuff = (EmbeddedEntity)db.awardBuff(null, this.getEntity(), icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
+		if(newBuff != null)
+		{
+			Buff buff = new Buff(newBuff, db, this);
+			buff.isNewEntity = true;
+			return buff;
+		}
+		else
+			ScriptService.log.log(Level.SEVERE, "Unable to create manual buff " + name + " for character " + this.getId());
+		return null;
+	}
+	
 	public String getKeyName()
 	{
-		return getKind() + "(" + getId() + ")";
+		return getKey().toString();
 	}
 
 	public Key getKey()

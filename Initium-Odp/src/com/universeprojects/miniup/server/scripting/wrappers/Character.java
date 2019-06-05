@@ -203,59 +203,6 @@ public class Character extends EntityWrapper
 		return newHitpoints;
 	}
 	
-//	public Buff[] getBuffs()
-//	{
-//		List<CachedEntity> playerBuffs = db.getBuffsFor(this.getKey());
-//		List<Buff> buffs = new ArrayList<Buff>();
-//		for(CachedEntity buff:playerBuffs)
-//			buffs.add(new Buff(buff, this.db, this));
-//		Buff[] arrBuffs = new Buff[buffs.size()];
-//		return buffs.toArray(arrBuffs);
-//	}
-//	
-//	public Buff[] getBuffsOfType(String buffName)
-//	{
-//		List<CachedEntity> playerBuffs = db.getBuffsFor(this.getKey());
-//		List<Buff> buffs = new ArrayList<Buff>();
-//		for(CachedEntity buff:playerBuffs)
-//		{
-//			if(buff.getProperty("name").equals(buffName))
-//				buffs.add(new Buff(buff, this.db, this));
-//		}
-//		Buff[] arrBuffs = new Buff[buffs.size()];
-//		return buffs.toArray(arrBuffs);
-//	}
-	
-//	public Buff addBuff(String buffDefName)
-//	{
-//		ScriptService.log.log(Level.INFO, "Adding BuffDef by name: " + buffDefName);
-//		CachedEntity newBuff = db.awardBuffByDef(buffDefName, this.getKey());
-//		if(newBuff != null)
-//		{
-//			Buff buff = new Buff(newBuff, db, this);
-//			buff.isNewEntity = true;
-//			return buff;
-//		}
-//		else
-//			ScriptService.log.log(Level.SEVERE, "Unable to create buff via BuffDef: " + buffDefName);
-//		return null;
-//	}
-	
-//	public Buff addManualBuff(String icon, String name, String description, int durationInSeconds, String field1Name, String field1Effect,
-//			String field2Name, String field2Effect, String field3Name, String field3Effect, int maximumCount)
-//	{
-//		EmbeddedEntity newBuff = db.awardBuff(null, this.getEntity(), icon, name, description, durationInSeconds, field1Name, field1Effect, field2Name, field2Effect, field3Name, field3Effect, maximumCount);
-//		if(newBuff != null)
-//		{
-//			Buff buff = new Buff(newBuff, db, this);
-//			buff.isNewEntity = true;
-//			return buff;
-//		}
-//		else
-//			ScriptService.log.log(Level.SEVERE, "Unable to create manual buff " + name + " for character " + this.getId());
-//		return null;
-//	}
-	
 	public String getType() 
 	{
 		return (String) this.getProperty("type");
