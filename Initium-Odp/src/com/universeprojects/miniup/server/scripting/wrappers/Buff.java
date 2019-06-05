@@ -4,22 +4,37 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.services.EmbeddedEntity;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 public class Buff extends EntityWrapper {
 	protected EntityWrapper parentEntity;
-	public Buff(CachedEntity entity, ODPDBAccess db) {
+	public Buff(CachedEntity entity, ODPDBAccess db) 
+	{
 		super(entity, db);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Buff(CachedEntity entity, ODPDBAccess db, EntityWrapper parentEntity)
 	{
 		this(entity, db);
 		this.parentEntity = parentEntity;
+	}
+	
+	public Buff(EmbeddedEntity entity, ODPDBAccess db, EntityWrapper parentEntity)
+	{
+		this(WrapEmbeddedEntity(entity), db, parentEntity);
+	}
+	
+	private CachedEntity WrapEmbeddedEntity(EmbeddedEntity entity)
+	{
+		CachedEntity ce = new CachedEntity(entity.getKey());
+		for(String fieldName:entity.getProperties().keySet())
+			ce.setProperty(fieldName, entity.getProperty(fieldName));
+		ce.setAttribute("entity", entity);
 	}
 	
 	public Date expiry()
@@ -78,7 +93,7 @@ public class Buff extends EntityWrapper {
 	{
 		if(this.parentEntity == null)
 		{
-			CachedEntity parEnt = db.getEntity((Key)this.getProperty("parentKey"));
+			CachedEntity parEnt = db.getEntity(parentEntityKey());
 			parentEntity = ScriptService.wrapEntity(parEnt, db);
 		}
 		return this.parentEntity;
@@ -86,6 +101,7 @@ public class Buff extends EntityWrapper {
 	
 	public Key parentEntityKey()
 	{
+		if(parentEntity != null) return parentEntity.getKey();
 		return (Key)this.getProperty("parentKey");
 	}
 	
@@ -98,5 +114,16 @@ public class Buff extends EntityWrapper {
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public void setProperty(String property, Object value)
+	{
+		super.setProperty(property, value);
+		if(this.isEmbeddedEntity)
+		{
+			EmbeddedEntity ent = (EmbeddedEntity)this.wrappedEntity.getAttribute("entity");
+			ent.setProperty(property, value);
+		}
 	}
 }

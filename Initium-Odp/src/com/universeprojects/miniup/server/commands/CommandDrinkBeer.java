@@ -29,7 +29,8 @@ public class CommandDrinkBeer extends Command {
         CachedEntity user = db.getCurrentUser();
         MainPageUpdateService service = MainPageUpdateService.getInstance(db, user, character, null, this);
 
-        db.doDrinkBeer(ds, character);
+        if(db.doDrinkBeer(ds, character))
+        	ds.put(character);
         service.updateInBannerCharacterWidget();
     }
 

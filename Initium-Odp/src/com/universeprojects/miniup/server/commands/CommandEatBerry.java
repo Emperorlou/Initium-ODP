@@ -92,6 +92,7 @@ public class CommandEatBerry extends Command {
 				item.setProperty("quantity", quantity-1);
 				ds.put(item);
 			}
+			ds.put(character);
 		}
 		
 		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, null, character, null, this);
