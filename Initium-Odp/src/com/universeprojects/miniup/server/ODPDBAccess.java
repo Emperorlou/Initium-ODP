@@ -5192,17 +5192,18 @@ public class ODPDBAccess
 					Long gold = null;
 					CachedEntity attackerCharacterLocation = getEntity((Key)attackingCharacterFinal.getProperty("locationKey"));
 					if (	
-							/* If the attacker or defender were standing in an instance*/
-							(locationFinal.getProperty("territoryKey")!=null || 
-									locationFinal.getProperty("defenceStructure")!=null || 
-							"Instance".equals(locationFinal.getProperty("combatType")) ||
-							attackerCharacterLocation.getProperty("territoryKey")!=null || 
-							attackerCharacterLocation.getProperty("defenceStructure")!=null || 
-							"Instance".equals(attackerCharacterLocation.getProperty("combatType")))
-							||
-							/* If the fight took place in a non-combat site and the max hitpoints of the defender was less than 100 */
-							("CombatSite".equals(locationFinal.getProperty("type"))==false &&
-							(Double)characterToDieFinal.getProperty("maxHitpoints")<100d)
+//							/* If the attacker or defender were standing in an instance*/
+//							(locationFinal.getProperty("territoryKey")!=null || 
+//									locationFinal.getProperty("defenceStructure")!=null || 
+//							"Instance".equals(locationFinal.getProperty("combatType")) ||
+//							attackerCharacterLocation.getProperty("territoryKey")!=null || 
+//							attackerCharacterLocation.getProperty("defenceStructure")!=null || 
+//							"Instance".equals(attackerCharacterLocation.getProperty("combatType")))
+//							||
+//							/* If the fight took place in a non-combat site and the max hitpoints of the defender was less than 100 */
+//							("CombatSite".equals(locationFinal.getProperty("type"))==false &&
+//							(Double)characterToDieFinal.getProperty("maxHitpoints")<100d)
+							("CombatSite".equals(locationFinal.getProperty("type"))==false
 						)
 					{
 						gold = (Long)characterToDieFinal.getProperty("dogecoins");
