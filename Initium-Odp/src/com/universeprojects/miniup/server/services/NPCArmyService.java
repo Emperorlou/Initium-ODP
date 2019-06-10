@@ -351,6 +351,8 @@ public class NPCArmyService extends Service
 				else
 					nextLocation = (Key)path.getProperty("location1Key");
 				
+				if(nextLocation == null) continue;
+				
 				if(this.excludedPropagateLocations.contains(nextLocation.getId()))
 				{
 					log.info(nextLocation.toString() + ": spawner excluded location to propagate");
@@ -366,11 +368,11 @@ public class NPCArmyService extends Service
 			{
 				if (getPropagationCount()<=0) return;
 				
-				if (paths.get(i).getProperty("discoveryChance")==null || (Double)paths.get(i).getProperty("discoveryChance")<=0d)
-					continue;
-				
 				CachedEntity pathToPropagateTo = paths.get(i);
 				Key locationToPropagateTo = pathsToLocations.get(pathToPropagateTo);
+				
+				if (pathToPropagateTo == null || locationToPropagateTo == null || pathToPropagateTo.getProperty("discoveryChance")==null || (Double)pathToPropagateTo.getProperty("discoveryChance")<=0d)
+					continue;
 				
 				// If there is already an NPCArmy at this location, we will add to it
 				List<CachedEntity> npcArmiesAtNextLocation = db.getFilteredList("NPCArmy", "locationKey", locationToPropagateTo);
@@ -388,7 +390,8 @@ public class NPCArmyService extends Service
 				{
 					CachedEntity locationEntity = locationEntities.get(i);
 					if (locationEntity==null) continue; // Cancel propagation to here, the location is deleted
-					if (isValidPropogateLocation(locationEntity) == false) return;
+					if (isValidPropogateLocation(locationEntity) == false) continue; // This is not a valid location to propagate to.
+					
 					log.info("Propagating to a new location: "+locationToPropagateTo);
 					CachedEntity newNpcArmy = new CachedEntity("NPCArmy");
 					newNpcArmy.setProperty("maxSpawnCount", db.solveCurve_Long(getPropagatedMaxSpawnCount()));
