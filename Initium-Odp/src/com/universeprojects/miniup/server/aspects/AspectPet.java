@@ -74,7 +74,13 @@ public class AspectPet extends ItemAspect
 		
 		// Get the satisfied value as a percentage, lower than 0% means hungry and not satisfied
 		long currentMs = System.currentTimeMillis();
-		long outOfFoodMs = getOutOfFoodDate().getTime();
+		Date oofDate = getOutOfFoodDate();
+		if (oofDate==null) {
+			oofDate = new Date(System.currentTimeMillis()+(60*60*1000));
+			setOutOfFoodDate(oofDate);
+		}
+		long outOfFoodMs = oofDate.getTime();
+		
 		long remainingSatisfiedTimeMs = outOfFoodMs-currentMs;
 		long maxSatisfiedMs = getHoursSatisfied().longValue()*3600000L;
 		
@@ -151,11 +157,6 @@ public class AspectPet extends ItemAspect
 		return (String) getProperty("mainImage");
 	}
 
-	public Date getLastUpdate()
-	{
-		return (Date) getProperty("lastUpdate");
-	}
-
 	public Double getMaxFood()
 	{
 		return (Double) getProperty("maxFood");
@@ -178,7 +179,10 @@ public class AspectPet extends ItemAspect
 
 	public Date getOutOfFoodDate()
 	{
-		return (Date) getProperty("outOfFoodDate");
+		Date date = (Date) getProperty("outOfFoodDate");
+		if (date==null) date = new Date();
+		setOutOfFoodDate(date);
+		return date;
 	}
 	
 	
@@ -198,10 +202,6 @@ public class AspectPet extends ItemAspect
 		setProperty("outOfFoodDate", date);
 	}
 	
-	public void setCurrentFood(Double food)
-	{
-		setProperty("currentFood", food);
-	}
 
 	public void setBuffs(List<Key> buffs)
 	{
@@ -226,11 +226,6 @@ public class AspectPet extends ItemAspect
 	public void setMainImage(String mainImage)
 	{
 		setProperty("mainImage", mainImage);
-	}
-
-	public void setLastUpdate(Date lastUpdate)
-	{
-		setProperty("lastUpdate", lastUpdate);
 	}
 
 	public void setMaxFood(Double maxFood)
@@ -367,6 +362,8 @@ public class AspectPet extends ItemAspect
 				for (String itemIdStr : itemIdStrs)
 				{
 					Long itemId = Long.parseLong(itemIdStr);
+					if (GameUtils.equals(itemId, petKey.getId()))
+						continue;
 					itemIds.add(itemId);
 					Key key = KeyFactory.createKey("Item", itemId);
 					pool.addToQueue(key);
@@ -409,9 +406,9 @@ public class AspectPet extends ItemAspect
 				
 				ds.put(pet.getEntity());
 
-				String feedingImage = petAspect.getFeedingImage();
+				String feedingImage = GameUtils.getResourceUrl(petAspect.getFeedingImage());
 				Long feedingImageMs = petAspect.getFeedingImageMs();
-				String regularImage = pet.getIcon();
+				String regularImage = GameUtils.getResourceUrl(pet.getIcon());
 
 				if (feedingImageMs != null && feedingImage != null)
 					addJavascriptToResponse("doFeedPetAnimation(" + petKey.getId() + ", '" + feedingImage + "', " + feedingImageMs + ", '" + regularImage + "');");

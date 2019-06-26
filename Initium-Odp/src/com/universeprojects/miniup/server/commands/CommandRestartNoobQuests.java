@@ -28,8 +28,8 @@ public class CommandRestartNoobQuests extends Command
 	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 	{
 		
-		QuestService questService = new QuestService(db);
-		db.getDB().put(questService.createQuestInstance(db.getCurrentCharacterKey(), QuestService.equipYourselfQuestKey).getRawEntity());
+		QuestService questService = getQuestService();
+		db.getDB().put(questService.createQuestInstance(QuestService.equipYourselfQuestKey).getRawEntity());
 
 		QueryHelper q = new QueryHelper(db.getDB());
 		List<Key> keys = q.getFilteredList_Keys("QuestDef", "noobQuest", true);

@@ -38,6 +38,11 @@ public class EntityWrapper extends BaseWrapper
 		this.isEmbeddedEntity = wrappedEntity.getAttribute("entity") != null;
 	}
 	
+	public ODPDBAccess getDB()
+	{
+		return db;
+	}
+	
 	public boolean hasCharges()
 	{
 		return getCharges() > 0;

@@ -42,7 +42,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-163";
+	final public static String version = "0.5.9-165";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 

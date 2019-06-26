@@ -8,7 +8,6 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.services.EmbeddedEntity;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 public class Buff extends EntityWrapper {

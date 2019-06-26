@@ -600,5 +600,10 @@ public abstract class CommonChecks
 		return false;
 	}
 
+	public static boolean checkLocationIsTown(CachedEntity location)
+	{
+		return GameUtils.equals(location.getProperty("type"), "Town");
+	}
+
 
 }

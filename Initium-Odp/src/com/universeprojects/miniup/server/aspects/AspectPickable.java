@@ -157,7 +157,7 @@ public class AspectPickable extends ItemAspect
 			
 			if (pickable.isNotActuallyPickingUpEntity()==false)
 			{
-				db.doCharacterCollectItem(db.getCurrentCharacter(), itemEntity, true);
+				db.doCharacterCollectItem(this, db.getCurrentCharacter(), itemEntity, true);
 				ds.put(itemEntity);
 				
 				message = addToCollectedMessage(message, itemEntity);
@@ -198,7 +198,7 @@ public class AspectPickable extends ItemAspect
 						newItem.setProperty("quantity", newQuantity);
 					}
 					
-					db.doCharacterCollectItem(db.getCurrentCharacter(), newItem);
+					db.doCharacterCollectItem(this, db.getCurrentCharacter(), newItem);
 					
 					newItems.add(newItem);
 

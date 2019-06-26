@@ -350,6 +350,8 @@ public class CommandCombatAttack extends Command
 			db.getGridMapService().regenerateTile(this, 500, 500);
 		}
 		
+		
+		getQuestService().checkCharacterPropertiesForObjectiveCompletions();
 	}
 
 	

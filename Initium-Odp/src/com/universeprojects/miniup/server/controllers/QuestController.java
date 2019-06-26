@@ -15,6 +15,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity.Objective;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
+import com.universeprojects.miniup.server.dbentities.QuestObjective;
 import com.universeprojects.miniup.server.services.QuestService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -32,7 +33,7 @@ public class QuestController extends PageController {
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
 
-		QuestService questService = new QuestService(db);
+		QuestService questService = new QuestService(null, db, db.getCurrentCharacter());
 		
 		String questDefKeyString = request.getParameter("key");
 		Key questDefKey = KeyFactory.stringToKey(questDefKeyString);
@@ -49,33 +50,36 @@ public class QuestController extends PageController {
 		description+="<h2>Objectives</h2>";
 		
 		boolean questComplete = true;
-		List<Objective> objectives = questDef.getObjectives();
+		List<QuestObjective> objectives = quest.getObjectiveData(questDef);
+		if (objectives==null)
+			objectives = questDef.getObjectiveData(db.getCurrentCharacterKey());
+		
 		if (objectives==null || objectives.isEmpty())
 			description+="None specified.";
 		else
 		{
 			description+="<ul>";
-			for(Objective objective:objectives)
+			for(QuestObjective objective:objectives)
 			{
-				if (objective.complete || quest.isComplete())
-					description+="<li style='color:#c7a46c'><span style='font-size:120%'>&#10004;</span> "+objective.name+"</li>";
+				if (objective.isComplete() || quest.isComplete())
+					description+="<li style='color:#c7a46c'><span style='font-size:120%'>&#10004;</span> "+objective.getName()+"</li>";
 				else
-					description+="<li>"+objective.name+"</li>";
+					description+="<li>"+objective.getName()+"</li>";
 				
-				if (objective.complete==false && quest.isComplete()==false) questComplete = false;
+				if (objective.isComplete()==false && quest.isComplete()==false) questComplete = false;
 			}
 			description+="</ul>";
 		}
 		
 		
-		// If the quest is now complete, lets save this new status
-		boolean newQuestGiven = questService.updateQuest(quest, questDef, questComplete);
-		
-		if (newQuestGiven)
-		{
-			// We need to refresh the page popup that shows quests so the player can see he has another quest to do after this...
-			description+="<script type='text/javascript'>reloadPagePopup();</script>";
-		}
+//		// If the quest is now complete, lets save this new status
+//		boolean newQuestGiven = questService.updateQuest(quest, questDef, questComplete);
+//		
+//		if (newQuestGiven)
+//		{
+//			// We need to refresh the page popup that shows quests so the player can see he has another quest to do after this...
+//			description+="<script type='text/javascript'>reloadPagePopup();</script>";
+//		}
 		
 		request.setAttribute("questComplete", questComplete);
 		request.setAttribute("name", questDef.getName());

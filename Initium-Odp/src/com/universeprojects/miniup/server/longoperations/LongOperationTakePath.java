@@ -24,6 +24,7 @@ import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
+import com.universeprojects.miniup.server.services.QuestService;
 import com.universeprojects.miniup.server.services.TerritoryService;
 
 public class LongOperationTakePath extends LongOperation {
@@ -356,6 +357,10 @@ public class LongOperationTakePath extends LongOperation {
 		if (attack==null) attack = false;
 	
 		CachedEntity newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
+		
+		getQuestService().checkLocationForObjectiveCompletions(newLocation);
+		
+		
 		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
 		update.updateFullPage_shortcut(true);
 		

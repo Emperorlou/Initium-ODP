@@ -68,6 +68,8 @@ public class CommandCharacterEquipItem extends Command {
 		MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, db.getCurrentUser(), character, null, this);
 		mpus.updateInBannerCharacterWidget();
 		
+		getQuestService().checkCharacterPropertiesForObjectiveCompletions();
+		
 		// Remove the item from inventory first.
 		deleteHtml("#inventory .invItem[ref='" + item.getId() + "']");
 		

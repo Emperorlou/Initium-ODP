@@ -20,6 +20,7 @@ import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.GlobalEvent;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
@@ -286,7 +287,7 @@ public class DBAccessor {
 	
 	public void moveItem(EntityWrapper currentCharacter, EntityWrapper item, EntityWrapper newContainer) throws UserErrorMessage 
 	{
-		db.doMoveItem(null, currentCharacter.wrappedEntity, item.wrappedEntity, newContainer.wrappedEntity);
+		db.doMoveItem(null, null, currentCharacter.wrappedEntity, item.wrappedEntity, newContainer.wrappedEntity);
 	}
 	
 	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)

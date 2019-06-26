@@ -138,6 +138,8 @@ public class CommandCombatEscape extends Command {
 			if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
 				db.sendGameMessage(db.getDB(), targetCharacter, userMessage);
 		}
+		
+		getQuestService().checkCharacterPropertiesForObjectiveCompletions();
 	}
 
 }

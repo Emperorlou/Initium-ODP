@@ -164,6 +164,8 @@ public class LongOperationRest extends LongOperation {
 		mpus.updateLocationDescription();
 		mpus.updateMonsterCountPanel();
 		
+		getQuestService().checkCharacterPropertiesForObjectiveCompletions();
+		
 		return "You are fully rested!";
 	}
 

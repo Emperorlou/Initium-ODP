@@ -2,16 +2,32 @@ package com.universeprojects.miniup.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.appengine.api.datastore.Key;
+import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.json.shared.JSONArray;
 import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
+import com.universeprojects.miniup.server.dbentities.QuestDefEntity.Objective;
+import com.universeprojects.miniup.server.dbentities.QuestEntity;
+import com.universeprojects.miniup.server.dbentities.QuestObjective;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridObject;
+import com.universeprojects.miniup.server.services.QuestService;
 
 public abstract class OperationBase
 {
+	final protected ODPDBAccess db;
+	
+	public OperationBase(ODPDBAccess db)
+	{
+		this.db = db;
+	}
+	
 	/**
 	 * Method stub. Returns back an ODPAuthenticator object to use in various ODPDBAccess methods.
 	 * @return
@@ -205,5 +221,49 @@ public abstract class OperationBase
 	
 	public abstract Long getSelectedTileX();
 	public abstract Long getSelectedTileY();
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*///////////////////////////////////
+	 * Quest related stuff	
+	 */
+
+	
+	
+	private QuestService questService = null;
+	
+	protected QuestService getQuestService()
+	{
+		if (questService==null)
+			questService = new QuestService(this, db, db.getCurrentCharacter());
+		
+		return questService;
+	}
+	
+	boolean questCompleteFlagged = false;
+	public void flagQuestComplete()
+	{
+		questCompleteFlagged = true;
+		addJavascriptToResponse("doQuestCompleteBannerEffect();");
+	}
+	
+	public void flagObjectiveComplete()
+	{
+		if (questCompleteFlagged) return;
+		
+		addJavascriptToResponse("doObjectiveCompleteBannerEffect();");
+	}
+	
+	
+	
+	
+	
 	
 }

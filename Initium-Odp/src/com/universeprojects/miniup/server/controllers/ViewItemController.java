@@ -117,7 +117,7 @@ public class ViewItemController extends PageController {
 			CachedEntity questDefEntity = db.getEntity((Key)item.getProperty("newQuest"));
 			if (questDefEntity!=null)
 			{
-				QuestService questService = new QuestService(db);
+//				QuestService questService = new QuestService(db, db.getCurrentCharacter());
 				QuestDefEntity questDef = new QuestDefEntity(db, questDefEntity);
 				QuestEntity quest = questDef.getQuestEntity(db.getCurrentCharacterKey());
 				

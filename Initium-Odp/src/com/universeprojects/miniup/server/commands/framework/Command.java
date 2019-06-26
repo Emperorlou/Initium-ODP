@@ -29,7 +29,6 @@ public abstract class Command extends OperationBase
 		ReloadPagePopup, 
 		ReloadMiniPagePopup
 	}
-	protected final ODPDBAccess db;
 	protected final CachedDatastoreService ds;
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
@@ -41,11 +40,11 @@ public abstract class Command extends OperationBase
 	
 	public Command(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
+		super(db);
 		this.request = request;
 		this.response = response;
 		
 		
-		this.db = db;
 		this.ds = db.getDB();
 		this.query = new QueryHelper(ds);
 	}

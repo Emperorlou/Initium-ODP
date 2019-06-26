@@ -190,6 +190,7 @@ public class LongOperationExplore extends LongOperation {
 				// First try to find a monster
 				if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location))
 				{
+					getQuestService().checkLocationForObjectiveCompletions(db.pool.get(db.getCurrentCharacter().getProperty("locationKey")));
 					return "You're being attacked!"; 
 				}
 				
@@ -272,6 +273,9 @@ public class LongOperationExplore extends LongOperation {
 						}
 							
 						discoverPath(ds, db, path);
+
+						getQuestService().checkLocationForObjectiveCompletions(db.getCharacterLocation(db.getCurrentCharacter()));
+						
 						return "You found a new place! You've never been here before..";
 					}
 				}
@@ -310,6 +314,9 @@ public class LongOperationExplore extends LongOperation {
 							}
 								
 							discoverPath(ds, db, path);
+
+							getQuestService().checkLocationForObjectiveCompletions(db.getCharacterLocation(db.getCurrentCharacter()));
+							
 							return "You found an old combat site. A battle had clearly taken place here..";
 						}
 					}
@@ -320,6 +327,9 @@ public class LongOperationExplore extends LongOperation {
 				if (findNaturalResources)
 				{
 					db.doCreateNaturalResourceDiscovery(db.getCurrentCharacter());
+					
+					getQuestService().checkLocationForObjectiveCompletions(db.getCharacterLocation(db.getCurrentCharacter()));
+					
 					return "You found an area you haven't seen before. There might be something here you're looking for..";
 				}
 			}

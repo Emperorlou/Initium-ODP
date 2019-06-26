@@ -30,7 +30,7 @@ public class CommandCollectItem extends Command
 		Long tileX = (Long)item.getProperty("gridMapPositionX");
 		Long tileY = (Long)item.getProperty("gridMapPositionY");
 		
-		db.doCharacterCollectItem(db.getCurrentCharacter(), item);
+		db.doCharacterCollectItem(this, db.getCurrentCharacter(), item);
 		
 		if(item.isUnsaved())
 			ds.put(item);

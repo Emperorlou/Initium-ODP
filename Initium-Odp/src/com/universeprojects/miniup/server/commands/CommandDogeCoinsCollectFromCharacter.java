@@ -14,6 +14,7 @@ import com.universeprojects.miniup.server.commands.framework.TransactionCommand;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
+import com.universeprojects.miniup.server.services.QuestService;
 
 /**
  * Collects all gold from the specified character ID
@@ -74,6 +75,7 @@ public class CommandDogeCoinsCollectFromCharacter extends TransactionCommand {
 		Long collectCoins = (Long)collectFromCharacter.getProperty("dogecoins");
 		character.setProperty("dogecoins", characterCoins + collectCoins);
 		collectFromCharacter.setProperty("dogecoins", 0L);
+		
 		
 		// Order matters! Always subtract coins first!
 		ds.put(collectFromCharacter);

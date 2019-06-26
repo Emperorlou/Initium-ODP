@@ -57,8 +57,7 @@ public class PetFoodCompatibleItemsListController extends PageController {
 	
 			QueryHelper query = new QueryHelper(db.getDB());
 
-			List<CachedEntity> items = query.getFilteredList("Item",  
-					"containerKey", db.getCurrentCharacterKey());
+			List<CachedEntity> items = query.getFilteredList("Item", "containerKey", db.getCurrentCharacterKey());
 			
 			// Now filter out all the items that are not compatible
 			petAspect.filterFoodItems(items);
@@ -66,13 +65,15 @@ public class PetFoodCompatibleItemsListController extends PageController {
 			
 			for(CachedEntity item:items)
 			{
+				if (GameUtils.equals(item.getId(), petEntity.getId()))
+					continue;
 				Map<String,String> data = new HashMap<>();
 				data.put("html", GameUtils.renderItem(db, character, item));
 				data.put("id", item.getId().toString());
 				
 				itemsFormatted.add(data);
 			}
-			request.setAttribute("petIcon", petEntity.getProperty("icon"));
+			request.setAttribute("petIcon", GameUtils.getResourceUrl(petEntity.getProperty("icon")));
 			request.setAttribute("petId", petId);
 			request.setAttribute("items", itemsFormatted);
 			request.setAttribute("petFoodMax", GameUtils.formatNumber(petAspect.getDesiredFoodKg()));

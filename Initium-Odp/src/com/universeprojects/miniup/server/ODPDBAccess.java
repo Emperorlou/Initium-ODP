@@ -57,6 +57,7 @@ import com.universeprojects.miniup.server.services.ModifierService.ModifierType;
 import com.universeprojects.miniup.server.services.MovementService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
+import com.universeprojects.miniup.server.services.QuestService;
 
 public class ODPDBAccess
 {
@@ -186,7 +187,9 @@ public class ODPDBAccess
 		}
 		pool.addToQueue(equipmentKeys);
 		pool.loadEntities();
-		return pool.get(equipmentKeys);
+		List<CachedEntity> list = pool.get(equipmentKeys);
+		while(list.remove(null));
+		return list;
 	}
 	
 	
@@ -907,7 +910,7 @@ public class ODPDBAccess
 	{
 		if (db == null) db = getDB();
 
-		CachedEntity location = new CachedEntity("Location");
+		CachedEntity location = new CachedEntity("Location", db.getPreallocatedIdFor("Location"));
 		// Set the starting attributes
 		location.setProperty("banner", banner);
 		location.setProperty("name", name);
@@ -919,12 +922,13 @@ public class ODPDBAccess
 		location.setProperty("gridMapWidth", (long)gridMapSize);
 		location.setProperty("gridMapHeight", (long)gridMapSize);
 
+		pool.addEntityDirectly(location);
+		
 		// GridMap stuff
 		GridMapService gmService = new GridMapService(this, parentLocation);
 		gmService.generateGridMapElementsFromParent(this, parentLocation, location);
 		
-		// Set some default attributes
-
+		
 		db.put(location);
 		return location;
 	}
@@ -1722,13 +1726,13 @@ public class ODPDBAccess
 	}
 
 	
-	public void doCharacterCollectItem(CachedEntity character, CachedEntity item) throws UserErrorMessage
+	public void doCharacterCollectItem(OperationBase command, CachedEntity character, CachedEntity item) throws UserErrorMessage
 	{
-		doCharacterCollectItem(character, item, false);
+		doCharacterCollectItem(command, character, item, false);
 	}
 	
 	
-	public void doCharacterCollectItem(CachedEntity character, CachedEntity item, boolean overrideImmovable) throws UserErrorMessage
+	public void doCharacterCollectItem(OperationBase command, CachedEntity character, CachedEntity item, boolean overrideImmovable) throws UserErrorMessage
 	{
 		if (character == null) throw new IllegalArgumentException("Character cannot be null.");
 		if (item == null) throw new UserErrorMessage("This item no longer exists.");
@@ -1757,6 +1761,9 @@ public class ODPDBAccess
 		item.setProperty("containerKey", character.getKey());
 		item.setProperty("movedTimestamp", new Date());
 
+		QuestService questService = command.getQuestService();
+		questService.checkAcquiredItemForObjectiveCompletions(item);
+		
 	}
 
 	public Long getCharacterWeight(CachedEntity character)
@@ -2665,7 +2672,7 @@ public class ODPDBAccess
 		}
 	}
 	
-	public boolean tryMoveItem(CachedEntity character, CachedEntity item, CachedEntity newContainer, Long requestQuantity) throws UserErrorMessage
+	public boolean tryMoveItem(OperationBase command, CachedEntity character, CachedEntity item, CachedEntity newContainer, Long requestQuantity) throws UserErrorMessage
 	{
 		CachedDatastoreService ds = getDB();
 
@@ -2931,6 +2938,13 @@ public class ODPDBAccess
 		// This call moved here from doMoveItem()
 		ds.put(item);
 
+		
+		if (GameUtils.equals(getCurrentCharacterKey(), newContainer.getKey()))
+		{
+			QuestService questService = command.getQuestService();
+			questService.checkAcquiredItemForObjectiveCompletions(item);
+		}
+		
 		if (stackTooLarge)
 		{
 			throw new UserErrorMessage("Container was only able to fit "+requestQuantity+" of the items.");
@@ -2950,18 +2964,18 @@ public class ODPDBAccess
 		return handled;
 	}
 
-	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer, Long quantity) throws UserErrorMessage
+	public void doMoveItem(OperationBase command, CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer, Long quantity) throws UserErrorMessage
 	{
 		// Throws if unsuccessful.
-		tryMoveItem(character, item, newContainer, quantity);
+		tryMoveItem(command, character, item, newContainer, quantity);
 
 		// Moved this to tryMoveItem() for messaging purposes
 		/* ds.put(item); */
 	}
 
-	public void doMoveItem(CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
+	public void doMoveItem(OperationBase command, CachedDatastoreService ds, CachedEntity character, CachedEntity item, CachedEntity newContainer) throws UserErrorMessage
 	{
-		doMoveItem(ds, character, item, newContainer, null);
+		doMoveItem(command, ds, character, item, newContainer, null);
 	}
 
 	public boolean doDrinkBeer(CachedDatastoreService ds, CachedEntity character) throws UserErrorMessage
@@ -5190,7 +5204,7 @@ public class ODPDBAccess
 					// ALSO
 					// If the fight took place in a non-combat site AND the hitpoints is less than 100, we will auto loot
 					Long gold = null;
-					CachedEntity attackerCharacterLocation = getEntity((Key)attackingCharacterFinal.getProperty("locationKey"));
+//					CachedEntity attackerCharacterLocation = getEntity((Key)attackingCharacterFinal.getProperty("locationKey"));
 					if (	
 //							/* If the attacker or defender were standing in an instance*/
 //							(locationFinal.getProperty("territoryKey")!=null || 
@@ -5203,7 +5217,7 @@ public class ODPDBAccess
 //							/* If the fight took place in a non-combat site and the max hitpoints of the defender was less than 100 */
 //							("CombatSite".equals(locationFinal.getProperty("type"))==false &&
 //							(Double)characterToDieFinal.getProperty("maxHitpoints")<100d)
-							("CombatSite".equals(locationFinal.getProperty("type"))==false
+							"CombatSite".equals(locationFinal.getProperty("type"))==false
 						)
 					{
 						gold = (Long)characterToDieFinal.getProperty("dogecoins");
@@ -6347,6 +6361,9 @@ public class ODPDBAccess
 			queueMainPageUpdateForCharacters(partyKeys, "updateFullPage_shortcut");
 		
 		
+		
+		
+		
 		return destination;
 	}
 	
@@ -7471,7 +7488,7 @@ public class ODPDBAccess
         return newCharacter;
     }
 
-	public List<List<String>> getValueFromFieldTypeFieldFilter2DCollection(CachedEntity entity, String fieldName)
+	public List<List<String>> getValueFromFieldTypeFieldFilter2DCollection(PropertyContainer entity, String fieldName)
 	{
 		// TODO Auto-generated method stub
 		return null;
@@ -7867,4 +7884,8 @@ public class ODPDBAccess
 		return changed;
 	}
 	
+	
+    public boolean doIfExpressionCheck(Object value1, String operator, String value2) {
+    	return false;
+    }
 }

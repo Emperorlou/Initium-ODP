@@ -32,7 +32,7 @@ public class CommandMoveItem extends Command
 		CachedEntity item = db.getEntity(KeyFactory.createKey("Item", itemId));
 		CachedEntity newContainer = db.getEntity(destinationKey);
 		
-		db.doMoveItem(null, db.getCurrentCharacter(), item, newContainer);
+		db.doMoveItem(this, null, db.getCurrentCharacter(), item, newContainer);
 	}
 
 }

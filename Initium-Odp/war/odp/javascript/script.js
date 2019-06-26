@@ -4388,7 +4388,7 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 					else
 					{
 						clearPopupPermanentOverlay(); 
-						playAudio("complete1");
+						if (isSoundEffectsEnabled()) playAudio("complete1");
 						doSimpleDesktopNotification(ideaName+" prototyping complete.", "");
 					}
 				}
@@ -4440,7 +4440,7 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 					else
 					{
 						clearPopupPermanentOverlay();
-						playAudio("complete1");
+						if (isSoundEffectsEnabled()) playAudio("complete1");
 						doSimpleDesktopNotification(skillName+" skill complete.", "");
 					}
 				}
@@ -5789,4 +5789,67 @@ function confirmRequirements_collectChoices(event)
 	
 	return result;
 }
+
+function clearQuestCompleteEffect()
+{
+	clearTimeout(window.questCompleteEffectTimer);
+	if ($("#questCompleteEffect img").length>0)
+		$("#questCompleteEffect img")[0].src='';
+	$("#questCompleteEffect").remove();
+}
+
+var overlayEffectIdCounter = 0;
+function overlayEffect(imgUrl, timeoutMs)
+{
+	overlayEffectIdCounter++;
+	
+	var effectId = overlayEffectIdCounter;
+	var effectTimer = null;
+	function clearOverlayEffect()
+	{
+		clearTimeout(effectTimer);
+		$("#overlayEffect"+effectId).fadeOut(1000, function(){
+			if ($("#overlayEffect"+effectId+" img").length>0)
+				$("#overlayEffect"+effectId+" img")[0].src='';
+			$("#overlayEffect"+effectId).remove();
+		});
+	}
+	
+	var html = "<div class='overlay-effect-container' id='overlayEffect"+effectId+"' >"+
+	"<img src='"+imgUrl+"'>"+
+	"</div>";
+	$("#banner-fx").prepend(html);
+	
+	effectTimer = setTimeout(clearOverlayEffect, timeoutMs);
+	
+}
+
+function doQuestCompleteBannerEffect()
+{
+	overlayEffect("https://i.imgur.com/s2XdVIl.gif", 5000);
+	if (isSoundEffectsEnabled()) playAudio("quest-complete1");
+}
+
+function doObjectiveCompleteBannerEffect()
+{
+	overlayEffect("https://i.imgur.com/mv9LtvM.gif", 5000);
+}
+
+
+//function doQuestCompleteEffect()
+//{
+//	$("#quest-complete-label").remove();
+//	clearQuestCompleteEffect();
+//	
+//	var html = "<div id='questCompleteEffect' style='position: fixed;overflow: visible;mix-blend-mode: color-dodge;width: 0px;height: 0px;left: 50%;top: 30%;z-index: 1000000000;'>"+
+//	"<img src='https://initium-resources.appspot.com/images/ui3/complete-effect.gif' style='position:absolute;margin-left: -250px;margin-top: 0px;float: left;pointer-events: none;transform: scale(2);'>"+
+//	"</div>";
+//	$("body").prepend(html);
+//	
+//	var completeHtml = "<h3 id='quest-complete-label'>Complete!</h3>";
+//	setTimeout(function(){$(".quest-window").append(completeHtml);}, 500);
+//	window.questCompleteEffectTimer = setTimeout(clearQuestCompleteEffect, 5000);
+//
+//	$("#questlist-questkey-${questDefKey}").addClass("quest-complete");
+//}
 

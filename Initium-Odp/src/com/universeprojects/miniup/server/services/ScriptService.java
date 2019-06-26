@@ -81,7 +81,7 @@ public class ScriptService extends Service
 		// where we pass a null CachedEntity for the currentCharacter parameter.
 		if(entity == null) return null;
 		
-		CachedEntity ce = null 
+		CachedEntity ce = null;
 		if(entity instanceof EmbeddedEntity)
 		{
 			EmbeddedEntity ent = (EmbeddedEntity)entity;

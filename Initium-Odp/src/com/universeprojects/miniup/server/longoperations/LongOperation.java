@@ -50,6 +50,7 @@ public abstract class LongOperation extends OperationBase
 	
 	public LongOperation(ODPDBAccess db, Map<String, String[]> requestParameters) throws UserErrorMessage
 	{
+		super(db);
 		if (db==null)
 			throw new IllegalArgumentException("GameFunctions cannot be null.");
 		if (db.getCurrentCharacter()==null)

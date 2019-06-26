@@ -40,8 +40,8 @@ public class CommandBeginQuest extends Command
 		if (CommonChecks.checkItemIsAccessible(item, db.getCurrentCharacter())==false)
 			throw new UserErrorMessage("You do not have access to this item and so you cannot start a quest from it. Make sure it is in your inventory or on the ground in your location.");
 		
-		QuestService questService = new QuestService(db);
-		QuestEntity quest = questService.createQuestInstance(db.getCurrentCharacterKey(), questDefKey);
+		QuestService questService = getQuestService();
+		QuestEntity quest = questService.createQuestInstance(questDefKey);
 
 		addCallbackData("questDefKey", questDef.getUrlSafeKey());
 		

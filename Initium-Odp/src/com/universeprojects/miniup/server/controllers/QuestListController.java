@@ -36,7 +36,7 @@ public class QuestListController extends PageController {
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
 
-		QuestService questService = new QuestService(db);
+		QuestService questService = new QuestService(null, db, db.getCurrentCharacter());
 		
 		List<QuestEntity> activeQuests = questService.getActiveQuests();
 		Map<Key, QuestDefEntity> activeQuestDefs = questService.getMapOfActiveQuestDefs();
