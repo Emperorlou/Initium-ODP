@@ -42,7 +42,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils 
 {
-	final public static String version = "0.5.9-165";
+	final public static String version = "0.5.9-166";
 	
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -1081,15 +1081,21 @@ public class GameUtils
 				quantityDiv="<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+formatNumber(quantity)+"</div></div>";
 				
 		}
-		
+		String altQuality = qualityClass;
+		if  (altQuality.length()>5)
+			altQuality = altQuality.substring(5);
 		if(CommonChecks.checkIsHardcore(item)) qualityClass += " hardcore";
+		String minitip = getItemMiniTip(db, item);
+		String minitipForAlt = "";
+		if (minitip.length()>10) 
+			minitipForAlt = minitip.substring(9, minitip.length()-1);
 		String result = null;
 		if (proceduralKey!=null)
-			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?proceduralKey="+proceduralKey+"'><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"'  "+minitipForAlt+"' " + minitip + " rel='/odp/viewitemmini?proceduralKey="+proceduralKey+"'><span class='accessible'>"+altQuality+"</span><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else if (popupEmbedded)
-			result = "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' " + getItemMiniTip(db, item) + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:26px; max-height:26px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='"+qualityClass+"' "+minitipForAlt+"' " + minitip + " onclick='reloadPopup(this, \""+WebUtils.getFullURL(request)+"\", event)' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><span class='accessible'>"+altQuality+"</span><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:26px; max-height:26px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		else
-			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' " + getItemMiniTip(db, item) + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
+			result = "<span class='"+notEnoughStrengthClass+"'><a class='clue "+qualityClass+"' "+minitipForAlt+"' " + minitip + " rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'><span class='accessible'>"+altQuality+"</span><div class='main-item-image-backing'>"+quantityDiv+"<img class='item-icon-img-"+item.getKey().getId()+"' style='max-width:32px; max-height:32px;' src='"+iconUrl+"' border=0/></div><div class='"+lowDurabilityClass+"main-item-name'>"+label+"</div></a></span>";
 		
 		if (result.toLowerCase().contains("<script") || result.toLowerCase().contains("javascript:")) throw new RuntimeException("CODENK1 Item("+item.getId()+")");
 		
@@ -1107,7 +1113,7 @@ public class GameUtils
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class='normal-container'>\r\n");
-		sb.append("	<a onclick='shareItem("+item.getId()+")' style='float:right' title='Clicking this will show the item in chat in the location you`re currently in.'>Share</a>\r\n");
+		sb.append("	<a alt='Share item to chat' onclick='shareItem("+item.getId()+")' style='float:right' title='Clicking this will show the item in chat in the location you`re currently in.'>Share</a>\r\n");
 		sb.append("	<br/><br/>\r\n");
 		
 		boolean selfUser = GameUtils.equals(currentChar.getKey(), item.getProperty("containerKey"));
@@ -1116,17 +1122,19 @@ public class GameUtils
 		{
 			ContainerService cs = new ContainerService(db);
 			if(cs.checkContainerAccessAllowed(currentChar, item))
-				sb.append("	<p class='main-item-controls' style='display:block;margin:5px;'><a onclick='doSetLabel(event, " + item.getId() + ")' style='font-size:13px;'>Rename</a></p>\r\n");
+				sb.append("	<p class='main-item-controls' style='display:block;margin:5px;'><a alt='Rename this item' onclick='doSetLabel(event, " + item.getId() + ")' style='font-size:13px;'>Rename</a></p>\r\n");
 		}
 		
 		sb.append("	<div class='item-popup-header'>\r\n");
+		
+		String cssQuality = determineQuality(item.getProperties());
 		
 		String iconUrl = getResourceUrl(item.getProperty("icon"));
 		
 		sb.append("		<div class='icon'>");
 		if (item.getProperty("quantity")!=null)
 			sb.append("<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>"+GameUtils.formatNumber((Long)item.getProperty("quantity"))+"</div></div>");
-		sb.append("<img class='item-icon-img-"+item.getKey().getId()+"' src='" + iconUrl + "' border='0'/></div>\r\n");
+		sb.append("<img alt='"+cssQuality.substring(5)+" quality item icon' class='item-icon-img-"+item.getKey().getId()+"' src='" + iconUrl + "' border='0'/></div>\r\n");
 		sb.append("		<div style='width:230px'>\r\n");
 		
 		
@@ -1135,7 +1143,7 @@ public class GameUtils
 		String itemClass = (String)item.getProperty("itemClass");
 		if(itemClass == null) itemClass = "";
 		String hcmClass = CommonChecks.checkIsHardcore(item) ? " hardcore" : "";
-		sb.append("			<span " + (isComparisonItem ? "" : "name='itemName' ") + "class='" + determineQuality(item.getProperties()) + hcmClass +"'>"+itemName+"</span>\r\n");
+		sb.append("			<span " + (isComparisonItem ? "" : "name='itemName' ") + "class='" + cssQuality + hcmClass +"'>"+itemName+"</span>\r\n");
 		sb.append("			<div " + (isComparisonItem ? "" : "name='itemClass' ") + "class='main-highlight" + hcmClass + "' style='font-size:14px'>"+itemClass+"</div>\r\n");
 		sb.append("		</div>\r\n");
 		sb.append("	</div>\r\n");
@@ -1761,7 +1769,12 @@ public class GameUtils
 					GameUtils.formatNumber(character.getProperty("intelligence"), true) + "<br/>" + 
 					GameUtils.formatNumber(db.getCharacterCarryingWeight(character) / 1000, true) + "/" + 
 					GameUtils.formatNumber(db.getCharacterMaxCarryingWeight(character) / 1000, true) + "kg";
+			String alt = "Character sheet - Strength: "+GameUtils.formatNumber(character.getProperty("strength"), true)+
+					" - Dexterity: "+GameUtils.formatNumber(character.getProperty("dexterity"), true) +
+					" - Intelligence: "+GameUtils.formatNumber(character.getProperty("intelligence"), true) +
+					" - Carrying weight: "+(int)Math.floor(db.getCharacterCarryingWeight(character).doubleValue()/db.getCharacterMaxCarryingWeight(character).doubleValue()*100d)+"%";
 			sb.append("<a class='clue' rel='/odp/viewcharactermini?characterId="+character.getKey().getId()+"' minitip='" + minitip + "'>");
+			sb.append("<span class='accessible'>"+alt+"</span>");
 		}
 		
 		String sizePrepend = "";

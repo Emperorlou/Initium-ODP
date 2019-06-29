@@ -862,7 +862,10 @@ public class MainPageUpdateService extends Service
 			else if (CommonChecks.checkLocationIsTown(location))
 			{
 				newHtml.append(getHtmlForInBannerLinkCentered(30, 50, "Browse nearby stores", "loadLocationMerchants()"));				
+				newHtml.append(getHtmlForInBannerLinkCentered(85, 50, "Nearby Items", "loadLocationItems()"));				
 			}
+			else
+				newHtml.append(getHtmlForInBannerLinkCentered(85, 50, "Nearby Items", "loadLocationItems()"));				
 			
 			newHtml.append(getSideBannerLinks());
 			

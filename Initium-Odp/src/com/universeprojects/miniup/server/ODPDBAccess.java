@@ -5963,7 +5963,7 @@ public class ODPDBAccess
 		return carrying;
 	}
 	
-	public long getCharacterMaxCarryingWeight(CachedEntity character)
+	public Long getCharacterMaxCarryingWeight(CachedEntity character)
 	{
 		long maxCarryWeight = 60000;
 		Double str = (Double)character.getProperty("strength");

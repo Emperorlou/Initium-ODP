@@ -14,6 +14,15 @@
     src: url(arial-narrow-2.ttf);
 }
 
+.accessible
+{
+	height: 1px;
+	width: 1px;
+	position: absolute;
+	overflow: hidden;
+	top: -10px;
+}
+
 /**
  * Marching ants border
  */

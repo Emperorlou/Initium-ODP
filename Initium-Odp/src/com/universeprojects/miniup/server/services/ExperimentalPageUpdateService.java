@@ -159,6 +159,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 
 		newHtml.append("	<div class='shortcut-overlay-2d'>");
 		newHtml.append("		<div style='position:absolute;top:15.0%;left:50.0%;'><a onclick='doAutoExplore(event);' class='auto-explore-link path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>Explore</a></div>");
+//		newHtml.append("		<div style='position:absolute;top:85.0%;left:50.0%;'><a onclick='loadLocationItems(event);' class='path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>Nearby Items</a></div>");
 		newHtml.append("	</div>");
 
 		if (CommonChecks.checkCharacterIsInCombat(character)==false)

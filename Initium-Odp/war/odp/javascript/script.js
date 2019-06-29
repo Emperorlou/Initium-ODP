@@ -5828,11 +5828,13 @@ function doQuestCompleteBannerEffect()
 {
 	overlayEffect("https://i.imgur.com/s2XdVIl.gif", 5000);
 	if (isSoundEffectsEnabled()) playAudio("quest-complete1");
+	window.scrollTo(0,0);
 }
 
 function doObjectiveCompleteBannerEffect()
 {
 	overlayEffect("https://i.imgur.com/mv9LtvM.gif", 5000);
+	window.scrollTo(0,0);
 }
 
 
