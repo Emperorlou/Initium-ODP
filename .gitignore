@@ -58,3 +58,5 @@ RemoteSystemsTempFiles/
 /Initium-Odp/war/WEB-INF/lib/geronimo-jpa_2.0_spec-1.0.jar
 /Initium-Odp/war/WEB-INF/lib/jdo-api-3.0.1.jar
 /Initium-Odp/war/WEB-INF/lib/jta-1.1.jar
+/Initium-Odp/war/WEB-INF/lib/appengine-api-1.0-sdk-1.9.59.jar
+/Initium-Odp/war/WEB-INF/lib/appengine-jsr107cache-1.9.59.jar
