@@ -1102,14 +1102,7 @@ function compareWeapons(a, b) {
 
 function loadInventory()
 {
-	$("#inventory").load("/odp/inventorylist?ajax=true&char="+window.characterOverride, function(){
-		var sorted = $('#invItems h4:contains("Armor")').nextUntil('#invItems h4').sort(compareArmor);
-		sorted.map(function() { var html = $(this)[0].outerHTML; $(this).remove(); $('#invItems h4:contains("Armor")').after(html)});
-		sorted = $('#invItems h4:contains("Shield")').nextUntil('#invItems h4').sort(compareArmor);
-		sorted.map(function() { var html = $(this)[0].outerHTML; $(this).remove(); $('#invItems h4:contains("Shield")').after(html)});
-		sorted = $('#invItems h4:contains("Weapon")').nextUntil('#invItems h4').sort(compareWeapons);
-		sorted.map(function() { var html = $(this)[0].outerHTML; $(this).remove(); $('#invItems h4:contains("Weapon")').after(html)});
-	});
+	$("#inventory").load("/odp/inventorylist?ajax=true&char="+window.characterOverride);
 //	$("#inventory").click(function(){
 //		$("#main-itemlist").html("<div class='boldbox' onclick='loadLocationItems()'><h4>Nearby items</h4></div>");
 //	});

@@ -180,6 +180,27 @@ public class EntityWrapper extends BaseWrapper
 		return wrappedEntity;
 	}
 	
+	public Boolean getHardcoreMode()
+	{
+		return (Boolean)getProperty("hardcoreMode");
+	}
+	
+	public boolean isHardcore()
+	{
+		Boolean hcm = getHardcoreMode();
+		return hcm != null && hcm == true;
+	}
+	
+	public boolean setHardcoreMode(boolean hcmMode)
+	{
+		if(wrappedEntity.hasProperty("hardcoreMode"))
+		{
+			setProperty("hardcoreMode", hcmMode);
+			return true;
+		}
+		return false;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public boolean removeScript(String scriptName)
 	{
