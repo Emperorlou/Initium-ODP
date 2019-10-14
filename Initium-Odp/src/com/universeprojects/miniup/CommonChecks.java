@@ -594,7 +594,7 @@ public abstract class CommonChecks
 	{
 		List<String> list = (List<String>)item.getProperty("_aspects");
 		
-		if (list.contains(clazz.getSimpleName().substring(6)))
+		if (list!=null && list.contains(clazz.getSimpleName().substring(6)))
 			return true;
 		
 		return false;
@@ -603,6 +603,11 @@ public abstract class CommonChecks
 	public static boolean checkLocationIsTown(CachedEntity location)
 	{
 		return GameUtils.equals(location.getProperty("type"), "Town");
+	}
+
+	public static boolean checkLocationIsTownHall(CachedEntity location)
+	{
+		return GameUtils.equals(location.getProperty("type"), "CityHall");
 	}
 
 

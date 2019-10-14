@@ -177,9 +177,7 @@
 	<br> <br> <a class='big-link' href='#' onclick='deleteAndRecreateCharacter(event, "${charName}${hc}")' id='btnNewCharacter'>Delete your character and recreate</a>
 </p>
 
-<c:if test="${premium==true}">
 <p>
 	<br> <br> <a class="big-link" href="#" onclick="rediscoverHouses(event)" id="btnRediscoverHouses">Rediscover All Owned Houses</a>
 </p>
-</c:if>
 <div class='mobile-spacer'></div>

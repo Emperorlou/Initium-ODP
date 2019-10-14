@@ -87,7 +87,7 @@ public class CharacterSwitcherController extends PageController {
 			if (useSimpleMode)
 				data.put("html", "<div class='character-widget-simple-mode'>"+c.getProperty("name")+"</div>");
 			else
-				data.put("html", GameUtils.renderCharacterWidget(pool, request, db, c, user, true));
+				data.put("html", GameUtils.renderCharacterWidget(pool, request, db, c, user, true, false));
 			data.put("id", c.getKey().getId());
 			data.put("name", c.getProperty("name"));
 			data.put("urlSafeKey", c.getUrlSafeKey());

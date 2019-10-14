@@ -8,6 +8,7 @@
 			https://initium-resources.appspot.com
 			https://initium-eventserver.universeprojects.com
 			wss://initium-eventserver.universeprojects.com
+			https://storage.googleapis.com/initium-resources/ 
 			https://www.google-analytics.com;
 		img-src 'self'
 			https://i.imgur.com
@@ -15,7 +16,8 @@
 			https://initium-resources.appspot.com
 			https://www.google-analytics.com
 			https://ajax.googleapis.com
-			https://www.paypalobjects.com; 
+			https://www.paypalobjects.com
+			https://storage.googleapis.com/initium-resources/; 
 		script-src 'self' 'unsafe-inline' 'unsafe-eval'
 			https://code.jquery.com 
 			https://cdnjs.cloudflare.com
@@ -79,7 +81,7 @@
 <script src="/javascript/rangeslider/rangeslider.min.js"></script>
 
 <script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
-<script src='/odp/javascript/map.js?t=4'></script>
+<script src='/odp/javascript/map.js?t=6'></script>
 
 <script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit" async defer></script>
 
@@ -343,6 +345,7 @@
 
 <script type='text/javascript' src='/odp/javascript/reveal-tutorial.js?v=15'></script>
 <script type='text/javascript' src='/odp/javascript/reveal-tutorial-impl.js?v=6'></script>
+<script type='text/javascript' src='/odp/javascript/ui-tutorial.js?v=${version}'></script>
 
 <!-- Dynamically add style tags that modify -->
 <style id='msw'>
@@ -568,9 +571,24 @@ Version: ${version}
 								${globalNavigationMap}
 							</div>
 							<div class='minimap-overlay'></div>
+							<div class='minimap-button minimap-button-zoom-in' onclick='minimapZoomIn()'></div>
+							<div class='minimap-button minimap-button-zoom-out' onclick='minimapZoomOut()'></div>
 							<div class='minimap-button minimap-button-map' onclick='toggleMovementState()'></div>
 							<div class='minimap-button minimap-button-localplaces standard-button-highlight' onclick='viewLocalNavigation(event)'></div>
 							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
+							
+							<script type='text/javascript'>
+							$('.minimap-container').bind('mousewheel', function(e)
+							{
+								if(e.originalEvent.wheelDelta /120 > 0) {
+									minimapZoomIn(e);
+								}
+								else{
+									minimapZoomOut(e);
+								}
+							});
+							</script>
+							
 						</div>
 						
 						
@@ -589,7 +607,7 @@ Version: ${version}
 							<a id="twodview-button" class="button-overlay-major" onclick="view2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
 						</div>			
 						
-						<div style='position:absolute;bottom: 35px;left:50.0%;'><div class='path-overlay-link auto-animate' id='monsterCountPanel'>${monsterCountPanel}</div></div>
+						<div style='position:absolute;bottom: 26px; width:100%; text-align:center;pointer-events:none;'><div class='path-overlay-link auto-animate' id='monsterCountPanel'>${monsterCountPanel}</div></div>
 						
 						<div id='long-operation-status' class='long-operation-status auto-animate'>
 							<h2 class='long-operation-status-title'></h2>
@@ -600,6 +618,7 @@ Version: ${version}
 						    <p><a class='text-shadow' style='pointer-events: auto;' onclick='cancelLongOperations(event)'>Cancel</a></p>
 						</div>
 
+						<div class='questPanel'>${questPanel}</div>
 						<div class="main-buttonbox mini-page-popup" style='display:none;'></div>						
 				
 					</div>
@@ -831,7 +850,7 @@ Version: ${version}
 			<p><a onclick='toggleMainPullout(); viewCharacterSwitcher()'>Switch characters</a></p>
 			<p><a onclick='toggleMainPullout(); viewProfile()'>View your profile</a></p>
 			<p><a onclick='toggleMainPullout(); popupCharacterTransferService(${characterId}, "<c:out value="${characterName}"/>", "<c:out value="${characterToTransfer}"/>")' style='cursor:pointer'>Open the Character Transfer Service</a></p>
-			<p><a onclick='toggleMainPullout(); uiTutorial.run();'>Watch the UI tutorial</a></p>
+			<!-- <p><a onclick='toggleMainPullout(); uiTutorial.run();'>Watch the UI tutorial</a></p> -->
 			<p><a onclick='toggleMainPullout(); viewAutofix()'>Help! Something's Wrong!</a></p>
 			<p><a onclick='toggleMainPullout(); logout()'>Logout</a></p>
 		</div>

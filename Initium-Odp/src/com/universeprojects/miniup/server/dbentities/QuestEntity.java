@@ -8,7 +8,6 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
-import com.universeprojects.miniup.server.dbentities.QuestDefEntity.Objective;
 
 public class QuestEntity extends InitiumEntityBase
 {
@@ -72,6 +71,9 @@ public class QuestEntity extends InitiumEntityBase
 		List<QuestObjective> list = null;
 
 		List<EmbeddedEntity> objectiveEEs = getObjectives();
+		if (objectiveEEs==null || objectiveEEs.isEmpty())
+			objectiveEEs = questDef.getObjectives();
+		
 		if (objectiveEEs!=null)
 		{
 			list = new ArrayList<>();
@@ -105,5 +107,21 @@ public class QuestEntity extends InitiumEntityBase
 			setStatus(QuestStatus.Complete);
 		
 		entity.setProperty("objectives", list);
+	}
+
+	public QuestObjective getCurrentObjective(QuestDefEntity questDef)
+	{
+		QuestObjective currentObjective = null;
+		List<QuestObjective> objectives = this.getObjectiveData(questDef);
+		if (objectives==null) return null;
+
+		for(QuestObjective obj:objectives)
+			if (obj.isComplete()==false)
+			{
+				currentObjective = obj;
+				break;
+			}
+		
+		return currentObjective;
 	}
 }

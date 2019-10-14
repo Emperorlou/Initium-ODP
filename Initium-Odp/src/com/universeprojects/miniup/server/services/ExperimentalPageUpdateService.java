@@ -78,7 +78,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 					newHtml.append("<div style='display:inline-block;vertical-align:top;'>");
 					newHtml.append("<a class='main-item clue' style='width:inherit;' rel='/odp/viewcharactermini?characterId="+partyCharacter.getKey().getId()+"'>");
 					newHtml.append("<div style='display:inline-block; position:relative;'>");
-					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true));
+					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true, false));
 					newHtml.append("<div style='position:absolute; top:0px; bottom: 0px; left:55px; right: 0px;'></div>");// Cover the widget so we can't click it
 					newHtml.append("</div>");
 					newHtml.append("<br>");

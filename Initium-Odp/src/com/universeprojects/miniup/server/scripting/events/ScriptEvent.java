@@ -31,13 +31,13 @@ public abstract class ScriptEvent extends OperationBase
 {
 	public ScriptEvent(CachedEntity character, ODPDBAccess db)
 	{
-		super(db);
+		super(db.getRequest(), db);
 		this.currentCharacter = ScriptService.wrapEntity(character, db);
 	}
 	
 	public ScriptEvent(EntityWrapper character)
 	{
-		super(character.getDB());
+		super(character.getDB().getRequest(), character.getDB());
 		this.currentCharacter = character;
 	}
 

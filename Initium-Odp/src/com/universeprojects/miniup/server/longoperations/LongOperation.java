@@ -50,7 +50,7 @@ public abstract class LongOperation extends OperationBase
 	
 	public LongOperation(ODPDBAccess db, Map<String, String[]> requestParameters) throws UserErrorMessage
 	{
-		super(db);
+		super(db.getRequest(), db);
 		if (db==null)
 			throw new IllegalArgumentException("GameFunctions cannot be null.");
 		if (db.getCurrentCharacter()==null)
@@ -526,34 +526,6 @@ public abstract class LongOperation extends OperationBase
 		return Long.parseLong(str);
 	}
 
-	
-	private MainPageUpdateService mpus = null;
-	public MainPageUpdateService getMPUS()
-	{
-		if (mpus!=null)
-			return mpus;
-			
-		String uiStyle = parameters.get("uiStyle");
-		if (uiStyle==null || uiStyle.equals("") || uiStyle.equals("null") || uiStyle.equals("undefined"))
-			uiStyle = "classic";
-		
-		if (uiStyle.equals("classic"))
-		{
-			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
-		}
-		else if (uiStyle.equals("experimental"))
-		{
-			mpus = new ExperimentalPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
-		}
-		else if (uiStyle.equals("wow"))
-		{
-			mpus = new FullPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
-		}
-		else
-			throw new RuntimeException("Unhandled ui style: "+uiStyle);
-		
-		return mpus;
-	}
 	
 }
 

@@ -13,7 +13,6 @@ import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
-import com.universeprojects.miniup.server.dbentities.QuestDefEntity.Objective;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.dbentities.QuestObjective;
 import com.universeprojects.miniup.server.services.QuestService;

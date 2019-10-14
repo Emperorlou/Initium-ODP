@@ -30,7 +30,7 @@ public abstract class Command extends OperationBase
 		ReloadMiniPagePopup
 	}
 	protected final CachedDatastoreService ds;
-	protected HttpServletRequest request;
+
 	protected HttpServletResponse response;
 	protected QueryHelper query;
 	
@@ -40,8 +40,7 @@ public abstract class Command extends OperationBase
 	
 	public Command(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response)
 	{
-		super(db);
-		this.request = request;
+		super(request, db);
 		this.response = response;
 		
 		
@@ -202,33 +201,6 @@ public abstract class Command extends OperationBase
 	}
 
 	
-	private MainPageUpdateService mpus = null;
-	public MainPageUpdateService getMPUS()
-	{
-		if (mpus!=null)
-			return mpus;
-			
-		String uiStyle = request.getParameter("uiStyle");
-		if (uiStyle==null || uiStyle.equals("") || uiStyle.equals("null") || uiStyle.equals("undefined"))
-			uiStyle = "classic";
-		
-		if (uiStyle.equals("classic"))
-		{
-			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
-		}
-		else if (uiStyle.equals("experimental"))
-		{
-			mpus = new ExperimentalPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
-		}
-		else if (uiStyle.equals("wow"))
-		{
-			mpus = new FullPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), this);
-		}
-		else
-			throw new RuntimeException("Unhandled ui style: "+uiStyle);
-		
-		return mpus;
-	}
 	
 	protected Long parseLong(String fieldName)
 	{

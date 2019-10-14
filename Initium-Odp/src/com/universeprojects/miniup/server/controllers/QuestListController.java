@@ -38,17 +38,17 @@ public class QuestListController extends PageController {
 
 		QuestService questService = new QuestService(null, db, db.getCurrentCharacter());
 		
-		List<QuestEntity> activeQuests = questService.getActiveQuests();
-		Map<Key, QuestDefEntity> activeQuestDefs = questService.getMapOfActiveQuestDefs();
+		List<QuestEntity> allQuests = questService.getAllQuests();
+		Map<Key, QuestDefEntity> allQuestDefs = questService.getMapOfAllQuestDefs();
 		
 		List<Map<String,Object>> data = new ArrayList<>();
 		boolean hasQuests = false;
-		if (activeQuests!=null && activeQuests.isEmpty()==false)
+		if (allQuests!=null && allQuests.isEmpty()==false)
 		{
 			hasQuests = true;
 			
 			// Sort the active quests first
-			Collections.sort(activeQuests, new Comparator<QuestEntity>()
+			Collections.sort(allQuests, new Comparator<QuestEntity>()
 			{
 	
 				@Override
@@ -60,10 +60,11 @@ public class QuestListController extends PageController {
 			});
 		
 			
-			for(int i = 0; i<activeQuests.size(); i++)
+			for(int i = 0; i<allQuests.size(); i++)
 			{
-				QuestEntity quest = activeQuests.get(i);
-				QuestDefEntity questDef = activeQuestDefs.get(quest.getQuestDefKey());
+				QuestEntity quest = allQuests.get(i);
+				QuestDefEntity questDef = allQuestDefs.get(quest.getQuestDefKey());
+				if (questDef==null) continue;
 				
 				Map<String, Object> questData = new HashMap<>();
 				

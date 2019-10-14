@@ -6,6 +6,7 @@
 			https://initium-resources.appspot.com
 			https://initium-eventserver.universeprojects.com
 			wss://initium-eventserver.universeprojects.com
+			https://storage.googleapis.com/initium-resources/ 
 			https://www.google-analytics.com;
 		img-src 'self'
 			https://i.imgur.com
@@ -13,7 +14,8 @@
 			https://initium-resources.appspot.com
 			https://www.google-analytics.com
 			https://ajax.googleapis.com
-			https://www.paypalobjects.com; 
+			https://www.paypalobjects.com
+			https://storage.googleapis.com/initium-resources/; 
 		script-src 'self' 'unsafe-inline' 'unsafe-eval'
 			https://code.jquery.com 
 			https://cdnjs.cloudflare.com
@@ -92,7 +94,7 @@
 <script src="/javascript/rangeslider/rangeslider.min.js"></script>
 
 <script src="/odp/javascript/openseadragon/openseadragon.min.js"></script>
-<script src="/odp/javascript/map.js?t=4"></script>
+<script src="/odp/javascript/map.js?t=6"></script>
 
 <script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&amp;render=explicit"></script>
 
@@ -349,6 +351,7 @@
 
 <script type="text/javascript" src="/odp/javascript/reveal-tutorial.js?v=15"></script>
 <script type="text/javascript" src="/odp/javascript/reveal-tutorial-impl.js?v=6"></script>
+<script type='text/javascript' src='/odp/javascript/ui-tutorial.js?v=1'></script>
 
 <script type="text/javascript" src="/odp/full.js?v=${version}"></script>
 
@@ -488,7 +491,7 @@ Version: ${version}
 			<p><a onclick='toggleMainPullout(); viewCharacterSwitcher()'>Switch characters</a></p>
 			<p><a onclick='toggleMainPullout(); viewProfile()'>View your profile</a></p>
 			<p><a onclick='toggleMainPullout(); popupCharacterTransferService(${characterId}, "<c:out value="${characterName}"/>", "<c:out value="${characterToTransfer}"/>")' style='cursor:pointer'>Open the Character Transfer Service</a></p>
-			<p><a onclick='toggleMainPullout(); uiTutorial.run();'>Watch the UI tutorial</a></p>
+			<!-- <p><a onclick='toggleMainPullout(); uiTutorial.run();'>Watch the UI tutorial</a></p> -->
 			<p><a onclick='toggleMainPullout(); viewAutofix()'>Help! Something's Wrong!</a></p>
 			<p><a onclick='toggleMainPullout(); logout()'>Logout</a></p>
 		</div>

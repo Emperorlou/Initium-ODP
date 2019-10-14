@@ -23,8 +23,6 @@ public class QuestService extends Service
 {
 	private final OperationBase command;
 	private final CachedEntity character;
-	private List<QuestDefEntity> activeQuestDefs;
-	private List<QuestEntity> activeQuests = null;
 	public final static Key equipYourselfQuestKey = KeyFactory.createKey("QuestDef", 5394555692384256L);
 
 	public QuestService(OperationBase command, ODPDBAccess db, CachedEntity character)
@@ -33,10 +31,53 @@ public class QuestService extends Service
 		this.command = command;
 		this.character = character;
 	}
-	
-	public Map<Key, QuestDefEntity> getMapOfActiveQuestDefs()
+
+	private List<QuestDefEntity> allQuestDefs = null;
+	public List<QuestDefEntity> getAllQuestDefs()
 	{
-		List<QuestDefEntity> list = getActiveQuestDefs();
+		if (allQuestDefs!=null) return allQuestDefs;
+		allQuestDefs = new ArrayList<>();
+	
+		List<Key> questDefsToFetch = new ArrayList<>();
+		
+		
+		List<QuestEntity> allQuests = getAllQuests();
+		if (allQuests!=null)
+			for(QuestEntity quest:allQuests)
+				questDefsToFetch.add((Key)quest.getQuestDefKey());
+		
+		List<CachedEntity> qdefs = ds.get(questDefsToFetch);
+		
+		for(CachedEntity item:qdefs)
+			allQuestDefs.add(new QuestDefEntity(db, item));
+
+		return allQuestDefs;
+	}
+	
+	
+	private List<QuestEntity> allQuests = null;
+	public List<QuestEntity> getAllQuests()
+	{
+		if (allQuests!=null) return allQuests;
+		
+		List<CachedEntity> questEntities = query.getFilteredList("Quest", "characterKey", character.getKey());
+		if  (questEntities==null || questEntities.isEmpty()) return null;
+		
+		allQuests = new ArrayList<QuestEntity>();
+		for(CachedEntity item:questEntities)
+		{
+			QuestEntity questEntity = new QuestEntity(db, item);
+			allQuests.add(questEntity);
+		}
+		
+		return allQuests;
+	}
+	
+	
+	
+	public Map<Key, QuestDefEntity> getMapOfAllQuestDefs()
+	{
+		List<QuestDefEntity> list = getAllQuestDefs();
 		
 		if (list==null) return null;
 		Map<Key, QuestDefEntity> result = new LinkedHashMap<>();
@@ -47,7 +88,8 @@ public class QuestService extends Service
 		return result;
 		
 	}
-	
+
+	private List<QuestDefEntity> activeQuestDefs = null;
 	public List<QuestDefEntity> getActiveQuestDefs()
 	{
 		if (activeQuestDefs!=null) return activeQuestDefs;
@@ -70,6 +112,7 @@ public class QuestService extends Service
 	}
 	
 	
+	private List<QuestEntity> activeQuests = null;
 	public List<QuestEntity> getActiveQuests()
 	{
 		if (activeQuests!=null) return activeQuests;
@@ -79,7 +122,12 @@ public class QuestService extends Service
 		
 		activeQuests = new ArrayList<QuestEntity>();
 		for(CachedEntity item:questEntities)
-			activeQuests.add(new QuestEntity(db, item));
+		{
+			if (item==null) continue;
+			QuestEntity questEntity = new QuestEntity(db, item);
+			if (questEntity.isComplete()==false)
+				activeQuests.add(questEntity);
+		}
 		
 		return activeQuests;
 	}
@@ -121,7 +169,7 @@ public class QuestService extends Service
 					value = entityToCheck.getProperty(fieldName);
 				if (value==null) value="null";
 				
-				if (db.doIfExpressionCheck(value.toString(), operator, conditionalValue))
+				if (db.doIfExpressionCheck(value, operator, conditionalValue))
 				{
 					success = true;
 					break;
@@ -276,6 +324,10 @@ public class QuestService extends Service
 			questComplete = true;
 			QuestDefEntity questDef = completedQuestDefEntities.get(quest.getProperty("questDefKey"));
 			db.sendGameMessage("'"+questDef.getName()+"' quest complete!");
+
+			boolean isNoobQuestLine = false;
+			if (questDef.getQuestLine()!=null && questDef.isNoobQuest())
+				isNoobQuestLine = true;
 			
 			activeQuestDefs.remove(questDef);
 			activeQuests.remove(completedQuestsEntities.get(quest.getKey()));
@@ -288,7 +340,9 @@ public class QuestService extends Service
 			db.pool.addToQueue(nextQuestDefKeys);
 			db.pool.loadEntities();
 			
-			if (nextQuestDefKeys!=null)
+			
+			if (nextQuestDefKeys!=null && nextQuestDefKeys.isEmpty()==false)
+			{
 				for(Key questDefKey:nextQuestDefKeys)
 				{
 					QuestEntity nextQuest = createQuestInstance(questDefKey);
@@ -303,17 +357,42 @@ public class QuestService extends Service
 					// Do some initial checks to see if we already have some completed objectives on this new quest
 					checkCharacterPropertiesForObjectiveCompletions();
 					checkLocationForObjectiveCompletions(db.getCharacterLocation(character));
-					
+		
 				}
-			
+			}
+			else
+			{
+				command.flagNoobQuestLineComplete(questDef.getQuestLine());
+			}
 		}
 		
 		if (questComplete)
 			command.flagQuestComplete();
-		else 
+		else
 			command.flagObjectiveComplete();
+
+//		if (activeQuestDefs.isEmpty()==false)
+//		{
+//			QuestDefEntity questDef = activeQuestDefs.get(0);
+//			QuestEntity quest = activeQuests.get(0);
+//			QuestObjective currentObjective = quest.getCurrentObjective(questDef);
+////			if (currentObjective!=null)
+////				command.addUITutorialsForObjective(currentObjective);
+//		}
+		
+		command.getMPUS().updateQuestPanel();
 		
 		
+	}
+
+
+
+	public void clearCache()
+	{
+		activeQuestDefs = null;
+		activeQuests = null;
+		allQuests = null;
+		allQuestDefs = null;
 	}
 	
 	

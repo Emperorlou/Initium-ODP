@@ -180,7 +180,7 @@
 			}
 			else if (selfSide.getKey().getKind().equals("Character"))
 			{
-				out.println(GameUtils.renderCharacterWidget(request, db, selfSide, db.getCurrentUser(), true)); 
+				out.println(GameUtils.renderCharacterWidget(request, db, selfSide, db.getCurrentUser(), true, false)); 
 			}
 			else if (selfSide.getKey().getKind().equals("Item"))
 			{
@@ -202,7 +202,7 @@
 			}
 			else if (otherSide.getKey().getKind().equals("Character"))
 			{
-				out.println(GameUtils.renderCharacterWidget(request, db, otherSide, null, false));
+				out.println(GameUtils.renderCharacterWidget(request, db, otherSide, null, false, false));
 			}
 			else if (otherSide.getKey().getKind().equals("Item"))
 			{

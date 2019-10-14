@@ -127,7 +127,7 @@ public class MoveItemsController extends PageController {
 		}
 		else if (selfSide.getKind().equals("Character"))
 		{
-			header = GameUtils.renderCharacterWidget(request, db, selfSide, user, true); 
+			header = GameUtils.renderCharacterWidget(request, db, selfSide, user, true, false); 
 		}
 		else if (selfSide.getKind().equals("Item"))
 		{
@@ -140,13 +140,13 @@ public class MoveItemsController extends PageController {
 			header = "<div class='location-heading-style'><h5>"+otherSide.getProperty("name")+"</h5>";
 			if (otherSide.getProperty("banner")!=null)
 			{
-				header += "<div class='banner-background-image' style='width:80%;background-image:url(\""+GameUtils.getResourceUrl(otherSide.getProperty("banner"))+"\")' border=0></div>";
+				header += "<div class='banner-background-image' style='background-image:url(\""+GameUtils.getResourceUrl(otherSide.getProperty("banner"))+"\")' border=0></div>";
 			}
 			header += "</div>";
 		}
 		else if (otherSide.getKind().equals("Character"))
 		{
-			header = GameUtils.renderCharacterWidget(request, db, otherSide, null, false);
+			header = GameUtils.renderCharacterWidget(request, db, otherSide, null, false, false);
 		}
 		else if (otherSide.getKind().equals("Item"))
 		{

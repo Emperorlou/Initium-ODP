@@ -46,6 +46,9 @@ public class CommandRestartNoobQuests extends Command
 		db.getDB().delete(questsToDelete);
 		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
+		
+		getQuestService().clearCache();
+		getMPUS().updateQuestPanel();
 	}
 
 }

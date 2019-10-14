@@ -110,8 +110,8 @@
 <script type='text/javascript'>var tradeVersion=${tradeVersion};</script>
     <div class='main-page'>
         <h2>Trading with <c:out value="${otherCharacterName}"/></h2> 
-        <%=GameUtils.renderCharacterWidget(request, db, character, user, true) %>
-        <%=GameUtils.renderCharacterWidget(request, db, otherCharacter, null, false) %>
+        <%=GameUtils.renderCharacterWidget(request, db, character, user, true, false) %>
+        <%=GameUtils.renderCharacterWidget(request, db, otherCharacter, null, false, false) %>
         
         
         

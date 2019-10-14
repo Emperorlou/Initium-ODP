@@ -386,6 +386,8 @@ public class AspectPet extends ItemAspect
 					if (CommonChecks.checkItemIsAccessible(foodItem, character) == false)
 						throw new UserErrorMessage("The '" + foodItem.getProperty("name") + "' is not accessible to the character in use.");
 
+					if (CommonChecks.checkItemIsMovable(foodItem) == false)
+						throw new UserErrorMessage("The '"+foodItem.getProperty("name")+"' is not something you can feed to a pet.");
 
 					boolean fedThis = petAspect.feed(foodItem);
 					if (fedThis==false) continue;

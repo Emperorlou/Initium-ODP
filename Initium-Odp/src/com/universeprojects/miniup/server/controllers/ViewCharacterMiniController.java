@@ -220,7 +220,7 @@ public class ViewCharacterMiniController extends PageController {
 		request.setAttribute("characterID", characterID);
 					
 		// Character widget
-		request.setAttribute("characterWidget", GameUtils.renderCharacterWidget(null, request, db, character, null, group, true, false, true, true, true));			
+		request.setAttribute("characterWidget", GameUtils.renderCharacterWidget(null, request, db, character, null, group, true, false, true, true, true, true));			
 					
 		// Buff list
 		request.setAttribute("buffList", GameUtils.renderBuffsList(buffs));		

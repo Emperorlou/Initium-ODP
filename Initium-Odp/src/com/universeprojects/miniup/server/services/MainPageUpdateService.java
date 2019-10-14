@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.services;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -24,6 +22,9 @@ import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.aspects.AspectFireplace;
+import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
+import com.universeprojects.miniup.server.dbentities.QuestEntity;
+import com.universeprojects.miniup.server.dbentities.QuestObjective;
 import com.universeprojects.miniup.server.longoperations.LongOperation;
 
 public class MainPageUpdateService extends Service 
@@ -68,24 +69,10 @@ public class MainPageUpdateService extends Service
 	
 	public static MainPageUpdateService getInstance(ODPDBAccess db, CachedEntity user, CachedEntity character, CachedEntity location, OperationBase operation)
 	{
-		String mainPageUrl = db.getRequest().getParameter("mainPageUrl");
-		if (mainPageUrl==null) mainPageUrl = "";
-		if (mainPageUrl.contains("/odp/full"))
-		{
-			return new FullPageUpdateService(db, user, character, location, operation);
-		}
-		else if (mainPageUrl.contains("/odp/experimental"))
-		{
-			return new ExperimentalPageUpdateService(db, user, character, location, operation);
-		}
-		else if (mainPageUrl.contains("/odp/game"))
-		{
-			return new GamePageUpdateService(db, user, character, location, operation);
-		}
+		if (operation!=null)
+			return operation.getMPUS();
 		else
-		{
-			return new MainPageUpdateService(db, user, character, location, operation);
-		}
+			return OperationBase.createMPUS(db, null);
 	}
 
 	protected String updateHtmlContents(String selector, String newHtml)
@@ -558,6 +545,7 @@ public class MainPageUpdateService extends Service
 		updateLocationQuicklist();
 		updateGlobalNavigationMap();
 		updateLocation2D();
+		updateQuestPanel();
 	}
 
 
@@ -622,7 +610,7 @@ public class MainPageUpdateService extends Service
 //			List<CachedEntity> characterList = db.getFilteredList("Character", "userKey", user.getKey());
 //			db.getRequest().setAttribute("characterList", characterList);  
 //		}
-		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, character, user, true);
+		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, character, user, true, true);
 		
 		return updateHtmlContents("#inBannerCharacterWidget", newHtml);
 	}
@@ -637,7 +625,7 @@ public class MainPageUpdateService extends Service
 		if (CommonChecks.checkCharacterIsInCombat(character))
 		{
 			CachedEntity combatant = getCombatant();
-			newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, combatant, null, false);
+			newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, combatant, null, false, false);
 		}
 		
 		return updateHtmlContents("#inBannerCombatantWidget", newHtml);
@@ -648,7 +636,7 @@ public class MainPageUpdateService extends Service
 	 */
 	public String updateInBannerCombatantWidget(CachedEntity combatant)
 	{
-		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, combatant, null, false);
+		String newHtml = GameUtils.renderCharacterWidget(db.getRequest(), db, combatant, null, false, false);
 		
 		return updateHtmlContents("#inBannerCombatantWidget", newHtml);
 	}
@@ -787,7 +775,19 @@ public class MainPageUpdateService extends Service
 				html.append("<input type='hidden' id='blank-global-navigation' value='true'/>");
 			}
 			
+			html.append("<div class='global-navigation-button zoom-in standard-button-highlight' onclick='navMapZoomIn(event)'></div>");
+			html.append("<div class='global-navigation-button zoom-out standard-button-highlight' onclick='navMapZoomOut(event)'></div>");
 			html.append("<div class='global-navigation-button local-places standard-button-highlight' onclick='viewLocalNavigation(event)'></div>");
+			html.append("<script type='text/javascript'>");
+			html.append("$('.global-navigation-map').bind('mousewheel', function(e){");
+			html.append("if(e.originalEvent.wheelDelta /120 > 0) {");
+			html.append("navMapZoomIn(e);");
+			html.append("}");
+			html.append("else{");
+			html.append("navMapZoomOut(e);");
+			html.append("}");
+			html.append("});");
+			html.append("</script>");
 		}
 		return updateHtmlContents(".map-contents", html.toString());
 	}
@@ -982,6 +982,11 @@ public class MainPageUpdateService extends Service
 					newHtml.append(getHtmlForInBannerLinkCentered(60, 50, "Rest", "doRest();"));
 				}
 				
+				if (CommonChecks.checkLocationIsTownHall(location))
+				{
+					newHtml.append(getHtmlForInBannerLinkCentered(60, 50, "Buy a House", "buyHouse(event);"));
+				}
+				
 				
 	
 				if (CommonChecks.checkLocationIsCombatSite(location)==false)
@@ -1050,7 +1055,7 @@ public class MainPageUpdateService extends Service
 				CommonChecks.checkLocationIsInstance(location)==false && 
 				CommonChecks.checkCharacterIsBusy(character)==false)
 		{
-			newHtml.append(getHtmlForInBannerLinkCentered(16, 50, "Explore", "doExplore(event);", null, null, "auto-explore-link"));
+			newHtml.append(getHtmlForInBannerLinkCentered(20, 50, "Explore", "doExplore(event);", null, null, "auto-explore-link"));
 		}
 		
 		
@@ -1649,7 +1654,7 @@ public class MainPageUpdateService extends Service
 
 					newHtml.append("<div style='display:inline-block;vertical-align:top;'>");
 					newHtml.append("<a class='main-item clue' style='width:inherit;' rel='/odp/viewcharactermini?characterId="+partyCharacter.getKey().getId()+"'>");
-					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true));
+					newHtml.append(GameUtils.renderCharacterWidget(db.getRequest(), db, partyCharacter, partyUser, true, false));
 					newHtml.append("<br>");
 					if (!GameUtils.equals(character.getKey(), partyCharacter.getKey()) && user!=null && 
 							GameUtils.equals(user.getKey(), partyUser.getKey())) {
@@ -1812,16 +1817,16 @@ public class MainPageUpdateService extends Service
 				{
 					if (monsterCount<1) monsterCount = 0d;
 					double monsterPercent = monsterCount/maxMonsterCount;
-					html.append("<div class='main-description'>");
+					html.append("<div>");
 					html.append("The monster activity in this area seems ");
 					if (monsterPercent>0.75)
-						html.append("high compared to usual.");
+						html.append("high.");
 					else if (monsterPercent>0.50)
-						html.append("moderate compared to usual.");
+						html.append("moderate.");
 					else if (monsterPercent>0.25)
-						html.append("low compared to usual.");
+						html.append("low.");
 					else if (monsterPercent>0)
-						html.append("very low compared to usual.");
+						html.append("very low.");
 					else
 						html.append("to be none.");
 					
@@ -1868,4 +1873,43 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#locationQuicklist", html.toString());
 	}
+	
+	public String updateQuestPanel()
+	{
+		StringBuilder html = new StringBuilder();
+		
+		QuestService qService = db.getQuestService(operation);
+		
+		List<QuestDefEntity> activeQuestDefs = qService.getActiveQuestDefs();
+		
+		if (activeQuestDefs==null || activeQuestDefs.isEmpty()) return updateHtmlContents(".questPanel", html.toString());
+		
+		QuestDefEntity questDef = activeQuestDefs.get(0);
+		QuestEntity quest = questDef.getQuestEntity(character.getKey());
+		QuestObjective currentObjective = quest.getCurrentObjective(questDef);
+
+		if (currentObjective==null) return updateHtmlContents(".questPanel", html.toString());
+		
+		html.append("<script type='text/javascript'>");
+		html.append(currentObjective.generateTutorialStepsJs());
+		html.append("</script>");
+		
+		html.append("<h5 style='cursor:pointer' onclick='viewQuest(\""+questDef.getUrlSafeKey()+"\")'>"+questDef.getName()+"</h5>");
+		List<QuestObjective> objectives = quest.getObjectiveData(questDef);
+		for(QuestObjective objective:objectives)
+		{
+			if (objective.isComplete())
+				html.append("<div class='quest-objective-item'><img src='"+GameUtils.getResourceUrl("images/ui3/checkbox1-checked.png")+"'/> "+objective.getName()+"</div>");
+			else
+				html.append("<div class='quest-objective-item'><img src='"+GameUtils.getResourceUrl("images/ui3/checkbox1-normal.png")+"'/> "+objective.getName()+"</div>");
+		}
+		
+		return updateHtmlContents(".questPanel", html.toString());
+	}
+
+	public CachedEntity getLocation()
+	{
+		return location;
+	}
+	
 }

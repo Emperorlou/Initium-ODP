@@ -49,7 +49,8 @@ var audioFilenames = [
 "seagull3",
 "seagull4",
 "seagull5",
-"quest-complete1"
+"quest-complete1",
+"objective-complete1"
 ];
 
 var audioDescriptorPresets = 

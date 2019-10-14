@@ -2,7 +2,7 @@ var selectedTileX = null;
 var selectedTileY = null;
 
 var uiStyle = localStorage.getItem("selectUIStyle");
-if (uiStyle==null) uiStyle = "classic";
+if (uiStyle==null) uiStyle = "experimental";
 
 var queryParams = "";
 if (location.href.indexOf("?")>-1)
@@ -2587,6 +2587,12 @@ function viewExchange()
 	pagePopup("/odp/ajax_exchange", null, "Exchange");
 }
 
+function viewTrainingQuestLines()
+{
+	closeAllPopups();
+	loadQuestWindow("/odp/trainingquestlist");
+}
+
 function viewQuests()
 {
 	pagePopup("/odp/questlist", null, "Available Quests");
@@ -2636,6 +2642,50 @@ function createQuestWindow(html)
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
+}
+
+
+
+
+function loadQuestWindow(url) 
+{
+	$(".popupBlurrable").addClass("blur");
+    window.popupsNum++;
+    window.popupsOpen++;
+    window.popupsArray[popupsNum-1] = "yes";
+    $("#popups").show();
+    currentPopups = $("#popups").html();
+	
+	
+	
+	var windowHtml = "";
+	windowHtml += 
+			"<div class='quest-window-container'>" +
+			"<div class='quest-window'>" +
+			"<div class='quest-window-internal'>";
+	
+	windowHtml+="<img class='wait' src='/javascript/images/wait.gif' border='0'/>";
+	
+	windowHtml+=
+			"</div>";
+	
+	windowHtml+=
+			"<div class='quest-window-bottombutton-container'>"+
+            "<div class='quest-window-bottombutton' onclick='closepopupMessage(" + popupsNum +")'>"+
+            "Okay"+
+            "</div>"+
+            "</div>"+
+            
+			"</div>"+
+			"</div>";
+
+	
+	
+    $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
+    expandpopupMessage();
+    enterPopupClose();
+    
+    $(".quest-window-internal").load(url);
 }
 
 
@@ -2692,9 +2742,6 @@ function createWelcomeWindow()
 	windowHtml+="<h2>Welcome to Initium!</h2>" +
 			"<p>You're about to begin playing the game by following a short series of quests. This is highly recommended for new players as it is a fun and engaging way to learn " +
 			"how to play the game. If you have any questions, feel free to speak up in <b>Global</b> chat, our community can be a bit weird but they're generally very helpful!</p>" +
-			"<p>The quests page can be accessed by clicking on the following icon in the button bar: " +
-			"<br><img src='http://imgur.com/g8zcyeO.png'/><br>" +
-			"Go to the quests page to complete a quest and to review instructions for quests you haven't yet completed.</p>" +
 			"";
 	
 	windowHtml+=
@@ -3019,7 +3066,9 @@ function playSoundsFromNotification(soundList)
 
 function restartNoobQuests()
 {
-	doCommand(event, "RestartNoobQuests");
+	confirmPopup("Reset quests?", "Are you sure you want to restart this quest line?<br>You will lose all progress on it if you do this.", function(){
+		doCommand(event, "RestartNoobQuests");
+	});
 }
 
 function loadRelatedSkills(itemKey)
@@ -3407,6 +3456,34 @@ function isGlobeNavigationVisible()
 //    $("#overheadmap-cells").append(html);
 //}
 
+function questLineCompletePopup(questLineName)
+{
+	createQuestWindow("<h4>'"+questLineName+"' Quest Line Complete!</h4>" +
+			"<p>" +
+			"Congratulations you completed a quest line. If you'd like to learn about another part of the game, try " +
+			"another training quest line." +
+			"</p>" +
+			"" +
+			"<h3 id='quest-complete-label' style='position:initial; '>Complete!</h3>" +
+			"<center><a class='standard-button-highlight' onclick='viewTrainingQuestLines();'><img alt='Training quests' src='https://initium-resources.appspot.com/images/ui3/quest-banners/button-training-quests1.png'/></a></center>" +
+			"");
+	genericOverlayEffect("https://initium-resources.appspot.com/images/ui3/complete-effect.gif?1", 500);
+}
+
+function beginNoobQuests(questDefId)
+{
+	confirmPopup("Begin quest line?", "Are you sure you want to begin this quest line? If you already have progress on this quest line your progress will be reset. Are you sure?", function()
+	{
+		closeAllPopups();
+		doCommand(null, "BeginNoobQuests", {questDefId:questDefId}, function(data)
+		{
+			if (data.error) return;
+			
+			viewQuest(data.questDefKey);
+		});
+	});
+}
+
 function beginQuest(event, itemId)
 {
 	doCommand(event, "BeginQuest", {itemId:itemId}, function(data){
@@ -3422,14 +3499,12 @@ function viewNoobWindow()
 			"<h4>Need some help?</h4>" +
 			"<h5>Do the 'noob' quests</h5>" +
 			"<p>Follow the noob quests, they teach you how to play the game and they don't take very long to complete. Do so by clicking the big white ! button on the button bar to open your quest list. <br><a onclick='clearMakeIntoPopup();viewQuests()'>Your quests list</a></p>" +
-			"<h5>Can't find the right buttons?</h5>" +
-			"<p>This is a brief UI tutorial to familiarize you with the very basics. Hopefully one day the UI will be so intuitive this won't be necessary for anybody. <br><a onclick='clearMakeIntoPopup();uiTutorial.run()'>Start tutorial</a></p>" +
 			"<h5>Got more questions you need answers to?</h5>" +
 			"<p>This is a FAQ made by players, for players. Common questions and their answers. You can find this by typing /faq in chat as well.<br><a onclick='clearMakeIntoPopup();' href='http://initium.wikia.com/wiki/Staub%27s_FAQ_Guide' target='_blank'>Community FAQ</a></p>" +
 			"<h5>Community-made fast track cheat sheet</h5>" +
 			"<p>This will help you make good decisions early in the game. This is mostly for new players but it's a good place to start if you don't want to make the same mistakes everyone else has made already.<br><a onclick='clearMakeIntoPopup();' href='http://initium.wikia.com/wiki/The_Starter_and_Progression_Guide' target='_blank'>Player-made guide</a></p>" +
-//			"<h5>Talk to the community in global!</h5>" +
-//			"<p>Last but not least our small gaming community is (generally) very helpful and happy you're here! If you have any questions just ask and many will be willing to go out of their way to help you out.</p>" +
+			"<h5>Talk to the community in global!</h5>" +
+			"<p>Last but not least our small gaming community is (generally) very helpful and happy you're here! If you have any questions just ask and many will be willing to go out of their way to help you out.</p>" +
 			"";
 	
 	makeIntoPopupHtml(html);
@@ -3831,6 +3906,11 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	if (eventObject!=null)
 		eventObject.stopPropagation();
 	
+}
+
+function systemMessage(msg)
+{
+	popupMessage("System Message", msg);
 }
 
 function doSetLeader(eventObject, charId, charName)
@@ -4818,6 +4898,10 @@ $(document).keyup(function(event){
 	if (buttonToPress.length>0)
 	{
 		buttonToPress[0].click();
+	}
+	else if (!event.ctrlKey && event.which==67) // C
+	{
+		viewCharacterSwitcher();
 	}
 	else if (event.which==71) // G
 	{
@@ -5824,19 +5908,116 @@ function overlayEffect(imgUrl, timeoutMs)
 	
 }
 
+
+var genericOverlayEffectIdCounter = 0;
+function genericOverlayEffect(imgUrl, timeoutMs)
+{
+	genericOverlayEffectIdCounter++;
+	
+	var effectId = genericOverlayEffectIdCounter;
+	var effectTimer = null;
+	function clearGenericOverlayEffect()
+	{
+		clearTimeout(effectTimer);
+		$("#genericOverlayEffect"+effectId).fadeOut(1000, function(){
+			if ($("#genericOverlayEffect"+effectId+" img").length>0)
+				$("#genericOverlayEffect"+effectId+" img")[0].src='';
+			$("#genericOverlayEffect"+effectId).remove();
+		});
+	}
+	
+	var html = "<div class='overlay-effect-container' id='genericOverlayEffect"+effectId+"' >"+
+	"<img src='"+imgUrl+"'>"+
+	"</div>";
+	$("body").append(html);
+	
+	effectTimer = setTimeout(clearGenericOverlayEffect, timeoutMs);
+	
+}
+
+
 function doQuestCompleteBannerEffect()
 {
 	overlayEffect("https://i.imgur.com/s2XdVIl.gif", 5000);
-	if (isSoundEffectsEnabled()) playAudio("quest-complete1");
+	if (isSoundEffectsEnabled()) playAudio("quest-complete1", 0.6);
 	window.scrollTo(0,0);
 }
 
 function doObjectiveCompleteBannerEffect()
 {
 	overlayEffect("https://i.imgur.com/mv9LtvM.gif", 5000);
+	if (isSoundEffectsEnabled()) playAudio("objective-complete1", 0.3);
 	window.scrollTo(0,0);
 }
 
+
+function minimapZoomIn()
+{
+	var scale = $(".minimap-container .overheadmap-cell-container-base:first").css("transform");
+	if (scale=="none")
+	{
+		scale = 1.0;
+	}
+	else
+	{
+		scale = scale.split(",")[0];
+		scale = scale.split("(")[1];
+		scale = parseFloat(scale);
+	}
+	scale *= 1.15;
+	$(".minimap-container .overheadmap-cell-container-base").css("transform", "scale("+scale+")");
+}
+
+function minimapZoomOut()
+{
+	var scale = $(".minimap-container .overheadmap-cell-container-base:first").css("transform");
+	if (scale=="none")
+	{
+		scale = 1.0;
+	}
+	else
+	{
+		scale = scale.split(",")[0];
+		scale = scale.split("(")[1];
+		scale = parseFloat(scale);
+	}
+	scale *= 0.86956521739130434782608695652174;
+	$(".minimap-container .overheadmap-cell-container-base").css("transform", "scale("+scale+")");
+}
+
+function navMapZoomIn()
+{
+	var scale = $(".global-navigation-map .overheadmap-cell-container-base:first").css("transform");
+	if (scale=="none")
+	{
+		scale = 1.0;
+	}
+	else
+	{
+		scale = scale.split(",")[0];
+		scale = scale.split("(")[1];
+		scale = parseFloat(scale);
+	}
+	scale *= 1.15;
+	$(".global-navigation-map .overheadmap-cell-container-base").css("transform", "scale("+scale+")");
+}
+
+function navMapZoomOut()
+{
+	var scale = $(".global-navigation-map .overheadmap-cell-container-base:first").css("transform");
+	if (scale=="none")
+	{
+		scale = 1.0;
+	}
+	else
+	{
+		scale = scale.split(",")[0];
+		scale = scale.split("(")[1];
+		scale = parseFloat(scale);
+	}
+	scale *= 0.86956521739130434782608695652174;
+	$(".global-navigation-map .overheadmap-cell-container-base").css("transform", "scale("+scale+")");
+}
 
 //function doQuestCompleteEffect()
 //{
@@ -5854,4 +6035,6 @@ function doObjectiveCompleteBannerEffect()
 //
 //	$("#questlist-questkey-${questDefKey}").addClass("quest-complete");
 //}
+
+
 

@@ -113,6 +113,8 @@ public class SublocationsController extends PageController {
 		for(int i = paths.size()-1; i>=0; i--)
 	    {
 			CachedEntity path = paths.get(i);
+			if (path==null) paths.remove(i);
+			
 	    	Key location1Key = (Key)path.getProperty("location1Key");
 	    	Key location2Key = (Key)path.getProperty("location2Key");
 	    	

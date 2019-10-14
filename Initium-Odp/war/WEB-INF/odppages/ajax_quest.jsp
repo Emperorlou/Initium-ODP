@@ -28,6 +28,7 @@ function doQuestCompleteEffect()
 }
 </script>
 
+
 <h2><c:out value="${name}"/></h2>
 ${description}
 

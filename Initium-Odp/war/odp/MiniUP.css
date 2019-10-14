@@ -2794,6 +2794,7 @@ position: absolute;
 	right:0px;
 	bottom:0px;
 	text-align:center;
+	max-height:30px;
 }
 
 #immovablesPanel div
@@ -2837,11 +2838,19 @@ position: absolute;
 .revealTutorial-highlight
 {
 	position:absolute;
-	border: 3px solid #00DD00;
-	border-radius:8px;
-	z-index:10000001;
-	padding:5px;
-	margin:-8px;
+	z-index: 10000003;
+	width:50px;
+	height:50px;
+	padding: 0px;
+	margin: 0px;
+	margin-top: -25px;
+	margin-left:0px;
+	transform: scale(2);
+	mix-blend-mode: screen;
+	background-image: url(https://i.imgur.com/XP9a3la.gif);
+	background-size: cover;
+	background-position: center center;
+	cursor:pointer;
 }
 .revealTutorial-highlight-arrow
 {
@@ -2927,12 +2936,14 @@ position: absolute;
 
 .sublocation-display-container .forget-button
 {
-	float: left;
     color: #FF0000;
-    font-size: 42px;
+    font-size: 30px;
     font-family: sans-serif;
     margin-left: 6px;
-    margin-top: 2px;	
+    margin-top: 2px;
+    height: 30px;
+    position: absolute;
+    top: 0px;    	
 }
 
 .sublocation-display-container h5
@@ -2943,7 +2954,7 @@ position: absolute;
     margin: 0px;
     text-shadow: 1px 1px 2px #000;
     text-align: right;
-    font-size:16px;    
+    font-size:12px;    
 }
 
 .sublocation-display
@@ -2997,6 +3008,7 @@ position: absolute;
 	top:40px;
 	transform-origin: 100% 0%;
 	z-index:1000;
+	max-height:55%;
 }
 
 .minimap-locationname
@@ -3036,6 +3048,9 @@ position: absolute;
 .minimap-overlay
 {
 	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-backing1.png);
+	background-position:center;
+	background-size: contain;
+	background-repeat: no-repeat;
 	position:absolute;
 	top:0px;
 	left:0px;
@@ -3059,9 +3074,27 @@ position: absolute;
 
 .minimap-button-map
 {
-	background-image:url(https://i.imgur.com/IP1yHOI.png);
+	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-button-map1.png);
 	top:26px;
 	right:26px;
+}
+
+.minimap-button-zoom-in
+{
+	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-in1.png);
+	top:18px;
+	left:43px;
+	width:43px;
+	height:43px;
+}
+
+.minimap-button-zoom-out
+{
+	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-out1.png);
+	top:55px;
+	left:12px;
+	width:43px;
+	height:43px;
 }
 
 .minimap-button-cancel
@@ -3115,10 +3148,10 @@ position: absolute;
 .mini-page-popup
 {
 	padding-left:7px;
-	background-color:rgba(25,24,23,0.62);
+	background-color:rgba(25,24,23,0.9);
 	display: inline-flex;
     flex-direction: column;
-    /*width: 300px;*/
+    width: 215px;
     z-index: 10000000;
     
     position: absolute;
@@ -3193,10 +3226,74 @@ position: absolute;
 	max-width:22px;
 }
 
+.questPanel
+{
+	display:inline-block;
+	position:absolute;
+	right:0px;
+	bottom:20%;
+	max-height:30%;
+	text-shadow: 1px 1px 1px #000;
+	background-color: rgba(0,0,0,0.3);
+	padding-left:4px;
+	overflow-y:auto;
+}
 
+.questPanel h5
+{
+	margin-top:4px;
+}
 
+.quest-line-container
+{
+	position:relative;
+	overflow:hidden;
+}
 
+.quest-line-complete::after
+{
+	content: '\2713 ';
+    font-size: 500%;
+    float: left;
+    text-shadow: 0px 0px 11px #44FF44;
+    color: #44FF44;
+    position: absolute;
+    top: -18px;
+    right: 3%;
+    padding:10px;
+    
+}
 
+.quest-objective-item
+{	
+}
+
+.quest-objective-item img
+{
+	vertical-align:middle;
+}
+
+.quest-banner-container
+{
+	text-align:center;
+	overflow:hidden;
+}
+
+.quest-banner
+{
+	
+}
+
+.quest-banner img
+{
+	max-width:100%;
+	filter: sepia(1) brightness(0.9) opacity(0.8);
+}
+
+.quest-banner img:hover
+{
+	filter:unset;
+}
 
 
 
@@ -3287,6 +3384,7 @@ position: absolute;
 	.minimap-container
 	{
 		transform:scale(0.8);
+		max-height:initial;
 	}		
 	
 	.page-popup-X
@@ -3308,6 +3406,7 @@ position: absolute;
 	{
 		transform:scale(0.5);
 		top:40px;
+		max-height:initial;
 	}	
 
 	#mix-blending-fix
@@ -3587,8 +3686,13 @@ position: absolute;
 	}
 
 }
-@media (max-width:500px)
+@media (max-width:550px)
 {
+	.questPanel
+	{
+	    zoom: 0.7;
+	}
+	
 	.progress-bar1
 	{
 		zoom: 0.8;
@@ -4741,12 +4845,12 @@ body
     color: #614f33;	
 	margin: -60px;
     margin-top: -39px;
-    padding-bottom: 64px;
 
     overflow-y: auto;
-    height: 100%;
     position: absolute;
 	font-family: DOS;
+	top:0px;
+	bottom: 34px;
 }
 
 .quest-window-internal h1
@@ -4960,6 +5064,29 @@ body
     height: 48px;
     bottom: -56px;
     right: -28px;
+}
+
+
+.global-navigation-button.zoom-in
+{
+	position: absolute;
+    background-image: url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-in1.png);
+    width: 43px;
+    height: 43px;
+    top: -53px;
+    right: 61px;
+    cursor:pointer;
+}
+
+.global-navigation-button.zoom-out
+{
+	position: absolute;
+    background-image: url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-out1.png);
+    width: 43px;
+    height: 43px;
+    top: -53px;
+    right: 13px;
+    cursor:pointer;
 }
 
 
@@ -5215,6 +5342,7 @@ body
 	{
 		transform:scale(0.5);
 		top:40px;
+		max-height:initial;
 	}	
 
 	.header1-spacer

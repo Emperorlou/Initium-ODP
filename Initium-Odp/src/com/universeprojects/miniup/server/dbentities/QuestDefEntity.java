@@ -81,69 +81,6 @@ public class QuestDefEntity extends InitiumEntityBase
 
 	}
 
-	public class Objective
-	{
-		final public Integer index;
-		final public QuestDefEntity questDef;
-		final public EmbeddedEntity data;
-
-		public Objective(EmbeddedEntity data, QuestDefEntity parent, int objectiveIndex)
-		{
-			this.index = objectiveIndex;
-			this.data = data;
-			this.questDef = parent;
-		}
-
-		public QuestDefEntity getQuestDef()
-		{
-			return questDef;
-		}
-
-		public int getObjectiveIndex()
-		{
-			return index;
-		}
-
-		public String getName()
-		{
-			return (String) data.getProperty("name");
-		}
-
-		public boolean isComplete()
-		{
-			return GameUtils.booleanEquals(data.getProperty("complete"), true);
-		}
-
-		public Double getProgress()
-		{
-			return (Double) data.getProperty("progress");
-		}
-
-		public Double getProgressTotal()
-		{
-			return (Double) data.getProperty("progressTotal");
-		}
-
-		public List<List<String>> getNeededCharacterFieldValues()
-		{
-			return db.getValueFromFieldTypeFieldFilter2DCollection(data, "neededCharacterFieldValues");
-		}
-
-		public List<List<String>> getNeededInventoryItemFieldValues()
-		{
-			return db.getValueFromFieldTypeFieldFilter2DCollection(data, "neededInventoryItemFieldValues");
-		}
-
-		public List<List<String>> getNeededLocationFieldValues()
-		{
-			return db.getValueFromFieldTypeFieldFilter2DCollection(data, "neededLocationFieldValues");
-		}
-
-		public void flagCompleted()
-		{
-			data.setProperty("complete", true);
-		}
-	}
 
 	public List<QuestObjective> getObjectiveData(Key characterKey)
 	{
@@ -165,7 +102,7 @@ public class QuestDefEntity extends InitiumEntityBase
 		return list;
 
 	}
-
+	
 
 	// public List<QuestObjective> getObjectiveDataOld()
 	// {
@@ -285,6 +222,16 @@ public class QuestDefEntity extends InitiumEntityBase
 	public Key getQuestEntityKey(Key characterKey)
 	{
 		return KeyFactory.createKey("Quest", characterKey.toString() + getKey().toString());
+	}
+
+	public boolean isNoobQuest()
+	{
+		return GameUtils.equals(entity.getProperty("noobQuest"), true);
+	}
+
+	public String getQuestLine()
+	{
+		return (String)entity.getProperty("questLine");
 	}
 
 }

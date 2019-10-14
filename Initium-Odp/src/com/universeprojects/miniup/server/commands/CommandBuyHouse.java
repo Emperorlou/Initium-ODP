@@ -35,9 +35,15 @@ public class CommandBuyHouse extends Command {
 		CachedEntity newHouse = ps.buyHouse(db, ds, user, character, currentLocation, houseName, DOGECOIN_COST);
 		if(newHouse != null)
 		{
+			character.setProperty("locationKey", newHouse.getKey());
+			
+			getQuestService().checkLocationForObjectiveCompletions(newHouse);
+			getQuestService().checkCharacterPropertiesForObjectiveCompletions();
+			
 			MainPageUpdateService mpus = MainPageUpdateService.getInstance(db, user, character, newHouse, this);
 			mpus.updateFullPage_shortcut();
 			db.sendGameMessage(ds, character, "You have purchased a house!");
+			
 		}
 	}
 }

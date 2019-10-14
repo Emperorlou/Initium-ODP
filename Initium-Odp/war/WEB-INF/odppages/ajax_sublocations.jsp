@@ -9,11 +9,11 @@
 </c:if>
 <c:forEach var="location" items="${locations}">
 	<div onclick='doGoto(event, ${location.pathId})' class='standard-button-highlight sublocation-display-container location-link-${location.locationId}'>
+		<div class='sublocation-display' style='background-image:url(${location.bannerUrl})'></div>
+		<h5>${location.name}</h5>
 		<c:if test="${location.isForgettable=='true'}">
 			<div class='standard-button-highlight forget-button' onclick='doForgetCombatSite(event,${location.locationId})'>X</div>
 		</c:if>
-		<div class='sublocation-display' style='background-image:url(${location.bannerUrl})'></div>
-		<h5>${location.name}</h5>
 	</div>
 </c:forEach>
 <c:if test='${forgetAllCombatSitesHtml!=null }'>

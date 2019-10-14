@@ -125,23 +125,24 @@ public class AspectPickable extends ItemAspect
 			InitiumObject item = new InitiumObject(db, itemEntity);
 			
 			// Check to make sure the item we're trying to pick actually has the aspects we require
-			if (item.hasAspect(AspectGridMapObject.class)==false || item.hasAspect(AspectPickable.class)==false)
-				throw new UserErrorMessage("You cannot pick this object.");
+//			if (item.hasAspect(AspectGridMapObject.class)==false || item.hasAspect(AspectPickable.class)==false)
+//				throw new UserErrorMessage("You cannot pick this object.");
 			
 			AspectPickable pickable = item.getAspect(AspectPickable.class);
 			
-			if (pickable.isEnabled()==false)
+			if (pickable!=null && pickable.isEnabled()==false)
 				throw new UserErrorMessage("You cannot pick/collect this object. At least not in it's current state.");
 			
-			if (item.getAspect(AspectGridMapObject.class).isLoose())
+			if (item.hasAspect(AspectGridMapObject.class) && item.getAspect(AspectGridMapObject.class).isLoose())
 				throw new UserErrorMessage("You cannot pick/collect this item. Perhaps try just picking it up the regular way?");
 			
 			// Right away lets set this to not pickable since we're going to be picking it now
-			pickable.setProperty("enabled", false);
+			if (pickable!=null)
+				pickable.setProperty("enabled", false);
 			
 			// Here we'll pick up the entity - if we're supposed to...
 			
-			if (pickable.isToDelete())
+			if (pickable==null || pickable.isToDelete())
 			{
 				if (isProceduralPick)
 				{
@@ -155,7 +156,7 @@ public class AspectPickable extends ItemAspect
 				pickable.setProperty("enabled", false);
 			}
 			
-			if (pickable.isNotActuallyPickingUpEntity()==false)
+			if (pickable!=null && pickable.isNotActuallyPickingUpEntity()==false)
 			{
 				db.doCharacterCollectItem(this, db.getCurrentCharacter(), itemEntity, true);
 				ds.put(itemEntity);
@@ -164,7 +165,7 @@ public class AspectPickable extends ItemAspect
 			}
 
 			// Now modify the entity, if we're supposed to
-			if (pickable.isToDelete()==false)
+			if (pickable!=null && pickable.isToDelete()==false)
 			{
 				boolean changed = db.performModifierTypeOperation(itemEntity, itemEntity, "entityModifier", "entityModifierEmbedded");
 				
@@ -176,7 +177,7 @@ public class AspectPickable extends ItemAspect
 				}
 			}
 			// Now create the additional entities, if we're supposed to
-			if (pickable.getAdditionalItems()!=null)
+			if (pickable!=null && pickable.getAdditionalItems()!=null)
 			{
 				List<CachedEntity> newItems = new ArrayList<>();
 				List<CachedEntity> list = ds.get(pickable.getAdditionalItems());

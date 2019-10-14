@@ -942,6 +942,15 @@ public class ODPDBAccess
 		return gridMapService;
 	}
 
+	private QuestService questService = null;
+	public QuestService getQuestService(OperationBase command)
+	{
+		if (questService==null)
+			questService = new QuestService(command, this, getCurrentCharacter());
+		
+		return questService;
+	}
+
 	public Key getDefaultLocationKey()
 	{
 		return (Key)getProject().getProperty("defaultSpawnLocationKey");

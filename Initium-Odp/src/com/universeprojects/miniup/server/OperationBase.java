@@ -1,31 +1,40 @@
 package com.universeprojects.miniup.server;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.json.shared.JSONArray;
 import com.universeprojects.json.shared.JSONObject;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
-import com.universeprojects.miniup.server.dbentities.QuestDefEntity.Objective;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.dbentities.QuestObjective;
+import com.universeprojects.miniup.server.dbentities.QuestObjective.TutorialStep;
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridObject;
+import com.universeprojects.miniup.server.services.ExperimentalPageUpdateService;
+import com.universeprojects.miniup.server.services.FullPageUpdateService;
+import com.universeprojects.miniup.server.services.MainPageUpdateService;
 import com.universeprojects.miniup.server.services.QuestService;
 
 public abstract class OperationBase
 {
 	final protected ODPDBAccess db;
+	protected HttpServletRequest request;
 	
-	public OperationBase(ODPDBAccess db)
+	public OperationBase(HttpServletRequest request, ODPDBAccess db)
 	{
 		this.db = db;
+		this.request = request;
 	}
 	
 	/**
@@ -36,6 +45,7 @@ public abstract class OperationBase
 		return null;
 	}
 
+	private Map<String, String> jsCode_Replaceable = null;
 	private List<Map<String, String>> htmlUpdates = new ArrayList<Map<String, String>>();
 	private List<JSONObject> gridCellUpdates = new ArrayList<>();
 	private List<JSONObject> gridObjectUpdates = new ArrayList<>();
@@ -149,6 +159,14 @@ public abstract class OperationBase
 		addHtmlUpdate("7", jquerySelector, htmlContents);
 	}
 	
+	public void addJavascriptToResponse_Replaceable(String javascriptId, String javascript)
+	{
+		if (jsCode_Replaceable==null)
+			jsCode_Replaceable = new LinkedHashMap<>();
+		
+		jsCode_Replaceable.put(javascriptId, javascript);
+	}
+	
 	public void addJavascriptToResponse(String javascript)
 	{
 		addHtmlUpdate("8", null, javascript);
@@ -162,11 +180,29 @@ public abstract class OperationBase
 		htmlData.put("selector", jquerySelector);
 		htmlData.put("html", htmlContents);
 		
+//		// Check if this thing has been updated already and replace it if it has
+//		if (GameUtils.equals("0", updateType) && htmlUpdates!=null)
+//			for(Map<String,String> existingData:htmlUpdates)
+//			{
+//				if (GameUtils.equals(jquerySelector, existingData.get("selector")))
+//				{
+//					existingData.put("html", htmlContents);
+//					return;
+//				}
+//			}
+		
 		htmlUpdates.add(htmlData);
 	}
 	
 	public List<Map<String,String>> getHtmlUpdates()
 	{
+		if (jsCode_Replaceable!=null)
+		{
+			for(String key:jsCode_Replaceable.keySet())
+			{
+				addJavascriptToResponse(jsCode_Replaceable.get(key));
+			}
+		}
 		return htmlUpdates;
 	}
 
@@ -242,7 +278,7 @@ public abstract class OperationBase
 	protected QuestService getQuestService()
 	{
 		if (questService==null)
-			questService = new QuestService(this, db, db.getCurrentCharacter());
+			questService = db.getQuestService(this);
 		
 		return questService;
 	}
@@ -261,8 +297,71 @@ public abstract class OperationBase
 		addJavascriptToResponse("doObjectiveCompleteBannerEffect();");
 	}
 	
+	public void addUITutorialsForObjective(QuestObjective o)
+	{
+		addJavascriptToResponse_Replaceable("uitutorial", o.generateTutorialStepsJs());
+	}
 	
+	private MainPageUpdateService mpus = null;
+	public MainPageUpdateService getMPUS()
+	{
+		if (mpus!=null)
+		{
+			if (GameUtils.equals(db.getCharacterLocationKey(db.getCurrentCharacter()), mpus.getLocation().getKey()))
+				return mpus;
+		}
+
+		mpus = OperationBase.createMPUS(db, this);
+		
+		return mpus;
+	}
 	
+	public static MainPageUpdateService createMPUS(ODPDBAccess db, OperationBase command)
+	{
+		MainPageUpdateService mpus;
+		String uiStyle = db.getRequest().getParameter("uiStyle");
+		
+		if (uiStyle==null)
+		{
+			String mainPageUrl = db.getRequest().getParameter("mainPageUrl");
+			if (mainPageUrl==null) mainPageUrl = db.getRequest().getServletPath();
+			if (mainPageUrl.contains("/odp/full"))
+			{
+				uiStyle = "wow";
+			}
+			else if (mainPageUrl.contains("/main.jsp"))
+			{
+				uiStyle = "classic";
+			}
+			else
+			{
+				uiStyle = "experimental";
+			}
+			
+		}
+		
+		if (uiStyle.equals("classic"))
+		{
+			mpus = new MainPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), command);
+		}
+		else if (uiStyle.equals("experimental"))
+		{
+			mpus = new ExperimentalPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), command);
+		}
+		else if (uiStyle.equals("wow"))
+		{
+			mpus = new FullPageUpdateService(db, db.getCurrentUser(), db.getCurrentCharacter(), db.getCharacterLocation(db.getCurrentCharacter()), command);
+		}
+		else
+			throw new RuntimeException("Unhandled ui style: "+uiStyle);
+
+		return mpus;
+	}
+
+	public void flagNoobQuestLineComplete(String questLine)
+	{
+		addJavascriptToResponse("questLineCompletePopup('"+questLine+"');");
+	}
 	
 	
 	

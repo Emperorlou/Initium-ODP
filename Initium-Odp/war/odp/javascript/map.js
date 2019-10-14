@@ -39,7 +39,8 @@ function createLocalMapViewer(id)
         prefixUrl: "https://initium-resources.appspot.com/images/map/controls/",
         springStiffness: 5,
         animationTime: 0.2,
-        tileSources: "/odp/javascript/images/map/" + quality + ".xml"
+        tileSources: "https://storage.googleapis.com/initium-resources/images/map/" + quality + ".xml"
+        
     });
 }
 

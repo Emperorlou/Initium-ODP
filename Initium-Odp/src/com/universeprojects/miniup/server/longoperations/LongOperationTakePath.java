@@ -358,11 +358,12 @@ public class LongOperationTakePath extends LongOperation {
 	
 		CachedEntity newLocation = db.doCharacterTakePath(ds, db.getCurrentCharacter(), path, attack);
 		
-		getQuestService().checkLocationForObjectiveCompletions(newLocation);
-		
 		
 		MainPageUpdateService update = MainPageUpdateService.getInstance(db, db.getCurrentUser(), db.getCurrentCharacter(), newLocation, this);
 		update.updateFullPage_shortcut(true);
+
+		getQuestService().checkLocationForObjectiveCompletions(newLocation);
+		getQuestService().checkCharacterPropertiesForObjectiveCompletions();
 		
 		return "You have arrived at "+newLocation.getProperty("name")+".";
 	}
