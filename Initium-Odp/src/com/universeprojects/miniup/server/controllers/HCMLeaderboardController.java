@@ -52,7 +52,9 @@ public class HCMLeaderboardController extends PageController
 		{
 			CachedEntity character = characters.get(i);
 			
-			if (CommonChecks.checkIsHardcore(character)&&CommonChecks.checkCharacterIsIncapacitated(character) && GameUtils.getElapsedDays((Date)character.getProperty("locationEntryDatetime"))>1)
+			if((int)character.getProperty("hardcoreRank")<=0) continue;
+			
+			if (CommonChecks.checkCharacterIsIncapacitated(character) && GameUtils.getElapsedDays((Date)character.getProperty("locationEntryDatetime"))>1)
 				continue;
 			
 			Map<String,String> data = new HashMap<>();
