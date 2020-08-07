@@ -1557,8 +1557,7 @@ public class ODPDBAccess
 			equipSlotRaw = "Cosmetic1,Cosmetic2,Cosmetic3";
 		
 		equipSlotRaw = equipSlotRaw.trim();
-		if (equipSlotRaw.endsWith(","))
-			equipSlotRaw = equipSlotRaw.substring(0, equipSlotRaw.length()-1);
+		if (equipSlotRaw.endsWith(",")) equipSlotRaw = equipSlotRaw.substring(0, equipSlotRaw.length()-1);
 		String[] equipSlotArr = equipSlotRaw.split(",");
 		
 		String destinationSlot = null;
@@ -1572,21 +1571,54 @@ public class ODPDBAccess
 			boolean swapSlot = CommonChecks.checkCharacterIsPlayer(character) && 
 					("Shield".equals(equipment.getProperty("itemType")) || "Weapon".equals(equipment.getProperty("itemType")));
 			
-			for(int i = equipSlotArr.length-1; i>=0; i--)
-			{
+			//this loop iterates backwards through equipSlotArr to find the first entry that is valid. If there are none, toss an error.
+			for(int i = equipSlotArr.length-1; i>=0; i--) {	
+				
 				String slotCheck = equipSlotArr[i].trim();
 				
+				//we split the destination slot at " and ". if there are more than 1 results from that, it's a complex item.
+				String[]complexSlot=slotCheck.split(" and ");
+				
+				if(complexSlot.length>1) {
+					boolean isValid=true;
+					
+					//this loop iterates through complexSlot and sees if all those slots are open. If a single one isn't, we break out.
+					for(int k=0; k!=complexSlot.length; k++) {
+						complexSlot[i]=complexSlot[i].trim(); //clean up the string, just in case.
+						
+						//if its 2hands, fix it.
+						if(complexSlot[i].equals("2Hands")) {
+							complexSlot[i]="LeftHand and RightHand";
+						}
+						
+						//if the equip slot doesn't exist, we break.
+						//if(CommonChecks.checkIsValidEquipSlot(complexSlot[i])==false) {
+						//	isValid=false;
+						//	break;
+						//}
+						
+						//if there is something equipped in one of the slots, we break.
+						if(character.getProperty("equipment"+complexSlot[i])!=null){
+							isValid=false;
+							break;
+						}
+					}
+					
+					//if every single slot is open, break out of the loop.
+					if(isValid==true) {
+						break;
+					}
+				}
+								
 				if(CommonChecks.checkIsValidEquipSlot(slotCheck)==false) 
 					continue;
 				
-				if (character.getProperty("equipment"+slotCheck)==null)
-				{
+				if (character.getProperty("equipment"+slotCheck)==null) {
 					destinationSlot = slotCheck;
 					break;
 				}
 				
-				if(swapSlot && destinationSlot == null)
-				{
+				if(swapSlot && destinationSlot == null) {
 					// If it's a shield/weapon type, find first swap slot.
 					CachedEntity currentSlotItem = db.getIfExists((Key)character.getProperty("equipment"+slotCheck));
 					
@@ -1607,8 +1639,7 @@ public class ODPDBAccess
 			throw new RuntimeException("There was no equipSlot specified for this item: "+equipment);
 		
 		
-		if (character==null)
-			throw new IllegalArgumentException("Character cannot be null.");
+		if (character==null) throw new IllegalArgumentException("Character cannot be null.");
 
 		ContainerService cs = new ContainerService(this);
 		if (!character.getKey().equals(equipment.getProperty("containerKey")))
@@ -1645,17 +1676,17 @@ public class ODPDBAccess
 			destinationSlot = "LeftHand and RightHand";
 
 		
-		if (destinationSlot!=null && destinationSlot.trim().equals("")==false)
-		{
+		if (destinationSlot!=null && destinationSlot.trim().equals("")==false) {
 			String[] destinationSlots = destinationSlot.split(" and ");
 			// Validate destination slots first.
-			for (String slot:destinationSlots)
-				if(CommonChecks.checkIsValidEquipSlot(slot.trim())==false)
+			for (String slot:destinationSlots) {
+				if(CommonChecks.checkIsValidEquipSlot(slot.trim())==false) {
 					throw new RuntimeException("Invalid EquipSlot specified for item.");
+				}
+			}
 			
 			// Check if we need to unequip some items first if they're in the way (and replacing is requested)
-			for (String slot:destinationSlots)
-			{
+			for (String slot:destinationSlots) {
 				
 				// If we already have some equipment in the slot we want to equip to, then unequip it first...
 				if (character.getProperty("equipment"+slot)!=null)
@@ -1667,16 +1698,12 @@ public class ODPDBAccess
 			}			
 			
 			// Now equip
-			for (String slot:destinationSlots)
-			{
+			for (String slot:destinationSlots) {
 				// Now equip this weapon...
 				character.setProperty("equipment"+slot, equipment.getKey());
 			}
-		}
-		
+		}		
 		db.put(character);
-		
-
 	}
 
 	public void doCharacterUnequipEntity(CachedDatastoreService db, CachedEntity character, String fromSlot)
