@@ -1586,16 +1586,17 @@ public class ODPDBAccess
 					for(int k=0; k!=complexSlot.length; k++) {
 						complexSlot[i]=complexSlot[i].trim(); //clean up the string, just in case.
 						
+						//if the equip slot doesn't exist, we break.
+						if(CommonChecks.checkIsValidEquipSlot(complexSlot[i])==false) {
+							isValid=false;
+							break;
+						}
+						
 						//if its 2hands, fix it.
 						if(complexSlot[i].equals("2Hands")) {
 							complexSlot[i]="LeftHand and RightHand";
 						}
-						
-						//if the equip slot doesn't exist, we break.
-						//if(CommonChecks.checkIsValidEquipSlot(complexSlot[i])==false) {
-						//	isValid=false;
-						//	break;
-						//}
+
 						
 						//if there is something equipped in one of the slots, we break.
 						if(character.getProperty("equipment"+complexSlot[i])!=null){
@@ -1606,6 +1607,7 @@ public class ODPDBAccess
 					
 					//if every single slot is open, break out of the loop.
 					if(isValid==true) {
+						destinationSlot=slotCheck;
 						break;
 					}
 				}
