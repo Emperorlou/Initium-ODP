@@ -55,6 +55,12 @@ public class CommandDeleteAndRecreate extends Command {
         if (name.equals(currentChar.getProperty("name"))==false && db.checkCharacterExistsByName(name))
             throw new UserErrorMessage("Character name is already in use.");
         
+        // Cannot reroll with items in inventory.
+        List<CachedEntity> inventory = db.getFilteredList("Item", "containerKey", (String)currentChar.getKey());
+        if (inventory.size() != 0) {
+        	throw new UserErrorMessage("Character has items in their inventory.");
+        }
+        
         // Cannot be in combat.
         if(CommonChecks.checkCharacterIsBusy(currentChar))
         	throw new UserErrorMessage("Character is currently busy.");

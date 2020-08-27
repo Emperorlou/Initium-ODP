@@ -323,6 +323,15 @@ public class DBAccessor {
 	}
 	
 	/**
+	 * Sends a game message to the specified characters
+	 */
+	public void sendMessageToCharacters(String message, Character... characters) {
+		for(Character target:characters) {
+			db.sendGameMessage(db.getDB(), target.wrappedEntity, message);
+		}
+	}
+	
+	/**
 	 * Creates a blank entity to work with in script context. This is to be used with
 	 * caution, and should ONLY be used when creating an item (not modifying existing
 	 * items). If uniqueName is omitted, will allow duplicates to be created.
