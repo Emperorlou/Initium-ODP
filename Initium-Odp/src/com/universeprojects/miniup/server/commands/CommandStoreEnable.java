@@ -9,6 +9,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 /** 
@@ -38,8 +39,8 @@ public class CommandStoreEnable extends Command {
 		if ("COMBAT".equals(character.getProperty("mode")))
 			throw new UserErrorMessage("You cannot setup shop while in combat.");
 		
-		if("UNCONSCIOUS".equals(character.getProperty("mode")) || "DEAD".equals(character.getProperty("mode")))
-			throw new UserErrorMessage("You cannot setup shop while dead!");
+		if(CommonChecks.checkCharacterIsIncapacitated(character))
+			throw new UserErrorMessage("You cannot setup shop while incapacitated!");
 		
 		db.setCharacterMode(ds, character, ODPDBAccess.CHARACTER_MODE_MERCHANT);
 		db.doCharacterTimeRefresh(ds, character);	// This is saving the character, so no need to save after this
