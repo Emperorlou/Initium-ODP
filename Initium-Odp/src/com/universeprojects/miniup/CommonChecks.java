@@ -65,6 +65,16 @@ public abstract class CommonChecks
 	}
 	
 	/**
+	 * Checks if a character is zombified.
+	 * @param character
+	 * @return
+	 */
+	public static boolean checkCharacterIsZombie(CachedEntity character) {
+		if("Zombie".equals(character.getProperty("status"))) return true;
+		return false;
+	}
+	
+	/**
 	 * Checks if a character is unconscious. 
 	 * 
 	 * This will return false if the character is actually dead.
@@ -448,7 +458,7 @@ public abstract class CommonChecks
 
 	public static boolean checkCharacterIsIncapacitated(CachedEntity character)
 	{
-		if (checkCharacterIsDead(character) || checkCharacterIsUnconscious(character))
+		if (checkCharacterIsDead(character) || checkCharacterIsUnconscious(character) || checkCharacterIsZombie(character))
 			return true;
 		return false;
 	}
