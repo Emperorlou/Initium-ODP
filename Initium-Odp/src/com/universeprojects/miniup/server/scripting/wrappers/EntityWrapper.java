@@ -201,6 +201,16 @@ public class EntityWrapper extends BaseWrapper
 		return false;
 	}
 	
+	/**
+	 * JS numbers don't translate cleanly; here, we can make sure that we are actually passing a LONG.
+	 * Useful for changing DR, int mod, dex mod, str mod, etc.
+	 * @param property
+	 * @param value
+	 */
+	public void setLongProperty(String property, Long value) {
+		this.setProperty(property, value);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public boolean removeScript(String scriptName)
 	{

@@ -3627,68 +3627,6 @@ function newGuardSetting(event, entity, type, attack)
 	doCommand(event, "GuardNewSetting", {entityKey:entity, type:type, attack:attack});
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ////////////////////////////////////////////////////////
 // COMMANDS
 
@@ -4916,19 +4854,47 @@ $(document).keyup(function(event){
 	{
 		viewProfile();
 	}
-	else if (event.which==76) // Changed to L since B is now for Nearby Characters list
-	{
-		window.location.href='main.jsp';
+	//user can just refresh the page. besides, this breaks on experimental.
+	//else if (event.which==76) // Changed to L since B is now for Nearby Characters list
+	//{
+	//	window.location.href='main.jsp';
+	//}
+	else if (event.which==85){ // U - go up in character list
+		switchCharacterByDirection(event, 1);
+	}
+	else if (event.which==74){ // J - go down in character list
+		switchCharacterByDirection(event, 2);
+	}
+	else if (event.which==75){ // K - iterate through characters in same acc and party
+		switchCharacterByDirection(event, 3);
+	}
+	else if (event.which==76){ // L - switch to party leader if possible
+		switchCharacterByDirection(event, 4);
+	}
+	else if (event.which==78){ // N - opens the navigation window.
+		if(uiStyle == "Classic UI"){
+			makeIntoPopup(".navigation-box")
+		}
+		else if(uiStyle == "Experimental"){
+			viewLocalNavigation(event);
+		}
 	}
 });
 
-
-
-
-
-
-
-
+function switchCharacterByDirection(eventObject, direction){
+	doCommand(eventObject,"SwitchCharacter",{"direction":direction},function()
+	{
+		if (location.href.indexOf("/main.jsp")>-1)
+			window.history.replaceState({}, document.title, "/" + "main.jsp");		
+		else if (location.href.indexOf("/odp/experimental")>-1)
+			window.history.replaceState({}, document.title, "/" + "odp/experimental");		
+		else if (location.href.indexOf("/odp/full")>-1)
+			window.history.replaceState({}, document.title, "/" + "odp/full");		
+		
+		closeAllTooltips();
+		clearMakeIntoPopup();
+	});
+}
 
 
 

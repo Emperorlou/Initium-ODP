@@ -784,6 +784,34 @@ public class ODPDBAccess
 		}
 		return null;
 	}
+	
+	/**
+	 * This returns an alphabetically sorted list of all characters associated with a userkey.
+	 * This will also filter out all invalid characters, notable dead and zombie.
+	 * @param userKey
+	 * @return
+	 */
+	public List<CachedEntity> getAlphabetSortedValidCharactersByUser(Key userKey){
+		List<CachedEntity> characters = query.getFilteredList("Character", "userKey", userKey);
+		Collections.sort(characters, new Comparator<CachedEntity>()
+		{
+			@Override
+			public int compare(CachedEntity o1, CachedEntity o2)
+			{
+				return ((String)o1.getProperty("name")).compareTo((String)o2.getProperty("name"));
+			}
+		});
+		
+		//this will validate all the characters. Filter out dead and zambie.
+		List<CachedEntity> toReturn = new ArrayList<>();
+		for(CachedEntity c:characters) {
+			if (c.getProperty("name").toString().startsWith("Dead ") == false && "Zombie".equals(c.getProperty("status")) == false) {
+				toReturn.add(c);
+			}
+		}
+		
+		return toReturn;
+	}
 
 	public CachedEntity getUserByEmail(String email)
 	{
@@ -1577,45 +1605,45 @@ public class ODPDBAccess
 				String slotCheck = equipSlotArr[i].trim();
 				
 				//we split the destination slot at " and ". if there are more than 1 results from that, it's a complex item.
-				String[]complexSlot=slotCheck.split(" and ");
+				String[]complexSlot = slotCheck.split(" and ");
 				
-				if(complexSlot.length>1) {
-					boolean isValid=true;
+				if(complexSlot.length > 1) {
+					boolean isValid = true;
 					
 					//this loop iterates through complexSlot and sees if all those slots are open. If a single one isn't, we break out.
 					for(int k=0; k!=complexSlot.length; k++) {
-						complexSlot[i]=complexSlot[i].trim(); //clean up the string, just in case.
+						complexSlot[i] = complexSlot[i].trim(); //clean up the string, just in case.
 						
 						//if the equip slot doesn't exist, we break.
-						if(CommonChecks.checkIsValidEquipSlot(complexSlot[i])==false) {
-							isValid=false;
+						if(CommonChecks.checkIsValidEquipSlot(complexSlot[i]) == false) {
+							isValid = false;
 							break;
 						}
 						
 						//if its 2hands, fix it.
 						if(complexSlot[i].equals("2Hands")) {
-							complexSlot[i]="LeftHand and RightHand";
+							complexSlot[i] = "LeftHand and RightHand";
 						}
 
 						
 						//if there is something equipped in one of the slots, we break.
-						if(character.getProperty("equipment"+complexSlot[i])!=null){
-							isValid=false;
+						if(character.getProperty("equipment" + complexSlot[i]) != null){
+							isValid = false;
 							break;
 						}
 					}
 					
 					//if every single slot is open, break out of the loop.
-					if(isValid==true) {
+					if(isValid == true) {
 						destinationSlot=slotCheck;
 						break;
 					}
 				}
 								
-				if(CommonChecks.checkIsValidEquipSlot(slotCheck)==false) 
+				if(CommonChecks.checkIsValidEquipSlot(slotCheck) == false) 
 					continue;
 				
-				if (character.getProperty("equipment"+slotCheck)==null) {
+				if (character.getProperty("equipment"+slotCheck) == null) {
 					destinationSlot = slotCheck;
 					break;
 				}
