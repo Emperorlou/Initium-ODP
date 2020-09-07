@@ -161,7 +161,7 @@ public class LongOperationExperiment extends LongOperation
 			throw new UserErrorMessage("You cannot experiment right now. You're currently maning your store. <br><a onclick='closeAllPopups(); toggleStorefront();'>Shutdown Store</a>");
 		else if ("UNCONSCIOUS".equals(mode))
 			throw new UserErrorMessage("You cannot experiment right now. You're currently unconscious, lol.");
-		else if ("DEAD".equals(mode))
+		else if ("DEAD".equals(mode) || "RESPAWNED".equals(mode))
 			throw new UserErrorMessage("You cannot experiment right now. You're DEAD. D:");
 		else if ("NORMAL".equals(character.getProperty("mode"))==false)
 			throw new UserErrorMessage("You cannot experiment right now. You're too busy.");		

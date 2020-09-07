@@ -4882,6 +4882,9 @@ $(document).keyup(function(event){
 	else if (event.which==72){ // H - opens the hotkey window.
 		openHotkeyWindow();
 	}
+	else if(event.which==65){ // A - aborts the current long operation.
+		cancelLongOperations(); //i tested, and sending this with no parameters DOES work
+	}
 });
 
 function switchCharacterByDirection(eventObject, direction){

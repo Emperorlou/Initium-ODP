@@ -181,6 +181,10 @@ public class CommandSwitchCharacter extends Command {
 		if ("Zombie".equals(targetCharacter.getProperty("status"))) {
 			throw new UserErrorMessage("You cannot switch to this character, it is now a zombie.");
 		}
+		
+		if ("RESPAWNED".equals(targetCharacter.getProperty("mode"))) {
+			throw new UserErrorMessage("This character has already been respawned.");
+		}
 
 		// Set and save new character
 		user.setProperty("characterKey", targetCharacter.getKey());

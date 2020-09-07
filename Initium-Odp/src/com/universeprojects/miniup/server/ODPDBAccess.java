@@ -85,6 +85,7 @@ public class ODPDBAccess
 	public enum CharacterMode
 	{
 		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD
+		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD, RESPANWED
 	}
 
 	public enum CharacterType
@@ -805,7 +806,7 @@ public class ODPDBAccess
 		//this will validate all the characters. Filter out dead and zambie.
 		List<CachedEntity> toReturn = new ArrayList<>();
 		for(CachedEntity c:characters) {
-			if (c.getProperty("name").toString().startsWith("Dead ") == false && "Zombie".equals(c.getProperty("status")) == false) {
+			if (!"RESPAWNED".equals(c.getProperty("mode")) && !"Zombie".equals(c.getProperty("status"))) {
 				toReturn.add(c);
 			}
 		}
