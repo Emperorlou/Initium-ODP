@@ -77,10 +77,9 @@ public class CharacterSwitcherController extends PageController {
 		
 		for(CachedEntity c:characters)
 		{
-			if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
-			{}
-			else
-				continue;
+			
+			if(!CommonChecks.checkCharacterIsRespawnable(c) || CommonChecks.checkCharacterIsZombie(c)) continue;
+
 			Map<String,Object> data = new HashMap<>();
 			charactersData.add(data);
 			
