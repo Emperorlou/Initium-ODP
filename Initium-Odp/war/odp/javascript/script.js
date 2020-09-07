@@ -4873,7 +4873,7 @@ $(document).keyup(function(event){
 	}
 	else if (event.which==78){ // N - opens the navigation window.
 		if(uiStyle == "Classic UI"){
-			makeIntoPopup(".navigation-box")
+			makeIntoPopup(".navigation-box");
 		}
 		else if(uiStyle == "Experimental"){
 			viewLocalNavigation(event);
