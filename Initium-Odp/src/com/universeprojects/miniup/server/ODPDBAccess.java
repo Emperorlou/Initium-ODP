@@ -84,7 +84,6 @@ public class ODPDBAccess
 	
 	public enum CharacterMode
 	{
-		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD
 		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD, RESPANWED
 	}
 
@@ -793,7 +792,8 @@ public class ODPDBAccess
 	 * @return
 	 */
 	public List<CachedEntity> getAlphabetSortedValidCharactersByUser(Key userKey){
-		List<CachedEntity> characters = query.getFilteredList("Character", "userKey", userKey);
+		CachedEntity user = getEntity(userKey);
+		List<CachedEntity> characters = getUserCharacters(user);
 		Collections.sort(characters, new Comparator<CachedEntity>()
 		{
 			@Override
