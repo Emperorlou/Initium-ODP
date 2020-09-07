@@ -4879,6 +4879,9 @@ $(document).keyup(function(event){
 			viewLocalNavigation(event);
 		}
 	}
+	else if (event.which==72){ // H - opens the hotkey window.
+		openHotkeyWindow();
+	}
 });
 
 function switchCharacterByDirection(eventObject, direction){
@@ -4896,7 +4899,9 @@ function switchCharacterByDirection(eventObject, direction){
 	});
 }
 
-
+function openHotkeyWindow(){
+	pagePopup("/odp/hotkeys.html", null, "Hotkeys");
+}
 
 function secondsElapsed(secondsToConvert)
 {
