@@ -13,7 +13,7 @@ function openMap()
 	var pagePopupId = "page-popup"+stackIndex;
 	var mapId = pagePopupId+"-map";
 	
-	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a><center><h3>Player-Made Game Map</h3><br/><span>Last updated: November 19, 2018</span></center><div id='"+mapId+"' class='page-popup-map'></div></div>");
+	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><a class='page-popup-Reload' onclick='reloadPagePopup()'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a><center><h3>Player-Made Game Map</h3><br/><span>Last updated: September 1st, 2020</span></center><div id='"+mapId+"' class='page-popup-map'></div></div>");
 	$("body").scrollTo("#buttonbar");
 	createLocalMapViewer(mapId);
 }

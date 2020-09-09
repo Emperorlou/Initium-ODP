@@ -80,9 +80,8 @@ public class CommandAutofixDeathModeNotSet extends Command {
 		else if("UNCONSCIOUS".equals(mode))
 			throw new UserErrorMessage("You're already unconscious! Get someone to save you, quick!");
 		
-		else if("DEAD".equals(mode))
+		else if("DEAD".equals(mode) || "RESPAWNED".equals(mode))
 			throw new UserErrorMessage("RIP. You're already dead!");
-		
 		else
 			throw new UserErrorMessage("Something seems to have gone wrong, please let Papa know!");
 	}
