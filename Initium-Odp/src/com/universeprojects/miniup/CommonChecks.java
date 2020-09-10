@@ -589,6 +589,22 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+	
+	public static boolean checkItemHasAspect(CachedEntity item, String aspectName) {
+		String raw = (String) item.getProperty("_aspect");
+		
+		//get rid of those pesky brackets.
+		raw = raw.substring(1, raw.length()-1);
+		
+		String[] aspects = raw.split(", ");
+		
+		for(String aspect:aspects) {
+			if(aspect.equals(aspectName)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public static boolean checkItemHasAspect(CachedEntity item, Class<? extends InitiumAspect> clazz)
 	{
@@ -609,6 +625,4 @@ public abstract class CommonChecks
 	{
 		return GameUtils.equals(location.getProperty("type"), "CityHall");
 	}
-
-
 }

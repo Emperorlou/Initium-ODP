@@ -701,6 +701,19 @@ function buyHouse(eventObject)
 	});
 }
 
+function doPublishItemFilter(event) {
+	var grey;
+	var white;
+	var bronze;
+	var gold;
+	var epic;
+	var magic;
+	var itemWhiteList = null; //grab from the itemWhiteList textbox.
+	var parameters = {"rarityFilter":{"grey":grey, "white":white, "bronze":bronze, "gold":gold, "epic":epic, "magic":magic},
+	"itemWhiteList":itemWhiteList};
+	doCommand(event, "PublishItemFilter", parameters)
+}
+
 function doCollectItem(event, itemId)
 {
 	doCommand(event, "CollectItem", {itemId:itemId}, 
