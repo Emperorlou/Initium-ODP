@@ -2651,6 +2651,25 @@ public class ODPDBAccess
 		Query q = new Query("Item").setFilter(new FilterPredicate("containerKey", FilterOperator.EQUAL, locationKey)).addSort("movedTimestamp", SortDirection.DESCENDING);
 		return ds.fetchAsList_Keys(q, 50, null);
 	}
+	
+	/**
+	 * Filters a list of entities by an aspect.
+	 * @param entities - the original list of entities
+	 * @param aspectName - the aspect to filter for
+	 * @return the filtered list of entities
+	 */
+	public List<CachedEntity> filterEntitiesByAspect(List<CachedEntity> entities, String aspectName){
+		List<CachedEntity> toReturn = new ArrayList<>();
+		
+		for(CachedEntity entity:entities) {			
+			//test to make sure this works
+			if(CommonChecks.checkItemHasAspect(entity, aspectName)) {
+				toReturn.add(entity);
+			}
+		}
+		
+		return toReturn;
+	}
 
 	/**
 	 * Returns a list of items for the specified container. Location will return 50 max items.
