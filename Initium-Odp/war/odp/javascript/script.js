@@ -701,18 +701,6 @@ function buyHouse(eventObject)
 	});
 }
 
-function doPublishItemFilter(event) {
-	var grey;
-	var white;
-	var bronze;
-	var gold;
-	var epic;
-	var magic;
-	var itemWhiteList = null; //grab from the itemWhiteList textbox.
-	var parameters = {"rarityFilter":{"grey":grey, "white":white, "bronze":bronze, "gold":gold, "epic":epic, "magic":magic},
-	"itemWhiteList":itemWhiteList};
-	doCommand(event, "PublishItemFilter", parameters)
-}
 
 function doCollectItem(event, itemId)
 {
@@ -5715,11 +5703,29 @@ function viewPetFoodOptions(event, petId)
 	closeAllTooltips();
 }
 
+function addItemToSlot(event, baseId, slottableId){
+	confirmPopup("Slot Item", "Are you sure you want to permanently slot this into your item? This is not reversible.", function(){
+		doCommand(event, "InsertItemToSlot", {baseId:baseId, slottableId:slottableId});
+	});
+}
+
+function viewSlottableItems(event, baseId){
+	$("body").append("" +
+	"<div id='slottableitemslist-container' class='main-buttonbox v3-window3 make-popup make-popup-removable'>" +
+	"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
+	"	<h4>Slottable Items</h4>" +
+	"	<div id='slottableitemslist'><img class='wait' src='/javascript/images/wait.gif' border='0'/></div>" +
+	"</div>" +
+	"<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
+$("#slottableitemslist").load("/odp/slottableitemslist?slottedItemId="+baseId+"&char="+window.characterOverride);
+closeAllTooltips();
+}
+
 function updateItemImage(itemId, image)
 {
 	 var elements = $('.item-icon-img-'+itemId);
 	 
-	 for(var i = 0; i<elements.length; i++)
+	 for(var i in elements)
 	 {
 		 if (elements[i].nodeName == "IMG")
 		 {
