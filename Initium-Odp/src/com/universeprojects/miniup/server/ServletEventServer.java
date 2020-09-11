@@ -8,7 +8,7 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.json.shared.JSONObject;
 import com.universeprojects.json.shared.parser.JSONParserFactory;
-import com.universeprojects.json.shared.parser.JSONServerParser;
+import com.universeprojects.json.server.parser.JSONServerParser;
 import com.universeprojects.json.shared.parser.ParseException;
 import com.universeprojects.miniup.CommonChecks;
 

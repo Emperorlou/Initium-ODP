@@ -845,6 +845,7 @@ public class MainPageUpdateService extends Service
 		
 		return newHtml.toString();
 	}
+
 	
 	public String updateInBannerOverlayLinks()
 	{
@@ -852,6 +853,8 @@ public class MainPageUpdateService extends Service
 		newHtml.append("<script type='text/javascript'>window.singleLeavePathId=null;</script>");
 		if (CommonChecks.checkCharacterIsInCombat(character)==false)
 		{
+			loadPathCache();
+			
 			// Check if we should add the show loot popup button
 			if (CommonChecks.checkCharacterIsIncapacitated(character)==false && 
 					CommonChecks.checkLocationIsCombatSite(location) && 
@@ -864,12 +867,13 @@ public class MainPageUpdateService extends Service
 				newHtml.append(getHtmlForInBannerLinkCentered(30, 50, "Browse nearby stores", "loadLocationMerchants()"));				
 				newHtml.append(getHtmlForInBannerLinkCentered(85, 50, "Nearby Items", "loadLocationItems()"));				
 			}
-			else
-				newHtml.append(getHtmlForInBannerLinkCentered(85, 50, "Nearby Items", "loadLocationItems()"));				
+			else if (CommonChecks.checkCharacterIsIncapacitated(character) == false)
+			{
+				newHtml.append(getHtmlForInBannerLinkCentered(85, 50, "Nearby Items", "loadLocationItems()"));
+			}
 			
 			newHtml.append(getSideBannerLinks());
 			
-			loadPathCache();
 
 			boolean noOverlayLinks = true;
 			for(int i = 0; i<paths.size(); i++)
@@ -961,7 +965,7 @@ public class MainPageUpdateService extends Service
 					int leftInt = new Double(leftDbl/728d*100).intValue();
 			
 	
-					String buttonCaption = "Head towards "+destLocationName;
+					String buttonCaption = "Head back towards "+destLocationName;
 					String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
 					String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
 					if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
@@ -1062,6 +1066,7 @@ public class MainPageUpdateService extends Service
 		
 		return updateHtmlContents("#banner-text-overlay", newHtml.toString());
 	}
+
 	
 	protected String getHtmlForInBannerLink(double top, double left, String buttonCaption, String onclickJs)
 	{

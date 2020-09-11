@@ -1331,8 +1331,13 @@ public class ODPDBAccess
 		return discoveries;
 	}
 
-	public List<CachedEntity> getDiscoveriesForCharacterAndLocation(Key characterKey, Key location, boolean showHidden)
+	public List<CachedEntity> getDiscoveriesForCharacterAndLocation(Key characterKey, Key location, boolean showHidden) {
+		return getDiscoveriesForCharacterAndLocation(characterKey, location, showHidden, 1000);
+	}
+	public List<CachedEntity> getDiscoveriesForCharacterAndLocation(Key characterKey, Key location, boolean showHidden, Integer limit)
 	{
+		if (limit==null) limit = 1000;
+		
 		List<CachedEntity> fetchAsList = null;
 		
 		
@@ -1354,8 +1359,8 @@ public class ODPDBAccess
 
 		
 		// So instead, we will query for all discoveries and then just pair them down
-		List<CachedEntity> location1List = query.getFilteredList("Discovery", "characterKey", characterKey, "location1Key", location);
-		List<CachedEntity> location2List = query.getFilteredList("Discovery", "characterKey", characterKey, "location2Key", location);
+		List<CachedEntity> location1List = query.getFilteredList("Discovery", limit, null, "characterKey", FilterOperator.EQUAL, characterKey, "location1Key", FilterOperator.EQUAL, location);
+		List<CachedEntity> location2List = query.getFilteredList("Discovery", limit, null, "characterKey", FilterOperator.EQUAL, characterKey, "location2Key", FilterOperator.EQUAL, location);
 		fetchAsList = location1List;
 		fetchAsList.addAll(location2List);
 		
@@ -1368,6 +1373,26 @@ public class ODPDBAccess
 		log.log(Level.WARNING, fetchAsList.size() + " discoveries found.");
 		
 		return fetchAsList;
+	}
+
+	/**
+	 * Returns no more than a count of 20 locations. There could be more. Also there is a high likelihood that
+	 * any number over 10 there could actually be hundreds because this is done with 2 queries and combat sites
+	 * tend to favor one or the other.
+	 *  
+	 * @param characterKey
+	 * @param location
+	 * @return
+	 */
+	public int getDiscoveriesForCharacterAndLocation_Count(Key characterKey, Key location)
+	{
+		// So instead, we will query for all discoveries and then just pair them down
+		Long count = query.getFilteredList_Count("Discovery", 10, "characterKey", FilterOperator.EQUAL, characterKey, "location1Key", FilterOperator.EQUAL, location);
+		Long count2 = query.getFilteredList_Count("Discovery", 10, "characterKey", FilterOperator.EQUAL, characterKey, "location2Key", FilterOperator.EQUAL, location);
+		if (count==null) count = 0L;
+		if (count2==null) count2 = 0L;
+		
+		return count.intValue() + count2.intValue();
 	}
 
 	public List<CachedEntity> getDiscoveriesForCharacter_KeysOnly(Key characterKey)

@@ -198,7 +198,7 @@ public class Character extends EntityWrapper
 	 */
 	public Double addHitpoints(Double addHp, boolean overrideMax)
 	{
-		Double newHitpoints = Math.min(getHitpoints() + addHp, overrideMax ? Integer.MAX_VALUE : getMaxHitpoints());
+		Double newHitpoints = Math.min(getHitpoints() + addHp, overrideMax ? 100 : getMaxHitpoints());
 		this.setProperty("hitpoints", newHitpoints);
 		return newHitpoints;
 	}
