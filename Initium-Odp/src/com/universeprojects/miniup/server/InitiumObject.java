@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.gefcommon.shared.elements.GameAspect;
@@ -22,6 +23,8 @@ public class InitiumObject implements GameObject<Key>
 	private GridMapService gms;
 	final protected ODPDBAccess db;
 	final protected CachedEntity entity;
+	final protected EmbeddedEntity ee;
+	final protected boolean isEmbedded;
 	protected Map<String, InitiumAspect> aspects;
 	
 	@SuppressWarnings("unchecked")
@@ -29,6 +32,8 @@ public class InitiumObject implements GameObject<Key>
 	{
 		this.db = db;
 		this.entity = entity;
+		this.ee = null;
+		this.isEmbedded = false;
 		
 		Object aspectsObj = entity.getProperty("_aspects");
 		Set<String> aspectIds = null;
@@ -49,6 +54,38 @@ public class InitiumObject implements GameObject<Key>
 		{
 			this.aspects = null;
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public InitiumObject(ODPDBAccess db, EmbeddedEntity entity) {
+		this.db = db;
+		this.entity = null;
+		this.ee = entity;
+		this.isEmbedded = true;
+		
+		Object aspectsObj = entity.getProperty("_aspects");
+		Set<String> aspectIds = null;
+		if (aspectsObj instanceof Set)
+			aspectIds = (Set<String>)aspectsObj;
+		else if (aspectsObj instanceof List)
+			aspectIds = new LinkedHashSet<String>((List<String>)aspectsObj);
+		
+		if (aspectIds!=null)
+		{
+			this.aspects = new HashMap<String, InitiumAspect>();
+			
+			for(String aspectId:aspectIds)
+				if (GameUtils.classExist("com.universeprojects.miniup.server.aspects.Aspect"+aspectId))
+					aspects.put(aspectId, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId, this));
+		}
+		else
+		{
+			this.aspects = null;
+		}
+	}
+	
+	public boolean isEmbedded() {
+		return this.isEmbedded;
 	}
 	
 	public void initialize()

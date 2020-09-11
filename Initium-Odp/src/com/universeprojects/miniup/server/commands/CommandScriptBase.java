@@ -21,6 +21,7 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
+import com.universeprojects.miniup.server.aspects.AspectSlottable;
 import com.universeprojects.miniup.server.aspects.AspectSlotted;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -88,13 +89,16 @@ public abstract class CommandScriptBase extends Command {
 			boolean isFromSlot = parameters.get("slot") != null;
 			if((io != null) && io.hasAspect(AspectSlotted.class) && isFromSlot ) {
 				
-				AspectSlotted aspect = io.getAspect(AspectSlotted.class);
-				List<EmbeddedEntity> slottedItems = aspect.getSlottedItems();
+				AspectSlotted aspectSlotted = io.getAspect(AspectSlotted.class);
+				List<EmbeddedEntity> slottedItems = aspectSlotted.getSlottedItems();
 				
 				for(EmbeddedEntity ee:slottedItems) {
 					
 					@SuppressWarnings("unchecked")
-					List<Key> newKeys = (List<Key>) ee.getProperty("Slottable:storedScripts");
+					InitiumObject eeIO = new InitiumObject(db, ee);
+					AspectSlottable aspectSlottable = eeIO.getAspect(AspectSlottable.class);
+					
+					List<Key> newKeys = aspectSlottable.getScripts();
 					
 					sourceScriptKeys.addAll(newKeys);
 				}
