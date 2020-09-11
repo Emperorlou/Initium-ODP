@@ -595,11 +595,8 @@ public abstract class CommonChecks
 		List<String> aspects = (List<String>) item.getProperty("_aspects");
 		if(aspects == null) return false;
 		
-		for(String aspect:aspects) {
-			if(aspect.equals(aspectName)) {
-				return true;
-			}
-		}
+		if(aspects.contains(aspectName)) return true;
+		
 		return false;
 	}
 
@@ -613,18 +610,7 @@ public abstract class CommonChecks
 		return false;
 	}
 	
-	/**
-	 * Returns true if the given entity is embedded onto another entity.
-	 * @param entity
-	 * @return
-	 */
-	public static boolean checkEntityIsEmbedded(CachedEntity entity) {
-		String test = entity.getKey().toString();
-		
-		if(test.split("@").length > 1) return true;
-		return false;
-	}
-	
+
 	public static boolean checkLocationIsTown(CachedEntity location)
 	{
 		return GameUtils.equals(location.getProperty("type"), "Town");

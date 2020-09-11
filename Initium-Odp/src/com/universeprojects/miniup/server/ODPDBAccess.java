@@ -678,21 +678,6 @@ public class ODPDBAccess
 		pool.loadEntities();
 		return pool.get(key);
 	}
-	
-	/**
-	 * Returns the parent of this entity.
-	 * Will return null if the given entity is not an embeddedentity.
-	 * @param entity
-	 * @return
-	 */
-	public CachedEntity getCachedEmbeddedEntityParent(CachedEntity entity) {
-		if(CommonChecks.checkEntityIsEmbedded(entity)) return null;
-		
-		//TODO: is this the right way to do this?
-		Key newKey = (Key)entity.getKey().toString().split("@")[0];
-		
-		return getEntity(newKey);
-	}
 
 	/**
 	 * Fetches a list CachedEntity from the given keys.

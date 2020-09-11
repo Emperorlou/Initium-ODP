@@ -2,6 +2,7 @@ package com.universeprojects.miniup.server.aspects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ItemAspect;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -37,7 +39,7 @@ public class AspectSlotted extends ItemAspect {
 	public List<ItemPopupEntry> getItemPopupEntries(CachedEntity currentCharacter)
 	{
 		if (CommonChecks.checkItemIsAccessible(object.getEntity(), currentCharacter) && hasOpenSlots()) {
-			ItemPopupEntry ipe = new ItemPopupEntry("Insert an item into the slots", "Insert a slottable item into this item.",
+			ItemPopupEntry ipe = new ItemPopupEntry("Insert an item into an available slot", "Insert a slottable item into this item.",
 					"viewSlottableItems(event, " + object.getKey().getId() + ")");
 			return Arrays.asList(new ItemPopupEntry[]
 			{
@@ -70,7 +72,7 @@ public class AspectSlotted extends ItemAspect {
 	 * @return
 	 */
 	public boolean hasOpenSlots() {
-		return getMaxCount() < getOpenCount();
+		return getOpenCount() > 0;
 	}
 	
 	/**
@@ -78,13 +80,23 @@ public class AspectSlotted extends ItemAspect {
 	 * @return
 	 */
 	public long getOpenCount() {
-		Long max = (Long)getProperty("maxCount");
+		Long max = getMaxCount();
 		
-		List<EmbeddedEntity> currentlySlotted = (List<EmbeddedEntity>)getProperty("slotItems"));
+		@SuppressWarnings("unchecked")
+		List<EmbeddedEntity> currentlySlotted = (List<EmbeddedEntity>)getProperty("slotItems");
 		
 		if(currentlySlotted == null) return max;
 		
 		return max-currentlySlotted.size();
+	}
+	
+	/**
+	 * Returns the embedded entities that exist on this aspect.
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<EmbeddedEntity> getSlottedItems(){
+		return (List<EmbeddedEntity>) getProperty("slotItems");
 	}
 	
 	static {
@@ -114,13 +126,12 @@ public class AspectSlotted extends ItemAspect {
 			
 			if(baseItem == null) throw new UserErrorMessage("Invalid Item ID.");
 			if(!CommonChecks.checkItemIsAccessible(baseItem.getEntity(), db.getCurrentCharacter()))
-				throw new UserErrorMessage("Nice try.");
+				throw new UserErrorMessage("This item isn't accessible right now.");
 			
 			AspectSlotted slottedAspect = (AspectSlotted) baseItem.getInitiumAspect("Slotted");
-			
-			if(slottedAspect == null) throw new UserErrorMessage("This item has no slots.");
-			
+			if(slottedAspect == null) throw new UserErrorMessage("This item has no slots.");	
 			if(!slottedAspect.hasOpenSlots()) throw new UserErrorMessage("All slots on this item are full.");
+			
 			
 			//generate the slottable item from the given ID, then do basic checks.
 			Key slottableKey = KeyFactory.createKey("Item", Long.parseLong(parameters.get("slottableId")));
@@ -128,9 +139,10 @@ public class AspectSlotted extends ItemAspect {
 			
 			if(slottableItem == null) throw new UserErrorMessage("Invalid Item ID");
 			if(!CommonChecks.checkItemIsAccessible(slottableItem.getEntity(), db.getCurrentCharacter()))
-				throw new UserErrorMessage("Nice try.");
-			if(!CommonChecks.checkItemHasAspect(baseItem.getEntity(), "Slottable"))
-				throw new UserErrorMessage("This item can't be inserted into a slot.");
+				throw new UserErrorMessage("This item isn't accessible right now.");
+			
+			AspectSlottable slottableAspect = (AspectSlottable) slottableItem.getInitiumAspect("Slottable");
+			if(slottableAspect == null) throw new UserErrorMessage("This item can't be inserted into a slot.");
 			
 			//we've made it this far, which means the base item and the slottable item are both completely valid.
 			//time to actually insert the item.
@@ -138,22 +150,21 @@ public class AspectSlotted extends ItemAspect {
 			//Write a method that copies a given entity to a new embeddedentity?
 			EmbeddedEntity newEmbedded = null;
 			
-			List<EmbeddedEntity> currentlySlotted = (List<EmbeddedEntity>)baseItem.getProperty("Slotted:slotItems");
-			if(currentlySlotted == null) currentlySlotted = new ArrayList<>();
-			currentlySlotted.add(newEmbedded);
+			List<EmbeddedEntity> itemsCurrentlySlotted = slottedAspect.getSlottedItems();
+			if(itemsCurrentlySlotted == null) itemsCurrentlySlotted = new ArrayList<>();
+			itemsCurrentlySlotted.add(newEmbedded);
 			
-			List<String> aspectsToAdd = (List<String>) slottableItem.getProperty("Slottable:aspects");
-			List<String> currentAspects = (List<String>) baseItem.getProperty("_aspects");
+					
+			List<String> aspectsToAdd = slottableAspect.getAspects();
+			Collection<InitiumAspect> currentAspects = baseItem.getAspects();
 			
-			if(currentAspects != null) {
-				if(currentAspects == null) currentAspects = new ArrayList<>();
-				for(String newAspect:aspectsToAdd) {
-					currentAspects.add(newAspect);
+			for(String newAspect:aspectsToAdd) {
+				for(InitiumAspect ia:currentAspects) {
+					if(ia.getName() == newAspect) continue;
+					
+					//ADD ASPECT HERE. Not sure how to do properly from just a string.
 				}
-				baseItem.setProperty("_aspects", currentAspects);
 			}
-			
-			baseItem.setProperty("Slotted:slotItems", currentlySlotted);
 			
 			db.delete(slottableItem.getEntity().getKey());
 			deleteHtml(".deletable-Item" + slottableItem.getEntity().getKey());
