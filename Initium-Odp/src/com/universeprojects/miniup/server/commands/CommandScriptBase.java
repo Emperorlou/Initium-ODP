@@ -18,8 +18,10 @@ import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
+import com.universeprojects.miniup.server.aspects.AspectSlotted;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
@@ -79,6 +81,26 @@ public abstract class CommandScriptBase extends Command {
 			@SuppressWarnings("unchecked")
 			List<Key> sourceScriptKeys = (List<Key>)entitySource.getProperty("scripts");
 			if(sourceScriptKeys == null) sourceScriptKeys = new ArrayList<Key>();
+			
+			//If the command indicated this was from a slot and we have the proper aspect, add
+			//all the script keys contained in the slots to the list.
+			InitiumObject io = new InitiumObject(db, entitySource);
+			boolean isFromSlot = parameters.get("slot") != null;
+			if((io != null) && io.hasAspect(AspectSlotted.class) && isFromSlot ) {
+				
+				AspectSlotted aspect = io.getAspect(AspectSlotted.class);
+				List<EmbeddedEntity> slottedItems = aspect.getSlottedItems();
+				
+				for(EmbeddedEntity ee:slottedItems) {
+					
+					@SuppressWarnings("unchecked")
+					List<Key> newKeys = (List<Key>) ee.getProperty("Slottable:storedScripts");
+					
+					sourceScriptKeys.addAll(newKeys);
+				}
+				
+			}
+			
 			for(Key scriptKey:sourceScriptKeys)
 			{
 				if (GameUtils.equals(scriptId, scriptKey.getId()))
@@ -111,23 +133,8 @@ public abstract class CommandScriptBase extends Command {
 			}
 			case("Item"):
 			{
-				// ...by being close enough to the item OR having it in their pocket
-				
-				Key itemContainerKey;
-				
-				//if the entitySource is embedded into the item in the form of a slot.
-				if(CommonChecks.checkEntityIsEmbedded(entitySource)) {
-					
-					CachedEntity parent = db.getCachedEmbeddedEntityParent(entitySource);
-					itemContainerKey = (Key)parent.getProperty("containerKey");
+				Key itemContainerKey = (Key)entitySource.getProperty("containerKey");
 
-				}
-				
-				//if the entitySource is a traditional item.
-				else {
-					itemContainerKey = (Key)entitySource.getProperty("containerKey");
-				}
-				
 				if (itemContainerKey == null || !GameUtils.equals(character.getKey(), itemContainerKey))
 					throw new UserErrorMessage("You can only trigger items in your posession!");
 				
