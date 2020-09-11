@@ -353,10 +353,15 @@ public class InitiumObject implements GameObject<Key>
 		return false;
 	}
 
+	/**
+	 * This method will do nothing if this object wraps an embeddedentity.
+	 * @param containerKey
+	 */
 	private void moveItemTo(Key containerKey)
 	{
 		// TODO: Do some checks to make sure this is possible perhaps...
 		
+		if(isEmbedded) return;
 		
 		// Remove it from the procedural map if necessary
 		if (isProcedural())
@@ -373,18 +378,38 @@ public class InitiumObject implements GameObject<Key>
 		setMovedTimestamp();
 	}
 	
+	/**
+	 * This method will do nothing if this object wraps an embeddedentity.
+	 * @param character
+	 * @throws UserErrorMessage
+	 */
 	public void moveItemToCharacter(CachedEntity character) throws UserErrorMessage
 	{
+		if(isEmbedded) return;
 		moveItemTo(character.getKey());
 	}
 
+	/**
+	 * This method will do nothing if this object wraps an embeddedentity.
+	 * @param containerItem
+	 * @throws UserErrorMessage
+	 */
 	public void moveItemToContainer(CachedEntity containerItem) throws UserErrorMessage
 	{
+		if(isEmbedded) return;
 		moveItemTo(containerItem.getKey());
 	}
 	
+	/**
+	 * This method will do nothing if this object wraps an embeddedentity.
+	 * @param location
+	 * @param tileX
+	 * @param tileY
+	 * @throws UserErrorMessage
+	 */
 	public void moveItemToLocation(CachedEntity location, Long tileX, Long tileY) throws UserErrorMessage
 	{
+		if(isEmbedded) return;
 		moveItemTo(location.getKey());
 		
 		GridMapService gms = db.getGridMapService();
