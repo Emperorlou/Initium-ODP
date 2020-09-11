@@ -115,11 +115,10 @@ public class AspectSlotted extends ItemAspect {
 			if(baseItem == null) throw new UserErrorMessage("Invalid Item ID.");
 			if(!CommonChecks.checkItemIsAccessible(baseItem.getEntity(), db.getCurrentCharacter()))
 				throw new UserErrorMessage("Nice try.");
-			if(!CommonChecks.checkItemHasAspect(baseItem.getEntity(), "Slotted"))
-				throw new UserErrorMessage("This item doesn't have any slots.");
 			
-			//gets a compiler error in ODP environment but should work when deployed.
 			AspectSlotted slottedAspect = (AspectSlotted) baseItem.getInitiumAspect("Slotted");
+			
+			if(slottedAspect == null) throw new UserErrorMessage("This item has no slots.");
 			
 			if(!slottedAspect.hasOpenSlots()) throw new UserErrorMessage("All slots on this item are full.");
 			
@@ -137,23 +136,11 @@ public class AspectSlotted extends ItemAspect {
 			//time to actually insert the item.
 			
 			//Write a method that copies a given entity to a new embeddedentity?
-			
 			EmbeddedEntity newEmbedded = null;
 			
 			List<EmbeddedEntity> currentlySlotted = (List<EmbeddedEntity>)baseItem.getProperty("Slotted:slotItems");
 			if(currentlySlotted == null) currentlySlotted = new ArrayList<>();
 			currentlySlotted.add(newEmbedded);
-			
-			List<Key> scriptsToAdd = (List<Key>) slottableItem.getProperty("Slottable:scripts");
-			List<Key> currentScripts = (List<Key>) baseItem.getProperty("scripts");
-			
-			if(scriptsToAdd != null) {
-				if(currentScripts == null) currentScripts = new ArrayList<>();
-				for(Key newKey:scriptsToAdd) {
-					currentScripts.add(newKey);
-				}
-				baseItem.setProperty("scripts", currentScripts);
-			}
 			
 			List<String> aspectsToAdd = (List<String>) slottableItem.getProperty("Slottable:aspects");
 			List<String> currentAspects = (List<String>) baseItem.getProperty("_aspects");

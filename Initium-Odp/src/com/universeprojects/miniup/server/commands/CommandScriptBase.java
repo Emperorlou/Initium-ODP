@@ -11,10 +11,12 @@ import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
@@ -110,9 +112,25 @@ public abstract class CommandScriptBase extends Command {
 			case("Item"):
 			{
 				// ...by being close enough to the item OR having it in their pocket
-				Key itemContainerKey = (Key)entitySource.getProperty("containerKey");
-				if (itemContainerKey==null || GameUtils.equals(character.getKey(), itemContainerKey)==false)
+				
+				Key itemContainerKey;
+				
+				//if the entitySource is embedded into the item in the form of a slot.
+				if(CommonChecks.checkEntityIsEmbedded(entitySource)) {
+					
+					CachedEntity parent = db.getCachedEmbeddedEntityParent(entitySource);
+					itemContainerKey = (Key)parent.getProperty("containerKey");
+
+				}
+				
+				//if the entitySource is a traditional item.
+				else {
+					itemContainerKey = (Key)entitySource.getProperty("containerKey");
+				}
+				
+				if (itemContainerKey == null || !GameUtils.equals(character.getKey(), itemContainerKey))
 					throw new UserErrorMessage("You can only trigger items in your posession!");
+				
 				break;
 			}
 			case("Location"):

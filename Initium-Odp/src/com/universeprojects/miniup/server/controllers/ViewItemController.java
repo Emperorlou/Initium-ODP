@@ -257,6 +257,25 @@ public class ViewItemController extends PageController {
 				// Get all the directItem scripts on this item 
 				@SuppressWarnings("unchecked")
 				List<Key> scriptKeys = (List<Key>)item.getProperty("scripts");
+				
+				//handle scripts that are embedded in a slot.
+				InitiumObject slotItem = new InitiumObject(db, item);
+				if(slotItem.hasAspect("Slotted")) {
+					List<EmbeddedEntity> embedded = (List<EmbeddedEntity>) item.getProperty("Slotted:slotItems");
+					
+					if(embedded != null) {
+						
+						for(EmbeddedEntity ee:embedded) {
+							
+							List<Key>embeddedScriptKeys = (List<Key>) ee.getProperty("Slottable:scripts");
+							
+							if(embeddedScriptKeys == null) continue;
+							
+							scriptKeys.addAll(embeddedScriptKeys);
+						}
+					}
+				}
+				
 				if (scriptKeys!=null && scriptKeys.isEmpty()==false)
 				{
 					List<CachedEntity> directItemScripts = db.getScriptsOfType(scriptKeys, 
