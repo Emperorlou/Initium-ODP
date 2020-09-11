@@ -44,12 +44,21 @@ public class SublocationsController extends PageController {
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
 		
+		
+	    CachedEntity character = db.getCurrentCharacter();
+	    
+	    if(CommonChecks.checkCharacterIsIncapacitated(character)) {
+	    	request.setAttribute("locationsViewable", false);
+	    	return "/WEB-INF/odppages/ajax_sublocations.jsp";
+	    }
+		
 		boolean showHidden = "true".equals(request.getParameter("showHidden"));
 		
 		request.setAttribute("showHidden", showHidden);
 		
 	    
-	    CachedEntity character = db.getCurrentCharacter();
+
+	    
 	    Key locationKey = (Key)character.getProperty("locationKey");
 	    db.pool.addToQueue(locationKey);
 	    
