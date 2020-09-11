@@ -71,8 +71,7 @@ public abstract class CommonChecks
 	 * @return
 	 */
 	public static boolean checkCharacterIsZombie(CachedEntity character) {
-		if("Zombie".equals(character.getProperty("status"))) return true;
-		return false;
+		return "Zombie".equals(character.getProperty("status"));
 	}
 	
 	/**

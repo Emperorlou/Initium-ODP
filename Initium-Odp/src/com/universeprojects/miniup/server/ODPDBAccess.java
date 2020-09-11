@@ -84,7 +84,7 @@ public class ODPDBAccess
 	
 	public enum CharacterMode
 	{
-		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD, RESPANWED
+		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD, RESPAWNED
 	}
 
 	public enum CharacterType
@@ -1606,41 +1606,47 @@ public class ODPDBAccess
 				String slotCheck = equipSlotArr[i].trim();
 				
 				//we split the destination slot at " and ". if there are more than 1 results from that, it's a complex item.
-				String[]complexSlot = slotCheck.split(" and ");
+				String[]complexSlotRaw = slotCheck.split(" and ");
+				List<String> complexSlot = Arrays.asList(complexSlotRaw);
 				
-				if(complexSlot.length > 1) {
+				//if there is an instance of 2Hands in the list, remove it and add lefthand/righthand.
+				for(String test:complexSlot) {
+					if(test.equals("2Hands")) {
+						complexSlot.add("LeftHand");
+						complexSlot.add("RightHand");
+						complexSlot.remove(test);
+						break;
+					}
+				}
+				
+				if(complexSlot.size() > 1) {
 					boolean isValid = true;
 					
 					//this loop iterates through complexSlot and sees if all those slots are open. If a single one isn't, we break out.
-					for(int k=0; k!=complexSlot.length; k++) {
-						complexSlot[i] = complexSlot[i].trim(); //clean up the string, just in case.
+					for(String slot:complexSlot) {
+						slot = slot.trim(); //clean up the string, just in case.
 						
 						//if the equip slot doesn't exist, we break.
-						if(CommonChecks.checkIsValidEquipSlot(complexSlot[i]) == false) {
+						if(CommonChecks.checkIsValidEquipSlot(slot) == false) {
 							isValid = false;
 							break;
-						}
-						
-						//if its 2hands, fix it.
-						if(complexSlot[i].equals("2Hands")) {
-							complexSlot[i] = "LeftHand and RightHand";
 						}
 
 						
 						//if there is something equipped in one of the slots, we break.
-						if(character.getProperty("equipment" + complexSlot[i]) != null){
+						if(character.getProperty("equipment" + slot) != null){
 							isValid = false;
 							break;
 						}
 					}
 					
-					//if every single slot is open, break out of the loop.
+					//if every single slot is open, break out of the loop. and use the original string.
 					if(isValid == true) {
-						destinationSlot=slotCheck;
+						destinationSlot = slotCheck;
 						break;
 					}
 				}
-								
+				
 				if(CommonChecks.checkIsValidEquipSlot(slotCheck) == false) 
 					continue;
 				
