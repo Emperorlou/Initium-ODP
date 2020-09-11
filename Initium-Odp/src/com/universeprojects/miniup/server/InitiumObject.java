@@ -56,14 +56,22 @@ public class InitiumObject implements GameObject<Key>
 		}
 	}
 	
+	/**
+	 * ONLY USE THIS WHEN ABSOLUTELY NECESSARY! If you need to access aspects that are on an embedded entity, use this constructor.
+	 * Most of the parameters are absolutely useless when embedded, really we only care about the aspects. Everything but aspects will just
+	 * return null.
+	 * @param db
+	 * @param entity - the embeddedentity that is wrapped by this initiumobject.
+	 */
 	@SuppressWarnings("unchecked")
-	public InitiumObject(ODPDBAccess db, EmbeddedEntity entity) {
+	public InitiumObject(ODPDBAccess db, EmbeddedEntity ee) {
 		this.db = db;
 		this.entity = null;
-		this.ee = entity;
+		this.ee = ee;
 		this.isEmbedded = true;
 		
-		Object aspectsObj = entity.getProperty("_aspects");
+		Object aspectsObj = ee.getProperty("_aspects");
+		
 		Set<String> aspectIds = null;
 		if (aspectsObj instanceof Set)
 			aspectIds = (Set<String>)aspectsObj;
@@ -120,6 +128,21 @@ public class InitiumObject implements GameObject<Key>
 		return result;
 	}
 	
+	public static List<InitiumObject> wrapEmbeddedEntities(ODPDBAccess db, List<EmbeddedEntity> entities){
+		List<InitiumObject> result = new ArrayList<InitiumObject>();
+		
+		for(EmbeddedEntity ee:entities) {
+			if(ee == null) continue;
+			result.add(new InitiumObject(db, ee));
+		}
+		
+		return result;
+	}
+	
+	public EmbeddedEntity getEmbeddedEntity() {
+		return ee;
+	}
+	
 	public CachedEntity getEntity()
 	{
 		return entity;
@@ -135,14 +158,19 @@ public class InitiumObject implements GameObject<Key>
 		return aspectClass.getSimpleName().substring(6);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void addAspect(Class<? extends InitiumAspect> aspectClass)
 	{
 		String aspectId = aspectClassToString(aspectClass);
 		aspects.put(aspectId, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId));
-		@SuppressWarnings("unchecked")
-		Set<String> aspectIds = (Set<String>)entity.getProperty("_aspects");
+		
+		Set<String> aspectIds;
+		
+		aspectIds = (Set<String>) getProperty("_aspects");
+		
 		aspectIds.add(aspectId);
-		entity.setPropertyManually("_aspects", aspectIds);
+		
+		setProperty("_aspects", aspectIds);
 	}
 	
 	public boolean isAspectPresent(Class<? extends InitiumAspect> aspectClass)
@@ -171,101 +199,117 @@ public class InitiumObject implements GameObject<Key>
 		return aspects.get(aspectId);
 	}
 
+	/**
+	 * Returns null if this object wraps an embedded entity.
+	 */
 	@Override
 	public String getSchemaKind()
 	{
+		if(isEmbedded) return null;
 		return entity.getKind();
 	}
 
 	@Override
 	public Key getKey()
 	{
+		if(isEmbedded) return ee.getKey();
 		return entity.getKey();
 	}
 	
+	/**
+	 * Returns null if this object wraps an embedded entity.
+	 * @return
+	 */
 	public String getProceduralKey()
 	{
+		if(isEmbedded) return null;
 		return (String)entity.getAttribute("proceduralKey");
 	}
 
 	@Override
 	public String getName()
 	{
-		return (String)entity.getProperty("name");
+		return (String)getProperty("name");
 	}
 
 	@Override
 	public String getItemClass()
 	{
-		return (String)entity.getProperty("itemClass");
+		return (String)getProperty("itemClass");
 	}
 
 	@Override
 	public Long getQuantity()
 	{
-		return (Long)entity.getProperty("quantity");
+		return (Long)getProperty("quantity");
 	}
 
 	@Override
 	public void setQuantity(Long value)
 	{
-		entity.setProperty("quantity", value);
+		setProperty("quantity", value);
 	}
 
 	@Override
 	public Long getDurability()
 	{
-		return (Long)entity.getProperty("durability");
+		return (Long)getProperty("durability");
 	}
 
 	@Override
 	public void setDurability(Long value)
 	{
-		entity.setProperty("durability", value);
+		setProperty("durability", value);
 	}
 	
 	public Key getContainerKey()
 	{
-		return (Key)entity.getProperty("containerKey");
+		return (Key)getProperty("containerKey");
 	}
 	
 	public void setContainerKey(Key newContainer)
 	{
-		entity.setProperty("containerKey", newContainer);
+		setProperty("containerKey", newContainer);
 	}
 	
 	public Date getMovedTimestamp()
 	{
-		return (Date)entity.getProperty("movedTimestamp");
+		return (Date)getProperty("movedTimestamp");
 	}
 	
 	public void setMovedTimestamp()
 	{
-		entity.setProperty("movedTimestamp", new Date());
+		setProperty("movedTimestamp", new Date());
 	}
 
 	@Override
 	public Object getProperty(String fieldName)
 	{
+		if(isEmbedded) return ee.getProperty(fieldName);
 		return entity.getProperty(fieldName);
 	}
 
 	@Override
 	public void setProperty(String fieldName, Object value)
 	{
+		if(isEmbedded) ee.setProperty(fieldName, value);
 		entity.setProperty(fieldName, value);
 	}
-
+	
+	/**
+	 * Returns null if this entity is embedded.
+	 */
 	@Override
 	public Collection<String> getPropertyNames()
 	{
-		return db.getFieldNamesForEntity(entity.getKind());
+		return db.getFieldNamesForEntity(getSchemaKind());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<String> getAspectNames()
 	{
-		return (Collection<String>)entity.getProperty("_aspects");
+		return (Collection<String>)getProperty("_aspects");
 	}
 
 	@Override
@@ -296,11 +340,15 @@ public class InitiumObject implements GameObject<Key>
 	}
 
 
+	/**
+	 * Returns false if the entity is embedded.
+	 * @return
+	 */
 	public boolean isProcedural()
 	{
-		if (entity.getKey().isComplete()) return false;
+=		if (entity.getKey().isComplete()) return false;
 		
-		if (entity.getAttribute("proceduralKey")!=null) return true;
+		if (getProceduralKey()!=null) return true;
 		
 		return false;
 	}
@@ -346,35 +394,52 @@ public class InitiumObject implements GameObject<Key>
 		gms.setItemPosition(entity, tileX, tileY);
 	}
 
+	/**
+	 * Returns null if this object wraps an embedded entity.
+	 * @param attributeKey
+	 * @return
+	 */
 	public Object getAttribute(String attributeKey)
 	{
+		if(isEmbedded) return null;
 		return entity.getAttribute(attributeKey);
 	}
 	
+	/**
+	 * Does nothing if this object wraps an embedded entity.
+	 * @param attributeKey
+	 * @param value
+	 */
 	public void setAttribute(String attributeKey, Object value)
 	{
+		if(isEmbedded) return;
 		entity.setAttribute(attributeKey, value);
 	}
 	
 	@Override
 	public String toString()
 	{
+		if(isEmbedded) return ee.toString();
 		return entity.toString();
 	}
 
 	public Long getMaxDurability()
 	{
-		return (Long)entity.getProperty("maxDurability");
+		return (Long)getProperty("maxDurability");
 	}
 
 	public String getIcon()
 	{
-		return (String)entity.getProperty("icon");
+		return (String)getProperty("icon");
 	}
 
+	/**
+	 * Does nothing if this object wraps an embeddedentity.
+	 * @param imageUrl
+	 */
 	public void setIcon(String imageUrl)
 	{
-		entity.setProperty("icon", imageUrl);
+		setProperty("icon", imageUrl);
 	}
 
 	public void liveUpdateIcon(OperationBase command)
