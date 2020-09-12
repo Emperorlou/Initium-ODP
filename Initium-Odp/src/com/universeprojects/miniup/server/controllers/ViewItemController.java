@@ -292,20 +292,15 @@ public class ViewItemController extends PageController {
 							Object scriptType = script.getProperty("type");
 							if(GameUtils.enumEquals(scriptType, ODPDBAccess.ScriptType.directItem))
 							{
-								boolean sourceIsSlotted = false;
-								
+								String link = "doTriggerItem(event,"+script.getId()+","+item.getId();
+
 								if(scriptKeys.size() != originalScriptKeys.size()) {
 									for(Key check:scriptKeys) {
 										if(originalScriptKeys.contains(check)) {
-											sourceIsSlotted = true;
+											link += ",{\"slot\":\"true\"}"; //I'm only fairly certain this is the correct way to do this
 											break;
 										}
 									}
-								}
-								
-								String link = "doTriggerItem(event,"+script.getId()+","+item.getId();
-								if(sourceIsSlotted) {
-									link += ",{slot:true}"; //I'm only fairly certain this is the correct way to do this
 								}
 								
 								link += ")";
