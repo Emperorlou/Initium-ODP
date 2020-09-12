@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.aspects;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,12 +92,57 @@ public class AspectSlotted extends ItemAspect {
 	}
 	
 	/**
-	 * Returns the embedded entities that exist on this aspect.
+	 * Returns a map the slotted items and their slottable aspect.
+	 * Returns null if there are no slotted items.
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public List<EmbeddedEntity> getSlottedItems(){
-		return (List<EmbeddedEntity>) getProperty("slotItems");
+	public Map<InitiumObject, AspectSlottable> getSlottedItems(){
+		
+		Map<InitiumObject, AspectSlottable> toReturn = new HashMap<>();
+		
+		List<InitiumObject> slottedItems = getOnlySlottedItems();
+		
+		if(slottedItems == null) return null;
+		
+		for(InitiumObject slotItem:slottedItems) {
+			AspectSlottable slottableAspect = slotItem.getAspect(AspectSlottable.class);
+			
+			if(slottableAspect == null) continue;
+			
+			toReturn.put(object, slottableAspect);
+		}
+		
+		return toReturn;
+	}
+	
+	/**
+	 * getSlottedItems returns a map of the slotted items and their aspect.
+	 * This returns ONLY the slotted items.
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<InitiumObject> getOnlySlottedItems(){
+		
+		List<EmbeddedEntity> emEnts = (List<EmbeddedEntity>) getProperty("slotItems");
+		List<InitiumObject> toReturn = new ArrayList<>();
+		
+		if(emEnts == null) return null;
+		
+		for(EmbeddedEntity item:emEnts) {
+			toReturn.add(new InitiumObject(db, item));
+		}
+		
+		return toReturn;
+	}
+	
+	/**
+	 * @param object
+	 */
+	private void addItemToSlot(InitiumObject object) {
+		List<InitiumObject> currentSlots = getOnlySlottedItems();
+		
+		//TODO: How to embed an entity?
 	}
 	
 	static {
@@ -146,25 +192,7 @@ public class AspectSlotted extends ItemAspect {
 			
 			//we've made it this far, which means the base item and the slottable item are both completely valid.
 			//time to actually insert the item.
-			
-			//Write a method that copies a given entity to a new embeddedentity?
-			EmbeddedEntity newEmbedded = null;
-			
-			List<EmbeddedEntity> itemsCurrentlySlotted = slottedAspect.getSlottedItems();
-			if(itemsCurrentlySlotted == null) itemsCurrentlySlotted = new ArrayList<>();
-			itemsCurrentlySlotted.add(newEmbedded);
-			
-					
-			List<String> aspectsToAdd = slottableAspect.getAspects();
-			Collection<InitiumAspect> currentAspects = baseItem.getAspects();
-			
-			for(String newAspect:aspectsToAdd) {
-				for(InitiumAspect ia:currentAspects) {
-					if(ia.getName() == newAspect) continue;
-					
-					//ADD ASPECT HERE. Not sure how to do properly from just a string.
-				}
-			}
+			slottedAspect.addItemToSlot(slottableItem);
 			
 			db.delete(slottableItem.getEntity().getKey());
 			deleteHtml(".deletable-Item" + slottableItem.getEntity().getKey());

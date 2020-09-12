@@ -15,6 +15,8 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.gefcommon.shared.elements.GameAspect;
 import com.universeprojects.gefcommon.shared.elements.GameObject;
 import com.universeprojects.miniup.server.aspects.AspectPet.CommandPetFeed;
+import com.universeprojects.miniup.server.aspects.AspectSlottable;
+import com.universeprojects.miniup.server.aspects.AspectSlotted;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.GridMapService;
 
@@ -36,24 +38,8 @@ public class InitiumObject implements GameObject<Key>
 		this.isEmbedded = false;
 		
 		Object aspectsObj = entity.getProperty("_aspects");
-		Set<String> aspectIds = null;
-		if (aspectsObj instanceof Set)
-			aspectIds = (Set<String>)aspectsObj;
-		else if (aspectsObj instanceof List)
-			aspectIds = new LinkedHashSet<String>((List<String>)aspectsObj);
 		
-		if (aspectIds!=null)
-		{
-			this.aspects = new HashMap<String, InitiumAspect>();
-			
-			for(String aspectId:aspectIds)
-				if (GameUtils.classExist("com.universeprojects.miniup.server.aspects.Aspect"+aspectId))
-					aspects.put(aspectId, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId, this));
-		}
-		else
-		{
-			this.aspects = null;
-		}
+		generateAspects(aspectsObj);
 	}
 	
 	/**
@@ -72,6 +58,9 @@ public class InitiumObject implements GameObject<Key>
 		
 		Object aspectsObj = ee.getProperty("_aspects");
 		
+		generateAspects(aspectsObj);
+		
+		/*//keeping this for reference
 		Set<String> aspectIds = null;
 		if (aspectsObj instanceof Set)
 			aspectIds = (Set<String>)aspectsObj;
@@ -85,6 +74,38 @@ public class InitiumObject implements GameObject<Key>
 			for(String aspectId:aspectIds)
 				if (GameUtils.classExist("com.universeprojects.miniup.server.aspects.Aspect"+aspectId))
 					aspects.put(aspectId, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId, this));
+		}
+		else
+		{
+			this.aspects = null;
+		}*/
+	}
+	
+	/**
+	 * Given a string list of aspects, we generate actual aspect objects and add them to this object.
+	 * @param rawAspects
+	 */
+	@SuppressWarnings("unchecked")
+	private void generateAspects(Object rawAspects) {
+		Set<String> aspectIds = null;
+		if (rawAspects instanceof Set)
+			aspectIds = (Set<String>)rawAspects;
+		else if (rawAspects instanceof List)
+			aspectIds = new LinkedHashSet<String>((List<String>)rawAspects);
+		
+		if (aspectIds!=null)
+		{
+			this.aspects = new HashMap<String, InitiumAspect>();
+			
+			for(String aspectId:aspectIds) 
+			{
+				if (GameUtils.classExist("com.universeprojects.miniup.server.aspects.Aspect"+aspectId)) 
+				{
+					InitiumAspect newAspect = (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectId, this);
+					
+					aspects.put(aspectId, newAspect);
+				}	
+			}
 		}
 		else
 		{

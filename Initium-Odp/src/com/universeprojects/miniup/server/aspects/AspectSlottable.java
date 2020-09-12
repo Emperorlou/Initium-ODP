@@ -1,9 +1,11 @@
 package com.universeprojects.miniup.server.aspects;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ItemAspect;
 
@@ -30,19 +32,18 @@ public class AspectSlottable extends ItemAspect{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Key> getScripts(){
+	public List<Key> getStoredScripts(){
 		return (List<Key>) getProperty("storedScripts");
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<String> getAspects(){
-		return (List<String>) getProperty("storedAspects");
+	public List<String> getStoredAspects(){	
+		//TODO: Unimplemented.
+		return null;
+		//return (List<String>) getProperty("storedAspects");
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<String> getModifiers(){
+	public List<String> getStoredModifiers(){
 		return (List<String>) getProperty("storedModifiers");
 	}
-
-
 }

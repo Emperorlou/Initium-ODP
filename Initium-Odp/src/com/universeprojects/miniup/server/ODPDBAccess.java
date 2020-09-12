@@ -2661,6 +2661,8 @@ public class ODPDBAccess
 	public List<CachedEntity> filterEntitiesByAspect(List<CachedEntity> entities, String aspectName){
 		List<CachedEntity> toReturn = new ArrayList<>();
 		
+		if(entities == null) return null;
+		
 		for(CachedEntity entity:entities) {			
 			//test to make sure this works
 			if(CommonChecks.checkItemHasAspect(entity, aspectName)) {

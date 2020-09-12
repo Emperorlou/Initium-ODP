@@ -90,19 +90,15 @@ public abstract class CommandScriptBase extends Command {
 			if((io != null) && io.hasAspect(AspectSlotted.class) && isFromSlot ) {
 				
 				AspectSlotted aspectSlotted = io.getAspect(AspectSlotted.class);
-				List<EmbeddedEntity> slottedItems = aspectSlotted.getSlottedItems();
 				
-				for(EmbeddedEntity ee:slottedItems) {
-					
-					@SuppressWarnings("unchecked")
-					InitiumObject eeIO = new InitiumObject(db, ee);
-					AspectSlottable aspectSlottable = eeIO.getAspect(AspectSlottable.class);
-					
-					List<Key> newKeys = aspectSlottable.getScripts();
+				Map<InitiumObject, AspectSlottable> slottedItems = aspectSlotted.getSlottedItems();
+								
+				for(Map.Entry<InitiumObject, AspectSlottable>entry:slottedItems.entrySet()) {
+										
+					List<Key> newKeys = entry.getValue().getStoredScripts();
 					
 					sourceScriptKeys.addAll(newKeys);
 				}
-				
 			}
 			
 			for(Key scriptKey:sourceScriptKeys)
