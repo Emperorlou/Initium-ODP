@@ -106,6 +106,9 @@ public class CommandSwitchCharacter extends Command {
 
 				//Iterate through characters in the same party and userke
 				if(direction == 3) {
+					//now that we've narrowed down our characters, we search for the index of our character and then increment the index.
+					if(userCharsInParty.size() == 1) throw new UserErrorMessage("You don't have any more characters in this party.");
+					
 					//sort the party, only if we need to.
 					Collections.sort(userCharsInParty, new Comparator<CachedEntity>()
 					{
@@ -116,9 +119,7 @@ public class CommandSwitchCharacter extends Command {
 						}
 					});
 					
-					//now that we've narrowed down our characters, we search for the index of our character and then increment the index.
-					if(userCharsInParty.size() == 1) throw new UserErrorMessage("You don't have any more characters in this party.");
-					//if there's more than 1 entry in the list
+					//this loop locates where we are in the party, and then
 					for(int i = 0; i < userCharsInParty.size(); i++) {
 						if(GameUtils.equals(userCharsInParty.get(i), currentCharacter)) {
 							
