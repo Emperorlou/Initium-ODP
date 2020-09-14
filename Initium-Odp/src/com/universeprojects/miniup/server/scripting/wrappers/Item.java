@@ -113,6 +113,32 @@ public class Item extends EntityWrapper
 		return newDura < 0;
 	}
 	
+	public Long getDexPen() {
+		return (Long)this.getProperty("dexterityPenalty");
+	}
+	public Long getStrMod() {
+		return (Long)this.getProperty("strengthModifier");
+	}
+	public Long getIntMod() {
+		return (Long)this.getProperty("intelligenceModifier");
+	}
+	public Long getDamageReduction() {
+		return (Long)this.getProperty("damageReduction");
+	}
+	
+	public void setDexPen(Long newDexPen) {
+		this.setProperty("dexterityPenalty", newDexPen);
+	}
+	public void setStrMod(Long newStrMod) {
+		this.setProperty("strengthModifier", newStrMod);
+	}
+	public void setIntMod(Long newIntMod) {
+		this.setProperty("intelligenceModifier", newIntMod);
+	}
+	public void setDamageReduction(Long damageReduction) {
+		this.setProperty("damageReduction", damageReduction);
+	}
+	
 	public boolean isKeyItem()
 	{
 		return this.getProperty("keyCode") != null;

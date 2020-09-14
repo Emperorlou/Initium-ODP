@@ -54,44 +54,43 @@ public class CommandSwitchCharacter extends Command {
 			direction = Integer.parseInt(parameters.get("direction"));
 			
 			//This method will return all characters that we can switch to. Filters out zambies and dead characters right off the bat.
-			List<CachedEntity> characters = db.getAlphabetSortedValidCharactersByUser(user.getKey());
 			
 			switch(direction) {
 			
-			//UP in characterswitcher.
 			case 1:
-				for(int i = 0; i < characters.size(); i++) {
-					CachedEntity c = characters.get(i);
-					//here, we are searching for the currentcharacter, so we know its index within the sorted list.
-					if(!GameUtils.equals(c.getKey(), currentCharacter.getKey)) continue;					
-					
-					//if we're at the first element in the list
-					if(i == 0) {
-						targetCharacterId = characters.get(characters.size()).getId();
-						break;
-					}
-					
-					targetCharacterId = characters.get(i-1).getId();
-					break;
-				}
-				break;
-				
-			//DOWN in characterswitcher
 			case 2:
+				List<CachedEntity> characters = db.getAlphabetSortedValidCharactersByUser(user.getKey());
+				
 				for(int i = 0; i < characters.size(); i++) {
-					CachedEntity c = characters.get(i);
-					//here, we are searching for the currentcharacter, so we know its index within the sorted list.
-					if(!GameUtils.equals(c.getKey(), currentCharacter.getKey)) continue;					
+					if(!GameUtils.equals(characters.get(0).getKey(), currentCharacter.getKey())) continue;
 					
-					//if we're at the last element in the list.
-					if(i == characters.size()) {
-						targetCharacterId = characters.get(0).getId();
+					//Move UP in character list.
+					if(direction == 1) {
+						
+						//if we're at the front of the list, loop back to the back.
+						if(i == 0) {
+							targetCharacterId = characters.get(characters.size()).getId();
+							break;
+						}
+						
+						targetCharacterId = characters.get(i-1).getId();
 						break;
 					}
-					targetCharacterId = characters.get(i+1).getId();
-					break;
+					
+					//Move DOWN in character list.
+					if(direction == 2) {
+						
+						//if we're at the end of the list, loop back to the front.
+						if(i == characters.size()) {
+							targetCharacterId = characters.get(0).getId();
+							break;
+						}
+						
+						//otherwise, grab the next one.
+						targetCharacterId = characters.get(i+1).getId();
+						break;
+					}
 				}
-				break;
 				
 			//Iterate through characters in the same party and userkey
 			case 3:
@@ -147,9 +146,8 @@ public class CommandSwitchCharacter extends Command {
 				}
 				throw new UserErrorMessage("The party leader isn't on this account.");
 				
-			default:
-				//if the direction wasn't 1-4, break.
-				break;
+			//if the direction wasn't 1-4, break.
+			default: break;
 			}
 		} 
 		catch(NumberFormatException e) {
@@ -180,10 +178,6 @@ public class CommandSwitchCharacter extends Command {
 		// Don't switch to characters with zombie status
 		if ("Zombie".equals(targetCharacter.getProperty("status"))) {
 			throw new UserErrorMessage("You cannot switch to this character, it is now a zombie.");
-		}
-		
-		if ("RESPAWNED".equals(targetCharacter.getProperty("mode"))) {
-			throw new UserErrorMessage("This character has already been respawned.");
 		}
 
 		// Set and save new character

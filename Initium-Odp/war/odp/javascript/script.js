@@ -2463,9 +2463,14 @@ function newCharacterFromDead(event)
 	doCommand(event, "CharacterRespawn");
 }
 
-function switchCharacter(eventObject, characterId)
+function switchCharacter(eventObject, characterId, direction)
 {
-	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function()
+
+	if(direction == undefined){
+		direction = null;
+	}
+
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId, "direction":directon},function()
 	{
 		if (location.href.indexOf("/main.jsp")>-1)
 			window.history.replaceState({}, document.title, "/" + "main.jsp");		
@@ -4860,16 +4865,16 @@ $(document).keyup(function(event){
 	//	window.location.href='main.jsp';
 	//}
 	else if (event.which==85){ // U - go up in character list
-		switchCharacterByDirection(event, 1);
+		switchCharacter(event, null, 4);
 	}
 	else if (event.which==74){ // J - go down in character list
-		switchCharacterByDirection(event, 2);
+		switchCharacter(event, null, 4);
 	}
 	else if (event.which==75){ // K - iterate through characters in same acc and party
-		switchCharacterByDirection(event, 3);
+		switchCharacter(event, null, 4);
 	}
 	else if (event.which==76){ // L - switch to party leader if possible
-		switchCharacterByDirection(event, 4);
+		switchCharacter(event, null, 4);
 	}
 	else if (event.which==78){ // N - opens the navigation window.
 		if(uiStyle == "Classic UI"){
@@ -4886,21 +4891,6 @@ $(document).keyup(function(event){
 		cancelLongOperations(); //i tested, and sending this with no parameters DOES work
 	}
 });
-
-function switchCharacterByDirection(eventObject, direction){
-	doCommand(eventObject,"SwitchCharacter",{"direction":direction},function()
-	{
-		if (location.href.indexOf("/main.jsp")>-1)
-			window.history.replaceState({}, document.title, "/" + "main.jsp");		
-		else if (location.href.indexOf("/odp/experimental")>-1)
-			window.history.replaceState({}, document.title, "/" + "odp/experimental");		
-		else if (location.href.indexOf("/odp/full")>-1)
-			window.history.replaceState({}, document.title, "/" + "odp/full");		
-		
-		closeAllTooltips();
-		clearMakeIntoPopup();
-	});
-}
 
 function openHotkeyWindow(){
 	pagePopup("/odp/hotkeys.html", null, "Hotkeys");

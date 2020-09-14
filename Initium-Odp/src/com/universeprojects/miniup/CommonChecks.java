@@ -58,7 +58,7 @@ public abstract class CommonChecks
 	public static boolean checkCharacterIsDead(CachedEntity character)
 	{
 		Double hitpoints = (Double)character.getProperty("hitpoints");
-		if (hitpoints<=0 && ("DEAD".equals(character.getProperty("mode")) || "RESPANWED".equals(character.getProperty("mode")))) {
+		if (hitpoints <= 0 && ("DEAD".equals(character.getProperty("mode")))) {
 			return true;
 		}
 		
@@ -89,16 +89,6 @@ public abstract class CommonChecks
 			return true;
 		
 		return false;
-	}
-	
-	/**
-	 * Checks if a character is respawnable.
-	 * @param character
-	 * @return
-	 */
-	public static boolean checkCharacterIsRespawnable(CachedEntity character) {
-		if("RESPAWNED".equals(character.getProperty("mode"))) return false;
-		return true;
 	}
 	
 	/**

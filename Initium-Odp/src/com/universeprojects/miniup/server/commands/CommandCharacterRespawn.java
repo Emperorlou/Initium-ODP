@@ -31,16 +31,11 @@ public class CommandCharacterRespawn extends Command
 		CachedEntity deadCharacter = db.getCurrentCharacter();
 
 		CachedDatastoreService ds = db.getDB();
-		
-		List<CachedEntity>characters = db.getUserCharacters(user);
-		
-		if(!CommonChecks.checkCharacterIsIncapacitated(deadCharacter)) throw new UserErrorMessage("You can't respawn a character that's alive...");
-		
-		//this will prevent duping of characters.
-		if("RESPAWNED".equals(deadCharacter.getProperty("mode"))) {
-			throw new UserErrorMessage("You've already respawned this character.");
-		}
-		deadCharacter.setProperty("mode", "RESPAWNED");
+			
+		if(!CommonChecks.checkCharacterIsIncapacitated(deadCharacter)) throw new UserErrorMessage("You can't respawn a character that's alive...");	
+
+		deadCharacter.setProperty("userKey", null);
+		//Commit deadcharacter to DB?
 		
 		CachedEntity newCharacter = db.doCreateNewCharacterFromDead(ds, getAuthenticator(), user, deadCharacter);
 		

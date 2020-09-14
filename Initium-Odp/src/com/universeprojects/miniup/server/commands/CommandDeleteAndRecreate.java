@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
@@ -55,9 +57,8 @@ public class CommandDeleteAndRecreate extends Command {
         if (name.equals(currentChar.getProperty("name"))==false && db.checkCharacterExistsByName(name))
             throw new UserErrorMessage("Character name is already in use.");
         
-        // Cannot reroll with items in inventory.
-        List<CachedEntity> inventory = db.getFilteredList("Item", "containerKey", (String)currentChar.getKey());
-        if (inventory.size() != 0) {
+        //user has items in inventory and therefore cannot reroll.
+        if (db.getFilteredList_Count("Item", "containerKey", FilterOperator.EQUAL, currentChar.getKey()) != 0) {
         	throw new UserErrorMessage("Character has items in their inventory.");
         }
         

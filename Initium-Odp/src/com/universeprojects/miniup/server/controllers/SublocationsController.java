@@ -51,6 +51,7 @@ public class SublocationsController extends PageController {
 	    	request.setAttribute("locationsViewable", false);
 	    	return "/WEB-INF/odppages/ajax_sublocations.jsp";
 	    }
+	    request.setAttribute("locationsViewable", true);
 		
 		boolean showHidden = "true".equals(request.getParameter("showHidden"));
 		

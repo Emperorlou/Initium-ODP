@@ -84,7 +84,7 @@ public class ODPDBAccess
 	
 	public enum CharacterMode
 	{
-		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD, RESPAWNED
+		NORMAL, COMBAT, MERCHANT, TRADING, UNCONSCIOUS, DEAD
 	}
 
 	public enum CharacterType
@@ -803,10 +803,10 @@ public class ODPDBAccess
 			}
 		});
 		
-		//this will validate all the characters. Filter out dead and zambie.
+		//this will validate all the characters. Filter out zambie.
 		List<CachedEntity> toReturn = new ArrayList<>();
 		for(CachedEntity c:characters) {
-			if (!"RESPAWNED".equals(c.getProperty("mode")) && !"Zombie".equals(c.getProperty("status"))) {
+			if ("Zombie".equals(c.getProperty("status")) == false) {
 				toReturn.add(c);
 			}
 		}
@@ -1600,62 +1600,21 @@ public class ODPDBAccess
 			boolean swapSlot = CommonChecks.checkCharacterIsPlayer(character) && 
 					("Shield".equals(equipment.getProperty("itemType")) || "Weapon".equals(equipment.getProperty("itemType")));
 			
-			//this loop iterates backwards through equipSlotArr to find the first entry that is valid. If there are none, toss an error.
-			for(int i = equipSlotArr.length-1; i>=0; i--) {	
-				
+			for(int i = equipSlotArr.length-1; i>=0; i--)
+			{
 				String slotCheck = equipSlotArr[i].trim();
 				
-				//we split the destination slot at " and ". if there are more than 1 results from that, it's a complex item.
-				String[]complexSlotRaw = slotCheck.split(" and ");
-				List<String> complexSlot = Arrays.asList(complexSlotRaw);
-				
-				//if there is an instance of 2Hands in the list, remove it and add lefthand/righthand.
-				for(String test:complexSlot) {
-					if(test.equals("2Hands")) {
-						complexSlot.add("LeftHand");
-						complexSlot.add("RightHand");
-						complexSlot.remove(test);
-						break;
-					}
-				}
-				
-				if(complexSlot.size() > 1) {
-					boolean isValid = true;
-					
-					//this loop iterates through complexSlot and sees if all those slots are open. If a single one isn't, we break out.
-					for(String slot:complexSlot) {
-						slot = slot.trim(); //clean up the string, just in case.
-						
-						//if the equip slot doesn't exist, we break.
-						if(CommonChecks.checkIsValidEquipSlot(slot) == false) {
-							isValid = false;
-							break;
-						}
-
-						
-						//if there is something equipped in one of the slots, we break.
-						if(character.getProperty("equipment" + slot) != null){
-							isValid = false;
-							break;
-						}
-					}
-					
-					//if every single slot is open, break out of the loop. and use the original string.
-					if(isValid == true) {
-						destinationSlot = slotCheck;
-						break;
-					}
-				}
-				
-				if(CommonChecks.checkIsValidEquipSlot(slotCheck) == false) 
+				if(CommonChecks.checkIsValidEquipSlot(slotCheck)==false) 
 					continue;
 				
-				if (character.getProperty("equipment"+slotCheck) == null) {
+				if (character.getProperty("equipment"+slotCheck)==null)
+				{
 					destinationSlot = slotCheck;
 					break;
 				}
 				
-				if(swapSlot && destinationSlot == null) {
+				if(swapSlot && destinationSlot == null)
+				{
 					// If it's a shield/weapon type, find first swap slot.
 					CachedEntity currentSlotItem = db.getIfExists((Key)character.getProperty("equipment"+slotCheck));
 					
