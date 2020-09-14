@@ -66,7 +66,6 @@ public class CommandSwitchCharacter extends Command {
 					
 					//Move UP in character list.
 					if(direction == 1) {
-						
 						//if we're at the front of the list, loop back to the back.
 						if(i == 0) {
 							targetCharacterId = characters.get(characters.size()).getId();
@@ -78,8 +77,7 @@ public class CommandSwitchCharacter extends Command {
 					}
 					
 					//Move DOWN in character list.
-					if(direction == 2) {
-						
+					if(direction == 2) {	
 						//if we're at the end of the list, loop back to the front.
 						if(i == characters.size()) {
 							targetCharacterId = characters.get(0).getId();
@@ -91,22 +89,11 @@ public class CommandSwitchCharacter extends Command {
 						break;
 					}
 				}
-				
-			//Iterate through characters in the same party and userkey
 			case 3:
+			case 4:
 				//here, we need to grab all the partied characters. then, filter by userkey.
 				List<CachedEntity> party = db.getParty(ds, currentCharacter);
 				if(party == null) throw new UserErrorMessage("You aren't in a party.");
-				
-				//sort the party here.
-				Collections.sort(party, new Comparator<CachedEntity>()
-				{
-					@Override
-					public int compare(CachedEntity o1, CachedEntity o2)
-					{
-						return ((String)o1.getProperty("name")).compareTo((String)o2.getProperty("name"));
-					}
-				});
 				
 				//now we narrow down the list of characters in the party to the ones that are
 				//associated with the same user.
@@ -117,34 +104,48 @@ public class CommandSwitchCharacter extends Command {
 					}
 				}
 
-				//now that we've narrowed down our characters, we search for the index of our character and then increment the index.
-				if(userCharsInParty.size() == 1) throw new UserErrorMessage("You don't have any more characters in this party.");
-				//if there's more than 1 entry in the list
-				for(int i = 0; i < userCharsInParty.size(); i++) {
-					if(GameUtils.equals(userCharsInParty.get(i), currentCharacter)) {
-						
-						//if we're at the end index, go back to 0.
-						if(i == userCharsInParty.size()) {
-							targetCharacterId = userCharsInParty.get(0).getId();
+				//Iterate through characters in the same party and userke
+				if(direction == 3) {
+					//sort the party, only if we need to.
+					Collections.sort(userCharsInParty, new Comparator<CachedEntity>()
+					{
+						@Override
+						public int compare(CachedEntity o1, CachedEntity o2)
+						{
+							return ((String)o1.getProperty("name")).compareTo((String)o2.getProperty("name"));
+						}
+					});
+					
+					//now that we've narrowed down our characters, we search for the index of our character and then increment the index.
+					if(userCharsInParty.size() == 1) throw new UserErrorMessage("You don't have any more characters in this party.");
+					//if there's more than 1 entry in the list
+					for(int i = 0; i < userCharsInParty.size(); i++) {
+						if(GameUtils.equals(userCharsInParty.get(i), currentCharacter)) {
+							
+							//if we're at the end index, go back to 0.
+							if(i == userCharsInParty.size()) {
+								targetCharacterId = userCharsInParty.get(0).getId();
+								break;
+							}
+							
+							//if we're not at the end index, go to the next one.
+							targetCharacterId = userCharsInParty.get(i+1).getId();	
 							break;
 						}
-						
-						//if we're not at the end index, go to the next one.
-						targetCharacterId = userCharsInParty.get(i+1).getId();	
-						break;
 					}
-				}
-				break;
-			
-			//Switch to the party leader, if the leader is associated with the same userkey as the active user.
-			case 4:
-				CachedEntity leader = db.getPartyLeader(ds, (String)currentCharacter.getProperty("partyCode"), null);
-				
-				if(leader.getProperty("userKey").equals(currentCharacter.getProperty("userKey"))) {
-					targetCharacterId = leader.getId();
 					break;
 				}
-				throw new UserErrorMessage("The party leader isn't on this account.");
+				
+				//Switch to the party leader, if the leader is associated with the same userkey as the active user.
+				if(direction == 4) {
+					CachedEntity leader = db.getPartyLeader(ds, (String)currentCharacter.getProperty("partyCode"), party);
+					
+					if(leader != null) {
+						targetCharacterId = leader.getId();
+						break;
+					}
+					throw new UserErrorMessage("The party leader isn't on this account.");
+				}
 				
 			//if the direction wasn't 1-4, break.
 			default: break;
