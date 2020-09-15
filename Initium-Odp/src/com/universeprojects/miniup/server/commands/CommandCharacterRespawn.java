@@ -35,7 +35,7 @@ public class CommandCharacterRespawn extends Command
 		if(!CommonChecks.checkCharacterIsIncapacitated(deadCharacter)) throw new UserErrorMessage("You can't respawn a character that's alive...");	
 
 		deadCharacter.setProperty("userKey", null);
-		//Commit deadcharacter to DB?
+		ds.put(deadCharacter);
 		
 		CachedEntity newCharacter = db.doCreateNewCharacterFromDead(ds, getAuthenticator(), user, deadCharacter);
 		
