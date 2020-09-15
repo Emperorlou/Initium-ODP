@@ -15,6 +15,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumAspect;
 import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ItemAspect;
@@ -137,12 +138,19 @@ public class AspectSlotted extends ItemAspect {
 	}
 	
 	/**
-	 * @param object
+	 * Adds an item to the list of slotted items.
+	 * @param toAddCached
 	 */
-	private void addItemToSlot(InitiumObject object) {
+	private void addItemToSlot(InitiumObject toAddCached, InitiumObject target) {
 		List<InitiumObject> currentSlots = getOnlySlottedItems();
 		
 		//TODO: How to embed an entity?
+		
+		InitiumObject toAddEE = new InitiumObject(db, GameUtils.generateEmbeddedFromCached(toAddCached.getEntity()));
+		currentSlots.add(toAddEE);
+		
+		target.setProperty("Slotted:slotItems", toAddEE);
+		
 	}
 	
 	static {
@@ -192,9 +200,10 @@ public class AspectSlotted extends ItemAspect {
 			
 			//we've made it this far, which means the base item and the slottable item are both completely valid.
 			//time to actually insert the item.
-			slottedAspect.addItemToSlot(slottableItem);
+			slottedAspect.addItemToSlot(slottableItem, baseItem);
 			
-			db.delete(slottableItem.getEntity().getKey());
+			db.getDB().put(baseItem.getEntity());
+			db.getDB().delete(slottableItem.getEntity());
 			deleteHtml(".deletable-Item" + slottableItem.getEntity().getKey());
 		}
 	}

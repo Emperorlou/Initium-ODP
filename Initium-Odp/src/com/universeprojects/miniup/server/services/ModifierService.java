@@ -2,10 +2,14 @@ package com.universeprojects.miniup.server.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.aspects.AspectSlottable;
+import com.universeprojects.miniup.server.aspects.AspectSlotted;
 
 public class ModifierService extends Service
 {
@@ -113,11 +117,27 @@ public class ModifierService extends Service
 		return modifiers;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Double getAffectedValue(Double startingValue, CachedEntity modifierEntity, ModifierType modifierType)
 	{
 		Object rawModifiers = modifierEntity.getProperty("modifiers");
-		if (rawModifiers==null) return startingValue;
-		List<String> modifiers = (List<String>)rawModifiers;
+		List<String>modifiers = new ArrayList<>();
+		
+		//if rawmodifiers is null, it will just add nothing to the list. I think?
+		modifiers.addAll((List<String>)rawModifiers);
+		
+		InitiumObject obj = new InitiumObject(db, modifierEntity);
+		
+		if(obj.hasAspect(AspectSlotted.class)) {
+			AspectSlotted slottedAspect = obj.getAspect(AspectSlotted.class);
+			Map<InitiumObject, AspectSlottable> items = slottedAspect.getSlottedItems();
+			
+			for(Map.Entry<InitiumObject, AspectSlottable> entry:items.entrySet()) {
+				modifiers.addAll(entry.getValue().getStoredModifiers());
+			}
+		}
+		
+		if(modifiers.size() == 0) return startingValue;
 		
 		Double buffValue = 0d;
 		for(String modifierLine:modifiers)
