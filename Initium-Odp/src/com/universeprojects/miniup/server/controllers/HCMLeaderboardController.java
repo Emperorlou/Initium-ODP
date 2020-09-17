@@ -52,7 +52,7 @@ public class HCMLeaderboardController extends PageController
 		{
 			CachedEntity character = characters.get(i);
 			
-			if(character.getProperty("hardcoreRank")==null || (int)character.getProperty("hardcoreRank")<=0) continue;
+			if(character.getProperty("hardcoreRank") == null || (Long)character.getProperty("hardcoreRank") <= 0L) continue;
 			
 			if (CommonChecks.checkCharacterIsIncapacitated(character) && GameUtils.getElapsedDays((Date)character.getProperty("locationEntryDatetime"))>1)
 				continue;
