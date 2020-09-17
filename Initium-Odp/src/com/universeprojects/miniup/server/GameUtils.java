@@ -2578,7 +2578,7 @@ public class GameUtils
 
 		if (email != null)
 		{
-			return "https://www.playinitium.com/login.jsp?game=" + WebUtils.StringToEncryptedForUrl(email);
+			return "https://www.playinitium.com/?game=" + WebUtils.StringToEncryptedForUrl(email);
 		}
 		return null;
 	}

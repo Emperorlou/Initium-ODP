@@ -109,9 +109,9 @@ public abstract class JspSnippets
 	public static void handleSecurityException(SecurityException e, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		if (e.getMessage()==null)
-			handleGeneralErrorMessage("Please login before you can use the rest of the site.", "login.jsp?rtn="+WebUtils.encode(WebUtils.getFullURL(request)), request, response, false);
+			handleGeneralErrorMessage("Please login before you can use the rest of the site.", "landing.jsp?rtn="+WebUtils.encode(WebUtils.getFullURL(request)), request, response, false);
 		else
-			handleGeneralErrorMessage(e.getMessage(), "login.jsp?rtn="+WebUtils.encode(WebUtils.getFullURL(request)), request, response, true);
+			handleGeneralErrorMessage(e.getMessage(), "landing.jsp?rtn="+WebUtils.encode(WebUtils.getFullURL(request)), request, response, true);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public abstract class JspSnippets
 	 */
 	public static void handleSecurityException_Ajax(SecurityException e, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		GameUtils.setPopupError(request, "You are not logged in. You have to <a href='login.jsp'>login here</a> before you'll be able to do anything else.");
+		GameUtils.setPopupError(request, "You are not logged in. You have to <a href='landing.jsp'>login here</a> before you'll be able to do anything else.");
 		WebUtils.forceRedirectClientTo("ajaxresponse.jsp", request, response);
 	}
 
