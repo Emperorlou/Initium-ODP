@@ -64,30 +64,9 @@ public class CommandSwitchCharacter extends Command {
 				for(int i = 0; i < characters.size(); i++) {
 					if(!GameUtils.equals(characters.get(0).getKey(), currentCharacter.getKey())) continue;
 					
-					//Move UP in character list.
-					if(direction == 1) {
-						//if we're at the front of the list, loop back to the back.
-						if(i == 0) {
-							targetCharacterId = characters.get(characters.size()).getId();
-							break;
-						}
-						
-						targetCharacterId = characters.get(i-1).getId();
-						break;
-					}
-					
-					//Move DOWN in character list.
-					if(direction == 2) {	
-						//if we're at the end of the list, loop back to the front.
-						if(i == characters.size()) {
-							targetCharacterId = characters.get(0).getId();
-							break;
-						}
-						
-						//otherwise, grab the next one.
-						targetCharacterId = characters.get(i+1).getId();
-						break;
-					}
+					int dir = direction == 1 ? -1 : 1;
+					targetCharacterId = characters.get((i+ characters.size() + dir) % characters.size()).getId();
+					break;
 				}
 			case 3:
 			case 4:
