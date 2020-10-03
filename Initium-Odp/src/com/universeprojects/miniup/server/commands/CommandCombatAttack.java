@@ -123,6 +123,7 @@ public class CommandCombatAttack extends Command
 	
 			if (status!=null) characterCrit = status.contains("It's a critical hit!");
 			if (status!=null) targetEquipmentDestroyed = status.contains("equipment-destroyed-notice");
+			boolean monsterRun = status.contains("fled");
 			Double targetNewHp = (Double)targetCharacter.getProperty("hitpoints");
 			
 			db.flagNotALooter(request);
@@ -139,7 +140,7 @@ public class CommandCombatAttack extends Command
 				
 				doVisualEffect(hand, true, false, false);
 			}
-			else
+			else if(!monsterRun)
 			{
 				String hitType = "hit";
 				if (characterCrit)
