@@ -4498,12 +4498,14 @@ public class ODPDBAccess
         
         int autoRunThreshold = targetCharacter.getProperty("autoRunThreshold");
         if(autoRunThreshold == null) autoRunThreshold == 0;
+        int autoRunChance = targetCharacter.getProperty("autoRunChance");
+        if(autoRunChance == null) autoRunChance == 0;
         
         //First, we check against the auto run threshold to see if the monster will attempt to run.
-        if(targetCharacter.getProperty("hitpoints")/targetCharacter.getProperty("maxHitpoints") < autoRunThreshold) {
+        if((targetCharacter.getProperty("hitpoints") / targetCharacter.getProperty("maxHitpoints"))*100 < autoRunThreshold) {
             
         	//then, we check a random number vs the auto run chance.
-        	if (rnd.nextDouble()*100 >= targetCharacter.getProperty("autoRunChance")) {
+        	if (rnd.nextDouble()*100 <= autoRunChance) {
             	
             	//then, the monster has to pass a dexterity check.
             	if(rnd.nextDouble() * charDex <= rnd.nextDouble() * monsterDex) {
