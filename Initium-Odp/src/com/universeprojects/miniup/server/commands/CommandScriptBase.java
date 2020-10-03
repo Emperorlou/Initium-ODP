@@ -207,7 +207,7 @@ public abstract class CommandScriptBase extends Command {
 					}
 					
 					//send all the specified game messages to the appropriate characters.
-					for(Entry<Character,Set<String>> messagesToSend : event.getGameMessages().entrySet()) {
+					for(Entry<Character, List<String>> messagesToSend : event.getGameMessages().entrySet()) {
 						for(String message : messagesToSend.getValue()){
 							db.sendGameMessage(db.getDB(), messagesToSend.getKey().wrappedEntity, message);
 						}
