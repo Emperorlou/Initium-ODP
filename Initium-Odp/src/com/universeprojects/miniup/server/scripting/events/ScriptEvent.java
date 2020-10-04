@@ -15,7 +15,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
-import com.universeprojects.miniup.server.scripting.wrappers.BaseWrapper;
+import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.services.ScriptService;
 
@@ -187,6 +187,35 @@ public abstract class ScriptEvent extends OperationBase
 	public boolean updatesGameState()
 	{
 		return jsResponse == JavascriptResponse.FullPageRefresh || reloadWidgets;
+	}
+	
+	private HashMap<Character, List<String>> gameMessages = new HashMap<Character, List<String>>();
+	public void sendGameMessage(Character character, String message) {
+		List<String> curMessages = gameMessages.get(character);
+		
+		if(curMessages == null) {
+			gameMessages.put(character, new ArrayList<String>());
+			curMessages = gameMessages.get(character);
+		}
+		curMessages.add(message);
+	}
+	public boolean removeGameMessage(Character character, String message) {
+		List<String> curMessages = gameMessages.get(character);
+		
+		if(curMessages == null) {
+			gameMessages.put(character, new ArrayList<String>());
+			curMessages = gameMessages.get(character);
+		}
+		return curMessages.remove(message);
+	}
+	
+	public String[] getGameMessagesFor(Character character) {
+		if(gameMessages.containsKey(character) == false) return new String[0];
+		List<String> curMessages = gameMessages.get(character);
+		return curMessages.toArray(new String[curMessages.size()]);
+	}
+	public Map<Character, List<String>> getGameMessages(){
+		return gameMessages;
 	}
 	
 	private Map<Key, Set<String>> dbGameUpdates = new HashMap<Key, Set<String>>();

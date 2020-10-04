@@ -241,6 +241,7 @@ public class EntityWrapper extends BaseWrapper
 		if(this.wrappedEntity.hasProperty("scripts")==false) return false;
 		List<CachedEntity> searchScripts = db.getFilteredList("Script", "name", scriptName);
 		List<Key> entityScripts = (List<Key>)this.getProperty("scripts");
+		if(entityScripts == null) return false;
 		for(CachedEntity script:searchScripts)
 		{
 			Key scriptKey = script.getKey();

@@ -21,6 +21,7 @@ import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
+import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
@@ -201,6 +202,14 @@ public abstract class CommandScriptBase extends Command {
 						{
 							for(String method:update.getValue())
 								db.sendMainPageUpdateForCharacter(ds, update.getKey(), method);
+						}
+					}
+					
+
+					//send all the specified game messages to the appropriate characters.
+					for(Entry<Character, List<String>> messagesToSend : event.getGameMessages().entrySet()) {
+						for(String message : messagesToSend.getValue()){
+							db.sendGameMessage(db.getDB(), messagesToSend.getKey().wrappedEntity, message);
 						}
 					}
 				}
