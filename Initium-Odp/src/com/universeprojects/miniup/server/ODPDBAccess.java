@@ -785,6 +785,35 @@ public class ODPDBAccess
 		return null;
 	}
 
+	/**
+	 * This returns an alphabetically sorted list of all characters associated with a userkey.
+	 * This will also filter out all invalid characters, notable dead and zombie.
+	 * @param userKey
+	 * @return
+	 */
+	public List<CachedEntity> getAlphabetSortedValidCharactersByUser(Key userKey){
+		CachedEntity user = getEntity(userKey);
+		List<CachedEntity> characters = getUserCharacters(user);
+		Collections.sort(characters, new Comparator<CachedEntity>()
+		{
+			@Override
+			public int compare(CachedEntity o1, CachedEntity o2)
+			{
+				return ((String)o1.getProperty("name")).compareTo((String)o2.getProperty("name"));
+			}
+		});
+
+		//this will validate all the characters. Filter out zambie.
+		List<CachedEntity> toReturn = new ArrayList<>();
+		for(CachedEntity c:characters) {
+			if ("Zombie".equals(c.getProperty("status")) == false) {
+				toReturn.add(c);
+			}
+		}
+
+		return toReturn;
+	}
+
 	public CachedEntity getUserByEmail(String email)
 	{
 		email = email.trim().toLowerCase();
