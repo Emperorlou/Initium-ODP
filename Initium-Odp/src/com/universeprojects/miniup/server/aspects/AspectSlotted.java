@@ -143,9 +143,7 @@ public class AspectSlotted extends ItemAspect {
 	 */
 	private void addItemToSlot(InitiumObject toAddCached, InitiumObject target) {
 		List<InitiumObject> currentSlots = getOnlySlottedItems();
-		
-		//TODO: How to embed an entity?
-		
+				
 		InitiumObject toAddEE = new InitiumObject(db, GameUtils.generateEmbeddedFromCached(toAddCached.getEntity()));
 		currentSlots.add(toAddEE);
 		
@@ -197,6 +195,8 @@ public class AspectSlotted extends ItemAspect {
 			
 			AspectSlottable slottableAspect = (AspectSlottable) slottableItem.getInitiumAspect("Slottable");
 			if(slottableAspect == null) throw new UserErrorMessage("This item can't be inserted into a slot.");
+			
+			if(!GameUtils.equals(slottedAspect.getProperty("slotValidator"), slottableAspect.getProperty("slotValidator"))) throw new UserErrorMessage("This item can't be inserted into this slot.");
 			
 			//we've made it this far, which means the base item and the slottable item are both completely valid.
 			//time to actually insert the item.
