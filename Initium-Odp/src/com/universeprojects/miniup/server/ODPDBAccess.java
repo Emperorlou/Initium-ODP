@@ -2665,6 +2665,7 @@ public class ODPDBAccess
 		
 		for(CachedEntity entity:entities) {			
 			//test to make sure this works
+			if(entity == null) continue;
 			if(CommonChecks.checkItemHasAspect(entity, aspectName)) {
 				toReturn.add(entity);
 			}

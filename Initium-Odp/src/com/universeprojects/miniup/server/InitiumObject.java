@@ -314,7 +314,7 @@ public class InitiumObject implements GameObject<Key>
 	public void setProperty(String fieldName, Object value)
 	{
 		if(isEmbedded) ee.setProperty(fieldName, value);
-		entity.setProperty(fieldName, value);
+		else entity.setProperty(fieldName, value);
 	}
 	
 	/**
