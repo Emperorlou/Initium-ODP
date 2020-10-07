@@ -4501,8 +4501,11 @@ public class ODPDBAccess
         int autoRunChance = targetCharacter.getProperty("autoRunChance");
         if(autoRunChance == null) autoRunChance = 0;
         
+        int targetHP = (int) targetCharacter.getProperty("hitpoints");
+        int targetMaxHP = (int) targetCharacter.getProperty("maxHitpoints");
+        
         //First, we check against the auto run threshold to see if the monster will attempt to run.
-        if((targetCharacter.getProperty("hitpoints") / targetCharacter.getProperty("maxHitpoints"))*100 < autoRunThreshold) {
+        if((targetHP / targetMaxHP)*100 < autoRunThreshold) {
             
         	//then, we check a random number vs the auto run chance.
         	if (rnd.nextDouble()*100 <= autoRunChance) {
