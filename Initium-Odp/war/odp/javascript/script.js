@@ -4876,6 +4876,9 @@ $(document).keyup(function(event){
 	else if (event.which==76){ // L - switch to party leader if possible
 		switchCharacter(event, null, 4);
 	}
+	else if (event.which==88){ // X - open the invention window.
+		viewInvention(event);
+	}
 	else if (event.which==78){ // N - opens the navigation window.
 		if(uiStyle == "Classic UI"){
 			makeIntoPopup(".navigation-box");
