@@ -458,7 +458,7 @@ public abstract class CommonChecks
 
 	public static boolean checkCharacterIsIncapacitated(CachedEntity character)
 	{
-		if (checkCharacterIsDead(character) || checkCharacterIsUnconscious(character) || checkCharacterIsZombie(character))
+		if (checkCharacterIsDead(character) || checkCharacterIsUnconscious(character))
 			return true;
 		return false;
 	}
