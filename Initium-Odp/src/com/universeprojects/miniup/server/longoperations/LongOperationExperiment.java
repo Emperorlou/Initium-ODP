@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumEntityPool;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -164,7 +165,11 @@ public class LongOperationExperiment extends LongOperation
 		else if ("DEAD".equals(mode))
 			throw new UserErrorMessage("You cannot experiment right now. You're DEAD. D:");
 		else if ("NORMAL".equals(character.getProperty("mode"))==false)
-			throw new UserErrorMessage("You cannot experiment right now. You're too busy.");		
+			throw new UserErrorMessage("You cannot experiment right now. You're too busy.");
+		
+		//zombie
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 	}
 	
 

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -60,6 +61,10 @@ public class CommandSetLabel extends Command {
 		if (containerKey==null)
 			throw new UserErrorMessage("You can only relabel items in your immediate vicinity.");
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		if (GameUtils.equals(containerKey,character.getKey())==false && GameUtils.equals(containerKey,(Key)character.getProperty("locationKey"))==false)
 			throw new UserErrorMessage("You can only relabel items in your immediate vicinity.");
 		

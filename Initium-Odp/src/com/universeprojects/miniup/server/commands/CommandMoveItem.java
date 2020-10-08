@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -24,6 +25,11 @@ public class CommandMoveItem extends Command
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 	{
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Long itemId = tryParseId(parameters, "itemId");
 		String destinationKeyStr = parameters.get("destinationKey");
 		String[] parts = destinationKeyStr.split("_");
@@ -32,7 +38,7 @@ public class CommandMoveItem extends Command
 		CachedEntity item = db.getEntity(KeyFactory.createKey("Item", itemId));
 		CachedEntity newContainer = db.getEntity(destinationKey);
 		
-		db.doMoveItem(this, null, db.getCurrentCharacter(), item, newContainer);
+		db.doMoveItem(this, null, character, item, newContainer);
 	}
 
 }

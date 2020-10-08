@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -23,6 +24,11 @@ public class CommandCollectItem extends Command
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 	{
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Long itemId = tryParseId(parameters, "itemId");
 		
 		CachedEntity item = db.getEntity(KeyFactory.createKey("Item", itemId));
@@ -30,7 +36,8 @@ public class CommandCollectItem extends Command
 		Long tileX = (Long)item.getProperty("gridMapPositionX");
 		Long tileY = (Long)item.getProperty("gridMapPositionY");
 		
-		db.doCharacterCollectItem(this, db.getCurrentCharacter(), item);
+		
+		db.doCharacterCollectItem(this, character, item);
 		
 		if(item.isUnsaved())
 			ds.put(item);

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
@@ -25,6 +26,10 @@ public class LongOperationCampDefend extends LongOperation
 			UserRequestIncompleteException 
 	{
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		
 		if (GameUtils.isPlayerIncapacitated(character))

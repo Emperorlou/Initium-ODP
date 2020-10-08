@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -45,6 +46,10 @@ public class CommandGroupMemberMakeGroupCreator extends Command
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity admin = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(admin))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Key groupKey = (Key) admin.getProperty("groupKey");
 		CachedEntity group = db.getEntity(groupKey);
 		CachedEntity newCreator = db.getCharacterById(tryParseId(parameters,

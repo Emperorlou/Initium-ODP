@@ -38,6 +38,10 @@ public class CommandAutofixStuckInLocation extends Command {
 		
 		//grab the current character and its location
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		CachedEntity currentLocation = db.getEntity((Key) character.getProperty("locationKey"));
 		if(currentLocation==null)
 		{

@@ -39,6 +39,10 @@ public class CommandPartyJoin extends Command {
 		CachedDatastoreService ds = getDS();
 
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		CachedEntity partyCharacter = null;
 		
 		String mode = (String) character.getProperty("mode");

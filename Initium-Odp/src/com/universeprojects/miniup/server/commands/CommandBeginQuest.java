@@ -28,6 +28,11 @@ public class CommandBeginQuest extends Command
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 	{
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Long itemId = Long.parseLong(parameters.get("itemId"));
 		CachedEntity item = db.getEntity("Item", itemId);
 		
@@ -46,7 +51,7 @@ public class CommandBeginQuest extends Command
 
 		addCallbackData("questDefKey", questDef.getUrlSafeKey());
 		
-		db.sendGameMessage(ds, db.getCurrentCharacter(), "You now have the '<a onclick='viewQuest(\""+questDef.getUrlSafeKey()+"\")'>"+questDef.getName()+"</a>' quest. You can see it in your <a onclick='viewQuests()'>quest log</a>.");
+		db.sendGameMessage(ds, character, "You now have the '<a onclick='viewQuest(\""+questDef.getUrlSafeKey()+"\")'>"+questDef.getName()+"</a>' quest. You can see it in your <a onclick='viewQuests()'>quest log</a>.");
 		
 		ds.put(quest.getRawEntity());
 	}

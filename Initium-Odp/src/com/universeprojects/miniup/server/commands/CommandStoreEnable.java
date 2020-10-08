@@ -33,6 +33,9 @@ public class CommandStoreEnable extends Command {
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
 		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 //		if ("MarketSite".equals(characterLocation.getProperty("type"))==false)
 //			throw new UserErrorMessage("You cannot setup shop outside of a marketplace.");
 		

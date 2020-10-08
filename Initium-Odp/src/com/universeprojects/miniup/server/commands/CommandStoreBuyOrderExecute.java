@@ -32,6 +32,9 @@ public class CommandStoreBuyOrderExecute extends TransactionCommand
 		Long totalQuantityBought = 0L;
 		Long totalBoughtGold = 0L;
 		boolean storeRanLowOfFunds = false;
+		
+		CachedEntity character = db.getCurrentCharacter();
+
 
 		// Prepare the buy order
 		CachedEntity buyOrder = db.getEntity("BuyItem", buyOrderId);
@@ -45,13 +48,18 @@ public class CommandStoreBuyOrderExecute extends TransactionCommand
 		CachedEntity storeCharacter = db.getEntity(storeCharacterKey);
 		if (storeCharacter==null) throw new UserErrorMessage("This store owner no longer exists.");
 		if (CommonChecks.checkCharacterIsVending(storeCharacter)==false) throw new UserErrorMessage("The store owner has closed his store.");
-		if (GameUtils.equals(storeCharacter.getProperty("locationKey"), db.getCurrentCharacter().getProperty("locationKey"))==false)
+		if (GameUtils.equals(storeCharacter.getProperty("locationKey"), character.getProperty("locationKey"))==false)
 			throw new UserErrorMessage("You are not in the same location as the character you're trying to sell to.");
 		
 
+		
 		// Prepare the buyer (us)
-		db.getCurrentCharacter().refetch(ds);
-		if (CommonChecks.checkCharacterIsBusy(db.getCurrentCharacter())) throw new UserErrorMessage("You're busy, you can't do this right now.");
+		character.refetch(ds);
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
+		if (CommonChecks.checkCharacterIsBusy(character)) throw new UserErrorMessage("You're busy, you can't do this right now.");
 		
 		for(int i = 0; i<itemIds.length; i++)
 		{

@@ -11,6 +11,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -40,6 +41,10 @@ public class CommandForgetAllCombatSites extends Command {
 		ds.beginBulkWriteMode();
 
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		List<Long> forgettableCombatSiteList = tryParseStringToLongList(parameters, "forgettableCombatSiteArray", ",");
 		//The location the command is being called from
 		Key characterLocationKey = (Key)character.getProperty("locationKey");

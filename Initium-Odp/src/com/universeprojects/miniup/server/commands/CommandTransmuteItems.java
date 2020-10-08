@@ -47,13 +47,18 @@ public class CommandTransmuteItems extends Command {
 		final ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		ContainerService cs = new ContainerService(db);
 		Long containerId = tryParseId(parameters, "containerId");
 		final Key containerKey = KeyFactory.createKey("Item", containerId);
 		
 		CachedEntity container = db.getEntity(containerKey);
 		
-		if (cs.checkContainerAccessAllowed(db.getCurrentCharacter(), container)==false)
+		if (cs.checkContainerAccessAllowed(character, container)==false)
 			throw new UserErrorMessage("You do not have access to this container.");
 		
 		if (GameUtils.equals(container.getProperty("transmuteEnabled"), true)==false)
