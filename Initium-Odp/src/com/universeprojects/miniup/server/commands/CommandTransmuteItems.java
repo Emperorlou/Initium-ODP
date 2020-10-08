@@ -107,8 +107,6 @@ public class CommandTransmuteItems extends Command {
 				iter.remove();
 		}
 		
-		// Get a reference to Character entity, for potential HCM item creation.
-		final CachedEntity character = db.getCurrentCharacter();
 		// perform the actual transmutation of the items
 		if (recipes.size() == 0) {
 			cs.doUse(ds, container, 1);
