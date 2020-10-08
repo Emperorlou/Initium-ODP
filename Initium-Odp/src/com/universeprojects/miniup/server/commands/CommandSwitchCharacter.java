@@ -61,7 +61,7 @@ public class CommandSwitchCharacter extends Command {
 		}
 
 		// Don't switch to characters with zombie status
-		if (CommonChecks.checkCharacterIsZombie(character)) {
+		if (CommonChecks.checkCharacterIsZombie(targetCharacter)) {
 			throw new UserErrorMessage("You cannot switch to this character, it is now a zombie.");
 		}
 
