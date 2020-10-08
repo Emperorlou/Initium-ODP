@@ -58,10 +58,20 @@ public abstract class CommonChecks
 	public static boolean checkCharacterIsDead(CachedEntity character)
 	{
 		Double hitpoints = (Double)character.getProperty("hitpoints");
-		if (hitpoints<=0 && "DEAD".equals(character.getProperty("mode")))
+		if (hitpoints <= 0 && ("DEAD".equals(character.getProperty("mode")))) {
 			return true;
+		}
 		
 		return false;
+	}
+	
+	/**
+	 * Checks if a character is zombified.
+	 * @param character
+	 * @return
+	 */
+	public static boolean checkCharacterIsZombie(CachedEntity character) {
+		return "Zombie".equals(character.getProperty("status"));
 	}
 	
 	/**
