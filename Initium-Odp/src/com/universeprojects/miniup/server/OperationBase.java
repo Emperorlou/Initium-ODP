@@ -39,9 +39,6 @@ public abstract class OperationBase
 		this.db = db;
 		this.request = request;
 		
-		if(CommonChecks.checkCharacterIsZombie(db.getCurrentCharacter()))
-			if(!(this instanceof CommandSwitchCharacter))
-				throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 	}
 	
 	/**
