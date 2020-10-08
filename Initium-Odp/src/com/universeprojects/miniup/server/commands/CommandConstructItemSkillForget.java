@@ -28,6 +28,10 @@ public class CommandConstructItemSkillForget extends Command
 		Long skillId = tryParseId(parameters, "skillId");
 		Key skillKey = KeyFactory.createKey("ConstructItemSkill", skillId);
 		CachedEntity skill = db.getEntity(skillKey);
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 		
 		if (skill==null) return;
 		

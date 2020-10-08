@@ -35,6 +35,10 @@ public class CommandPartyLeave extends Command {
 		CachedDatastoreService ds = getDS();
 
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		if(character == null)
 			throw new RuntimeException("Character is null in command");
 		

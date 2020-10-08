@@ -27,6 +27,11 @@ public class CommandConstructItemSkillRename extends Command
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 	{
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		String newName = parameters.get("name");
 		if (newName==null || newName.matches(nameRegex)==false)
 			throw new UserErrorMessage("The new name must have only letters, numbers, spaces, or any of the following characters: . ' #");
@@ -42,7 +47,7 @@ public class CommandConstructItemSkillRename extends Command
 		if (CommonChecks.checkIdeaIsCharacters(skill, db.getCurrentCharacterKey())==false)
 			throw new UserErrorMessage("This skill is not your skill to rename.");
 
-		newName = db.getCurrentCharacter().getProperty("name")+"'s "+newName;
+		newName = character.getProperty("name")+"'s "+newName;
 		
 		// Check to see if this skill name is used anywhere else already
 		QueryHelper query = new QueryHelper(db.getDB());

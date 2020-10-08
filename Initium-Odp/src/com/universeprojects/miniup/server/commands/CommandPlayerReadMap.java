@@ -30,6 +30,10 @@ public class CommandPlayerReadMap extends Command {
 		ODPDBAccess db = getDB();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		CachedEntity user = db.getCurrentUser();
 		
 		Long itemId = tryParseId(parameters, "itemId");

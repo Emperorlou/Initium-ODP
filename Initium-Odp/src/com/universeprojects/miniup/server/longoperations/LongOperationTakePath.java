@@ -62,6 +62,10 @@ public class LongOperationTakePath extends LongOperation {
 		try
 		{
 			CachedEntity character = db.getCurrentCharacter();
+			
+			if(CommonChecks.checkCharacterIsZombie(character))
+				throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+			
 			String forceOneWay = (String)path.getProperty("forceOneWay");
 			if ("FromLocation1Only".equals(forceOneWay) && GameUtils.equals(character.getProperty("locationKey"), path.getProperty("location2Key")))
 				throw new UserErrorMessage("You cannot take this path.");

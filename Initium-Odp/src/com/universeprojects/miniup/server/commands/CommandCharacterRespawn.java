@@ -29,6 +29,9 @@ public class CommandCharacterRespawn extends Command
 		
 		CachedEntity user = db.getCurrentUser();
 		CachedEntity deadCharacter = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(deadCharacter))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 
 		CachedDatastoreService ds = db.getDB();
 			

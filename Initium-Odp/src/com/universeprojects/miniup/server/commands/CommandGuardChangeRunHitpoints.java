@@ -5,6 +5,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -21,6 +23,11 @@ public class CommandGuardChangeRunHitpoints extends Command
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 	{
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		String rawValue = parameters.get("value");
 		
 		if (rawValue!=null && rawValue.equals("null") || rawValue.trim().equals(""))
@@ -37,9 +44,9 @@ public class CommandGuardChangeRunHitpoints extends Command
 		if (value!=null && value<=0)
 			value = null;
 		
-		db.getCurrentCharacter().setProperty("guardRunHitpoints", value);
+		character.setProperty("guardRunHitpoints", value);
 		
-		ds.put(db.getCurrentCharacter());
+		ds.put(character);
 		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 	}

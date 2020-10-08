@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -31,6 +32,10 @@ public class CommandStoreNewBuyOrder extends Command {
 	@Override
 	public void run(Map<String,String> parameters) throws UserErrorMessage 
 	{
+		
+		if(CommonChecks.checkCharacterIsZombie(db.getCurrentCharacter()))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		String itemName = parameters.get("itemName");
 		Long value = Long.parseLong(parameters.get("value"));
 		Long quantity = null;

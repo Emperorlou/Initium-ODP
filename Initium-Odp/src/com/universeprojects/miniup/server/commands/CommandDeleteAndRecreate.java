@@ -44,6 +44,10 @@ public class CommandDeleteAndRecreate extends Command {
         if (name==null) throw new UserErrorMessage("Character name cannot be blank.");
         
         CachedEntity currentChar = db.getCurrentCharacter();
+        
+		if(CommonChecks.checkCharacterIsZombie(currentChar))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
         if(currentChar == null) throw new RuntimeException("Current character entity is null");
         if(CommonChecks.checkCharacterIsIncapacitated(currentChar)) throw new UserErrorMessage("You must respawn before you delete and recreate your character.");
         

@@ -53,6 +53,9 @@ public class CommandAttack extends Command {
 		if (ds==null || location==null || character==null || monster==null)
 			throw new RuntimeException("canAttackHelper invalid parameter.");
 		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		// Check that monster is an actual monster
 		if ("NPC".equals(monster.getProperty("type"))==false)
 			throw new UserErrorMessage("You can only attack monsters this way.");

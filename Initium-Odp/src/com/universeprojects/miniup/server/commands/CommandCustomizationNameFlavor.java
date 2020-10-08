@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.WebUtils;
@@ -26,6 +27,11 @@ public class CommandCustomizationNameFlavor extends Command
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException
 	{
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Long itemId = WebUtils.getLongParam(request, "itemId");
 		CachedEntity entity = db.getEntity("Item", itemId);
 		
@@ -65,7 +71,7 @@ public class CommandCustomizationNameFlavor extends Command
 		String description = "Item Name: "+itemName+" - Flavor: "+flavor;
 		
 		// This is mostly just done for tracking purposes
-		db.newCustomOrder(db.getCurrentUser(), db.getCurrentCharacter(), entity, typeKey, description, true);
+		db.newCustomOrder(db.getCurrentUser(), character, entity, typeKey, description, true);
 		
 		entity.setProperty("name", itemName);
 		entity.setProperty("description", flavor);

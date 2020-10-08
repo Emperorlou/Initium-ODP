@@ -42,6 +42,10 @@ public class CommandStoreBuyItem extends Command {
 		{}
 		
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		CachedEntity saleItem = db.getEntity("SaleItem", saleItemId);
 		if (saleItem==null)
 			throw new UserErrorMessage("This item has been taken down. The owner is no longer selling it.");
