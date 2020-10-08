@@ -16,6 +16,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.json.shared.JSONArray;
 import com.universeprojects.json.shared.JSONObject;
 import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.commands.CommandSwitchCharacter;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
@@ -39,7 +40,8 @@ public abstract class OperationBase
 		this.request = request;
 		
 		if(CommonChecks.checkCharacterIsZombie(db.getCurrentCharacter()))
-			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+			if(!(this instanceof CommandSwitchCharacter))
+				throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 	}
 	
 	/**

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -60,7 +61,7 @@ public class CommandSwitchCharacter extends Command {
 		}
 
 		// Don't switch to characters with zombie status
-		if ("Zombie".equals(targetCharacter.getProperty("status"))) {
+		if (CommonChecks.checkCharacterIsZombie(character)) {
 			throw new UserErrorMessage("You cannot switch to this character, it is now a zombie.");
 		}
 
