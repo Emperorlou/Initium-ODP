@@ -684,7 +684,7 @@ public class ViewItemController extends PageController {
 			itemMap.put("description", field.toString());
 		
 		//If we have explicitely allowed charges to be visible on this item, display them.
-		Boolean chargesVisible = (boolean) item.getProperty("chargesVisible");
+		Boolean chargesVisible = (Boolean) item.getProperty("chargesVisible");
 		if(chargesVisible == null) chargesVisible = false;
 		if(chargesVisible) {
 			field = item.getProperty("charges");
