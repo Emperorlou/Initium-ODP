@@ -683,6 +683,16 @@ public class ViewItemController extends PageController {
 		if (field!=null && field.toString().trim().equals("")==false)
 			itemMap.put("description", field.toString());
 		
+		//If we have explicitely allowed charges to be visible on this item, display them.
+		Boolean chargesVisible = (boolean) item.getProperty("chargesVisible");
+		if(chargesVisible == null) chargesVisible = false;
+		if(chargesVisible) {
+			field = item.getProperty("charges");
+			if(field != null && field.toString().trim().equals("") == false) {
+				itemMap.put("charges", field.toString());
+			}
+		}
+		
 		
 		// Modifiers
 		ModifierService mService = new ModifierService(db);
