@@ -63,34 +63,10 @@ public class SublocationsController extends PageController {
 	    Key locationKey = (Key)character.getProperty("locationKey");
 	    db.pool.addToQueue(locationKey);
 	    
-	    List<CachedEntity> discoveriesForCharacterAndLocation = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacterKey(), locationKey, showHidden);
-	    List<Key> alwaysVisiblePaths = db.getLocationAlwaysVisiblePaths_KeysOnly(locationKey);
-	    
-	    db.pool.addToQueue(alwaysVisiblePaths);
-	    
-	    Set<Key> pathKeys = new LinkedHashSet<>(alwaysVisiblePaths);
-	    for(CachedEntity discovery:discoveriesForCharacterAndLocation)
-	    {
-	    	db.pool.addToQueue(discovery.getProperty("location1Key"), discovery.getProperty("location2Key"), discovery.getProperty("entityKey"));
-	    	pathKeys.add((Key)discovery.getProperty("entityKey"));
-	    }
-	    
-	    db.pool.loadEntities();
-	    
-	    // Also load in the always-visible destination locations
-	    if (alwaysVisiblePaths.isEmpty()==false)
-	    {
-	    	for(Key key:alwaysVisiblePaths)
-	    	{
-	    		CachedEntity path = db.pool.get(key);
-		    	db.pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
-	    	}
-	    	db.pool.loadEntities();
-	    }
+	    List<CachedEntity> paths = db.getVisiblePathsByLocation(db.getCurrentCharacterKey(), locationKey, showHidden);
 	    
 	    CachedEntity currentLocation = db.pool.get(locationKey);
 	    
-	    List<CachedEntity> paths = db.pool.get(pathKeys);
 	    
 	    // First sort paths by type a little bit
 	    Collections.sort(paths, new Comparator<CachedEntity>()

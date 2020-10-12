@@ -722,8 +722,8 @@ public class MainPageUpdateService extends Service
 			}
 			else
 			{
-				// Load the paths and destLocations for the root location
-				paths = db.getPathsByLocation_PermanentOnly(location.getKey());
+				// Load the paths and destLocations for the root location. Load only the paths that the user can see.
+				paths = db.getVisiblePathsByLocation(character.getKey(), location.getKey(), false);
 				
 				// Go through the paths and get the destination locations pooled
 				for(CachedEntity path:paths)
