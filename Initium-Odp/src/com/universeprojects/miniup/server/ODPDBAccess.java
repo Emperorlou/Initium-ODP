@@ -11,6 +11,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1071,6 +1072,45 @@ public class ODPDBAccess
 			// ignore
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns a list of all paths visible by a character at a location.
+	 * @param characterKey - the key of the character that is viewing these paths.
+	 * @param locationKey - the key of the location.
+	 * @param showHidden - do we load hidden paths as well.
+	 * @return
+	 */
+	public List<CachedEntity> getVisiblePathsByLocation (Key characterKey, Key locationKey, boolean showHidden){
+	   
+		if(characterKey == null || locationKey == null) throw new RuntimeException("");
+		
+		List<CachedEntity> discoveriesForCharacterAndLocation = getDiscoveriesForCharacterAndLocation(characterKey, locationKey, showHidden);
+	    List<Key> alwaysVisiblePaths = getLocationAlwaysVisiblePaths_KeysOnly(locationKey);
+		
+	    pool.addToQueue(alwaysVisiblePaths);
+	    
+	    Set<Key> pathKeys = new LinkedHashSet<>(alwaysVisiblePaths);
+	    for(CachedEntity discovery:discoveriesForCharacterAndLocation)
+	    {
+	    	pool.addToQueue(discovery.getProperty("location1Key"), discovery.getProperty("location2Key"), discovery.getProperty("entityKey"));
+	    	pathKeys.add((Key)discovery.getProperty("entityKey"));
+	    }
+	    
+	    pool.loadEntities();
+	    
+	    // Also load in the always-visible destination locations
+	    if (alwaysVisiblePaths.isEmpty()==false)
+	    {
+	    	for(Key key:alwaysVisiblePaths)
+	    	{
+	    		CachedEntity path = pool.get(key);
+		    	pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
+	    	}
+	    	pool.loadEntities();
+	    }
+		
+		return pool.get(pathKeys);
 	}
 
 	public List<CachedEntity> getPathsByLocation_PermanentOnly(Key locationKey)
