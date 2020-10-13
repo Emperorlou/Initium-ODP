@@ -28,8 +28,8 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 	protected void processBatchItems(Map<String, String> parameters, ODPDBAccess db, CachedDatastoreService ds,
 			CachedEntity character, List<CachedEntity> batchItems) throws UserErrorMessage {
 		Long splitItemQuantity;
-		if (batchItems.size() > 10) {
-			throw new UserErrorMessage("You can only split 10 item at a time.");
+		if (batchItems.size() > 12) {
+			throw new UserErrorMessage("You can only split 12 items at a time.");
 		}
 		ds.beginTransaction();
 		try {
@@ -45,6 +45,14 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 			}
 			if (stackSize <= 0 || stacks <= 0) {
 				throw new UserErrorMessage("Please input a positive integer value.");
+			}
+			
+			if(batchItems.size() > 1 && stacks > 1) {
+				throw new UserErrorMessage("You can't split multiple items into multiple stacks.");
+			}
+			
+			if(stacks > 24) {
+				throw new UserErrorMessage("Too many stacks. Max is 24.");
 			}
 			
 			//iterate through all of our items.
