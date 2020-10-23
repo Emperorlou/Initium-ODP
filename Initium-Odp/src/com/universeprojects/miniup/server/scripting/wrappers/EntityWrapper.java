@@ -43,6 +43,13 @@ public class EntityWrapper extends BaseWrapper
 		return db;
 	}
 	
+	/**
+	 * Can this entity be a valid target of a game message? If true, override this method.
+	 */
+	public boolean validMessageTarget() {
+		return false;
+	}
+	
 	public boolean hasCharges()
 	{
 		return getCharges() > 0;

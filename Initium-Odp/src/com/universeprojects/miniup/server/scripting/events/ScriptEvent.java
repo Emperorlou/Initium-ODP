@@ -15,7 +15,6 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.OperationBase;
 import com.universeprojects.miniup.server.commands.framework.Command.JavascriptResponse;
-import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.services.ScriptService;
 
@@ -189,32 +188,34 @@ public abstract class ScriptEvent extends OperationBase
 		return jsResponse == JavascriptResponse.FullPageRefresh || reloadWidgets;
 	}
 	
-	private HashMap<Character, List<String>> gameMessages = new HashMap<Character, List<String>>();
-	public void sendGameMessage(Character character, String message) {
-		List<String> curMessages = gameMessages.get(character);
+	private HashMap<EntityWrapper, List<String>> gameMessages = new HashMap<EntityWrapper, List<String>>();
+	public boolean sendGameMessage(EntityWrapper entity, String message) {
+		if(entity.validMessageTarget() == false) return false;
+		List<String> curMessages = gameMessages.get(entity);
 		
 		if(curMessages == null) {
-			gameMessages.put(character, new ArrayList<String>());
-			curMessages = gameMessages.get(character);
+			gameMessages.put(entity, new ArrayList<String>());
+			curMessages = gameMessages.get(entity);
 		}
 		curMessages.add(message);
+		return true;
 	}
-	public boolean removeGameMessage(Character character, String message) {
-		List<String> curMessages = gameMessages.get(character);
+	public boolean removeGameMessage(EntityWrapper entity, String message) {
+		List<String> curMessages = gameMessages.get(entity);
 		
 		if(curMessages == null) {
-			gameMessages.put(character, new ArrayList<String>());
-			curMessages = gameMessages.get(character);
+			gameMessages.put(entity, new ArrayList<String>());
+			curMessages = gameMessages.get(entity);
 		}
 		return curMessages.remove(message);
 	}
 	
-	public String[] getGameMessagesFor(Character character) {
-		if(gameMessages.containsKey(character) == false) return new String[0];
-		List<String> curMessages = gameMessages.get(character);
+	public String[] getGameMessagesFor(EntityWrapper entity) {
+		if(gameMessages.containsKey(entity) == false) return new String[0];
+		List<String> curMessages = gameMessages.get(entity);
 		return curMessages.toArray(new String[curMessages.size()]);
 	}
-	public Map<Character, List<String>> getGameMessages(){
+	public Map<EntityWrapper, List<String>> getGameMessages(){
 		return gameMessages;
 	}
 	

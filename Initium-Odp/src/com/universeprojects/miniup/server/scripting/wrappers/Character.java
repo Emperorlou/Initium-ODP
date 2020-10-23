@@ -40,6 +40,11 @@ public class Character extends EntityWrapper
 		super(character, db);
 	}
 	
+	@Override
+	public boolean validMessageTarget() {
+		return true;
+	}
+	
 	private List<Item> getInventory()
 	{
 		if(inventory == null)
