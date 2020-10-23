@@ -63,7 +63,7 @@ public class SublocationsController extends PageController {
 	    Key locationKey = (Key)character.getProperty("locationKey");
 	    db.pool.addToQueue(locationKey);
 	    
-	    List<CachedEntity> paths = db.getVisiblePathsByLocation(db.getCurrentCharacterKey(), locationKey, showHidden);
+	    List<CachedEntity> paths = db.getVisiblePathsByLocation(character.getKey(), db.getCharacterLocationKey(character), showHidden);
 	    
 	    CachedEntity currentLocation = db.pool.get(locationKey);
 	    
