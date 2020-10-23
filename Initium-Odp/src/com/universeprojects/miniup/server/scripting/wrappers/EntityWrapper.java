@@ -43,6 +43,13 @@ public class EntityWrapper extends BaseWrapper
 		return db;
 	}
 	
+	/**
+	 * Can this entity be a valid target of a game message? If true, override this method.
+	 */
+	public boolean validMessageTarget() {
+		return false;
+	}
+	
 	public boolean hasCharges()
 	{
 		return getCharges() > 0;
@@ -241,6 +248,7 @@ public class EntityWrapper extends BaseWrapper
 		if(this.wrappedEntity.hasProperty("scripts")==false) return false;
 		List<CachedEntity> searchScripts = db.getFilteredList("Script", "name", scriptName);
 		List<Key> entityScripts = (List<Key>)this.getProperty("scripts");
+		if(entityScripts == null) return false;
 		for(CachedEntity script:searchScripts)
 		{
 			Key scriptKey = script.getKey();

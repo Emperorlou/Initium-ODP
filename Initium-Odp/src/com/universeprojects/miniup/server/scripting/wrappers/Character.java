@@ -40,6 +40,11 @@ public class Character extends EntityWrapper
 		super(character, db);
 	}
 	
+	@Override
+	public boolean validMessageTarget() {
+		return true;
+	}
+	
 	private List<Item> getInventory()
 	{
 		if(inventory == null)
@@ -130,7 +135,7 @@ public class Character extends EntityWrapper
 	
 	private void populateCarriedCharacters()
 	{
-		List<CachedEntity> chars = db.getFilteredList("Character", "containerKey", this.getKey());
+		List<CachedEntity> chars = db.getFilteredList("Character", "locationKey", this.getKey());
 		carriedCharacters = carriedCharacters == null ? new ArrayList<Character>() : carriedCharacters;
 		for(CachedEntity carried:chars)
 		{

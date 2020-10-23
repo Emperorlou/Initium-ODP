@@ -15,6 +15,10 @@ public class Group extends EntityWrapper
 		super(group, db);
 	}
 	
+	public boolean validMessageTarget() {
+		return true;
+	}
+	
 	public Key creatorKey()
 	{
 		return (Key)this.getProperty("creatorKey");
