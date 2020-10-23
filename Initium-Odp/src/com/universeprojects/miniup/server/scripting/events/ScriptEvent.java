@@ -188,34 +188,38 @@ public abstract class ScriptEvent extends OperationBase
 		return jsResponse == JavascriptResponse.FullPageRefresh || reloadWidgets;
 	}
 	
-	private HashMap<EntityWrapper, List<String>> gameMessages = new HashMap<EntityWrapper, List<String>>();
+	private HashMap<Key, List<String>> gameMessages = new HashMap<Key, List<String>>();
 	public boolean sendGameMessage(EntityWrapper entity, String message) {
 		if(entity.validMessageTarget() == false) return false;
-		List<String> curMessages = gameMessages.get(entity);
+		Key eKey = entity.getKey();
+		List<String> curMessages = gameMessages.get(eKey);
 		
 		if(curMessages == null) {
-			gameMessages.put(entity, new ArrayList<String>());
-			curMessages = gameMessages.get(entity);
+			gameMessages.put(eKey, new ArrayList<String>());
+			curMessages = gameMessages.get(eKey);
 		}
 		curMessages.add(message);
 		return true;
 	}
 	public boolean removeGameMessage(EntityWrapper entity, String message) {
-		List<String> curMessages = gameMessages.get(entity);
+		if(entity.validMessageTarget() == false) return false;
+		Key eKey = entity.getKey();
+		List<String> curMessages = gameMessages.get(eKey);
 		
 		if(curMessages == null) {
-			gameMessages.put(entity, new ArrayList<String>());
-			curMessages = gameMessages.get(entity);
+			gameMessages.put(eKey, new ArrayList<String>());
+			curMessages = gameMessages.get(eKey);
 		}
 		return curMessages.remove(message);
 	}
 	
 	public String[] getGameMessagesFor(EntityWrapper entity) {
-		if(gameMessages.containsKey(entity) == false) return new String[0];
-		List<String> curMessages = gameMessages.get(entity);
+		Key eKey = entity.getKey();
+		if(gameMessages.containsKey(eKey) == false) return new String[0];
+		List<String> curMessages = gameMessages.get(eKey);
 		return curMessages.toArray(new String[curMessages.size()]);
 	}
-	public Map<EntityWrapper, List<String>> getGameMessages(){
+	public Map<Key, List<String>> getGameMessages(){
 		return gameMessages;
 	}
 	
