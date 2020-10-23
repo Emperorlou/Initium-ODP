@@ -7386,6 +7386,11 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void sendGameMessage(CachedDatastoreService ds, Key entityKey, String message) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	public boolean hasNewGameMessages()
 	{
@@ -7962,4 +7967,5 @@ public class ODPDBAccess
     public boolean doIfExpressionCheck(Object value1, String operator, String value2) {
     	return false;
     }
+
 }
