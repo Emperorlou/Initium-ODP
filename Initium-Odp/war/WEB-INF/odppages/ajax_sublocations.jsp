@@ -9,7 +9,7 @@
 		<p><a onclick='viewLocalNavigation(event, false)'>Hide Hidden Paths</a></p>
 	</c:if>
 	<c:forEach var="location" items="${locations}">
-		<div onclick='doGoto(event, ${location.pathId})' class='standard-button-highlight sublocation-display-container location-link-${location.locationId}'>
+		<div onclick=${location.onClick} class='standard-button-highlight sublocation-display-container location-link-${location.locationId}'>
 			<div class='sublocation-display' style='background-image:url(${location.bannerUrl})'></div>
 			<h5>${location.name}</h5>
 			<c:if test="${location.isForgettable=='true'}">
