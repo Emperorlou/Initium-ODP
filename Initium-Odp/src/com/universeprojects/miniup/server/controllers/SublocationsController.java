@@ -164,10 +164,17 @@ public class SublocationsController extends PageController {
 	    	Map<String,String> data = new HashMap<>();
 	    	if (forgettableLocations.contains(location.getKey()))
 	    		data.put("isForgettable", "true");
-	    	data.put("pathId", path.getId().toString());
 	    	data.put("locationId", location.getId().toString());
-	    	data.put("name", (String)location.getProperty("name"));
 	    	data.put("bannerUrl", GameUtils.getResourceUrl((String)location.getProperty("banner")));
+	    	
+	    	if("Script".equals(location.getKind())) {
+		    	data.put("onClick", "doTriggerLocation(event, "+location.getId().toString() + ", " + currentLocation.getId().toString() + ")");
+		    	data.put("name", (String)location.getProperty("caption"));
+	    	}
+	    	else {
+		    	data.put("onClick", "doGoto(event, " + location.getId().toString() + ")");
+		    	data.put("name", (String)location.getProperty("name"));
+	    	}
 	    	
 	    	locationsFormatted.add(data);
 	    }
