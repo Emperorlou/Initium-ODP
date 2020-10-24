@@ -726,8 +726,10 @@ public class MainPageUpdateService extends Service
 				paths = db.getVisiblePathsByLocation(character.getKey(), location.getKey(), false);
 				
 				// Go through the paths and get the destination locations pooled
-				for(CachedEntity path:paths)
+				for(CachedEntity path:paths) {
+					if(path == null) continue;
 					db.pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
+				}
 				
 				db.pool.loadEntities();
 

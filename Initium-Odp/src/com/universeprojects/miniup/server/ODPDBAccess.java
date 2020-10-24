@@ -1083,7 +1083,7 @@ public class ODPDBAccess
 	 */
 	public List<CachedEntity> getVisiblePathsByLocation (Key characterKey, Key locationKey, boolean showHidden){
 	   
-		if(characterKey == null || locationKey == null) throw new RuntimeException("");
+		if(characterKey == null || locationKey == null) throw new RuntimeException("Error loading paths for Character: " + characterKey + " at Location: " + locationKey);
 		
 		List<CachedEntity> discoveriesForCharacterAndLocation = getDiscoveriesForCharacterAndLocation(characterKey, locationKey, showHidden);
 	    List<Key> alwaysVisiblePaths = getLocationAlwaysVisiblePaths_KeysOnly(locationKey);
