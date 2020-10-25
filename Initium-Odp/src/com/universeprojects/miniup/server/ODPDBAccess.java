@@ -1109,8 +1109,16 @@ public class ODPDBAccess
 	    	}
 	    	pool.loadEntities();
 	    }
+	    
+	    List<CachedEntity> paths = pool.get(pathKeys);
+	    
+		Iterator<CachedEntity> itr = paths.iterator();
+		while(itr.hasNext()) {
+			CachedEntity path = itr.next();
+			if(path == null) paths.remove(path);
+		}
 		
-		return pool.get(pathKeys);
+		return paths;
 	}
 
 	public List<CachedEntity> getPathsByLocation_PermanentOnly(Key locationKey)

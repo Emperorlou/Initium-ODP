@@ -727,7 +727,6 @@ public class MainPageUpdateService extends Service
 				
 				// Go through the paths and get the destination locations pooled
 				for(CachedEntity path:paths) {
-					if(path == null) continue;
 					db.pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
 				}
 				
