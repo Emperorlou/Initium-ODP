@@ -172,7 +172,7 @@ public class SublocationsController extends PageController {
 		    	data.put("name", (String)location.getProperty("caption"));
 	    	}
 	    	else {
-		    	data.put("onClick", "doGoto(event, " + location.getId().toString() + ")");
+		    	data.put("onClick", "doGoto(event, " + path.getId().toString() + ")");
 		    	data.put("name", (String)location.getProperty("name"));
 	    	}
 	    	
