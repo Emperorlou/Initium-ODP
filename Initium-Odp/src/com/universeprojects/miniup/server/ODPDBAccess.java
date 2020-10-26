@@ -1115,7 +1115,7 @@ public class ODPDBAccess
 		Iterator<CachedEntity> itr = paths.iterator();
 		while(itr.hasNext()) {
 			CachedEntity path = itr.next();
-			if(path == null) paths.remove(path);
+			if(path == null) itr.remove();
 		}
 		
 		return paths;
