@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -92,7 +93,8 @@ public class MovementService extends Service {
 			List<CachedEntity> characters = new ArrayList<>();
 			
 			if(checkAllCharacters) {
-				characters.addAll(db.getParty(db.getDB(), character));
+				if(character.getProperty("partyCode") != null) 	characters.addAll(db.getParty(db.getDB(), character));
+				else if(characters.size() == 0) characters.add(character);
 			}
 			else characters.add(character);
 			
@@ -131,9 +133,16 @@ public class MovementService extends Service {
 	
 	private boolean checkHasKey(CachedEntity character, long lockCode) {
 		int matchingKeys = db.getFilteredList_Count("Item", "containerKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
-		if(matchingKeys == 0)
-			matchingKeys = db.getFilteredList_Count("Buff", "parentKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
 		
+		//if we dont have any physical keys, we check for buffs.
+		if(matchingKeys == 0) {
+			//grab all the buffs associated with this character
+			List<EmbeddedEntity> buffs = db.getBuffsFor(character);
+			for(EmbeddedEntity buff : buffs) {
+				//if we find a buff with the proper keycode, just return true.
+				if(buff.getProperty("keyCode") == (Long) lockCode) return true;
+			}
+		}
 		return (matchingKeys > 0);
 	}
 
