@@ -140,9 +140,12 @@ public class MovementService extends Service {
 			List<EmbeddedEntity> buffs = db.getBuffsFor(character);
 			for(EmbeddedEntity buff : buffs) {
 				
+				
 				//if we find a buff with the proper keycode, just return true.
 				Long buffCode = (Long) buff.getProperty("keyCode");
-				if(buffCode.equals((Long)lockCode)) return true;
+				
+				if(GameUtils.equals(lockCode, buffCode)) return true;
+
 			}
 		}
 		return (matchingKeys > 0);
