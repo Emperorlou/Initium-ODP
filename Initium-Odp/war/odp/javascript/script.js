@@ -4887,6 +4887,9 @@ $(document).keyup(function(event){
 			viewLocalNavigation(event);
 		}
 	}
+	else if (event.which==81){ //Q - opens the quest log.
+		viewQuests();
+	}
 	else if (event.which==72){ // H - opens the hotkey window.
 		openHotkeyWindow();
 	}
