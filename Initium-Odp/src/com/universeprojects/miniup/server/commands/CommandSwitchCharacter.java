@@ -47,7 +47,7 @@ public class CommandSwitchCharacter extends Command {
 		CachedEntity currentCharacter = db.getCurrentCharacter();
 
 		// Get characterId to switch to
-		Long targetCharacterId;
+		Long targetCharacterId = null;
 		
 		//This allows for hotkeys to loop through characters, either in alphabetical order or characters in the same party.
 		try {
