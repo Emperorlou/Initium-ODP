@@ -2465,11 +2465,7 @@ function newCharacterFromDead(event)
 
 function switchCharacter(eventObject, characterId, direction)
 {
-
-	if(direction == undefined){
-		direction = null;
-	}
-
+	direction = direction || 0;
 	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId, "direction":directon},function()
 	{
 		if (location.href.indexOf("/main.jsp")>-1)
@@ -4880,11 +4876,11 @@ $(document).keyup(function(event){
 		viewInvention(event);
 	}
 	else if (event.which==78){ // N - opens the navigation window.
-		if(uiStyle == "Classic UI"){
-			makeIntoPopup(".navigation-box");
-		}
-		else if(uiStyle == "Experimental"){
+		if(uiStyle == "experimental"){
 			viewLocalNavigation(event);
+		}
+		else{
+			makeIntoPopup(".navigation-box");
 		}
 	}
 	else if (event.which==81){ //Q - opens the quest log.
