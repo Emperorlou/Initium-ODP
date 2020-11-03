@@ -807,7 +807,7 @@ public class ODPDBAccess
 		//this will validate all the characters. Filter out zambie.
 		List<CachedEntity> toReturn = new ArrayList<>();
 		for(CachedEntity c:characters) {
-			if (CommonChecks.checkCharacterIsZombie(c)) {
+			if (CommonChecks.checkCharacterIsZombie(c) == false) {
 				toReturn.add(c);
 			}
 		}
