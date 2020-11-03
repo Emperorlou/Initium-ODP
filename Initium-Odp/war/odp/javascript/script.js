@@ -2463,9 +2463,14 @@ function newCharacterFromDead(event)
 	doCommand(event, "CharacterRespawn");
 }
 
-function switchCharacter(eventObject, characterId)
+function switchCharacter(eventObject, characterId, direction)
 {
-	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function()
+
+	if(direction == undefined){
+		direction = null;
+	}
+
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId, "direction":directon},function()
 	{
 		if (location.href.indexOf("/main.jsp")>-1)
 			window.history.replaceState({}, document.title, "/" + "main.jsp");		
@@ -3626,68 +3631,6 @@ function newGuardSetting(event, entity, type, attack)
 {
 	doCommand(event, "GuardNewSetting", {entityKey:entity, type:type, attack:attack});
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ////////////////////////////////////////////////////////
 // COMMANDS
@@ -4916,21 +4859,48 @@ $(document).keyup(function(event){
 	{
 		viewProfile();
 	}
-	else if (event.which==76) // Changed to L since B is now for Nearby Characters list
-	{
-		window.location.href='main.jsp';
+	//user can just refresh the page. besides, this breaks on experimental.
+	//else if (event.which==76) // Changed to L since B is now for Nearby Characters list
+	//{
+	//	window.location.href='main.jsp';
+	//}
+	else if (event.which==85){ // U - go up in character list
+		switchCharacter(event, null, 1);
+	}
+	else if (event.which==74){ // J - go down in character list
+		switchCharacter(event, null, 2);
+	}
+	else if (event.which==75){ // K - iterate through characters in same acc and party
+		switchCharacter(event, null, 3);
+	}
+	else if (event.which==76){ // L - switch to party leader if possible
+		switchCharacter(event, null, 4);
+	}
+	else if (event.which==88){ // X - open the invention window.
+		viewInvention(event);
+	}
+	else if (event.which==78){ // N - opens the navigation window.
+		if(uiStyle == "Classic UI"){
+			makeIntoPopup(".navigation-box");
+		}
+		else if(uiStyle == "Experimental"){
+			viewLocalNavigation(event);
+		}
+	}
+	else if (event.which==81){ //Q - opens the quest log.
+		viewQuests();
+	}
+	else if (event.which==72){ // H - opens the hotkey window.
+		openHotkeyWindow();
+	}
+	else if(event.which==65){ // A - aborts the current long operation.
+		cancelLongOperations(); //i tested, and sending this with no parameters DOES work
 	}
 });
 
-
-
-
-
-
-
-
-
-
+function openHotkeyWindow(){
+	pagePopup("/odp/hotkeys.html", null, "Hotkeys");
+}
 
 function secondsElapsed(secondsToConvert)
 {
