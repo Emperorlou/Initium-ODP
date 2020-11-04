@@ -105,7 +105,7 @@ public class CommandSwitchCharacter extends Command {
 						if(GameUtils.equals(userCharsInParty.get(i), currentCharacter)) {
 							
 							//if we're at the end index, go back to 0.
-							if(i + 1 == userCharsInParty.size()) {
+							if(i - 1 == userCharsInParty.size()) {
 								targetCharacterId = userCharsInParty.get(0).getId();
 								break;
 							}
