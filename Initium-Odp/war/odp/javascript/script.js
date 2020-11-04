@@ -2466,7 +2466,7 @@ function newCharacterFromDead(event)
 function switchCharacter(eventObject, characterId, direction)
 {
 	direction = direction || 0;
-	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId, "direction":directon},function()
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId, "direction":direction},function()
 	{
 		if (location.href.indexOf("/main.jsp")>-1)
 			window.history.replaceState({}, document.title, "/" + "main.jsp");		
