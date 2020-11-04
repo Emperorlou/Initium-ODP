@@ -69,6 +69,7 @@ public class CommandSwitchCharacter extends Command {
 					targetCharacterId = characters.get((i+ characters.size() + dir) % characters.size()).getId();
 					break;
 				}
+				break;
 			case 3:
 			case 4:
 				//here, we need to grab all the partied characters. then, filter by userkey.
@@ -104,7 +105,7 @@ public class CommandSwitchCharacter extends Command {
 						if(GameUtils.equals(userCharsInParty.get(i), currentCharacter)) {
 							
 							//if we're at the end index, go back to 0.
-							if(i == userCharsInParty.size()) {
+							if(i + 1 == userCharsInParty.size()) {
 								targetCharacterId = userCharsInParty.get(0).getId();
 								break;
 							}
