@@ -63,7 +63,7 @@ public class CommandSwitchCharacter extends Command {
 				List<CachedEntity> characters = db.getAlphabetSortedValidCharactersByUser(user.getKey());
 				
 				for(int i = 0; i < characters.size(); i++) {
-					if(!GameUtils.equals(characters.get(0).getKey(), currentCharacter.getKey())) continue;
+					if(!GameUtils.equals(characters.get(i).getKey(), currentCharacter.getKey())) continue;
 					
 					int dir = direction == 1 ? -1 : 1;
 					targetCharacterId = characters.get((i+ characters.size() + dir) % characters.size()).getId();
