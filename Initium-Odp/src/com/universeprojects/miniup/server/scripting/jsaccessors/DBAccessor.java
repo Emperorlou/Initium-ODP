@@ -290,16 +290,18 @@ public class DBAccessor {
 		db.doMoveItem(null, null, currentCharacter.wrappedEntity, item.wrappedEntity, newContainer.wrappedEntity);
 	}
 	
-	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter)
+	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter, ScriptEvent currentEvent)
 	{
-		return destroyItem(item, currentCharacter, currentCharacter.getName()+"'s "+item.getName()+" was so badly damaged it has been destroyed.");
+		return destroyItem(item, currentCharacter, currentCharacter.getName()+"'s "+item.getName()+" was so badly damaged it has been destroyed.", currentEvent);
 	}
 	
-	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter, String destroyMessage)
+	public boolean destroyItem(EntityWrapper item, EntityWrapper currentCharacter, String destroyMessage, ScriptEvent currentEvent)
 	{
-		db.doDestroyEquipment(null, currentCharacter.wrappedEntity, item.wrappedEntity);
+		unequipItem(item, currentCharacter);
+		currentEvent.deleteEntity(item);
+		
 		if(destroyMessage != null && destroyMessage.length() > 0)
-			db.sendGameMessage(db.getDB(), currentCharacter.wrappedEntity, "<div class='equipment-destroyed-notice'>"+destroyMessage+"</div>");
+			currentEvent.sendGameMessage(currentCharacter, "<div class='equipment-destroyed-notice'>"+destroyMessage+"</div>");
 		return true;
 	}
 	
@@ -326,14 +328,14 @@ public class DBAccessor {
 	 * Creates a blank entity to work with in script context. This is to be used with
 	 * caution, and should ONLY be used when creating an item (not modifying existing
 	 * items). If uniqueName is omitted, will allow duplicates to be created.
-	 * @param kind Only "Item" and "Location" are currently allowed.
+	 * @param kind Only "Item", "Location" and "Path" are currently allowed.
 	 * @param uniqueName Distinct name, to ensure only 1 of this item EVER gets created.
 	 * @return The EntityWrapper item we want to create. Keep in mind that the only way
 	 * to get the raw entity in script context is if it's a new entity.
 	 */
 	public EntityWrapper createEntity(String kind, String uniqueName)
 	{
-		if(!Arrays.asList("Item","Location").contains(kind))
+		if(!Arrays.asList("Item","Location","Path").contains(kind))
 			throw new RuntimeException("Invalid kind specified for CachedEntity!");
 		
 		CachedDatastoreService ds = db.getDB();
@@ -401,6 +403,21 @@ public class DBAccessor {
 		}
 		
 		return createItemInternal(defList.get(0));
+	}
+	
+	public EntityWrapper createItemForChar(Long defID, Character character) {
+		Item newItem = (Item) createItemFromId(defID);
+		newItem.setContainer(character);
+		newItem.wrappedEntity.setProperty("hardcoreMode", character.isHardcore());
+		
+		return newItem;
+	}
+	public EntityWrapper createItemForChar(String defName, Character character) {
+		Item newItem = (Item) createItemFromDef(defName);
+		newItem.setContainer(character);
+		newItem.wrappedEntity.setProperty("hardcoreMode", character.isHardcore());
+		
+		return newItem;
 	}
 	
 	private EntityWrapper createItemInternal(CachedEntity itemDef)
