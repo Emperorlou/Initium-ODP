@@ -405,14 +405,14 @@ public class DBAccessor {
 		return createItemInternal(defList.get(0));
 	}
 	
-	public EntityWrapper createItemForChar(Long defID, Character character) {
+	public EntityWrapper createCharacterItem(Long defID, Character character) {
 		Item newItem = (Item) createItemFromId(defID);
 		newItem.setContainer(character);
 		newItem.wrappedEntity.setProperty("hardcoreMode", character.isHardcore());
 		
 		return newItem;
 	}
-	public EntityWrapper createItemForChar(String defName, Character character) {
+	public EntityWrapper createCharacterItem(String defName, Character character) {
 		Item newItem = (Item) createItemFromDef(defName);
 		newItem.setContainer(character);
 		newItem.wrappedEntity.setProperty("hardcoreMode", character.isHardcore());
