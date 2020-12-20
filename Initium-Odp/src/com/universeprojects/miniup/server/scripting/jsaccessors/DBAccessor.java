@@ -348,6 +348,7 @@ public class DBAccessor {
 		}
 		
 		CachedEntity newEnt = new CachedEntity(kind, ds);
+		newEnt.setProperty("name", uniqueName);
 		EntityWrapper wrapped = ScriptService.wrapEntity(newEnt, db);
 		wrapped.isNewEntity = true;
 		return wrapped;
