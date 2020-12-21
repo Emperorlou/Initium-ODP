@@ -734,12 +734,12 @@ public class MainPageUpdateService extends Service
 
 				destLocations = new ArrayList<>();
 				for(CachedEntity path:paths)
-				if (GameUtils.equals(location.getKey(), path.getProperty("location1Key")))
-					destLocations.add(db.pool.get(path.getProperty("location2Key")));
-				else if (GameUtils.equals(location.getKey(), path.getProperty("location2Key")))
-					destLocations.add(db.pool.get(path.getProperty("location1Key")));
-				else
-					destLocations.add(null);
+					if (GameUtils.equals(location.getKey(), path.getProperty("location1Key")))
+						destLocations.add(db.pool.get(path.getProperty("location2Key")));
+					else if (GameUtils.equals(location.getKey(), path.getProperty("location2Key")))
+						destLocations.add(db.pool.get(path.getProperty("location1Key")));
+					else
+						destLocations.add(null);
 			}
 			
 			
