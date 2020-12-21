@@ -1174,6 +1174,11 @@ function helpPopup()
 	pagePopup("/odp/chatHelp.html", null, "Chat Help");
 }
 
+function openMechanicsPage()
+{
+	pagePopup("/odp/mechanics.jsp", null, "Mechanics");
+}
+
 
 function shareItem(itemId)
 {
