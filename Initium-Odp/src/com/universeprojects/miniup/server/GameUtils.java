@@ -226,6 +226,8 @@ public class GameUtils
         for (String key : properties.keySet()) {
             toReturn.setProperty(key, properties.get(key));
         }
+        
+        return toReturn;
     }
 
 	public static void addMessageForClient(HttpServletRequest request, String message)
