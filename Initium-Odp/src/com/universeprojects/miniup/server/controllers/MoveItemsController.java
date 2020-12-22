@@ -89,9 +89,9 @@ public class MoveItemsController extends PageController {
 		
 		// Verify container access.
 		ContainerService cs = new ContainerService(db);	
-		if (cs.checkContainerAccessAllowed(character, selfSide)==false)
+		if (cs.checkContainerAccessAllowed(character, selfSide, true)==false)
 			throw new RuntimeException("Hack attempt might have happened.");
-		if (cs.checkContainerAccessAllowed(character, otherSide)==false)
+		if (cs.checkContainerAccessAllowed(character, otherSide, true)==false)
 			throw new RuntimeException("Hack attempt might have happened.");
 
 		// Can we transfer gold too?

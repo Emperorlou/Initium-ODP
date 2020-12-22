@@ -63,7 +63,7 @@ public class CommandDogeCoinsCollectFromItem extends TransactionCommand {
 
 		ContainerService cs = new ContainerService(db);
 		
-		if(cs.checkContainerAccessAllowed(character, itemContainer)==false)
+		if(cs.checkContainerAccessAllowed(character, itemContainer, true)==false)
 			throw new UserErrorMessage("Character does not have access to this container");
 
 		Long characterCoins = (Long)character.getProperty("dogecoins");

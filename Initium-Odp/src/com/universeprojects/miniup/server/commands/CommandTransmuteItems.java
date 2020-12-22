@@ -58,7 +58,7 @@ public class CommandTransmuteItems extends Command {
 		
 		CachedEntity container = db.getEntity(containerKey);
 		
-		if (cs.checkContainerAccessAllowed(character, container)==false)
+		if (cs.checkContainerAccessAllowed(character, container, true)==false)
 			throw new UserErrorMessage("You do not have access to this container.");
 		
 		if (GameUtils.equals(container.getProperty("transmuteEnabled"), true)==false)

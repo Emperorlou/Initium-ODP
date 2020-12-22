@@ -38,7 +38,7 @@ public class CommandItemsSwapStorageContainers extends CommandItemsBase {
 			for(CachedEntity item : batchItems){					
 				if(!GameUtils.isStorageItem(item))
 					throw new UserErrorMessage("You must select two storage items to swap.");
-				if(!cs.checkContainerAccessAllowed(character, item))
+				if(!cs.checkContainerAccessAllowed(character, item, true))
 					throw new UserErrorMessage("You do not have access to one of these containers.");
 			}
 			

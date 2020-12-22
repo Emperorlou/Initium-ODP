@@ -126,7 +126,7 @@ public abstract class CommandScriptBase extends Command {
 			{
 				ContainerService cs = new ContainerService(db);
 				
-				if(cs.checkContainerAccessAllowed(character, entitySource)==false)
+				if(cs.checkContainerAccessAllowed(character, entitySource, true)==false)
 					throw new UserErrorMessage("This item is not within your reach!");
 				break;
 			}

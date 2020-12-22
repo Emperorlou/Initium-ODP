@@ -73,7 +73,7 @@ public class CommandDogeCoinsCollectFromCharacter extends TransactionCommand {
 		
 		// Check whether character can access this body's container/location.
 		CachedEntity otherCharacterLocation = db.getEntity((Key)collectFromCharacter.getProperty("locationKey"));
-		if(cs.checkContainerAccessAllowed(character, otherCharacterLocation)==false)
+		if(cs.checkContainerAccessAllowed(character, otherCharacterLocation, true)==false)
 			throw new UserErrorMessage("You cannot collect coins from this body because you're not in the same location as it.");
 		
 		Long characterCoins = (Long)character.getProperty("dogecoins");

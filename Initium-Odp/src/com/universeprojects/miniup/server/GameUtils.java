@@ -1114,7 +1114,7 @@ public class GameUtils
 		if (GameUtils.isStorageItem(item))
 		{
 			ContainerService cs = new ContainerService(db);
-			if (cs.checkContainerAccessAllowed(currentChar, item)) sb.append("	<p class='main-item-controls' style='display:block;margin:5px;'><a alt='Rename this item' onclick='doSetLabel(event, "
+			if (cs.checkContainerAccessAllowed(currentChar, item, true)) sb.append("	<p class='main-item-controls' style='display:block;margin:5px;'><a alt='Rename this item' onclick='doSetLabel(event, "
 					+ item.getId() + ")' style='font-size:13px;'>Rename</a></p>\r\n");
 		}
 

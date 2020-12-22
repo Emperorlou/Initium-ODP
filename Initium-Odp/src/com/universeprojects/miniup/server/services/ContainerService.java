@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.services;
 import java.util.Date;
 import java.util.List;
 
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
@@ -50,9 +51,11 @@ public class ContainerService extends Service {
 	 * This is for stuff that allows access to a given container (location, item, or character). Returns false if access should not be allowed.
 	 * @param character
 	 * @param container
+	 * @param checkNested TODO
 	 * @return
+	 * @throws EntityNotFoundException 
 	 */
-	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container)
+	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container, boolean checkNested)
 	{
 		// If the container is ourselves, it's ok
 		if (container.getKind().equals("Character") && GameUtils.equals(character.getKey(), container.getKey()))
@@ -69,6 +72,15 @@ public class ContainerService extends Service {
 		// If the container is an item in our location, it's ok
 		if (container.getKind().equals("Item") && GameUtils.equals(character.getProperty("locationKey"), container.getProperty("containerKey")))
 			return true;
+		
+		if(checkNested) {
+			//check for nested containers
+			if(container.getKind().equals("Item")) {
+				for(int i = 0; i != 4; i++) {
+					if(checkContainerAccessAllowed(character, db.getEntity((Key) container.getProperty("containerKey")), false)) return true;
+				}
+			}
+		}
 		
 		return false;
 	}

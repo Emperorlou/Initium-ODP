@@ -2805,9 +2805,9 @@ public class ODPDBAccess
 
 		ContainerService cs = new ContainerService(this);
 		
-		if (cs.checkContainerAccessAllowed(character, startContainer)==false)
+		if (cs.checkContainerAccessAllowed(character, startContainer, true)==false)
 			throw new UserErrorMessage("Hey!");
-		if (cs.checkContainerAccessAllowed(character, newContainer)==false)
+		if (cs.checkContainerAccessAllowed(character, newContainer, true)==false)
 			throw new UserErrorMessage("Hey!");
 
 		Long itemQuantity = (Long)item.getProperty("quantity");
@@ -2969,10 +2969,9 @@ public class ODPDBAccess
 				
 				// Items can only be picked up from item-containers if the character is currently in the same location as said container
 				// OR if the container is in the character's inventory
-				if (GameUtils.equals(characterPickingUp.getProperty("locationKey"), oldContainer.getProperty("containerKey"))==false && 
-						GameUtils.equals(characterPickingUp.getKey(), oldContainer.getProperty("containerKey"))==false)
+				if(cs.checkContainerAccessAllowed(characterPickingUp, oldContainer, true))
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
-				
+
 				// Check if the character can actually carry something else or if its all too heavy...
 				// And if quantity is specified, measure for specified quantity rather than whole stack
 				Long itemWeight = (requestQuantity != null) ? requestQuantity*itemSingleWeight : getItemWeight(item);

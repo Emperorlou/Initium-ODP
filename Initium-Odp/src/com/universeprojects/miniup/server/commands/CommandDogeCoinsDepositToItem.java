@@ -71,7 +71,7 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 
 		ContainerService cs = new ContainerService(db);
 		
-		if(cs.checkContainerAccessAllowed(character, itemContainer)==false)
+		if(cs.checkContainerAccessAllowed(character, itemContainer, true)==false)
 			throw new UserErrorMessage("Character does not have access to this container");
 
 		Long containerCoins = (Long)item.getProperty("dogecoins");

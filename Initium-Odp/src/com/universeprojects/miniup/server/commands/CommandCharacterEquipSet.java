@@ -56,7 +56,7 @@ public class CommandCharacterEquipSet extends Command {
 		if (character == null)
 			throw new IllegalArgumentException("Character cannot be null.");
 		
-		if (cs.checkContainerAccessAllowed(character, container) == false)
+		if (cs.checkContainerAccessAllowed(character, container, true) == false)
 			throw new UserErrorMessage(
 					"You do not have access to this container.");
 

@@ -353,7 +353,7 @@ public class ViewItemController extends PageController {
 		if(GameUtils.isStorageItem(item))
 		{
 			ContainerService cs = new ContainerService(db);
-			itemMap.put("isContainer", cs.checkContainerAccessAllowed(currentChar, item));
+			itemMap.put("isContainer", cs.checkContainerAccessAllowed(currentChar, item, true));
 		}
 		else
 			itemMap.put("isContainer", false);
