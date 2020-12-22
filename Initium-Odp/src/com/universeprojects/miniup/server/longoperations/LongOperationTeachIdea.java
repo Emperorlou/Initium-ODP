@@ -18,7 +18,6 @@ public class LongOperationTeachIdea extends LongOperation{
 
 	public LongOperationTeachIdea(ODPDBAccess db, Map<String, String[]> requestParameters) throws UserErrorMessage {
 		super(db, requestParameters);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -90,8 +89,8 @@ public class LongOperationTeachIdea extends LongOperation{
 			for(CachedEntity student : students) {
 				//make sure the student is still valid. Ensure that they're still in learn mode, and that they're still in the same location.
 				
-				if(GameUtils.equals(student.getProperty("locationKey"), character.getProperty("locationKey"))) continue;
-				if(GameUtils.equals(student.getProperty("mode"), "LEARNING")) continue; //not sure if this is how we want to do this.
+				if(GameUtils.equals(student.getProperty("locationKey"), character.getProperty("locationKey")) == false) continue;
+				if(GameUtils.equals(student.getProperty("mode"), "LEARNING") == false) continue; //not sure if this is how we want to do this.
 				
 				//get all ideas that this character has. If they dont already have this idea, give it to them.
 				
