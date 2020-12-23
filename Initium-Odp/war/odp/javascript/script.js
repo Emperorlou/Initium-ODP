@@ -2592,6 +2592,11 @@ function viewQuests()
 	pagePopup("/odp/questlist", null, "Available Quests");
 }
 
+function pinQuest(id)
+{
+	doCommand(event, "PinQuest", {questId:id})
+}
+
 function viewQuest(keyString)
 {
 	createQuestWindow("<div id='quest-id-"+keyString+"'><div style='text-align:center'><img src='/javascript/images/wait.gif' border=0/></div></div>");

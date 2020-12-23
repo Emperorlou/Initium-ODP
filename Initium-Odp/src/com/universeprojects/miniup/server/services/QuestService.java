@@ -132,6 +132,12 @@ public class QuestService extends Service
 		return activeQuests;
 	}
 	
+	public QuestEntity getPinnedQuest() {
+		CachedEntity rawQuest = db.getEntity((Key) character.getProperty("pinnedQuest"));
+		if(rawQuest == null) return null;
+		return new QuestEntity(db, rawQuest);
+	}
+	
 	public QuestEntity createQuestInstance(Key questDefKey)
 	{
 		QuestEntity quest = new QuestEntity(db, character.getKey(), questDefKey);
