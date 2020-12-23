@@ -100,7 +100,8 @@ public class NPCArmyService extends Service
 
 	public void setPropagationCount(long propagationCount)
 	{
-		if(false == propagateInfinitely()) npcArmy.setProperty("propagationCount", propagationCount);
+		if(Boolean.TRUE.equals(propagateInfinitely())) return;
+		npcArmy.setProperty("propagationCount", propagationCount);
 	}
 
 	public double getSpawnsPerTick()
