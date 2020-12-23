@@ -226,6 +226,16 @@ public class DBAccessor {
 	{
 		return KeyFactory.createKey(kind, id);
 	}
+	
+	/**
+	 * Use this for comparing keys
+	 * @param object1
+	 * @param object1
+	 * @return
+	 */
+	public boolean equals(Object object1, Object object1) {
+		return GameUtils.equals(object1, object1);
+	}
 
 	public boolean setInternalName(EntityWrapper wrapper, String newInternalName)
 	{
