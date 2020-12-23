@@ -25,6 +25,7 @@ import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
 import com.universeprojects.miniup.server.scripting.wrappers.Buff;
 import com.universeprojects.miniup.server.scripting.wrappers.Discovery;
 import com.universeprojects.miniup.server.scripting.wrappers.Item;
+import com.universeprojects.miniup.server.scripting.wrappers.Knowledge;
 import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
@@ -113,6 +114,8 @@ public class ScriptService extends Service
 				return new Path(ce, db);
 			case "Discovery":
 				return new Discovery(ce, db);
+			case "Knowledge":
+				return new Knowledge(ce, db);
 			default: 
 				throw new RuntimeException("Entity does not support scripting.");
 		}

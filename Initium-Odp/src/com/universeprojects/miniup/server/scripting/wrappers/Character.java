@@ -19,6 +19,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -34,6 +35,8 @@ public class Character extends EntityWrapper
 	private Map<String, Item> equippedInventory = null;
 	private List<Character> carriedCharacters = null;
 	private Group characterGroup = null;
+	
+	private ODPKnowledgeService knowledgeService = null;
 	
 	public Character(CachedEntity character, ODPDBAccess db) 
 	{
@@ -398,5 +401,65 @@ public class Character extends EntityWrapper
 		}
 		
 		return characterGroup;
+	}
+	
+	/*################# KNOWLEDGE ###################*/
+	public Knowledge getKnowledgeByName(String name) {
+		CachedEntity toReturn = getKS().fetchKnowledgeByName(name);
+		if(toReturn == null) return null;
+		else return new Knowledge(toReturn, db);
+	}
+	
+	/**
+	 * Fetch all knowledge entities associated with this character.
+	 * @return
+	 */
+	public Knowledge[] getAllKnowledge(){
+		List<Knowledge> toReturn = new ArrayList<>();
+		for(CachedEntity ce : getKS().getAllKnowledge()) 
+			toReturn.add(new Knowledge(ce, db));
+		
+		return toReturn.toArray(new Knowledge[toReturn.size()]);
+	}
+	
+	/**
+	 * Fetchs the knowledge chain for an item. Creates it if it doesnt exist.
+	 * @param item
+	 * @return
+	 */
+	public Knowledge[] getKnowledgeForItem(Item item) {
+		return getKnowledgeForItem(item, true);
+	}
+	
+	/**
+	 * Fetchs the knowledge chain for an item.
+	 * @param item
+	 * @param createIfNoExist
+	 * @return
+	 */
+	public Knowledge[] getKnowledgeForItem(Item item, boolean createIfNoExist) {
+		List<Knowledge> toReturn = new ArrayList<>();
+		for(CachedEntity ce : getKS().getKnowledgeEntitiesFor(item.getEntity(), createIfNoExist)) 
+			toReturn.add(new Knowledge(ce, db));
+		
+		return toReturn.toArray(new Knowledge[toReturn.size()]);
+	}
+	
+	/**
+	 * Increase the knowledge for a particular item.
+	 * @param item
+	 * @param amount
+	 * @param percentageCap - what percent of the knowledge cap can you get from this increase?
+	 * @return
+	 */
+	public boolean increaseKnowledgeFor(Item item, int amount, int percentageCap) {
+		return getKS().increaseKnowledgeFor(item.getEntity(), amount, percentageCap);
+	}
+	
+	private ODPKnowledgeService getKS() {
+		if(knowledgeService == null)
+			knowledgeService = db.getKnowledgeService(wrappedEntity.getKey());
+		
+		return knowledgeService;
 	}
 }
