@@ -405,7 +405,7 @@ public class Character extends EntityWrapper
 	
 	/*################# KNOWLEDGE ###################*/
 	public Knowledge getKnowledgeByName(String name) {
-		CachedEntity toReturn = getKS().fetchKnowledgeByName(name);
+		CachedEntity toReturn = getKnowledgeService().fetchKnowledgeByName(name);
 		if(toReturn == null) return null;
 		else return new Knowledge(toReturn, db);
 	}
@@ -416,7 +416,7 @@ public class Character extends EntityWrapper
 	 */
 	public Knowledge[] getAllKnowledge(){
 		List<Knowledge> toReturn = new ArrayList<>();
-		for(CachedEntity ce : getKS().getAllKnowledge()) 
+		for(CachedEntity ce : getKnowledgeService().getAllKnowledge()) 
 			toReturn.add(new Knowledge(ce, db));
 		
 		return toReturn.toArray(new Knowledge[toReturn.size()]);
@@ -439,7 +439,7 @@ public class Character extends EntityWrapper
 	 */
 	public Knowledge[] getKnowledgeForItem(Item item, boolean createIfNoExist) {
 		List<Knowledge> toReturn = new ArrayList<>();
-		for(CachedEntity ce : getKS().getKnowledgeEntitiesFor(item.getEntity(), createIfNoExist)) 
+		for(CachedEntity ce : getKnowledgeService().getKnowledgeEntitiesFor(item.getEntity(), createIfNoExist)) 
 			toReturn.add(new Knowledge(ce, db));
 		
 		return toReturn.toArray(new Knowledge[toReturn.size()]);
@@ -453,10 +453,10 @@ public class Character extends EntityWrapper
 	 * @return
 	 */
 	public boolean increaseKnowledgeFor(Item item, int amount, int percentageCap) {
-		return getKS().increaseKnowledgeFor(item.getEntity(), amount, percentageCap);
+		return getKnowledgeService().increaseKnowledgeFor(item.getEntity(), amount, percentageCap);
 	}
 	
-	private ODPKnowledgeService getKS() {
+	private ODPKnowledgeService getKnowledgeService() {
 		if(knowledgeService == null)
 			knowledgeService = db.getKnowledgeService(wrappedEntity.getKey());
 		
