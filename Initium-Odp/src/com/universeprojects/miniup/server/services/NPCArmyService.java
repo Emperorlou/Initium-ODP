@@ -87,6 +87,10 @@ public class NPCArmyService extends Service
 	{
 		npcArmy.setProperty("uniqueId", uniqueId);
 	}
+	
+	public Boolean propagateInfinitely() {
+		return (Boolean) npcArmy.getProperty("propagateInfinitely");
+	}
 
 	public long getPropagationCount()
 	{
@@ -96,7 +100,7 @@ public class NPCArmyService extends Service
 
 	public void setPropagationCount(long propagationCount)
 	{
-		npcArmy.setProperty("propagationCount", propagationCount);
+		if(false == propagateInfinitely()) npcArmy.setProperty("propagationCount", propagationCount);
 	}
 
 	public double getSpawnsPerTick()
