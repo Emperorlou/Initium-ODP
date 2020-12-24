@@ -30,6 +30,7 @@ import com.universeprojects.miniup.server.scripting.wrappers.Character;
 import com.universeprojects.miniup.server.scripting.wrappers.Location;
 import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Path;
+import com.universeprojects.miniup.server.scripting.wrappers.Quest;
 
 public class ScriptService extends Service 
 {
@@ -116,6 +117,8 @@ public class ScriptService extends Service
 				return new Discovery(ce, db);
 			case "Knowledge":
 				return new Knowledge(ce, db);
+			case "Quest":
+				return new Quest(ce, db);
 			default: 
 				throw new RuntimeException("Entity does not support scripting.");
 		}

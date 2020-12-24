@@ -1,25 +1,22 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.logging.Level;
-
-import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
+import com.universeprojects.miniup.server.services.QuestService;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -37,6 +34,7 @@ public class Character extends EntityWrapper
 	private Group characterGroup = null;
 	
 	private ODPKnowledgeService knowledgeService = null;
+	private QuestService questService = null;
 	
 	public Character(CachedEntity character, ODPDBAccess db) 
 	{
@@ -461,5 +459,73 @@ public class Character extends EntityWrapper
 			knowledgeService = db.getKnowledgeService(wrappedEntity.getKey());
 		
 		return knowledgeService;
+	}
+	
+	/*################# QUESTS ###################*/	
+	/**
+	 * Grants a quest by name of the Def, and then returns it.
+	 * @param name
+	 * @return
+	 */
+	public Quest grantQuest(String name) {
+		if(true == hasQuest(name)) return getQuestByName(name);
+		
+		CachedEntity questDefEntity = db.getFilteredList("QuestDef", 1, "name", FilterOperator.EQUAL, name).get(0);
+		
+		return grantQuestInternal(questDefEntity);
+	}
+	
+	/**
+	 * Grants a quest based on the Def ID, then returns it.
+	 * @param defId
+	 * @return
+	 */
+	public Quest grantQuest(Long defId) {
+		return grantQuestInternal(db.getEntity(KeyFactory.createKey("QuestDef", defId)));
+	}
+	
+	private Quest grantQuestInternal(CachedEntity qde) {
+		if(qde == null) return null;
+		
+		QuestEntity raw = getQuestService().createQuestInstance(qde.getKey());
+				
+		return new Quest(raw, db);
+	}
+	
+	public boolean hasQuest(String name) {
+		return getQuestService().getQuestByName(name) != null;
+	}
+	
+	public Quest getQuestByName(String name) {
+		QuestEntity rawQuest = getQuestService().getQuestByName(name);
+		if(rawQuest == null) return null;
+		return new Quest(rawQuest, db);
+	}
+	
+	public Quest[] getAllQuests() {
+		List<QuestEntity> allQuests = getQuestService().getAllQuests();
+		List<Quest> toReturn = new ArrayList<>();
+		
+		for(QuestEntity quest : allQuests)
+			toReturn.add(new Quest(quest, db));
+		
+		return toReturn.toArray(new Quest[toReturn.size()]);
+	}
+	
+	public Quest[] getActiveQuests() {
+		List<QuestEntity> activeQuests = getQuestService().getActiveQuests();
+		List<Quest> toReturn = new ArrayList<>();
+		
+		for(QuestEntity quest : activeQuests)
+			toReturn.add(new Quest(quest, db));
+		
+		return toReturn.toArray(new Quest[toReturn.size()]);
+	}
+	
+	private QuestService getQuestService() {
+		if(questService == null)
+			questService = db.getQuestService(null);
+		
+		return questService;
 	}
 }

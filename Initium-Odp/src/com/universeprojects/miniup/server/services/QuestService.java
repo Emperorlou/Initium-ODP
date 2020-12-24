@@ -73,7 +73,14 @@ public class QuestService extends Service
 		return allQuests;
 	}
 	
-	
+	public QuestEntity getQuestByName(String name) {
+		for(QuestDefEntity qde : getAllQuestDefs()) {
+			if(qde.getName() == name) {
+				return qde.getQuestEntity(character.getKey());
+			}
+		}
+		return null;
+	}
 	
 	public Map<Key, QuestDefEntity> getMapOfAllQuestDefs()
 	{
