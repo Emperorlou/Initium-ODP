@@ -4272,6 +4272,15 @@ function hideBannerLoadingIcon()
 	$('#banner-loading-icon').remove();
 }
 
+function toggleCharacterWidgetVisibility()
+{
+	if (inBannerCharacterWidget.style.visibility == 'visible') {
+		inBannerCharacterWidget.style.visibility = 'hidden';
+	} else if (inBannerCharacterWidget.style.visibility == 'hidden') {
+		inBannerCharacterWidget.style.visibility = 'visible';
+	}
+}
+
 function doGoto(event, pathId, attack)
 {
 	clearMakeIntoPopup();
@@ -4279,6 +4288,7 @@ function doGoto(event, pathId, attack)
 	if (attack == null)
 		attack = false;
 	showBannerLoadingIcon();
+	toggleCharacterWidgetVisibility(); // hide
 	longOperation(event, "TakePath", {pathId:pathId,attack:attack}, 
 			function(action) // responseFunction
 			{
@@ -4286,6 +4296,7 @@ function doGoto(event, pathId, attack)
 				{
 					clearPopupPermanentOverlay(); 
 					closeAllPagePopups();
+					toggleCharacterWidgetVisibility();
 				}
 				else if (action.isComplete)
 				{
@@ -4300,7 +4311,7 @@ function doGoto(event, pathId, attack)
 					setAudioDescriptor(locationAudioDescriptor, locationAudioDescriptorPreset, isOutside);
 					clearLoopedSounds();
 					playLoopedSounds();
-					//clearPopupPermanentOverlay(); 
+					toggleCharacterWidgetVisibility();
 					//fullpageRefresh();
 				}
 				else
