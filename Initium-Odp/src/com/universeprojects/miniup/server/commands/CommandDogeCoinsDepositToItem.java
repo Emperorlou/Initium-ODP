@@ -55,11 +55,17 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 		if(item == null)
 			throw new UserErrorMessage("Item does not exist");
 		
-		Long depositAmount = GameUtils.fromShorthandNumber(parameters.get("amount").replace(",", ""));
-		if(depositAmount == null)
+		Long depositAmount;
+		if (parameters.get("amount") == "") {
+			depositAmount = (Long)character.getProperty("dogecoins");
+		} else {
+			depositAmount = GameUtils.fromShorthandNumber(parameters.get("amount").replace(",", ""));
+		}
+		
+		if(depositAmount == null) 
 			throw new UserErrorMessage("Please type a valid gold amount.");
 		else if(depositAmount < 0)
-			throw new UserErrorMessage("Cannot deposit a negative amount");
+			throw new UserErrorMessage("Cannot deposit a negative amount.");
 
 		Long characterCoins = (Long)character.getProperty("dogecoins");
 		if(depositAmount > characterCoins)
