@@ -4274,6 +4274,9 @@ function hideBannerLoadingIcon()
 
 function doGoto(event, pathId, attack)
 {
+	if (window.event.altKey)
+		return;
+		
 	clearMakeIntoPopup();
 	
 	if (attack == null)
