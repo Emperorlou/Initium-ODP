@@ -233,8 +233,8 @@ public class DBAccessor {
 	 * @param object1
 	 * @return
 	 */
-	public boolean equals(Object object1, Object object1) {
-		return GameUtils.equals(object1, object1);
+	public boolean equals(Object object1, Object object2) {
+		return GameUtils.equals(object1, object2);
 	}
 
 	public boolean setInternalName(EntityWrapper wrapper, String newInternalName)
