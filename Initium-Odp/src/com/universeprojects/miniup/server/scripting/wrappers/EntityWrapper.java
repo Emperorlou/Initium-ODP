@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
-import java.security.spec.DSAGenParameterSpec;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,8 +8,6 @@ import java.util.logging.Level;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PropertyContainer;
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.GameUtils;
@@ -48,6 +45,13 @@ public class EntityWrapper extends BaseWrapper
 	 */
 	public boolean validMessageTarget() {
 		return false;
+	}
+	
+	public boolean compareDefinition(Long id) {
+		if(wrappedEntity.hasProperty("_definitionKey") == false) return false;
+		Key key = (Key) getProperty("_definitionKey");
+		
+		return key.getId() == id;
 	}
 	
 	public boolean hasCharges()
