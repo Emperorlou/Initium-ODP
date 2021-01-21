@@ -47,9 +47,14 @@ public class EntityWrapper extends BaseWrapper
 		return false;
 	}
 	
+	public Key getDefKey() {
+		return (Key) getProperty("_definitionKey");
+	}
+	
 	public boolean compareDefinition(Long id) {
-		if(wrappedEntity.hasProperty("_definitionKey") == false) return false;
-		Key key = (Key) getProperty("_definitionKey");
+		Key key = getDefKey();
+		
+		if(key == null) return false;
 		
 		return key.getId() == id;
 	}
