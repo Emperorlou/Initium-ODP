@@ -308,6 +308,9 @@ public class CommandCombatAttack extends Command
 				if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
 					db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
 				
+				for(CachedEntity ce : db.getParty(ds, character))
+					db.queueMainPageUpdateForCharacter(ce.getKey(), "updateFullPage_shortcut");
+				
 			}
 			else
 			{

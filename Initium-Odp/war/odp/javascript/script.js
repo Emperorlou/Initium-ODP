@@ -4860,16 +4860,16 @@ $(document).keyup(function(event){
 	//{
 	//	window.location.href='main.jsp';
 	//}
-	else if (event.ctrlKey && event.which==85){ // U - go up in character list
+	else if (event.altKey && event.which==85){ // U - go up in character list
 		switchCharacter(event, null, 1);
 	}
-	else if (event.ctrlKey && event.which==74){ // J - go down in character list
+	else if (event.altKey && event.which==74){ // J - go down in character list
 		switchCharacter(event, null, 2);
 	}
-	else if (event.ctrlKey && event.which==75){ // K - iterate through characters in same acc and party
+	else if (event.altKey && event.which==75){ // K - iterate through characters in same acc and party
 		switchCharacter(event, null, 3);
 	}
-	else if (event.ctrlKey && event.which==76){ // L - switch to party leader if possible
+	else if (event.altKey && event.which==76){ // L - switch to party leader if possible
 		switchCharacter(event, null, 4);
 	}
 	else if (event.which==88){ // X - open the invention window.
