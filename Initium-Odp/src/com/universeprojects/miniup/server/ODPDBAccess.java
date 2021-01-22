@@ -5206,9 +5206,6 @@ public class ODPDBAccess
 						setPartiedField(party, attackingCharacterFinal, "combatType", null);
 						setPartiedField(party, attackingCharacterFinal, "locationEntryDatetime", new Date());
 						
-						for(CachedEntity ce : party) 
-							sendMainPageUpdateForCharacter(ds, ce.getKey(), "updateFullPage_shortcut");
-						
 					}
 					
 					////////////////////////
@@ -5357,6 +5354,9 @@ public class ODPDBAccess
 					db.put(attackingCharacterFinal);
 					if (party != null) {
 						putPartyMembersToDB_SkipSelf(db, party, attackingCharacterFinal);
+						
+						for(CachedEntity ce : party) 
+							sendMainPageUpdateForCharacter(ds, ce.getKey(), "updateFullPage_shortcut");
 					}
 					
 					Map<String, Object> result = new HashMap<String, Object>();
