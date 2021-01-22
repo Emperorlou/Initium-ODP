@@ -5205,6 +5205,10 @@ public class ODPDBAccess
 						setPartiedField(party, attackingCharacterFinal, "combatant", null);
 						setPartiedField(party, attackingCharacterFinal, "combatType", null);
 						setPartiedField(party, attackingCharacterFinal, "locationEntryDatetime", new Date());
+						
+						for(CachedEntity ce : party) 
+							sendMainPageUpdateForCharacter(ds, ce.getKey(), "updateFullPage_shortcut");
+						
 					}
 					
 					////////////////////////
