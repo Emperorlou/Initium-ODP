@@ -79,9 +79,6 @@ public class CommandGroupDelete extends Command
 
 		db.doLeaveGroup(ds, character); // Sets group properties to null
 
-		ds.put(character); // This is a bit redundant since it happens in
-							// doLeaveGroup but I'll leave it anyways
-
 		setPopupMessage(groupName + " has been deleted.");
 	}
 }
