@@ -5354,9 +5354,6 @@ public class ODPDBAccess
 					db.put(attackingCharacterFinal);
 					if (party != null) {
 						putPartyMembersToDB_SkipSelf(db, party, attackingCharacterFinal);
-						
-						for(CachedEntity ce : party) 
-							sendMainPageUpdateForCharacter(ds, ce.getKey(), "updateFullPage_shortcut");
 					}
 					
 					Map<String, Object> result = new HashMap<String, Object>();
