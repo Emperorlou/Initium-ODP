@@ -793,8 +793,7 @@ public class ODPDBAccess
 	 * @return
 	 */
 	public List<CachedEntity> getAlphabetSortedValidCharactersByUser(Key userKey){
-		CachedEntity user = getEntity(userKey);
-		List<CachedEntity> characters = getUserCharacters(user);
+		List<CachedEntity> characters = getFilteredList("Character", "userKey", userKey);
 		Collections.sort(characters, new Comparator<CachedEntity>()
 		{
 			@Override
@@ -806,10 +805,15 @@ public class ODPDBAccess
 
 		//this will validate all the characters. Filter out zambie.
 		List<CachedEntity> toReturn = new ArrayList<>();
-		for(CachedEntity c:characters) {
-			if (CommonChecks.checkCharacterIsZombie(c) == false) {
-				toReturn.add(c);
-			}
+		for(CachedEntity ce : characters) {
+			
+			//if the character is a zombie, skip.
+			if(CommonChecks.checkCharacterIsZombie(ce)) continue;
+			
+			//if the character is both dead and the name starts with dead, skip.
+			if(((String)ce.getProperty("name")).startsWith("Dead ") && CommonChecks.checkCharacterIsDead(ce)) continue;
+			
+			toReturn.add(ce);
 		}
 
 		return toReturn;
