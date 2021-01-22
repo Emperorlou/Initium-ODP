@@ -1709,7 +1709,7 @@ public class GameUtils
 		if (leftSide)
 			nameAndBars.append("<div class='character-display-box-info'>");
 		else
-			nameAndBars.append("<div class='character-display-box-info' style='text-align:right;max-width:100px; overflow: hidden;'>");
+			nameAndBars.append("<div class='character-display-box-info' style='text-align:right;max-width:100px; overflow: hidden; position: relative'>");
 		if (isSelf)
 			nameAndBars.append("	<a id='character-switcher' class='" + hcmClass + "' onclick='viewCharacterSwitcher()' style='cursor:pointer'>" + characterName + "</a>");
 		else
