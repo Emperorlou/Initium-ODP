@@ -315,6 +315,9 @@ public class LongOperationTakePath extends LongOperation {
 			if ((path.getProperty("travelTime")!=null && ((Long)path.getProperty("travelTime"))>0) || longDistanceTravel)
 				buffedTravel = db.getPathTravelTime(path, character);
 			
+			if(buffedTravel == 0)
+				buffedTravel = 1L; //time of 0 sometimes rubberbands.
+			
 			setDataProperty("secondsToWait", buffedTravel);
 			
 			setLongOperationName("Walking to "+destination.getProperty("name"));
