@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -308,8 +309,11 @@ public class CommandCombatAttack extends Command
 				if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
 					db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
 				
-				for(CachedEntity ce : db.getParty(ds, character))
-					db.queueMainPageUpdateForCharacter(ce.getKey(), "updateFullPage_shortcut");
+				List<CachedEntity> party = db.getParty(ds, character);
+				
+				if(party != null)
+					for(CachedEntity ce : db.getParty(ds, character))
+						db.queueMainPageUpdateForCharacter(ce.getKey(), "updateFullPage_shortcut");
 				
 			}
 			else
