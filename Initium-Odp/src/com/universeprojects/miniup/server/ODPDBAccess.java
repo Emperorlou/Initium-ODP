@@ -4462,7 +4462,7 @@ public class ODPDBAccess
 
         
         CachedDatastoreService db = getDB();
-        CombatService cs = new CombatService(db);
+        CombatService cs = new CombatService(this);
 
         
         // Here we're flagging that a combat action took place so that the cron job in charge of ensuring combat keeps moving along
@@ -4496,9 +4496,9 @@ public class ODPDBAccess
         
         String status = "";
         
-        int autoRunThreshold = targetCharacter.getProperty("autoRunThreshold");
+        Integer autoRunThreshold = (Integer) targetCharacter.getProperty("autoRunThreshold");
         if(autoRunThreshold == null) autoRunThreshold = 0;
-        int autoRunChance = targetCharacter.getProperty("autoRunChance");
+        Integer autoRunChance = (Integer) targetCharacter.getProperty("autoRunChance");
         if(autoRunChance == null) autoRunChance = 0;
         
         int targetHP = (int) targetCharacter.getProperty("hitpoints");
