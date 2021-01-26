@@ -4532,7 +4532,7 @@ public class ODPDBAccess
         	// Determine whether the weapon zombifies the target.
         	boolean zombifyWeapon = weapon != null && GameUtils.booleanEquals(weapon.getProperty("zombifying"), true);
             AttackResult attackResult = attackWithWeapon(db, sourceCharacter, weapon, targetCharacter);
-            status = attackResult.status;
+            status += attackResult.status;
             int damage = attackResult.damage;
 
             // If we are dual wielding weapons, use the random crit chance to determine if we get a free second hit
