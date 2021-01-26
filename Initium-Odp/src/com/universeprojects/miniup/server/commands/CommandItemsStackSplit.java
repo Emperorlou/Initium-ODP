@@ -28,9 +28,9 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 	protected void processBatchItems(Map<String, String> parameters, ODPDBAccess db, CachedDatastoreService ds,
 			CachedEntity character, List<CachedEntity> batchItems) throws UserErrorMessage {
 		Long splitItemQuantity;
-		if (batchItems.size() > 12) {
+		if (batchItems.size() > 12) 
 			throw new UserErrorMessage("You can only split 12 items at a time.");
-		}
+		
 		ds.beginTransaction();
 		try {
 			
@@ -43,20 +43,18 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 			catch (NumberFormatException e) {
 				throw new UserErrorMessage("Please input an integer value.");
 			}
-			if (stackSize <= 0 || stacks <= 0) {
+			
+			if (stackSize <= 0 || stacks <= 0) 
 				throw new UserErrorMessage("Please input a positive integer value.");
-			}
 			
-			if(batchItems.size() > 1 && stacks > 1) {
+			if(batchItems.size() > 1 && stacks > 1) 
 				throw new UserErrorMessage("You can't split multiple items into multiple stacks.");
-			}
 			
-			if(stacks > 24) {
+			if(stacks > 24) 
 				throw new UserErrorMessage("Too many stacks. Max is 24.");
-			}
 			
 			//iterate through all of our items.
-			for(CachedEntity splitItem:batchItems) {	
+			for(CachedEntity splitItem : batchItems) {	
 				if (CommonChecks.isItemCustom(splitItem)) {
 					sendError("You cannot split a custom item.", splitItem);
 					continue;
@@ -98,8 +96,9 @@ public class CommandItemsStackSplit extends CommandItemsBase {
 				splitItem.setProperty("quantity", newStackSize);
 				ds.put(splitItem);
 				
-				ds.commit();
 			}
+			
+			ds.commit();
 		} 
 		
 		finally {
