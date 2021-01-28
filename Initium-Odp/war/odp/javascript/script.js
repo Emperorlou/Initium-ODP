@@ -866,6 +866,14 @@ function transmuteItems(eventObject, containerId)
 	doCommand(eventObject, "TransmuteItems", {"containerId":containerId});
 }
 
+function addItemFilter(eventObject, itemId){
+	doCommand(eventObject, "AddItemFilter", {"itemId":itemId});
+}
+
+function removeAllItemFilters(eventObject){
+	doCommand(eventObject, "RemoveAllItemFilters");
+}
+
 //function storeSellItem(itemId)
 //{
 //	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
