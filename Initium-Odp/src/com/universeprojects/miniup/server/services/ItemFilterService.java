@@ -12,7 +12,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 
 public class ItemFilterService extends Service{
 	
-	private final String[] qualities = new String[]{"item-junk", "item-normal", "item-rare", "item-unique", "item-magic", "item-pic", "itemm-custom"};
+	private final String[] qualities = new String[]{"item-junk", "item-normal", "item-rare", "item-unique", "item-magic", "item-epic", "item-custom"};
 	private Map<String, Integer> qualityMap = null;
 
 	public ItemFilterService(ODPDBAccess db) {
