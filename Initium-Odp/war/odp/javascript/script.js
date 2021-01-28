@@ -1039,6 +1039,11 @@ function loadInventoryAndEquipment()
 	loadInventory();
 	loadEquipment();
 }
+
+function loadItemFilterList()
+{
+	pagePopup("odp/itemfilters", null, "Item Filters");
+}
 // used to sort armor and shields
 function compareArmor (a, b) {
 	var parser = /([\-\d]+)\/([\-\d]+)\/([\-\d]+) ([EGAPMN])\/([EGAPMN])\/([EGAPMN])/;
@@ -4899,6 +4904,10 @@ $(document).keyup(function(event){
 	}
 	else if(event.which==65){ // A - aborts the current long operation.
 		cancelLongOperations(); //i tested, and sending this with no parameters DOES work
+	}
+
+	else if(event.which==73 && event.altKey){ //I and alt, loads item filters
+		loadItemFilterList();
 	}
 });
 
