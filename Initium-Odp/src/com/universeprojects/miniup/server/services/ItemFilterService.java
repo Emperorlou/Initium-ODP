@@ -49,8 +49,8 @@ public class ItemFilterService extends Service{
 		return true;
 	}
 	
-	public boolean isQualityBetterThan(String item, String filter) {
-		return getQualityMap().get(item) > getQualityMap().get(filter);
+	public boolean isQualityBetterThan(String itemQuality, String filterQuality) {
+		return getQualityMap().get(itemQuality) > getQualityMap().get(filterQuality);
 	}
 	
 	/**
@@ -74,6 +74,10 @@ public class ItemFilterService extends Service{
 	 * @return
 	 */
 	public Map<String, String> getFilters(){
-		return db.getValue_StringStringMap(db.getCurrentCharacter(), "itemFilters");
+		Map<String, String> result = db.getValue_StringStringMap(db.getCurrentCharacter(), "itemFilters");
+		if(result == null)
+			return new HashMap<>();
+		
+		return result;
 	}
 }
