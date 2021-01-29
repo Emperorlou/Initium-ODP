@@ -4572,6 +4572,27 @@ public class ODPDBAccess
             doCharacterIncreaseStat(db, sourceCharacter, "intelligence", maxStats[2], 0.5d*multiplier);
         }
         
+		//run all onattack scripts attached to the user's buffs.
+		ScriptService scriptService = ScriptService.getScriptService(this);
+		
+		Map<EmbeddedEntity, List<CachedEntity>> buffScripts = scriptService.getCharacterBuffScriptsOfType(sourceCharacter, ScriptType.onAttack);
+		
+		for(Entry<EmbeddedEntity, List<CachedEntity>> entry : buffScripts.entrySet()) {
+			//pass the embeddedentity of the buff to the script; sourceEntity is character.
+			
+			for(CachedEntity script : entry.getValue()) {
+				CombatEvent event = scriptService.generateCombatEvent(sourceCharacter, null, targetCharacter, ScriptType.onAttack);
+				
+				event.setAttribute("sourceBuff", ScriptService.wrapEntity(entry, this));
+				
+				scriptService.executeScript(event, script, sourceCharacter);
+				
+				if(!event.haltExecution) {
+					scriptService.cleanupEvent(event);
+				}
+			}
+		}
+        
         Double charDex = getCharacterDexterity(sourceCharacter);
         Double monsterDex = getCharacterDexterity(targetCharacter);
         Random rnd = new Random();
@@ -4799,29 +4820,6 @@ public class ODPDBAccess
 		if (strengthDamageBonus<0) strengthDamageBonus=0;
 		
 		
-		
-		//run all onattack scripts attached to the user's buffs.
-		ScriptService scriptService = ScriptService.getScriptService(this);
-		
-		Map<EmbeddedEntity, List<CachedEntity>> buffScripts = scriptService.getCharacterBuffScriptsOfType(sourceCharacter, ScriptType.onAttack);
-		
-		for(Entry<EmbeddedEntity, List<CachedEntity>> entry : buffScripts.entrySet()) {
-			//pass the embeddedentity of the buff to the script; sourceEntity is character.
-			
-			for(CachedEntity script : entry.getValue()) {
-				CombatEvent event = scriptService.generateCombatEvent(sourceCharacter, null, targetCharacter, ScriptType.onAttack);
-				
-				event.setAttribute("sourceBuff", ScriptService.wrapEntity(entry, this));
-				
-				scriptService.executeScript(event, script, sourceCharacter);
-				
-				if(!event.haltExecution) {
-					scriptService.cleanupEvent(event);
-				}
-			}
-		}
-		
-		
 		String weaponName = "bare hands";
 		if (weapon!=null)
 		{
@@ -4913,7 +4911,8 @@ public class ODPDBAccess
 			attackResult.status += "The attack hit! "+attackResult.damage+" damage ("+strengthDamageBonus+" was from strength"+physicalDamageBonusLine+") was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+".";
 		}
 		
-		//Run onAttackHit scripts		
+		//Run onAttackHit scripts
+		ScriptService scriptService = ScriptService.getScriptService(this);
 		List<CachedEntity> scripts = scriptService.getScriptsOfType(weapon, ScriptType.onAttackHit);
 		
 		for(CachedEntity script : scripts) {
