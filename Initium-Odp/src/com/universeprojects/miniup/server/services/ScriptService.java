@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -212,6 +214,37 @@ public class ScriptService extends Service
 	protected void finalize( ) throws Throwable
 	{
 		close();
+	}
+	
+	/**
+	 * Handles internal cleanup of scriptevent; saving/deleting entities, logging, game messages.
+	 * Game updates and operationbase merging should be handled elsewhere.
+	 * @param event
+	 */
+	public void cleanupEvent(ScriptEvent event) {
+	
+		for(CachedEntity ce : event.getSaveEntities())
+			db.getDB().put(ce);
+		
+		for(CachedEntity ce : event.getDeleteEntities())
+			db.getDB().delete(ce);
+		
+		for(Entry<Level, String> logs:event.logEntries.entrySet())
+			ScriptService.log.log(logs.getKey(), logs.getValue());
+
+		//send all the specified game messages to the appropriate characters.
+		for(Entry<Key, List<String>> messagesToSend : event.getGameMessages().entrySet()) {
+			for(String message : messagesToSend.getValue()){
+				db.sendGameMessage(db.getDB(), messagesToSend.getKey(), message);
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<CachedEntity> getScriptsOfType(CachedEntity entity, ScriptType type){
+		List<Key> scriptKeys = (List<Key>) entity.getProperty("scripts");
+		
+		return db.getScriptsOfType(scriptKeys, type);
 	}
 	
 	/**

@@ -167,15 +167,8 @@ public abstract class CommandScriptBase extends Command {
 			{
 				if(!event.haltExecution)
 				{
-					for(CachedEntity saveEntity:event.getSaveEntities())
-						ds.put(saveEntity);
-					for(CachedEntity delEntity:event.getDeleteEntities())
-						ds.delete(delEntity);
-					
+					service.cleanupEvent(event);
 					ds.commitBulkWrite();
-					
-					for(Entry<Level, String> logs:event.logEntries.entrySet())
-						ScriptService.log.log(logs.getKey(), logs.getValue());
 					
 					this.mergeOperationUpdates(event);
 					
@@ -208,14 +201,6 @@ public abstract class CommandScriptBase extends Command {
 						{
 							for(String method:update.getValue())
 								db.sendMainPageUpdateForCharacter(ds, update.getKey(), method);
-						}
-					}
-					
-
-					//send all the specified game messages to the appropriate characters.
-					for(Entry<Key, List<String>> messagesToSend : event.getGameMessages().entrySet()) {
-						for(String message : messagesToSend.getValue()){
-							db.sendGameMessage(db.getDB(), messagesToSend.getKey(), message);
 						}
 					}
 				}

@@ -49,6 +49,7 @@ import com.universeprojects.miniup.server.aspects.AspectBuffable;
 import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
+import com.universeprojects.miniup.server.scripting.events.CombatEvent;
 import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.GridMapService;
@@ -59,6 +60,7 @@ import com.universeprojects.miniup.server.services.MovementService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 import com.universeprojects.miniup.server.services.QuestService;
+import com.universeprojects.miniup.server.services.ScriptService;
 
 public class ODPDBAccess
 {
@@ -4888,6 +4890,20 @@ public class ODPDBAccess
 			attackResult.status += "The attack hit! "+attackResult.damage+" damage ("+strengthDamageBonus+" was from strength"+physicalDamageBonusLine+") was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+".";
 		}
 		
+		//Run onAttackHit scripts
+		
+		ScriptService service = ScriptService.getScriptService(this);
+		
+		List<CachedEntity> scripts = service.getScriptsOfType(weapon, ScriptType.onAttackHit);
+		
+		for(CachedEntity script : scripts) {
+			CombatEvent event = new CombatEvent(this, sourceCharacter, weapon, targetCharacter);
+			
+			service.executeScript(event, script, weapon);
+			if(!event.haltExecution)
+				service.cleanupEvent(event);
+		}
+		
 		
 		
 		// Try blocking the damage if there is any damage...
@@ -5148,7 +5164,21 @@ public class ODPDBAccess
 		for(CachedEntity block:GameUtils.roll(blockEntities, "blockChance", null, null))
 		{
 			if (block!=null)
-			{
+			{				
+				ScriptService service = ScriptService.getScriptService(this);
+				
+				List<CachedEntity> scripts = service.getScriptsOfType(block, ScriptType.onDefendHit);
+				
+				for(CachedEntity script : scripts) {
+					CombatEvent event = new CombatEvent(this, sourceCharacter, block, targetCharacter);
+										
+					service.executeScript(event, script, block);
+					
+					if(!event.haltExecution)
+						service.cleanupEvent(event);
+				}
+				
+				
 				if(updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, block))
 					break;
 			}
