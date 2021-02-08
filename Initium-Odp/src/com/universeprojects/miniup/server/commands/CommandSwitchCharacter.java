@@ -16,9 +16,9 @@ import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
-import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
 
 /**
@@ -163,14 +163,26 @@ public class CommandSwitchCharacter extends Command {
 			throw new UserErrorMessage("You cannot switch to this character, it is now a zombie.");
 		}
 
-		// Set and save new character
-		user.setProperty("characterKey", targetCharacter.getKey());
-		try {
-			ds.put(user);
-		} catch (Exception e) {
-			throw new UserErrorMessage("Error while switching character: " + e.getMessage());
-		}
 
+		//user is not multitabbed
+		if(GameUtils.equals(user.getProperty("characterKey"), currentCharacter.getKey())) {
+			// Set and save new character
+			user.setProperty("characterKey", targetCharacter.getKey());
+			try {
+				ds.put(user);
+			} catch (Exception e) {
+				throw new UserErrorMessage("Error while switching character: " + e.getMessage());
+			}
+		}
+		//user is multitabbed
+		else {
+			try {
+				WebUtils.askForRedirectClientTo("main.jsp?char=" + targetCharacter.getUrlSafeKey(), request, response);
+			} catch (Exception e) {
+				throw new UserErrorMessage("Error while switching character: " + e.getMessage());
+			}
+		}
+		
 		// Set the cached currentCharacter to target
 		request.setAttribute("characterEntity", targetCharacter);
 		
