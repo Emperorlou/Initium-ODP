@@ -42,7 +42,7 @@
 	<a onclick='changeEmailAddress("${userEmail}")'>Change your account's email address</a>
 </p>
 <p>
-	<a href='https://www.playinitium.com/resetpassword.jsp'>Reset password</a>
+	<a href='/resetpassword.jsp'>Reset password</a>
 </p>
 <p>
 	<a onclick='toggleHideUserActivity(event)' id="toggleHideUserActivity">
