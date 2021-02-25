@@ -176,12 +176,7 @@ public class CommandSwitchCharacter extends Command {
 		}
 		//user is multitabbed
 		else {
-			try {
-				String url = response.encodeRedirectURL("main.jsp?char=" + targetCharacter.getUrlSafeKey());
-				WebUtils.askForRedirectClientTo(url, request, response);
-			} catch (Exception e) {
-				throw new UserErrorMessage("Error while switching character: " + e.getMessage());
-			}
+			addJavascriptToResponse("window.characterOverride = " + targetCharacter.getUrlSafeKey() + ";");
 		}
 		
 		// Set the cached currentCharacter to target

@@ -25,29 +25,6 @@ return;
 <!-- with a "Quirks Mode" doctype is not supported. -->
 
 <html>
-<head>
-	<jsp:include page="common-head.jsp" />
-
-	<!--                                           -->
-	<!-- Any title is fine                         -->
-	<!--                                           -->
-	<title>Game Mechanics</title>
-
-	<style>
-		.boldbox a img {
-			border: solid 3px #DDDDDD;
-			max-width: 250px;
-			float: left;
-			margin: 10px;
-		}
-		p
-		{
-			margin-left:15px;
-		}
-	</style>
-
-</head>
-
 <!--                                           -->
 <!-- The body can have arbitrary html, or      -->
 <!-- you can leave the body empty if you want  -->
