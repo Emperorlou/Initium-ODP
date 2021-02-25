@@ -2473,7 +2473,7 @@ function switchCharacter(eventObject, characterId, direction)
 	direction = direction || 0;
 	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId, "direction":direction},function()
 	{
-		var charParam = window.characterOverride != null ? ("?char=" + window.characterOverride) : "";
+		var charParam = (window.characterOverride != null && window.characterOverride.length>10) ? ("?char=" + window.characterOverride) : "";
 		if (location.href.indexOf("/main.jsp")>-1)
 			window.history.replaceState({}, document.title, "/" + "main.jsp" + charParam);		
 		else if (location.href.indexOf("/odp/experimental")>-1)
