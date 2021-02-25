@@ -60,6 +60,8 @@ public class Item extends EntityWrapper
 	
 	private Item[] contents = null;
 	public Item[] getContents() {
+		Key key = (Key) this.getProperty("containerKey");
+		if(key.getKind().equals("Item")) return new Item[0];
 		if(contents != null) return contents;
 		
 		List<CachedEntity> results = db.getFilteredList("Item", "containerKey", getKey());

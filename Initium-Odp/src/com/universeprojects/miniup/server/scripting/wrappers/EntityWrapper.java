@@ -47,12 +47,12 @@ public class EntityWrapper extends BaseWrapper
 		return false;
 	}
 	
-	public Key getDefKey() {
+	public Key getDefinitionKey() {
 		return (Key) getProperty("_definitionKey");
 	}
 	
 	public boolean compareDefinition(Long id) {
-		Key key = getDefKey();
+		Key key = getDefinitionKey();
 		
 		if(key == null) return false;
 		
