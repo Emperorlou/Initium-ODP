@@ -348,6 +348,10 @@ public class Character extends EntityWrapper
 		return "COMBAT".equals(this.getProperty("mode"));
 	}
 	
+	public boolean isIncapacitated() {
+		return "DEAD".equals(this.getProperty("mode")) || "UNCONSCIOUS".equals(this.getProperty("mode"));
+	}
+	
 	public boolean isInParty()
 	{
 		return GameUtils.isCharacterInParty(this.wrappedEntity);
