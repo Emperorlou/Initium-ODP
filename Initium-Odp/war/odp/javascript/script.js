@@ -920,7 +920,7 @@ function createCampsite()
 function depositDogecoinsToItem(itemId, event)
 {
 	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", $("#mainGoldIndicator").text().replace(/,/g,""), function(amount){
-		if (amount!=null && amount!="")
+		if (amount!=null)
 		{
 			doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
 				if(error) return;
@@ -5495,12 +5495,18 @@ function mergeItemStacks(eventObject, selector)
 
 function splitItemStack(eventObject, selector)
 {
+
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+
 	promptPopup("Stack Split","Enter a stack size to create:","1",function(stackSize){
-		if (stackSize!=null&&stackSize!=""){
-			doCommand(eventObject, "ItemsStackSplit",{"itemIds":itemIds, "stackSize":stackSize});
+		if(stackSize != null && stackSize != ""){
+			promptPopup("Stack Split","Enter how many stacks you want:","1",function(stacks){
+				if(stacks != null && stacks != ""){
+					doCommand(eventObject, "ItemsStackSplit",{"itemIds":itemIds, "stackSize":stackSize, "stacks":stacks});
+				}
+			});
 		}
 	});
 }
