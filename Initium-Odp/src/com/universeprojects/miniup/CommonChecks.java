@@ -547,7 +547,7 @@ public abstract class CommonChecks
 
 	public static boolean checkLocationIsRootLocation(CachedEntity location)
 	{
-		if (GameUtils.equals(location.getProperty("type"), "Permanent") || GameUtils.equals(location.getProperty("type"), "Town"))
+		if (GameUtils.equals(location.getProperty("type"), "Permanent") || GameUtils.equals(location.getProperty("type"), "Town") || GameUtils.equals(location.getProperty("type"), "RestSite"))
 			if ("Global".equals(location.getProperty("mapComponentType")))
 				return true;
 		
