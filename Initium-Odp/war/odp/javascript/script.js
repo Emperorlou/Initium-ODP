@@ -920,7 +920,7 @@ function createCampsite()
 function depositDogecoinsToItem(itemId, event)
 {
 	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", $("#mainGoldIndicator").text().replace(/,/g,""), function(amount){
-		if (amount!=null && amount!="")
+		if (amount!=null)
 		{
 			doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
 				if(error) return;
