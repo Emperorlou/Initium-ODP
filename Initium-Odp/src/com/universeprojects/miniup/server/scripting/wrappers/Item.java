@@ -58,6 +58,25 @@ public class Item extends EntityWrapper
 		return true;
 	}
 	
+	private Item[] contents = null;
+	public Item[] getContents() {
+		Key key = (Key) this.getProperty("containerKey");
+		if(key.getKind().equals("Item")) return new Item[0];
+		if(contents != null) return contents;
+		
+		List<CachedEntity> results = db.getFilteredList("Item", "containerKey", getKey());
+				
+		List<Item> toReturn = new ArrayList<>();
+		
+		for(CachedEntity ce : results) {
+			toReturn.add((Item) ScriptService.wrapEntity(ce, db));
+		}
+		
+		contents = toReturn.toArray(new Item[toReturn.size()]);
+		
+		return contents;
+	}
+	
 	public Long getQuantity()
 	{
 		return (Long)this.getProperty("quantity");

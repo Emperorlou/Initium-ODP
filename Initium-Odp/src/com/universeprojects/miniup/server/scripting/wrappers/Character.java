@@ -357,6 +357,16 @@ public class Character extends EntityWrapper
 		return GameUtils.isCharacterInParty(this.wrappedEntity);
 	}
 	
+	/**
+	 * This method will either return the full party if the user is in a party, or just the user if theyre not in a party.
+	 * This reduces the code in the script.
+	 * @return
+	 */
+	public Character[] getPartyInclusive() {
+		if(isInParty()) return getParty();
+		return new Character[] {this};
+	}
+	
 	public Character[] getParty()
 	{
 		if(isInParty()==false) return new Character[0];

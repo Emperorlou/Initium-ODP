@@ -5580,11 +5580,12 @@ div#buildingObject {
 /* Long operation state and style */
 
 /*Make things disappear that shouldn't be visible during long operations*/
+/*
 body[longoperation='true'] #monsterCountPanel
 {
 	visibility:hidden!important;
 	opacity:0!important;
-}
+} lets not do this for now */
 
 body[longoperation='true'] #banner-text-overlay
 {
