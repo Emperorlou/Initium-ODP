@@ -176,7 +176,7 @@ public class CommandSwitchCharacter extends Command {
 		}
 		//user is multitabbed
 		else {
-			addJavascriptToResponse("window.characterOverride = " + targetCharacter.getUrlSafeKey() + ";");
+			addJavascriptToResponse("window.characterOverride = '" + targetCharacter.getUrlSafeKey() + "';");
 		}
 		
 		// Set the cached currentCharacter to target
