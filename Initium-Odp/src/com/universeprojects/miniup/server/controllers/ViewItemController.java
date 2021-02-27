@@ -28,6 +28,7 @@ import com.universeprojects.miniup.server.ItemAspect.ItemPopupEntry;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
+import com.universeprojects.miniup.server.aspects.AspectSlotted;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
@@ -257,6 +258,27 @@ public class ViewItemController extends PageController {
 				// Get all the directItem scripts on this item 
 				@SuppressWarnings("unchecked")
 				List<Key> scriptKeys = (List<Key>)item.getProperty("scripts");
+				
+				List<Key> originalScriptKeys = scriptKeys;
+								
+				//handle scripts that are embedded in a slot.
+				InitiumObject slotItem = new InitiumObject(db, item);
+				if(slotItem.hasAspect("Slotted")) {
+					List<EmbeddedEntity> embedded = slotItem.getAspect(AspectSlotted.class).getSlottedItems();
+					
+					if(embedded != null) {
+						
+						for(EmbeddedEntity ee:embedded) {
+							
+							List<Key>embeddedScriptKeys = (List<Key>) ee.getProperty("Slottable:scripts");
+							
+							if(embeddedScriptKeys == null) continue;
+							
+							scriptKeys.addAll(embeddedScriptKeys);
+						}
+					}
+				}
+				
 				if (scriptKeys!=null && scriptKeys.isEmpty()==false)
 				{
 					List<CachedEntity> directItemScripts = db.getScriptsOfType(scriptKeys, 
@@ -270,10 +292,23 @@ public class ViewItemController extends PageController {
 							Object scriptType = script.getProperty("type");
 							if(GameUtils.enumEquals(scriptType, ODPDBAccess.ScriptType.directItem))
 							{
+								String link = "doTriggerItem(event,"+script.getId()+","+item.getId();
+
+								if(scriptKeys.size() != originalScriptKeys.size()) {
+									for(Key check:scriptKeys) {
+										if(originalScriptKeys.contains(check)) {
+											link += ",{\"slot\":\"true\"}"; //I'm only fairly certain this is the correct way to do this
+											break;
+										}
+									}
+								}
+								
+								link += ")";
+								
 								ItemPopupEntry scriptEntry = new ItemPopupEntry(
 										(String)script.getProperty("caption"), 
 										(String)script.getProperty("description"), 
-										"doTriggerItem(event,"+script.getId()+","+item.getId()+")");
+										link);
 								
 								itemPopupEntries.add(scriptEntry);
 							}

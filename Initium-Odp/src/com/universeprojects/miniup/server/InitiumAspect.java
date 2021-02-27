@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.gefcommon.shared.elements.GameAspect;
@@ -16,12 +17,22 @@ public abstract class InitiumAspect implements GameAspect<Key>
 	final protected ODPDBAccess db;
 	final protected InitiumObject object;
 	final protected CachedEntity entity;
+	final protected EmbeddedEntity ee;
 	final protected String aspectId;
 	
 	protected InitiumAspect(InitiumObject object)
 	{
 		this.object = object;
-		this.entity = object.getEntity();
+		
+		if(object.isEmbedded) {
+			this.ee = object.getEmbeddedEntity();
+			this.entity = null;
+		}
+		else {
+			this.entity = object.getEntity();
+			this.ee = null;
+		}
+		
 		this.db = object.getDB();
 		this.aspectId = this.getClass().getSimpleName().substring(6);
 	}
@@ -43,6 +54,14 @@ public abstract class InitiumAspect implements GameAspect<Key>
 	}
 	
 	/**
+	 * Returns true if this aspect exists on an embedded entity.
+	 * @return
+	 */
+	public boolean isEmbedded() {
+		return object.isEmbedded();
+	}
+	
+	/**
 	 * This is called whenever it's time to adjust values and generally update values on the item. This may result in needing to be saved to the DB
 	 * or have realtime updates sent to people, so we return true if the object changed.
 	 * 
@@ -57,13 +76,13 @@ public abstract class InitiumAspect implements GameAspect<Key>
 	@Override
 	public void setProperty(String fieldName, Object value)
 	{
-		entity.setProperty(new StringBuilder().append(aspectId).append(":").append(fieldName).toString(), value);
+		object.setProperty(new StringBuilder().append(aspectId).append(":").append(fieldName).toString(), value);
 	}
 	
 	@Override
 	public Object getProperty(String fieldName)
 	{
-		return entity.getProperty(new StringBuilder().append(aspectId).append(":").append(fieldName).toString());
+		return object.getProperty(new StringBuilder().append(aspectId).append(":").append(fieldName).toString());
 	}
 
 	@Override
@@ -83,8 +102,6 @@ public abstract class InitiumAspect implements GameAspect<Key>
 	{
 		return object;
 	}
-	
-	
 	
 	public static Map<String, Class<? extends Command>> aspectCommands = new HashMap<>();
 	public static void addCommand(String commandName, Class<? extends Command> commandClass)

@@ -599,6 +599,16 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+	
+	public static boolean checkItemHasAspect(CachedEntity item, String aspectName) {
+		
+		List<String> aspects = (List<String>) item.getProperty("_aspects");
+		if(aspects == null) return false;
+		
+		if(aspects.contains(aspectName)) return true;
+		
+		return false;
+	}
 
 	public static boolean checkItemHasAspect(CachedEntity item, Class<? extends InitiumAspect> clazz)
 	{
@@ -609,6 +619,7 @@ public abstract class CommonChecks
 		
 		return false;
 	}
+	
 
 	public static boolean checkLocationIsTown(CachedEntity location)
 	{
@@ -619,6 +630,4 @@ public abstract class CommonChecks
 	{
 		return GameUtils.equals(location.getProperty("type"), "CityHall");
 	}
-
-
 }

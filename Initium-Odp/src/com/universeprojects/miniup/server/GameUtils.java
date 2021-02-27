@@ -208,6 +208,27 @@ public class GameUtils
 		}
 
 	}
+	
+	/**
+	 * Generate an embedded entity that is an exact copy of a cached entity
+	 * @param source - the cached entity we're copying
+	 * @return the embedded entity
+	 */
+	public static EmbeddedEntity generateEmbeddedFromCached(CachedEntity source) {
+		Map<String, ?> properties = source.getProperties();
+		
+        if (properties == null) {
+            return null;
+        }
+        
+        EmbeddedEntity toReturn = new EmbeddedEntity();
+        
+        for (String key : properties.keySet()) {
+            toReturn.setProperty(key, properties.get(key));
+        }
+        
+        return toReturn;
+    }
 
 	public static void addMessageForClient(HttpServletRequest request, String message)
 	{

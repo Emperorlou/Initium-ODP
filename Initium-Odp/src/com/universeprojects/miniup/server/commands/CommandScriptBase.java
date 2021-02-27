@@ -11,14 +11,18 @@ import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
+import com.universeprojects.miniup.server.InitiumObject;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
+import com.universeprojects.miniup.server.aspects.AspectSlottable;
+import com.universeprojects.miniup.server.aspects.AspectSlotted;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
@@ -84,6 +88,25 @@ public abstract class CommandScriptBase extends Command {
 			@SuppressWarnings("unchecked")
 			List<Key> sourceScriptKeys = (List<Key>)entitySource.getProperty("scripts");
 			if(sourceScriptKeys == null) sourceScriptKeys = new ArrayList<Key>();
+			
+			//If the command indicated this was from a slot and we have the proper aspect, add
+			//all the script keys contained in the slots to the list.
+			InitiumObject io = new InitiumObject(db, entitySource);
+			boolean isFromSlot = parameters.get("slot") != null;
+			if((io != null) && io.hasAspect(AspectSlotted.class) && isFromSlot ) {
+				
+				AspectSlotted aspectSlotted = io.getAspect(AspectSlotted.class);
+				
+				Map<InitiumObject, AspectSlottable> slottedItems = aspectSlotted.getSlottedItems();
+								
+				for(Map.Entry<InitiumObject, AspectSlottable>entry:slottedItems.entrySet()) {
+										
+					List<Key> newKeys = entry.getValue().getStoredScripts();
+					
+					sourceScriptKeys.addAll(newKeys);
+				}
+			}
+			
 			for(Key scriptKey:sourceScriptKeys)
 			{
 				if (GameUtils.equals(scriptId, scriptKey.getId()))
@@ -116,10 +139,11 @@ public abstract class CommandScriptBase extends Command {
 			}
 			case("Item"):
 			{
-				// ...by being close enough to the item OR having it in their pocket
 				Key itemContainerKey = (Key)entitySource.getProperty("containerKey");
-				if (itemContainerKey==null || GameUtils.equals(character.getKey(), itemContainerKey)==false)
+
+				if (itemContainerKey == null || !GameUtils.equals(character.getKey(), itemContainerKey))
 					throw new UserErrorMessage("You can only trigger items in your posession!");
+				
 				break;
 			}
 			case("Location"):
