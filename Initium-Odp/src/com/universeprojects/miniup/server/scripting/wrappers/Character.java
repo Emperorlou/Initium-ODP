@@ -523,8 +523,9 @@ public class Character extends EntityWrapper
 	}
 	
 	private QuestService getQuestService() {
+		
 		if(questService == null)
-			questService = db.getQuestService(null);
+			questService = db.getQuestService(null, wrappedEntity);
 		
 		return questService;
 	}
