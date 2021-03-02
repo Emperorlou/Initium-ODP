@@ -24,9 +24,7 @@ public class CommandTransferSend extends Command{
 
 	@Override
 	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException {
-		
-		db.getDB().beginTransaction();
-		
+				
 		CachedEntity currentUser = db.getCurrentUser();
 		CachedEntity currentCharacter = db.getCurrentCharacter();
 		
@@ -70,9 +68,7 @@ public class CommandTransferSend extends Command{
 		
 		db.getDB().put(currentCharacter, currentUser, targetUser);
 		
-		db.getDB().commit();
-		
-		//now delete all discoveries that point towards a player house. This is done outside of the transaction on purpose.
+		//now delete all discoveries that point towards a player house.
 		//First, grab all the towns.
 		List<CachedEntity> towns = db.getFilteredList("Location", "type", "Town");
 		for(CachedEntity town : towns) {
