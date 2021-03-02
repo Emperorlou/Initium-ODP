@@ -51,6 +51,7 @@ import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.scripting.events.AttackHitEvent;
 import com.universeprojects.miniup.server.scripting.events.CombatEvent;
+import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
 import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.GridMapService;
@@ -130,7 +131,7 @@ public class ODPDBAccess
 	{
 		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
 		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem, global,
-		ownerHtml;
+		ownerHtml, onDeath;
 	}
 
 	public enum StaticBuffables
@@ -5404,6 +5405,25 @@ public class ODPDBAccess
 					
 					// Leave the party if we haven't already
 					doRequestLeaveParty(ds, characterToDieFinal, true);
+					
+					//this is reliant on another PR.
+					
+					ODPDBAccess dba = getInstance(request);
+					
+					ScriptService service = ScriptService.getScriptService(dba);
+					
+					@SuppressWarnings("unchecked")
+					List<CachedEntity> scripts = service.getScriptsOfType(characterToDieFinal, ScriptType.onDeath);
+					for(CachedEntity script : scripts) {
+						
+						SimpleEvent event = new SimpleEvent(characterToDieFinal, dba);
+						
+						service.executeScript(event, script, characterToDieFinal);
+						
+						if(!event.haltExecution) 
+							service.cleanupEvent(event);
+						
+					}
 					
 					db.put(characterToDieFinal);
 					db.put(locationFinal);
