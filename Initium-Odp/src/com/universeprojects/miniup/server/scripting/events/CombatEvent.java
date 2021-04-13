@@ -24,11 +24,11 @@ import com.universeprojects.miniup.server.scripting.wrappers.Item;
  *   
  * @author spfiredrake
  */
-public class CombatEvent extends ScriptEvent {
+public abstract class CombatEvent extends ScriptEvent {
 	public Character attacker;
 	public Character defender;
 	public Item weapon;
-	public Map<String, Long> damage = new HashMap<String, Long>();
+	//public Map<String, Long> damage = new HashMap<String, Long>();
 	
 	/**
 	 * Initializes the combat event with the character as both the event source and attacking entity.
@@ -91,6 +91,13 @@ public class CombatEvent extends ScriptEvent {
 		super(character);
 	}
 	
+	@Override
+	public String eventKind() {
+		return "Combat";
+	}
+	
+	//We don't need these methods yet.
+	/*
 	public void setContext(ODPDBAccess db, CachedEntity attacker, CachedEntity weapon, CachedEntity defender)
 	{
 		this.attacker = new Character(attacker, db);
@@ -99,12 +106,7 @@ public class CombatEvent extends ScriptEvent {
 		this.damage.clear();
 		this.reset();
 	}
-	
-	@Override
-	public String eventKind() {
-		return "Combat";
-	}
-	
+
 	public Long addDamage(String damageType, Long damageDealt)
 	{
 		if(!damage.containsKey(damageType))
@@ -129,7 +131,7 @@ public class CombatEvent extends ScriptEvent {
 		for(Long dmg:damage.values())
 			totDamage += dmg;
 		return totDamage;
-	}
+	}*/
 	
 	@SuppressWarnings("unchecked")
 	public static Map<ScriptType, HashMap<CachedEntity, List<CachedEntity>>> 

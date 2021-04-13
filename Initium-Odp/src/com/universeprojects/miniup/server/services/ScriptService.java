@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +22,11 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
+import com.universeprojects.miniup.server.scripting.events.AttackEvent;
+import com.universeprojects.miniup.server.scripting.events.AttackHitEvent;
+import com.universeprojects.miniup.server.scripting.events.CombatEvent;
+import com.universeprojects.miniup.server.scripting.events.DefendEvent;
+import com.universeprojects.miniup.server.scripting.events.DefendHitEvent;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 import com.universeprojects.miniup.server.scripting.jsaccessors.DBAccessor;
 import com.universeprojects.miniup.server.scripting.wrappers.Buff;
@@ -212,6 +219,79 @@ public class ScriptService extends Service
 	protected void finalize( ) throws Throwable
 	{
 		close();
+	}
+	
+	/**
+	 * Handles internal cleanup of scriptevent; saving/deleting entities, logging, game messages.
+	 * Game updates and operationbase merging should be handled elsewhere.
+	 * @param event
+	 */
+	public void cleanupEvent(ScriptEvent event) {
+	
+		for(CachedEntity ce : event.getSaveEntities())
+			db.getDB().put(ce);
+		
+		for(CachedEntity ce : event.getDeleteEntities())
+			db.getDB().delete(ce);
+		
+		for(Entry<Level, String> logs:event.logEntries.entrySet())
+			ScriptService.log.log(logs.getKey(), logs.getValue());
+
+		//send all the specified game messages to the appropriate characters.
+		for(Entry<Key, List<String>> messagesToSend : event.getGameMessages().entrySet()) {
+			for(String message : messagesToSend.getValue()){
+				db.sendGameMessage(db.getDB(), messagesToSend.getKey(), message);
+			}
+		}
+	}
+	
+	public CombatEvent generateCombatEvent(CachedEntity attacker, CachedEntity item, CachedEntity defender, ScriptType type) {
+		switch(type) {
+			case onAttack:
+				return new AttackEvent(db, attacker, item, defender); //unimplemented, for now.
+			case onAttackHit:
+				return new AttackHitEvent(db, attacker, item, defender);
+			case onDefend:
+				return new DefendEvent(null, db); //unimplemented, for now.
+			case onDefendHit:
+				return new DefendHitEvent(db, attacker, item, defender);
+			case combatItem:
+				return null; //unimplemented, for now.
+		default:
+			throw new IllegalArgumentException("Illegal script type " + type + " passed into ScriptService.generateCombatEvent");
+			
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<CachedEntity> getScriptsOfType(CachedEntity entity, ScriptType type){
+		List<Key> scriptKeys = (List<Key>) entity.getProperty("scripts");
+		
+		return db.getScriptsOfType(scriptKeys, type);
+	}
+	
+	/**
+	 * Returns an <embeddedentity-list<cachedentity>> map of the user's buffs and all scripts associated of the type on those buffs.
+	 * @param character
+	 * @param type
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<EmbeddedEntity, List<CachedEntity>> getCharacterBuffScriptsOfType(CachedEntity character, ScriptType type){
+		List<EmbeddedEntity> buffs = db.getBuffsFor(character);
+		
+		Map<EmbeddedEntity, List<CachedEntity>> result = new HashMap<>();
+		
+		for(EmbeddedEntity buff : buffs) {
+			List<Key> scriptKeys = (List<Key>) buff.getProperty("scripts");
+			
+			List<CachedEntity> scripts = db.getEntities(scriptKeys);
+			scripts.removeIf(n -> n.getProperty("type") != type);
+			
+			result.put(buff, scripts);
+		}
+		
+		return result;
 	}
 	
 	/**

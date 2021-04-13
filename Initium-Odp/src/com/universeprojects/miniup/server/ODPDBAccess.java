@@ -49,6 +49,9 @@ import com.universeprojects.miniup.server.aspects.AspectBuffable;
 import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
+import com.universeprojects.miniup.server.scripting.events.AttackHitEvent;
+import com.universeprojects.miniup.server.scripting.events.CombatEvent;
+import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
 import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.GridMapService;
@@ -59,6 +62,7 @@ import com.universeprojects.miniup.server.services.MovementService;
 import com.universeprojects.miniup.server.services.ODPInventionService;
 import com.universeprojects.miniup.server.services.ODPKnowledgeService;
 import com.universeprojects.miniup.server.services.QuestService;
+import com.universeprojects.miniup.server.services.ScriptService;
 
 public class ODPDBAccess
 {
@@ -127,7 +131,7 @@ public class ODPDBAccess
 	{
 		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
 		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem, global,
-		ownerHtml;
+		ownerHtml, onDeath;
 	}
 
 	public enum StaticBuffables
@@ -4569,6 +4573,27 @@ public class ODPDBAccess
             doCharacterIncreaseStat(db, sourceCharacter, "intelligence", maxStats[2], 0.5d*multiplier);
         }
         
+		//run all onattack scripts attached to the user's buffs.
+		ScriptService scriptService = ScriptService.getScriptService(this);
+		
+		Map<EmbeddedEntity, List<CachedEntity>> buffScripts = scriptService.getCharacterBuffScriptsOfType(sourceCharacter, ScriptType.onAttack);
+		
+		for(Entry<EmbeddedEntity, List<CachedEntity>> entry : buffScripts.entrySet()) {
+			//pass the embeddedentity of the buff to the script; sourceEntity is character.
+			
+			for(CachedEntity script : entry.getValue()) {
+				CombatEvent event = scriptService.generateCombatEvent(sourceCharacter, null, targetCharacter, ScriptType.onAttack);
+				
+				event.setAttribute("sourceBuff", ScriptService.wrapEntity(entry, this));
+				
+				scriptService.executeScript(event, script, sourceCharacter);
+				
+				if(!event.haltExecution) {
+					scriptService.cleanupEvent(event);
+				}
+			}
+		}
+        
         Double charDex = getCharacterDexterity(sourceCharacter);
         Double monsterDex = getCharacterDexterity(targetCharacter);
         Random rnd = new Random();
@@ -4794,7 +4819,6 @@ public class ODPDBAccess
 		str*=2d;
 		strengthDamageBonus = new Double(GameUtils.rnd.nextDouble()*str).intValue();
 		if (strengthDamageBonus<0) strengthDamageBonus=0;
-
 		
 		
 		String weaponName = "bare hands";
@@ -4886,6 +4910,21 @@ public class ODPDBAccess
 				physicalDamageBonusLine = ", "+physicalDamageBonus+" was from physical damage bonus effects";
 			
 			attackResult.status += "The attack hit! "+attackResult.damage+" damage ("+strengthDamageBonus+" was from strength"+physicalDamageBonusLine+") was done to the "+targetCharacter.getProperty("name")+" with "+sourceCharacter.getProperty("name")+"'s "+weaponName+".";
+		}
+		
+		//Run onAttackHit scripts
+		ScriptService scriptService = ScriptService.getScriptService(this);
+		List<CachedEntity> scripts = scriptService.getScriptsOfType(weapon, ScriptType.onAttackHit);
+		
+		for(CachedEntity script : scripts) {
+			AttackHitEvent event = (AttackHitEvent) scriptService.generateCombatEvent(sourceCharacter, weapon, targetCharacter, ScriptType.onAttackHit);
+			
+			scriptService.executeScript(event, script, weapon);
+			if(!event.haltExecution)
+				scriptService.cleanupEvent(event);
+			
+			attackResult.status += event.status;
+			attackResult.damage += event.damage;
 		}
 		
 		
@@ -5149,6 +5188,20 @@ public class ODPDBAccess
 		{
 			if (block!=null)
 			{
+				ScriptService service = ScriptService.getScriptService(this);
+				
+				List<CachedEntity> scripts = service.getScriptsOfType(block, ScriptType.onDefendHit);
+				
+				for(CachedEntity script : scripts) {
+					CombatEvent event = service.generateCombatEvent(sourceCharacter, block, targetCharacter, ScriptType.onDefendHit);
+										
+					service.executeScript(event, script, block);
+					
+					if(!event.haltExecution)
+						service.cleanupEvent(event);
+				}
+				
+				
 				if(updateBlockAttackResult(result, sourceCharacter, targetCharacter, sourceWeapon, damage, block))
 					break;
 			}
@@ -5352,6 +5405,25 @@ public class ODPDBAccess
 					
 					// Leave the party if we haven't already
 					doRequestLeaveParty(ds, characterToDieFinal, true);
+					
+					//this is reliant on another PR.
+					
+					ODPDBAccess dba = getInstance(request);
+					
+					ScriptService service = ScriptService.getScriptService(dba);
+					
+					@SuppressWarnings("unchecked")
+					List<CachedEntity> scripts = service.getScriptsOfType(characterToDieFinal, ScriptType.onDeath);
+					for(CachedEntity script : scripts) {
+						
+						SimpleEvent event = new SimpleEvent(characterToDieFinal, dba);
+						
+						service.executeScript(event, script, characterToDieFinal);
+						
+						if(!event.haltExecution) 
+							service.cleanupEvent(event);
+						
+					}
 					
 					db.put(characterToDieFinal);
 					db.put(locationFinal);

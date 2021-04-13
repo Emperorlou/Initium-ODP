@@ -13,6 +13,7 @@ import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.CombatEvent;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
+import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
  * Makes it possible to execute script during combat.
@@ -60,7 +61,7 @@ public class CommandScriptCombat extends CommandScriptBase {
 		CachedEntity combatant = db.getCharacterCombatant(character);
 		
 		if(combatant == null) throw new RuntimeException("Character is in COMBAT mode, but combatant is null");
-		return new CombatEvent(db, character, trigger, combatant);
+		return ScriptService.getScriptService(db).generateCombatEvent(character, trigger, combatant, ScriptType.combatItem);
 	}
 
 	@Override
