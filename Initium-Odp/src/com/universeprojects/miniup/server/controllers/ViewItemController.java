@@ -302,7 +302,7 @@ public class ViewItemController extends PageController {
 				Object reachableHtml = item.getProperty("reachableHtml");
 				
 				//if its empty, check for the scripts.
-				if(reachableHtml == null || "".equals(reachableHtml) == false) {
+				if(reachableHtml == null || "".equals(reachableHtml)) {
 					
 					@SuppressWarnings("unchecked")
 					List<Key> scriptKeys = (List<Key>) item.getProperty("scripts");
