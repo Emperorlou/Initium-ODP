@@ -296,6 +296,44 @@ public class ViewItemController extends PageController {
 					itemMap.put("ownerOnlyHtml", field.toString());
 			}
 			
+			//If the item is accessible, generate custom HTML.
+			if(CommonChecks.checkItemIsAccessible(item, currentChar)) {
+				
+				Object reachableHtml = item.getProperty("reachableHtml");
+				
+				//if its empty, check for the scripts.
+				if(reachableHtml == null || "".equals(reachableHtml) == false) {
+					
+					@SuppressWarnings("unchecked")
+					List<Key> scriptKeys = (List<Key>) item.getProperty("scripts");
+					
+					if (scriptKeys!=null && scriptKeys.isEmpty()==false) {
+						List<CachedEntity> reachableHtmlScripts = db.getScriptsOfType(scriptKeys, ODPDBAccess.ScriptType.reachableHtml);
+						
+						if (reachableHtmlScripts!=null && reachableHtmlScripts.isEmpty()==false){
+							for(CachedEntity script : reachableHtmlScripts) {
+								
+								if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) continue;
+								
+								
+								SimpleEvent event = new SimpleEvent(currentChar, db);
+								if(ScriptService.getScriptService(db).executeScript(event, script, item) && event.getAttribute("reachableHtml") != null)
+								{
+									itemMap.put("reachableHtml", event.getAttribute("reachableHtml"));
+								}
+							}
+						}
+					}
+					
+					if(itemMap.containsKey("reachableHtml") == false) {
+						itemMap.put("reachableHtml", null);
+					}
+				}
+				else {
+					itemMap.put("reachableHtml", reachableHtml);
+				}
+			}
+			
 			// Aspects
 			InitiumObject iObject = new InitiumObject(db, item);
 			if (iObject.hasAspects())
