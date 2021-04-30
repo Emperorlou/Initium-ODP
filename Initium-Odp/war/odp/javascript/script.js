@@ -4882,12 +4882,7 @@ $(document).keyup(function(event){
 		viewInvention(event);
 	}
 	else if (event.which==78){ // N - opens the navigation window.
-		if(uiStyle == "experimental"){
-			viewLocalNavigation(event);
-		}
-		else{
-			makeIntoPopup(".navigation-box");
-		}
+		makeIntoPopup(".navigation-box");
 	}
 	else if (event.which==81){ //Q - opens the quest log.
 		viewQuests();
