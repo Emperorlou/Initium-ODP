@@ -581,6 +581,7 @@ Version: ${version}
 							<div class='minimap-button minimap-button-zoom-in' onclick='minimapZoomIn()'></div>
 							<div class='minimap-button minimap-button-zoom-out' onclick='minimapZoomOut()'></div>
 							<div class='minimap-button minimap-button-map' onclick='toggleMovementState()'></div>
+							<div class='minimap-button minimap-button-viewallpaths' onclick='makeIntoPopup(".navigation-box")'></div>
 							<div class='minimap-button minimap-button-localplaces standard-button-highlight' onclick='viewLocalNavigation(event)'></div>
 							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
 							
