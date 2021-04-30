@@ -7454,6 +7454,37 @@ public class ODPDBAccess
 		db.put(achievement);
 		return achievement;
 	}
+	
+	/**
+	 * Given a character, grant an achievement.
+	 * @param achievementName
+	 * @param user
+	 * @return
+	 */
+	public boolean grantAchievement(CachedEntity character, String achievementName) {
+		
+		CachedEntity user = getEntity((Key) character.getProperty("userKey"));
+
+		
+		List<CachedEntity> achievements = getFilteredList("achievement", 1, "name", FilterOperator.EQUAL, achievementName);
+		if(achievements.size() != 1) return false; //achievement doesnt exist or there are duplicates; either way, fail.
+		
+		CachedEntity ach = achievements.get(0);
+		
+		@SuppressWarnings("unchecked")
+		List<Key> currentAchievements = (List<Key>) user.getProperty("achievements");
+		
+		for(Key achKey : currentAchievements)
+			if(GameUtils.equals(achKey, ach.getKey()))
+				return false; //they already had the achievement.
+		
+		currentAchievements.add(ach.getKey());
+		user.setProperty("achievements", currentAchievements);
+		
+		getDB().put(user);
+		return true;
+	
+	}
 
 	public Map<String, String> getValue_StringStringMap(CachedEntity entity, String fieldName)
 	{
