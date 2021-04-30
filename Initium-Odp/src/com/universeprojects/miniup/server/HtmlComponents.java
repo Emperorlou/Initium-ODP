@@ -460,7 +460,7 @@ public class HtmlComponents {
 	
 	public static String generatePathsButton()
 	{
-		return generateButtonBarItem("pathsButton", "Show all Connecting Locations", "makeIntoPopup(\".navigation-box\")", "https://initium-resources.appspot.com/images/ui/path.png");
+		return generateButtonBarItem("pathsButton", "Show all Connecting Locations", "makeIntoPopup(\".navigation-box\")", "https://storage.googleapis.com/initium-resources/images/ui/path.png");
 	}
 	
 	public static String generateButtonBar(CachedEntity character)
