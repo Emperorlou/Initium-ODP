@@ -458,17 +458,11 @@ public class HtmlComponents {
 		return generateButtonBarItem("inventoryButton", "Open your inventory", "inventory(event)", "https://initium-resources.appspot.com/images/ui/backpack1.png");
 	}
 	
-	public static String generatePathsButton()
-	{
-		return generateButtonBarItem("pathsButton", "Show all Connecting Locations", "makeIntoPopup(\".navigation-box\")", "https://storage.googleapis.com/initium-resources/images/ui/path.png");
-	}
-	
 	public static String generateButtonBar(CachedEntity character)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div id='buttonbar-main' class='header-inner'>");
 		// Buttons
-		sb.append("<span> "+ generatePathsButton() + "</span>");
 		sb.append("<span>" + generateInventoryButton() + "</span>");
 		sb.append("<span>" + generateQuestButton() + "</span>");
 		sb.append("<span>" + generateMapButton() + "</span>");

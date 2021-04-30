@@ -3071,6 +3071,12 @@ position: absolute;
 {
 	filter: brightness(1.5);
 }
+.minimap-button-paths
+{
+	background-image:url(https://storage.googleapis.com/initium-resources/images/ui/viewpathsbutton.png);
+	bottom:26px;
+	left:26px;
+}
 
 .minimap-button-map
 {
