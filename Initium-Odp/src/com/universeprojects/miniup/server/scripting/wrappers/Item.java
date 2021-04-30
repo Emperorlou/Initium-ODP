@@ -149,10 +149,14 @@ public class Item extends EntityWrapper
 		return (Date)this.getProperty("createdDate");
 	}
 	
-	public String renderItem()
+	public String renderItem() {
+		return renderItem(false);
+	}
+	
+	public String renderItem(boolean popupEmbedded)
 	{
 		EntityWrapper owner = this.container();
 		CachedEntity ownerEntity = owner == null ? db.getCurrentCharacter() : owner.wrappedEntity;
-		return GameUtils.renderItem(this.db, ownerEntity, this.wrappedEntity);
+		return GameUtils.renderItem(this.db, null, ownerEntity, this.wrappedEntity, popupEmbedded, false);
 	}
 }

@@ -5534,7 +5534,7 @@ public class ODPDBAccess
 						item.setProperty("movedTimestamp", new Date());
 						
 						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
-							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+=GameUtils.renderItem(item, true)+"<br>";
 					}
 					else
 					{
@@ -5545,7 +5545,7 @@ public class ODPDBAccess
 						{
 							dropAllSB.append("," + item.getId().toString());
 							loot+="<div style='display:inline-block; margin-right:3px;'>";
-							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+=GameUtils.renderItem(item, true)+"<br>";
 							loot+="<div>";
 							loot+="		<div class='main-item-controls'>";
 							// Get all the slots this item can be equipped in

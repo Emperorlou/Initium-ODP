@@ -1002,6 +1002,11 @@ public class GameUtils
 	{
 		return renderItem(null, null, null, item, false, false);
 	}
+	
+	public static String renderItem(CachedEntity item, boolean popupEmbedded)
+	{
+		return renderItem(null, null, null, item, popupEmbedded, false);
+	}
 
 	public static String renderItem(ODPDBAccess db, CachedEntity character, CachedEntity item)
 	{
