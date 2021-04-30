@@ -7880,8 +7880,7 @@ public class ODPDBAccess
 			{
 				CachedEntity parent = getParentLocation(ds, location);
 				if (parent==null) return location;
-				location = parent;
-				if (CommonChecks.checkLocationIsRootLocation(location))
+				if (CommonChecks.checkLocationIsRootLocation(parent))
 					return parent;
 			}
 		}
