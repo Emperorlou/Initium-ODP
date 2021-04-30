@@ -50,4 +50,9 @@ public class AspectBuffable extends ItemAspect
 		setProperty("buffs", list);
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }

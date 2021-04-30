@@ -286,4 +286,9 @@ public class AspectPickable extends ItemAspect
 	}
 	
 	
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }

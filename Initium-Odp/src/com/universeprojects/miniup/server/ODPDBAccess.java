@@ -44,6 +44,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
+import com.universeprojects.generators.shared.random.RandomDistributionFactory.ParseException;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.aspects.AspectBuffable;
 import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
@@ -4767,7 +4768,11 @@ public class ODPDBAccess
 		Object result = 0d;
 		if (weapon!=null && weapon.getProperty("weaponDamage")!=null && weapon.getProperty("weaponDamage").toString().trim().equals("")==false)
 		{
-		    result = solveProperty("Attack with Weapon", weapon, "weaponDamage");
+		    try {
+				result = solveProperty("Attack with Weapon", weapon, "weaponDamage");
+			} catch (ParseException e) {
+				throw new ContentDeveloperException("Parsing error on the weaponDamage field in "+weapon.getKey()+": "+e.getMessage());
+			}
 		    if (result==null)
 		        throw new RuntimeException("'Attack with Weapon' failed to solve.");
 		}
@@ -4946,8 +4951,9 @@ public class ODPDBAccess
 	 * @param string
 	 * @param weapon
 	 * @return
+	 * @throws ParseException 
 	 */
-	public Object solveProperty(String string, CachedEntity weapon, String fieldName)
+	public Object solveProperty(String string, CachedEntity weapon, String fieldName) throws ParseException
 	{
 		return null;
 	}

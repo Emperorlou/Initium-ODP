@@ -672,4 +672,9 @@ public class AspectFireplace extends ItemAspect
 		return "Can contain a fire";
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }

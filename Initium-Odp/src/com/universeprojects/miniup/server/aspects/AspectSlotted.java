@@ -37,4 +37,9 @@ public class AspectSlotted extends ItemAspect
 		return count;
 	}
 	
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }

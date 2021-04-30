@@ -344,4 +344,34 @@ public class InitiumObject implements GameObject<Key>
 	{
 		command.addJavascriptToResponse("updateItemImage("+getKey().getId()+", '"+GameUtils.getResourceUrl(getIcon())+"');");
 	}
+
+	@Override
+	public Double getMass() {
+		return (Double)entity.getProperty("weight");
+	}
+
+	@Override
+	public void setMass(Double mass) {
+		entity.setProperty("weight", mass);
+	}
+
+	@Override
+	public Double getVolume() {
+		return (Double)entity.getProperty("space");
+	}
+
+	@Override
+	public void setVolume(Double volume) {
+		entity.setProperty("space", volume);
+	}
+
+	@Override
+	public GameAspect<Key> addAspect(String aspectName) {
+		return aspects.put(aspectName, (InitiumAspect)GameUtils.createObject("com.universeprojects.miniup.server.aspects.Aspect"+aspectName, this));
+	}
+
+	@Override
+	public void removeAspect(String aspectName) {
+		aspects.remove(aspectName);
+	}
 }

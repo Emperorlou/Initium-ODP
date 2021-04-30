@@ -17,4 +17,9 @@ public class AspectTransport extends InitiumAspect
 
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }
