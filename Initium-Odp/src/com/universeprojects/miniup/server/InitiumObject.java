@@ -347,22 +347,31 @@ public class InitiumObject implements GameObject<Key>
 
 	@Override
 	public Double getMass() {
-		return (Double)entity.getProperty("weight");
+		Long mass = (Long)entity.getProperty("weight");
+		if (mass==null) mass = 0L;
+		
+		return mass.doubleValue();
 	}
 
 	@Override
 	public void setMass(Double mass) {
-		entity.setProperty("weight", mass);
+		if (mass==null) mass = 0d;
+		entity.setProperty("weight", mass.longValue());
 	}
 
 	@Override
 	public Double getVolume() {
-		return (Double)entity.getProperty("space");
+		Long space = (Long)entity.getProperty("space");
+		if (space==null) space = 0L;
+		
+		return space.doubleValue();
 	}
 
 	@Override
 	public void setVolume(Double volume) {
-		entity.setProperty("space", volume);
+		if (volume==null) volume = 0d;
+		
+		entity.setProperty("space", volume.longValue());
 	}
 
 	@Override
