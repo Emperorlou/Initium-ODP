@@ -7474,6 +7474,9 @@ public class ODPDBAccess
 		@SuppressWarnings("unchecked")
 		List<Key> currentAchievements = (List<Key>) user.getProperty("achievements");
 		
+		if(currentAchievements == null)
+			currentAchievements = new ArrayList<>();
+		
 		for(Key achKey : currentAchievements)
 			if(GameUtils.equals(achKey, ach.getKey()))
 				return false; //they already had the achievement.
