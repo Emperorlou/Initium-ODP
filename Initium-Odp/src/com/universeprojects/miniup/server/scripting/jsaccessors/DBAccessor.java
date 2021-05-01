@@ -366,6 +366,10 @@ public class DBAccessor {
 		return wrapped;
 	}
 	
+	public boolean grantAchievement(Character character, String achievementName) {
+		return db.grantAchievement(character.wrappedEntity, achievementName);
+	}
+	
 	/*################# CREATE MONSTER ###################*/
 	public EntityWrapper createMonsterFromId(Long defID, Location location)
 	{
