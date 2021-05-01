@@ -1468,8 +1468,9 @@ function acceptCharacterTransfer()
 	promptPopup("Accept Character Transfer", "What is the name of the character you are going to transfer to this account? \n\nPlease note that the name is case sensitive!", "", function(charName){
 		if (charName!=null)
 		{
-			enforceSingleAction();
-			window.location.href = "/ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode+"&char="+window.characterOverride+"&char="+window.characterOverride;
+			doCommand(event, "TransferReceive", {"name":name});
+			//enforceSingleAction();
+			//window.location.href = "/ServletUserControl?type=acceptCharacterTransfer&name="+charName+"&v="+window.verifyCode+"&char="+window.characterOverride+"&char="+window.characterOverride;
 		}
 	});
 }
@@ -1479,8 +1480,9 @@ function transferCharacter(currentCharName)
 	promptPopup("Transfer Character To..", "Please type the email address of the account you wish to transfer this character to.\n\nPlease note that you are currently using: "+currentCharName, "", function(email){
 		if (email!=null)
 		{
-			enforceSingleAction();
-			window.location.href = "/ServletUserControl?type=transferCharacter&email="+encodeURIComponent(email)+"&v="+window.verifyCode+"&char="+window.characterOverride;
+			doCommand(event, "TransferSend", {"email":email});
+			//enforceSingleAction();
+			//window.location.href = "/ServletUserControl?type=transferCharacter&email="+encodeURIComponent(email)+"&v="+window.verifyCode+"&char="+window.characterOverride;
 		}
 	});
 }
