@@ -7472,7 +7472,7 @@ public class ODPDBAccess
 		CachedEntity user = getEntity((Key) character.getProperty("userKey"));
 
 		
-		List<CachedEntity> achievements = getFilteredList("achievement", 1, "name", FilterOperator.EQUAL, achievementName);
+		List<CachedEntity> achievements = getFilteredList("Achievement", 1, "title", FilterOperator.EQUAL, achievementName);
 		if(achievements.size() != 1) return false; //achievement doesnt exist or there are duplicates; either way, fail.
 		
 		CachedEntity ach = achievements.get(0);
