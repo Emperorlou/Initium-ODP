@@ -128,7 +128,7 @@ public class ODPDBAccess
 	{
 		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
 		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem, global,
-		ownerHtml;
+		ownerHtml, reachableHtml;
 	}
 
 	public enum StaticBuffables
