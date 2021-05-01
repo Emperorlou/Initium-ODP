@@ -157,6 +157,6 @@ public class Item extends EntityWrapper
 	{
 		EntityWrapper owner = this.container();
 		CachedEntity ownerEntity = owner == null ? db.getCurrentCharacter() : owner.wrappedEntity;
-		return GameUtils.renderItem(this.db, null, ownerEntity, this.wrappedEntity, popupEmbedded, false);
+		return GameUtils.renderItem(this.db, db.getRequest(), ownerEntity, this.wrappedEntity, popupEmbedded, false);
 	}
 }

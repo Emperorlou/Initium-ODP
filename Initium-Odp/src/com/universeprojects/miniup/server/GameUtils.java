@@ -1003,9 +1003,9 @@ public class GameUtils
 		return renderItem(null, null, null, item, false, false);
 	}
 	
-	public static String renderItem(CachedEntity item, boolean popupEmbedded)
+	public static String renderItem(ODPDBAccess db, CachedEntity item, boolean popupEmbedded)
 	{
-		return renderItem(null, null, null, item, popupEmbedded, false);
+		return renderItem(db, db.getRequest(), null, item, popupEmbedded, false);
 	}
 
 	public static String renderItem(ODPDBAccess db, CachedEntity character, CachedEntity item)
