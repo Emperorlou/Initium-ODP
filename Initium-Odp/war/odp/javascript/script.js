@@ -8,8 +8,8 @@ var queryParams = "";
 if (location.href.indexOf("?")>-1)
 	queryParams = location.href.substring(location.href.indexOf("?"));
 
-if (location.href.indexOf("main.jsp")>-1 || 
-		location.href.indexOf("/odp/experimental")>-1 || 
+if (location.href.indexOf("main.jsp")>-1 ||
+		location.href.indexOf("/odp/experimental")>-1 ||
 		location.href.indexOf("/odp/full")>-1)
 {
 	if (uiStyle=="experimental")
@@ -65,22 +65,22 @@ $(window).ready(function(e){
 		else
 			window.singlePostFormSubmitted = true;
 	});
-	
+
 	$(window).resize(function() {
-		expandpopupMessage(); 
+		expandpopupMessage();
 	});
 
-	
+
 	$(".boldBoxCollapsed > h4").click(function(){
 		$(this).parent().toggleClass("boldBoxCollapsed");
 	});
-	
+
 	// For all inputs under the body: If a text box is selected, don't allow shortcut keys to process (prevent default)
 	$("body").on("keyup", "input,textarea", function(event){
 		event.stopPropagation();
 	});
-	
-	// Any inputs with the main-item-filter-input class should be named (ID) according to 
+
+	// Any inputs with the main-item-filter-input class should be named (ID) according to
 	// which div class they will be filtering on.
 	$("#page-popup-root").on("input propertychange paste", "input.main-item-filter-input", function(event)
 	{
@@ -98,13 +98,13 @@ $(window).ready(function(e){
 			var filterItems = $(selector);
 			var showItems = filterItems.has(conditionSelector);
 			var hideItems = filterItems.not(showItems);
-			
+
 			showItems.show().next("br").show();
 			hideItems.hide().next("br").hide();
 			setSelectionCheckboxes(event, null);
 	    }, 500));
 	});
-	
+
 	// Unfortunately, we have to use event delegation for checkboxes, since it's in popup content.
 	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-all", function(event)
 	{
@@ -115,7 +115,7 @@ $(window).ready(function(e){
 		selectItems.find("input:checkbox").prop("checked", cb.prop("checked"));
 		selectItems.toggleClass("main-item-selected", cb.prop("checked"));
 	});
-	
+
 	$("#page-popup-root").on("click", ".selection-root input:checkbox.check-group", function(event)
 	{
 		var cb = $(event.currentTarget);
@@ -123,25 +123,25 @@ $(window).ready(function(e){
 		var groupItems = cb.parents(".selection-root").find(".selection-list #" + groupId + " .main-item:visible");
 		groupItems.find("input:checkbox").prop("checked", cb.prop("checked"));
 		groupItems.toggleClass("main-item-selected", cb.prop("checked"));
-		
+
 		setSelectionCheckboxes(event, groupId);
 	});
-	
+
 	$("#page-popup-root").on("click", ".selection-list input:checkbox", function(event)
 	{
 		var cb = $(event.currentTarget);
 		cb.parent(".main-item").toggleClass("main-item-selected", cb.prop("checked"));
-		
+
 		setSelectionCheckboxes(event);
 	});
-	
+
 	$("#page-popup-root").on("click", ".selection-list .main-item-container", function(event)
 	{
 		$(event.currentTarget).parent().find("input:checkbox").click();
 	});
-	
+
 	var isTouchEvent = false;
-	
+
 	// Handlers for the minitip overlays
 	$('body').on("mouseover", "[minitip]", function(event) {
 		if (!isTouchEvent) {
@@ -152,54 +152,54 @@ $(window).ready(function(e){
 			$(".minitip").css("left", elemPos.left+"px");
 		};
 	});
-	
+
 	$('body').on("mouseout", "[minitip]", function(event) {
 		$(this).find(".minitip").remove();
 	});
-	
+
 	$('body').on("touchstart", "[minitip]", function(event) {
 		isTouchEvent = true;
 		setTimeout(function() { isTouchEvent = false;}, 300);
 	});
-	
+
 	$('body').on("taphold", "[minitip]", function(event) {
 		$(this).append('<div class="minitip">' + $(this).attr("minitip") + '</div>');
 		return false;
 	});
-	
+
 	$(".main-expandable .main-expandable-title").click(function(){
 		$(this).parent().find(".main-expandable-content").show();
 		$(this).hide();
 	});
-	
+
 	// Set the correct image for the header mute button
 	if (isSoundEffectsEnabled())
 	{
 		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-on1.png");
-		
+
 	}
 	else
 	{
 		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
 		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-off1.png");
 }
-		
+
 
 	// When the window gains focus, call the "flagReadMessages" to indicate that the user has now read any unread messages that may have been waiting for him
 	$(window).focus(function(){
 		flagReadMessages();
-		
+
 		updateBannerWeatherSystem();
 	});
-	
+
 });
 
 
 
 /**
  * This removes the * from the title, (and by extension the 'unread messages' symbol on chrome browsers).
- *  
+ *
  * You can safely call this as often as you want.
  */
 function flagReadMessages()
@@ -214,8 +214,8 @@ function flagReadMessages()
 }
 
 /**
- * This adds a * to the title of the page (and by extension adds an 'unread messages' symbol on chrome browsers). 
- * 
+ * This adds a * to the title of the page (and by extension adds an 'unread messages' symbol on chrome browsers).
+ *
  * You can safely call this as often as you want.
  */
 function flagUnreadMessages()
@@ -230,7 +230,7 @@ function flagUnreadMessages()
 }
 
 //Pop up Message
-function popupPermanentOverlay(title, content, popupClassOverride) 
+function popupPermanentOverlay(title, content, popupClassOverride)
 {
 	$("#banner-text-overlay").hide();
 	if (popupClassOverride==null)
@@ -246,7 +246,7 @@ function popupPermanentOverlay(title, content, popupClassOverride)
     expandpopupMessage();
 }
 
-function popupMessage(title, content, noBackground) 
+function popupMessage(title, content, noBackground)
 {
 	noBackgroundHtml = "";
 	if (noBackground==true)
@@ -263,22 +263,22 @@ function popupMessage(title, content, noBackground)
     enterPopupClose();
    }
 
-$(document).bind("keydown",function(e) 
+$(document).bind("keydown",function(e)
 {
 	if (isMakePopupOpen() && e.keyCode == 27)
 	{
 		clearMakeIntoPopup();
 		return;
 	}
-    if (popupsOpen >= 1) 
+    if (popupsOpen >= 1)
     {
-        if ((e.keyCode == 13) || (e.keyCode == 27)) 
+        if ((e.keyCode == 13) || (e.keyCode == 27))
         {
             closepopupMessage(currentPopup());
             return;
         }
     }
-    
+
     if (currentPopupStackIndex>0)
     {
     	if (e.keyCode == 27){
@@ -286,8 +286,8 @@ $(document).bind("keydown",function(e)
     		return;
     	}
     }
-    
-    if (e.keyCode == 27) 
+
+    if (e.keyCode == 27)
     {
     	if (window.viewBannerDefault!=null) viewBannerDefault();
     }
@@ -299,11 +299,11 @@ function isPagePopupsOpen()
 {
 	if (window.popupsOpen<=0)
 		return false;
-	
+
 	return true;
 }
 
-function enterPopupClose() 
+function enterPopupClose()
 {
 }
 
@@ -328,7 +328,7 @@ function closeAllTooltips()
 }
 
 function closepopupMessage(popupID) {
-	
+
     $("#popupWrapperBackground_" + popupID).remove();
     if (window.popupsOpen>0)
     	window.popupsOpen = window.popupsOpen-1;
@@ -341,25 +341,25 @@ function closepopupMessage(popupID) {
     }
     else
     	enterPopupClose();
-    
+
 }
-function expandpopupMessage() 
+function expandpopupMessage()
 {
 	var win = $(window);
 	var viewportHeight = win.height();
 	var viewportWidth = win.width();
-	
+
 	$(".popup").each(function(index)
 	{
 		var popup = $(this);
 		var width = popup.width();
 		var height = popup.height();
-		
+
 		popup.css("left", viewportWidth/2-(width/2)+"px");
 		popup.css("top", viewportHeight/2-(height/2)+"px");
 	});
-	
-	
+
+
 //    var winHeight = window.innerHeight;
 //    var popupWrapperH = winHeight-125;
 //    var popupWrapperM = -popupWrapperH/2;
@@ -369,7 +369,7 @@ function expandpopupMessage()
 //    $(".popup_text").css("max-height", popupTextH + "px");
 //    var popupM = (-popupWrapperM - ($("#popup_text_" + currentPopup()).height())); console.log(popupM + '\n' + $("#popup_text_" + currentPopup()).height());
 //    if ($("#popup_" + currentPopup()).height() < popupTextH) $("#popup_" + currentPopup()).css("margin-top", popupM + "px");
-//    
+//
 //    $("#popups").find("img").each(function(index,element)
 //	{
 //		element.src = element.src+"";
@@ -405,7 +405,7 @@ function popupPermanentOverlay_Experiment(title, text)
 	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 
 	$("#banner-base").html(content);
-	
+
 }
 
 function popupPermanentOverlay_Searching(locationName)
@@ -432,44 +432,44 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	var yOffset = 180;
 
 	var content = "";
-	
+
 	if (isAnimationsEnabled() && uiStyle!="experimental" && uiStyle!="wowlike")
 	{
-	 
+
 		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
-	
+
 		if (biome=="Dungeon")
 		{
 			// This version uses the new torch walking man
 			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
-			
+
 			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			var grassTiles = 40;
 			// The ground first
 			for(var i = 0; i<grassTiles; i++)
 			{
 				var filename = "ground";
-				
+
 				filename+=random(1,4);
-					
-				
+
+
 				var y = random(-40, 10);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
-			
+
 			// Add the dungeon wall
 			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
-		
+
 			var torches = random(1,5);
 			var torchXOffset = random(0,100);
 			for(var i = 0; i<torches; i++)
 			{
-				
+
 				var x = torchXOffset;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
 			}
-			
+
 	//		var plants = random(0,10);
 	//		// Trees and shrubs next
 	//		for(var i = 0; i<plants; i++)
@@ -488,18 +488,18 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	////				filename = "shrub";
 	////			else if (type==5)
 	////				filename = "baretree";
-	//			
+	//
 	////			if (filename == "tree")
 	////				filename+=random(1,6);
 	////			else if (filename == "shrub")
 	////				filename+=random(1,3);
 	////			else if (filename == "baretree")
 	//			filename+=random(1,7);
-	//	
+	//
 	//			var y = random(-60, 60);
 	//			var x = random(width/2*-1,width/2)-100;
 	//			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
-	//		}		
+	//		}
 		}
 		else if (biome=="Snow")
 		{
@@ -508,19 +508,19 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<grassTiles; i++)
 			{
 				var filename = "snow";
-				
+
 				if (random(1,2)==1)
 					filename+=random(1,6);
 				else
 					filename+=random(1,4);
-					
-		
+
+
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
-			
-			
+
+
 			var plants = random(0,10);
 			// Trees and shrubs next
 			for(var i = 0; i<plants; i++)
@@ -539,14 +539,14 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	//				filename = "shrub";
 	//			else if (type==5)
 	//				filename = "baretree";
-				
+
 	//			if (filename == "tree")
 	//				filename+=random(1,6);
 	//			else if (filename == "shrub")
 	//				filename+=random(1,3);
 	//			else if (filename == "baretree")
 				filename+=random(1,7);
-		
+
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
@@ -559,19 +559,19 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<grassTiles; i++)
 			{
 				var filename = "sand";
-				
+
 				if (random(1,2)==1)
 					filename+=random(1,6);
 				else
 					filename+=random(1,4);
-					
-		
+
+
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
-			
-			
+
+
 			var plants = random(-5,20);
 			// Trees and shrubs next
 			for(var i = 0; i<plants; i++)
@@ -590,14 +590,14 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	//				filename = "shrub";
 	//			else if (type==5)
 	//				filename = "baretree";
-				
+
 	//			if (filename == "tree")
 	//				filename+=random(1,6);
 	//			else if (filename == "shrub")
 	//				filename+=random(1,3);
 	//			else if (filename == "baretree")
 				filename+=random(1,7);
-		
+
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
@@ -610,19 +610,19 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			for(var i = 0; i<grassTiles; i++)
 			{
 				var filename = "grass";
-				
+
 				if (random(1,2)==1)
 					filename+=random(1,6);
 				else
 					filename+=random(3,6);
-					
-		
+
+
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
-			
-			
+
+
 			var plants = 40;
 			// Trees and shrubs next
 			for(var i = 0; i<plants; i++)
@@ -651,7 +651,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 				        filename = "baretree" + random(1,7);
 				        break;
 				}
-		
+
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
 				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
@@ -664,8 +664,8 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		text = "<p class='text-shadow'>"+text+"</p>";
 	else
 		text = "";
-	
-	
+
+
 	content+="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 	content+="</div>";
 
@@ -675,7 +675,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 
 //function popupPermanentOverlay_Searching(locationName) {
 //	var title = "Exploring "+locationName;
-//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
+//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";
 //	popupPermanentOverlay(title, content);
 //	$(".walkingman").animate({left: "+=60px"}, 800, "linear", function()
 //			{
@@ -703,7 +703,7 @@ function buyHouse(eventObject)
 
 function doCollectItem(event, itemId)
 {
-	doCommand(event, "CollectItem", {itemId:itemId}, 
+	doCommand(event, "CollectItem", {itemId:itemId},
 		function(data,error){
 			if(error) return;
 			$(event.currentTarget || event.target).text("");
@@ -714,7 +714,7 @@ function doCollectItem(event, itemId)
 function playerReadMap(eventObject, itemId, pathId, hasDura)
 {
 	closeAllTooltips();
-	var readMap = function() { doCommand(eventObject, "PlayerReadMap", {"itemId":itemId,"pathId":pathId}); }; 
+	var readMap = function() { doCommand(eventObject, "PlayerReadMap", {"itemId":itemId,"pathId":pathId}); };
 	if(hasDura)
 	{
 		confirmPopup("Confirm Read Map", "This map looks to be worn. Read anyway?", readMap);
@@ -755,7 +755,7 @@ function storeBuyItemNew(eventObject, itemName, itemPrice, itemId, saleItemId, c
 			$(".saleItem[ref='"+saleItemId+"']").html(data.createStoreItem);
 		});
 	};
-	
+
 	if(typeof quantity === "undefined" || quantity === 1)
 		confirmPopup("Buy Item", "Are you SURE you want to buy this <a class='clue' rel='/odp/viewitemmini?itemId="+itemId+"'>"+itemName+"</a> for "+itemPrice+" gold?", yesFunction);
 	else{
@@ -819,12 +819,12 @@ function storeDeleteItemNew(eventObject,saleItemId,itemId)
 {
 	doCommand(eventObject,"StoreDeleteItem",{"saleItemId":saleItemId,"itemId":itemId},function(data,error){
 		if (error) return;
-		
+
 		$(".saleItem[ref='"+saleItemId+"']").remove();
 		var container = $("#invItems");
 		container.html(data.createInvItem+container.html());
 		});
-		
+
 }
 
 function storeRenameNew(eventObject, oldName)
@@ -834,7 +834,7 @@ function storeRenameNew(eventObject, oldName)
 		{
 			doCommand(eventObject,"StoreRename",{"name":name});
 		}
-	});	
+	});
 }
 
 function storeDisabledNew(eventObject)
@@ -858,10 +858,10 @@ function storeSetSaleNew(eventObject)
 			doCommand(eventObject,"StoreSetSale",{"sale":sale});
 		}
 	});
-	
+
 }
 
-function transmuteItems(eventObject, containerId) 
+function transmuteItems(eventObject, containerId)
 {
 	doCommand(eventObject, "TransmuteItems", {"containerId":containerId});
 }
@@ -887,7 +887,7 @@ function transmuteItems(eventObject, containerId)
 //
 //function storeDeleteItem(saleItemId)
 //{
-//	location.href = "/ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;	
+//	location.href = "/ServletCharacterControl?type=storeDeleteItem&saleItemId="+saleItemId+""+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //}
 
 //function renameStore()
@@ -901,43 +901,40 @@ function transmuteItems(eventObject, containerId)
 function createCampsite()
 {
 	clearMakeIntoPopup();
-	
+
 	var lastNameUsed = localStorage.getItem("campsiteName");
 	if (lastNameUsed==null)
 		lastNameUsed = "";
-	
+
 	promptPopup("New Campsite", "Provide a new name for your campsite:", lastNameUsed, function(name){
 		if (name!=null && name!="")
 		{
 			localStorage.setItem("campsiteName", name);
 			doCampCreate(name);
 		}
-	}, 
-	null, 
+	},
+	null,
 	true);
 }
 
 function depositDogecoinsToItem(itemId, event)
 {
 	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", $("#mainGoldIndicator").text().replace(/,/g,""), function(amount){
-		if (amount!=null)
-		{
-			doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
-				if(error) return;
-				reloadPagePopup();
-			});
-		}
+		doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
+			if(error) return;
+			reloadPagePopup();
+		});
 	});
 }
 
 function collectDogecoinsFromItem(itemId, event, reload)
 {
 	if(reload===undefined) reload = true;
-	// Command updates the gold indicator as needed, but not the inventory gold span. 
+	// Command updates the gold indicator as needed, but not the inventory gold span.
 	// Just reload popup (if one is open, that is).
 	doCommand(event, "DogeCoinsCollectFromItem", {"itemId" : itemId}, function(data, error){
 		if(error) return;
-		
+
 		if(reload) reloadPagePopup();
 		else $(event.currentTarget || event.target).text("Collect 0 gold");
 	});
@@ -1122,9 +1119,9 @@ function ajaxAction(url, eventObject, loadFunction)
 		url+="&ajax=true";
 	else
 		url+="?ajax=true";
-	
+
 	url += "&v="+window.verifyCode+"&char="+window.characterOverride;
-	
+
 	if (window.characterOverride!=null && window.characterOverride.length>10)
 		url+="&char="+window.characterOverride;
 
@@ -1141,7 +1138,7 @@ function ajaxAction(url, eventObject, loadFunction)
 		popupMessage("ERROR", "There was a server error when trying to perform the action. Feel free to report this on /r/initium. A log has been generated.");
 		clickedElement.html(originalText);
 	});
-	
+
 	eventObject.stopPropagation();
 }
 
@@ -1161,8 +1158,8 @@ function helpPopup()
 			"<li>/quickstart - A quick start guide for new players who want to play efficiently as quick as possible! <a href='quickstart.jsp'>Open quick start page.</a></li>" +
 			"<li>/about - Easily share the link to the official 'about' page on this site. <a href='about.jsp'>Open about page.</a></li>" +
 			"<li>/mechanics - Easily share the link to the official 'mechanics' page on this site. It goes into more detail about how the game works. <a href='mechanics.jsp'>Open mechanics page.</a></li>" +
-			"<li>/premium - Easily share a link to where people can learn about premium accounts.</li>" + 
-			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" + 
+			"<li>/premium - Easily share a link to where people can learn about premium accounts.</li>" +
+			"<li>/roll - Do a dice roll in chat. Use the format xdx or xtox. For example: /roll 1d6 or /roll 10to100. Full math functions work too!</li>" +
 			"<li>/app - This shows all the links to the mobile apps we have available.</li>" +
 			"<li>/competition - This puts up a link to the official competition page. This page allows you to donate to prize pools and is usually used to organize competitions between the content developers for creating new content.</li>" +
 			"<li>/faq - This puts up a link to a player made Frequently Asked Questions document which <a href='http://initium.wikia.com/wiki/Staub%27s_FAQ_Guide' target='_blank'>you can also find here.</a></li>" +
@@ -1183,7 +1180,7 @@ function openMechanicsPage()
 function shareItem(itemId)
 {
 	var message = "Item("+itemId+")";
-	
+
 	var target = null;
     if (messager.channel == "PrivateChat" && currentPrivateChatCharacterId!=null)
 	{
@@ -1199,10 +1196,10 @@ function shareItem(itemId)
 		alert("You cannot chat privately until you select a person to chat privately with. Click on their name and then click on Private Chat.");
 		return;
 	}
-	
+
 	messager.sendMessage(message, target);
 	//popupMessage("Item shared", "Everyone who is in your location can now see the item you just shared.");
-	
+
 	closeAllTooltips();
 }
 
@@ -1255,7 +1252,7 @@ function declareWar(eventObject)
 		}
 	});
 }
-function endWar(eventObject, groupId) 
+function endWar(eventObject, groupId)
 {
 	confirmPopup("End War", "Are you sure you want to end this war?", function(){
 		doCommand(eventObject, "GroupDoSetWar", {"groupId" : groupId, "decision" : "end"});
@@ -1297,11 +1294,11 @@ function setGroupDescription(eventObject, existingDescription)
 		{
 			doCommand(eventObject, "GroupChangeDescription", {"description" : description});
 		}
-		
+
 	});
 }
 
-function submitGroupAllianceRequest(eventObject) 
+function submitGroupAllianceRequest(eventObject)
 {
 	promptPopup("Request Alliance", "Enter the name of the group you want to ally with.", "",  function(groupName) {
 		if (groupName != null || groupName != "") {
@@ -1361,18 +1358,18 @@ function reloadPopup(element, backUrl, event)
 {
 	var reloadDiv = $("#reload-div");
 	var reloadDivReturn = $("#reload-div-return");
-	
+
 	var url = $(element).attr("rel");
-	
+
 	if (url==null)
 		return;
 	reloadDiv.load(url);
-	
+
 	if (backUrl==null)
 		reloadDivReturn.html("");
 	else
 		reloadDivReturn.html("<a onclick='reloadPopup(this, null, event)' rel='"+backUrl+"'>&lt;&lt; Back</a>");
-	
+
 	if (event!=null)
 		event.stopPropagation();
 }
@@ -1386,18 +1383,18 @@ function refreshPopup(url, event)
 {
 	var reloadDiv = $("#reload-div");
 	var reloadDivReturn = $("#reload-div-return");
-	
+
 	var url = $(element).attr("rel");
-	
+
 	if (url==null)
 		return;
 	reloadDiv.load(url);
-	
+
 	if (backUrl==null)
 		reloadDivReturn.html("");
 	else
 		reloadDivReturn.html("<a onclick='reloadPopup(this, null, event)' rel='"+backUrl+"'>&lt;&lt; Back</a>");
-	
+
 	if (event!=null)
 		event.stopPropagation();
 }
@@ -1410,7 +1407,7 @@ function refreshPopup(url, event)
 //			window.location.href="/ServletCharacterControl?type=storeSale&sale="+sale+"&v="+window.verifyCode+"&char="+window.characterOverride;
 //		}
 //	});
-//	
+//
 //}
 
 
@@ -1440,7 +1437,7 @@ function popupCharacterTransferService(currentCharacterId, currentCharacterName,
 {
 	if (characterNameToAccept==null || characterNameToAccept=="")
 		characterNameToAccept = "[No character specified]";
-		
+
 	var content = "This service allows you to transfer characters between user accounts. In order to transfer a character " +
 			"you have to first click on the `Accept Character by Name` link and type the name of the character that you will " +
 			"accept. Then log into the account with the character you want to transfer and click the `Transfer Character to Another Account` " +
@@ -1457,9 +1454,9 @@ function popupCharacterTransferService(currentCharacterId, currentCharacterName,
 			"";
 //	<p><a onclick='acceptCharacterTransfer()'>Accept Character by Name</a></p>
 //	<p><a onclick='transferCharacter("${characterName}")'>Transfer Character to Another Account</a></p>
-	
+
 	$(".cluetip").hide();
-	
+
 	popupMessage("Character Transfer Service", content, false);
 }
 
@@ -1503,12 +1500,12 @@ function dropAllInventory(event)
 function moveSelectedElements(fromSelector, toSelector, delimitedIds, newHtml)
 {
 	var itemsList = "[ref="+(delimitedIds || "").split(",").join("],[ref=")+"]";
-	
+
 	var selectedItems = $(fromSelector).filter(itemsList);
 	// Get rid of following line breaks first.
 	selectedItems.next("br").remove();
 	selectedItems.remove();
-	
+
 	var container = $(toSelector);
 	container.html(newHtml+container.html());
 }
@@ -1527,22 +1524,22 @@ function setSelectionCheckboxes(event, groupId)
 	var selectRoot = $(event.currentTarget || event.target).parents(".selection-root");
 	var allItems = selectRoot.find(".main-item:visible");
 	var checkedItems = allItems.has("input:checkbox:checked");
-	
+
 	// Check-all first
 	selectRoot.find("input:checkbox.check-all")
 		.prop({
 			checked: allItems.length > 0 && checkedItems.length == allItems.length,
 			indeterminate: checkedItems.length > 0 && checkedItems.length != allItems.length
 		});
-	
+
 	// If we pass in a groupId, that means we've clicked a group checkbox already.
 	// There won't be any overlapping groups (yet), so don't bother doing anything else with groups.
 	if(groupId == null || groupId == "")
 	{
 		// Check if this event belongs to a group. We can limit our selection that way.
 		var belongsToGroup = $(event.currentTarget || event.target).parents(".selection-group").prop("id");
-		
-		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]" 
+
+		var groupFilter = belongsToGroup == null ? "" : "[ref=" + belongsToGroup + "]"
 		selectRoot.find("input:checkbox.check-group" + groupFilter).each(function(idx, grp) {
 			var groupCB = $(grp);
 			var groupItems = allItems.filter("#" + groupCB.attr("ref") + " .main-item");
@@ -1563,7 +1560,7 @@ function selectedItemsDrop(event, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
-	
+
 	confirmPopup("Drop Selected Inventory", "Are you sure you want to drop " + batchItems.length + " selected items on the ground?\n\nPlease note that items for sale in your store will be excluded.", function(){
 		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
@@ -1576,7 +1573,7 @@ function selectedItemsRemoveFromStore(event, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
-	
+
 	confirmPopup("Remove Items from Store", "Are you sure you want to remove " + batchItems.length + " selected items from your store?", function(){
 		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
@@ -1596,7 +1593,7 @@ function selectedItemsSell(event, selector)
 		if (amount!=null && amount!="")
 		{
 			var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
-	
+
 			doCommand(event,"ItemsSell",{"itemIds":itemIds,"amount":amount}, function(data, error){
 				if (error) return;
 				moveSelectedElements(selector, "#saleItems", data.processedItems || "", data.createSellItem);
@@ -1610,7 +1607,7 @@ function selectedItemsTrade(event, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
-	
+
 	confirmPopup("Trade Items", "Are you sure you want to trade " + batchItems.length + " selected items?", function(){
 		var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
@@ -1630,13 +1627,13 @@ function autofixStuckInLocation(event)
 
 function autofixLootStuckOnMonster(event)
 {
-	doCommand(event, "AutofixLootStuckOnMonster"); //callback? 
+	doCommand(event, "AutofixLootStuckOnMonster"); //callback?
 }
 
 
 function autofixDeathModeNotSet(event)
 {
-	doCommand(event, "AutofixDeathModeNotSet"); //callback? 
+	doCommand(event, "AutofixDeathModeNotSet"); //callback?
 }
 
 function characterDropCharacter(event, characterId)
@@ -1713,7 +1710,7 @@ function refreshInstanceRespawnWarning()
 function giftPremium(name)
 {
 	closeAllTooltips();
-	
+
 	if (name==null) name = "";
 	promptPopup("Gift Premium to Another Player", "Please specify a character name to gift premium membership to. The user who owns this character will then be given a premium membership:", name, function(characterName){
 		confirmPopup("Anonymous gift?", "Do you wish to remain anonymous? The player receiving the gift will not know who gave it to them if you choose yes.", function(){
@@ -1763,7 +1760,7 @@ function incrementStackIndex()
     if (currentPopupStackIndex==1)
     {
 		$("#page-popup-root").html("");
-	    
+
     }
     else
    	{
@@ -1776,7 +1773,7 @@ function decrementStackIndex()
 {
 	if (currentPopupStackIndex==0)
 		return 0;
-	
+
 	currentPopupStackIndex--;
 	if (currentPopupStackIndex==0)
 	{
@@ -1796,29 +1793,29 @@ function pagePopup(url, closeCallback, title, refreshFunctionJs)
 {
 	if (refreshFunctionJs==null)
 		refreshFunctionJs = "reloadPagePopup()";
-	
+
 	if (currentPopupStackIndex==0)
 		if (typeof window.panGrid === "function" && $(window).width()>=1200)
 			panGrid(-$(window).width()/4, 0);
-	
+
 	if (url.indexOf("?")>0)
 		url+="&ajax=true";
 	else
 		url+="?ajax=true";
-	
+
 	if (window.characterOverride!=null && window.characterOverride.length>10)
 		url += "&char="+window.characterOverride;
-	
+
 	exitFullscreenChat();
-	
+
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
-	
+
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup v3-window1'><a class='page-popup-Reload' onclick='"+refreshFunctionJs+"'>&#8635;</a><a class='page-popup-X' onclick='closePagePopup()'>X</a><div class='page-popup-title'><h4>"+title+"</h4></div><div class='page-popup-content' id='"+pagePopupId+"-content' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div><div class='mobile-spacer'></div></div>");
 	$("#"+pagePopupId+"-content").load(url);
 	$("body").scrollTo("#buttonbar");
-	
+
 	if (closeCallback!=null)
 		popupStackCloseCallbackHandlers.push(closeCallback);
 	else
@@ -1828,7 +1825,7 @@ function pagePopup(url, closeCallback, title, refreshFunctionJs)
 function pagePopupHtml(title, html)
 {
 	exitFullscreenChat();
-	
+
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	//<div id='"+pagePopupId+"' class='location-controls-page'><div class='header1'><div class='header1-buttonbar'><div class='header1-buttonbar-inner'><div class='header1-button header1-buttonbar-left' onclick='reloadPagePopup()'>↻</div><div class='header1-buttonbar-middle'><div id='pagepopup-title'>"+popupTitle+"</div></div><div class='header1-button header1-buttonbar-right' onclick='closePagePopup()'>X</div></div></div></div><div class='main1 location-controls-page-internal'><div id='"+pagePopupId+"-content' class='location-controls' src='+url+'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></div></div></div>
@@ -1838,14 +1835,14 @@ function pagePopupHtml(title, html)
 
 function pagePopupIframe(url)
 {
-	
+
 	if (url.indexOf("?")>0)
 		url+="&ajax=true&char="+window.characterOverride;
 	else
 		url+="?ajax=true&char="+window.characterOverride;
-	
+
 	exitFullscreenChat();
-	
+
 	var stackIndex = incrementStackIndex();
 	var pagePopupId = "page-popup"+stackIndex;
 	$("#page-popup-root").append("<div id='"+pagePopupId+"' class='page-popup'><iframe id='"+pagePopupId+"-content' class='page-popup-iframe' src='"+url+"'><img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/></iframe></div>");
@@ -1858,16 +1855,16 @@ function closePagePopup(doNotCallback)
 	{
 		closeMap();
 	}
-	
+
 	decrementStackIndex();
-	
+
 	if (currentPopupStackIndex==0)
 	{
 		if (typeof window.panGrid === "function" && $(window).width()>=1200)
 			panGrid($(window).width()/4, 0);
 		$(".half-page-variant").hide();
 	}
-	
+
 	if (doNotCallback!=true)
 	{
 		var func = popupStackCloseCallbackHandlers.pop();
@@ -1879,7 +1876,7 @@ function closePagePopup(doNotCallback)
 function closeAllPagePopups(doNotCallback)
 {
 	while (currentPopupStackIndex>0)
-	{		
+	{
 		closePagePopup(doNotCallback);
 	}
 }
@@ -1904,11 +1901,11 @@ function reloadPagePopup(quietly)
 	var content = $("#"+pagePopupId+"-content");
 	if (content.length==0)
 		return;
-	
+
 	var url = content.attr("src");
 
-	ga('send', 'pageview', url);	
-	
+	ga('send', 'pageview', url);
+
 	if (quietly==false)
 		content.html("<img id='banner-loading-icon' src='/javascript/images/wait.gif' border=0/>");
 	else
@@ -1921,7 +1918,7 @@ function reloadPagePopup(quietly)
 	{
 		content.attr('src', url);
 	}
-	else 
+	else
 	{
 		content.load(url, null, function(){
 			$(".page-popup-Reload").html("&#8635;");
@@ -1934,7 +1931,7 @@ window.moveItemTimer = null;
 function moveItem(event, itemId, newContainerKind, newContainerId)
 {
 	var destinationKey = newContainerKind+"_"+newContainerId;
-	doCommand(event, "MoveItem", {itemId:itemId, destinationKey:destinationKey}, 
+	doCommand(event, "MoveItem", {itemId:itemId, destinationKey:destinationKey},
 		function(data,error){
 	        // Clear any previously set timer before setting a fresh one
 	    	if(window.moveItemTimer != null)
@@ -1943,7 +1940,7 @@ function moveItem(event, itemId, newContainerKind, newContainerId)
 	            reloadPagePopup(true);
 	            window.moveItemTimer = null;
 	        }, 2000);
-	        
+
 	        if(error) return;
 	        $(event.currentTarget || event.target).text("");
 		});
@@ -1951,13 +1948,13 @@ function moveItem(event, itemId, newContainerKind, newContainerId)
 
 function loadInlineItemsAndCharacters()
 {
-	$("#inline-items").load("/odp/locationitemlist?ajax=true&char="+window.characterOverride);	
-	$("#inline-characters").load("/odp/locationcharacterlist?ajax=true&char="+window.characterOverride);	
+	$("#inline-items").load("/odp/locationitemlist?ajax=true&char="+window.characterOverride);
+	$("#inline-characters").load("/odp/locationcharacterlist?ajax=true&char="+window.characterOverride);
 }
 
 function loadInlineCollectables()
 {
-	$("#collectables-area").load("ajax_collectables.jsp?ajax=true&char="+window.characterOverride);	
+	$("#collectables-area").load("ajax_collectables.jsp?ajax=true&char="+window.characterOverride);
 }
 
 function inventory(event)
@@ -2000,7 +1997,7 @@ function viewContainer(containerId, title, closePopups)
 		closeAllPopups();
 		closeAllTooltips();
 	}
-	
+
 	if(containerId == null)
 		pagePopup("/odp/ajax_moveitems?preset=location", null, title || "Nearby Items");
 	else
@@ -2078,7 +2075,7 @@ function resendVerificationEmail()
 		enforceSingleAction();
 		location.href = "/ServletUserControl?type=resendVerificationEmail"+"&v="+window.verifyCode+"&char="+window.characterOverride;
 	});
-	
+
 }
 
 function changeEmailAddress(oldEmail)
@@ -2184,7 +2181,7 @@ function enforceSingleAction()
 {
 	if (singleActionIssued)
 		throw "Attempted to execute more than one action at a time. This action has been cancelled.";
-	
+
 	singleActionIssued = true;
 }
 
@@ -2246,7 +2243,7 @@ function toggleDuelRequests(eventObject)
 }
 
 function toggleCloaked(eventObject)
-{	
+{
 	doCommand(eventObject, "ToggleCloak", {"buttonId" : eventObject.currentTarget.id});
 }
 
@@ -2375,7 +2372,7 @@ function tradeStartTradeNew(eventObject,characterId)
 	doCommand(eventObject,"TradeStartTrade",{"inputType":"characterId","characterId":characterId},function(data,error){
 		if (error) return;
 		_viewTrade();
-		popupMessage("Trade Started", data.tradePrompt);	
+		popupMessage("Trade Started", data.tradePrompt);
 	})
 }
 
@@ -2385,7 +2382,7 @@ function tradeStartTradeNewCharacterName(eventObject,characterName)
 	doCommand(eventObject,"TradeStartTrade",{"inputType":"characterName","characterName":characterName},function(data,error){
 		if (error) return;
 		_viewTrade();
-		popupMessage("Trade Started", data.tradePrompt);	
+		popupMessage("Trade Started", data.tradePrompt);
 	})
 }
 
@@ -2438,7 +2435,7 @@ function tradeSetGoldNew(eventObject,currentDogecoin,curAvailDogecoin)
 				$("#myTradeGoldAmount").text(data.newTradeGoldAmount);
 				tradeVersion = data.tradeVersion;
 			})
-			
+
 		}
 	});
 }
@@ -2448,7 +2445,7 @@ function tradeAddAllItemsNew(eventObject)
 	doCommand(eventObject,"TradeAddAllItems");
 	reloadPagePopup();
 }
-	
+
 
 //function duelRequest(characterId)
 //{
@@ -2475,11 +2472,11 @@ function switchCharacter(eventObject, characterId, direction)
 	{
 		var charParam = (window.characterOverride != null && window.characterOverride.length>10) ? ("?char=" + window.characterOverride) : "";
 		if (location.href.indexOf("/main.jsp")>-1)
-			window.history.replaceState({}, document.title, "/" + "main.jsp" + charParam);		
+			window.history.replaceState({}, document.title, "/" + "main.jsp" + charParam);
 		else if (location.href.indexOf("/odp/experimental")>-1)
 			window.history.replaceState({}, document.title, "/" + "odp/experimental" + charParam);
 		else if (location.href.indexOf("/odp/full")>-1)
-			window.history.replaceState({}, document.title, "/" + "odp/full" + charParam);	
+			window.history.replaceState({}, document.title, "/" + "odp/full" + charParam);
 
 		closeAllTooltips();
 		clearMakeIntoPopup();
@@ -2524,7 +2521,7 @@ function viewStore(characterId)
 //}
 
 function doEatBerry(eventObject)
-{	
+{
 	var itemId = $("#popupItemId").val();
 	if (itemId == null) return;
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
@@ -2535,7 +2532,7 @@ function doEatBerry(eventObject)
 }
 
 function doEatCandy(eventObject)
-{	
+{
 	var itemId = $("#popupItemId").val();
 	if (itemId == null) return;
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
@@ -2546,7 +2543,7 @@ function doEatCandy(eventObject)
 }
 
 function doDrinkElixir(eventObject)
-{	
+{
 	var itemId = $("#popupItemId").val();
 	if (itemId == null) return;
 	doCommand(eventObject,"EatBerry",{"itemId":itemId},function(data,error){
@@ -2601,11 +2598,11 @@ function viewQuests()
 function viewQuest(keyString)
 {
 	createQuestWindow("<div id='quest-id-"+keyString+"'><div style='text-align:center'><img src='/javascript/images/wait.gif' border=0/></div></div>");
-	
+
 	$("#quest-id-"+keyString).load("/odp/quest?key="+keyString+"&char="+window.characterOverride);
 }
 
-function createQuestWindow(html) 
+function createQuestWindow(html)
 {
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -2613,32 +2610,32 @@ function createQuestWindow(html)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-	
-	
-	
+
+
+
 	var windowHtml = "";
-	windowHtml += 
+	windowHtml +=
 			"<div class='quest-window-container'>" +
 			"<div class='quest-window'>" +
 			"<div class='quest-window-internal'>";
-	
+
 	windowHtml+=html;
-	
+
 	windowHtml+=
 			"</div>";
-	
+
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
             "<div class='quest-window-bottombutton' onclick='closepopupMessage(" + popupsNum +")'>"+
             "Okay"+
             "</div>"+
             "</div>"+
-            
+
 			"</div>"+
 			"</div>";
 
-	
-	
+
+
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
@@ -2647,7 +2644,7 @@ function createQuestWindow(html)
 
 
 
-function loadQuestWindow(url) 
+function loadQuestWindow(url)
 {
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -2655,41 +2652,41 @@ function loadQuestWindow(url)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-	
-	
-	
+
+
+
 	var windowHtml = "";
-	windowHtml += 
+	windowHtml +=
 			"<div class='quest-window-container'>" +
 			"<div class='quest-window'>" +
 			"<div class='quest-window-internal'>";
-	
+
 	windowHtml+="<img class='wait' src='/javascript/images/wait.gif' border='0'/>";
-	
+
 	windowHtml+=
 			"</div>";
-	
+
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
             "<div class='quest-window-bottombutton' onclick='closepopupMessage(" + popupsNum +")'>"+
             "Okay"+
             "</div>"+
             "</div>"+
-            
+
 			"</div>"+
 			"</div>";
 
-	
-	
+
+
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
-    
+
     $(".quest-window-internal").load(url);
 }
 
 
-function createMapWindow(html) 
+function createMapWindow(html)
 {
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -2697,24 +2694,24 @@ function createMapWindow(html)
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-	
-	
-	
+
+
+
 	var windowHtml = "";
-	windowHtml += 
+	windowHtml +=
 			"<div class='overheadmap-window'>" +
 			"<div class='map-contents global-navigation-map overheadmap-window-internal'>";
-	
+
 	windowHtml+=html;
-	
+
 	windowHtml+=
 			"</div>";
-	
+
 	windowHtml+="</div>";
 
 	windowHtml+="<a class='overheadmap-X' onclick='closepopupMessage(" + popupsNum +")'>X</a>";
-	
-	
+
+
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
@@ -2722,7 +2719,7 @@ function createMapWindow(html)
 
 
 
-function createWelcomeWindow() 
+function createWelcomeWindow()
 {
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -2730,29 +2727,29 @@ function createWelcomeWindow()
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-	
-	
-	
+
+
+
 	var windowHtml = "";
-	windowHtml += 
+	windowHtml +=
 			"<div class='quest-window-container'>" +
 			"<div class='quest-window'>" +
 			"<div class='quest-window-internal'>";
-	
+
 	windowHtml+="<h2>Welcome to Initium!</h2>" +
 			"<p>You're about to begin playing the game by following a short series of quests. This is highly recommended for new players as it is a fun and engaging way to learn " +
 			"how to play the game. If you have any questions, feel free to speak up in <b>Global</b> chat, our community can be a bit weird but they're generally very helpful!</p>" +
 			"";
-	
+
 	windowHtml+=
 			"</div>";
-	
+
 	windowHtml+="" +
 			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
 			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
 			"Click here to disable sounds" +
 			"</a>";
-	
+
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
             "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +")'>"+
@@ -2762,12 +2759,12 @@ function createWelcomeWindow()
             "Okay"+
             "</div>"+
             "</div>"+
-            
+
 			"</div>"+
 			"</div>";
 
-	
-	
+
+
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
@@ -2775,19 +2772,19 @@ function createWelcomeWindow()
 
 /*
 <form action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_top'>
-<input type='hidden' name='custom' value='5299602559336448'> 
-<input type='hidden' name='cmd' value='_donations'> 
+<input type='hidden' name='custom' value='5299602559336448'>
+<input type='hidden' name='cmd' value='_donations'>
 <input type='hidden' name='business' value='narmstrong@playinitium.com'>
 <input type='hidden' name='amount' value='5.00'>
 <input type='hidden' name='currency_code' value='USD'>
 <input type='hidden' name='item_name' value='Initium Development'>
 <input type='hidden' name='tax' value='0'>
-<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'> 
+<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'>
 <img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>
 </form>
 */
 
-function createDonationWindow() 
+function createDonationWindow()
 {
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -2795,19 +2792,19 @@ function createDonationWindow()
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-	
-	
-	
+
+
+
 	var windowHtml = "";
-	windowHtml += 
+	windowHtml +=
 			"<div class='quest-window-container'>" +
 			"<div class='quest-window'>" +
 			"<div class='quest-window-internal'>";
-	
+
 	windowHtml+="<h2 style='text-align:center;'>The cost of a full account will soon increase!</h2>" +
 			"<p>Currently, while Initium is still in development, you can get a full premium account for only <b>$5.00</b> however the cost for a premium account will " +
 			"increase once the game is officially launched. Take advantage of this pre-launch price by donating at least 5 dollars.</p>" +
-			"<p>" + 
+			"<p>" +
 			"Premium account features include:" +
 			"<ul>" +
 			"<li>Other players can rescue you if you go unconscious</li>" +
@@ -2825,21 +2822,21 @@ function createDonationWindow()
 			"<input type='hidden' name='currency_code' value='USD'>" +
 			"<input type='hidden' name='item_name' value='Initium Development'>" +
 			"<input type='hidden' name='tax' value='0'>" +
-			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!'>" + 
+			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!'>" +
 			"<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>" +
 			"</form>" +
 			"</center>" +
 			"</p>";
-	
+
 	windowHtml+=
 			"</div>";
-	
+
 	windowHtml+="" +
 			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
 			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
 			"Click here to disable sounds" +
 			"</a>";
-	
+
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
             "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
@@ -2849,19 +2846,19 @@ function createDonationWindow()
             "Okay"+
             "</div>"+
             "</div>"+
-            
+
 			"</div>"+
 			"</div>";
 
-	
-	
+
+
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
 }
 
 
-function createUpgradeToPremiumWindow() 
+function createUpgradeToPremiumWindow()
 {
 	$(".popupBlurrable").addClass("blur");
     window.popupsNum++;
@@ -2869,20 +2866,20 @@ function createUpgradeToPremiumWindow()
     window.popupsArray[popupsNum-1] = "yes";
     $("#popups").show();
     currentPopups = $("#popups").html();
-	
-	
-	
+
+
+
 	var windowHtml = "";
-	windowHtml += 
+	windowHtml +=
 			"<div class='quest-window-container'>" +
 			"<div class='quest-window'>" +
 			"<div class='quest-window-internal' style='padding-bottom:0px;'>";
-	
+
 	if (window.isPremium==true)
 	{
 		windowHtml+="" +
 		"<h4>Thank-you for your continued support!</h4>";
-	
+
 	}
 	else
 	{
@@ -2903,10 +2900,10 @@ function createUpgradeToPremiumWindow()
 	}
 	windowHtml+="" +
 	"<p>Please be aware that donations of $25 or more will result in DOUBLE the donation credit (as though you donated twice as much) which you can use to buy cosmetic item customizations, trade with other players, buy more character slots, and gift premium memberships to those less fortunate.</p>";
-	
+
 	windowHtml+=
 			"</div>";
-	
+
 	windowHtml+="" +
 			"<center style='position: absolute; bottom: -39px; width: 100%;'>" +
 			"<form id='donatequick' action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank' onsubmit='setTimeout(function(){closepopupMessage(" + popupsNum +"); }, 1000)'>" +
@@ -2917,7 +2914,7 @@ function createUpgradeToPremiumWindow()
 			"<input type='hidden' name='currency_code' value='USD'>" +
 			"<input type='hidden' name='item_name' value='Initium Development'>" +
 			"<input type='hidden' name='tax' value='0'>" +
-			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!' style='cursor:pointer;'><br>" + 
+			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!' style='cursor:pointer;'><br>" +
 			"<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>" +
 			"</form>" +
 			"</center>" +
@@ -2925,7 +2922,7 @@ function createUpgradeToPremiumWindow()
 			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
 			"Click here to disable sounds" +
 			"</a>";
-	
+
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
             "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); '>"+
@@ -2935,12 +2932,12 @@ function createUpgradeToPremiumWindow()
             "Okay"+
             "</div>"+
             "</div>"+
-            
+
 			"</div>"+
 			"</div>";
 
-	
-	
+
+
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+windowHtml+'</div></div>');
     expandpopupMessage();
     enterPopupClose();
@@ -2952,28 +2949,28 @@ function createUpgradeToPremiumWindow()
 function viewInvention()
 {
 	closeAllPagePopups();
-	var params = "?selected2DTileX="+selectedTileX+"&selected2DTileY="+selectedTileY; 
+	var params = "?selected2DTileX="+selectedTileX+"&selected2DTileY="+selectedTileY;
 	pagePopup("/odp/invention"+params, null, "Invention", "viewInvention()");
 }
 
 function combineChippedTokens(event, itemId)
 {
 	doCommand(event, "CombineChippedTokens", {itemId:itemId}, function(){
-		closeAllTooltips();		
+		closeAllTooltips();
 	});
 }
 
 function splitPremiumToken(event, itemId)
 {
 	doCommand(event, "SplitPremiumToken", {itemId:itemId}, function(){
-		closeAllTooltips();		
+		closeAllTooltips();
 	});
 }
 
 function doRenameConstructItemSkill(event, currentName, skillId)
 {
 	closeAllTooltips();
-	
+
 	promptPopup("Rename Skill", "Provide a new name for this skill. You may use letters, numbers, spaces, or any of these characters: . ' #", currentName, function(name){
 		doCommand(event, "ConstructItemSkillRename", {skillId:skillId,name:name});
 	});
@@ -2982,7 +2979,7 @@ function doRenameConstructItemSkill(event, currentName, skillId)
 function doForgetConstructItemSkill(event, name, skillId)
 {
 	closeAllTooltips();
-	
+
 	confirmPopup("Permanently Forget Skill", "Are you sure you want to forget the "+name+" skill? You cannot undo this operation.", function(){
 		doCommand(event, "ConstructItemSkillForget", {skillId:skillId});
 	});
@@ -2998,7 +2995,7 @@ function doBuyCharacterSlots(event)
 function doFireplaceLight(event, itemKey)
 {
 	closeAllTooltips();
-	
+
 	doCommand(event, "FireplaceLight", {itemKey:itemKey});
 }
 
@@ -3006,7 +3003,7 @@ function doFireplaceLight(event, itemKey)
 function doFireplaceAddFuel(event, itemKey)
 {
 	closeAllTooltips();
-	
+
 	doCommand(event, "FireplaceAddFuel", {itemKey:itemKey});
 }
 
@@ -3015,7 +3012,7 @@ var queuedMainPageUpdates = [];
 function requestUpdateMainPage(updateList)
 {
 	var needsToWait = queuedMainPageUpdates.length==0;
-	
+
 	// Add all the new updates we need to do to the queue if they aren't already there
 	var newUpdateList = [];
 	if (updateList!=null)
@@ -3029,7 +3026,7 @@ function requestUpdateMainPage(updateList)
 		setTimeout(requestUpdateMainPage, 500);
 		return;
 	}
-	
+
 	var currentTime = new Date().getTime();
 	if (lastUpdate==null || lastUpdate<currentTime-3000)
 	{
@@ -3055,11 +3052,11 @@ function requestUpdateMainPage(updateList)
 function playSoundsFromNotification(soundList)
 {
 	if (isSoundEffectsEnabled()==false) return;
-	
+
 	var sounds = [];
 	if (soundList!=null)
 		sounds = soundList.split(",");
-	
+
 	for(var i = 0; i<sounds.length; i++)
 		playAudio(sounds[i], 0.3);
 }
@@ -3079,7 +3076,7 @@ function loadRelatedSkills(itemKey)
 function makeIntoPopupFromUrl(url, title, disableGlass)
 {
 	clearMakeIntoPopup();
-	
+
 	window.scrollTo(0,0);
 	if (disableGlass!=true)
 		$(".make-popup-root").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
@@ -3096,7 +3093,7 @@ function makeIntoPopupFromUrl(url, title, disableGlass)
 function makeIntoPopupHtml(html, disableGlass)
 {
 	clearMakeIntoPopup();
-	
+
 	window.scrollTo(0,0);
 	if (disableGlass!=true)
 		$(".make-popup-root").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
@@ -3112,7 +3109,7 @@ function isMakePopupOpen()
 function makeIntoPopup(jquerySelector)
 {
 	clearMakeIntoPopup();
-	
+
 	window.scrollTo(0,0);
 	$(".make-popup-root").append("<div onclick='clearMakeIntoPopup()' class='make-popup-underlay'></div>");
 	$(jquerySelector).addClass("make-popup").prepend("<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>");
@@ -3137,15 +3134,15 @@ function clearMiniPagePopup()
 function miniPagePopup(url, title)
 {
 	window.scrollTo(0,0);
-	
-	var html = 
-			"<a class='mini-page-popup-reload' onclick='reloadMiniPagePopup()'>&#8635;</a>	\r\n" + 
-			"<a class='mini-page-popup-X' onclick='clearMiniPagePopup()'>X</a>	\r\n" + 
-			"<h4>"+title+"</h4>\r\n" + 
-			"<div id='mini-page-popup-contents'>\r\n" + 
-			"	<img class='wait' src='/javascript/images/wait.gif' border='0'/>\r\n" + 
+
+	var html =
+			"<a class='mini-page-popup-reload' onclick='reloadMiniPagePopup()'>&#8635;</a>	\r\n" +
+			"<a class='mini-page-popup-X' onclick='clearMiniPagePopup()'>X</a>	\r\n" +
+			"<h4>"+title+"</h4>\r\n" +
+			"<div id='mini-page-popup-contents'>\r\n" +
+			"	<img class='wait' src='/javascript/images/wait.gif' border='0'/>\r\n" +
 			"</div>\r\n";
-	
+
 	$(".mini-page-popup").html(html).show();
 
 	$("#mini-page-popup-contents").load(url).attr("url", url);
@@ -3155,7 +3152,7 @@ function getMiniPagePopupTitle()
 {
 	if (isMiniPagePopupActive())
 		return $(".mini-page-popup h4").text();
-	
+
 	return null;
 }
 
@@ -3191,7 +3188,7 @@ function viewCharacterSwitcher()
 function createNewCharacter(event)
 {
 	clearMakeIntoPopup();
-	
+
 	promptPopup("New Character", "Give your new character a name:<br/><span style='font-size: 10px'>Add ! at the end for hardcore mode.</span>", "", function(name){
 		doCommand(event, "NewCharacter", {name:name}, function(){
 			clearMakeIntoPopup();
@@ -3202,7 +3199,7 @@ function createNewCharacter(event)
 
 function mustCreateNewCharacter()
 {
-	promptPopup("New Character", "It seems your character died a while ago and we no longer know " + 
+	promptPopup("New Character", "It seems your character died a while ago and we no longer know " +
 			"what your old character\'s name was. <br>Give your new character a name:<br/><span style='font-size: 10px'>Add ! at the end for hardcore mode.</span>", "", function(name){
 		doCommand(event, "NewCharacter", {name:name}, function(){
 		});
@@ -3212,7 +3209,7 @@ function mustCreateNewCharacter()
 function toggleMainPullout()
 {
 	var mainPullout = $("#main-pullout");
-	
+
 	if ($("#main-pullout:visible").length>0)
 	{
 		// It's visible, make it invisible
@@ -3263,7 +3260,7 @@ function storeBuyOrderExecuteAll(event, buyOrderId)
 		var id = items.get(i).id;
 		itemIds.push(parseInt(id));
 	}
-	
+
 	confirmPopup("Sell your stuff", "Are you sure you want to sell EVERYTHING you are holding that matches this buy order?<br>(Only 20 can be sold at a time)", function(){
 		doCommand(event, "StoreBuyOrderExecute", {buyOrderId:buyOrderId, itemId:itemIds}, function(data){
 			$("#buyordercompatibleitemslist-container").html(
@@ -3290,13 +3287,13 @@ function viewBuyOrderOptions(event, buyOrderId)
 function storeDeleteBuyOrder(event, buyOrderId)
 {
 	doCommand(event, "StoreDeleteBuyOrder", {buyOrderId:buyOrderId});
-	
+
 }
 
 function closeClosableMessage(id)
 {
 	localStorage.setItem("closableMessage-"+id, true);
-	
+
 	$("#"+id).hide();
 }
 
@@ -3321,7 +3318,7 @@ function view2DView(forcedMode)
 	else
 	{
 		$("body").attr("bannerstate", "location-2d");
-		
+
 		// Call the center function to view the banner centered
 		centerGridOnScreen();
 	}
@@ -3356,18 +3353,18 @@ function drawTravelLine(event, startX, startY, x, y, seconds)
 		}
 		else
 			scale = 1;
-		
+
 		if (map.hasClass("minimap-contents"))
 			scale*=0.6;
-		
+
 		map.append("" +
 				"<svg class='travel-line-container' style='position:absolute;left:0px; top:0px;bottom:0px;right:0px;width:100%;height:100%;z-index:1;'>" +
 				"	<line class='travel-line' x1='"+startX+"' y1='"+startY+"' x2='"+startX+"' y2='"+startY+"'/>" +
 				"</svg>"
 				).append("<a class='travel-line-cancel-button' onclick='cancelLongOperations(event)'><img src='https://initium-resources.appspot.com/images/ui4/button-cancel1.png' alt='Cancel Travel'/></a>");
-		
-		
-		map[0].travelLineData = 
+
+
+		map[0].travelLineData =
 		{
 			startTime:new Date().getTime(),
 			endTime:new Date().getTime()+((seconds+1)*1000),
@@ -3376,7 +3373,7 @@ function drawTravelLine(event, startX, startY, x, y, seconds)
 			x2:x*scale,
 			y2:y*scale
 		};
-		
+
 		setTimeout(updateTravelLine, 100);
 	}
 }
@@ -3384,7 +3381,7 @@ function drawTravelLine(event, startX, startY, x, y, seconds)
 function cancelTravelLine()
 {
 	$(".minimap-button-cancel").hide();
-	
+
 	var maps = $(".map-contents");
 	for(var i = 0; i<maps.length; i++)
 	{
@@ -3403,38 +3400,38 @@ function updateTravelLine()
 		var map = $(maps[i]);
 		var data = map[0].travelLineData;
 		if (data==null) continue;
-		
+
 		var elapsed = new Date().getTime()-data.startTime;
 		var percentComplete = elapsed/(data.endTime-data.startTime);
 		if (percentComplete>1) percentComplete = 1;
-		
+
 		var x = (data.x2-data.x1)*percentComplete;
 		var y = (data.y2-data.y1)*percentComplete;
-		
+
 		x+=data.x1;
 		y+=data.y1;
-		
+
 		var travelLine = map.find(".travel-line");
 		var parent = travelLine.parent();
-		
+
 		var canvasWidth = parent.width();
 		var canvasHeight = parent.height();
-		
+
 		travelLine.attr("x1", data.x1+(canvasWidth/2)).attr("y1", data.y1+(canvasHeight/2)).attr("x2",x+(canvasWidth/2)).attr("y2",y+(canvasHeight/2));
-		
+
 		if (percentComplete<1)
 		{
 			setTimeout(updateTravelLine, 100);
 		}
 	}
-	
+
 }
 
 function isGlobeNavigationVisible()
 {
 	if ($(".global-navigation-map").length>1)
 		return true;
-	
+
 	return false;
 }
 
@@ -3442,9 +3439,9 @@ function isGlobeNavigationVisible()
 //{
 //	positionX = positionX*100+"px";
 //	positionY = positionY*100+"px";
-//	
-//	var html = 
-//		  "<div class='overheadmap-cell-container-base'>"; 
+//
+//	var html =
+//		  "<div class='overheadmap-cell-container-base'>";
 //	html+="		<a onclick='doGoto(event, "+locationId+", false);' class='path-overlay-link overheadmap-cell-container' style='left:"+positionX+"; top:"+positionY+";'>";
 //    html+="			<div class='overheadmap-cell-label-container'>";
 //    html+="				<div class='label'>"+locationName+"</div>";
@@ -3452,7 +3449,7 @@ function isGlobeNavigationVisible()
 //    html+="			<img src='"+imageUrl+"'/>";
 //    html+="		</a>";
 //    html+="</div>";
-//    
+//
 //    $("#overheadmap-cells").append(html);
 //}
 
@@ -3478,7 +3475,7 @@ function beginNoobQuests(questDefId)
 		doCommand(null, "BeginNoobQuests", {questDefId:questDefId}, function(data)
 		{
 			if (data.error) return;
-			
+
 			viewQuest(data.questDefKey);
 		});
 	});
@@ -3488,7 +3485,7 @@ function beginQuest(event, itemId)
 {
 	doCommand(event, "BeginQuest", {itemId:itemId}, function(data){
 		if (data.error) return;
-		
+
 		viewQuest(data.questDefKey);
 	});
 }
@@ -3506,81 +3503,81 @@ function viewNoobWindow()
 			"<h5>Talk to the community in global!</h5>" +
 			"<p>Last but not least our small gaming community is (generally) very helpful and happy you're here! If you have any questions just ask and many will be willing to go out of their way to help you out.</p>" +
 			"";
-	
+
 	makeIntoPopupHtml(html);
 }
 
 function viewJoinTeam()
 {
 	var html = "" +
-			"				<p>We are always on the look-out for those who want to help build Initium. You don\'t need to be a programmer to help! There are 3 categories of \r\n" + 
-			"				help you can provide with varying degrees of skill required. They are as follows...</p>\r\n" + 
-			"\r\n" + 
-			"				<h5>Back and Frontend Developers</h5>\r\n" + 
-			"				<p>\r\n" + 
+			"				<p>We are always on the look-out for those who want to help build Initium. You don\'t need to be a programmer to help! There are 3 categories of \r\n" +
+			"				help you can provide with varying degrees of skill required. They are as follows...</p>\r\n" +
+			"\r\n" +
+			"				<h5>Back and Frontend Developers</h5>\r\n" +
+			"				<p>\r\n" +
 			"				(Java, Javascript, Html, and/or CSS experience recommended)<br>" +
-			"				Got some programming experience? We\'re able to accommodate a variety of different skill levels for the backend development. If\r\n" + 
-			"				you\'re interested just send me an email and then jump right into getting your development environment setup \r\n" + 
-			"				<a href=\'https://github.com/Emperorlou/Initium-ODP\'>using these installation instructions</a>. If you have any trouble, definitely \r\n" + 
-			"				let me know via email and I\'ll try to help you out.\r\n" + 
-			"				<br><br>				\r\n" + 
-			"				If you\'re more a frontend guy, there is certainly stuff to be done there as well so don\'t hesitate to share your javascript and jquery experience with us!\r\n" + 
-			"				<br><br>\r\n" + 
-			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be a Code Developer for Initium\' target=\"_top\">Apply to be a Code Developer here</a>\r\n" + 
-			"				<br><br>\r\n" + 
-			"				<i>Include how much time you have on a daily basis to help with development, what you do for a living, and what kind of experience\r\n" + 
-			"				you have with web development. You don\'t necessarily need experience to be accepted!</i> \r\n" + 
-			"				</p>			\r\n" + 
-			"\r\n" + 
-			"				\r\n" + 
-			"				<h5>Content Developers</h5>\r\n" + 
-			"				<p>\r\n" + 
+			"				Got some programming experience? We\'re able to accommodate a variety of different skill levels for the backend development. If\r\n" +
+			"				you\'re interested just send me an email and then jump right into getting your development environment setup \r\n" +
+			"				<a href=\'https://github.com/Emperorlou/Initium-ODP\'>using these installation instructions</a>. If you have any trouble, definitely \r\n" +
+			"				let me know via email and I\'ll try to help you out.\r\n" +
+			"				<br><br>				\r\n" +
+			"				If you\'re more a frontend guy, there is certainly stuff to be done there as well so don\'t hesitate to share your javascript and jquery experience with us!\r\n" +
+			"				<br><br>\r\n" +
+			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be a Code Developer for Initium\' target=\"_top\">Apply to be a Code Developer here</a>\r\n" +
+			"				<br><br>\r\n" +
+			"				<i>Include how much time you have on a daily basis to help with development, what you do for a living, and what kind of experience\r\n" +
+			"				you have with web development. You don\'t necessarily need experience to be accepted!</i> \r\n" +
+			"				</p>			\r\n" +
+			"\r\n" +
+			"				\r\n" +
+			"				<h5>Content Developers</h5>\r\n" +
+			"				<p>\r\n" +
 			"				(no specific skill required but you probably wont get in till you've been active for a month or so)<br>" +
-			"				We usually have a handful of content developers active at any time. These are people who create the game world using an online editor that was custom built for\r\n" + 
-			"				Initium. It is very easy to use. If you wish to become a content developer, give me a shout! Just so you are aware however, I generally pick people who are\r\n" + 
-			"				regular, active members of the community and tend to play quite a lot. The most important part of being a content developer is that you have a lot of time \r\n" + 
-			"				on your hands! \r\n" + 
-			"				<br><br>\r\n" + 
-			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be a Content Developer for Initium\' target=\"_top\">Apply to be a Content Developer here</a>\r\n" + 
-			"				<br><br>\r\n" + 
-			"				<i>Simply include your in-game character name, how much time you have on a daily basis to help with world building, what you do for a living, and any other \r\n" + 
-			"				bits of information that would help me decide to choose you as our next content dev!</i> \r\n" + 
-			"				</p>\r\n" + 
-			"	\r\n" + 
-			"	\r\n" + 
-			"				<h5>Artists</h5>\r\n" + 
-			"				<p>\r\n" + 
+			"				We usually have a handful of content developers active at any time. These are people who create the game world using an online editor that was custom built for\r\n" +
+			"				Initium. It is very easy to use. If you wish to become a content developer, give me a shout! Just so you are aware however, I generally pick people who are\r\n" +
+			"				regular, active members of the community and tend to play quite a lot. The most important part of being a content developer is that you have a lot of time \r\n" +
+			"				on your hands! \r\n" +
+			"				<br><br>\r\n" +
+			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be a Content Developer for Initium\' target=\"_top\">Apply to be a Content Developer here</a>\r\n" +
+			"				<br><br>\r\n" +
+			"				<i>Simply include your in-game character name, how much time you have on a daily basis to help with world building, what you do for a living, and any other \r\n" +
+			"				bits of information that would help me decide to choose you as our next content dev!</i> \r\n" +
+			"				</p>\r\n" +
+			"	\r\n" +
+			"	\r\n" +
+			"				<h5>Artists</h5>\r\n" +
+			"				<p>\r\n" +
 			"				(pixel art, photoshop work)<br>" +
-			"				We can always use talented artists to help us create new banner images and equipment icons. After you\'ve had a good look at the game and the art style, \r\n" + 
-			"				apply here and provide us with some cool sample work that relates!\r\n" + 
-			"				<br><br>\r\n" + 
-			"				If you\'re not really an artist but you can use a computer AND you can get your hands on Photoshop CS5 (CS5 is important) then you have everything you need\r\n" + 
-			"				to help us with creating beautiful banners from photographs. Most of the work is just 1-click once you\'re setup!\r\n" + 
-			"				<br><br>\r\n" + 
-			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be an Artist for Initium\' target=\"_top\">Apply to be an Artist here</a>\r\n" + 
-			"				<br><br>\r\n" + 
-			"				<i>Include how much time you have on a daily basis to help with art development, what you do for a living, and include any sample art pieces\r\n" + 
-			"				that might relate (or not) to help your application!</i> \r\n" + 
-			"				</p>			\r\n" + 
-			"	\r\n" + 
-			"				<h5>Marketing</h5>\r\n" + 
-			"				<p>\r\n" + 
+			"				We can always use talented artists to help us create new banner images and equipment icons. After you\'ve had a good look at the game and the art style, \r\n" +
+			"				apply here and provide us with some cool sample work that relates!\r\n" +
+			"				<br><br>\r\n" +
+			"				If you\'re not really an artist but you can use a computer AND you can get your hands on Photoshop CS5 (CS5 is important) then you have everything you need\r\n" +
+			"				to help us with creating beautiful banners from photographs. Most of the work is just 1-click once you\'re setup!\r\n" +
+			"				<br><br>\r\n" +
+			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be an Artist for Initium\' target=\"_top\">Apply to be an Artist here</a>\r\n" +
+			"				<br><br>\r\n" +
+			"				<i>Include how much time you have on a daily basis to help with art development, what you do for a living, and include any sample art pieces\r\n" +
+			"				that might relate (or not) to help your application!</i> \r\n" +
+			"				</p>			\r\n" +
+			"	\r\n" +
+			"				<h5>Marketing</h5>\r\n" +
+			"				<p>\r\n" +
 			"				(using Reddit, social media, posting on forums, contacting journalists, research)<br>" +
-			"				This is a new position that we\'re preparing for. While Initium is still very new and a work-in-progress, many people have had hundreds of hours of fun\r\n" + 
-			"				with the game even in it\'s current state. We\'d like to start marketing the game in a variety of different ways that finally branch outside of using\r\n" + 
-			"				Reddit (which has been our exclusive marketing platform up to this point). As a marketing agent, you would help us fill out a spreadsheet of possible\r\n" + 
-			"				places that we can advertise the game for free (like different subreddits, or gaming magazines), journalists that might be interested in writing an \r\n" + 
-			"				article about Initium, or maybe just using other forms of social media to get the word out.  \r\n" + 
-			"				<br><br>\r\n" + 
-			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be Marketing agent for Initium\' target=\"_top\">Apply to be Marketing Agent here</a>\r\n" + 
-			"				<br><br>\r\n" + 
-			"				<i>Include how much time you have on a daily basis to help with marketing, and what you do for a living.</i> \r\n" + 
-			"				</p>\r\n" + 
+			"				This is a new position that we\'re preparing for. While Initium is still very new and a work-in-progress, many people have had hundreds of hours of fun\r\n" +
+			"				with the game even in it\'s current state. We\'d like to start marketing the game in a variety of different ways that finally branch outside of using\r\n" +
+			"				Reddit (which has been our exclusive marketing platform up to this point). As a marketing agent, you would help us fill out a spreadsheet of possible\r\n" +
+			"				places that we can advertise the game for free (like different subreddits, or gaming magazines), journalists that might be interested in writing an \r\n" +
+			"				article about Initium, or maybe just using other forms of social media to get the word out.  \r\n" +
+			"				<br><br>\r\n" +
+			"				<a href=\'mailto:nikolasarmstrong@gmail.com?Subject=Applying to be Marketing agent for Initium\' target=\"_top\">Apply to be Marketing Agent here</a>\r\n" +
+			"				<br><br>\r\n" +
+			"				<i>Include how much time you have on a daily basis to help with marketing, and what you do for a living.</i> \r\n" +
+			"				</p>\r\n" +
 			"";
-	
-	
+
+
 	pagePopupHtml("Join the team!", html);
-	
+
 }
 
 function viewThisLocationWindow()
@@ -3596,7 +3593,7 @@ function viewLocalNavigation(event, showHidden)
 function showLootPopup()
 {
 	clearMakeIntoPopup();
-	
+
 	var html = "";
 	html += "<div id='locationQuickList-contents'>";
 	html += "<div><h4>Loot</h4></div>";
@@ -3612,9 +3609,9 @@ function showLootPopup()
 	html += "	<div id='inline-items'>";
 	html += "	</div>";
 	html += "</div>";
-	
+
 	clearMakeIntoPopup();
-	
+
 	makeIntoPopupHtml(html, true);
 	loadInlineItemsAndCharacters();
 }
@@ -3687,7 +3684,7 @@ function ajaxUpdatePage(ajaxResponseData)
 }
 
 /**
- * This function activates the wait gif animation on the clicked element and returns 
+ * This function activates the wait gif animation on the clicked element and returns
  * a function that, when called, will restore the original html for the clicked element.
  * @param eventObject
  * @returns {Function}
@@ -3704,14 +3701,14 @@ function activateWaitGif(eventObject)
 			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
 		}
 	}
-	
+
 	return function(){
 		if (eventObject!=null)
 		{
 			clickedElement.html(originalText.replace("hasTooltip", ""));
 		}
 	};
-	
+
 }
 
 window.commandInProgress = false;
@@ -3719,7 +3716,7 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 {
 	if (window.commandInProgress==true)
 		return;
-	
+
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
 	if (parameters==null)
 	{
@@ -3732,16 +3729,16 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 		parameters.selected2DTileY = selectedTileY;
 		parameters.uiStyle = uiStyle;
 	}
-	
+
 	parameters.mainPageUrl = location.href;
-	
+
 	if (window.characterOverride!=null && window.characterOverride.length>10)
 		parameters.char = window.characterOverride;
-	
+
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "/cmd?cmd="+commandName;
-	
-	
+
+
 	var clickedElement = null;
 	var originalText = null;
 	if (eventObject!=null)
@@ -3752,9 +3749,9 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 			clickedElement.html("<img class='wait' src='/javascript/images/wait.gif' border=0/>");
 		}
 	}
-	
+
 	ga('send', 'pageview', url);
-	
+
 	var selectedItems = null;
 	if (userRequestId!=null)
 	{
@@ -3762,7 +3759,7 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 		if (selectedItems==null) selectedItems = {};
 		parameters["__"+userRequestId+"UserResponse"] = JSON.stringify(selectedItems);
 	}
-	
+
 	window.commandInProgress = true;
 	// We need to post, as larger batch operations failed due to URL string being too long
 	$.post(url, parameters)
@@ -3774,13 +3771,13 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 		// on the original element.
 		if (eventObject!=null && originalText)
 			clickedElement.html(originalText.replace("hasTooltip", ""));
-		
+
 		if (data.antiBotQuestionActive == true)
 		{
 			antiBotQuestionPopup();
 			return;
 		}
-		
+
 		// Refresh the full page or the pagePopup if applicable
 		if (data.javascriptResponse == "FullPageRefresh")
 		{
@@ -3800,17 +3797,17 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 			messager.getMessages(true);
 		}
 
-		
+
 		// Here we handle the special: UserRequestBuilder page popup mechanism
 		if (data.pagePopupUrl!=null)
 		{
 			handleUserRequest(data);
 		}
-		
+
 		// Here we display the system message if there was a system message
 		if (data.message!=null && data.message.length>0)
 			popupMessage("System Message", data.message);
-		
+
 		// Update the map with response data
 		if (data._2dViewportUpdates!=null) {
 			// For testing purposes, we might not have method in scope
@@ -3831,7 +3828,7 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 			callback(data.callbackData, error);
 		else if (callback!=null && data==null)
 			callback(null, error);
-	
+
 	})
 	.fail(function(data)
 	{
@@ -3840,10 +3837,10 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 		if (eventObject!=null)
 			clickedElement.html(originalText.replace("hasTooltip", ""));
 	});
-	
+
 	if (eventObject!=null)
 		eventObject.stopPropagation();
-	
+
 }
 
 function systemMessage(msg)
@@ -3928,10 +3925,10 @@ function startLongOperationCountdown(data)
 	lastLongOperationDueTime = new Date().getTime()+((timeLeftSeconds+1)*1000);
 	lastLongOperationStartTime = data.startTime;
 	updateLongOperationTimeLeft();
-	
+
 	stopLongOperationCountdown();
 	longOperationCountdownTimer = setInterval(updateLongOperationTimeLeft, 1000);
-	
+
 	showLongOperationProgress();
 	setLongOperationProgress(totalSeconds-timeLeftSeconds/totalSeconds, data.longOperationName, data.longOperationDescription);
 }
@@ -3954,24 +3951,24 @@ function updateLongOperationTimeLeft()
 		var totalSecs = totalMs/1000;
 		var timeLeft = (dueTime-currentTime)/1000;
 		var timeSpent = totalSecs-timeLeft;
-		
+
 		var percent = timeSpent/totalSecs*100;
 		if (percent>100) percent = 100;
 		if (percent<0) percent = 0;
 		// Here we're making the progress bar only go from 2% to 98% because of the progress bar graphic's specific requirements to fit properly
 		var percentCorrected = 2;
 		percentCorrected += percent*0.96;
-		
+
 		if (timeLeft<0)
 			$("#long-operation-timeleft").text("0 seconds remaining.");
 		else
 			$("#long-operation-timeleft").text(secondsToTimeString(timeLeft)+" remaining.");
-		
+
 		var loProgressBar = $("#long-operation-status");
 		if (loProgressBar.length>0)
 		{
 			loProgressBar.find(".progress-bar-text").text(secondsToTimeString(timeLeft));
-			loProgressBar.find(".progress-bar-fill").css("width", percentCorrected+"%"); 
+			loProgressBar.find(".progress-bar-fill").css("width", percentCorrected+"%");
 		}
 	}
 }
@@ -3979,29 +3976,29 @@ function updateLongOperationTimeLeft()
 function secondsToTimeString(seconds)
 {
 	if (seconds<0) return "100%";
-	
+
 	var days = Math.floor(seconds/86400);
 	seconds -= (days*86400);
 
 	var hours = Math.floor(seconds/3600);
 	seconds -= (hours*3600);
-	
+
 	var minutes = Math.floor(seconds/60);
 	seconds -= (minutes*60);
-	
+
 	var result = "";
-	
-	if (days>0) 
+
+	if (days>0)
 	{
 		result+=days+" days ";
 		result+=hours+" hours ";
 	}
-	else if (hours>0) 
+	else if (hours>0)
 	{
 		result+=hours+" hours ";
 		result+=minutes+" minutes ";
 	}
-	else if (minutes>0) 
+	else if (minutes>0)
 	{
 		result+=minutes+" minutes ";
 		result+=Math.round(seconds)+" seconds";
@@ -4012,10 +4009,10 @@ function secondsToTimeString(seconds)
 	}
 	else
 		result+="100%";
-	
-	
+
+
 	return result;
-	
+
 }
 
 
@@ -4033,9 +4030,9 @@ function longOperation_fullPageRefresh(eventObject, operationName, operationDesc
 		popupMessage("ERROR", "There was a server error when trying to perform the "+operationName+" action. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
 		$(eventObject.currentTarget).html(originalText);
 	});
-	
+
 	eventObject.stopPropagation();
-	
+
 }
 
 var lastLongOperationTimer = null;
@@ -4043,7 +4040,7 @@ var lastLongOperationDueTime = null;
 var lastLongOperationEventObject = null;
 var lastLongOperationStartTime = null;
 /**
- * 
+ *
  * @param eventObject
  * @param actionUrl
  * @param responseFunction This is the handler that is called when the operation returns. The data that is passed into the handler includes: data.isComplete (boolean), data.error (boolean), data.timeLeft (seconds remaining to wait)
@@ -4053,7 +4050,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 {
 	if (window.commandInProgress==true)
 		return;
-	
+
 	lastLongOperationEventObject = eventObject;		// We're persisting the event object because when the ajax call returns, we may need to know what element was clicked when starting the long operation
 
 	// Changing to a post now, so no need to generate the URL parameter string anymore.
@@ -4068,16 +4065,16 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		parameters.selected2DTileY = selectedTileY;
 		parameters.uiStyle = uiStyle;
 	}
-	
+
 	parameters.mainPageUrl = location.href;
-	
+
 	if (window.characterOverride!=null && window.characterOverride.length>10)
 		parameters.char = window.characterOverride;
-	
+
 	// Now generate the url. We might use this later on to recall the command for some reason... probably not though. To be honest, this part was copypasta from the LongOperation command type
 	var url = "/longoperation?cmd="+commandName;
-	
-	
+
+
 	var clickedElement = null;
 	var originalText = null;
 	if (eventObject!=null)
@@ -4089,8 +4086,8 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		}
 	}
 
-	ga('send', 'pageview', url);	
-	
+	ga('send', 'pageview', url);
+
 	var selectedItems = null;
 	if (userRequestId!=null && eventObject!=null)
 	{
@@ -4098,7 +4095,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		if (selectedItems==null) selectedItems = {};
 		parameters["__"+userRequestId+"UserResponse"] = JSON.stringify(selectedItems);
 	}
-	
+
 
 	window.commandInProgress=true;
 	$.post(url, parameters)
@@ -4110,21 +4107,21 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			clickedElement.html(originalText);
 			clickedElement.removeClass("marching-ants");
 		}
-		
+
 		if (data.captcha==true)
 		{
 			antiBotQuestionPopup();
 			return;
 		}
-		
+
 		// Do the page update first, regarless if there was an error. We do this because even errored responses may contain page updates.
 		ajaxUpdatePage(data);
-	
+
 		if (data.hasNewGameMessages==true)
 		{
 			messager.getMessages(true);
 		}
-		
+
 		if (data.cancelled)
 		{
 			clearPopupPermanentOverlay();
@@ -4134,7 +4131,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 				lastLongOperationTimer = null;
 			}
 		}
-		
+
 		if (data.error!=undefined)
 		{
 			hideBannerLoadingIcon();
@@ -4152,7 +4149,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			clearPopupPermanentOverlay();
 			return;
 		}
-		
+
 		if (data.refresh==true)
 		{
 			fullpageRefresh();
@@ -4162,7 +4159,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 		{
 			popupMessage("System Message", data.message, false);
 		}
-		
+
 		// Here we handle the special: UserRequestBuilder page popup mechanism
 		if (data.pagePopupUrl!=null)
 		{
@@ -4170,14 +4167,14 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			return;
 		}
 
-		
+
 		if (responseFunction!=null)
 			responseFunction(data);
 
 		if (data.error!=undefined)
 			return;
-		
-		
+
+
 		if (data.isComplete==false)
 		{
 			if (data.timeLeft>0)
@@ -4187,7 +4184,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 					popupPremiumReminder();
 
 				startLongOperationCountdown( data);
-				
+
 				window.scrollTo(0,0);
 			}
 			else
@@ -4201,9 +4198,9 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			if (data.description!=null)
 				$("#long-operation-complete-text").html(data.description);
 		}
-		
-		
-		
+
+
+
 		lastLongOperationEventObject = null;
 	})
 	.fail(function(xhr, textStatus, errorThrown){
@@ -4220,10 +4217,10 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 			clickedElement.html(originalText);
 			clickedElement.removeClass("marching-ants");
 		}
-		
+
 		lastLongOperationEventObject = null;
 	});
-	
+
 	if (eventObject!=null && eventObject.stopPropagation)
 		eventObject.stopPropagation();
 }
@@ -4232,7 +4229,7 @@ function cancelLongOperations(eventObject)
 {
 	if (window.commandInProgress)
 		return;
-	
+
 	stopLongOperationCountdown();
 	longOperation(eventObject, "cancelLongOperations", null, function(){
 		clearPopupPermanentOverlay();
@@ -4254,7 +4251,7 @@ function setBannerImage(url)
 {
 	if (bannerUrl!=null && url!=bannerUrl && window.previousBannerUrl!=bannerUrl)
 		window.previousBannerUrl = bannerUrl;
-	
+
 	bannerUrl = url;
 	updateBannerWeatherSystem();
 }
@@ -4263,12 +4260,12 @@ function setBannerOverlayText(title, text, noCancel)
 {
 	if (text==null)
 		text = "";
-	
+
 	var contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
-	
+
 	if (noCancel)
 		contents = "<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"</div>";
-	
+
 	$(".travel-scene-text").remove();
 	$("#banner-base").append(contents);
 }
@@ -4281,16 +4278,16 @@ function hideBannerLoadingIcon()
 function doGoto(event, pathId, attack)
 {
 	clearMakeIntoPopup();
-	
+
 	if (attack == null)
 		attack = false;
 	showBannerLoadingIcon();
-	longOperation(event, "TakePath", {pathId:pathId,attack:attack}, 
+	longOperation(event, "TakePath", {pathId:pathId,attack:attack},
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 					closeAllPagePopups();
 				}
 				else if (action.isComplete)
@@ -4299,14 +4296,14 @@ function doGoto(event, pathId, attack)
 					var bannerstate = $("body").attr("bannerstate");
 					if (bannerstate == "location-2d")
 						$("body").attr("bannerstate", "");
-					
-					
-					clearPopupPermanentOverlay(); 
+
+
+					clearPopupPermanentOverlay();
 					updateBannerWeatherSystem();
 					setAudioDescriptor(locationAudioDescriptor, locationAudioDescriptorPreset, isOutside);
 					clearLoopedSounds();
 					playLoopedSounds();
-					//clearPopupPermanentOverlay(); 
+					//clearPopupPermanentOverlay();
 					//fullpageRefresh();
 				}
 				else
@@ -4328,18 +4325,18 @@ function doExperiment(event, itemId)
 	var checkedIds = $(".experiment-item-checkbox:checked").map(function(){return $(this).attr('id');}).get();
 	if (checkedIds.length==0) checkedIds = null;
 	if (itemId!=null) checkIds = [itemId];
-	
+
 	showBannerLoadingIcon();
-	longOperation(event, "InventionExperimentNew", {itemIds:checkedIds}, 
+	longOperation(event, "InventionExperimentNew", {itemIds:checkedIds},
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 				}
 				else if (action.isComplete)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 					reloadPagePopup(false);
 				}
 				else
@@ -4387,15 +4384,15 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 			btn.show();
 		}
 	}
-	
+
 	showBannerLoadingIcon();
 	//BeginPrototype
-	longOperation(event, "InventionPrototypeNew", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId, autoStart:autoStart}, 
+	longOperation(event, "InventionPrototypeNew", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId, autoStart:autoStart},
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 				}
 				else if (action.isComplete)
 				{
@@ -4405,7 +4402,7 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 					}
 					else
 					{
-						clearPopupPermanentOverlay(); 
+						clearPopupPermanentOverlay();
 						if (isSoundEffectsEnabled()) playAudio("complete1");
 						doSimpleDesktopNotification(ideaName+" prototyping complete.", "");
 					}
@@ -4418,9 +4415,9 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 			function()	// recallFunction
 			{
 				doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId);
-			}, 
+			},
 			userRequestId);
-	
+
 }
 
 function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId, autoStart)
@@ -4437,17 +4434,17 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 			btn.show();
 		}
 	}
-	
+
 	closeAllTooltips();
-	
+
 	showBannerLoadingIcon();
 	//DoSkillConstructItem
-	longOperation(event, "InventionConstructItemSkillNew", {skillName:skillName, constructItemSkillId:skillId,repsUniqueId:repsUniqueId, autoStart:autoStart}, 
+	longOperation(event, "InventionConstructItemSkillNew", {skillName:skillName, constructItemSkillId:skillId,repsUniqueId:repsUniqueId, autoStart:autoStart},
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 				}
 				else if (action.isComplete)
 				{
@@ -4470,9 +4467,9 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 			function()	// recallFunction
 			{
 				doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId);
-			}, 
+			},
 			userRequestId);
-	
+
 }
 
 
@@ -4480,16 +4477,16 @@ function doCollectCollectable(event, collectableId, userRequestId)
 {
 	clearMakeIntoPopup();
 	showBannerLoadingIcon();
-	longOperation(event, "CollectCollectable", {collectableId:collectableId},  
+	longOperation(event, "CollectCollectable", {collectableId:collectableId},
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 				}
 				else if (action.isComplete)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 					hideBannerLoadingIcon();
 				}
 				else
@@ -4510,7 +4507,7 @@ function doAutoExplore(event)
 {
 	var lastExploreState = localStorage.getItem("auto-explore");
 	if (lastExploreState==null) lastExploreState = "explore";
-	
+
 	if (lastExploreState=="explore")
 		doExplore(event, false, false);
 	else if (lastExploreState=="ignoreCombatSites")
@@ -4528,7 +4525,7 @@ function updateAutoExploreButton()
 		exploreState = "Find Natural Resources";
 	else
 		exploreState = "Explore";
-	
+
 	$(".auto-explore-link").text(exploreState);
 }
 
@@ -4536,7 +4533,7 @@ function updateAutoExploreButton()
 function doExplore(event, ignoreCombatSites, findNaturalResources)
 {
 	var exploreState = null;
-	
+
 	if (ignoreCombatSites!=null && findNaturalResources != null)
 	{
 		if (ignoreCombatSites==true)
@@ -4551,21 +4548,21 @@ function doExplore(event, ignoreCombatSites, findNaturalResources)
 		localStorage.setItem("auto-explore", "explore");
 
 	updateAutoExploreButton();
-	
-	
+
+
 	clearMakeIntoPopup();
-	
+
 	if (ignoreCombatSites == null)
 		ignoreCombatSites = getBannerIgnoreOldSites();
 	if (findNaturalResources==null)
 		findNaturalResources = false;
 	showBannerLoadingIcon();
-	longOperation(event, "Explore", {ignoreCombatSites:ignoreCombatSites, findNaturalResources:findNaturalResources}, 
+	longOperation(event, "Explore", {ignoreCombatSites:ignoreCombatSites, findNaturalResources:findNaturalResources},
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 				}
 				else if (action.isComplete)
 				{
@@ -4588,12 +4585,12 @@ function doExplore(event, ignoreCombatSites, findNaturalResources)
 function doRest()
 {
 	showBannerLoadingIcon();
-	longOperation(null, "Rest", null, 
+	longOperation(null, "Rest", null,
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 				}
 				else if (action.isComplete)
 				{
@@ -4616,12 +4613,12 @@ function doRest()
 function doCampDefend()
 {
 	showBannerLoadingIcon();
-	longOperation(null, "CampDefend", null, 
+	longOperation(null, "CampDefend", null,
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined || action.isComplete)
 				{
-					clearPopupPermanentOverlay(); 
+					clearPopupPermanentOverlay();
 				}
 				else
 				{
@@ -4639,12 +4636,12 @@ function doCampDefend()
 function doCampCreate(campName)
 {
 	showBannerLoadingIcon();
-	longOperation(null, "CampCreate", {"name":campName}, 
+	longOperation(null, "CampCreate", {"name":campName},
 		function(action) // responseFunction
 		{
 			if(action.error !== undefined)
 			{
-				clearPopupPermanentOverlay(); 
+				clearPopupPermanentOverlay();
 			}
 			else if (action.isComplete)
 			{
@@ -4668,17 +4665,17 @@ function handleUserRequest(data, autoStart)
 		data.pagePopupUrl+="&userRequestId="+data.userRequestId+"&"+data.urlParameters+"&autoStart="+autoStart;
 	else
 		data.pagePopupUrl+="?userRequestId="+data.userRequestId+"&"+data.urlParameters+"&autoStart="+autoStart;
-	
+
 	// Add the exta request data to the url..
-	
-	
+
+
 	closeAllPopups();
 	closeAllTooltips();
-	pagePopup(data.pagePopupUrl, 
+	pagePopup(data.pagePopupUrl,
 	function ()
 	{
 		hideBannerLoadingIcon();
-	}, 
+	},
 	data.pagePopupTitle);
 }
 
@@ -4688,7 +4685,7 @@ function handleUserRequest(data, autoStart)
  * 3. Ajax call returns an object with the current state (waitTime, variousArgs) and calls the doGoto_ajaxResponse()
  * 4. For certain return states (like messages/errors) the longOperation will handle it? (maybe)
  * 5. doGoto_ajaxResponse() knows how to handle a completed state and an unfinished state
- * 
+ *
  * If the page is refreshed, main.jsp will look for an ongoing longOperation before rendering, if it finds one
  * it will include a call to doGoto() with all the same parameters in some script tags.
  */
@@ -4707,17 +4704,17 @@ function updateMinimizeChat()
 function isChatMinimized()
 {
 	var chatbox = $(".chat_box");
-	
+
 	if (chatbox.hasClass("minimized-chat"))
 		return true;
-	
+
 	return false;
 }
 
 function toggleMinimizeChat(forceHide)
 {
 	$("#chat_tab").toggle();
-	
+
 	var chatbox = $("#chatbox-container");
 	if (forceHide==false || chatbox.hasClass("chat-hide"))
 	{
@@ -4733,7 +4730,7 @@ function toggleMinimizeChat(forceHide)
 		$("#chatbox-container").addClass("chat-hide");
 		$(".minimize-chat-button").text(">");
 	}
-	
+
 	if (window.updateBannerSize) updateBannerSize();
 }
 
@@ -4750,14 +4747,14 @@ function updateMinimizeBox(buttonElement, selector)
 			minimizeBox({target:$(buttonElement)}, selector);
 		else
 			maximizeBox({target:$(buttonElement)}, selector);
-		
+
 		if (window.updateBannerSize) updateBannerSize();
 	});
 }
 
 function toggleMinimizeBox(event, selector)
 {
-	
+
 	if (isBoxMinimized(selector) == "true")
 		maximizeBox(event, selector);
 	else
@@ -4799,7 +4796,7 @@ function _viewTrade()
 	pagePopup("/odp/ajax_trade.jsp",function(){
 		doCommand(null,"TradeCancel");
 //		popupMessage("Trade Cancelled","This trade has been cancelled.")
-	}, "Trade");	
+	}, "Trade");
 }
 
 function updateTradeWindow()
@@ -4938,12 +4935,12 @@ function secondsElapsed(secondsToConvert)
 }
 
 
-function xorShift32(seed) 
+function xorShift32(seed)
 {
     seed ^= (seed << 11);
     seed ^= (seed >>> 25);
     seed ^= (seed << 8);
-    var out = seed % 127521;     
+    var out = seed % 127521;
     return (out < 0) ? -out : out;
 }
 
@@ -4951,7 +4948,7 @@ function rnd(seed, min, max)
 {
 	var rand = xorShift32(seed);
 	var dbl = (rand/127521);
- 
+
     return (dbl*(max-min))+min;
 }
 
@@ -5003,18 +5000,18 @@ function confirmCancelPopup(title, content, showCancel, yesFunction, noFunction)
     currentPopups = $("#popups").html();
     $("#popups").html(currentPopups + '<div tabindex="0" id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p>' + content + '</p><br></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option confirm_yes">Yes</a><a id="'+unique+'-no"  class="popup_confirm_option confirm_no">No</a>' + (showCancel ? '<a id="'+unique+'-cancel"  class="popup_confirm_option confirm_cancel">Cancel</a>' : '') + '</div></div></div></div>');
     expandpopupMessage();
-    
+
     var popupRoot = $('#popupWrapperBackground_' + popupsNum).focus();
 
     popupRoot.css("outline", "0px solid tranparent");
     popupRoot.focus();
-    
+
     popupRoot.keyup(function(e){
     	stopEventPropagation(e);
     });
     popupRoot.keydown(function(e){
     	stopEventPropagation(e);
-        if (e.keyCode == 13) 
+        if (e.keyCode == 13)
         {
         	closepopupMessage(currentPopup());
         	if (yesFunction)
@@ -5031,7 +5028,7 @@ function confirmCancelPopup(title, content, showCancel, yesFunction, noFunction)
         	}
         }
     });
-    
+
     $("#"+unique+"-yes").click(function(){
     	closepopupMessage(currentPopup());
     	if (yesFunction)
@@ -5063,7 +5060,7 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 {
 	if (content!=null)
 		content = content.replace("\n", "<br>");
-	
+
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
@@ -5079,14 +5076,14 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 	var rangeId = "popup_prompt_range_"+unique;
 	var numberId = "popup_prompt_number_"+unique;
 	var displayId = "popup_prompt_displaytext_"+unique;
-	var changeText = function() { 
+	var changeText = function() {
 		var newText = this.value;
 		if(valueFunction) {
 			newText = valueFunction(Math.min(this.value,maxValue));
-		} 
+		}
 		$("#"+displayId).text(newText);
 	};
-	var newPopup = 
+	var newPopup =
 		'<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')">' +
 		'<div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();">'+
 		'<div id="popup_' + popupsNum + '" class="'+popupClassOverride+'">'+
@@ -5095,36 +5092,36 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 		'<div id="popup_text_' + popupsNum + '" class="popup_text" style="max-height:200px">'+
 		'<p style="margin:0px 2px">' + content + '</p>'+
 		'<div class="popup_range_body" style="text-align:center">';
-	var nudHtml = '<input id="'+numberId+'" class="popup_range_number" type="number" min="'+minValue+'" max="'+maxValue+'" value="1" onchange="'+rangeId+'.value=this.value;"/>'; 
+	var nudHtml = '<input id="'+numberId+'" class="popup_range_number" type="number" min="'+minValue+'" max="'+maxValue+'" value="1" onchange="'+rangeId+'.value=this.value;"/>';
 	var increment = 1, numArrow = 1;
 	while(increment < maxValue && numArrow < 5) // Don't allow more than 4 increment arrows
 	{
-		nudHtml = '<a class="range-increment" data-inc="'+(increment*-1)+'" style="float-left">'+('&lt;'.repeat(numArrow))+'</a>' + nudHtml + 
+		nudHtml = '<a class="range-increment" data-inc="'+(increment*-1)+'" style="float-left">'+('&lt;'.repeat(numArrow))+'</a>' + nudHtml +
 				'<a class="range-increment" data-inc="'+increment+'" style="float-right">'+('&gt;'.repeat(numArrow))+'</a>';
 		numArrow++;
 		increment*=10;
 	}
-	
-	newPopup += '<div class="noselect">'+nudHtml+'</div><input id="'+rangeId+'" class="popup_range_slider" style="width:80%;" type="range" min="'+minValue+'" max="'+maxValue+'" step="1" value="'+minValue+'" oninput="'+numberId+'.value = this.value;" onchange="'+numberId+'.value = this.value;"/>';	
+
+	newPopup += '<div class="noselect">'+nudHtml+'</div><input id="'+rangeId+'" class="popup_range_slider" style="width:80%;" type="range" min="'+minValue+'" max="'+maxValue+'" step="1" value="'+minValue+'" oninput="'+numberId+'.value = this.value;" onchange="'+numberId+'.value = this.value;"/>';
 	newPopup += '<br/><span id="'+displayId+'"></span>';
 	newPopup += '</div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option option_okay">Okay</a><a id="'+unique+'-no" class="popup_confirm_option option_cancel">Cancel</a></div></div></div></div>';
     $("#popups").html(currentPopups + newPopup);
 	$("#popup_"+popupsNum).on("change", "#"+rangeId+",#"+numberId, changeText);
     expandpopupMessage();
-    
+
     var inputText = $('#'+numberId);
-    
+
     if (doNotFocus!=true)
     {
 	    inputText.focus();
     }
 
-    
-    
+
+
 	// Use range, since that limits the acceptable values.
     var inputRange = $('#'+rangeId);
     inputRange.change();
-	
+
 	var promptNo = function()
 	{
 		closepopupMessage(currentPopup());
@@ -5145,19 +5142,19 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
 				return;
 			}
 		}
-		
+
 		closepopupMessage(currentPopup());
-		
+
 		if (yesFunction)
 			yesFunction(value);
 	};
-	
+
     inputRange.keyup(function(e){
     	stopEventPropagation(e);
     });
     inputRange.keydown(function(e){
     	stopEventPropagation(e);
-        if (e.keyCode == 13) 
+        if (e.keyCode == 13)
         {
         	promptYes();
         }
@@ -5165,10 +5162,10 @@ function rangePopup(title, content, minValue, maxValue, valueFunction, yesFuncti
         {
         	promptNo();
         }
-        
+
         e.stopPropagation();
     });
-    
+
     // Increment arrow click.
     $("#popup_"+popupsNum).on("click", ".range-increment", function(event) { var inc = +$(this).data("inc"); inputRange.val(+inputRange.val()+inc); inputRange.change(); });
     // Yes/no click.
@@ -5180,15 +5177,15 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
 {
 	if (content!=null)
 		content = content.replace("\n", "<br>");
-	
+
 	if (defaultText==null)
 		defaultText = "";
-	
+
 	defaultText = defaultText+"";
-	
+
 	defaultText = defaultText.replace("\"", "`").replace("'", "`");
-	
-	
+
+
 	var unique = "ID"+Math.floor((Math.random() * 990000000) + 1);
 	var popupClassOverride = null;
 	if (popupClassOverride==null)
@@ -5203,9 +5200,9 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
     $("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="popupWrapperBackground" onclick="closepopupMessage('+popupsNum+')"><div id="popupWrapper_' + popupsNum + '" class="popupWrapper" onclick="event.stopPropagation();"><div id="popup_' + popupsNum + '" class="'+popupClassOverride+'"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><div id="popup_body_' + popupsNum + '" class="popup_body"><div id="popup_text_' + popupsNum + '" class="popup_text"><p style="margin:0px">' + content + '</p><br><div style="text-align:center"><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/></div></div></div><div id="popup_footer_' + popupsNum + '" class="popup_footer"><a id="'+unique+'-yes" class="popup_confirm_option confirm_okay">Okay</a><a id="'+unique+'-no" class="popup_confirm_option confirm_cancel">Cancel</a></div></div></div></div>');
     //$("#popups").html(currentPopups + '<div id="popupWrapperBackground_' + popupsNum + '" class="page-popup"><div id="popup_header_' + popupsNum + '" class="popup_header">' + title + '</div><p>' + content + '</p><br><input id="popup_prompt_input_'+unique+'" class="popup_prompt_input" type="text" value="'+defaultText+'"/><a id="'+unique+'-yes" class="popup_confirm_yes">Okay</a><a id="'+unique+'-no" class="popup_confirm_no">Cancel</a></div>');
     expandpopupMessage();
-    
+
     var inputText = $('#popup_prompt_input_'+unique);
-    
+
     if (doNotFocus!=true)
     {
 	    inputText.focus();
@@ -5217,14 +5214,14 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
     });
     inputText.keydown(function(e){
     	stopEventPropagation(e);
-        if (e.keyCode == 13) 
+        if (e.keyCode == 13)
         {
         	var value = null;
         	if (yesFunction)
             	value = $('#popup_prompt_input_'+unique).val();
-        	
+
         	closepopupMessage(currentPopup());
-        	
+
         	if (yesFunction)
         		yesFunction(value);
         }
@@ -5236,19 +5233,19 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
         		noFunction();
         	}
         }
-        
+
         e.stopPropagation();
     });
-    
-    
-    
+
+
+
     $("#"+unique+"-yes").click(function(){
     	var value = null;
     	if (yesFunction)
         	value = $('#popup_prompt_input_'+unique).val();
-    	
+
     	closepopupMessage(currentPopup());
-    	
+
     	if (yesFunction)
     		yesFunction(value);
     });
@@ -5259,8 +5256,8 @@ function promptPopup(title, content, defaultText, yesFunction, noFunction, doNot
     		noFunction();
     	}
     });
-    
-    
+
+
 }
 
 
@@ -5379,7 +5376,7 @@ function toggleEnvironmentSoundEffects(newState)
 	if (newState !== undefined) {
 		enabled = newState;
 	}
-	
+
 	createjs.Sound.muted = enabled;
 	localStorage.setItem("checkboxDisableEnvironmentSoundEffects", enabled+"");
 
@@ -5388,7 +5385,7 @@ function toggleEnvironmentSoundEffects(newState)
 		setAudioDescriptor(requestedAudioDescriptor[0], requestedAudioDescriptor[1], requestedAudioDescriptor[2]);
 		requestedAudioDescriptor = null;
 	}
-	
+
 	// Set the correct image for the header mute button
 	if (enabled)
 	{
@@ -5400,7 +5397,7 @@ function toggleEnvironmentSoundEffects(newState)
 		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
 		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-on1.png");
 	}
-	
+
 }
 
 function updateEnvironmentSoundEffectsVolume()
@@ -5414,18 +5411,18 @@ function playBannerFx(animationUrl, flipX, flipY)
 {
 	var divParent = $("#banner-fx");
 	var fxDiv = divParent.children();
-	
+
 	fxDiv.remove();
 
 	divParent.html("<img style='position:absolute; top:0px; width:100%; height:100%;' src='"+animationUrl+"'/>");
-		
+
 	fxDiv = divParent.children();
 
  	fxDiv.show().each(function() {
             this.offsetHeight;
-        }).prop("src", animationUrl);	
-	
-	
+        }).prop("src", animationUrl);
+
+
 	if (flipX==true)
 		fxDiv.addClass("flip-background-x");
 	if (flipY==true)
@@ -5469,7 +5466,7 @@ function antiBotQuestionPopup()
 {
 	popupMessage("Anti Bot Check", "<div id='myCaptcha' style='float:left;margin-right:10px;'></div><p>We have to check from time to time to make sure you're a human playing. This is to prevent people from " +
 			"playing the game automatically using bots. Having trouble? <a onclick='location.reload()'>Click here</a> to refresh.</p>");
-	
+
 	grecaptcha.render( 'myCaptcha', {
 		  'sitekey' : '6Ldx9wcUAAAAAG78kIIiv-pnhHBaAaTrpcX5ZDwT',  // required
 		  'theme' : 'light',  // optional
@@ -5519,8 +5516,8 @@ function renameUnnamedPlayer(eventObject)
 function swapContainers(event, selector)
 {
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
-	if(batchItems.length == 0) return;	
-	
+	if(batchItems.length == 0) return;
+
 	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
 
 	doCommand(event,"ItemsSwapStorageContainers",{"itemIds":itemIds});
@@ -5541,10 +5538,10 @@ function changeGenericTab(event, tabId)
 	var element = $(event.target);
 	var id = element.attr("id");
 	var code = id.substring(0, id.indexOf("-"));
-	
+
 	$("."+tabId+".tab-selected").removeClass("tab-selected");
 	element.addClass("tab-selected");
-	
+
 	$("."+tabId+".tab-content-selected").removeClass("tab-content-selected").addClass("tab-content");
 	$("."+tabId+"."+code+"-content").addClass("tab-content-selected").removeClass("tab-content");
 	console.log(code);
@@ -5585,7 +5582,7 @@ function hideLongOperationProgress()
 {
 	$("body").attr("longoperation", "");
 	$(".progress-bar-fill").removeAttr("style");
-	
+
 	stopLongOperationCountdown();
 }
 
@@ -5600,10 +5597,10 @@ function setLongOperationProgress(percent, title, description)
 	{
 		statusDiv.find(".long-operation-status-description").text(description);
 	}
-	
+
 	percent *= 0.96;
 	percent += 2;
-	
+
 	statusDiv.find(".progress-bar-fill").css("width", percent+"%");
 }
 
@@ -5631,7 +5628,7 @@ function petFeedExecute(event, petId, itemId)
 {
 //	confirmPopup("Feed pet", "Are you sure you want to feed this to your pet? <br>(If you want to feed only a partial amount, you will have to split the stack first in your inventory)", function(){
 		doCommand(event, "PetFeed", {petId:petId, itemId:[itemId]}, function(data){
-			// Refresh the popup 
+			// Refresh the popup
 //			$("#petfoodcompatibleitemslist-container").html(
 //					"	<a class='make-popup-X' onclick='clearMakeIntoPopup()'>X</a>" +
 //					"	<h4>Item picker</h4>" +
@@ -5650,7 +5647,7 @@ function petFeedExecuteAll(event, petId)
 		var id = items.get(i).id;
 		itemIds.push(parseInt(id));
 	}
-	
+
 	confirmPopup("Feed pet", "Are you sure you want to give this pet EVERYTHING you are holding, to eat? Note: They will only eat what they like to eat.<br>(Only the first 20 in this list will be given)", function(){
 		doCommand(event, "PetFeed", {petId:petId, itemId:itemIds}, function(data){
 //			$("#petfoodcompatibleitemslist-container").html(
@@ -5678,7 +5675,7 @@ function viewPetFoodOptions(event, petId)
 function updateItemImage(itemId, image)
 {
 	 var elements = $('.item-icon-img-'+itemId);
-	 
+
 	 for(var i = 0; i<elements.length; i++)
 	 {
 		 if (elements[i].nodeName == "IMG")
@@ -5707,17 +5704,17 @@ function doFeedPetAnimation(petId, feedAnimation, animLengthMs, regularImage)
 {
 	if (window.petFeedAnimTimeoutIds["ID"+petId]!=null)
 		clearTimeout(window.petFeedAnimTimeoutIds["ID"+petId]);
-	
+
 	var originalSrc = regularImage;
-	
+
 	var timeoutId = setTimeout(function(){
 		updatePetImage(petId, originalSrc);
 		window.petFeedAnimTimeoutIds["ID"+petId] = null;
 	}, animLengthMs,
 	originalSrc, petId);
-	
+
 	updatePetImage(petId, feedAnimation);
-	
+
 	window.petFeedAnimTimeoutIds["ID"+petId] = timeoutId;
 }
 
@@ -5739,11 +5736,11 @@ function doFeedPetAnimation(petId, feedAnimation, animLengthMs, regularImage)
 
 
 /*
- * 
- * 
+ *
+ *
  * Confirm requirements JSP scripts
- * 
- * 
+ *
+ *
  */
 
 var crSelectedRequirementSlotIndex = null;
@@ -5752,7 +5749,7 @@ function selectRequirement(event, requirementSlotIndex, gerKeyList)
 	crSelectedRequirementSlotIndex = requirementSlotIndex.split(":").join("\\:");
 	$(".confirm-requirements-requirement").removeClass("confirm-requirements-selected");
 	$(event.target).closest(".confirm-requirements-requirement").addClass("confirm-requirements-selected");
-	doCommand(event, "ConfirmRequirementsUpdate", {slotIndex:requirementSlotIndex, gerKeyList:gerKeyList});	
+	doCommand(event, "ConfirmRequirementsUpdate", {slotIndex:requirementSlotIndex, gerKeyList:gerKeyList});
 }
 
 function selectAll(event)
@@ -5772,10 +5769,10 @@ function selectItem(event, itemId)
 	// Check that we're not trying to select an item that is already chosen as a requirement. It doesn't work that way.
 	if ($(event.target).closest(".confirm-requirements-requirement").length>0)
 		return;
-	
+
 	//unselectItem(null);
-	
-	
+
+
 	$("#"+crSelectedRequirementSlotIndex).val(itemId);
 	var itemPanelForRequirement = $("#itemHtmlForRequirement"+crSelectedRequirementSlotIndex);
 	var itemVisual = $(event.target).closest(".confirm-requirements-item-candidate");
@@ -5800,7 +5797,7 @@ function unselectItem(event)
 	candidatesContainer.children(".list").prepend(e);
 	e.hide();
 	e.fadeIn("slow");
-	
+
 	if (event!=null)
 		event.stopPropagation();
 }
@@ -5826,17 +5823,17 @@ function confirmRequirements_collectChoices(event)
 					firstTime = false;
 				else
 					val+=",";
-				
+
 				val+=$(itemsSelected[ii]).attr("itemKey");
 			}
-			
+
 			result.slots[requirementsContainer.attr("slotName")] = val;
 		}
 	}
-	
+
 	if ($("#repetitionCount").length>0)
 		result.repetitionCount = $("#repetitionCount").val();
-	
+
 	return result;
 }
 
@@ -5852,7 +5849,7 @@ var overlayEffectIdCounter = 0;
 function overlayEffect(imgUrl, timeoutMs)
 {
 	overlayEffectIdCounter++;
-	
+
 	var effectId = overlayEffectIdCounter;
 	var effectTimer = null;
 	function clearOverlayEffect()
@@ -5864,14 +5861,14 @@ function overlayEffect(imgUrl, timeoutMs)
 			$("#overlayEffect"+effectId).remove();
 		});
 	}
-	
+
 	var html = "<div class='overlay-effect-container' id='overlayEffect"+effectId+"' >"+
 	"<img src='"+imgUrl+"'>"+
 	"</div>";
 	$("#banner-fx").prepend(html);
-	
+
 	effectTimer = setTimeout(clearOverlayEffect, timeoutMs);
-	
+
 }
 
 
@@ -5879,7 +5876,7 @@ var genericOverlayEffectIdCounter = 0;
 function genericOverlayEffect(imgUrl, timeoutMs)
 {
 	genericOverlayEffectIdCounter++;
-	
+
 	var effectId = genericOverlayEffectIdCounter;
 	var effectTimer = null;
 	function clearGenericOverlayEffect()
@@ -5891,14 +5888,14 @@ function genericOverlayEffect(imgUrl, timeoutMs)
 			$("#genericOverlayEffect"+effectId).remove();
 		});
 	}
-	
+
 	var html = "<div class='overlay-effect-container' id='genericOverlayEffect"+effectId+"' >"+
 	"<img src='"+imgUrl+"'>"+
 	"</div>";
 	$("body").append(html);
-	
+
 	effectTimer = setTimeout(clearGenericOverlayEffect, timeoutMs);
-	
+
 }
 
 
@@ -5989,18 +5986,15 @@ function navMapZoomOut()
 //{
 //	$("#quest-complete-label").remove();
 //	clearQuestCompleteEffect();
-//	
+//
 //	var html = "<div id='questCompleteEffect' style='position: fixed;overflow: visible;mix-blend-mode: color-dodge;width: 0px;height: 0px;left: 50%;top: 30%;z-index: 1000000000;'>"+
 //	"<img src='https://initium-resources.appspot.com/images/ui3/complete-effect.gif' style='position:absolute;margin-left: -250px;margin-top: 0px;float: left;pointer-events: none;transform: scale(2);'>"+
 //	"</div>";
 //	$("body").prepend(html);
-//	
+//
 //	var completeHtml = "<h3 id='quest-complete-label'>Complete!</h3>";
 //	setTimeout(function(){$(".quest-window").append(completeHtml);}, 500);
 //	window.questCompleteEffectTimer = setTimeout(clearQuestCompleteEffect, 5000);
 //
 //	$("#questlist-questkey-${questDefKey}").addClass("quest-complete");
 //}
-
-
-
