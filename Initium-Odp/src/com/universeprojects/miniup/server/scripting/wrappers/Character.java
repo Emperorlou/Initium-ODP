@@ -99,7 +99,15 @@ public class Character extends EntityWrapper
 				equipKeys.put(equipSlot, slot);
 		}
 			
-		List<CachedEntity> items = db.getFilteredList("Item", "containerKey", this.getKey());
+		List<CachedEntity> items = null;
+		
+		if(isNewEntity) {
+			items = db.interceptFromBulkPut("Item", "containerKey", this.getKey());
+		}
+		else {
+			items = db.getFilteredList("Item", "containerKey", this.getKey());
+		}
+		
 		for(CachedEntity item:items)
 		{
 			if(item != null)

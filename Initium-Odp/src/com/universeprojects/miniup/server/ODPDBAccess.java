@@ -177,6 +177,10 @@ public class ODPDBAccess
 		
 		return factory.getInstance(request);
 	}
+	
+	public List<CachedEntity> interceptFromBulkPut(String type, String fieldName, Object equalToValue){
+		return getDB().interceptFromBulkPut(type, fieldName, equalToValue);
+	}
 
 	public Collection<CachedEntity> getCharacterEquipment(CachedEntity character)
 	{
