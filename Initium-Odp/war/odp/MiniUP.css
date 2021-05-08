@@ -13,6 +13,10 @@
     font-family: CHAT;
     src: url(arial-narrow-2.ttf);
 }
+@font-face {
+	font-family: LEGENDARY;
+	src: url(Algerian.tff)
+}
 
 .accessible
 {
@@ -688,6 +692,21 @@ a.main-highlight:HOVER
     font-size: 16px;
     text-shadow: -1px -1px 0px #AC54FF;
     color: #5e2e8c;
+}
+
+.item-legendary
+{
+	font-size: 16px;
+	text-shadow: -1px -1px 0px #db0000;
+	color: color:#f05000;
+	font-family: LEGENDARY;
+}
+
+.item-event
+{
+	font-size: 16px;
+	text-shadow: -1px -1px 0px #00f058;
+	color: color:#0098f0;
 }
 
 .item-magic

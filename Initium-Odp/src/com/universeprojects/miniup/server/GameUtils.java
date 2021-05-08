@@ -711,6 +711,10 @@ public class GameUtils
 				qualityClass = "item-unique";
 			else if ("Epic".equals(qualityClassOverride))
 				qualityClass = "item-epic";
+			else if("Legendary".equals(qualityClassOverride))
+				qualityClass = "item-legendary";
+			else if("Event".equals(qualityClassOverride))
+				qualityClass = "item-event";
 			else if ("Custom".equals(qualityClassOverride))
 				qualityClass = "item-custom";
 			else if ("Magic".equals(qualityClassOverride)) qualityClass = "item-magic";
