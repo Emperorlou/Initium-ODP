@@ -11,6 +11,8 @@ public class MoveEvent extends ScriptEvent
 	public Location fromLocation; 
 	public Location toLocation;
 	public Long delay = 0L;
+	public boolean stop = false;
+	public String stopMessage = null;
 	
 	public MoveEvent(ODPDBAccess db, CachedEntity character, CachedEntity startLocation, CachedEntity endLocation)
 	{

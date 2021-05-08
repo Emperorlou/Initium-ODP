@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -357,5 +359,37 @@ public class ScriptService extends Service
 			if(!currentScriptMap.isEmpty()) scriptMap.put(sType, currentScriptMap);
 		}
 		return scriptMap;
+	}
+	
+	/**
+	 * After a script is complete, clean up the event.
+	 * @param event
+	 */
+	public void cleanupEvent(ScriptEvent event) {
+		for(CachedEntity saveEntity:event.getSaveEntities())
+			ds.put(saveEntity);
+		for(CachedEntity delEntity:event.getDeleteEntities())
+			ds.delete(delEntity);
+		
+		for(Entry<Key,Set<String>> update:event.getGameUpdates().entrySet())
+		{
+			if("Location".equals(update.getKey().getKind()))
+			{
+				for(String method:update.getValue())
+					db.sendMainPageUpdateForLocation(update.getKey(), ds, method);
+			}
+			else if("Character".equals(update.getKey().getKind()))
+			{
+				for(String method:update.getValue())
+					db.sendMainPageUpdateForCharacter(ds, update.getKey(), method);
+			}
+		}
+		
+		//send all the specified game messages to the appropriate characters.
+		for(Entry<Key, List<String>> messagesToSend : event.getGameMessages().entrySet()) {
+			for(String message : messagesToSend.getValue()){
+				db.sendGameMessage(db.getDB(), messagesToSend.getKey(), message);
+			}
+		}
 	}
 }
