@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.gefcommon.shared.elements.GameObject;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
@@ -1887,12 +1888,29 @@ public class MainPageUpdateService extends Service
 		
 		QuestService qService = db.getQuestService(operation);
 		
-		List<QuestDefEntity> activeQuestDefs = qService.getActiveQuestDefs();
+		QuestEntity quest = null;
+		QuestDefEntity questDef = null;
 		
-		if (activeQuestDefs==null || activeQuestDefs.isEmpty()) return updateHtmlContents(".questPanel", html.toString());
+		QuestEntity pinnedQuest = qService.getPinnedQuest();
 		
-		QuestDefEntity questDef = activeQuestDefs.get(0);
-		QuestEntity quest = questDef.getQuestEntity(character.getKey());
+		//We have a pinned quest and its not complete
+		if(pinnedQuest != null && false == pinnedQuest.isComplete()) {
+			quest = pinnedQuest;
+			
+			CachedEntity rawQuestDef = db.getEntity((Key) quest.getRawEntity().getProperty("questDefKey"));
+			
+			questDef = new QuestDefEntity(db, rawQuestDef);
+		}
+		//otherwise, just grab the first active quest in the list.
+		else {
+			List<QuestDefEntity> activeQuestDefs = qService.getActiveQuestDefs();
+			
+			if (activeQuestDefs==null || activeQuestDefs.isEmpty()) return updateHtmlContents(".questPanel", html.toString());
+			
+			questDef = activeQuestDefs.get(0);
+			quest = questDef.getQuestEntity(character.getKey());
+		}
+		
 		QuestObjective currentObjective = quest.getCurrentObjective(questDef);
 
 		if (currentObjective==null) return updateHtmlContents(".questPanel", html.toString());

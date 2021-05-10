@@ -6,19 +6,25 @@
 
 <center><a class='standard-button-highlight' onclick='viewTrainingQuestLines();'><img alt='Training quests' src='https://initium-resources.appspot.com/images/ui3/quest-banners/button-training-quests1.png'/></a></center>
 
-<h4>Quests</h4>
-<c:if test="${hasQuests!=true}">
+<h2>Quests</h2>
+<c:if test="${hasActiveQuests!=true && hasFinishedQuests!=true}">
 	You don't have any quests at the moment.
 </c:if>
-<c:if test="${hasQuests==true}">
-	<c:forEach var="quest" items="${data}">
-		<c:if test="${quest.complete==true}">
-		<div class='quest-container quest-complete' id='questlist-questkey-${quest.key}'>
-		</c:if>
-		<c:if test="${quest.complete==false}">
+<c:if test="${hasActiveQuests==true}">
+	<h4>Active Quests</h4>
+	<c:forEach var="quest" items="${activeQuests}">
 		<div class='quest-container' id='questlist-questkey-${quest.key}'>
-		</c:if>
 			<a onclick='viewQuest("${quest.key}")'>${quest.name}</a>
 		</div>
 	</c:forEach>
 </c:if>
+
+<c:if test="${hasFinishedQuests == true }">
+	<h4>Finished Quests</h4>
+	<c:forEach var="finishedQuest" items="${finishedQuests}">
+		<div class='quest-container quest-complete' id='questlist-questkey-${finishedQuest.key}'>
+			<a onclick='viewQuest("${finishedQuests.key}")'>${finishedQuests.name}</a>
+		</div>
+	</c:forEach>
+</c:if>
+

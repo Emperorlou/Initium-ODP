@@ -111,28 +111,28 @@ public class ViewItemController extends PageController {
 		
 		if (CommonChecks.checkItemIsChippedToken(item))
 			request.setAttribute("showChippedTokenUI", true);
-
-		if (item.getProperty("newQuest")!=null)
-		{
-			CachedEntity questDefEntity = db.getEntity((Key)item.getProperty("newQuest"));
-			if (questDefEntity!=null)
+		
+		if (CommonChecks.checkItemIsAccessible(item, character)) {
+			request.setAttribute("showRelatedSkills", true);
+			
+			if (item.getProperty("newQuest")!=null)
 			{
-//				QuestService questService = new QuestService(db, db.getCurrentCharacter());
-				QuestDefEntity questDef = new QuestDefEntity(db, questDefEntity);
-				QuestEntity quest = questDef.getQuestEntity(db.getCurrentCharacterKey());
-				
-				if (quest!=null && quest.isComplete())
-					request.setAttribute("questComplete", true);
-				
-				request.setAttribute("newQuest", true);
+				CachedEntity questDefEntity = db.getEntity((Key)item.getProperty("newQuest"));
+				if (questDefEntity!=null)
+				{
+//					QuestService questService = new QuestService(db, db.getCurrentCharacter());
+					QuestDefEntity questDef = new QuestDefEntity(db, questDefEntity);
+					QuestEntity quest = questDef.getQuestEntity(db.getCurrentCharacterKey());
+					
+					if (quest!=null && quest.isComplete())
+						request.setAttribute("questComplete", true);
+					
+					request.setAttribute("newQuest", true);
+					
+				}
 				
 			}
-			
 		}
-		
-		
-		if (CommonChecks.checkItemIsAccessible(item, character))
-			request.setAttribute("showRelatedSkills", true);
 
 		ds.beginBulkWriteMode();
 		
