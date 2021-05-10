@@ -25,7 +25,6 @@ import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
-import com.universeprojects.miniup.server.services.QuestService;
 import com.universeprojects.miniup.server.services.ScriptService;
 import com.universeprojects.miniup.server.services.TerritoryService;
 
@@ -342,19 +341,8 @@ public class LongOperationTakePath extends LongOperation {
 		db.getDB().beginBulkWriteMode();
 		try
 		{
-			if (db.randomMonsterEncounter(ds, character, location, 1, 0.5d))
-			{
-				// Create discovery for character, and optionally unhide it (unsaved = already exists);
-				CachedEntity discovery = db.newDiscovery(null, character, path);
-				if(discovery != null && discovery.getKey().isComplete())
-				{
-					discovery.setProperty("hidden", false);
-					db.getDB().put(discovery);
-				}
-				throw new GameStateChangeException("While you were on your way, someone found you...", true);
-			}
-			
-			//onMoveEnd scripts
+			//onMoveEnd scripts. We want these to run before the game rolls for a monster encounter, so we can interrupt
+			//the path if necessary.
 			@SuppressWarnings("unchecked")
 			List<Key> scriptKeys = (List<Key>) path.getProperty("scripts");
 			
@@ -382,7 +370,17 @@ public class LongOperationTakePath extends LongOperation {
 				}
 			}
 			
-			
+			if (db.randomMonsterEncounter(ds, character, location, 1, 0.5d))
+			{
+				// Create discovery for character, and optionally unhide it (unsaved = already exists);
+				CachedEntity discovery = db.newDiscovery(null, character, path);
+				if(discovery != null && discovery.getKey().isComplete())
+				{
+					discovery.setProperty("hidden", false);
+					db.getDB().put(discovery);
+				}
+				throw new GameStateChangeException("While you were on your way, someone found you...", true);
+			}
 		}
 		finally
 		{
