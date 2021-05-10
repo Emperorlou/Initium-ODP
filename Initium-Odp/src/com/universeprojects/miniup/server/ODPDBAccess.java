@@ -985,6 +985,10 @@ public class ODPDBAccess
 		
 		return questService;
 	}
+	
+	public QuestService getQuestService(OperationBase command, CachedEntity character) {
+		return new QuestService(command, this, character);
+	}
 
 	public Key getDefaultLocationKey()
 	{
