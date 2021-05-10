@@ -370,6 +370,23 @@ public class DBAccessor {
 		return db.grantAchievement(character.wrappedEntity, achievementName);
 	}
 	
+	public boolean hasAchievement(Character character, String achievementName) {
+		 CachedEntity user = db.getEntity((Key) character.wrappedEntity.getProperty("userKey")); 
+		 
+		 @SuppressWarnings("unchecked")
+		 List<Key> achievements = (List<Key>) user.getProperty("achievements");
+		 if(achievements == null)
+			 return false;
+		 
+		 List<CachedEntity> achEnts = db.getEntities(achievements);
+		 
+		 for(CachedEntity ce : achEnts)
+			 if(GameUtils.equals(ce.getProperty("title"), achievementName))
+				 return true;
+		 
+		 return false;
+	}
+	
 	/*################# CREATE MONSTER ###################*/
 	public EntityWrapper createMonsterFromId(Long defID, Location location)
 	{
