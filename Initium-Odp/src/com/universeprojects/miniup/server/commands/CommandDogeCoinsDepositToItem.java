@@ -58,18 +58,16 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 		Long characterCoins = (Long)character.getProperty("dogecoins");
 		Long depositAmount;
 
-		if (parameters.get("amount") == "")
-			depositAmount = characterCoins;
-		else
-			depositAmount = GameUtils.fromShorthandNumber(parameters.get("amount").replace(",", ""));
+		depositAmount = GameUtils.fromShorthandNumber(parameters.get("amount").replace(",", ""));
 
-		if(depositAmount == null)
-			throw new UserErrorMessage("Please type a valid gold amount.");
+		if(depositAmount == null || depositAmount == "")
+			depositAmount = characterCoins;
+		else if(depositAmount > characterCoins)
+			throw new UserErrorMessage("Character does not have the specified coins to deposit");
 		else if(depositAmount < 0)
 			throw new UserErrorMessage("Cannot deposit a negative amount");
-
-		if(depositAmount > characterCoins)
-			throw new UserErrorMessage("Character does not have the specified coins to deposit");
+		else
+			throw new UserErrorMessage("Please type a valid gold amount.");
 		
 		CachedEntity itemContainer = db.getEntity((Key)item.getProperty("containerKey"));
 		if(itemContainer == null)
