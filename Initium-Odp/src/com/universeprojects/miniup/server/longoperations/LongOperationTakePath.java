@@ -361,6 +361,8 @@ public class LongOperationTakePath extends LongOperation {
 								if(mEvent.stopMessage == null) 
 									mEvent.stopMessage = "You were interrupted!";
 								
+								db.getDB().commitBulkWrite();
+								
 								throw new UserErrorMessage(mEvent.stopMessage);
 									
 							}
