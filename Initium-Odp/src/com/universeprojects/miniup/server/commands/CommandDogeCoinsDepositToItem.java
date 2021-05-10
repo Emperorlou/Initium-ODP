@@ -60,7 +60,7 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 
 		depositAmount = GameUtils.fromShorthandNumber(parameters.get("amount").replace(",", ""));
 
-		if(depositAmount == null || depositAmount == "")
+		if(depositAmount == null)
 			depositAmount = characterCoins;
 		else if(depositAmount > characterCoins)
 			throw new UserErrorMessage("Character does not have the specified coins to deposit");
