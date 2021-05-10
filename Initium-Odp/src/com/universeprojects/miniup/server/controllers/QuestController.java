@@ -76,9 +76,10 @@ public class QuestController extends PageController {
 		
 		description += "<div style ='text-align: center;color:#c7a46c;font-size:150%;'</div><a onclick='pinQuest(" + quest.getKey().getId();
 				
-		if(isPinned) description += ")'>Unpin this quest</a>";
-		
-		else description += ")'>Pin this quest</a>";
+		if(isPinned)
+			description += ")'>Unpin this quest</a>";
+		else
+			description += ")'>Pin this quest</a>";
 		
 //		// If the quest is now complete, lets save this new status
 //		boolean newQuestGiven = questService.updateQuest(quest, questDef, questComplete);
