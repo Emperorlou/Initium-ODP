@@ -75,7 +75,7 @@ public class QuestService extends Service
 	
 	public QuestEntity getQuestByName(String name) {
 		for(QuestDefEntity qde : getAllQuestDefs()) {
-			if(qde.getName() == name) {
+			if(GameUtils.equals(qde.getName(), name)) {
 				return qde.getQuestEntity(character.getKey());
 			}
 		}

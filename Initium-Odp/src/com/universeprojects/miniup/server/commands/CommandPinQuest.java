@@ -13,6 +13,7 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.services.QuestService;
 
@@ -30,16 +31,18 @@ public class CommandPinQuest extends Command{
 		if(CommonChecks.checkCharacterIsZombie(character))
 			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 		
-		Long questId = Long.parseLong(parameters.get("questId"));
-		CachedEntity rawQuest = db.getEntity("Quest", questId);
+		Long questDefId = Long.parseLong(parameters.get("questId"));
+		CachedEntity rawQuestDef = db.getEntity("QuestDef", questDefId);
 		
-		if(rawQuest == null) 
+		if(rawQuestDef == null) 
 			throw new UserErrorMessage("This quest doesn't exist.");
 		
-		QuestEntity quest = new QuestEntity(db, rawQuest);
+		QuestDefEntity questDef = new QuestDefEntity(db, db.getEntity("QuestDef", questDefId));
 		
-		if(GameUtils.equals(character.getKey(), quest.getKey()))
-			throw new UserErrorMessage("You don't own this quest.");
+		QuestEntity quest = questDef.getQuestEntity(character.getKey());
+		
+		if(quest == null)
+			throw new UserErrorMessage("You haven't started this quest yet.");
 		
 		if(quest.isComplete())
 			throw new UserErrorMessage("This quest is already complete.");
@@ -49,8 +52,7 @@ public class CommandPinQuest extends Command{
 		
 		else character.setProperty("pinnedQuest", quest.getKey());
 		
-		CachedEntity questDef = db.getEntity(quest.getQuestDefKey());
-		db.sendGameMessage("You've pinned " + questDef.getProperty("name"));
+		db.sendGameMessage("You've pinned " + questDef.getName());
 
 		ds.put(character);
 		
