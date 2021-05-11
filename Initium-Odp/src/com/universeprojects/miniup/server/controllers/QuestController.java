@@ -74,7 +74,7 @@ public class QuestController extends PageController {
 			description+="</ul>";
 		}
 		
-		description += "<div style ='text-align: center;color:#c7a46c;font-size:150%;'</div><a onclick='pinQuest(" + quest.getKey().getId();
+		description += "<div style ='text-align: center;color:#c7a46c;font-size:150%;'</div><a onclick='pinQuest(" + questDefKey.getId();
 				
 		if(isPinned)
 			description += ")'>Unpin this quest</a>";
