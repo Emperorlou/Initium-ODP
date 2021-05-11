@@ -152,7 +152,7 @@ public class ODPDBAccess
 	{
 			"Pet", 
 			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck",
-			"Cosmetic1", "Cosmetic2", "Cosmetic3"
+			"Cosmetic1", "Cosmetic2", "Cosmetic3", "Charm"
 	};
 
 	private CachedDatastoreService ds = null;
