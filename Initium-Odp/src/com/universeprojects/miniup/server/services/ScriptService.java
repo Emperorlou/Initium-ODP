@@ -68,10 +68,10 @@ public class ScriptService extends Service
 		 */
 		@Override
 		public boolean exposeToScripts(String s) {
-			if(s.contains("java.lang.")) {
+			if(s.startsWith("java.lang.")) {
 				return true;
 			}
-			if(s.contains("java.util.")) {
+			if(s.startsWith("java.util.")) {
 				return true;
 			}
 			return false;
