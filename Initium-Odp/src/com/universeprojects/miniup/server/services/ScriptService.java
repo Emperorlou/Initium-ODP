@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
@@ -87,6 +86,8 @@ public class ScriptService extends Service
 		//initialize the threadsafe ScriptEngine with the filter.
 		if(engine == null) 
 			engine = new NashornScriptEngineFactory().getScriptEngine(new Filter());
+		
+		canExecute = true;
 		
 		//add the core object to the context
 		contextObjects.put("core", new DBAccessor(db, request));
