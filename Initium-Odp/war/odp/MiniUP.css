@@ -699,7 +699,7 @@ a.main-highlight:HOVER
 	font-size: 18px;
     text-shadow: -1px -1px 0px hsl(20deg 100% 57%);
     color: hsla(18, 100%, 44%, 1);
-    font-family: Algerian; /* This worked on one instance of chrome and not the other. We'll see. */
+    font-family: LEGENDARY; /* This worked on one instance of chrome and not the other. We'll see. */
 }
 
 .item-event
