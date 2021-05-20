@@ -33,6 +33,9 @@ import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Path;
 import com.universeprojects.miniup.server.scripting.wrappers.Quest;
 
+import jdk.nashorn.api.scripting.ClassFilter;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
+
 public class ScriptService extends Service 
 {
 	public final static Logger log = Logger.getLogger(ScriptService.class.getName());
@@ -53,13 +56,37 @@ public class ScriptService extends Service
 		return service;
 	}
 	
+	/**
+	 * Define what script context is allowed to see.
+	 * @author Evan
+	 *
+	 */
+	private class Filter implements ClassFilter {
+
+		/**
+		 * We only allow java.lang and java.util objects to be exposed
+		 * @return true if the object is allowed, false otherwise.
+		 */
+		@Override
+		public boolean exposeToScripts(String s) {
+			if(s.contains("java.lang.")) {
+				return true;
+			}
+			if(s.contains("java.util.")) {
+				return true;
+			}
+			return false;
+		}
+	}
+	
 	private ScriptService(ODPDBAccess db, HttpServletRequest request)
 	{
 		super(db);
+
 		
-		//initialize the threadsafe ScriptEngine
+		//initialize the threadsafe ScriptEngine with the filter.
 		if(engine == null) 
-			engine = new ScriptEngineManager().getEngineByName("nashorn");
+			engine = new NashornScriptEngineFactory().getScriptEngine(new Filter());
 		
 		//add the core object to the context
 		contextObjects.put("core", new DBAccessor(db, request));
