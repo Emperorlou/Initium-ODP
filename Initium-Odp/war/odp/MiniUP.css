@@ -696,17 +696,17 @@ a.main-highlight:HOVER
 
 .item-legendary
 {
-	font-size: 16px;
-	text-shadow: -1px -1px 0px #db0000;
-	color: color:#f05000;
-	font-family: LEGENDARY;
+	font-size: 18px;
+    text-shadow: -1px -1px 0px hsl(20deg 100% 57%);
+    color: hsla(18, 100%, 44%, 1);
+    font-family: Algerian; /* This worked on one instance of chrome and not the other. We'll see. */
 }
 
 .item-event
 {
-	font-size: 16px;
-	text-shadow: -1px -1px 0px #00f058;
-	color: color:#0098f0;
+    font-size: 16px;
+    text-shadow: -1px -1px 0px hsl(172deg 100% 57%);
+    color: hsla(170, 100%, 53%, 1);
 }
 
 .item-magic
