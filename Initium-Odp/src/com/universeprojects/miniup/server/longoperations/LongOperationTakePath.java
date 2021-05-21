@@ -137,6 +137,10 @@ public class LongOperationTakePath extends LongOperation {
 					
 					if(service.executeScript(mEvent, script, path)) {
 						if(!mEvent.haltExecution) {
+							
+							scriptDelay += mEvent.delay;
+							service.cleanupEvent(mEvent);
+							
 							if(mEvent.stop) {
 								if(mEvent.stopMessage == null) 
 									mEvent.stopMessage = "You were interrupted!";
@@ -144,8 +148,7 @@ public class LongOperationTakePath extends LongOperation {
 								throw new UserErrorMessage(mEvent.stopMessage);
 									
 							}
-							scriptDelay += mEvent.delay;
-							service.cleanupEvent(mEvent);
+
 						}
 					}
 				}
@@ -357,14 +360,15 @@ public class LongOperationTakePath extends LongOperation {
 					
 					if(service.executeScript(mEvent, script, path)) {
 						if(!mEvent.haltExecution) {
+							
+							service.cleanupEvent(mEvent);
+							
 							if(mEvent.stop) {
 								if(mEvent.stopMessage == null) 
 									mEvent.stopMessage = "You were interrupted!";
 																
 								throw new UserErrorMessage(mEvent.stopMessage);
-									
 							}
-							service.cleanupEvent(mEvent);
 						}
 					}
 				}
