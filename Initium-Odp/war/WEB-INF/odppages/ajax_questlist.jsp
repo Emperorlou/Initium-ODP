@@ -23,7 +23,7 @@
 	<h4>Finished Quests</h4>
 	<c:forEach var="finishedQuest" items="${finishedQuests}">
 		<div class='quest-container quest-complete' id='questlist-questkey-${finishedQuest.key}'>
-			<a onclick='viewQuest("${finishedQuests.key}")'>${finishedQuests.name}</a>
+			<a onclick='viewQuest("${finishedQuest.key}")'>${finishedQuest.name}</a>
 		</div>
 	</c:forEach>
 </c:if>
