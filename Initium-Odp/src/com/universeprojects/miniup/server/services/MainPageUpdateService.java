@@ -910,13 +910,11 @@ public class MainPageUpdateService extends Service
 				
 				if(destLocation.getKind().equals("Script")) {
 					destLocationName = (String)destLocation.getProperty("caption");
-					buttonCaption = "Head towards "+destLocationName;
+					buttonCaption = destLocationName;
 					onclick = "doTriggerLocation(event, " + destLocation.getId() + "," + location.getId() + ");";
 				}
 				else {
 					destLocationName = (String)destLocation.getProperty("name");
-					
-
 					buttonCaption = "Head towards "+destLocationName;
 					onclick = "doGoto(event, "+path.getKey().getId()+", true);";
 				}
