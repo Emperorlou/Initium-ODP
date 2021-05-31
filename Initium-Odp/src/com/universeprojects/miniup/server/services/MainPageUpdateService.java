@@ -977,9 +977,23 @@ public class MainPageUpdateService extends Service
 					double leftDbl = 728/2;
 					int topInt = new Double(topDbl/211d*100).intValue();
 					int leftInt = new Double(leftDbl/728d*100).intValue();
-			
-	
-					String buttonCaption = "Head back towards "+destLocationName;
+					
+					String buttonCaption = "";
+					String onclick = "";
+					
+					if(destLocation.getKind().equals("Script")) {
+						buttonCaption = (String) destLocation.getProperty("caption");
+						
+						onclick = "doTriggerLocation(event, " + destLocation.getId() + "," + location.getId() + ");";
+					}
+					else {
+						buttonCaption = "Head back towards "+destLocationName;
+						
+						newHtml.append("<script type='text/javascript'>window.singleLeavePathId=").append(paths.get(onlyOnePathIndex).getId()).append(";</script>");
+
+						onclick = "doGoto(event, window.singleLeavePathId, true);";	
+					}	
+					
 					String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
 					String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
 					if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
@@ -987,9 +1001,7 @@ public class MainPageUpdateService extends Service
 					if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
 						buttonCaption = overlayCaptionOverride;
 
-					newHtml.append("<script type='text/javascript'>window.singleLeavePathId=").append(paths.get(onlyOnePathIndex).getId()).append(";</script>");
-
-					String onclick = "doGoto(event, window.singleLeavePathId, true);";				
+			
 					
 					newHtml.append(getHtmlForInBannerLinkCentered(topInt, leftInt, buttonCaption, onclick));
 					
