@@ -885,7 +885,6 @@ public class MainPageUpdateService extends Service
 				CachedEntity destLocation = destLocations.get(i);
 				Integer pathEnd = pathEnds.get(i);
 					
-				String destLocationName = (String)destLocation.getProperty("name");
 	
 				String overlayCoordinates = (String)path.getProperty("location"+pathEnd+"OverlayCoordinates");
 				if (overlayCoordinates==null || overlayCoordinates.matches("\\d+x\\d+")==false)
@@ -904,9 +903,22 @@ public class MainPageUpdateService extends Service
 				double leftDbl = Double.parseDouble(left);
 				int topInt = new Double(topDbl/211d*100).intValue();
 				int leftInt = new Double(leftDbl/728d*100).intValue();
-		
-
-				String buttonCaption = "Head towards "+destLocationName;
+				
+				String destLocationName = "";
+				String buttonCaption = "";
+				String onclick = "";
+				
+				if(destLocation.getKind().equals("Script")) {
+					destLocationName = (String)destLocation.getProperty("caption");
+					buttonCaption = destLocationName;
+					onclick = "doTriggerLocation(event, " + destLocation.getId() + "," + location.getId() + ");";
+				}
+				else {
+					destLocationName = (String)destLocation.getProperty("name");
+					buttonCaption = "Head towards "+destLocationName;
+					onclick = "doGoto(event, "+path.getKey().getId()+", true);";
+				}
+				
 				String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
 				String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
 				if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
@@ -915,7 +927,6 @@ public class MainPageUpdateService extends Service
 					buttonCaption = overlayCaptionOverride;
 				
 				
-				String onclick = "doGoto(event, "+path.getKey().getId()+", true);";				
 				
 				newHtml.append(getHtmlForInBannerLink(topInt, leftInt, buttonCaption, onclick));
 			}
