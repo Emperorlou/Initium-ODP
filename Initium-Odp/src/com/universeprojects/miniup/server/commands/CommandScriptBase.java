@@ -37,6 +37,8 @@ import com.universeprojects.miniup.server.services.ScriptService;
  * @author spotupchik
  */
 public abstract class CommandScriptBase extends Command {
+	
+	private boolean inTransaction = false;
 
 	public CommandScriptBase(ODPDBAccess db, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -74,6 +76,10 @@ public abstract class CommandScriptBase extends Command {
 		{
 			if(GameUtils.enumEquals(entitySource.getProperty("type"), ScriptType.global)==false)
 				throw new RuntimeException("Specified script is not a global type!");
+			
+			if((Boolean) entitySource.getProperty("transaction") == true)
+				beginTransaction(character, entitySource);
+
 		}
 		else
 		{
@@ -94,6 +100,9 @@ public abstract class CommandScriptBase extends Command {
 			}
 			if(scriptSource == null)
 				throw new UserErrorMessage("The " + (entitySource != null ? entitySource.getKind() : "entity") + " does not have this effect!");
+		
+			if((Boolean) scriptSource.getProperty("transaction") == true)
+				beginTransaction(character, scriptSource, entitySource);
 		}
 		
 		// Can player trigger this effect...
@@ -162,14 +171,18 @@ public abstract class CommandScriptBase extends Command {
 		{
 			ScriptService service = ScriptService.getScriptService(db);
 			CachedDatastoreService ds = db.getDB();
-			ds.beginBulkWriteMode();
+			if(!inTransaction)
+				ds.beginBulkWriteMode();
 			if(service.executeScript(event, scriptSource, entitySource))
 			{
 				if(!event.haltExecution)
 				{
 					service.cleanupEvent(event);
 					
-					ds.commitBulkWrite();
+					if(inTransaction)
+						ds.commit();
+					else
+						ds.commitBulkWrite();
 					
 					for(Entry<Level, String> logs:event.logEntries.entrySet())
 						ScriptService.log.log(logs.getKey(), logs.getValue());
@@ -279,5 +292,13 @@ public abstract class CommandScriptBase extends Command {
 		{
 			setPopupMessage(event.popupMessage);
 		}
+	}
+	
+	private void beginTransaction(CachedEntity...toRefetch) {
+		ds.beginTransaction();
+		for(CachedEntity ce : toRefetch) 
+			ce.refetch(ds);
+		
+		inTransaction = true;
 	}
 }
