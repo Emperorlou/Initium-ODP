@@ -78,7 +78,7 @@ public abstract class CommandScriptBase extends Command {
 				throw new RuntimeException("Specified script is not a global type!");
 			
 			if((Boolean) entitySource.getProperty("transaction") == true)
-				beginTransaction(character, entitySource);
+				beginTransaction(entitySource, character);
 
 		}
 		else
@@ -102,7 +102,7 @@ public abstract class CommandScriptBase extends Command {
 				throw new UserErrorMessage("The " + (entitySource != null ? entitySource.getKind() : "entity") + " does not have this effect!");
 		
 			if((Boolean) scriptSource.getProperty("transaction") == true)
-				beginTransaction(character, scriptSource, entitySource);
+				beginTransaction(entitySource, scriptSource, character);
 		}
 		
 		// Can player trigger this effect...
@@ -299,8 +299,12 @@ public abstract class CommandScriptBase extends Command {
 		}
 	}
 	
-	private void beginTransaction(CachedEntity...toRefetch) {
+	private void beginTransaction(CachedEntity scriptSource, CachedEntity...toRefetch) {
 		ds.beginTransaction();
+		
+		if((Boolean)scriptSource.getProperty("atomic") == true)
+			scriptSource.refetch(ds);
+		
 		for(CachedEntity ce : toRefetch) 
 			ce.refetch(ds);
 		
