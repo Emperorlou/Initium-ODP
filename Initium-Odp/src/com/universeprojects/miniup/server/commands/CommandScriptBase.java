@@ -179,8 +179,13 @@ public abstract class CommandScriptBase extends Command {
 				{
 					service.cleanupEvent(event);
 					
-					if(inTransaction)
+					if(inTransaction) {
+						
+						if((Boolean)scriptSource.getProperty("atomic") == true)
+							ds.put(scriptSource);
+						
 						ds.commit();
+					}
 					else
 						ds.commitBulkWrite();
 					
