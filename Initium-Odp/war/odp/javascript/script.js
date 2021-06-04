@@ -2122,17 +2122,17 @@ function doTriggerGlobal(event, globalId, attributes, entities, closeTools)
 	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities, closeTools);
 }
 
-function doTriggerLocation(event, effectId, locationId, attributes, closeTools)
+function doTriggerLocation(event, effectId, locationId, attributes, long, closeTools)
 {
-	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, null, closeTools);
+	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, null, long, closeTools);
 }
 
-function doTriggerItem(event, effectId, itemId, attributes, closeTools)
+function doTriggerItem(event, effectId, itemId, attributes, long, closeTools)
 {
-	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, null, closeTools);
+	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, null, long, closeTools);
 }
 
-function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools)
+function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, long, closeTools)
 {
 	if(closeTools == null || closeTools)
 		closeAllTooltips();
@@ -2141,11 +2141,15 @@ function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attr
 	if(effectId) params["scriptId"] = effectId;
 	if(attributes) params["attributes"] = attributes;
 	if(entities) params["entities"] = entities;
-	doCommand(event, "Script"+effectType, params);
+
+	if(long)
+		doLongTriggerEffect(event, params);
+	else
+		doCommand(event, "Script"+effectType, params);
 }
 
-function doLongTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools){
-	longOperation(event, "LongOperationScript", parmeters, 	
+function doLongTriggerEffect(event, params){
+	longOperation(event, "LongOperationScript", params, 	
 		function(action) // responseFunction
 		{
 			if(action.error !== undefined)
@@ -2164,31 +2168,8 @@ function doLongTriggerEffect(event, effectType, effectId, sourceType, sourceId, 
 			}
 		},
 		function(){ //recall function
-			doLongTriggerEffect(); //TODO
+			doLongTriggerEffect(null);
 		});
-
-	longOperation(event, "InventionExperimentNew", {itemIds:checkedIds}, 
-	function(action) // responseFunction
-	{
-		if(action.error !== undefined)
-		{
-			clearPopupPermanentOverlay(); 
-		}
-		else if (action.isComplete)
-		{
-			clearPopupPermanentOverlay(); 
-			reloadPagePopup(false);
-		}
-		else
-		{
-			popupPermanentOverlay_Experiment("Experimenting", "You are performing experiments on the things around you so you might understand them better...");
-
-		}
-	},
-	function()	// recallFunction
-	{
-		doExperiment(null);
-	});
 }
 
 function doAttack(eventObject, charId)

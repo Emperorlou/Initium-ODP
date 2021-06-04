@@ -21,7 +21,14 @@ public class LongOperationScript extends LongOperation{
 		
 		setDataProperty("paramMap", parameters); //TODO make sure we can serialize a string-string map
 		
-		ScriptActionSimple action = new ScriptActionSimple(db, this, parameters);
+		ScriptActionSimple action = new ScriptActionSimple(db, this, parameters) {
+			//Override the action so that the state check knows that this is a long operation.
+			//Wasn't worth making an entire new class for this
+			@Override
+			protected boolean isLongScript() {
+				return true;
+			}
+		};
 		ScriptEvent event = action.execute();
 		
 		setLongOperationName((String) event.getAttribute("actionName"));

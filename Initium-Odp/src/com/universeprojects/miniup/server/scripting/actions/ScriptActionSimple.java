@@ -31,6 +31,12 @@ public class ScriptActionSimple extends ScriptAction{
 	@Override
 	protected void validateScriptState(CachedEntity trigger, CachedEntity script) throws UserErrorMessage
 	{
+		
+		//If callback is NOT null and allowLong is false, throw an error.
+		//If callback is null and allowLong is true, throw an error.
+		if(isLongScript() == (script.getProperty("callback") == null))
+			throw new UserErrorMessage("Invalid State");
+		
 		switch(trigger.getKind())
 		{
 			case "Item":
@@ -48,6 +54,10 @@ public class ScriptActionSimple extends ScriptAction{
 			default:
 				throw new RuntimeException("Unexpected trigger source for script " + script.getProperty("name"));
 		}
+	}
+	
+	protected boolean isLongScript() {
+		return false;
 	}
 	
 	@Override
