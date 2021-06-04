@@ -10,8 +10,11 @@ import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
+import com.universeprojects.miniup.server.UserRequestIncompleteException;
+import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.SimpleEvent;
+import com.universeprojects.miniup.server.scripting.actions.ScriptActionSimple;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
 
 /**
@@ -36,52 +39,17 @@ import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
  * @author SPFiredrake
  *
  */
-public class CommandScriptLink extends CommandScriptBase {
+public class CommandScriptLink extends Command {
 
 	public CommandScriptLink(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
 		super(db, request, response);
 	}
-	
-	@Override
-	protected void validateCharacterState(CachedEntity character) throws UserErrorMessage
-	{
-		if(GameUtils.isPlayerIncapacitated(character))
-			throw new UserErrorMessage("You are incapacitated and cannot trigger any effects!");
-		if(GameUtils.enumEquals(character.getProperty("mode"), CharacterMode.COMBAT))
-			throw new UserErrorMessage("You cannot trigger this effect in combat!");
-	}
-	
-	@Override
-	protected void validateScriptState(CachedEntity trigger, CachedEntity script) throws UserErrorMessage
-	{
-		switch(trigger.getKind())
-		{
-			case "Item":
-				if(GameUtils.enumEquals(script.getProperty("type"), ScriptType.directItem) == false)
-					throw new UserErrorMessage("Item does not support this effect.");
-				break;
-			case "Location":
-				if(GameUtils.enumEquals(script.getProperty("type"), ScriptType.directLocation) == false)
-					throw new UserErrorMessage("Location does not support this effect.");
-				break;
-			case "Character":
-				// What sort of validation do we allow here? Will likely be directCharacter
-				// script type, for <secret>magic</secret>. Just allow for now.
-				break;
-			default:
-				throw new RuntimeException("Unexpected trigger source for script " + script.getProperty("name"));
-		}
-	}
-	
-	@Override
-	protected ScriptEvent generateEvent(CachedEntity character, CachedEntity triggerEntity, 
-			CachedEntity script, Map<String, String> parameters) throws UserErrorMessage
-	{
-		return new SimpleEvent(character, getDB());
-	}
 
 	@Override
-	protected void processParameters(ScriptEvent event,
-			Map<String, String> parameters) throws UserErrorMessage {
+	public void run(Map<String, String> parameters) throws UserErrorMessage, UserRequestIncompleteException {
+		ScriptActionSimple action = new ScriptActionSimple(db, this, parameters);
+		
+		action.execute();
 	}
+	
 }
