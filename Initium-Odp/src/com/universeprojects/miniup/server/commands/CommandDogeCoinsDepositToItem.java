@@ -52,6 +52,10 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 		CachedEntity item = db.getEntity("Item", itemId);
 		if(item == null)
 			throw new UserErrorMessage("Item does not exist");
+
+		// Since these entities are getting saved, they need to be refetched within this call.
+		character.refetch(ds);
+		item.refetch(ds);
 		
 		Long characterCoins = (Long)character.getProperty("dogecoins");
 		Long depositAmount = null;
