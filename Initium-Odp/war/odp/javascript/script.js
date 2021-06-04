@@ -398,14 +398,17 @@ function clearPopupPermanentOverlay()
 	}
 }
 
-function popupPermanentOverlay_Experiment(title, text)
-{
+function popupPermanentOverlay_image(title, text, image){
 	$("#banner-text-overlay").hide();
-	setBannerImage("https://initium-resources.appspot.com/images/animated/invention1.gif");
+	setBannerImage(image);
 	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 
 	$("#banner-base").html(content);
-	
+}
+
+function popupPermanentOverlay_Experiment(title, text);
+{
+	popupPermanentOverlay(title, text, "https://initium-resources.appspot.com/images/animated/invention1.gif")
 }
 
 function popupPermanentOverlay_Searching(locationName)
@@ -2139,6 +2142,53 @@ function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attr
 	if(attributes) params["attributes"] = attributes;
 	if(entities) params["entities"] = entities;
 	doCommand(event, "Script"+effectType, params);
+}
+
+function doLongTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools){
+	longOperation(event, "LongOperationScript", parmeters, 	
+		function(action) // responseFunction
+		{
+			if(action.error !== undefined)
+			{
+				clearPopupPermanentOverlay(); 
+			}
+			else if (action.isComplete)
+			{
+				clearPopupPermanentOverlay(); 
+				reloadPagePopup(false);
+			}
+			else
+			{
+				popupPermanentOverlay_image(action.callback-title, action.callback-text, action.callback-image)
+
+			}
+		},
+		function(){ //recall function
+			doLongTriggerEffect(); //TODO
+		});
+
+	longOperation(event, "InventionExperimentNew", {itemIds:checkedIds}, 
+	function(action) // responseFunction
+	{
+		if(action.error !== undefined)
+		{
+			clearPopupPermanentOverlay(); 
+		}
+		else if (action.isComplete)
+		{
+			clearPopupPermanentOverlay(); 
+			reloadPagePopup(false);
+		}
+		else
+		{
+			popupPermanentOverlay_Experiment("Experimenting", "You are performing experiments on the things around you so you might understand them better...");
+
+		}
+	},
+	function()	// recallFunction
+	{
+		doExperiment(null);
+	});
 }
 
 function doAttack(eventObject, charId)

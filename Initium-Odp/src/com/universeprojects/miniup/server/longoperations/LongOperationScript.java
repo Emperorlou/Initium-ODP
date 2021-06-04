@@ -24,6 +24,11 @@ public class LongOperationScript extends LongOperation{
 		setLongOperationName((String) event.getAttribute("actionName"));
 		setLongOperationDescription((String) event.getAttribute("actionDescription"));
 		
+		putToCallback("title", (String) event.getAttribute("overlayTitle"));
+		putToCallback("text", (String) event.getAttribute("overlayText"));
+		putToCallback("image", (String) event.getAttribute("overlayImage"));
+		
+		
 		return (Integer) event.getAttribute("time");
 	}
 

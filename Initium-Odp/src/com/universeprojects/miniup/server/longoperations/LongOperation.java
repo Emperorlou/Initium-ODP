@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +48,7 @@ public abstract class LongOperation extends OperationBase
 	
 	CachedEntity longOperationDataEntity = null;
 	Map<String, Object> data = null; 
+	
 	
 	public LongOperation(ODPDBAccess db, Map<String, String[]> requestParameters) throws UserErrorMessage
 	{
@@ -330,6 +332,9 @@ public abstract class LongOperation extends OperationBase
 		result.put("longOperationName", longOperationName);
 		result.put("longOperationDescription", longOperationDescription);
 		
+		for(Entry<String, String> entry : callback.entrySet())
+			result.put("callback-" + entry.getKey(), entry.getValue());
+		
 		
 		result.put("refresh", fullRefresh);
 		
@@ -525,7 +530,19 @@ public abstract class LongOperation extends OperationBase
 		
 		return Long.parseLong(str);
 	}
-
 	
+	private Map<String, String> callback = null;
+	public void putToCallback(String key, String value) {
+		if(callback == null)
+			callback = new HashMap<>();
+		
+		callback.put(key, value);
+	}
+	public void removeCallback(String key) {
+		if(callback == null)
+			return;
+		
+		callback.remove(key);
+	}
 }
 
