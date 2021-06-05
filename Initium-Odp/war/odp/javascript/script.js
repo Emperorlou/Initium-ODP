@@ -2163,7 +2163,15 @@ function doLongTriggerEffect(event, params){
 			}
 			else
 			{
-				popupPermanentOverlay_image(action.callback-title, action.callback-text, action.callback-image)
+				let title = action.callback-title;
+				let text = action.callback-text;
+				let image = action.callback-image;
+
+				title = title != null ? title : "Working";
+				text = text != null ? text : "Please wait while this action completes";
+				image = image != null ? image : "https://initium-resources.appspot.com/images/animated/invention1.gif";
+
+				popupPermanentOverlay_image(title, text, image);
 
 			}
 		},

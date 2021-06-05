@@ -56,6 +56,10 @@ public class ScriptActionSimple extends ScriptAction{
 		}
 	}
 	
+	/**
+	 * Returns if the execution of this script should be a long operation.
+	 * @return
+	 */
 	protected boolean isLongScript() {
 		return false;
 	}
