@@ -2122,17 +2122,17 @@ function doTriggerGlobal(event, globalId, attributes, entities, closeTools)
 	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities, closeTools);
 }
 
-function doTriggerLocation(event, effectId, locationId, attributes, long, closeTools)
+function doTriggerLocation(event, effectId, locationId, attributes, closeTools, long)
 {
-	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, null, long, closeTools);
+	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, null, closeTools, long);
 }
 
-function doTriggerItem(event, effectId, itemId, attributes, long, closeTools)
+function doTriggerItem(event, effectId, itemId, attributes, closeTools, long)
 {
-	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, null, long, closeTools);
+	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, null, closeTools, long);
 }
 
-function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, long, closeTools)
+function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools, long)
 {
 	if(closeTools == null || closeTools)
 		closeAllTooltips();
