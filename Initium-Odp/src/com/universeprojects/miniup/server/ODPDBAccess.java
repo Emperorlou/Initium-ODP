@@ -4587,31 +4587,39 @@ public class ODPDBAccess
         Integer autoRunChance = (Integer) targetCharacter.getProperty("autoRunChance");
         if(autoRunChance == null) autoRunChance = 0;
         
-        int targetHP = (int) targetCharacter.getProperty("hitpoints");
-        int targetMaxHP = (int) targetCharacter.getProperty("maxHitpoints");
-        
-        //First, we check against the auto run threshold to see if the monster will attempt to run.
-        if((targetHP / targetMaxHP)*100 < autoRunThreshold) {
+        if(autoRunThreshold > 0 && autoRunChance > 0) {
+            Double targetHP = (Double) targetCharacter.getProperty("hitpoints");
+            Double targetMaxHP = (Double) targetCharacter.getProperty("maxHitpoints");
             
-        	//then, we check a random number vs the auto run chance.
-        	if (rnd.nextDouble()*100 <= autoRunChance) {
-            	
-            	//then, the monster has to pass a dexterity check.
-            	if(rnd.nextDouble() * charDex <= rnd.nextDouble() * monsterDex) {
-            		cs.leaveCombat(sourceCharacter, targetCharacter);
-            		
-            		db.put(sourceCharacter);
-            		db.delete(targetCharacter);
-            		
-            		return status += "The " + targetCharacter.getProperty("name") + " fled!";
-            	}
-            	
-            	//they miss the dex check, but we tell the player they tried.
-            	else {
-            		status += "The " + targetCharacter.getProperty("name") + " attempted to flee but couldn't! ";
-            	}
+            //First, we check against the auto run threshold to see if the monster will attempt to run.
+            if((targetHP / targetMaxHP) < autoRunThreshold) {
+                            	
+            	//then, we check a random number vs the auto run chance.
+            	if (GameUtils.roll(autoRunChance)) {
+                	
+                	//then, the monster has to pass a dexterity check.
+                	if(rnd.nextDouble() * charDex <= rnd.nextDouble() * monsterDex) {
+                		cs.leaveCombat(sourceCharacter, targetCharacter);
+                		
+                		db.put(sourceCharacter);
+                		
+                		QueryHelper qh = new QueryHelper(db);
+                		List<Key> itemKeys = qh.getFilteredList_Keys("Item", "containerKey", sourceCharacter.getKey());
+                		db.delete(itemKeys);
+                		
+                		db.delete(targetCharacter);
+                		
+                		return status += "The " + targetCharacter.getProperty("name") + " fled!";
+                	}
+                	
+                	//they miss the dex check, but we tell the player they tried.
+                	else {
+                		status += "The " + targetCharacter.getProperty("name") + " attempted to flee but couldn't! ";
+                	}
+                }
             }
         }
+        
         //if our attack hits.
         if (rnd.nextDouble()*charDex>=rnd.nextDouble()*monsterDex)
         {
