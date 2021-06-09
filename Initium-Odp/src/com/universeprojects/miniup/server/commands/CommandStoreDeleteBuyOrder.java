@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -41,6 +42,9 @@ public class CommandStoreDeleteBuyOrder extends Command {
 		
 		CachedEntity user = db.getCurrentUser();
 		Key characterKey = db.getCurrentCharacterKey();
+		
+		if(CommonChecks.checkCharacterIsZombie(db.getCurrentCharacter()))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 		
 		if (GameUtils.equals(characterKey, buyOrder.getProperty("characterKey"))==false)
 			throw new UserErrorMessage("The buy order this user is trying to delete does not belong to his character.");

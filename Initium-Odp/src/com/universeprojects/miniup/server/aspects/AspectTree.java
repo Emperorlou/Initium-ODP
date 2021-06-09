@@ -127,4 +127,9 @@ public class AspectTree extends ItemAspect
 		return (Long)getProperty("bark");
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }

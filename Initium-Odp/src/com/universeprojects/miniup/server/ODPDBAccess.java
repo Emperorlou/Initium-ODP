@@ -11,6 +11,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,6 +44,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
+import com.universeprojects.generators.shared.random.RandomDistributionFactory.ParseException;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.aspects.AspectBuffable;
 import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
@@ -127,7 +129,7 @@ public class ODPDBAccess
 	{
 		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
 		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem, global,
-		ownerHtml;
+		ownerHtml, reachableHtml
 	}
 
 	public enum StaticBuffables
@@ -151,7 +153,7 @@ public class ODPDBAccess
 	{
 			"Pet", 
 			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck",
-			"Cosmetic1", "Cosmetic2", "Cosmetic3"
+			"Cosmetic1", "Cosmetic2", "Cosmetic3", "Charm"
 	};
 
 	private CachedDatastoreService ds = null;
@@ -786,6 +788,39 @@ public class ODPDBAccess
 		return null;
 	}
 
+	/**
+	 * This returns an alphabetically sorted list of all characters associated with a userkey.
+	 * This will also filter out all invalid characters, notable dead and zombie.
+	 * @param userKey
+	 * @return
+	 */
+	public List<CachedEntity> getAlphabetSortedValidCharactersByUser(Key userKey){
+		List<CachedEntity> characters = getFilteredList("Character", "userKey", userKey);
+		Collections.sort(characters, new Comparator<CachedEntity>()
+		{
+			@Override
+			public int compare(CachedEntity o1, CachedEntity o2)
+			{
+				return ((String)o1.getProperty("name")).compareTo((String)o2.getProperty("name"));
+			}
+		});
+
+		//this will validate all the characters. Filter out zambie.
+		List<CachedEntity> toReturn = new ArrayList<>();
+		for(CachedEntity ce : characters) {
+			
+			//if the character is a zombie, skip.
+			if(CommonChecks.checkCharacterIsZombie(ce)) continue;
+			
+			//if the character is both dead and the name starts with dead, skip.
+			if(((String)ce.getProperty("name")).startsWith("Dead ") && CommonChecks.checkCharacterIsDead(ce)) continue;
+			
+			toReturn.add(ce);
+		}
+
+		return toReturn;
+	}
+
 	public CachedEntity getUserByEmail(String email)
 	{
 		email = email.trim().toLowerCase();
@@ -951,6 +986,10 @@ public class ODPDBAccess
 		
 		return questService;
 	}
+	
+	public QuestService getQuestService(OperationBase command, CachedEntity character) {
+		return new QuestService(command, this, character);
+	}
 
 	public Key getDefaultLocationKey()
 	{
@@ -1072,6 +1111,53 @@ public class ODPDBAccess
 			// ignore
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns a list of all paths visible by a character at a location.
+	 * @param characterKey - the key of the character that is viewing these paths.
+	 * @param locationKey - the key of the location.
+	 * @param showHidden - do we load hidden paths as well.
+	 * @return
+	 */
+	public List<CachedEntity> getVisiblePathsByLocation (Key characterKey, Key locationKey, boolean showHidden){
+	   
+		if(characterKey == null || locationKey == null) throw new RuntimeException("Error loading paths for Character: " + characterKey + " at Location: " + locationKey);
+		
+		List<CachedEntity> discoveriesForCharacterAndLocation = getDiscoveriesForCharacterAndLocation(characterKey, locationKey, showHidden);
+	    List<Key> alwaysVisiblePaths = getLocationAlwaysVisiblePaths_KeysOnly(locationKey);
+		
+	    pool.addToQueue(alwaysVisiblePaths);
+	    
+	    Set<Key> pathKeys = new LinkedHashSet<>(alwaysVisiblePaths);
+	    for(CachedEntity discovery:discoveriesForCharacterAndLocation)
+	    {
+	    	pool.addToQueue(discovery.getProperty("location1Key"), discovery.getProperty("location2Key"), discovery.getProperty("entityKey"));
+	    	pathKeys.add((Key)discovery.getProperty("entityKey"));
+	    }
+	    
+	    pool.loadEntities();
+	    
+	    // Also load in the always-visible destination locations
+	    if (alwaysVisiblePaths.isEmpty()==false)
+	    {
+	    	for(Key key:alwaysVisiblePaths)
+	    	{
+	    		CachedEntity path = pool.get(key);
+		    	pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
+	    	}
+	    	pool.loadEntities();
+	    }
+	    
+	    List<CachedEntity> paths = pool.get(pathKeys);
+	    
+		Iterator<CachedEntity> itr = paths.iterator();
+		while(itr.hasNext()) {
+			CachedEntity path = itr.next();
+			if(path == null) itr.remove();
+		}
+		
+		return paths;
 	}
 
 	public List<CachedEntity> getPathsByLocation_PermanentOnly(Key locationKey)
@@ -4722,7 +4808,11 @@ public class ODPDBAccess
 		Object result = 0d;
 		if (weapon!=null && weapon.getProperty("weaponDamage")!=null && weapon.getProperty("weaponDamage").toString().trim().equals("")==false)
 		{
-		    result = solveProperty("Attack with Weapon", weapon, "weaponDamage");
+		    try {
+				result = solveProperty("Attack with Weapon", weapon, "weaponDamage");
+			} catch (ParseException e) {
+				throw new ContentDeveloperException("Parsing error on the weaponDamage field in "+weapon.getKey()+": "+e.getMessage());
+			}
 		    if (result==null)
 		        throw new RuntimeException("'Attack with Weapon' failed to solve.");
 		}
@@ -4901,8 +4991,9 @@ public class ODPDBAccess
 	 * @param string
 	 * @param weapon
 	 * @return
+	 * @throws ParseException 
 	 */
-	public Object solveProperty(String string, CachedEntity weapon, String fieldName)
+	public Object solveProperty(String string, CachedEntity weapon, String fieldName) throws ParseException
 	{
 		return null;
 	}
@@ -5164,6 +5255,7 @@ public class ODPDBAccess
 						setPartiedField(party, attackingCharacterFinal, "combatant", null);
 						setPartiedField(party, attackingCharacterFinal, "combatType", null);
 						setPartiedField(party, attackingCharacterFinal, "locationEntryDatetime", new Date());
+						
 					}
 					
 					////////////////////////
@@ -5488,7 +5580,7 @@ public class ODPDBAccess
 						item.setProperty("movedTimestamp", new Date());
 						
 						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
-							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+=GameUtils.renderItem(this, item, true)+"<br>";
 					}
 					else
 					{
@@ -5499,7 +5591,7 @@ public class ODPDBAccess
 						{
 							dropAllSB.append("," + item.getId().toString());
 							loot+="<div style='display:inline-block; margin-right:3px;'>";
-							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+=GameUtils.renderItem(this, item, true)+"<br>";
 							loot+="<div>";
 							loot+="		<div class='main-item-controls'>";
 							// Get all the slots this item can be equipped in
@@ -7382,6 +7474,11 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void sendGameMessage(CachedDatastoreService ds, Key entityKey, String message) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	public boolean hasNewGameMessages()
 	{
@@ -7402,6 +7499,40 @@ public class ODPDBAccess
 
 		db.put(achievement);
 		return achievement;
+	}
+	
+	/**
+	 * Given a character, grant an achievement.
+	 * @param achievementName
+	 * @param user
+	 * @return
+	 */
+	public boolean grantAchievement(CachedEntity character, String achievementName) {
+		
+		CachedEntity user = getEntity((Key) character.getProperty("userKey"));
+
+		
+		List<CachedEntity> achievements = getFilteredList("Achievement", 1, "title", FilterOperator.EQUAL, achievementName);
+		if(achievements.size() != 1) return false; //achievement doesnt exist or there are duplicates; either way, fail.
+		
+		CachedEntity ach = achievements.get(0);
+		
+		@SuppressWarnings("unchecked")
+		List<Key> currentAchievements = (List<Key>) user.getProperty("achievements");
+		
+		if(currentAchievements == null)
+			currentAchievements = new ArrayList<>();
+		
+		for(Key achKey : currentAchievements)
+			if(GameUtils.equals(achKey, ach.getKey()))
+				return false; //they already had the achievement.
+		
+		currentAchievements.add(ach.getKey());
+		user.setProperty("achievements", currentAchievements);
+		
+		getDB().put(user);
+		return true;
+	
 	}
 
 	public Map<String, String> getValue_StringStringMap(CachedEntity entity, String fieldName)
@@ -7829,8 +7960,7 @@ public class ODPDBAccess
 			{
 				CachedEntity parent = getParentLocation(ds, location);
 				if (parent==null) return location;
-				location = parent;
-				if (CommonChecks.checkLocationIsRootLocation(location))
+				if (CommonChecks.checkLocationIsRootLocation(parent))
 					return parent;
 			}
 		}
@@ -7958,4 +8088,5 @@ public class ODPDBAccess
     public boolean doIfExpressionCheck(Object value1, String operator, String value2) {
     	return false;
     }
+
 }

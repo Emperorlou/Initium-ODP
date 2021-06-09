@@ -30,14 +30,17 @@ public class LongOperationRest extends LongOperation {
 	{
 		Key locationKey = (Key)db.getCurrentCharacter().getProperty("locationKey");
 		CachedEntity location = db.getEntity(locationKey);
+		CachedEntity character = db.getCurrentCharacter();
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 		
 		String locationType = (String)location.getProperty("type");
-		if (GameUtils.isPlayerIncapacitated(db.getCurrentCharacter()))
+		if (GameUtils.isPlayerIncapacitated(character))
 			throw new UserErrorMessage("You're incapacitated, you can't do this right now.");
 		if ("RestSite".equals(locationType)==false && "CampSite".equals(locationType)==false)
 			throw new UserErrorMessage("You cannot rest here. Find a rest site like a camp or an Inn, or even a player's house.");
 		
-		Double hitpointsToRegain = (Double)db.getCurrentCharacter().getProperty("maxHitpoints")-(Double)db.getCurrentCharacter().getProperty("hitpoints");
+		Double hitpointsToRegain = (Double)character.getProperty("maxHitpoints")-(Double)character.getProperty("hitpoints");
 		if (hitpointsToRegain<=0)
 		{
 			if("CampSite".equals(locationType))
@@ -45,7 +48,7 @@ public class LongOperationRest extends LongOperation {
 			
 			boolean hasDrunk = false;
 			boolean hasWellRested = false;
-			for(EmbeddedEntity buff:db.getBuffsFor(db.getCurrentCharacter()))
+			for(EmbeddedEntity buff:db.getBuffsFor(character))
 			{
 				if("Well Rested".equals(buff.getProperty("name")))
 					hasWellRested = true;

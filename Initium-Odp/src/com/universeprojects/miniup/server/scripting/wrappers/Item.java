@@ -58,6 +58,25 @@ public class Item extends EntityWrapper
 		return true;
 	}
 	
+	private Item[] contents = null;
+	public Item[] getContents() {
+		Key key = (Key) this.getProperty("containerKey");
+		if(key.getKind().equals("Item")) return new Item[0];
+		if(contents != null) return contents;
+		
+		List<CachedEntity> results = db.getFilteredList("Item", "containerKey", getKey());
+				
+		List<Item> toReturn = new ArrayList<>();
+		
+		for(CachedEntity ce : results) {
+			toReturn.add((Item) ScriptService.wrapEntity(ce, db));
+		}
+		
+		contents = toReturn.toArray(new Item[toReturn.size()]);
+		
+		return contents;
+	}
+	
 	public Long getQuantity()
 	{
 		return (Long)this.getProperty("quantity");
@@ -130,10 +149,14 @@ public class Item extends EntityWrapper
 		return (Date)this.getProperty("createdDate");
 	}
 	
-	public String renderItem()
+	public String renderItem() {
+		return renderItem(false);
+	}
+	
+	public String renderItem(boolean popupEmbedded)
 	{
 		EntityWrapper owner = this.container();
 		CachedEntity ownerEntity = owner == null ? db.getCurrentCharacter() : owner.wrappedEntity;
-		return GameUtils.renderItem(this.db, ownerEntity, this.wrappedEntity);
+		return GameUtils.renderItem(this.db, db.getRequest(), ownerEntity, this.wrappedEntity, popupEmbedded, false);
 	}
 }

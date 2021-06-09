@@ -111,28 +111,28 @@ public class ViewItemController extends PageController {
 		
 		if (CommonChecks.checkItemIsChippedToken(item))
 			request.setAttribute("showChippedTokenUI", true);
-
-		if (item.getProperty("newQuest")!=null)
-		{
-			CachedEntity questDefEntity = db.getEntity((Key)item.getProperty("newQuest"));
-			if (questDefEntity!=null)
+		
+		if (CommonChecks.checkItemIsAccessible(item, character)) {
+			request.setAttribute("showRelatedSkills", true);
+			
+			if (item.getProperty("newQuest")!=null)
 			{
-//				QuestService questService = new QuestService(db, db.getCurrentCharacter());
-				QuestDefEntity questDef = new QuestDefEntity(db, questDefEntity);
-				QuestEntity quest = questDef.getQuestEntity(db.getCurrentCharacterKey());
-				
-				if (quest!=null && quest.isComplete())
-					request.setAttribute("questComplete", true);
-				
-				request.setAttribute("newQuest", true);
+				CachedEntity questDefEntity = db.getEntity((Key)item.getProperty("newQuest"));
+				if (questDefEntity!=null)
+				{
+//					QuestService questService = new QuestService(db, db.getCurrentCharacter());
+					QuestDefEntity questDef = new QuestDefEntity(db, questDefEntity);
+					QuestEntity quest = questDef.getQuestEntity(db.getCurrentCharacterKey());
+					
+					if (quest!=null && quest.isComplete())
+						request.setAttribute("questComplete", true);
+					
+					request.setAttribute("newQuest", true);
+					
+				}
 				
 			}
-			
 		}
-		
-		
-		if (CommonChecks.checkItemIsAccessible(item, character))
-			request.setAttribute("showRelatedSkills", true);
 
 		ds.beginBulkWriteMode();
 		
@@ -294,6 +294,44 @@ public class ViewItemController extends PageController {
 				field = item.getProperty("ownerOnlyHtml");
 				if(field != null && "".equals(field)==false && itemMap.containsKey("ownerOnlyHtml") == false)
 					itemMap.put("ownerOnlyHtml", field.toString());
+			}
+			
+			//If the item is accessible, generate custom HTML.
+			if(CommonChecks.checkItemIsAccessible(item, currentChar)) {
+				
+				Object reachableHtml = item.getProperty("reachableHtml");
+				
+				//if its empty, check for the scripts.
+				if(reachableHtml == null || "".equals(reachableHtml)) {
+					
+					@SuppressWarnings("unchecked")
+					List<Key> scriptKeys = (List<Key>) item.getProperty("scripts");
+					
+					if (scriptKeys!=null && scriptKeys.isEmpty()==false) {
+						List<CachedEntity> reachableHtmlScripts = db.getScriptsOfType(scriptKeys, ODPDBAccess.ScriptType.reachableHtml);
+						
+						if (reachableHtmlScripts!=null && reachableHtmlScripts.isEmpty()==false){
+							for(CachedEntity script : reachableHtmlScripts) {
+								
+								if(GameUtils.booleanEquals(script.getProperty("hidden"), true)) continue;
+								
+								
+								SimpleEvent event = new SimpleEvent(currentChar, db);
+								if(ScriptService.getScriptService(db).executeScript(event, script, item) && event.getAttribute("reachableHtml") != null)
+								{
+									itemMap.put("reachableHtml", event.getAttribute("reachableHtml"));
+								}
+							}
+						}
+					}
+					
+					if(itemMap.containsKey("reachableHtml") == false) {
+						itemMap.put("reachableHtml", null);
+					}
+				}
+				else {
+					itemMap.put("reachableHtml", reachableHtml);
+				}
 			}
 			
 			// Aspects
@@ -682,6 +720,16 @@ public class ViewItemController extends PageController {
 		field = item.getProperty("description");
 		if (field!=null && field.toString().trim().equals("")==false)
 			itemMap.put("description", field.toString());
+		
+		//If we have explicitely allowed charges to be visible on this item, display them.
+		Boolean chargesVisible = (Boolean) item.getProperty("chargesVisible");
+		if(chargesVisible == null) chargesVisible = false;
+		if(chargesVisible) {
+			field = item.getProperty("charges");
+			if(field != null && field.toString().trim().equals("") == false) {
+				itemMap.put("charges", field.toString());
+			}
+		}
 		
 		
 		// Modifiers

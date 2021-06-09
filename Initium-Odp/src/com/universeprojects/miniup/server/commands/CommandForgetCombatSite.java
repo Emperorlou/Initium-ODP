@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -29,6 +30,10 @@ public class CommandForgetCombatSite extends Command {
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Long locationId = WebUtils.getLongParam(request, "locationId");
 
 		db.doDeleteCombatSite(null, character, KeyFactory.createKey("Location", locationId), true, false);		

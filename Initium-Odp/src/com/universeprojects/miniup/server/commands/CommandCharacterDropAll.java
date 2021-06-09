@@ -39,6 +39,9 @@ public class CommandCharacterDropAll extends Command {
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
 		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		// We will add all items that are for sale or equipped to a master ignore list.
 		// This should speed up the process by not having to perform these checks for every item
 		// Using HashSet, since we want to ignore duplicates (such as multi-slot equipped items)

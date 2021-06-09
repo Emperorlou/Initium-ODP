@@ -246,7 +246,7 @@ public class ServletEventServer extends HttpServlet
 				
 				if (message.startsWith("/mechanics"))
 				{
-					message = "<a href='odp/mechanics.jsp'>[Visit Game Mechanics Page]</a> "+message.substring(10);
+					message = "<a onclick='openMechanicsPage()'>[Visit Game Mechanics Page]</a> "+message.substring(10);
 				}
 				
 				if (message.startsWith("/premium"))

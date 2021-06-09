@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -47,6 +48,10 @@ public class CommandSample extends Command {
 		// deal with the user who is activating them in one way or another
 		CachedEntity user = db.getCurrentUser();
 		CachedEntity character = db.getCurrentCharacter();
+		
+		//IMPORTANT; Make sure to block the zombie from performing the action, if applicable.
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 
 		// We're going to output whether or not we have a full account or a throwaway, just for fun
 		boolean hasUser = false;

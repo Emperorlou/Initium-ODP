@@ -43,6 +43,9 @@ public void run(Map<String,String> parameters) throws UserErrorMessage {
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
 		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Key itemKey = KeyFactory.createKey("Item", itemId);
 		CachedEntity item = db.getEntity(itemKey);
 		

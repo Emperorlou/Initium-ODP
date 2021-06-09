@@ -32,21 +32,26 @@ public class LongOperationExplore extends LongOperation {
 		if ("true".equals(parameters.get("findNaturalResources")))
 			findNaturalResources = true;
 		
-		if (GameUtils.isCharacterInParty(db.getCurrentCharacter()) && GameUtils.isCharacterPartyLeader(db.getCurrentCharacter())==false)
+		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
+		if (GameUtils.isCharacterInParty(character) && GameUtils.isCharacterPartyLeader(character)==false)
 			throw new UserErrorMessage("You cannot move your party because you are not the leader.");
 		
-		if (ODPDBAccess.CHARACTER_MODE_COMBAT.equals(db.getCurrentCharacter().getProperty("mode")))
+		if (ODPDBAccess.CHARACTER_MODE_COMBAT.equals(character.getProperty("mode")))
 			throw new UserErrorMessage("You cannot explore right now because you are currently in combat.");
-		if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(db.getCurrentCharacter().getProperty("mode")))
+		if (ODPDBAccess.CHARACTER_MODE_MERCHANT.equals(character.getProperty("mode")))
 			throw new UserErrorMessage("You cannot explore right now because you are currently vending. <br><a onclick='closeAllPopups(); toggleStorefront();'>Shutdown Store</a>");
-		if (ODPDBAccess.CHARACTER_MODE_TRADING.equals(db.getCurrentCharacter().getProperty("mode")))
+		if (ODPDBAccess.CHARACTER_MODE_TRADING.equals(character.getProperty("mode")))
 			throw new UserErrorMessage("You cannot explore right now because you are currently trading.");
-		if (db.getCurrentCharacter().getProperty("mode")==null || "".equals(db.getCurrentCharacter().getProperty("mode")) || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(db.getCurrentCharacter().getProperty("mode")))
+		if (character.getProperty("mode")==null || "".equals(character.getProperty("mode")) || ODPDBAccess.CHARACTER_MODE_NORMAL.equals(db.getCurrentCharacter().getProperty("mode")))
 		{/*We're in normal mode and so we can actually explore*/}
 		else
 			throw new UserErrorMessage("You cannot explore right now because you are busy.");
 
-		CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
+		CachedEntity location = db.getCharacterLocation(character);
 		
 		CachedEntity permanentLocation = db.getParentPermanentLocation(location);
 		if (permanentLocation!=null) location = permanentLocation;

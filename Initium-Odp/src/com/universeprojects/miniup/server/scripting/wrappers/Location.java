@@ -28,6 +28,10 @@ public class Location extends EntityWrapper {
 		isInstanceLocation = GameUtils.booleanEquals(entity.getProperty("instanceModeEnabled"), true);
 	}
 	
+	public boolean validMessageTarget() {
+		return true;
+	}
+	
 	/**
 	 * Boolean indicating whether this location is instanced or not. Does not indicate
 	 * that an instance timer is set.

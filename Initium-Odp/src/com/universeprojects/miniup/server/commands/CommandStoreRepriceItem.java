@@ -50,6 +50,9 @@ public class CommandStoreRepriceItem extends Command
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
 		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		if(GameUtils.isPlayerIncapacitated(character))
 			throw new UserErrorMessage("You are currently incapacitated, so probably shouldn't be worrying about what's in your shop.");
 		

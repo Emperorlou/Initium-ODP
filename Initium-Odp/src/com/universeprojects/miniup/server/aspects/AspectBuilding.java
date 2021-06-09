@@ -12,5 +12,10 @@ public class AspectBuilding extends InitiumAspect
 		super(object);
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 
 }

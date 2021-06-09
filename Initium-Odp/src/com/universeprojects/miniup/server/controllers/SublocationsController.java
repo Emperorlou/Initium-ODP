@@ -44,43 +44,29 @@ public class SublocationsController extends PageController {
 		ODPDBAccess db = ODPDBAccess.getInstance(request);
 		try{InitiumPageController.requireLoggedIn(db);}catch(NotLoggedInException e){return InitiumPageController.loginMessagePage;}
 		
+		
+	    CachedEntity character = db.getCurrentCharacter();
+	    
+	    if(CommonChecks.checkCharacterIsIncapacitated(character)) {
+	    	request.setAttribute("locationsViewable", false);
+	    	return "/WEB-INF/odppages/ajax_sublocations.jsp";
+	    }
+	    request.setAttribute("locationsViewable", true);
+		
 		boolean showHidden = "true".equals(request.getParameter("showHidden"));
 		
 		request.setAttribute("showHidden", showHidden);
 		
 	    
-	    CachedEntity character = db.getCurrentCharacter();
+
+	    
 	    Key locationKey = (Key)character.getProperty("locationKey");
 	    db.pool.addToQueue(locationKey);
 	    
-	    List<CachedEntity> discoveriesForCharacterAndLocation = db.getDiscoveriesForCharacterAndLocation(db.getCurrentCharacterKey(), locationKey, showHidden);
-	    List<Key> alwaysVisiblePaths = db.getLocationAlwaysVisiblePaths_KeysOnly(locationKey);
-	    
-	    db.pool.addToQueue(alwaysVisiblePaths);
-	    
-	    Set<Key> pathKeys = new LinkedHashSet<>(alwaysVisiblePaths);
-	    for(CachedEntity discovery:discoveriesForCharacterAndLocation)
-	    {
-	    	db.pool.addToQueue(discovery.getProperty("location1Key"), discovery.getProperty("location2Key"), discovery.getProperty("entityKey"));
-	    	pathKeys.add((Key)discovery.getProperty("entityKey"));
-	    }
-	    
-	    db.pool.loadEntities();
-	    
-	    // Also load in the always-visible destination locations
-	    if (alwaysVisiblePaths.isEmpty()==false)
-	    {
-	    	for(Key key:alwaysVisiblePaths)
-	    	{
-	    		CachedEntity path = db.pool.get(key);
-		    	db.pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
-	    	}
-	    	db.pool.loadEntities();
-	    }
+	    List<CachedEntity> paths = db.getVisiblePathsByLocation(character.getKey(), db.getCharacterLocationKey(character), showHidden);
 	    
 	    CachedEntity currentLocation = db.pool.get(locationKey);
 	    
-	    List<CachedEntity> paths = db.pool.get(pathKeys);
 	    
 	    // First sort paths by type a little bit
 	    Collections.sort(paths, new Comparator<CachedEntity>()
@@ -178,10 +164,17 @@ public class SublocationsController extends PageController {
 	    	Map<String,String> data = new HashMap<>();
 	    	if (forgettableLocations.contains(location.getKey()))
 	    		data.put("isForgettable", "true");
-	    	data.put("pathId", path.getId().toString());
 	    	data.put("locationId", location.getId().toString());
-	    	data.put("name", (String)location.getProperty("name"));
 	    	data.put("bannerUrl", GameUtils.getResourceUrl((String)location.getProperty("banner")));
+	    	
+	    	if("Script".equals(location.getKind())) {
+		    	data.put("onClick", "doTriggerLocation(event, "+location.getId().toString() + ", " + currentLocation.getId().toString() + ")");
+		    	data.put("name", (String)location.getProperty("caption"));
+	    	}
+	    	else {
+		    	data.put("onClick", "doGoto(event, " + path.getId().toString() + ")");
+		    	data.put("name", (String)location.getProperty("name"));
+	    	}
 	    	
 	    	locationsFormatted.add(data);
 	    }

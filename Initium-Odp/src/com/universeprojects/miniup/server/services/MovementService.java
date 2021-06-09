@@ -1,11 +1,13 @@
 package com.universeprojects.miniup.server.services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -65,39 +67,64 @@ public class MovementService extends Service {
 	public void checkForLocks(CachedEntity character, CachedEntity pathToTake, Key destinationLocationKey) throws UserErrorMessage
 	{
 		Object lockCode = null;
-		if (GameUtils.equals(destinationLocationKey, pathToTake.getProperty("location1Key")))
+		Boolean checkAllCharacters = false;
+		String errorMessage = null;
+		if (GameUtils.equals(destinationLocationKey, pathToTake.getProperty("location1Key"))) {
 			lockCode = pathToTake.getProperty("location2LockCode");
-		else if (GameUtils.equals(destinationLocationKey, pathToTake.getProperty("location2Key")))
+			
+			checkAllCharacters = (Boolean) pathToTake.getProperty("location1KeyCheckAll");
+			
+			errorMessage = (String) pathToTake.getProperty("location1KeyErrorMessage");
+		}
+		else if (GameUtils.equals(destinationLocationKey, pathToTake.getProperty("location2Key"))) {
 			lockCode = pathToTake.getProperty("location1LockCode");
+			
+			checkAllCharacters = (Boolean) pathToTake.getProperty("location2KeyCheckAll");
+			
+			errorMessage = (String) pathToTake.getProperty("location2KeyErrorMessage");
+		}
 		else
 			throw new RuntimeException("Player is not located at either end of the specified path.");
 		
+		if(checkAllCharacters == null) checkAllCharacters = false;
+		if(errorMessage == null) errorMessage = "This location is locked. You must have the correct key before you can access it.";
 		if (lockCode != null) 
 		{
-			if (checkHasKey(character, (long)lockCode) == false)
-				throw new UserErrorMessage("This location is locked. You must have the correct key before you can access it.");
-			else {
-				FilterPredicate f1 = new FilterPredicate("containerKey", FilterOperator.EQUAL, character.getKey());
-				FilterPredicate f2 = new FilterPredicate("keyCode", FilterOperator.EQUAL, (long)lockCode);
-				CachedDatastoreService ds = db.getDB();
+			List<CachedEntity> characters = new ArrayList<>();
+			
+			if(checkAllCharacters) {
+				if(character.getProperty("partyCode") != null) 	characters.addAll(db.getParty(db.getDB(), character));
+				else if(characters.size() == 0) characters.add(character);
+			}
+			else characters.add(character);
+			
+			for(CachedEntity checkCharacter:characters) {
+				if (checkHasKey(checkCharacter, (long)lockCode) == false) 
+					throw new UserErrorMessage(errorMessage);
 				
-				List<CachedEntity> matchingKeys = ds.fetchAsList("Item", CompositeFilterOperator.and(f1, f2), 1000);
-				
-				// If no item keys, then it's a buff key, which doesn't get affected.
-				if(matchingKeys.isEmpty()==false)
-				{
-					// first matching key loses 1 durability
-					CachedEntity key = matchingKeys.get(0);
+				else {
+					FilterPredicate f1 = new FilterPredicate("containerKey", FilterOperator.EQUAL, checkCharacter.getKey());
+					FilterPredicate f2 = new FilterPredicate("keyCode", FilterOperator.EQUAL, (long)lockCode);
+					CachedDatastoreService ds = db.getDB();
 					
-					if (GameUtils.equals(key.getProperty("durability"), null) == false) {
-						long durability = (long) key.getProperty("durability");
+					List<CachedEntity> matchingKeys = ds.fetchAsList("Item", CompositeFilterOperator.and(f1, f2), 1000);
+					
+					// If no item keys, then it's a buff key, which doesn't get affected.
+					if(matchingKeys.isEmpty()==false)
+					{
+						// first matching key loses 1 durability
+						CachedEntity key = matchingKeys.get(0);
 						
-						if (durability > 1) {
-							key.setProperty("durability", durability - 1);
-							ds.put(key);
+						if (GameUtils.equals(key.getProperty("durability"), null) == false) {
+							long durability = (long) key.getProperty("durability");
+							
+							if (durability > 1) {
+								key.setProperty("durability", durability - 1);
+								ds.put(key);
+							}
+							else
+								ds.delete(key);
 						}
-						else
-							ds.delete(key);
 					}
 				}
 			}
@@ -106,9 +133,21 @@ public class MovementService extends Service {
 	
 	private boolean checkHasKey(CachedEntity character, long lockCode) {
 		int matchingKeys = db.getFilteredList_Count("Item", "containerKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
-		if(matchingKeys == 0)
-			matchingKeys = db.getFilteredList_Count("Buff", "parentKey", FilterOperator.EQUAL, character.getKey(), "keyCode", FilterOperator.EQUAL, (long)lockCode);
 		
+		//if we dont have any physical keys, we check for buffs.
+		if(matchingKeys == 0) {
+			//grab all the buffs associated with this character
+			List<EmbeddedEntity> buffs = db.getBuffsFor(character);
+			for(EmbeddedEntity buff : buffs) {
+				
+				
+				//if we find a buff with the proper keycode, just return true.
+				Long buffCode = (Long) buff.getProperty("keyCode");
+				
+				if(GameUtils.equals(lockCode, buffCode)) return true;
+
+			}
+		}
 		return (matchingKeys > 0);
 	}
 

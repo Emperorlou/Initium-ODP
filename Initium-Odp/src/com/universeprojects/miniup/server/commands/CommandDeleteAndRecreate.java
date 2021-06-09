@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
@@ -42,6 +44,10 @@ public class CommandDeleteAndRecreate extends Command {
         if (name==null) throw new UserErrorMessage("Character name cannot be blank.");
         
         CachedEntity currentChar = db.getCurrentCharacter();
+        
+		if(CommonChecks.checkCharacterIsZombie(currentChar))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
         if(currentChar == null) throw new RuntimeException("Current character entity is null");
         if(CommonChecks.checkCharacterIsIncapacitated(currentChar)) throw new UserErrorMessage("You must respawn before you delete and recreate your character.");
         
@@ -54,6 +60,11 @@ public class CommandDeleteAndRecreate extends Command {
         // Check if the name is already in use
         if (name.equals(currentChar.getProperty("name"))==false && db.checkCharacterExistsByName(name))
             throw new UserErrorMessage("Character name is already in use.");
+        
+        //user has items in inventory and therefore cannot reroll.
+        if (db.getFilteredList_Count("Item", "containerKey", FilterOperator.EQUAL, currentChar.getKey()) != 0) {
+        	throw new UserErrorMessage("Character has items in their inventory.");
+        }
         
         // Cannot be in combat.
         if(CommonChecks.checkCharacterIsBusy(currentChar))

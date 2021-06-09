@@ -15,12 +15,15 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
+import com.universeprojects.miniup.server.scripting.wrappers.Character;
+import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
@@ -53,6 +56,10 @@ public abstract class CommandScriptBase extends Command {
 		// TODO Auto-generated method stub
 		ODPDBAccess db = getDB();
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		validateCharacterState(character);
 		
 		// Get the entity for which the script will run
@@ -160,10 +167,7 @@ public abstract class CommandScriptBase extends Command {
 			{
 				if(!event.haltExecution)
 				{
-					for(CachedEntity saveEntity:event.getSaveEntities())
-						ds.put(saveEntity);
-					for(CachedEntity delEntity:event.getDeleteEntities())
-						ds.delete(delEntity);
+					service.cleanupEvent(event);
 					
 					ds.commitBulkWrite();
 					
@@ -190,19 +194,7 @@ public abstract class CommandScriptBase extends Command {
 					else
 						setJavascriptResponse(event.getJavascriptResponse());
 					
-					for(Entry<Key,Set<String>> update:event.getGameUpdates().entrySet())
-					{
-						if("Location".equals(update.getKey().getKind()))
-						{
-							for(String method:update.getValue())
-								db.sendMainPageUpdateForLocation(update.getKey(), ds, method);
-						}
-						else if("Character".equals(update.getKey().getKind()))
-						{
-							for(String method:update.getValue())
-								db.sendMainPageUpdateForCharacter(ds, update.getKey(), method);
-						}
-					}
+
 				}
 				afterExecuteScript(db, event);
 			}

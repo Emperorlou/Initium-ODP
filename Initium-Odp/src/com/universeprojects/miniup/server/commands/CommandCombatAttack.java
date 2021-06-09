@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -38,6 +39,10 @@ public class CommandCombatAttack extends Command
 		ODPAuthenticator auth = getAuthenticator();
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		CachedEntity user = db.getCurrentUser();
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 
@@ -308,6 +313,12 @@ public class CommandCombatAttack extends Command
 
 				if (CommonChecks.checkCharacterIsPlayer(targetCharacter))
 					db.queueMainPageUpdateForCharacter(targetCharacter.getKey(), "updateFullPage_shortcut");
+				
+				List<CachedEntity> party = db.getParty(ds, character);
+				
+				if(party != null)
+					for(CachedEntity ce : db.getParty(ds, character))
+						db.queueMainPageUpdateForCharacter(ce.getKey(), "updateFullPage_shortcut");
 				
 			}
 			else

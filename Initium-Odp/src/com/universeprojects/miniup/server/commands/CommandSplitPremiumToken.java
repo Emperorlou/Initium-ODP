@@ -31,6 +31,9 @@ public class CommandSplitPremiumToken extends TransactionCommand
 	{
 		CachedEntity character = db.getCurrentCharacter();
 		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Long itemId = tryParseId(parameters, "itemId");
 		if (itemId==null)
 			throw new IllegalArgumentException("Missing itemId.");

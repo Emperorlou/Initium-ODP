@@ -920,13 +920,10 @@ function createCampsite()
 function depositDogecoinsToItem(itemId, event)
 {
 	promptPopup("Deposit Gold", "How much gold do you want to put in this item:", $("#mainGoldIndicator").text().replace(/,/g,""), function(amount){
-		if (amount!=null && amount!="")
-		{
-			doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
-				if(error) return;
-				reloadPagePopup();
-			});
-		}
+		doCommand(event, "DogeCoinsDepositToItem", {"itemId" : itemId, "amount": amount}, function(data, error){
+			if(error) return;
+			reloadPagePopup();
+		});
 	});
 }
 
@@ -1172,6 +1169,11 @@ function helpPopup()
 			"<li>/wiki - This puts up a link to a player made wiki for Initium which <a href='http://initium.wikia.com/wiki/Initium_Wiki' target='_blank'>you can also find here.</a></li>" +
 			"</ul>", false);*/
 	pagePopup("/odp/chatHelp.html", null, "Chat Help");
+}
+
+function openMechanicsPage()
+{
+	pagePopup("/odp/mechanics.jsp", null, "Mechanics");
 }
 
 
@@ -2463,17 +2465,19 @@ function newCharacterFromDead(event)
 	doCommand(event, "CharacterRespawn");
 }
 
-function switchCharacter(eventObject, characterId)
+function switchCharacter(eventObject, characterId, direction)
 {
-	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId},function()
+	direction = direction || 0;
+	doCommand(eventObject,"SwitchCharacter",{"characterId":characterId, "direction":direction},function()
 	{
+		var charParam = (window.characterOverride != null && window.characterOverride.length>10) ? ("?char=" + window.characterOverride) : "";
 		if (location.href.indexOf("/main.jsp")>-1)
-			window.history.replaceState({}, document.title, "/" + "main.jsp");		
+			window.history.replaceState({}, document.title, "/" + "main.jsp" + charParam);		
 		else if (location.href.indexOf("/odp/experimental")>-1)
-			window.history.replaceState({}, document.title, "/" + "odp/experimental");		
+			window.history.replaceState({}, document.title, "/" + "odp/experimental" + charParam);
 		else if (location.href.indexOf("/odp/full")>-1)
-			window.history.replaceState({}, document.title, "/" + "odp/full");		
-		
+			window.history.replaceState({}, document.title, "/" + "odp/full" + charParam);	
+
 		closeAllTooltips();
 		clearMakeIntoPopup();
 	});
@@ -2589,6 +2593,11 @@ function viewTrainingQuestLines()
 function viewQuests()
 {
 	pagePopup("/odp/questlist", null, "Available Quests");
+}
+
+function pinQuest(id)
+{
+	doCommand(event, "PinQuest", {questId:id})
 }
 
 function viewQuest(keyString)
@@ -3626,68 +3635,6 @@ function newGuardSetting(event, entity, type, attack)
 {
 	doCommand(event, "GuardNewSetting", {entityKey:entity, type:type, attack:attack});
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ////////////////////////////////////////////////////////
 // COMMANDS
@@ -4916,21 +4863,43 @@ $(document).keyup(function(event){
 	{
 		viewProfile();
 	}
-	else if (event.which==76) // Changed to L since B is now for Nearby Characters list
-	{
-		window.location.href='main.jsp';
+	//user can just refresh the page. besides, this breaks on experimental.
+	//else if (event.which==76) // Changed to L since B is now for Nearby Characters list
+	//{
+	//	window.location.href='main.jsp';
+	//}
+	else if (event.altKey && event.which==85){ // U - go up in character list
+		switchCharacter(event, null, 1);
+	}
+	else if (event.altKey && event.which==74){ // J - go down in character list
+		switchCharacter(event, null, 2);
+	}
+	else if (event.altKey && event.which==75){ // K - iterate through characters in same acc and party
+		switchCharacter(event, null, 3);
+	}
+	else if (event.altKey && event.which==76){ // L - switch to party leader if possible
+		switchCharacter(event, null, 4);
+	}
+	else if (event.which==88){ // X - open the invention window.
+		viewInvention(event);
+	}
+	else if (event.which==78){ // N - opens the navigation window.
+		makeIntoPopup(".navigation-box");
+	}
+	else if (event.which==81){ //Q - opens the quest log.
+		viewQuests();
+	}
+	else if (event.which==72){ // H - opens the hotkey window.
+		openHotkeyWindow();
+	}
+	else if(event.which==65){ // A - aborts the current long operation.
+		cancelLongOperations(); //i tested, and sending this with no parameters DOES work
 	}
 });
 
-
-
-
-
-
-
-
-
-
+function openHotkeyWindow(){
+	pagePopup("/odp/hotkeys.html", null, "Hotkeys");
+}
 
 function secondsElapsed(secondsToConvert)
 {
@@ -5523,12 +5492,18 @@ function mergeItemStacks(eventObject, selector)
 
 function splitItemStack(eventObject, selector)
 {
+
 	var batchItems = $(selector).has("input:checkbox:visible:checked");
 	if(batchItems.length == 0) return;
 	var itemIds = batchItems.map(function(i, selItem){ return $(selItem).attr("ref"); }).get().join(",");
+
 	promptPopup("Stack Split","Enter a stack size to create:","1",function(stackSize){
-		if (stackSize!=null&&stackSize!=""){
-			doCommand(eventObject, "ItemsStackSplit",{"itemIds":itemIds, "stackSize":stackSize});
+		if(stackSize != null && stackSize != ""){
+			promptPopup("Stack Split","Enter how many stacks you want:","1",function(stacks){
+				if(stacks != null && stacks != ""){
+					doCommand(eventObject, "ItemsStackSplit",{"itemIds":itemIds, "stackSize":stackSize, "stacks":stacks});
+				}
+			});
 		}
 	});
 }
@@ -6028,6 +6003,3 @@ function navMapZoomOut()
 //
 //	$("#questlist-questkey-${questDefKey}").addClass("quest-complete");
 //}
-
-
-

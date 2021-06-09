@@ -15,6 +15,9 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.json.shared.JSONArray;
 import com.universeprojects.json.shared.JSONObject;
+import com.universeprojects.miniup.CommonChecks;
+import com.universeprojects.miniup.server.commands.CommandSwitchCharacter;
+import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.dbentities.QuestObjective;
@@ -35,6 +38,7 @@ public abstract class OperationBase
 	{
 		this.db = db;
 		this.request = request;
+		
 	}
 	
 	/**

@@ -31,6 +31,10 @@ public class CommandCharacterDropCharacter extends Command {
 	public void run(Map<String, String> parameters) throws UserErrorMessage {
 		ODPDBAccess db = getDB();
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		CachedEntity location = db.getEntity((Key)character.getProperty("locationKey"));
 		
 		if(CommonChecks.checkCharacterIsBusy(character))

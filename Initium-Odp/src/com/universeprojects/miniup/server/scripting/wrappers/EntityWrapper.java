@@ -1,6 +1,5 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
-import java.security.spec.DSAGenParameterSpec;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,8 +8,6 @@ import java.util.logging.Level;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PropertyContainer;
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.GameUtils;
@@ -41,6 +38,25 @@ public class EntityWrapper extends BaseWrapper
 	public ODPDBAccess getDB()
 	{
 		return db;
+	}
+	
+	/**
+	 * Can this entity be a valid target of a game message? If true, override this method.
+	 */
+	public boolean validMessageTarget() {
+		return false;
+	}
+	
+	public Key getDefinitionKey() {
+		return (Key) getProperty("_definitionKey");
+	}
+	
+	public boolean compareDefinition(Long id) {
+		Key key = getDefinitionKey();
+		
+		if(key == null) return false;
+		
+		return key.getId() == id;
 	}
 	
 	public boolean hasCharges()
@@ -241,6 +257,7 @@ public class EntityWrapper extends BaseWrapper
 		if(this.wrappedEntity.hasProperty("scripts")==false) return false;
 		List<CachedEntity> searchScripts = db.getFilteredList("Script", "name", scriptName);
 		List<Key> entityScripts = (List<Key>)this.getProperty("scripts");
+		if(entityScripts == null) return false;
 		for(CachedEntity script:searchScripts)
 		{
 			Key scriptKey = script.getKey();

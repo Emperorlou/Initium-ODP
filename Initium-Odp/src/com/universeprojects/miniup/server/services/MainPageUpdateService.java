@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
+import com.universeprojects.gefcommon.shared.elements.GameObject;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.HtmlComponents;
@@ -722,23 +723,25 @@ public class MainPageUpdateService extends Service
 			}
 			else
 			{
-				// Load the paths and destLocations for the root location
-				paths = db.getPathsByLocation_PermanentOnly(location.getKey());
+				// Load the paths and destLocations for the root location. Load only the paths that the user can see.
+				paths = db.getVisiblePathsByLocation(character.getKey(), location.getKey(), false);
 				
 				// Go through the paths and get the destination locations pooled
-				for(CachedEntity path:paths)
+				for(CachedEntity path:paths) {
 					db.pool.addToQueue(path.getProperty("location1Key"), path.getProperty("location2Key"));
+				}
 				
 				db.pool.loadEntities();
 
 				destLocations = new ArrayList<>();
-				for(CachedEntity path:paths)
-				if (GameUtils.equals(location.getKey(), path.getProperty("location1Key")))
-					destLocations.add(db.pool.get(path.getProperty("location2Key")));
-				else if (GameUtils.equals(location.getKey(), path.getProperty("location2Key")))
-					destLocations.add(db.pool.get(path.getProperty("location1Key")));
-				else
-					destLocations.add(null);
+				for(CachedEntity path:paths) {
+					if (GameUtils.equals(location.getKey(), path.getProperty("location1Key")))
+						destLocations.add(db.pool.get(path.getProperty("location2Key")));
+					else if (GameUtils.equals(location.getKey(), path.getProperty("location2Key")))
+						destLocations.add(db.pool.get(path.getProperty("location1Key")));
+					else
+						destLocations.add(null);
+				}
 			}
 			
 			
@@ -882,7 +885,6 @@ public class MainPageUpdateService extends Service
 				CachedEntity destLocation = destLocations.get(i);
 				Integer pathEnd = pathEnds.get(i);
 					
-				String destLocationName = (String)destLocation.getProperty("name");
 	
 				String overlayCoordinates = (String)path.getProperty("location"+pathEnd+"OverlayCoordinates");
 				if (overlayCoordinates==null || overlayCoordinates.matches("\\d+x\\d+")==false)
@@ -901,9 +903,22 @@ public class MainPageUpdateService extends Service
 				double leftDbl = Double.parseDouble(left);
 				int topInt = new Double(topDbl/211d*100).intValue();
 				int leftInt = new Double(leftDbl/728d*100).intValue();
-		
-
-				String buttonCaption = "Head towards "+destLocationName;
+				
+				String destLocationName = "";
+				String buttonCaption = "";
+				String onclick = "";
+				
+				if(destLocation.getKind().equals("Script")) {
+					destLocationName = (String)destLocation.getProperty("caption");
+					buttonCaption = destLocationName;
+					onclick = "doTriggerLocation(event, " + destLocation.getId() + "," + location.getId() + ");";
+				}
+				else {
+					destLocationName = (String)destLocation.getProperty("name");
+					buttonCaption = "Head towards "+destLocationName;
+					onclick = "doGoto(event, "+path.getKey().getId()+", true);";
+				}
+				
 				String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
 				String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
 				if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
@@ -912,7 +927,6 @@ public class MainPageUpdateService extends Service
 					buttonCaption = overlayCaptionOverride;
 				
 				
-				String onclick = "doGoto(event, "+path.getKey().getId()+", true);";				
 				
 				newHtml.append(getHtmlForInBannerLink(topInt, leftInt, buttonCaption, onclick));
 			}
@@ -963,9 +977,23 @@ public class MainPageUpdateService extends Service
 					double leftDbl = 728/2;
 					int topInt = new Double(topDbl/211d*100).intValue();
 					int leftInt = new Double(leftDbl/728d*100).intValue();
-			
-	
-					String buttonCaption = "Head back towards "+destLocationName;
+					
+					String buttonCaption = "";
+					String onclick = "";
+					
+					if(destLocation.getKind().equals("Script")) {
+						buttonCaption = (String) destLocation.getProperty("caption");
+						
+						onclick = "doTriggerLocation(event, " + destLocation.getId() + "," + location.getId() + ");";
+					}
+					else {
+						buttonCaption = "Head back towards "+destLocationName;
+						
+						newHtml.append("<script type='text/javascript'>window.singleLeavePathId=").append(paths.get(onlyOnePathIndex).getId()).append(";</script>");
+
+						onclick = "doGoto(event, window.singleLeavePathId, true);";	
+					}	
+					
 					String buttonCaptionOverride = (String)path.getProperty("location"+pathEnd+"ButtonNameOverride");
 					String overlayCaptionOverride = (String)path.getProperty("location"+pathEnd+"OverlayText");
 					if (buttonCaptionOverride!=null && buttonCaptionOverride.trim().equals("")==false)
@@ -973,9 +1001,7 @@ public class MainPageUpdateService extends Service
 					if (overlayCaptionOverride!=null && overlayCaptionOverride.trim().equals("")==false)
 						buttonCaption = overlayCaptionOverride;
 
-					newHtml.append("<script type='text/javascript'>window.singleLeavePathId=").append(paths.get(onlyOnePathIndex).getId()).append(";</script>");
-
-					String onclick = "doGoto(event, window.singleLeavePathId, true);";				
+			
 					
 					newHtml.append(getHtmlForInBannerLinkCentered(topInt, leftInt, buttonCaption, onclick));
 					
@@ -1885,12 +1911,29 @@ public class MainPageUpdateService extends Service
 		
 		QuestService qService = db.getQuestService(operation);
 		
-		List<QuestDefEntity> activeQuestDefs = qService.getActiveQuestDefs();
+		QuestEntity quest = null;
+		QuestDefEntity questDef = null;
 		
-		if (activeQuestDefs==null || activeQuestDefs.isEmpty()) return updateHtmlContents(".questPanel", html.toString());
+		QuestEntity pinnedQuest = qService.getPinnedQuest();
 		
-		QuestDefEntity questDef = activeQuestDefs.get(0);
-		QuestEntity quest = questDef.getQuestEntity(character.getKey());
+		//We have a pinned quest and its not complete
+		if(pinnedQuest != null && false == pinnedQuest.isComplete()) {
+			quest = pinnedQuest;
+			
+			CachedEntity rawQuestDef = db.getEntity((Key) quest.getRawEntity().getProperty("questDefKey"));
+			
+			questDef = new QuestDefEntity(db, rawQuestDef);
+		}
+		//otherwise, just grab the first active quest in the list.
+		else {
+			List<QuestDefEntity> activeQuestDefs = qService.getActiveQuestDefs();
+			
+			if (activeQuestDefs==null || activeQuestDefs.isEmpty()) return updateHtmlContents(".questPanel", html.toString());
+			
+			questDef = activeQuestDefs.get(0);
+			quest = questDef.getQuestEntity(character.getKey());
+		}
+		
 		QuestObjective currentObjective = quest.getCurrentObjective(questDef);
 
 		if (currentObjective==null) return updateHtmlContents(".questPanel", html.toString());

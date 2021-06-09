@@ -1,24 +1,22 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.logging.Level;
-
-import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.universeprojects.cacheddatastore.CachedDatastoreService;
+import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.CharacterMode;
 import com.universeprojects.miniup.server.ODPDBAccess.GroupStatus;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
+import com.universeprojects.miniup.server.dbentities.QuestEntity;
+import com.universeprojects.miniup.server.services.ODPKnowledgeService;
+import com.universeprojects.miniup.server.services.QuestService;
 import com.universeprojects.miniup.server.services.ScriptService;
 
 /**
@@ -35,9 +33,17 @@ public class Character extends EntityWrapper
 	private List<Character> carriedCharacters = null;
 	private Group characterGroup = null;
 	
+	private ODPKnowledgeService knowledgeService = null;
+	private QuestService questService = null;
+	
 	public Character(CachedEntity character, ODPDBAccess db) 
 	{
 		super(character, db);
+	}
+	
+	@Override
+	public boolean validMessageTarget() {
+		return true;
 	}
 	
 	private List<Item> getInventory()
@@ -130,7 +136,7 @@ public class Character extends EntityWrapper
 	
 	private void populateCarriedCharacters()
 	{
-		List<CachedEntity> chars = db.getFilteredList("Character", "containerKey", this.getKey());
+		List<CachedEntity> chars = db.getFilteredList("Character", "locationKey", this.getKey());
 		carriedCharacters = carriedCharacters == null ? new ArrayList<Character>() : carriedCharacters;
 		for(CachedEntity carried:chars)
 		{
@@ -340,9 +346,23 @@ public class Character extends EntityWrapper
 		return "COMBAT".equals(this.getProperty("mode"));
 	}
 	
+	public boolean isIncapacitated() {
+		return "DEAD".equals(this.getProperty("mode")) || "UNCONSCIOUS".equals(this.getProperty("mode"));
+	}
+	
 	public boolean isInParty()
 	{
 		return GameUtils.isCharacterInParty(this.wrappedEntity);
+	}
+	
+	/**
+	 * This method will either return the full party if the user is in a party, or just the user if theyre not in a party.
+	 * This reduces the code in the script.
+	 * @return
+	 */
+	public Character[] getPartyInclusive() {
+		if(isInParty()) return getParty();
+		return new Character[] {this};
 	}
 	
 	public Character[] getParty()
@@ -393,5 +413,134 @@ public class Character extends EntityWrapper
 		}
 		
 		return characterGroup;
+	}
+	
+	/*################# KNOWLEDGE ###################*/
+	public Knowledge getKnowledgeByName(String name) {
+		CachedEntity toReturn = getKnowledgeService().fetchKnowledgeByName(name);
+		if(toReturn == null) return null;
+		else return new Knowledge(toReturn, db);
+	}
+	
+	/**
+	 * Fetch all knowledge entities associated with this character.
+	 * @return
+	 */
+	public Knowledge[] getAllKnowledge(){
+		List<Knowledge> toReturn = new ArrayList<>();
+		for(CachedEntity ce : getKnowledgeService().getAllKnowledge()) 
+			toReturn.add(new Knowledge(ce, db));
+		
+		return toReturn.toArray(new Knowledge[toReturn.size()]);
+	}
+	
+	/**
+	 * Fetchs the knowledge chain for an item. Creates it if it doesnt exist.
+	 * @param item
+	 * @return
+	 */
+	public Knowledge[] getKnowledgeForItem(Item item) {
+		return getKnowledgeForItem(item, true);
+	}
+	
+	/**
+	 * Fetchs the knowledge chain for an item.
+	 * @param item
+	 * @param createIfNoExist
+	 * @return
+	 */
+	public Knowledge[] getKnowledgeForItem(Item item, boolean createIfNoExist) {
+		List<Knowledge> toReturn = new ArrayList<>();
+		for(CachedEntity ce : getKnowledgeService().getKnowledgeEntitiesFor(item.getEntity(), createIfNoExist)) 
+			toReturn.add(new Knowledge(ce, db));
+		
+		return toReturn.toArray(new Knowledge[toReturn.size()]);
+	}
+	
+	/**
+	 * Increase the knowledge for a particular item.
+	 * @param item
+	 * @param amount
+	 * @param percentageCap - what percent of the knowledge cap can you get from this increase?
+	 * @return
+	 */
+	public boolean increaseKnowledgeFor(Item item, int amount, int percentageCap) {
+		return getKnowledgeService().increaseKnowledgeFor(item.getEntity(), amount, percentageCap);
+	}
+	
+	private ODPKnowledgeService getKnowledgeService() {
+		if(knowledgeService == null)
+			knowledgeService = db.getKnowledgeService(wrappedEntity.getKey());
+		
+		return knowledgeService;
+	}
+	
+	/*################# QUESTS ###################*/	
+	/**
+	 * Grants a quest by name of the Def, and then returns it.
+	 * @param name
+	 * @return
+	 */
+	public Quest grantQuest(String name) {
+		if(true == hasQuest(name)) return getQuestByName(name);
+		
+		CachedEntity questDefEntity = db.getFilteredList("QuestDef", 1, "name", FilterOperator.EQUAL, name).get(0);
+		
+		return grantQuestInternal(questDefEntity);
+	}
+	
+	/**
+	 * Grants a quest based on the Def ID, then returns it.
+	 * @param defId
+	 * @return
+	 */
+	public Quest grantQuest(Long defId) {
+		return grantQuestInternal(db.getEntity(KeyFactory.createKey("QuestDef", defId)));
+	}
+	
+	private Quest grantQuestInternal(CachedEntity qde) {
+		if(qde == null) return null;
+		
+		QuestEntity raw = getQuestService().createQuestInstance(qde.getKey());
+				
+		return new Quest(raw, db);
+	}
+	
+	public boolean hasQuest(String name) {
+		return getQuestService().getQuestByName(name) != null;
+	}
+	
+	public Quest getQuestByName(String name) {
+		QuestEntity rawQuest = getQuestService().getQuestByName(name);
+		if(rawQuest == null) return null;
+		return new Quest(rawQuest, db);
+	}
+	
+	public Quest[] getAllQuests() {
+		List<QuestEntity> allQuests = getQuestService().getAllQuests();
+		List<Quest> toReturn = new ArrayList<>();
+		
+		for(QuestEntity quest : allQuests)
+			toReturn.add(new Quest(quest, db));
+		
+		return toReturn.toArray(new Quest[toReturn.size()]);
+	}
+	
+	public Quest[] getActiveQuests() {
+		List<QuestEntity> activeQuests = getQuestService().getActiveQuests();
+		List<Quest> toReturn = new ArrayList<>();
+		
+		for(QuestEntity quest : activeQuests)
+			toReturn.add(new Quest(quest, db));
+		
+		return toReturn.toArray(new Quest[toReturn.size()]);
+	}
+	
+	private QuestService getQuestService() {
+		
+		if(questService == null)
+			questService = db.getQuestService(null, wrappedEntity);
+		
+		return questService;
 	}
 }

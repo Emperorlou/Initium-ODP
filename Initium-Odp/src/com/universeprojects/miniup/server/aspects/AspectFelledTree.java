@@ -17,4 +17,10 @@ public class AspectFelledTree extends InitiumAspect
 
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
+
 }

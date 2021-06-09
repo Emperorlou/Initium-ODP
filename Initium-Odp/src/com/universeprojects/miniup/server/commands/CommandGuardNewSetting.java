@@ -38,6 +38,10 @@ public class CommandGuardNewSetting extends Command
 		
 		// Validate that they are not in a town.
 		CachedEntity curChar = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(curChar))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		CachedEntity charLocation = ds.getIfExists((Key)curChar.getProperty("locationKey"));
 		if(charLocation == null)
 			throw new RuntimeException("Current character location is null");

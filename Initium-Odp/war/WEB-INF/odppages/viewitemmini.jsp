@@ -80,6 +80,7 @@
 				<c:if test="${item.space != null}"><div name='space' class='item-popup-field' title='The amount of space this item roughtly takes up when placed in a box in cubic centimeters.'>Space:&nbsp;<div class='main-item-subnote'>${item.space}</div></div>${statComp.space}</c:if>
 				<c:if test="${item.warmth != null}"><div name='warmth' class='item-popup-field' title='The amount of warmth this item provides the wearer.'>Warmth: <div class='main-item-subnote'>${item.warmth} units</div></div>${statComp.warmth}</c:if>
 				<c:if test="${item.durability != null}"><div name='durability' class='item-popup-field' title='The number of uses this item still has left. Once it reaches 0, the item is destroyed.'>Durability: <div class='main-item-subnote'>${item.durability}</div></div>${statComp.durability}</c:if>
+				<c:if test="${item.charges != null}"><div name='charges' class='item-popup-field' title='The number of activations this item has. Once this reaches 0, the item will no longer be able to be activated.'>Charges: <div class='main-item-subnote'>${item.charges}</div></div></c:if>
 				<c:if test="${item.aspectList != null}"><div class='simple-aspect-list'>${item.aspectList}</div></c:if>
 			</div>
 			<c:if test="${item.modifiers!=null}">
@@ -94,6 +95,7 @@
 			<br/>
 			<div name='description' class='item-flavor-description'>${item.description}</div>
 		</div>
+		<c:if test="${item.reachableHtml != null}"><div>${item.reachableHtml}</div></c:if>
 		<c:if test="${item.ownerOnlyHtml != null}"><div>${item.ownerOnlyHtml}</div></c:if>
 		
 		<c:if test="${item.popupEntries != null}">

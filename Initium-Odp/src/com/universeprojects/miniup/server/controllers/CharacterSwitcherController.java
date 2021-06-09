@@ -43,7 +43,7 @@ public class CharacterSwitcherController extends PageController {
 
 		QueryHelper query = new QueryHelper(db.getDB());
 		
-		List<CachedEntity> characters = query.getFilteredList("Character", "userKey", user.getKey());
+		List<CachedEntity> characters = db.getAlphabetSortedValidCharactersByUser(user.getKey());
 		List<Map<String,Object>> charactersData = new ArrayList<>();
 		
 		boolean useSimpleMode = db.getUserCharacterSlotCount(user)>40;
@@ -66,21 +66,9 @@ public class CharacterSwitcherController extends PageController {
 			}
 		
 		pool.loadEntities();
-		Collections.sort(characters, new Comparator<CachedEntity>()
-		{
-			@Override
-			public int compare(CachedEntity o1, CachedEntity o2)
-			{
-				return ((String)o1.getProperty("name")).compareTo((String)o2.getProperty("name"));
-			}
-		});
 		
 		for(CachedEntity c:characters)
 		{
-			if (c.getProperty("name").toString().startsWith("Dead ")==false && "Zombie".equals(c.getProperty("status"))==false)
-			{}
-			else
-				continue;
 			Map<String,Object> data = new HashMap<>();
 			charactersData.add(data);
 			

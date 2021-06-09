@@ -25,6 +25,8 @@ public class CommandRefreshTile extends Command
 		Integer tileX = parseInteger("selected2DTileX");
 		Integer tileY = parseInteger("selected2DTileY");
 		
+		if(tileY == null || tileX == null) return;
+		
 		GridMapService gms = db.getGridMapService();
 		
 		gms.regenerateDBItemTileCache(tileX, tileY);

@@ -39,6 +39,10 @@ public class CommandAutofixLootStuckOnMonster extends Command {
 		
 		//grab the current character, the character key, and current location
 		CachedEntity character = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Key characterKey = character.getKey();
 		CachedEntity location = db.getEntity((Key) character.getProperty("locationKey"));
 		

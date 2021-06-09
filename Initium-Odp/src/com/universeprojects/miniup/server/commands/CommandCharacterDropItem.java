@@ -34,6 +34,9 @@ public class CommandCharacterDropItem extends Command {
 		CachedDatastoreService ds = getDS();
 		CachedEntity character = db.getCurrentCharacter();
 		
+		if(CommonChecks.checkCharacterIsZombie(character))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
+		
 		Long itemId = tryParseId(parameters, "itemId");
 		CachedEntity dropItem = db.getEntity("Item", itemId);
 		if(dropItem == null) throw new RuntimeException("Item does not exist");

@@ -73,7 +73,14 @@ public class QuestService extends Service
 		return allQuests;
 	}
 	
-	
+	public QuestEntity getQuestByName(String name) {
+		for(QuestDefEntity qde : getAllQuestDefs()) {
+			if(GameUtils.equals(qde.getName(), name)) {
+				return qde.getQuestEntity(character.getKey());
+			}
+		}
+		return null;
+	}
 	
 	public Map<Key, QuestDefEntity> getMapOfAllQuestDefs()
 	{
@@ -130,6 +137,12 @@ public class QuestService extends Service
 		}
 		
 		return activeQuests;
+	}
+	
+	public QuestEntity getPinnedQuest() {
+		CachedEntity rawQuest = db.getEntity((Key) character.getProperty("pinnedQuest"));
+		if(rawQuest == null) return null;
+		return new QuestEntity(db, rawQuest);
 	}
 	
 	public QuestEntity createQuestInstance(Key questDefKey)

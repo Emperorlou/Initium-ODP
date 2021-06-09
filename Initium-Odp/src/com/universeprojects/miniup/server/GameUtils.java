@@ -711,6 +711,10 @@ public class GameUtils
 				qualityClass = "item-unique";
 			else if ("Epic".equals(qualityClassOverride))
 				qualityClass = "item-epic";
+			else if("Legendary".equals(qualityClassOverride))
+				qualityClass = "item-legendary";
+			else if("Event".equals(qualityClassOverride))
+				qualityClass = "item-event";
 			else if ("Custom".equals(qualityClassOverride))
 				qualityClass = "item-custom";
 			else if ("Magic".equals(qualityClassOverride)) qualityClass = "item-magic";
@@ -1001,6 +1005,11 @@ public class GameUtils
 	public static String renderItem(CachedEntity item)
 	{
 		return renderItem(null, null, null, item, false, false);
+	}
+	
+	public static String renderItem(ODPDBAccess db, CachedEntity item, boolean popupEmbedded)
+	{
+		return renderItem(db, db.getRequest(), null, item, popupEmbedded, false);
 	}
 
 	public static String renderItem(ODPDBAccess db, CachedEntity character, CachedEntity item)
@@ -1709,7 +1718,7 @@ public class GameUtils
 		if (leftSide)
 			nameAndBars.append("<div class='character-display-box-info'>");
 		else
-			nameAndBars.append("<div class='character-display-box-info' style='text-align:right;max-width:100px; overflow: hidden;'>");
+			nameAndBars.append("<div class='character-display-box-info' style='text-align:right;max-width:100px; overflow: hidden; position: relative'>");
 		if (isSelf)
 			nameAndBars.append("	<a id='character-switcher' class='" + hcmClass + "' onclick='viewCharacterSwitcher()' style='cursor:pointer'>" + characterName + "</a>");
 		else

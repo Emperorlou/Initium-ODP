@@ -1,5 +1,6 @@
 package com.universeprojects.miniup.server.commands;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.commands.framework.Command;
@@ -27,8 +29,16 @@ public class CommandCharacterRespawn extends Command
 		
 		CachedEntity user = db.getCurrentUser();
 		CachedEntity deadCharacter = db.getCurrentCharacter();
+		
+		if(CommonChecks.checkCharacterIsZombie(deadCharacter))
+			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
 
 		CachedDatastoreService ds = db.getDB();
+			
+		if(!CommonChecks.checkCharacterIsIncapacitated(deadCharacter)) throw new UserErrorMessage("You can't respawn a character that's alive...");	
+
+		deadCharacter.setProperty("userKey", null);
+		ds.put(deadCharacter);
 		
 		CachedEntity newCharacter = db.doCreateNewCharacterFromDead(ds, getAuthenticator(), user, deadCharacter);
 		

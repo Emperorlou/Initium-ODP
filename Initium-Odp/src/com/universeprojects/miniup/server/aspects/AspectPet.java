@@ -443,4 +443,9 @@ public class AspectPet extends ItemAspect
 
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }
