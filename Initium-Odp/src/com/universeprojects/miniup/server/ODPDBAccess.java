@@ -4604,7 +4604,7 @@ public class ODPDBAccess
                 		db.put(sourceCharacter);
                 		
                 		QueryHelper qh = new QueryHelper(db);
-                		List<Key> itemKeys = qh.getFilteredList_Keys("Item", "containerKey", sourceCharacter.getKey());
+                		List<Key> itemKeys = qh.getFilteredList_Keys("Item", "containerKey", targetCharacter.getKey());
                 		db.delete(itemKeys);
                 		
                 		db.delete(targetCharacter);
