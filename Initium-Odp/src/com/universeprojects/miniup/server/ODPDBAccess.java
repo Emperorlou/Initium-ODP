@@ -51,6 +51,7 @@ import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.BlockadeService;
+import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.miniup.server.services.GuardService;
@@ -4547,6 +4548,7 @@ public class ODPDBAccess
 
         
         CachedDatastoreService db = getDB();
+        CombatService cs = new CombatService(this);
 
         
         // Here we're flagging that a combat action took place so that the cron job in charge of ensuring combat keeps moving along
@@ -4577,12 +4579,54 @@ public class ODPDBAccess
         Double charDex = getCharacterDexterity(sourceCharacter);
         Double monsterDex = getCharacterDexterity(targetCharacter);
         Random rnd = new Random();
+        
+        String status = "";
+        
+        Integer autoRunThreshold = (Integer) targetCharacter.getProperty("autoRunThreshold");
+        if(autoRunThreshold == null) autoRunThreshold = 0;
+        Integer autoRunChance = (Integer) targetCharacter.getProperty("autoRunChance");
+        if(autoRunChance == null) autoRunChance = 0;
+        
+        if(autoRunThreshold > 0 && autoRunChance > 0) {
+            Double targetHP = (Double) targetCharacter.getProperty("hitpoints");
+            Double targetMaxHP = (Double) targetCharacter.getProperty("maxHitpoints");
+            
+            //First, we check against the auto run threshold to see if the monster will attempt to run.
+            if((targetHP / targetMaxHP) < autoRunThreshold) {
+                            	
+            	//then, we check a random number vs the auto run chance.
+            	if (GameUtils.roll(autoRunChance)) {
+                	
+                	//then, the monster has to pass a dexterity check.
+                	if(rnd.nextDouble() * charDex <= rnd.nextDouble() * monsterDex) {
+                		cs.leaveCombat(sourceCharacter, targetCharacter);
+                		
+                		db.put(sourceCharacter);
+                		
+                		QueryHelper qh = new QueryHelper(db);
+                		List<Key> itemKeys = qh.getFilteredList_Keys("Item", "containerKey", targetCharacter.getKey());
+                		db.delete(itemKeys);
+                		
+                		db.delete(targetCharacter);
+                		
+                		return status += "The " + targetCharacter.getProperty("name") + " fled!";
+                	}
+                	
+                	//they miss the dex check, but we tell the player they tried.
+                	else {
+                		status += "The " + targetCharacter.getProperty("name") + " attempted to flee but couldn't! ";
+                	}
+                }
+            }
+        }
+        
+        //if our attack hits.
         if (rnd.nextDouble()*charDex>=rnd.nextDouble()*monsterDex)
         {
         	// Determine whether the weapon zombifies the target.
         	boolean zombifyWeapon = weapon != null && GameUtils.booleanEquals(weapon.getProperty("zombifying"), true);
             AttackResult attackResult = attackWithWeapon(db, sourceCharacter, weapon, targetCharacter);
-            String status = attackResult.status;
+            status += attackResult.status;
             int damage = attackResult.damage;
 
             // If we are dual wielding weapons, use the random crit chance to determine if we get a free second hit

@@ -122,12 +122,17 @@ public class CommandCombatAttack extends Command
 			boolean characterMissed = false;
 			boolean targetEquipmentDestroyed = false;
 			boolean characterCrit = false;
+			boolean monsterRun = false;
 			Double targetHp = (Double)targetCharacter.getProperty("hitpoints");
 			
 			status = db.doCharacterAttemptAttack(auth, user, character, weapon, targetCharacter);
 	
-			if (status!=null) characterCrit = status.contains("It's a critical hit!");
-			if (status!=null) targetEquipmentDestroyed = status.contains("equipment-destroyed-notice");
+			if(status != null) {
+				characterCrit = status.contains("It's a critical hit!");
+				targetEquipmentDestroyed = status.contains("equipment-destroyed-notice");
+				monsterRun = status.contains("fled!");
+			}
+			
 			Double targetNewHp = (Double)targetCharacter.getProperty("hitpoints");
 			
 			db.flagNotALooter(request);
@@ -144,7 +149,7 @@ public class CommandCombatAttack extends Command
 				
 				doVisualEffect(hand, true, false, false);
 			}
-			else
+			else if(!monsterRun)
 			{
 				String hitType = "hit";
 				if (characterCrit)
