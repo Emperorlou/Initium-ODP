@@ -9,11 +9,11 @@ dependencies {
     compile project(':GEFCommon')
     compile project(':CachedDatastore')
     compile project(':GEFJson')
+    compile project(':Webapp')
 
 	// https://mvnrepository.com/artifact/javax.servlet/jstl
 	compile group: 'javax.servlet', name: 'jstl', version: '1.2'
 
-    compile 'com.universeprojects:java-webapp-lite:1.0-SNAPSHOT'
     compile 'commons-codec:commons-codec:1.6'
 
     compile 'org.mozilla:rhino:1.7.8'
