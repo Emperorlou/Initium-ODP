@@ -55,6 +55,7 @@ import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.miniup.server.services.GuardService;
+import com.universeprojects.miniup.server.services.ItemFilterService;
 import com.universeprojects.miniup.server.services.ModifierService;
 import com.universeprojects.miniup.server.services.ModifierService.ModifierType;
 import com.universeprojects.miniup.server.services.MovementService;
@@ -5544,6 +5545,8 @@ public class ODPDBAccess
 		List<CachedEntity> items = getFilteredList("Item", "containerKey", characterToDie.getKey());
 		
 		StringBuilder dropAllSB = new StringBuilder();
+		ItemFilterService ifs = new ItemFilterService(this);
+
 		for(CachedEntity item:items)
 		{
 			if (item==null) continue;
@@ -5582,7 +5585,7 @@ public class ODPDBAccess
 				}
 				else
 				{
-					if (overburdened)
+					if (overburdened || false == ifs.allowItem(item))
 					{
 						item.setProperty("containerKey", location.getKey());
 						item.setProperty("movedTimestamp", new Date());

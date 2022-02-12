@@ -866,6 +866,14 @@ function transmuteItems(eventObject, containerId)
 	doCommand(eventObject, "TransmuteItems", {"containerId":containerId});
 }
 
+function addItemFilter(eventObject, itemId){
+	doCommand(eventObject, "AddItemFilter", {"itemId":itemId});
+}
+
+function removeAllItemFilters(eventObject){
+	doCommand(eventObject, "RemoveAllItemFilters");
+}
+
 //function storeSellItem(itemId)
 //{
 //	promptPopup("Sell Item", "How much do you want to sell this item for?", "0", function(confirm){
@@ -1027,6 +1035,11 @@ function loadInventoryAndEquipment()
 {
 	loadInventory();
 	loadEquipment();
+}
+
+function loadItemFilterList()
+{
+	pagePopup("odp/itemfilters", null, "Item Filters");
 }
 // used to sort armor and shields
 function compareArmor (a, b) {
@@ -4894,6 +4907,10 @@ $(document).keyup(function(event){
 	}
 	else if(event.which==65){ // A - aborts the current long operation.
 		cancelLongOperations(); //i tested, and sending this with no parameters DOES work
+	}
+
+	else if(event.which==73 && event.altKey){ //I and alt, loads item filters
+		loadItemFilterList();
 	}
 });
 
