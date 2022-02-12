@@ -13,9 +13,9 @@ import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ItemFilterService;
 
-public class CommandCharacterAddItemFilter extends Command{
+public class CommandAddItemFilter extends Command{
 
-	public CommandCharacterAddItemFilter(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
+	public CommandAddItemFilter(ODPDBAccess db, HttpServletRequest request, HttpServletResponse response) {
 		super(db, request, response);
 	}
 

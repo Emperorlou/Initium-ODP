@@ -1,8 +1,6 @@
 package com.universeprojects.miniup.server.services;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
@@ -12,7 +10,9 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 
 public class ItemFilterService extends Service{
 	
-	private final String[] qualities = new String[]{"item-junk", "item-normal", "item-rare", "item-unique", "item-magic", "item-epic", "item-custom"};
+	private final String[] qualities = new String[]{"item-junk", "item-normal", "item-rare", "item-unique", "item-magic", "item-epic", "item-custom", "item-event", "item-legendary"};
+	private final List<String> qual = Arrays.asList(qualities);
+
 	private Map<String, Integer> qualityMap = null;
 
 	public ItemFilterService(ODPDBAccess db) {
@@ -27,10 +27,12 @@ public class ItemFilterService extends Service{
 		filters.put((String) item.getProperty("name"), GameUtils.determineQuality(item.getProperties()));
 		
 		db.setValue_StringStringMap(character, "itemFilters", filters);
+		filterCache = null;
 	}
 	
 	public void removeAllFilters() {
 		db.getCurrentCharacter().setProperty("itemFilters", null);
+		filterCache = null;
 	}
 	
 	public boolean allowItem(CachedEntity item) {
@@ -40,44 +42,37 @@ public class ItemFilterService extends Service{
 		if(filters == null || filters.size() == 0) return true; //no filters? return true.
 		
 		for(Entry<String, String> entry : filters.entrySet()) {
-			
+
+			//wrong filter? continue
 			if(GameUtils.equals(entry.getKey(), item.getProperty("name")) == false) continue;
-			
+
+			//if the index of the items quality is HIGHER than the index of the filter's quality, return true
 			return isQualityBetterThan(GameUtils.determineQuality(item.getProperties()), entry.getValue());
 		}
-		
+
+		//if we dont have a filter for this item, return true
 		return true;
 	}
-	
+
+	//this method tests if the item's quality is higher than the filter's quality.
 	public boolean isQualityBetterThan(String itemQuality, String filterQuality) {
-		return getQualityMap().get(itemQuality) > getQualityMap().get(filterQuality);
+
+		return qual.indexOf(itemQuality) > qual.indexOf(filterQuality);
 	}
 	
 	/**
-	 * it might be worth ditching this in favor of a list?
+	 * Grab the filters stored on the character. Cache the result, so we dont have to do the map parsing algorithm every time
 	 * @return
 	 */
-	private Map<String, Integer> getQualityMap(){
-		if(qualityMap != null)
-			return qualityMap;
-		
-		qualityMap = new HashMap<>();
-		
-		for(int i = 0; i != qualities.length; i++) 
-			qualityMap.put(qualities[i], i);
-				
-		return qualityMap;
-	}
-	
-	/**
-	 * is it faster to cache this?
-	 * @return
-	 */
+	private Map<String, String> filterCache = new HashMap<>();
 	public Map<String, String> getFilters(){
-		Map<String, String> result = db.getValue_StringStringMap(db.getCurrentCharacter(), "itemFilters");
-		if(result == null)
-			return new HashMap<>();
+
+		if(filterCache != null) return filterCache;
+
+		filterCache = db.getValue_StringStringMap(db.getCurrentCharacter(), "itemFilters");
+		if(filterCache == null)
+			filterCache = new HashMap<>();
 		
-		return result;
+		return filterCache;
 	}
 }
