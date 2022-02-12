@@ -215,4 +215,11 @@ public class AspectCardDeck extends InitiumAspect
 		}
 	}
 	
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
+	
+	
 }

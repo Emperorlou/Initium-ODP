@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.InitiumPageController;
 import com.universeprojects.miniup.server.NotLoggedInException;
 import com.universeprojects.miniup.server.ODPDBAccess;
@@ -38,7 +40,7 @@ public class QuestController extends PageController {
 		Key questDefKey = KeyFactory.stringToKey(questDefKeyString);
 		QuestDefEntity questDef = new QuestDefEntity(db, db.getDB().getIfExists(questDefKey));
 		QuestEntity quest = questDef.getQuestEntity(db.getCurrentCharacterKey());
-		
+				
 		if (quest==null)
 		{
 			return null;
@@ -47,6 +49,8 @@ public class QuestController extends PageController {
 		String description = questDef.getDescription();
 		
 		description+="<h2>Objectives</h2>";
+		
+		boolean isPinned = GameUtils.equals(db.getCurrentCharacter().getProperty("pinnedQuest"), quest.getKey());
 		
 		boolean questComplete = true;
 		List<QuestObjective> objectives = quest.getObjectiveData(questDef);
@@ -70,6 +74,12 @@ public class QuestController extends PageController {
 			description+="</ul>";
 		}
 		
+		description += "<div style ='text-align: center;color:#c7a46c;font-size:150%;'</div><a onclick='pinQuest(" + questDefKey.getId();
+				
+		if(isPinned)
+			description += ")'>Unpin this quest</a>";
+		else
+			description += ")'>Pin this quest</a>";
 		
 //		// If the quest is now complete, lets save this new status
 //		boolean newQuestGiven = questService.updateQuest(quest, questDef, questComplete);
@@ -83,8 +93,7 @@ public class QuestController extends PageController {
 		request.setAttribute("questComplete", questComplete);
 		request.setAttribute("name", questDef.getName());
 		request.setAttribute("description", description);
-		request.setAttribute("questDefKey", questDef.getUrlSafeKey());
-		
+		request.setAttribute("questDefKey", questDef.getUrlSafeKey());		
 		
 		
 		return "/WEB-INF/odppages/ajax_quest.jsp";

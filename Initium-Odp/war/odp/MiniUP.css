@@ -13,6 +13,10 @@
     font-family: CHAT;
     src: url(arial-narrow-2.ttf);
 }
+@font-face {
+	font-family: LEGENDARY;
+	src: url(algerian.ttf)
+}
 
 .accessible
 {
@@ -688,6 +692,21 @@ a.main-highlight:HOVER
     font-size: 16px;
     text-shadow: -1px -1px 0px #AC54FF;
     color: #5e2e8c;
+}
+
+.item-legendary
+{
+	font-size: 18px;
+    text-shadow: -1px -1px 0px hsl(20deg 100% 57%);
+    color: hsla(18, 100%, 44%, 1);
+    font-family: LEGENDARY; /* This worked on one instance of chrome and not the other. We'll see. */
+}
+
+.item-event
+{
+    font-size: 16px;
+    text-shadow: -1px -1px 0px hsl(172deg 100% 57%);
+    color: hsla(170, 100%, 53%, 1);
 }
 
 .item-magic
@@ -3070,6 +3089,12 @@ position: absolute;
 .minimap-button:hover
 {
 	filter: brightness(1.5);
+}
+.minimap-button-viewallpaths
+{
+	background-image:url(https://storage.googleapis.com/initium-resources/images/ui/viewpathsbutton.png);
+	bottom:26px;
+	left:26px;
 }
 
 .minimap-button-map
@@ -5580,11 +5605,12 @@ div#buildingObject {
 /* Long operation state and style */
 
 /*Make things disappear that shouldn't be visible during long operations*/
+/*
 body[longoperation='true'] #monsterCountPanel
 {
 	visibility:hidden!important;
 	opacity:0!important;
-}
+} lets not do this for now */
 
 body[longoperation='true'] #banner-text-overlay
 {

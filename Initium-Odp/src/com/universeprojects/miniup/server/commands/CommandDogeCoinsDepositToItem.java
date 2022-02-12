@@ -47,23 +47,37 @@ public class CommandDogeCoinsDepositToItem extends TransactionCommand {
 		
 		if(CommonChecks.checkCharacterIsZombie(character))
 			throw new UserErrorMessage("You can't control yourself... Must... Eat... Brains...");
-		
-		character = ds.refetch(character);
-		
+				
 		long itemId = tryParseId(parameters, "itemId");
 		CachedEntity item = db.getEntity("Item", itemId);
 		if(item == null)
 			throw new UserErrorMessage("Item does not exist");
+
+		// Since these entities are getting saved, they need to be refetched within this call.
+		character.refetch(ds);
+		item.refetch(ds);
 		
-		Long depositAmount = GameUtils.fromShorthandNumber(parameters.get("amount").replace(",", ""));
-		if(depositAmount == null)
-			throw new UserErrorMessage("Please type a valid gold amount.");
+		Long characterCoins = (Long)character.getProperty("dogecoins");
+		Long depositAmount = null;
+		
+		String rawAmount = parameters.get("amount");
+		
+		//if they entered nothing, deposit all gold
+		if(rawAmount == null || rawAmount.equals("")) {
+			depositAmount = characterCoins;
+		}
+		//otherwise, infer the amount they entered
+		else {
+			depositAmount = GameUtils.fromShorthandNumber(rawAmount.replace(",", ""));
+			if(depositAmount == null)
+				throw new UserErrorMessage("Please enter a valid amount of gold.");
+		}
+		
+		if(depositAmount > characterCoins)
+			throw new UserErrorMessage("Character does not have the specified coins to deposit");
 		else if(depositAmount < 0)
 			throw new UserErrorMessage("Cannot deposit a negative amount");
 
-		Long characterCoins = (Long)character.getProperty("dogecoins");
-		if(depositAmount > characterCoins)
-			throw new UserErrorMessage("Character does not have the specified coins to deposit");
 		
 		CachedEntity itemContainer = db.getEntity((Key)item.getProperty("containerKey"));
 		if(itemContainer == null)

@@ -40,6 +40,9 @@ To do this simply run the odp-clone.bat file in the root of this repo that shoul
 ## Import Initium-ODP as a gradle project into your IDE of choice
 Exact instructions for this depend on the IDE you wish to use. The IDE will need Gradle support to work so if you're using an older version of eclipse you may want to upgrade (better gradle support) or install a plugin.
 
+## IntelliJ Community Edition
+Open the root folder(the one containing this readme) as a project and you should be good to go!
+
 ## Improve this documentation
 If there was ANYTHING that didn't work as expected, please update this documentation to reflect that and how to solve the issue. THANKS!
 

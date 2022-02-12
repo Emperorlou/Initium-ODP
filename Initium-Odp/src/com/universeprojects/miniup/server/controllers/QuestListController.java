@@ -41,11 +41,12 @@ public class QuestListController extends PageController {
 		List<QuestEntity> allQuests = questService.getAllQuests();
 		Map<Key, QuestDefEntity> allQuestDefs = questService.getMapOfAllQuestDefs();
 		
+		List<Map<String,Object>> activeQuests = new ArrayList<>();
+		List<Map<String,Object>> finishedQuests = new ArrayList<>();
+		
 		List<Map<String,Object>> data = new ArrayList<>();
-		boolean hasQuests = false;
 		if (allQuests!=null && allQuests.isEmpty()==false)
 		{
-			hasQuests = true;
 			
 			// Sort the active quests first
 			Collections.sort(allQuests, new Comparator<QuestEntity>()
@@ -58,28 +59,29 @@ public class QuestListController extends PageController {
 					return o1.getCreatedDate().compareTo(o2.getCreatedDate());
 				}
 			});
-		
 			
-			for(int i = 0; i<allQuests.size(); i++)
-			{
-				QuestEntity quest = allQuests.get(i);
+			for(QuestEntity quest : allQuests) {
 				QuestDefEntity questDef = allQuestDefs.get(quest.getQuestDefKey());
-				if (questDef==null) continue;
+				if(questDef == null) continue;
 				
 				Map<String, Object> questData = new HashMap<>();
 				
 				questData.put("name", questDef.getName());
 				questData.put("description", questDef.getDescription());
-				//TODO: THIS IS BAAAAAD, DO IT BETTER VERY SOON vvvvv
-				questData.put("complete", questDef.getQuestEntity(db.getCurrentCharacterKey()).getStatus()==QuestStatus.Complete);
+				
+				questData.put("complete", quest.isComplete());
 				questData.put("key", questDef.getUrlSafeKey());
 				
-				data.add(questData);
+				if(quest.isComplete()) finishedQuests.add(questData);
+				else activeQuests.add(questData);
+				
 			}
 		}
 		
-		request.setAttribute("data", data);
-		request.setAttribute("hasQuests", hasQuests);
+		request.setAttribute("activeQuests", activeQuests);
+		request.setAttribute("hasActiveQuests", activeQuests.size() > 0);
+		request.setAttribute("finishedQuests", finishedQuests);
+		request.setAttribute("hasFinishedQuests", finishedQuests.size() > 0);
 		
 		return "/WEB-INF/odppages/ajax_questlist.jsp";
 	}

@@ -20,11 +20,12 @@ import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.ConfirmAttackException;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.commands.framework.WarnPlayerException;
+import com.universeprojects.miniup.server.scripting.events.MoveEvent;
 import com.universeprojects.miniup.server.services.BlockadeService;
 import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.GuardService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
-import com.universeprojects.miniup.server.services.QuestService;
+import com.universeprojects.miniup.server.services.ScriptService;
 import com.universeprojects.miniup.server.services.TerritoryService;
 
 public class LongOperationTakePath extends LongOperation {
@@ -47,6 +48,8 @@ public class LongOperationTakePath extends LongOperation {
 	@Override
 	int doBegin(Map<String, String> parameters) throws UserErrorMessage
 	{
+		int scriptDelay = 0;
+		
 		CombatService combatService = new CombatService(db);
 		
 		boolean allowAttack = false;
@@ -97,46 +100,9 @@ public class LongOperationTakePath extends LongOperation {
 			
 			currentLocation = db.getEntity(currentLocationKey);
 			
-			// Then determine which location the character will end up on.
-			// If we find that the character isn't on either end of the path, we'll throw.
-			Key pathLocation1Key = (Key)path.getProperty("location1Key");
-			Key pathLocation2Key = (Key)path.getProperty("location2Key");
-			if (currentLocationKey.getId()==pathLocation1Key.getId())
-				destinationKey = pathLocation2Key;
-			else if (currentLocationKey.getId()==pathLocation2Key.getId())
-				destinationKey = pathLocation1Key;
-			else
-			{
-				// We want to now allow players to travel between root locations easily so lets check if that's a possibility now...
-				if (CommonChecks.checkLocationIsRootLocation(currentLocation)==false)
-				{
-					CachedEntity rootLocation = db.getRootLocation(currentLocation);
-					if (GameUtils.equals(rootLocation.getKey(), pathLocation1Key))
-						destinationKey = pathLocation2Key;
-					else if (GameUtils.equals(rootLocation.getKey(), pathLocation2Key))
-						destinationKey = pathLocation1Key;
-				}
-				
-				if (destinationKey==null)
-					throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+db.getCurrentCharacter().getKey().getId()+") Path("+path.getKey().getId()+")");
-			}
-	
-			// Script paths have script as destination. Let them discover (with party),
-			// but don't let them take the path. Generated button has trigger script.
-			if("Script".equals(destinationKey.getKind()))
-			{
-				try
-				{
-					List<CachedEntity> party = db.getParty(ds, character);
-					if(party == null || party.size() == 0) party = Arrays.asList(character);
-					for(CachedEntity member:party)
-						db.newDiscovery(ds, member, path);
-				}
-				catch (Exception tex) {}
-				throw new UserErrorMessage("You cannot travel this path normally...");
-			}
+			destination = getDestination(currentLocation, path);
+			destinationKey = destination.getKey();
 			
-			destination = db.getEntity(destinationKey);
 	
 			boolean isInParty = true;
 			if (character.getProperty("partyCode")==null || character.getProperty("partyCode").equals(""))
@@ -155,6 +121,38 @@ public class LongOperationTakePath extends LongOperation {
 							character.getKey(),
 							path.getKey(),
 							currentLocationKey));
+			
+			//onMoveBegin scripts
+			@SuppressWarnings("unchecked")
+			List<Key> scriptKeys = (List<Key>) path.getProperty("scripts");
+			
+			if (scriptKeys!=null && scriptKeys.isEmpty()==false)
+			{
+				List<CachedEntity> onBeginScripts = db.getScriptsOfType(scriptKeys, ODPDBAccess.ScriptType.onMoveBegin);
+				
+				ScriptService service = ScriptService.getScriptService(db);
+				
+				for(CachedEntity script : onBeginScripts) {
+					MoveEvent mEvent = new MoveEvent(db, character, currentLocation, destination);
+					
+					if(service.executeScript(mEvent, script, path)) {
+						if(!mEvent.haltExecution) {
+							
+							scriptDelay += mEvent.delay;
+							service.cleanupEvent(mEvent);
+							
+							if(mEvent.stop) {
+								if(mEvent.stopMessage == null) 
+									mEvent.stopMessage = "You were interrupted!";
+								
+								throw new UserErrorMessage(mEvent.stopMessage);
+									
+							}
+
+						}
+					}
+				}
+			}
 			
 			// Do the territory interruption now
 			doTerritoryInterruption(destination, path, allowAttack, isInParty);
@@ -315,6 +313,11 @@ public class LongOperationTakePath extends LongOperation {
 			if ((path.getProperty("travelTime")!=null && ((Long)path.getProperty("travelTime"))>0) || longDistanceTravel)
 				buffedTravel = db.getPathTravelTime(path, character);
 			
+			buffedTravel += scriptDelay;
+			
+			if(buffedTravel == 0)
+				buffedTravel = 1L; //time of 0 sometimes rubberbands.
+			
 			setDataProperty("secondsToWait", buffedTravel);
 			
 			setLongOperationName("Walking to "+destination.getProperty("name"));
@@ -332,7 +335,8 @@ public class LongOperationTakePath extends LongOperation {
 
 	@Override
 	String doComplete() throws UserErrorMessage {
-		CachedEntity location = db.getCharacterLocation(db.getCurrentCharacter());
+		CachedEntity character = db.getCurrentCharacter();
+		CachedEntity location = db.getCharacterLocation(character);
 		CachedEntity path = db.getEntity(KeyFactory.createKey("Path", (Long)getDataProperty("pathId")));
 		if (path==null)
 			throw new UserErrorMessage("The path you were attempting to take no longer exists.");
@@ -340,10 +344,40 @@ public class LongOperationTakePath extends LongOperation {
 		db.getDB().beginBulkWriteMode();
 		try
 		{
-			if (db.randomMonsterEncounter(ds, db.getCurrentCharacter(), location, 1, 0.5d))
+			//onMoveEnd scripts. We want these to run before the game rolls for a monster encounter, so we can interrupt
+			//the path if necessary.
+			@SuppressWarnings("unchecked")
+			List<Key> scriptKeys = (List<Key>) path.getProperty("scripts");
+			
+			if (scriptKeys!=null && scriptKeys.isEmpty()==false)
+			{
+				List<CachedEntity> onEndScripts = db.getScriptsOfType(scriptKeys, ODPDBAccess.ScriptType.onMoveEnd);
+				
+				ScriptService service = ScriptService.getScriptService(db);
+				
+				for(CachedEntity script : onEndScripts) {
+					MoveEvent mEvent = new MoveEvent(db, character, location, getDestination(location, path));
+					
+					if(service.executeScript(mEvent, script, path)) {
+						if(!mEvent.haltExecution) {
+							
+							service.cleanupEvent(mEvent);
+							
+							if(mEvent.stop) {
+								if(mEvent.stopMessage == null) 
+									mEvent.stopMessage = "You were interrupted!";
+																
+								throw new UserErrorMessage(mEvent.stopMessage);
+							}
+						}
+					}
+				}
+			}
+			
+			if (db.randomMonsterEncounter(ds, character, location, 1, 0.5d))
 			{
 				// Create discovery for character, and optionally unhide it (unsaved = already exists);
-				CachedEntity discovery = db.newDiscovery(null, db.getCurrentCharacter(), path);
+				CachedEntity discovery = db.newDiscovery(null, character, path);
 				if(discovery != null && discovery.getKey().isComplete())
 				{
 					discovery.setProperty("hidden", false);
@@ -406,9 +440,49 @@ public class LongOperationTakePath extends LongOperation {
 			}
 		}
 	}
+	private CachedEntity getDestination(CachedEntity currentLocation, CachedEntity path) throws UserErrorMessage{
+		// Then determine which location the character will end up on.
+		// If we find that the character isn't on either end of the path, we'll throw.
+		CachedEntity character = db.getCurrentCharacter();
+		Key currentLocationKey = currentLocation.getKey();
+		Key destinationKey = null;
+		Key pathLocation1Key = (Key)path.getProperty("location1Key");
+		Key pathLocation2Key = (Key)path.getProperty("location2Key");
+		if (currentLocationKey.getId()==pathLocation1Key.getId())
+			destinationKey = pathLocation2Key;
+		else if (currentLocationKey.getId()==pathLocation2Key.getId())
+			destinationKey = pathLocation1Key;
+		else
+		{
+			// We want to now allow players to travel between root locations easily so lets check if that's a possibility now...
+			if (CommonChecks.checkLocationIsRootLocation(currentLocation)==false)
+			{
+				CachedEntity rootLocation = db.getRootLocation(currentLocation);
+				if (GameUtils.equals(rootLocation.getKey(), pathLocation1Key))
+					destinationKey = pathLocation2Key;
+				else if (GameUtils.equals(rootLocation.getKey(), pathLocation2Key))
+					destinationKey = pathLocation1Key;
+			}
+			
+			if (destinationKey==null)
+				throw new UserErrorMessage("Character cannot take a path when he is not located at either end of it. Character("+character.getKey().getId()+") Path("+path.getKey().getId()+")");
+		}
 
-
-	
-	
-
+		// Script paths have script as destination. Let them discover (with party),
+		// but don't let them take the path. Generated button has trigger script.
+		if("Script".equals(destinationKey.getKind()))
+		{
+			try
+			{
+				List<CachedEntity> party = db.getParty(ds, character);
+				if(party == null || party.size() == 0) party = Arrays.asList(character);
+				for(CachedEntity member:party)
+					db.newDiscovery(ds, member, path);
+			}
+			catch (Exception tex) {}
+			throw new UserErrorMessage("You cannot travel this path normally...");
+		}
+		
+		return db.getEntity(destinationKey);
+	}
 }

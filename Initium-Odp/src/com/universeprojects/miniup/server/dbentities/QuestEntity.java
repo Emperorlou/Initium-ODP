@@ -7,6 +7,7 @@ import java.util.List;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 
 public class QuestEntity extends InitiumEntityBase
@@ -17,6 +18,8 @@ public class QuestEntity extends InitiumEntityBase
 		Complete,
 		Skipped
 	}
+	
+	private List<QuestObjective> allObjectives = null;
 	
 	public QuestEntity(ODPDBAccess db, Key characterKey, Key questDefKey)
 	{
@@ -68,23 +71,32 @@ public class QuestEntity extends InitiumEntityBase
 	
 	public List<QuestObjective> getObjectiveData(QuestDefEntity questDef)
 	{
-		List<QuestObjective> list = null;
-
+		if(allObjectives != null)
+			return allObjectives;
+		
 		List<EmbeddedEntity> objectiveEEs = getObjectives();
 		if (objectiveEEs==null || objectiveEEs.isEmpty())
 			objectiveEEs = questDef.getObjectives();
 		
 		if (objectiveEEs!=null)
 		{
-			list = new ArrayList<>();
+			allObjectives = new ArrayList<>();
 			for(int i = 0; i<objectiveEEs.size(); i++)
 			{
 				EmbeddedEntity objEE = objectiveEEs.get(i);
-				list.add(new QuestObjective(db, objEE, questDef, i));
+				allObjectives.add(new QuestObjective(db, objEE, questDef, i));
 			}
 		}
 		
-		return list;
+		return allObjectives;
+	}
+	
+	public QuestObjective getObjectiveByName(String name, QuestDefEntity questDef) {
+		for(QuestObjective qo : getObjectiveData(questDef))
+			if(GameUtils.equals(qo.getName(), name))
+				return qo;
+		
+		return null;
 	}
 	
 	public void updateObjectives(List<QuestObjective> objectiveData)

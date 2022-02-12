@@ -44,12 +44,14 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.cacheddatastore.Transaction;
+import com.universeprojects.generators.shared.random.RandomDistributionFactory.ParseException;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.aspects.AspectBuffable;
 import com.universeprojects.miniup.server.commands.CommandItemsStackMerge;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.longoperations.AbortedActionException;
 import com.universeprojects.miniup.server.services.BlockadeService;
+import com.universeprojects.miniup.server.services.CombatService;
 import com.universeprojects.miniup.server.services.ContainerService;
 import com.universeprojects.miniup.server.services.GridMapService;
 import com.universeprojects.miniup.server.services.GuardService;
@@ -128,7 +130,7 @@ public class ODPDBAccess
 	{
 		directItem, directLocation, onAttack, onAttackHit, onDefend, onDefendHit, 
 		onMoveBegin, onMoveEnd, onServerTick, onCombatTick, combatItem, global,
-		ownerHtml;
+		ownerHtml, reachableHtml
 	}
 
 	public enum StaticBuffables
@@ -152,7 +154,7 @@ public class ODPDBAccess
 	{
 			"Pet", 
 			"Helmet", "Chest", "Shirt", "Gloves", "Legs", "Boots", "RightHand", "LeftHand", "RightRing", "LeftRing", "Neck",
-			"Cosmetic1", "Cosmetic2", "Cosmetic3"
+			"Cosmetic1", "Cosmetic2", "Cosmetic3", "Charm"
 	};
 
 	private CachedDatastoreService ds = null;
@@ -794,8 +796,7 @@ public class ODPDBAccess
 	 * @return
 	 */
 	public List<CachedEntity> getAlphabetSortedValidCharactersByUser(Key userKey){
-		CachedEntity user = getEntity(userKey);
-		List<CachedEntity> characters = getUserCharacters(user);
+		List<CachedEntity> characters = getFilteredList("Character", "userKey", userKey);
 		Collections.sort(characters, new Comparator<CachedEntity>()
 		{
 			@Override
@@ -807,10 +808,15 @@ public class ODPDBAccess
 
 		//this will validate all the characters. Filter out zambie.
 		List<CachedEntity> toReturn = new ArrayList<>();
-		for(CachedEntity c:characters) {
-			if (CommonChecks.checkCharacterIsZombie(c) == false) {
-				toReturn.add(c);
-			}
+		for(CachedEntity ce : characters) {
+			
+			//if the character is a zombie, skip.
+			if(CommonChecks.checkCharacterIsZombie(ce)) continue;
+			
+			//if the character is both dead and the name starts with dead, skip.
+			if(((String)ce.getProperty("name")).startsWith("Dead ") && CommonChecks.checkCharacterIsDead(ce)) continue;
+			
+			toReturn.add(ce);
 		}
 
 		return toReturn;
@@ -980,6 +986,10 @@ public class ODPDBAccess
 			questService = new QuestService(command, this, getCurrentCharacter());
 		
 		return questService;
+	}
+	
+	public QuestService getQuestService(OperationBase command, CachedEntity character) {
+		return new QuestService(command, this, character);
 	}
 
 	public Key getDefaultLocationKey()
@@ -4539,6 +4549,7 @@ public class ODPDBAccess
 
         
         CachedDatastoreService db = getDB();
+        CombatService cs = new CombatService(this);
 
         
         // Here we're flagging that a combat action took place so that the cron job in charge of ensuring combat keeps moving along
@@ -4569,12 +4580,54 @@ public class ODPDBAccess
         Double charDex = getCharacterDexterity(sourceCharacter);
         Double monsterDex = getCharacterDexterity(targetCharacter);
         Random rnd = new Random();
+        
+        String status = "";
+        
+        Integer autoRunThreshold = (Integer) targetCharacter.getProperty("autoRunThreshold");
+        if(autoRunThreshold == null) autoRunThreshold = 0;
+        Integer autoRunChance = (Integer) targetCharacter.getProperty("autoRunChance");
+        if(autoRunChance == null) autoRunChance = 0;
+        
+        if(autoRunThreshold > 0 && autoRunChance > 0) {
+            Double targetHP = (Double) targetCharacter.getProperty("hitpoints");
+            Double targetMaxHP = (Double) targetCharacter.getProperty("maxHitpoints");
+            
+            //First, we check against the auto run threshold to see if the monster will attempt to run.
+            if((targetHP / targetMaxHP) < autoRunThreshold) {
+                            	
+            	//then, we check a random number vs the auto run chance.
+            	if (GameUtils.roll(autoRunChance)) {
+                	
+                	//then, the monster has to pass a dexterity check.
+                	if(rnd.nextDouble() * charDex <= rnd.nextDouble() * monsterDex) {
+                		cs.leaveCombat(sourceCharacter, targetCharacter);
+                		
+                		db.put(sourceCharacter);
+                		
+                		QueryHelper qh = new QueryHelper(db);
+                		List<Key> itemKeys = qh.getFilteredList_Keys("Item", "containerKey", targetCharacter.getKey());
+                		db.delete(itemKeys);
+                		
+                		db.delete(targetCharacter);
+                		
+                		return status += "The " + targetCharacter.getProperty("name") + " fled!";
+                	}
+                	
+                	//they miss the dex check, but we tell the player they tried.
+                	else {
+                		status += "The " + targetCharacter.getProperty("name") + " attempted to flee but couldn't! ";
+                	}
+                }
+            }
+        }
+        
+        //if our attack hits.
         if (rnd.nextDouble()*charDex>=rnd.nextDouble()*monsterDex)
         {
         	// Determine whether the weapon zombifies the target.
         	boolean zombifyWeapon = weapon != null && GameUtils.booleanEquals(weapon.getProperty("zombifying"), true);
             AttackResult attackResult = attackWithWeapon(db, sourceCharacter, weapon, targetCharacter);
-            String status = attackResult.status;
+            status += attackResult.status;
             int damage = attackResult.damage;
 
             // If we are dual wielding weapons, use the random crit chance to determine if we get a free second hit
@@ -4764,7 +4817,11 @@ public class ODPDBAccess
 		Object result = 0d;
 		if (weapon!=null && weapon.getProperty("weaponDamage")!=null && weapon.getProperty("weaponDamage").toString().trim().equals("")==false)
 		{
-		    result = solveProperty("Attack with Weapon", weapon, "weaponDamage");
+		    try {
+				result = solveProperty("Attack with Weapon", weapon, "weaponDamage");
+			} catch (ParseException e) {
+				throw new ContentDeveloperException("Parsing error on the weaponDamage field in "+weapon.getKey()+": "+e.getMessage());
+			}
 		    if (result==null)
 		        throw new RuntimeException("'Attack with Weapon' failed to solve.");
 		}
@@ -4943,8 +5000,9 @@ public class ODPDBAccess
 	 * @param string
 	 * @param weapon
 	 * @return
+	 * @throws ParseException 
 	 */
-	public Object solveProperty(String string, CachedEntity weapon, String fieldName)
+	public Object solveProperty(String string, CachedEntity weapon, String fieldName) throws ParseException
 	{
 		return null;
 	}
@@ -5206,6 +5264,7 @@ public class ODPDBAccess
 						setPartiedField(party, attackingCharacterFinal, "combatant", null);
 						setPartiedField(party, attackingCharacterFinal, "combatType", null);
 						setPartiedField(party, attackingCharacterFinal, "locationEntryDatetime", new Date());
+						
 					}
 					
 					////////////////////////
@@ -5532,7 +5591,7 @@ public class ODPDBAccess
 						item.setProperty("movedTimestamp", new Date());
 						
 						if ("NPC".equals(attackingCharacterFinal.getProperty("type"))==false)
-							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+=GameUtils.renderItem(this, item, true)+"<br>";
 					}
 					else
 					{
@@ -5543,7 +5602,7 @@ public class ODPDBAccess
 						{
 							dropAllSB.append("," + item.getId().toString());
 							loot+="<div style='display:inline-block; margin-right:3px;'>";
-							loot+=GameUtils.renderItem(item)+"<br>";
+							loot+=GameUtils.renderItem(this, item, true)+"<br>";
 							loot+="<div>";
 							loot+="		<div class='main-item-controls'>";
 							// Get all the slots this item can be equipped in
@@ -7452,6 +7511,40 @@ public class ODPDBAccess
 		db.put(achievement);
 		return achievement;
 	}
+	
+	/**
+	 * Given a character, grant an achievement.
+	 * @param achievementName
+	 * @param user
+	 * @return
+	 */
+	public boolean grantAchievement(CachedEntity character, String achievementName) {
+		
+		CachedEntity user = getEntity((Key) character.getProperty("userKey"));
+
+		
+		List<CachedEntity> achievements = getFilteredList("Achievement", 1, "title", FilterOperator.EQUAL, achievementName);
+		if(achievements.size() != 1) return false; //achievement doesnt exist or there are duplicates; either way, fail.
+		
+		CachedEntity ach = achievements.get(0);
+		
+		@SuppressWarnings("unchecked")
+		List<Key> currentAchievements = (List<Key>) user.getProperty("achievements");
+		
+		if(currentAchievements == null)
+			currentAchievements = new ArrayList<>();
+		
+		for(Key achKey : currentAchievements)
+			if(GameUtils.equals(achKey, ach.getKey()))
+				return false; //they already had the achievement.
+		
+		currentAchievements.add(ach.getKey());
+		user.setProperty("achievements", currentAchievements);
+		
+		getDB().put(user);
+		return true;
+	
+	}
 
 	public Map<String, String> getValue_StringStringMap(CachedEntity entity, String fieldName)
 	{
@@ -7878,8 +7971,7 @@ public class ODPDBAccess
 			{
 				CachedEntity parent = getParentLocation(ds, location);
 				if (parent==null) return location;
-				location = parent;
-				if (CommonChecks.checkLocationIsRootLocation(location))
+				if (CommonChecks.checkLocationIsRootLocation(parent))
 					return parent;
 			}
 		}

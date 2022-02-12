@@ -221,4 +221,10 @@ public class AspectPassiveChange extends InitiumAspect
 		private static final long serialVersionUID = 1L;
 		
 	}
+
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }

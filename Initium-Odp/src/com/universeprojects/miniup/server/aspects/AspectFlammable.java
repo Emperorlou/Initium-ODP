@@ -34,4 +34,9 @@ public class AspectFlammable extends ItemAspect
 		return "Flammable";
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }

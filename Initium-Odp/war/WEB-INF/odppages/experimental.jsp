@@ -560,7 +560,14 @@ Version: ${version}
 						<div class='auto-animate' id='banner-text-overlay'>${bannerTextOverlay}</div>
 						
 						<div id='main-viewport-container' class='location-2d auto-animate'>${location2D}</div>
-							
+						
+						<div id='inBannerCharacterWidget' class='characterWidgetContainer auto-animate'>
+							${inBannerCharacterWidget}
+						</div>
+						<div id='inBannerCombatantWidget' class='combatantWidgetContainer auto-animate'>
+							${inBannerCombatantWidget }
+						</div>
+						
 						<div id='partyPanel' class='auto-animate'>
 						${partyPanel}
 						</div>
@@ -574,6 +581,7 @@ Version: ${version}
 							<div class='minimap-button minimap-button-zoom-in' onclick='minimapZoomIn()'></div>
 							<div class='minimap-button minimap-button-zoom-out' onclick='minimapZoomOut()'></div>
 							<div class='minimap-button minimap-button-map' onclick='toggleMovementState()'></div>
+							<div class='minimap-button minimap-button-viewallpaths' onclick='makeIntoPopup(".navigation-box")'></div>
 							<div class='minimap-button minimap-button-localplaces standard-button-highlight' onclick='viewLocalNavigation(event)'></div>
 							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
 							
@@ -591,16 +599,8 @@ Version: ${version}
 							
 						</div>
 						
-						
 						<div class='map-contents global-navigation-map auto-animate'>${globalNavigationMap}</div>
 											
-						<div id='inBannerCharacterWidget' class='characterWidgetContainer auto-animate'>
-							${inBannerCharacterWidget}
-						</div>
-						<div id='inBannerCombatantWidget' class='combatantWidgetContainer auto-animate'>
-							${inBannerCombatantWidget }
-						</div>
-						
 						<div class="path-overlay-link major-banner-links auto-animate">
 							<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>
 							<a id="movement-button" class="button-overlay-major" onclick="toggleMovementState()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>

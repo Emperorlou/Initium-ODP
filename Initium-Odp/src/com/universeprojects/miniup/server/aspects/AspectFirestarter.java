@@ -32,4 +32,9 @@ public class AspectFirestarter extends ItemAspect
 		return "Can start a fire";
 	}
 
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }

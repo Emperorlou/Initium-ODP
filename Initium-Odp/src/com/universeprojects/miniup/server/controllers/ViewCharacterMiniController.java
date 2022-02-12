@@ -196,7 +196,7 @@ public class ViewCharacterMiniController extends PageController {
 		for(String slot:ODPDBAccess.EQUIPMENT_SLOTS)
 		{
 			CachedEntity item = db.getEntity((Key)character.getProperty("equipment"+slot));
-			if (item==null && slot.equals("Pet")) continue;
+			if (item==null && (slot.equals("Pet") || slot.equals("Charm"))) continue;
 			
 			sb.append("<div class='main-item'>"+slot+": ");
 			if(item == null)

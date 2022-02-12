@@ -95,6 +95,7 @@
 			<br/>
 			<div name='description' class='item-flavor-description'>${item.description}</div>
 		</div>
+		<c:if test="${item.reachableHtml != null}"><div>${item.reachableHtml}</div></c:if>
 		<c:if test="${item.ownerOnlyHtml != null}"><div>${item.ownerOnlyHtml}</div></c:if>
 		
 		<c:if test="${item.popupEntries != null}">

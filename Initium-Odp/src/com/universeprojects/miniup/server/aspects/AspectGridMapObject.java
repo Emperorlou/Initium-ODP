@@ -36,4 +36,10 @@ public class AspectGridMapObject extends ItemAspect
 		if (getProperty("mode")==null) return true;
 		return "Loose".equals(getProperty("mode"));
 	}
+
+	@Override
+	public Integer getVersion() {
+		return 1;
+	}
+
 }
