@@ -45,14 +45,25 @@ public class ContainerService extends Service {
 		}
 	}
 	
+	/**
+	 * Checks if character has access to the container. 
+	 * @param character
+	 * @param container
+	 * @return
+	 */
+	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container) {
+		return checkContainerAccessAllowed(character, container, true);
+	}
+	
 	
 	/**
 	 * This is for stuff that allows access to a given container (location, item, or character). Returns false if access should not be allowed.
 	 * @param character
 	 * @param container
+	 * @param checkNested
 	 * @return
 	 */
-	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container)
+	public boolean checkContainerAccessAllowed(CachedEntity character, CachedEntity container, boolean checkNested)
 	{
 		// If the container is ourselves, it's ok
 		if (container.getKind().equals("Character") && GameUtils.equals(character.getKey(), container.getKey()))
@@ -62,13 +73,24 @@ public class ContainerService extends Service {
 		if (container.getKind().equals("Location") && GameUtils.equals(character.getProperty("locationKey"), container.getKey()))
 			return true;
 		
-		// If the container is an item in our inventory, it's ok
-		if (container.getKind().equals("Item") && GameUtils.equals(character.getKey(), container.getProperty("containerKey")))
-			return true;
-		
-		// If the container is an item in our location, it's ok
-		if (container.getKind().equals("Item") && GameUtils.equals(character.getProperty("locationKey"), container.getProperty("containerKey")))
-			return true;
+		// If the container is an item...
+		if(container.getKind().equals("Item")) {
+			
+			// ... and its in our inventory
+			if(GameUtils.equals(character.getKey(), container.getProperty("containerKey")))
+				return true;
+			
+			// ... or its at our location
+			if(GameUtils.equals(character.getProperty("locationKey"), container.getProperty("containerKey")))
+				return true;
+			
+			// Allow up to 4 levels of check nested.
+			if(checkNested) {
+				for(int i = 0; i != 4; i++) {
+					if(checkContainerAccessAllowed(character, db.getEntity((Key) container.getProperty("containerKey")), false)) return true;
+				}
+			}
+		}
 		
 		return false;
 	}
