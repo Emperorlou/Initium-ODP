@@ -2862,7 +2862,8 @@ public class ODPDBAccess
 			{
 				handled = true;
 				// Make sure the container we're moving to is either in our inventory or in our location...
-				if (GameUtils.equals(newContainer.getProperty("containerKey"), character.getKey())==false && GameUtils.equals(newContainer.getProperty("containerKey"), character.getProperty("locationKey"))==false)
+				ContainerService containerService = new ContainerService(this);
+				if(false == containerService.checkContainerAccessAllowed(character, newContainer))
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
 
 

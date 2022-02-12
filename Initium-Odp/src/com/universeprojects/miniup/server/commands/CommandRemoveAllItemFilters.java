@@ -13,10 +13,10 @@ import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ItemFilterService;
 
-public class CommandCharacterRemoveAllItemFilters extends Command{
+public class CommandRemoveAllItemFilters extends Command{
 
-	public CommandCharacterRemoveAllItemFilters(ODPDBAccess db, HttpServletRequest request,
-			HttpServletResponse response) {
+	public CommandRemoveAllItemFilters(ODPDBAccess db, HttpServletRequest request,
+									   HttpServletResponse response) {
 		super(db, request, response);
 		// TODO Auto-generated constructor stub
 	}
