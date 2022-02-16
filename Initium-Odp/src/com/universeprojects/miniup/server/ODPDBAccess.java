@@ -2862,8 +2862,7 @@ public class ODPDBAccess
 			{
 				handled = true;
 				// Make sure the container we're moving to is either in our inventory or in our location...
-				ContainerService containerService = new ContainerService(this);
-				if(false == containerService.checkContainerAccessAllowed(character, newContainer))
+				if(false == cs.checkContainerAccessAllowed(character, newContainer))
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
 
 				/*
@@ -2874,7 +2873,7 @@ public class ODPDBAccess
 					if (((Key)newContainer.getProperty("containerKey")).getKind().equals("Item"))
 						throw new UserErrorMessage("You cannot put a container within a container within a container. We cannot allow that depth of containering because efficiency.");
 				}
-				
+
 				*/
 
 				// Make sure we can actually put things into this item container...
@@ -2987,7 +2986,10 @@ public class ODPDBAccess
 				if (GameUtils.equals(characterPickingUp.getProperty("locationKey"), oldContainer.getProperty("containerKey"))==false && 
 						GameUtils.equals(characterPickingUp.getKey(), oldContainer.getProperty("containerKey"))==false)
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
-				
+
+				if(false == cs.checkContainerAccessAllowed(characterPickingUp, oldContainer))
+					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
+
 				// Check if the character can actually carry something else or if its all too heavy...
 				// And if quantity is specified, measure for specified quantity rather than whole stack
 				Long itemWeight = (requestQuantity != null) ? requestQuantity*itemSingleWeight : getItemWeight(item);
