@@ -157,7 +157,7 @@
 		<c:if test="${comparisons != null}">
 			<span id='item-comparison-link'><a onclick='$("#item-comparisons").show(); $("#item-comparison-link").hide();' minitip='Compare with existing equipment'><img src='https://initium-resources.appspot.com/images/ui/compare-equipment1.png'/></a></span>
 		</c:if>
-		<a onclick='addItemFilter("event, ${itemKey}")' minitip='Flag items with this name and rarity(or lower) to be dropped automatically.'><img src='https://initium-resources.appspot.com/images/ui/storefrontDisabled.png'/></a>
+		<a onclick='addItemFilter("event, ${item.itemId}")' minitip='Flag items with this name and rarity(or lower) to be dropped automatically.'><img src='https://initium-resources.appspot.com/images/ui/storefrontDisabled.png'/></a>
 	</div>
 	
 	<c:if test="${comparisons != null}">
