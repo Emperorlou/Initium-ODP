@@ -2874,10 +2874,9 @@ public class ODPDBAccess
 					if (((Key)newContainer.getProperty("containerKey")).getKind().equals("Item"))
 						throw new UserErrorMessage("You cannot put a container within a container within a container. We cannot allow that depth of containering because efficiency.");
 				}
-
+				
 				*/
 
-				 */
 				// Make sure we can actually put things into this item container...
 				Long maxWeight = (Long)newContainer.getProperty("maxWeight");
 				Long maxSpace = (Long)newContainer.getProperty("maxSpace");
