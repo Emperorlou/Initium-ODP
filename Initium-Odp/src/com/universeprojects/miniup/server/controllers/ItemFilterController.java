@@ -10,7 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.services.ItemFilterService;
 import com.universeprojects.web.Controller;
@@ -19,8 +18,8 @@ import com.universeprojects.web.PageController;
 @Controller
 public class ItemFilterController extends PageController {
 	
-	public AutofixController() {
-		super("itemfilters");
+	public ItemFilterController() {
+		super("itemfilters"); 
 	}
 
 	@Override
