@@ -64,7 +64,7 @@ public class ItemFilterService extends Service{
 	 * Grab the filters stored on the character. Cache the result, so we dont have to do the map parsing algorithm every time
 	 * @return
 	 */
-	private Map<String, String> filterCache = new HashMap<>();
+	private Map<String, String> filterCache = null;
 	public Map<String, String> getFilters(){
 
 		if(filterCache != null) return filterCache;
