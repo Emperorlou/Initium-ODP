@@ -19,7 +19,7 @@ import com.universeprojects.web.PageController;
 @Controller
 public class ItemFilterController extends PageController {
 	
-	public AutofixController() {
+	public ItemFilterController() {
 		super("itemfilters");
 	}
 
