@@ -769,7 +769,7 @@ public class GameUtils
 			qualityUnit = "blockChance[15..50]&&dexterityPenalty[10..0]&&damageReduction[5..25]";
 		}
 		else
-			return "";
+			return "item-normal";
 
 		String[] qualityUnitParts = qualityUnit.split("&&");
 
