@@ -2,7 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF8" pageEncoding="UTF8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
-<center><a class='standard-button-highlight' onclick='removeAllItemFilters();'><strong>Remove all of your Item Filters.<strong></a></center>
+<center><a class='standard-button-highlight' onclick='removeAllItemFilters();'><strong>Remove all of your Item Filters.</strong></a></center>
 
 <br><br>
 Here are your item filters. When you kill an instanced monster, all of the items will be compared to this list to see if they should be dropped or not.

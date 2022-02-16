@@ -2866,6 +2866,7 @@ public class ODPDBAccess
 				if(false == containerService.checkContainerAccessAllowed(character, newContainer))
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
 
+				/*
 
 				// Check if the container is already in a container, and if the item we're transferring is a container. We don't want to allow that depth.
 				if (item.getProperty("maxWeight")!=null)
@@ -2874,6 +2875,8 @@ public class ODPDBAccess
 						throw new UserErrorMessage("You cannot put a container within a container within a container. We cannot allow that depth of containering because efficiency.");
 				}
 				
+				*/
+
 				// Make sure we can actually put things into this item container...
 				Long maxWeight = (Long)newContainer.getProperty("maxWeight");
 				Long maxSpace = (Long)newContainer.getProperty("maxSpace");

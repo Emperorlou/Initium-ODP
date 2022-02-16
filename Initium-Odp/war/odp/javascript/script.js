@@ -4909,7 +4909,7 @@ $(document).keyup(function(event){
 		cancelLongOperations(); //i tested, and sending this with no parameters DOES work
 	}
 
-	else if(event.which==70){ //Z, loads item filters
+	else if(event.which==90){ //Z, loads item filters
 		loadItemFilterList();
 	}
 });
