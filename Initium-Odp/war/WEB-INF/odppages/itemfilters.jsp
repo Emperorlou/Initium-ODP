@@ -15,7 +15,7 @@ The filter is based on the item's name, and it will filter out any items with eq
 	You don't have any item filters. To add one, click on an item, then click the crossed out icon on the bottom of the popup.
 </c:if>
 <c:if test="${hasFilter == true}">
-	<c:forEach var="filter" items="${data}">
+	<c:forEach var="filter" items="${itemFilters}">
 		${filter}
 	</c:forEach>
 </c:if>
