@@ -33,8 +33,8 @@ public class ItemFilterController extends PageController {
 		List<String> filterData = new ArrayList<>();
 
 		for(Entry<String,String> entry : filters.entrySet())
-			filterData.add("<c class=" + entry.getValue() + ">" + entry.getKey() + "</c><br>" +
-					" - <a onclick=removeItemFilter(event, \"" + entry.getKey() + "\">Remove this filter</a>");
+			filterData.add("<c class=" + entry.getValue() + ">" + entry.getKey() + "</c>" +
+					" - <a onclick=removeItemFilter(event, \"" + entry.getKey() + "\")>Remove this filter</a>");
 
 		request.setAttribute("itemFilters", filterData);
 		request.setAttribute("hasFilters", filterData.size() > 0);
