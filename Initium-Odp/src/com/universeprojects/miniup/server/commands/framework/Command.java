@@ -68,7 +68,7 @@ public abstract class Command extends OperationBase
 	 * 
 	 * @param message
 	 */
-	protected void setPopupMessage(String message)
+	public void setPopupMessage(String message)
 	{
 		this.popupMessage = message;
 	}
@@ -125,7 +125,7 @@ public abstract class Command extends OperationBase
 	 * 
 	 * @param jsResponse
 	 */
-	protected void setJavascriptResponse(JavascriptResponse jsResponse)
+	public void setJavascriptResponse(JavascriptResponse jsResponse)
 	{
 		this.jsResponse = jsResponse;
 	}

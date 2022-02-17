@@ -398,14 +398,17 @@ function clearPopupPermanentOverlay()
 	}
 }
 
-function popupPermanentOverlay_Experiment(title, text)
-{
+function popupPermanentOverlay_image(title, text, image){
 	$("#banner-text-overlay").hide();
-	setBannerImage("https://initium-resources.appspot.com/images/animated/invention1.gif");
+	setBannerImage(image);
 	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 
 	$("#banner-base").html(content);
-	
+}
+
+function popupPermanentOverlay_Experiment(title, text);
+{
+	popupPermanentOverlay(title, text, "https://initium-resources.appspot.com/images/animated/invention1.gif")
 }
 
 function popupPermanentOverlay_Searching(locationName)
@@ -2132,17 +2135,17 @@ function doTriggerGlobal(event, globalId, attributes, entities, closeTools)
 	doTriggerEffect(event, "Global", null, "global", globalId, attributes, entities, closeTools);
 }
 
-function doTriggerLocation(event, effectId, locationId, attributes, closeTools)
+function doTriggerLocation(event, effectId, locationId, attributes, closeTools, long)
 {
-	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, null, closeTools);
+	doTriggerEffect(event, "Link", effectId, "location", locationId, attributes, null, closeTools, long);
 }
 
-function doTriggerItem(event, effectId, itemId, attributes, closeTools)
+function doTriggerItem(event, effectId, itemId, attributes, closeTools, long)
 {
-	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, null, closeTools);
+	doTriggerEffect(event, "Link", effectId, "item", itemId, attributes, null, closeTools, long);
 }
 
-function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools)
+function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attributes, entities, closeTools, long)
 {
 	if(closeTools == null || closeTools)
 		closeAllTooltips();
@@ -2151,7 +2154,43 @@ function doTriggerEffect(event, effectType, effectId, sourceType, sourceId, attr
 	if(effectId) params["scriptId"] = effectId;
 	if(attributes) params["attributes"] = attributes;
 	if(entities) params["entities"] = entities;
-	doCommand(event, "Script"+effectType, params);
+
+	if(long)
+		doLongTriggerEffect(event, params);
+	else
+		doCommand(event, "Script"+effectType, params);
+}
+
+function doLongTriggerEffect(event, params){
+	longOperation(event, "LongOperationScript", params, 	
+		function(action) // responseFunction
+		{
+			if(action.error !== undefined)
+			{
+				clearPopupPermanentOverlay(); 
+			}
+			else if (action.isComplete)
+			{
+				clearPopupPermanentOverlay(); 
+				reloadPagePopup(false);
+			}
+			else
+			{
+				let title = action.callback-title;
+				let text = action.callback-text;
+				let image = action.callback-image;
+
+				title = title != null ? title : "Working";
+				text = text != null ? text : "Please wait while this action completes";
+				image = image != null ? image : "https://initium-resources.appspot.com/images/animated/invention1.gif";
+
+				popupPermanentOverlay_image(title, text, image);
+
+			}
+		},
+		function(){ //recall function
+			doLongTriggerEffect(null);
+		});
 }
 
 function doAttack(eventObject, charId)

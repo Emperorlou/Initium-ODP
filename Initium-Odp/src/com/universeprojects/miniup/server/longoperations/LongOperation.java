@@ -3,14 +3,11 @@ package com.universeprojects.miniup.server.longoperations;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import java.util.Map.Entry;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,11 +25,7 @@ import com.universeprojects.miniup.server.UserRequestIncompleteException;
 import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.CaptchaService;
-import com.universeprojects.miniup.server.services.ExperimentalPageUpdateService;
-import com.universeprojects.miniup.server.services.FullPageUpdateService;
 import com.universeprojects.miniup.server.services.MainPageUpdateService;
-
-
 
 public abstract class LongOperation extends OperationBase
 {
@@ -47,6 +40,7 @@ public abstract class LongOperation extends OperationBase
 	
 	CachedEntity longOperationDataEntity = null;
 	Map<String, Object> data = null; 
+	
 	
 	public LongOperation(ODPDBAccess db, Map<String, String[]> requestParameters) throws UserErrorMessage
 	{
@@ -118,7 +112,6 @@ public abstract class LongOperation extends OperationBase
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static Map<String,Object> getLongOperationData(ODPDBAccess db, Key characterKey)
 	{
 		return getLongOperationData(db, getLongOperationDataEntity(db, characterKey));
@@ -330,6 +323,10 @@ public abstract class LongOperation extends OperationBase
 		result.put("longOperationName", longOperationName);
 		result.put("longOperationDescription", longOperationDescription);
 		
+		//Send the custom parameters back to the client
+		for(Entry<String, String> entry : callback.entrySet())
+			result.put("callback-" + entry.getKey(), entry.getValue());
+		
 		
 		result.put("refresh", fullRefresh);
 		
@@ -525,7 +522,24 @@ public abstract class LongOperation extends OperationBase
 		
 		return Long.parseLong(str);
 	}
-
 	
+	private Map<String, String> callback = null;
+	/**
+	 * Add a custom parameter that will appear in the client
+	 * @param key
+	 * @param value
+	 */
+	public void putToCallback(String key, String value) {
+		if(callback == null)
+			callback = new HashMap<>();
+		
+		callback.put(key, value);
+	}
+	public void removeCallback(String key) {
+		if(callback == null)
+			return;
+		
+		callback.remove(key);
+	}
 }
 
