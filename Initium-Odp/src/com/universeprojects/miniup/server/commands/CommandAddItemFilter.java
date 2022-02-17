@@ -41,7 +41,8 @@ public class CommandAddItemFilter extends Command{
 		db.getDB().put(character);
 		db.sendGameMessage("You now have a new item filter! " + 
 		"<a onclick='loadItemFilterList()'>[View your active item filters]</a>" +
-		"<a onclick='removeAllItemFilters()'>[Remove all of " + character.getProperty("name") + "'s item filters]</a>");
+		" <a onclick='removeItemFilter(event, \"" + item.getProperty("name") + "\">[Remove this filter]</a>" +
+		" <a onclick='removeAllItemFilters()'>[Remove all of " + character.getProperty("name") + "'s item filters]</a>");
 	}
 
 }
