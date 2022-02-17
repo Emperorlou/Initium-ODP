@@ -2980,12 +2980,14 @@ public class ODPDBAccess
 				CachedEntity oldContainer = getEntity(oldContainerKey);
 				
 				CachedEntity characterPickingUp = newContainer;
-				
+
+				/*
 				// Items can only be picked up from item-containers if the character is currently in the same location as said container
 				// OR if the container is in the character's inventory
 				if (GameUtils.equals(characterPickingUp.getProperty("locationKey"), oldContainer.getProperty("containerKey"))==false && 
 						GameUtils.equals(characterPickingUp.getKey(), oldContainer.getProperty("containerKey"))==false)
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
+				 */
 
 				if(false == cs.checkContainerAccessAllowed(characterPickingUp, oldContainer))
 					throw new UserErrorMessage("You do not have physical access to this item so you cannot transfer anything to/from it. It needs to be near you or in your inventory.");
