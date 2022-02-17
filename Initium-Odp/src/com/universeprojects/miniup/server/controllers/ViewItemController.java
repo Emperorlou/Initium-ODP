@@ -104,6 +104,9 @@ public class ViewItemController extends PageController {
 		}
 		
 		request.setAttribute("itemId", itemId);
+
+		if(CommonChecks.checkItemIsAccessible(item, character))
+			request.setAttribute("reachable", true);
 		
 		// This is a special case for premium tokens...
 		if (CommonChecks.checkItemIsPremiumToken(item))
