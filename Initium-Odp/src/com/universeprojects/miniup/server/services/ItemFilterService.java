@@ -20,14 +20,22 @@ public class ItemFilterService extends Service{
 	}
 	
 	public void addItemFilter(CachedEntity item) {
-		
-		CachedEntity character = db.getCurrentCharacter();
-		
+
 		Map<String, String> filters = getFilters();	
 		filters.put((String) item.getProperty("name"), GameUtils.determineQuality(item.getProperties()));
+
+		setFilters(filters);
 		
-		db.setValue_StringStringMap(character, "itemFilters", filters);
-		filterCache = null;
+	}
+
+	public String removeItemFilter(String name){
+		Map<String, String> filters = getFilters();
+
+		String result = filters.remove(name);
+
+		setFilters(filters);
+
+		return result;
 	}
 	
 	public void removeAllFilters() {
@@ -74,5 +82,11 @@ public class ItemFilterService extends Service{
 			filterCache = new HashMap<>();
 		
 		return filterCache;
+	}
+
+	public void setFilters(Map<String, String> filters){
+		db.setValue_StringStringMap(db.getCurrentCharacter(), "itemFilters", filters);
+
+		filterCache = null;
 	}
 }

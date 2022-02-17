@@ -29,13 +29,14 @@ public class ItemFilterController extends PageController {
 		
 		Map<String, String> filters = new ItemFilterService(db).getFilters();
 		
-		List<String> data = new ArrayList<>();
-		
-		for(Entry<String,String> entry : filters.entrySet()) 
-			data.add("<a class=" + entry.getValue() + ">" + entry.getKey() + "</a><br>");
-		
-		request.setAttribute("itemFilters", data);
-		request.setAttribute("hasFilters", data.size() > 0);
+		List<String> filterData = new ArrayList<>();
+
+		for(Entry<String,String> entry : filters.entrySet())
+			filterData.add("<c class=" + entry.getValue() + ">" + entry.getKey() + "</c><br>" +
+					" - <a onclick=removeItemFilter(event, \"" + entry.getKey() + "\">Remove this filter</a>");
+
+		request.setAttribute("itemFilters", filterData);
+		request.setAttribute("hasFilters", filterData.size() > 0);
 		
 		return "/WEB-INF/odppages/itemfilters.jsp";
 	}

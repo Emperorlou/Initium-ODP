@@ -870,6 +870,10 @@ function addItemFilter(eventObject, itemId){
 	doCommand(eventObject, "AddItemFilter", {"itemId":itemId});
 }
 
+function removeItemFilter(eventObject, name){
+    doCommand(eventObject, "RemoveItemFilter", {"name":name});
+}
+
 function removeAllItemFilters(eventObject){
 	doCommand(eventObject, "RemoveAllItemFilters");
 }

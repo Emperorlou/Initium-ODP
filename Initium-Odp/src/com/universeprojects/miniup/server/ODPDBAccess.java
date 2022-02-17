@@ -5622,6 +5622,7 @@ public class ODPDBAccess
 							loot+="		</div>";
 							loot+="</div>";
 							loot+="</div>";
+							loot+="<br>";
 						}
 					}
 				}
