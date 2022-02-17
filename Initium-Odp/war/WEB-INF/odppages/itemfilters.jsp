@@ -14,7 +14,7 @@ The filter is based on the item's name, and it will filter out any items with eq
 <c:if test="${hasFilters == false}">
 	You don't have any item filters. To add one, click on an item, then click the crossed out icon on the bottom of the popup.
 </c:if>
-<c:if test="${hasFilter == true}">
+<c:if test="${hasFilters == true}">
 	<c:forEach var="filter" items="${itemFilters}">
 		${filter}
 	</c:forEach>
