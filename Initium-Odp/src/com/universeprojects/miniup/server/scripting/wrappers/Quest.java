@@ -1,7 +1,9 @@
 package com.universeprojects.miniup.server.scripting.wrappers;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
@@ -89,5 +91,21 @@ public class Quest extends EntityWrapper{
 	public void updateObjectives() {
 		rawQuest.updateObjectives(rawQuest.getObjectiveData(rawQuestDef));
 	}
-	//what else do we want to be able to see? the index of the objective?
+
+	/**
+	 * Add a custom objective to the quest. This objective can only be marked as "complete" from script context.
+	 * @param name - the name of the objective; this will be displayed to the player
+	 * @param completeEntireQuest - if true, completing this objective will complete the entire quest.
+	 */
+	public void addObjective(String name, boolean completeEntireQuest){
+		List<EmbeddedEntity> objectives = rawQuest.getObjectives();
+
+		if(objectives == null) objectives = new ArrayList<>();
+
+		EmbeddedEntity newObj = new EmbeddedEntity();
+		newObj.setProperty("name", name);
+		newObj.setProperty("forceCompleteEntireQuest", completeEntireQuest);
+
+		rawQuest.getRawEntity().setProperty("objectives", objectives);
+	}
 }
