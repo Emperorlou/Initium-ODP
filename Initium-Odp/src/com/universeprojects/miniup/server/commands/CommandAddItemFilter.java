@@ -9,6 +9,7 @@ import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.CommonChecks;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.UserRequestIncompleteException;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.commands.framework.Command;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.ItemFilterService;
@@ -41,7 +42,7 @@ public class CommandAddItemFilter extends Command{
 		db.getDB().put(character);
 		db.sendGameMessage("You now have a new item filter! " + 
 		"<a onclick='loadItemFilterList()'>[View your active item filters]</a>" +
-				" <a onclick='removeItemFilter(event,'" + item.getProperty("name") + "')>[Remove this filter]</a>" +
+				" <a onclick='removeItemFilter(event,'" + WebUtils.jsSafe((String) item.getProperty("name")) + "')>[Remove this filter]</a>" +
 		" <a onclick='removeAllItemFilters()'>[Remove all of " + character.getProperty("name") + "'s item filters]</a>");
 	}
 

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.WebUtils;
 import com.universeprojects.miniup.server.services.ItemFilterService;
 import com.universeprojects.web.Controller;
 import com.universeprojects.web.PageController;
@@ -34,7 +35,7 @@ public class ItemFilterController extends PageController {
 
 		for(Entry<String,String> entry : filters.entrySet())
 			filterData.add("<c class=" + entry.getValue() + ">" + entry.getKey() + "</c>" +
-					" - <a onclick=removeItemFilter(event,'" + entry.getKey() + "')>Remove this filter</a>");
+					" - <a onclick=removeItemFilter(event,'" + WebUtils.jsSafe(entry.getKey()) + "')>Remove this filter</a>");
 
 		request.setAttribute("itemFilters", filterData);
 		request.setAttribute("hasFilters", filterData.size() > 0);
