@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
@@ -92,19 +93,23 @@ public class Quest extends EntityWrapper{
 		rawQuest.updateObjectives(rawQuest.getObjectiveData(rawQuestDef));
 	}
 
+	public void addObjective(String name){addObjective(name, false)}
+
 	/**
-	 * Add a custom objective to the quest. This objective can only be marked as "complete" from script context.
+	 * Add a custom objective to the quest. This objective can only be marked as "complete" from script context
 	 * @param name - the name of the objective; this will be displayed to the player
 	 * @param completeEntireQuest - if true, completing this objective will complete the entire quest.
 	 */
 	public void addObjective(String name, boolean completeEntireQuest){
 		List<EmbeddedEntity> objectives = rawQuest.getObjectives();
 
-		if(objectives == null) objectives = new ArrayList<>();
+		if(objectives == null)
+			objectives = new ArrayList<>();
 
 		EmbeddedEntity newObj = new EmbeddedEntity();
 		newObj.setProperty("name", name);
 		newObj.setProperty("forceCompleteEntireQuest", completeEntireQuest);
+		objectives.add(newObj);
 
 		rawQuest.getRawEntity().setProperty("objectives", objectives);
 	}
