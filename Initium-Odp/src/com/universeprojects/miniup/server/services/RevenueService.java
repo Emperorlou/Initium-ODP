@@ -10,7 +10,10 @@ import com.universeprojects.miniup.server.InitiumTransaction;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -22,16 +25,22 @@ public class RevenueService extends Service{
     }
 
     /**
-     * Purchaes another buff
-     * @param user
-     * @param globalBuff
+     * Purchase a buff, given a user and a buff.
+     * @param user the user who is activating this buff
+     * @param globalBuff the buff they are activating
      * @throws AbortTransactionException
+     * @throws UserErrorMessage
      */
     public void incrementGlobalBuff(CachedEntity user, CachedEntity globalBuff) throws AbortTransactionException, UserErrorMessage {
         Boolean halted = new InitiumTransaction<Boolean>(db.getDB()) {
             @Override
             public Boolean doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
 
+                //I believe this is necessary
+                user.refetch(ds);
+                globalBuff.refetch(ds);
+
+                //calculate the cost of the buff.
                 Long playerDonations = (Long) user.getProperty("totalDonations");
                 Long cost = (Long) globalBuff.getProperty("cost");
 
@@ -39,11 +48,13 @@ public class RevenueService extends Service{
                 if(cost > playerDonations) return false;
 
                 user.setProperty("totalDonations", playerDonations - cost);
+
                 //at this point the purchase is validated.
 
                 List<EmbeddedEntity> purchases = getPurchases(globalBuff);
                 Long minutes = (Long) globalBuff.getProperty("minutes");
-                if(minutes == null || minutes == 0) throw new IllegalArgumentException("Minutes cannot be null or 0.");
+                if(minutes == null || minutes == 0)
+                    throw new IllegalArgumentException("Minutes cannot be null or 0.");
 
                 //Generate a date at the given expiry time.
                 Calendar cal = Calendar.getInstance();
@@ -71,12 +82,11 @@ public class RevenueService extends Service{
     /**
      * Given a key, returns the global buff rate for that key. This should be an NPCDef or an ItemDef, but could
      * theoretically be anything.
-     * @param definitionKey
+     * @param definitionKey the key that we are applying the buff to
      * @return the % increase to apply to the target key. 0 is the default.
      */
     public Long computeBuffForDefinition(Key definitionKey) {
-        String keyString = definitionKey.getKind() + "(" + definitionKey.getId() + ")";
-        Key buffKey = db.createKey("GlobalBuff", keyString);
+        Key buffKey = db.createKey("GlobalBuff", definitionKey.toString());
 
         CachedEntity globalBuff = null;
 
@@ -89,7 +99,7 @@ public class RevenueService extends Service{
         }
 
         //check to see if the buff is actually active. if not, return 0
-        if(globalBuff == null || !isBuffEnabled(globalBuff) || !isBuffActive(globalBuff))
+        if(globalBuff == null || !isBuffActive(globalBuff) || !isBuffEnabled(globalBuff))
             return 0L;
 
         //calculate
@@ -99,8 +109,8 @@ public class RevenueService extends Service{
 
     /**
      * Compute the buff's value, given all of the purchases.
-      * @param globalBuff
-     * @return
+      * @param globalBuff the buff we are operating on
+     * @return the % increase that this buff applies
      */
     public Long computeBuff(CachedEntity globalBuff){
 
@@ -111,8 +121,8 @@ public class RevenueService extends Service{
 
     /**
      * Find the latest date out of a set of the expiry dates.
-     * @param globalBuff
-     * @return
+     * @param globalBuff the buff we are operating on
+     * @return the date at which this buff will no longer be active.
      */
     public Date getExpiryDate(CachedEntity globalBuff){
         List<EmbeddedEntity> purchases = getSortedActivePurchases(globalBuff);
@@ -124,22 +134,20 @@ public class RevenueService extends Service{
 
     /**
      * Find the earliest date out of a set of dates
-     * @param globalBuff
-     * @return
+     * @param globalBuff the buff we are operating on
+     * @return the date at which this buff will DECREMENT (ie: one purchase has run out but another is active)
      */
     public Date getDecrementDate(CachedEntity globalBuff){
         List<EmbeddedEntity> purchases = getSortedActivePurchases(globalBuff);
 
         EmbeddedEntity earliest = purchases.get(0);
 
-
         return (Date) earliest.getProperty("expiryDate");
     }
 
     /**
-     * Returns true if there are any active purchases.
-     * @param globalBuff
-     * @return
+     * @param globalBuff the buff we are operating on
+     * @return true if the buff is active right now
      */
     public boolean isBuffActive(CachedEntity globalBuff){
         Date currentDate = new Date();
@@ -156,19 +164,23 @@ public class RevenueService extends Service{
         return false;
     }
 
+    /**
+     * Are we showing this buff as an option to the player?
+     * @param globalBuff the buff we are operating on
+     * @return true if the buff is enabled
+     */
     public boolean isBuffEnabled(CachedEntity globalBuff){
         return (Boolean) globalBuff.getProperty("enabled");
     }
 
     /**
-     * Gets a list of the active purchases, orted earliest -> latest
-     * @param globalBuff
-     * @return
+     * @param globalBuff the buff we are operating on
+     * @return a sorted list of all active purchases for this buff. earliest -> latest
      */
     public List<EmbeddedEntity> getSortedActivePurchases(CachedEntity globalBuff){
         List<EmbeddedEntity> purchases = getActivePurchases(globalBuff);
 
-        //I think this is correct???
+        //I think this is correct??? TODO
         purchases.sort((d1, d2) -> {
             Date date1 = (Date) d1.getProperty("expiryDate");
             Date date2 = (Date) d2.getProperty("expiryDate");
@@ -176,18 +188,17 @@ public class RevenueService extends Service{
             return date1.compareTo(date2);
         });
 
-
         return purchases;
     }
 
     /**
-     * Return a list of all the active purchases for this buff.
-     * @param globalBuff
-     * @return
+     * @param globalBuff the buff we are operating on
+     * @return an unsorted list of all the active purchases for this buff.
      */
     public List<EmbeddedEntity> getActivePurchases(CachedEntity globalBuff){
         List<EmbeddedEntity> purchases = getPurchases(globalBuff);
 
+        //TODO im not sure if initium is on java 8, lol. I hope this implementation works
         return purchases
                 .stream()
                 .filter(p -> false == isExpired((Date) p.getProperty("expiryDate")))
@@ -195,8 +206,8 @@ public class RevenueService extends Service{
     }
 
     /**
-     * @param globalBuff
-     * @return
+     * @param globalBuff the buff we are operating on
+     * @return all purchases for this buff. There could theoretically be a LOT of these dudes.
      */
     private List<EmbeddedEntity> getPurchases(CachedEntity globalBuff){
         List<EmbeddedEntity> purchases = (List<EmbeddedEntity>) globalBuff.getProperty("purchases");
@@ -207,9 +218,8 @@ public class RevenueService extends Service{
     }
 
     /**
-     * Returns true is the given date is BEFORE the current date.
-     * @param expiryDate
-     * @return
+     * @param expiryDate the given date
+     * @return true is the given date is BEFORE the current date.
      */
     public boolean isExpired(Date expiryDate){
         return expiryDate.before(new Date());
