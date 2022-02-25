@@ -7,6 +7,7 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
+import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 
 public class ItemFilterService extends Service{
 	
@@ -19,10 +20,12 @@ public class ItemFilterService extends Service{
 		super(db);
 	}
 	
-	public void addItemFilter(CachedEntity item) {
+	public void addItemFilter(CachedEntity item) throws UserErrorMessage {
 
 		Map<String, String> filters = getFilters();	
 		filters.put((String) item.getProperty("name"), GameUtils.determineQuality(item.getProperties()));
+
+		if(filters.size() > 100) throw new UserErrorMessage("You have too many filters! Try getting rid of some.");
 
 		setFilters(filters);
 		

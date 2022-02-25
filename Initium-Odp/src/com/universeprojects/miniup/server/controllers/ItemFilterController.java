@@ -35,7 +35,7 @@ public class ItemFilterController extends PageController {
 
 		for(Entry<String,String> entry : filters.entrySet())
 			filterData.add("<c class=" + entry.getValue() + ">" + entry.getKey() + "</c>" +
-					" - <a onclick=removeItemFilter(event,'" + WebUtils.jsSafe(entry.getKey()) + "')>Remove this filter</a>");
+					" - <a onclick = 'removeItemFilter(event,\"" + WebUtils.jsSafe(entry.getKey()) + "\"')>Remove this filter</a>");
 
 		request.setAttribute("itemFilters", filterData);
 		request.setAttribute("hasFilters", filterData.size() > 0);
