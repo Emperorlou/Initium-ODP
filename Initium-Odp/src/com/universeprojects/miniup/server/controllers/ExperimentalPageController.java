@@ -126,6 +126,7 @@ public class ExperimentalPageController extends PageController {
 		request.setAttribute("globalNavigationMap", updateService.updateGlobalNavigationMap());
 		request.setAttribute("location2D", updateService.updateLocation2D());
 		request.setAttribute("questPanel", updateService.updateQuestPanel());
+		request.setAttribute("globalBuffIndicator", updateService.updateGlobalBuffIndicator());
 		
 		
 		if (db.getCurrentCharacter().isUnsaved())

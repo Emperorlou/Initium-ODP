@@ -86,6 +86,20 @@ public class RevenueService extends Service{
 
         if(!halted) throw new UserErrorMessage("You can't afford that!");
     }
+
+    /**
+     * @return true is there is any active buff
+     */
+    public boolean anyBuffActive(){
+        List<CachedEntity> buffs = db.getFilteredList("GlobalBuff", "enabled", true);
+
+        for(CachedEntity ce : buffs)
+            if(isBuffActive(ce))
+                return true;
+
+        return false;
+    }
+
     /**
      * Given a key, returns the global buff rate for that key. This should be an NPCDef or an ItemDef, but could
      * theoretically be anything.

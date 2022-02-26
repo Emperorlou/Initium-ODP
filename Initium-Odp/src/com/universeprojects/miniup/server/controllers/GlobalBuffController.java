@@ -46,7 +46,8 @@ public class GlobalBuffController extends PageController{
 
             //TODO display the timer
             if(active){
-
+                html += "<center><h5 class = 'highlightbox-green'>";
+                html += "</h5></center>";
             }
 
             //if the buff is active, we add a highlight
@@ -69,6 +70,8 @@ public class GlobalBuffController extends PageController{
                 inactiveBuffOutput.add(html);
             }
         }
+
+
 
         request.setAttribute("activeBuffs", activeBuffOutput);
         request.setAttribute("inactiveBuffs", inactiveBuffOutput);
