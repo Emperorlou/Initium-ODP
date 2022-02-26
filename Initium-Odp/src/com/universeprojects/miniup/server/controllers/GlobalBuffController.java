@@ -38,7 +38,7 @@ public class GlobalBuffController extends PageController{
 
             Boolean active = rs.isBuffActive(buff);
 
-            Long price = (Long) buff.getProperty("price");
+            Long price = (Long) buff.getProperty("cost");
 
             html += "<div class = 'boldbox'>";
             html += "<h4>" + buff.getProperty("displayName") + "</h4>";

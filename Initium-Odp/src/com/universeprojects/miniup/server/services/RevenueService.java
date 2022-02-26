@@ -113,7 +113,7 @@ public class RevenueService extends Service{
         QueryHelper qh = new QueryHelper(db.getDB());
 
         //getting the keys first will only hit the DB for a single read
-        List<Key> buffKeys = qh.getFilteredList_Keys("GlobalBuff", "appliesTo", definitionKey);
+        List<Key> buffKeys = qh.getFilteredList_Keys("GlobalBuff", "applyTo", definitionKey);
 
         if(buffKeys.size() == 0)
             return result;
