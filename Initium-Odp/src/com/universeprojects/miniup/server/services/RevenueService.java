@@ -6,6 +6,7 @@ import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
+import com.universeprojects.cacheddatastore.QueryHelper;
 import com.universeprojects.miniup.server.InitiumTransaction;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
@@ -18,6 +19,13 @@ import java.util.stream.Collectors;
 
 /**
  * Global Buffs and all associated methods, including hooks
+ *
+ * TODO List
+ * Command for adding a buff
+ * UI for adding buffs - blatantly copy the custom page.
+ * Convince ID to implement the hooks properly
+ * Add a notice for when buffs are active
+ *
  */
 public class RevenueService extends Service{
     public RevenueService(ODPDBAccess db) {
@@ -25,13 +33,13 @@ public class RevenueService extends Service{
     }
 
     /**
-     * Purchase a buff, given a user and a buff.
+     * Buy a global buff. This entire method is wrapped by a transaction.
      * @param user the user who is activating this buff
      * @param globalBuff the buff they are activating
      * @throws AbortTransactionException
      * @throws UserErrorMessage
      */
-    public void incrementGlobalBuff(CachedEntity user, CachedEntity globalBuff) throws AbortTransactionException, UserErrorMessage {
+    public void buyGlobalBuff(CachedEntity user, CachedEntity globalBuff) throws AbortTransactionException, UserErrorMessage {
         Boolean halted = new InitiumTransaction<Boolean>(db.getDB()) {
             @Override
             public Boolean doTransaction(CachedDatastoreService ds) throws AbortTransactionException {
@@ -78,33 +86,37 @@ public class RevenueService extends Service{
 
         if(!halted) throw new UserErrorMessage("You can't afford that!");
     }
-
     /**
      * Given a key, returns the global buff rate for that key. This should be an NPCDef or an ItemDef, but could
      * theoretically be anything.
      * @param definitionKey the key that we are applying the buff to
      * @return the % increase to apply to the target key. 0 is the default.
      */
-    public Long computeBuffForDefinition(Key definitionKey) {
-        Key buffKey = db.createKey("GlobalBuff", definitionKey.toString());
+    public Long computeBuffForDefinition(Key definitionKey){
 
-        CachedEntity globalBuff = null;
+        Long result = 0L;
 
-        try{
-             globalBuff = db.getDB().get(buffKey);
+        QueryHelper qh = new QueryHelper(db.getDB());
+
+        //getting the keys first will only hit the DB for a single read
+        List<Key> buffKeys = qh.getFilteredList_Keys("GlobalBuff", "appliesTo", definitionKey);
+
+        if(buffKeys.size() == 0)
+            return result;
+
+        List<CachedEntity> globalBuffs = db.getEntity(buffKeys);
+
+        //iterate over all the buffs
+        for(CachedEntity ce : globalBuffs){
+            //if it is null, deactivated, or disabled; skip it
+            if(ce == null || !isBuffActive(ce) || !isBuffEnabled(ce))
+                continue;
+
+            //otherwise, compute the value of the buff and add it to the result.
+            result += computeBuff(ce);
         }
-        //no entity? return 0
-        catch(EntityNotFoundException e){
-            return 0L;
-        }
 
-        //check to see if the buff is actually active. if not, return 0
-        if(globalBuff == null || !isBuffActive(globalBuff) || !isBuffEnabled(globalBuff))
-            return 0L;
-
-        //calculate
-        return computeBuff(globalBuff);
-
+        return result;
     }
 
     /**
@@ -114,7 +126,7 @@ public class RevenueService extends Service{
      */
     public Long computeBuff(CachedEntity globalBuff){
 
-        Long baseValue = (Long) globalBuff.getProperty("baseValue");
+        Long baseValue = (Long) globalBuff.getProperty("buffPercent");
 
         return baseValue*getActivePurchases(globalBuff).size();
     }
