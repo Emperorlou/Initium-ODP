@@ -2108,6 +2108,18 @@ function viewReferrals()
 	pagePopup("/ajax_referrals.jsp", null, "Latest Referral Visits");
 }
 
+function viewGlobalBuffs()
+{
+    pagePopup("/globalbuffs", null, "Global Buffs");
+}
+
+function orderGlobalBuff(event, buffId)
+{
+    confirmPopup("Are you sure?", "This will enable the buff you've chosen. This is non-refundable.", function(){
+        doCommand(event, "BuyGlobalBuff", {buffId:buffId});
+    });
+}
+
 function customizeItemOrderPage(itemId)
 {
     closeAllPopupsTooltips();

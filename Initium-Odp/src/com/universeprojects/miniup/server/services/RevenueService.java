@@ -60,7 +60,7 @@ public class RevenueService extends Service{
                 //at this point the purchase is validated.
 
                 List<EmbeddedEntity> purchases = getPurchases(globalBuff);
-                Long minutes = (Long) globalBuff.getProperty("minutes");
+                Long minutes = (Long) globalBuff.getProperty("duration");
                 if(minutes == null || minutes == 0)
                     throw new IllegalArgumentException("Minutes cannot be null or 0.");
 
