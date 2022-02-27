@@ -102,7 +102,7 @@ public abstract class CommandScriptBase extends Command {
 				throw new UserErrorMessage("The " + (entitySource != null ? entitySource.getKind() : "entity") + " does not have this effect!");
 		
 			if((Boolean) scriptSource.getProperty("transaction") == true)
-				beginTransaction(entitySource, scriptSource, character);
+				beginTransaction(scriptSource, entitySource, character);
 		}
 		
 		// Can player trigger this effect...
