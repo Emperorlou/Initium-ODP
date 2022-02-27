@@ -871,7 +871,9 @@ function addItemFilter(eventObject, itemId){
 }
 
 function removeItemFilter(eventObject, name){
-    doCommand(eventObject, "RemoveItemFilter", {"name":name});
+    doCommand(eventObject, "RemoveItemFilter", {"name":name}, function(data, error){
+        reloadPagePopup();
+    });
 }
 
 function removeAllItemFilters(eventObject){
