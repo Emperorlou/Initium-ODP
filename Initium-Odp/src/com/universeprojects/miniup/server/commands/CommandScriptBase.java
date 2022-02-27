@@ -77,7 +77,7 @@ public abstract class CommandScriptBase extends Command {
 			if(GameUtils.enumEquals(entitySource.getProperty("type"), ScriptType.global)==false)
 				throw new RuntimeException("Specified script is not a global type!");
 
-			Boolean tx = entitySource.getProperty("transaction");
+			Boolean tx = (Boolean) entitySource.getProperty("transaction");
 			if(tx != null && tx)
 				beginTransaction(entitySource, character);
 
@@ -101,8 +101,8 @@ public abstract class CommandScriptBase extends Command {
 			}
 			if(scriptSource == null)
 				throw new UserErrorMessage("The " + (entitySource != null ? entitySource.getKind() : "entity") + " does not have this effect!");
-		
-			Boolean tx = scriptSource.getProperty("transaction");
+
+			Boolean tx = (Boolean) scriptSource.getProperty("transaction");
 			if(tx != null && tx)
 				beginTransaction(scriptSource, entitySource, character);
 		}
@@ -183,7 +183,7 @@ public abstract class CommandScriptBase extends Command {
 					
 					if(inTransaction) {
 
-						Boolean atomic = scriptSource.getProperty("atomic");
+						Boolean atomic = (Boolean) scriptSource.getProperty("atomic");
 						if(atomic != null && atomic)
 							ds.put(scriptSource);
 						
@@ -305,7 +305,7 @@ public abstract class CommandScriptBase extends Command {
 	private void beginTransaction(CachedEntity scriptSource, CachedEntity...toRefetch) {
 		ds.beginTransaction();
 
-		Boolean atomic = scriptSource.getProperty("atomic");
+		Boolean atomic = (Boolean) scriptSource.getProperty("atomic");
 		if(atomic != null && atomic)
 			scriptSource.refetch(ds);
 		
