@@ -530,6 +530,9 @@ Version: ${version}
 			<div class='header-inner'>
 				<div id='pullout-button' class='header-inner-section'><a onclick='toggleMainPullout()'><img src='https://initium-resources.appspot.com/images/ui3/header-button-options1.png' alt='Pullout menu' height='34px'/></a></div>
 				<div class='header-inner-section' style='width:100%;vertical-align: middle; text-align: center;'><div style='margin-left:-32px; margin-right:-22px;'><a id='locationName' onclick='location.reload()'>${locationName}</a></div></div>
+                <div id = 'globalBuffIndicator' class = 'header-inner-section' onclick = 'viewGlobalBuffs()'>
+                    ${globalBuffIndicator}
+                </div>
 				<div id='mainMoneyIndicator' class='header-inner-section' onclick='viewProfile()'>
 					${mainMoneyIndicator}
 				</div>

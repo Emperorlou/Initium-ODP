@@ -695,10 +695,15 @@ public class ODPDBAccess
 	public List<CachedEntity> getEntity(Key...keys)
 	{
 		if (keys == null) return null;
-		List<Key> list = Arrays.asList(keys);
-		pool.addToQueue(list);
+		return getEntity(Arrays.asList(keys));
+	}
+
+	public List<CachedEntity> getEntity(List<Key> keys){
+		if(keys == null) return null;
+
+		pool.addToQueue(keys);
 		pool.loadEntities();
-		return pool.get(list);
+		return pool.get(keys);
 	}
 
 	/**

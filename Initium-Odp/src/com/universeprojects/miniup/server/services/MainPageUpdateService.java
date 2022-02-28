@@ -547,6 +547,7 @@ public class MainPageUpdateService extends Service
 		updateGlobalNavigationMap();
 		updateLocation2D();
 		updateQuestPanel();
+		updateGlobalBuffIndicator();
 	}
 
 
@@ -1529,6 +1530,16 @@ public class MainPageUpdateService extends Service
 		js.append(getAdditionalLocationJs());
 		
 		return updateJavascript("ajaxJs", js.toString());
+	}
+
+	public String updateGlobalBuffIndicator(){
+		RevenueService rs = new RevenueService(db);
+
+		if(rs.anyBuffActive())
+			return updateHtmlContents("#globalBuffIndicator", "There is a buff active!!!");
+
+		else
+			return updateHtmlContents("#globalBuffIndicator", "There is no active buff :(");
 	}
 	
 	public String updateActivePlayerCount()
