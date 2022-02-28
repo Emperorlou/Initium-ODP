@@ -101,19 +101,28 @@ public class RevenueService extends Service{
     }
 
     /**
-     * Given a key, returns the global buff rate for that key. This should be an NPCDef or an ItemDef, but could
-     * theoretically be anything.
-     * @param definitionKey the key that we are applying the buff to
+     * Given a key, returns the global buff rate for that key.
+     * @param definitionKey the key that we are applying the buff to. Has to be NPCDef or ItemDef, or will throw
      * @return the % increase to apply to the target key. 0 is the default.
      */
     public Long computeBuffForDefinition(Key definitionKey){
+
+        String type = definitionKey.getKind();
+        String fieldName = "";
+
+        if(type.equals("NPCDef"))
+            fieldName = "npcDefs";
+        if(type.equals("ItemDef"))
+            fieldName = "itemDefs";
+        else
+            throw new IllegalArgumentException("Attempted to buff unsupported entity type");
 
         Long result = 0L;
 
         QueryHelper qh = new QueryHelper(db.getDB());
 
         //getting the keys first will only hit the DB for a single read
-        List<Key> buffKeys = qh.getFilteredList_Keys("GlobalBuff", "applyTo", definitionKey);
+        List<Key> buffKeys = qh.getFilteredList_Keys("GlobalBuff", fieldName, definitionKey);
 
         if(buffKeys.size() == 0)
             return result;
