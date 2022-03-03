@@ -26,18 +26,3 @@ Describe how this feature works
         ${inactiveBuff}
     </c:forEach>
 </c:if>
-
-<c:if test = "${activeBuffs.size() != 0}">
-    <center><h2><Active Global Buffs</h2></center>
-
-    <c:forEach var = "activeBuff" items = "${activeBuffs}">
-        <div class = "boldbox">
-            <h4>${activeBuff.displayName}<h4>
-            <div><h5>${activeBuff.displayPrice}</h5></div>
-
-            <div class = "paragraph" style = "margin:10px; text-align:right;">
-                <a onclick = ${activeBuff.orderLink}>Order now!</a>
-            </div>
-        </div>
-    </c:forEach>
-</c:if>
