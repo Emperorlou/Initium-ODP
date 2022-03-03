@@ -4596,10 +4596,10 @@ public class ODPDBAccess
         
         String status = "";
         
-        Integer autoRunThreshold = (Integer) targetCharacter.getProperty("autoRunThreshold");
-        if(autoRunThreshold == null) autoRunThreshold = 0;
-        Integer autoRunChance = (Integer) targetCharacter.getProperty("autoRunChance");
-        if(autoRunChance == null) autoRunChance = 0;
+        Double autoRunThreshold = (Double) targetCharacter.getProperty("autoRunThreshold");
+        if(autoRunThreshold == null) autoRunThreshold = 0d;
+		Double autoRunChance = (Double) targetCharacter.getProperty("autoRunChance");
+        if(autoRunChance == null) autoRunChance = 0d;
         
         if(autoRunThreshold > 0 && autoRunChance > 0) {
             Double targetHP = (Double) targetCharacter.getProperty("hitpoints");
@@ -4623,7 +4623,7 @@ public class ODPDBAccess
                 		
                 		db.delete(targetCharacter);
                 		
-                		return status += "The " + targetCharacter.getProperty("name") + " fled!";
+                		return "The " + targetCharacter.getProperty("name") + " fled!";
                 	}
                 	
                 	//they miss the dex check, but we tell the player they tried.

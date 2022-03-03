@@ -10,7 +10,7 @@ Describe how this feature works
 <br><br>
 
 <c:if test = "${activeBuffs.size() != 0}">
-    <center><h2><Active Global Buffs</h2></center>
+    <center><h2>Active Global Buffs</h2></center>
 
     <c:forEach var = "activeBuff" items = "${activeBuffs}">
         ${activeBuff}
@@ -20,7 +20,7 @@ Describe how this feature works
 <br><br>
 
 <c:if test = "${inactiveBuffs.size() != 0}">
-    <center><h2><Inactive Global Buffs</h2></center>
+    <center><h2>Inactive Global Buffs</h2></center>
 
     <c:forEach var = "inactiveBuff" items = "${inactiveBuffs}">
         ${inactiveBuff}

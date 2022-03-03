@@ -37,6 +37,8 @@ import com.universeprojects.miniup.server.services.ScriptService;
  * @author spotupchik
  */
 public abstract class CommandScriptBase extends Command {
+	
+	private boolean inTransaction = false;
 
 	public CommandScriptBase(ODPDBAccess db, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -74,6 +76,11 @@ public abstract class CommandScriptBase extends Command {
 		{
 			if(GameUtils.enumEquals(entitySource.getProperty("type"), ScriptType.global)==false)
 				throw new RuntimeException("Specified script is not a global type!");
+
+			Boolean tx = (Boolean) entitySource.getProperty("transaction");
+			if(tx != null && tx)
+				beginTransaction(entitySource, character);
+
 		}
 		else
 		{
@@ -94,6 +101,10 @@ public abstract class CommandScriptBase extends Command {
 			}
 			if(scriptSource == null)
 				throw new UserErrorMessage("The " + (entitySource != null ? entitySource.getKind() : "entity") + " does not have this effect!");
+
+			Boolean tx = (Boolean) scriptSource.getProperty("transaction");
+			if(tx != null && tx)
+				beginTransaction(scriptSource, entitySource, character);
 		}
 		
 		// Can player trigger this effect...
@@ -162,14 +173,24 @@ public abstract class CommandScriptBase extends Command {
 		{
 			ScriptService service = ScriptService.getScriptService(db);
 			CachedDatastoreService ds = db.getDB();
-			ds.beginBulkWriteMode();
+			if(!inTransaction)
+				ds.beginBulkWriteMode();
 			if(service.executeScript(event, scriptSource, entitySource))
 			{
 				if(!event.haltExecution)
 				{
 					service.cleanupEvent(event);
 					
-					ds.commitBulkWrite();
+					if(inTransaction) {
+
+						Boolean atomic = (Boolean) scriptSource.getProperty("atomic");
+						if(atomic != null && atomic)
+							ds.put(scriptSource);
+						
+						ds.commit();
+					}
+					else
+						ds.commitBulkWrite();
 					
 					for(Entry<Level, String> logs:event.logEntries.entrySet())
 						ScriptService.log.log(logs.getKey(), logs.getValue());
@@ -279,5 +300,18 @@ public abstract class CommandScriptBase extends Command {
 		{
 			setPopupMessage(event.popupMessage);
 		}
+	}
+	
+	private void beginTransaction(CachedEntity scriptSource, CachedEntity...toRefetch) {
+		ds.beginTransaction();
+
+		Boolean atomic = (Boolean) scriptSource.getProperty("atomic");
+		if(atomic != null && atomic)
+			scriptSource.refetch(ds);
+		
+		for(CachedEntity ce : toRefetch) 
+			ce.refetch(ds);
+		
+		inTransaction = true;
 	}
 }

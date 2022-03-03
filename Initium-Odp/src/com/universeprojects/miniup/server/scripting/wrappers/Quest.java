@@ -93,7 +93,7 @@ public class Quest extends EntityWrapper{
 		rawQuest.updateObjectives(rawQuest.getObjectiveData(rawQuestDef));
 	}
 
-	public void addObjective(String name){addObjective(name, false)}
+	public void addObjective(String name){addObjective(name, false);}
 
 	/**
 	 * Add a custom objective to the quest. This objective can only be marked as "complete" from script context
