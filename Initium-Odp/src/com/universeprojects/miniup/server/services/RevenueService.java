@@ -78,7 +78,7 @@ public class RevenueService extends Service{
 
                 purchases.add(latest);
                 globalBuff.setProperty("purchases", purchases);
-                
+
                 putBuffToMemcache(globalBuff);
 
                 ds.put(user, globalBuff);
