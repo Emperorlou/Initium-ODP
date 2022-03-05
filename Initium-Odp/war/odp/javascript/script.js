@@ -2112,7 +2112,7 @@ function viewReferrals()
 
 function viewGlobalBuffs()
 {
-    pagePopup("/globalbuffs", null, "Global Buffs");
+    pagePopup("/odp/globalbuffs", null, "Global Buffs");
 }
 
 function orderGlobalBuff(event, buffId)

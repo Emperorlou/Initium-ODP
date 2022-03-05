@@ -3,6 +3,7 @@ package com.universeprojects.miniup.server.services;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.memcache.Expiration;
 import com.universeprojects.cacheddatastore.AbortTransactionException;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
@@ -77,6 +78,8 @@ public class RevenueService extends Service{
 
                 purchases.add(latest);
                 globalBuff.setProperty("purchases", purchases);
+                
+                putBuffToMemcache(globalBuff);
 
                 ds.put(user, globalBuff);
 
@@ -88,8 +91,45 @@ public class RevenueService extends Service{
     }
 
     /**
+     * Put all the buffs applied by this buff to memcache
+     * @param globalBuff
+     */
+    public void putBuffToMemcache(CachedEntity globalBuff){
+        List<Key> npcDefs = (List<Key>) globalBuff.getProperty("npcDefs");
+        List<Key> itemDefs = (List<Key>) globalBuff.getProperty("itemDefs");
+
+        Double buff = computeBuff(globalBuff);
+
+        for(Key k : npcDefs)
+            putBuffableToMemcache(k, buff);
+
+        for(Key k : itemDefs)
+            putBuffableToMemcache(k, buff);
+    }
+
+    /**
+     * Put the buff on an invidiual key to memcache
+     * @param definitionKey
+     * @param value
+     */
+    public void putBuffableToMemcache(Key definitionKey, Double value){
+        db.getDB().getMC().put("GlobalBuff-" + definitionKey.toString(), value, Expiration.byDeltaSeconds(1800));
+    }
+
+    /**
+     * Grab the buff on an individual key from memcache
+     * @param definitionKey
+     * @return
+     */
+    public Double getBuffableFromMemcache(Key definitionKey){
+        return db.getDB().getStatDouble("GlobalBuff-" + definitionKey.toString());
+    }
+
+    /**
+     *
      * @return true is there is any active buff
      */
+    @Deprecated
     public boolean anyBuffActive(){
         List<CachedEntity> buffs = db.getFilteredList("GlobalBuff", "enabled", true);
 
@@ -103,10 +143,16 @@ public class RevenueService extends Service{
     /**
      * Given a key, returns the global buff rate for that key.
      * @param definitionKey the key that we are applying the buff to. Has to be NPCDef or ItemDef, or will throw
-     * @return the % increase to apply to the target key. 0 is the default.
+     * @return the multiplier for this buff
      */
-    public Long computeBuffForDefinition(Key definitionKey){
+    public Double computeBuffForDefinition(Key definitionKey){
 
+        Double cached = getBuffableFromMemcache(definitionKey);
+
+        if(cached != null)
+            return cached;
+
+        //compute from DB and then put to memcache
         String type = definitionKey.getKind();
         String fieldName = "";
 
@@ -117,15 +163,17 @@ public class RevenueService extends Service{
         else
             throw new IllegalArgumentException("Attempted to buff unsupported entity type");
 
-        Long result = 0L;
+        Double result = 0d;
 
         QueryHelper qh = new QueryHelper(db.getDB());
 
         //getting the keys first will only hit the DB for a single read
         List<Key> buffKeys = qh.getFilteredList_Keys("GlobalBuff", fieldName, definitionKey);
 
-        if(buffKeys.size() == 0)
-            return result;
+        if(buffKeys.size() == 0){
+            putBuffableToMemcache(definitionKey, result);
+            return result; //0d
+        }
 
         List<CachedEntity> globalBuffs = db.getEntity(buffKeys);
 
@@ -139,17 +187,23 @@ public class RevenueService extends Service{
             result += computeBuff(ce);
         }
 
+        putBuffableToMemcache(definitionKey, result);
+
         return result;
     }
+
+    /**
+     * Below this point are methods that operate on GlobalBuff entity types.
+     */
 
     /**
      * Compute the buff's value, given all of the purchases.
       * @param globalBuff the buff we are operating on
      * @return the % increase that this buff applies
      */
-    public Long computeBuff(CachedEntity globalBuff){
+    public Double computeBuff(CachedEntity globalBuff){
 
-        Long baseValue = (Long) globalBuff.getProperty("buffPercent");
+        Double baseValue = (Double) globalBuff.getProperty("multiplier");
 
         return baseValue*getActivePurchases(globalBuff).size();
     }
