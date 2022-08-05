@@ -4387,6 +4387,36 @@ function doExperiment(event, itemId)
 			});
 }
 
+function doTeach(event)
+{
+	var checkedIdeas = $(".teach-idea-checkbox:checked").map(function(){return $(this).attr('id');}).get();
+	if(checkedIdeas.length == 0) checkedIdeas = null;
+	var checkedCharacters = $(".teach-character-checkbox:checked").map(function(){return $(this).attr('id');}).get();
+	if(checkedCharacters.length == 0) checkedCharacters = null;
+	longOperation(event, "Teach", {ideaIds:checkedIdeas, characterIds:checkedCharacters},
+		function(action)
+		{
+			if(action.error !== undefined)
+			{
+				clearPopupPermanentOverlay();
+			}
+			else if (action.isComplete)
+			{
+				clearPopupPermanentOverlay(); 
+				reloadPagePopup(false);
+			}
+			else
+			{
+				popupPermanentOverlay_Experiment("Teaching", "You're spreading knowledge to those around you.");
+
+			}
+		},
+		function()
+		{
+			doTeach(null);
+		});
+}
+
 
 function repeatConfirmRequirementsButton(repsUniqueId)
 {
