@@ -4992,9 +4992,19 @@ public class ODPDBAccess
 		                damageReduction = (Long)blockResult.get("damageReduction");
 		            if (damageReduction == attackResult.damage)
 		            	attackResult.status += "<br>However, this attack was completely blocked due to the "+armorNames+". No "+((String)blockResult.get("damageType")).toLowerCase()+" damage was done.";
-		            else
-		            	attackResult.status += "<br>However, this attack was <u>partially</u> blocked.<br> "+blockResult.get("damageType")+" damage was reduced by "+blockResult.get("damageReduction")+" due to the "+armorNames+", "+(attackResult.damage-damageReduction)+" total damage was dealt.";
-		            
+		            else{
+						attackResult.status += "<br>However, this attack was <u>partially</u> blocked.<br> "+blockResult.get("damageType")+" damage was reduced by "+blockResult.get("damageReduction");
+
+						Long buffReduction = (Long)blockResult.get("buffReduction");
+						String buffReductionLine = "";
+						if(buffReduction != null){
+							buffReductionLine = "(" + buffReduction + " was from damage reduction bonuses)";
+						}
+
+						attackResult.status += buffReductionLine + " due to the "+armorNames+", "+(attackResult.damage-damageReduction)+" total damage was dealt.";
+
+					}
+
 		            if (blockResult.get("status")!=null)
 		            	attackResult.status += "<br>"+(String)blockResult.get("status");
 		                
@@ -5082,7 +5092,24 @@ public class ODPDBAccess
 			else if (blockCapability.equals("Excellent")) damageReduction *= 2;
 			else if (blockCapability.equals("Good")) damageReduction = new Double(damageReduction.doubleValue() * 1.5d).longValue();
 			else if (blockCapability.equals("Poor")) damageReduction = new Double(damageReduction.doubleValue() * 0.75d).longValue();
-			
+
+			Long preBuffDamageReduction = damageReduction;
+
+			//buff the damage reduction
+			damageReduction = getLongBuffableValue(targetCharacter, damageType + "Reduction", damageReduction);
+
+			//add the buffed damage reduction to the result to display back to the player, only if it actually got buffed.
+			if(damageReduction != preBuffDamageReduction){
+				Long buffReduction = (Long) result.get("buffReduction");
+
+				if(buffReduction == null)
+					buffReduction = 0L;
+
+				buffReduction += damageReduction - preBuffDamageReduction;
+
+				result.put("buffReduction", buffReduction);
+			}
+
 		}
 		else
 			damageType = "";
