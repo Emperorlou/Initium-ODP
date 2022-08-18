@@ -50,6 +50,10 @@ var getUrlParameter = function(sParam) {
     }
 };
 
+function isCordovaApp() {
+	return window['webkit'] != undefined && window['webkit'].messageHandlers['cordova_iab'] != undefined;	
+}
+
 window.characterOverride = getUrlParameter("char");
 if (window.characterOverride==null || window.characterOverride=="null")
 	window.characterOverride = "";

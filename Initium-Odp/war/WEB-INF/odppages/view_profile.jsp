@@ -16,15 +16,20 @@
 		${donationHistory}
 	</p>
 	<br>
-	<a onclick='createUpgradeToPremiumWindow()'>
-		<img src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border="0" alt="PayPal - The safer, easier way to pay online!"/><br> 
-		<img src='https://initium-resources.appspot.com/images/paypal-cards.jpg' border=0 />
-	</a>
-	<div class='fineprint'>
-		You <u>do not</u> need a PayPal account when you donate using credit or bank cards.
+	<div class='paypal-panel'>
+		<a onclick='createUpgradeToPremiumWindow()'>
+			<img src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border="0" alt="PayPal - The safer, easier way to pay online!"/><br> 
+			<img src='https://initium-resources.appspot.com/images/paypal-cards.jpg' border=0 />
+		</a>
+		<div class='fineprint'>
+			You <u>do not</u> need a PayPal account when you donate using credit or bank cards.
+		</div>
+		<br>
+		<div class='fineprint'>PayPal takes 30 cents + 2.5% from every donation</div>
 	</div>
-	<br>
-	<div class='fineprint'>PayPal takes 30 cents + 2.5% from every donation</div>
+	<div class='no-paypal-panel'>
+		<p>Please visit our website at playinitium.com to acquire donation credit or a premium account!</p>
+	</div>
 </div>
 </c:if>
 
@@ -181,3 +186,16 @@
 	<br> <br> <a class="big-link" href="#" onclick="rediscoverHouses(event)" id="btnRediscoverHouses">Rediscover All Owned Houses</a>
 </p>
 <div class='mobile-spacer'></div>
+
+
+
+
+<script type='text/javascript'>
+if (isCordovaApp() == true) {
+	$(".paypal-panel").hide();
+	$(".no-paypal-panel").show();
+} else {
+	$(".paypal-panel").show();
+	$(".no-paypal-panel").hide();
+}
+</script>

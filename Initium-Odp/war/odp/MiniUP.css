@@ -5931,3 +5931,16 @@ body[longoperation='true'] .long-operation-status
 	
 }
 
+
+
+.server-wide-buff-indicator {
+	max-height: 34px;
+} 
+
+.buff-disabled {
+	max-height: 20px;	
+}
+
+.buff-enabled {
+	mix-blend-mode: lighten!important;
+}

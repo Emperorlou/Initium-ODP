@@ -1536,10 +1536,10 @@ public class MainPageUpdateService extends Service
 		RevenueService rs = new RevenueService(db);
 
 		if(rs.anyBuffActive())
-			return updateHtmlContents("#globalBuffIndicator", "There is a buff active!!!");
+			return updateHtmlContents("#globalBuffIndicator", "<img class='server-wide-buff-indicator buff-enabled' src='https://storage.googleapis.com/initium-resources/images/ui/global-buff1.gif' alt='!!' title='There is a server-wide buff active!'/>");
 
 		else
-			return updateHtmlContents("#globalBuffIndicator", "There is no active buff :(");
+			return updateHtmlContents("#globalBuffIndicator", "<img class='server-wide-buff-indicator buff-disabled' src='https://storage.googleapis.com/initium-resources/images/ui/global-buff-inactive1.png' alt='--' title='There is no server-wide buff currently active'/>");
 	}
 	
 	public String updateActivePlayerCount()

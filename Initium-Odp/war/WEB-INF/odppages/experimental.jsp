@@ -327,8 +327,13 @@
 		if (location.search!=null && location.search.indexOf("tutorial=true")>-1)
 			uiTutorial.run();
 		
-		if (location.search!=null && location.search.indexOf("welcome=true")>-1)
-			createDonationWindow();
+		if (location.search!=null && location.search.indexOf("welcome=true")>-1) {
+			if (isCordovaApp() == false)
+				createDonationWindow();
+			else
+				createWelcomeWindow();
+			
+		}
 		
 		updateBannerSize();
 		
