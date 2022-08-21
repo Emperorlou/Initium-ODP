@@ -1,6 +1,11 @@
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
 <div class="item-popup">
 	<input type='hidden' id='popupItemId' value='${item.itemId}'/>
+	
+	<c:if test="${item.largeImage != null && item.largeImage != ''}">
+		<div class='item-popup-largeimage' style='background-image:url(${item.largeImage})'></div>
+	</c:if>
+	
 	<c:if test="${isItemOwner}"><a href='#' onclick='customizeItemOrderPage(${item.itemId})' style='float:left'>Customize</a></c:if>
 	<div class='normal-container'>
 		<a onclick='shareItem(${item.itemId})' style='float:right' title='Clicking this will show the item in chat in the location you`re currently in.'>Share</a>
@@ -129,7 +134,7 @@
 		<p>
 		<a href='ServletUserControl?type=usePremiumToken&itemId=${item.itemId}'>Deposit to Account</a> <br>
 		Click this link to use this token on yourself. This will give your account premium membership. 
-		If you already have a premium membership, 5 dollars will be added towards your donation credit 
+		If you already have a premium membership, 500 credits will be added towards your donation credit 
 		which you can use to gift premium to someone else, order a customization, or to create another 
 		token like this at a later date.
 		</p>

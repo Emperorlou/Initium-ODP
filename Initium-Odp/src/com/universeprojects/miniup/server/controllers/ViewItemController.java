@@ -410,9 +410,13 @@ public class ViewItemController extends PageController {
 				isGridMapObjectImage = true;
 		}
 		
+		String largeImageUrl = GameUtils.getResourceUrl(item.getProperty("largeImage"));
+		
+		
 		
 		itemMap.put("isGridMapObjectImage", isGridMapObjectImage);
 		itemMap.put("icon", iconUrl);
+		itemMap.put("largeImage", largeImageUrl);
 		if (item.getProperty("quantity")!=null)
 			itemMap.put("quantity", GameUtils.formatNumber((Long)item.getProperty("quantity")));
 		

@@ -571,14 +571,14 @@ public class MainPageUpdateService extends Service
 		if (user!=null)
 			availableDonations = (Long)user.getProperty("totalDonations");
 		if (availableDonations==null) availableDonations = 0L;
-		Double donationsDbl = availableDonations.doubleValue()/100;
+		Double donationsDbl = availableDonations.doubleValue();
 		String donationsFormatted = GameUtils.formatNumber(donationsDbl);
 		
 		Long gold = (Long)character.getProperty("dogecoins");
 		String goldFormatted = GameUtils.formatNumber(gold);
 		
 		String html = "<div class='top-section'>Gold: <span>"+goldFormatted+"</span></div>\r\n" + 
-				"<div class='top-section' style='color: #a29852;'>Credit: $"+donationsFormatted+"</span></div>\r\n";
+				"<div class='top-section' style='color: #a29852;'>Credit: "+donationsFormatted+"</span></div>\r\n";
 		
 		return updateHtmlContents("#mainMoneyIndicator", html);
 	}

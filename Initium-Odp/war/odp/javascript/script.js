@@ -1199,6 +1199,17 @@ function openMechanicsPage()
 	pagePopup("/odp/mechanics.jsp", null, "Mechanics");
 }
 
+function openCustomStorePage(itemId)
+{
+	closeAllPagePopups();
+	
+	if (itemId != null)
+		pagePopup("/odp/customstore?itemId=" + itemId, null, "Cosmetics Store");
+	else
+		pagePopup("/odp/customstore", null, "Cosmetics Store");
+		
+}
+
 
 function shareItem(itemId)
 {
@@ -1233,17 +1244,27 @@ function viewGroup(groupId)
 	pagePopup("/odp/ajax_group?groupId=" + groupId, null, "Group Page");
 }
 
+function orderCustomStoreItem(eventObject, itemId, customStoreItemDefId) {
+	confirmPopup("Confirmation", "Are you sure you want to buy this customization?\n\nThis cannot be undone.", function() {
+		doCommand(eventObject, "CustomizationSprite", {"itemId":itemId, "customStoreItemDefId":customStoreItemDefId}, function(data, error) {
+			if (error) return;
+			closePagePopup();
+		});
+	});
+	
+}
+
 
 function createNewGroup(eventObject)
 {
 	promptPopup("New Group","What name will you be using for your group.\n\nPlease use ONLY letters, commas, and apostrophes and a maximum of 30 characters.\n\nThis name cannot be changed later, so choose wisely!","", function(groupName) {
-				if (groupName != null && groupName != "") {
-					doCommand(eventObject, "GroupCreate", {"groupName" : groupName}, function(data, error) {
-						if (error) return;
-						viewGroup(data.groupId);
-					})
-				}
-			});
+		if (groupName != null && groupName != "") {
+			doCommand(eventObject, "GroupCreate", {"groupName" : groupName}, function(data, error) {
+				if (error) return;
+				viewGroup(data.groupId);
+			})
+		}
+	});
 }
 
 
@@ -3027,7 +3048,7 @@ function doForgetConstructItemSkill(event, name, skillId)
 
 function doBuyCharacterSlots(event)
 {
-	confirmPopup("Get more character slots", "Are you sure you want to get 8 more character slots for $5 in donation credit?", function(){
+	confirmPopup("Get more character slots", "Are you sure you want to get 8 more character slots for 500 donation credit?", function(){
 		doCommand(event, "BuyCharacterSlots");
 	});
 }

@@ -67,10 +67,10 @@
 							<a onclick='doCreatePrototype(event, ${idea.id}, "<c:out value="${idea.name}"/>");'>Create prototype now</a>
 						</p>
 					</div>
-					<a onclick="doCreatePrototype(event, ${idea.id}, '<c:out value="${idea.name}"/>', null, null, true);">
+					<a class='instant-start-skill-button' onclick="doCreatePrototype(event, ${idea.id}, '<c:out value="${idea.name}"/>', null, null, true);">
 						<img src="https://initium-resources.appspot.com/images/ui/begin-icon1.png">
 					</a>					
-					<a class='hint' rel='#idea-popup-1-${idea.id}'><img src='${idea.icon}' style='vertical-align:middle; min-height:32px; min-width:32px;' border=0/> ${idea.name}</a>
+					<a class='hint' rel='#idea-popup-1-${idea.id}'><span class='skill-icon' style='background-image: url(${idea.icon});'></span> ${idea.name}</a>
 				</div>
 			</c:forEach>
 		</c:if>
@@ -103,11 +103,11 @@
 						</p>
 						
 					</div>
-					<div class='generic-itemlike-container'>
-						<a onclick="doConstructItemSkill(event, ${skill.id}, '<c:out value="${skill.name}"/>', null, null, true);">
+					<div class='generic-itemlike-container' style='vertical-align:middle;'>
+						<a class='instant-start-skill-button' onclick="doConstructItemSkill(event, ${skill.id}, '<c:out value="${skill.name}"/>', null, null, true);">
 							<img src="https://initium-resources.appspot.com/images/ui/begin-icon1.png">
 						</a>					
-						<a class='hint' rel='#skill-popup-1-${skill.id}'><img src='${skill.icon}' style='min-width:32px; min-height:32px;' border=0/> 
+						<a class='hint' rel='#skill-popup-1-${skill.id}'><span class='skill-icon' style='background-image: url(${skill.icon});'></span> 
 							<div class='generic-itemlike-name-container'>
 								<div class='generic-itemlike-name' id='skill-name-${skill.id}'>${skill.name}</div>
 								<div class='generic-itemlike-lowerline'>${skill.itemClass}</div>

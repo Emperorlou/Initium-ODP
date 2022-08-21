@@ -43,7 +43,7 @@ public class CommandBuyCharacterSlots extends TransactionCommand
 		if (availableCredit == null) availableCredit = 0L;
 		
 		if (availableCredit<500)
-			throw new UserErrorMessage("You need at least 5 USD in donation credit to get additional character slots.");
+			throw new UserErrorMessage("You need at least 500 donation credit to get additional character slots.");
 		
 		Long maxCharacterCount = db.getUserCharacterSlotCount(user);
 		int characterCount = (Integer)request.getAttribute("characterCount");

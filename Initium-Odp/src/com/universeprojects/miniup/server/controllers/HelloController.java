@@ -13,7 +13,7 @@ import java.io.IOException;
 public class HelloController extends PageController {
 	
 	public HelloController() {
-		super("hello");
+		super("hello3");
 	}
 
 @Override
@@ -24,6 +24,6 @@ protected final String processRequest(HttpServletRequest request, HttpServletRes
 	String msg = "Hello World!";
 	request.setAttribute("message", msg);
 	
-	return "/WEB-INF/odppages/hello.jsp";
+	return "/WEB-INF/odppages/ajax_customstore.jsp";
 	}
 }

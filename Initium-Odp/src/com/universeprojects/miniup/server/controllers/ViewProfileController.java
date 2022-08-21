@@ -99,9 +99,9 @@ public class ViewProfileController extends PageController {
 		if (totalDonations==null) totalDonations = 0L;
 		if (donationHistory==null) donationHistory = 0L;
 		Double donationHistoryDollars = donationHistory.doubleValue()/100;
-		Double donationDollars = totalDonations.doubleValue()/100;
+		Double donationDollars = totalDonations.doubleValue();
 		request.setAttribute("donationHistory", "$"+GameUtils.formatNumber(donationHistoryDollars));
-		request.setAttribute("totalDonations", "$"+GameUtils.formatNumber(donationDollars));
+		request.setAttribute("totalDonations", ""+GameUtils.formatNumber(donationDollars));
 		
 		
 		

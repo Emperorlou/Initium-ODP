@@ -18,6 +18,31 @@
 	src: url(algerian.ttf)
 }
 
+
+.self-center {
+	position: relative;
+    transform: translateX(-50%);
+    left: 50%;	
+}
+
+button {
+	background-color: #9f3c2400;
+    border: 0px;
+    color: #e2b766;
+    padding: 23px;
+    padding-left: 27px;
+    padding-right: 27px;
+    margin: 0px;
+    cursor: pointer;
+    border-image-slice: 14 14 12 13 fill;
+    border-image-width: 20px 20px 20px 20px;
+    border-image-outset: 0px 0px 0px 0px;
+    border-image-repeat: stretch stretch;
+    border-image-source: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    border-style: solid;
+    font-size: 15px;
+}
+
 .accessible
 {
 	height: 1px;
@@ -697,9 +722,11 @@ a.main-highlight:HOVER
 .item-legendary
 {
 	font-size: 18px;
-    text-shadow: -1px -1px 0px hsl(20deg 100% 57%);
-    color: hsla(18, 100%, 44%, 1);
-    font-family: LEGENDARY; /* This worked on one instance of chrome and not the other. We'll see. */
+    text-shadow: 0px 0px 9px hsl(0deg 100% 50%), 0px 0px 9px hsl(0deg 100% 50%);
+    color: hsl(0deg 100% 50%);
+    font-family: LEGENDARY;
+    filter: brightness(1);
+    font-weight: normal!important;
 }
 
 .item-event
@@ -2042,6 +2069,21 @@ a.range-increment {
 	float: right;
 }
 
+.item-popup {
+	position: relative;
+}
+
+.item-popup-largeimage {
+	bottom: 0px;
+    width: 100%;
+    height: 150px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-bottom: 3px solid #32323a;
+    background-color: #000;
+}
+
 .item-popup-header
 {
 	font-size: 20px;
@@ -2683,6 +2725,7 @@ position: absolute;
 }
 .tab-row-tab
 {
+	color: #FFF;
 	display:inline-block;
 	width:32px;
 	height:32px;
@@ -5944,3 +5987,94 @@ body[longoperation='true'] .long-operation-status
 .buff-enabled {
 	mix-blend-mode: lighten!important;
 }
+
+
+.skill-icon {
+	display: inline-block;
+	vertical-align: middle;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	width: 32px; 
+	height: 32px;	
+}
+
+.instant-start-skill-button {
+	vertical-align: middle;
+}
+
+.custom-store-list-container {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.custom-store-item-container {
+	position: relative;
+	margin: 10px;
+	padding: 8px;
+	border: none;
+	border-radius: 8px;
+	text-align: center;
+	
+}
+
+.custom-store-item-image {
+	display: inline-block;
+	width: 64px;
+	height: 64px;
+	background-position: center;
+	background-repeat: no-repeat;
+	
+}
+
+.custom-store-item-cost {
+    margin: 5px;
+    color: #FFF;
+    text-shadow: 1px 1px 2px black;
+}
+
+.custom-store-item-buybutton {
+	font-size: 14px;
+}
+
+.custom-store-item-expiry {
+	color: #FF4444;
+	margin: 5px;
+    text-shadow: 1px 1px 2px black;
+}
+
+
+.custom-store-large-image-preview {
+    position: absolute;
+    top: -150px;
+    padding: 10px;
+    border-radius: 15px;
+    background: #000;
+    z-index: 1;
+}
+
+.custom-store-junk-bg {
+	background: rgb(68,68,68);
+	background: radial-gradient(circle, rgba(103,103,103,1) 0%, rgba(68,68,68,1) 100%);	
+}
+
+.custom-store-common-bg {
+	background: rgb(129,129,129);
+	background: radial-gradient(circle, rgba(212,212,212,1) 0%, rgba(129,129,129,1) 100%);
+}
+
+.custom-store-rare-bg {
+	background: rgb(175,121,45);
+	background: radial-gradient(circle, rgba(175,121,45,1) 0%, rgba(108,77,26,1) 100%);	
+}
+
+.custom-store-unique-bg {
+	background: rgb(108,100,47);
+	background: radial-gradient(circle, rgba(230,203,83,1) 0%, rgba(108,100,47,1) 100%);	 
+}
+
+.custom-store-epic-bg {
+	background: rgb(117,49,116);
+	background: radial-gradient(circle, rgba(183,71,195,1) 0%, rgba(117,49,116,1) 100%);}
+

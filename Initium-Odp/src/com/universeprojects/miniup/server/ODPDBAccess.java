@@ -8141,4 +8141,16 @@ public class ODPDBAccess
     	return false;
     }
 
+	public void sendCustomOrderNotification(CachedDatastoreService ds, CachedEntity customOrder, boolean instant)
+			throws UserErrorMessage {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendCustomizationStorePurchaseNotification(CachedDatastoreService ds,
+			CachedEntity customizationStoreItemDef) throws UserErrorMessage {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

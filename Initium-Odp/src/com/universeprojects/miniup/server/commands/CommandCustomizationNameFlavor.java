@@ -47,11 +47,14 @@ public class CommandCustomizationNameFlavor extends Command
 		itemName = itemName.trim().replace("  ", " ");
 		flavor = flavor.trim().replace("  ", " ");
 		
+		if (itemName.equals("") && flavor.equals(""))
+			throw new UserErrorMessage("Specify a name and flavor to use first!");
+		
 		// Verify this is a name we can use...
-		if (itemName.matches(regexValidator)==false)
+		if (!itemName.equals("") && itemName.matches(regexValidator)==false)
 			throw new UserErrorMessage("Item can only contain the following special characters: ',.-()/");
 		
-		if (flavor.matches(regexValidator)==false)
+		if (!flavor.equals("") && flavor.matches(regexValidator)==false)
 			throw new UserErrorMessage("Item flavor can only contain the following special characters: ',.-()/");
 		
 		if (itemName.length()<1)

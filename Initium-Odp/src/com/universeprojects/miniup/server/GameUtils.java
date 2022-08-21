@@ -1073,10 +1073,15 @@ public class GameUtils
 		if (quantity != null)
 		{
 			if (quantity >= 1000L && smallMode)
-				quantityDiv = "<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator' title='" + formatNumber(quantity) + "'>" + shorthandNumber(quantity)
-						+ "</div></div>";
+				quantityDiv = "<div class='main-item-quantity-indicator-container'>"
+								+ "<div class='main-item-quantity-indicator' title='" + formatNumber(quantity) + "'>" + shorthandNumber(quantity) + ""
+								+ "</div>"
+							+ "</div>";
 			else
-				quantityDiv = "<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>" + formatNumber(quantity) + "</div></div>";
+				quantityDiv = "<div class='main-item-quantity-indicator-container'>"
+								+ "<div class='main-item-quantity-indicator'>" + formatNumber(quantity) + ""
+								+ "</div>"
+							+ "</div>";
 
 		}
 		String altQuality = qualityClass;
@@ -1087,18 +1092,38 @@ public class GameUtils
 		if (minitip.length() > 10) minitipForAlt = minitip.substring(9, minitip.length() - 1);
 		String result = null;
 		if (proceduralKey != null)
-			result = "<span class='" + notEnoughStrengthClass + "'><a class='clue " + qualityClass + "'   " + minitip + " rel='/odp/viewitemmini?proceduralKey=" + proceduralKey
-					+ "'><div class='main-item-image-backing'>" + quantityDiv + "<img class='item-icon-img-" + item.getKey().getId() + "' style='max-width:32px; max-height:32px;' src='" + iconUrl
-					+ "' border=0/></div><div class='" + lowDurabilityClass + "main-item-name'>" + label + "<span class='accessible'> " + minitipForAlt + "</span></div></a></span>";
+			result = "<span class='" + notEnoughStrengthClass + "'>"
+					+ "<a class='clue " + qualityClass + "'   " + minitip + " rel='/odp/viewitemmini?proceduralKey=" + proceduralKey + "'>"
+							+ "<div class='main-item-image-backing'>" + quantityDiv + ""
+									+ "<img class='item-icon-img-" + item.getKey().getId() + "' style='max-width:32px; max-height:32px;' src='" + iconUrl + "' border=0/>"
+							+ "</div>"
+							+ "<div class='" + lowDurabilityClass + "main-item-name'>" + label + ""
+								+ "<span class='accessible'> " + minitipForAlt + "</span>"
+							+ "</div>"
+					+ "</a>"
+					+ "</span>";
 		else if (popupEmbedded)
-			result = "<span class='" + notEnoughStrengthClass + "'><a class='" + qualityClass + "'  " + minitip + " onclick='reloadPopup(this, \"" + WebUtils.getFullURL(request)
-					+ "\", event)' rel='/odp/viewitemmini?itemId=" + item.getKey().getId() + "'><div class='main-item-image-backing'>" + quantityDiv + "<img class='item-icon-img-"
-					+ item.getKey().getId() + "' style='max-width:26px; max-height:26px;' src='" + iconUrl + "' border=0/></div><div class='" + lowDurabilityClass + "main-item-name'>" + label
-					+ "<span class='accessible'> " + minitipForAlt + "</span></div></a></span>";
+			result = "<span class='" + notEnoughStrengthClass + "'>"
+					+ "<a class='" + qualityClass + "'  " + minitip + " onclick='reloadPopup(this, \"" + WebUtils.getFullURL(request) + "\", event)' rel='/odp/viewitemmini?itemId=" + item.getKey().getId() + "'>"
+							+ "<div class='main-item-image-backing'>" + quantityDiv + ""
+									+ "<img class='item-icon-img-" + item.getKey().getId() + "' style='max-width:26px; max-height:26px;' src='" + iconUrl + "' border=0/>"
+							+ "</div>"
+							+ "<div class='" + lowDurabilityClass + "main-item-name'>" + label
+								+ "<span class='accessible'> " + minitipForAlt + "</span>"
+							+ "</div>"
+					+ "</a>"
+					+ "</span>";
 		else
-			result = "<span class='" + notEnoughStrengthClass + "'><a class='clue " + qualityClass + "'  " + minitip + " rel='/odp/viewitemmini?itemId=" + item.getKey().getId()
-					+ "'><div class='main-item-image-backing'>" + quantityDiv + "<img class='item-icon-img-" + item.getKey().getId() + "' style='max-width:32px; max-height:32px;' src='" + iconUrl
-					+ "' border=0/></div><div class='" + lowDurabilityClass + "main-item-name'>" + label + "<span class='accessible'> " + minitipForAlt + "</span></div></a></span>";
+			result = "<span class='" + notEnoughStrengthClass + "'>"
+					+ "<a class='clue " + qualityClass + "'  " + minitip + " rel='/odp/viewitemmini?itemId=" + item.getKey().getId() + "'>"
+							+ "<div class='main-item-image-backing'>" + quantityDiv + ""
+									+ "<img class='item-icon-img-" + item.getKey().getId() + "' style='max-width:32px; max-height:32px;' src='" + iconUrl + "' border=0/>"
+							+ "</div>"
+							+ "<div class='" + lowDurabilityClass + "main-item-name'>" + label + ""
+									+ "<span class='accessible'> " + minitipForAlt + "</span>"
+							+ "</div>"
+					+ "</a>"
+					+ "</span>";
 
 		if (result.toLowerCase().contains("<script") || result.toLowerCase().contains("javascript:")) throw new RuntimeException("CODENK1 Item(" + item.getId() + ")");
 
