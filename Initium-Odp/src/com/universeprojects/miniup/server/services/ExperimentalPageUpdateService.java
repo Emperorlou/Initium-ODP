@@ -145,7 +145,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("<div id='viewportcontainer' class='vpcontainer'>");
 		newHtml.append("<div id='viewport' class='vp'>");
 
-		newHtml.append("	<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
+//		newHtml.append("	<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
 		newHtml.append("	<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
 		newHtml.append("	<div class='cursorSubObject' id='gridmap-repeatinvention-button' onclick=''></div>");
 		newHtml.append("	<div id='grid' class='grid'>");

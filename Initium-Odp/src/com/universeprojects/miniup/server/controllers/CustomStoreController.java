@@ -46,12 +46,14 @@ public class CustomStoreController extends PageController {
 		CustomizationStoreService css = new CustomizationStoreService(db);
 		
 		List<CachedEntity> buyableList = css.getBuyableList(item);
+		List<CachedEntity> allBuyableList = css.getBuyableList(null);
 		
 		if (item != null) {
 			request.setAttribute("itemRendered", GameUtils.renderItem(item));
 			request.setAttribute("itemId", itemId);
 		}
 		request.setAttribute("buyables", transformBuyableListForUI(buyableList));
+		request.setAttribute("allBuyables", transformBuyableListForUI(allBuyableList));
 		request.setAttribute("isBuyablesAvailable", buyableList.size() > 0);
 		
 		
@@ -109,6 +111,8 @@ public class CustomStoreController extends PageController {
 		for(CachedEntity customDef:list) {
 			String icon = (String) customDef.getProperty("icon");
 			String largeImage = (String) customDef.getProperty("largeImage");
+			String effectOverlay = (String) customDef.getProperty("effectOverlay");
+			Double effectOverlayBrightness = (Double) customDef.getProperty("effectOverlayBrightness");
 			Long cost = (Long) customDef.getProperty("cost");
 			Date saleExpiryDate = (Date) customDef.getProperty("saleExpiryDate");
 			String rarity = (String) customDef.getProperty("rarity");
@@ -116,10 +120,10 @@ public class CustomStoreController extends PageController {
 			
 			// Sanitize
 			if (icon == null) continue;
-			if (rarity == null) rarity = "Common";	
+			if (rarity == null) rarity = "Common";	 
 			rarity = rarity.toLowerCase();
 			
-			// Get the correct category
+			// Get the correct category 
 			List<Map<String, Object>> category = result.get(applyText);
 			if (category == null) {
 				category = new ArrayList<>();
@@ -131,6 +135,8 @@ public class CustomStoreController extends PageController {
 			data.put("id", customDef.getId());
 			data.put("icon", GameUtils.getResourceUrl(icon));
 			data.put("largeImage", GameUtils.getResourceUrl(largeImage));
+			data.put("effectOverlay", GameUtils.getResourceUrl(effectOverlay)); 
+			data.put("effectOverlayBrightness", effectOverlayBrightness);
 			data.put("cost", cost);
 			data.put("costFormatted", GameUtils.formatNumber(cost, false));
 			if (saleExpiryDate != null) 

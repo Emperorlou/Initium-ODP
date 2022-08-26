@@ -3,7 +3,7 @@
 	<input type='hidden' id='popupItemId' value='${item.itemId}'/>
 	
 	<c:if test="${item.largeImage != null && item.largeImage != ''}">
-		<div class='item-popup-largeimage' style='background-image:url(${item.largeImage})'></div>
+		<div class='item-popup-largeimage' style='background: url(${item.largeImage}) center no-repeat, radial-gradient(#4e4e4e, #181715);'></div>
 	</c:if>
 	
 	<c:if test="${isItemOwner}"><a href='#' onclick='customizeItemOrderPage(${item.itemId})' style='float:left'>Customize</a></c:if>
@@ -22,6 +22,10 @@
 				<c:if test="${item.isGridMapObjectImage==false}">
 					<img src='${item.icon}' border='0'/>
 				</c:if>
+		     	<c:if test="${item.effectOverlay != null}">
+					<div class='icon-overlay' style='background-image:url(${item.effectOverlay}); filter: brightness(${item.effectOverlayBrightness == null ? 1 : item.effectOverlayBrightness })'></div>
+				</c:if>
+				
 		
 			</div>
 			<div style='width:230px'>

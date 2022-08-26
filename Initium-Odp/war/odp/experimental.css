@@ -76,14 +76,13 @@
 
 .button-overlay-major img
 {
-	max-height:50px;
+	max-height:44px;
 }
 
 #immovablesPanel
 {
 	position:absolute;
 }
-
 
 
 
@@ -200,6 +199,7 @@ body[bannerstate='globe-navigation'] .global-navigation-map
 	display:block;
 	opacity:1;
 	visibility:visible;
+	margin-left:215px;
 }
 
 body[bannerstate='globe-navigation'] .minimap-container
@@ -323,7 +323,7 @@ body[bannerstate='combat'] .major-banner-links
 {
 	.major-banner-links
 	{
-		zoom:0.8;
+		zoom:1;
 	}
 	
 }
@@ -345,7 +345,7 @@ body[bannerstate='combat'] .major-banner-links
 {
 	.major-banner-links
 	{
-		zoom:0.5;
+		zoom:0.7;
 	}
 }
 

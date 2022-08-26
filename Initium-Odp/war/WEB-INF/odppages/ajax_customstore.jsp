@@ -81,13 +81,51 @@
 			
 			<div class='tab-pane' id='featured-deals'>
 				<h2>Compatible Skins</h2>
-				<c:if test="${isBuyablesAvailable == false}"><p>Sorry! There are no compatible customizations for this item in the store. Let a content dev know and they might be able to add some!</p></c:if>
-				<c:forEach var="category" items="${buyables}">
+				
+				<c:if test="${noItem == true}">
+					<p>You have to select an item before you can buy a skin for it. Click on an item and then go to the Customize link at the top of the window that pops up.</p>
+				</c:if>
+
+				<c:if test="${noItem==false}">				
+					<c:if test="${isBuyablesAvailable == false}"><p>Sorry! There are no compatible customizations for this item in the store. Let a content dev know and they might be able to add some!</p></c:if>
+					<c:forEach var="category" items="${buyables}">
+						<h5>${category.key}</h5>
+						<div class='custom-store-list-container'>
+							<c:forEach var="item" items="${category.value}">
+								<div class='custom-store-item-container custom-store-${item.rarity}-bg'>
+									<div class='custom-store-large-image-preview' id='large-hover-img-${item.id}' style='display:none'>
+										<c:if test="${item.largeImage == null || item.largeImage == ''}">
+											<p>No large image available.</p>
+										</c:if>
+										<c:if test="${item.largeImage != null && item.largeImage != ''}">
+											<i>Large image preview</i>
+											<img src='${item.largeImage}'/>
+										</c:if>
+									</div>
+									<div onmouseenter='$("#large-hover-img-${item.id}").show();' onmouseleave='$("#large-hover-img-${item.id}").hide();' class='custom-store-item-image' style='background-image:url(${item.icon})'>
+										<div class='custom-store-item-image-overlay' style='background-image: url(${item.effectOverlay}); filter: brightness(${item.effectOverlayBrightness});'></div>										
+									</div>
+									<div class='custom-store-item-cost'>${item.costFormatted}</div>
+									<button class='custom-store-item-buybutton' onclick='orderCustomStoreItem(event, ${itemId}, ${item.id})'>Buy</button>
+									<c:if test="${item.expiryDateFormatted != null}">
+										<div class='custom-store-item-expiry'>${item.expiryDateFormatted} left</div>
+									</c:if> 
+								</div>
+							</c:forEach>
+						</div>
+					</c:forEach>
+				</c:if>
+			</div>
+			
+			<div class='tab-pane' id='all-cosmetics' style='display:none;'>
+				<h2>All Skins</h2>
+				<p>To apply one of these skins to an item, click on the item and then click the Customize link at the top.</p>
+				<c:forEach var="category" items="${allBuyables}">
 					<h5>${category.key}</h5>
 					<div class='custom-store-list-container'>
 						<c:forEach var="item" items="${category.value}">
 							<div class='custom-store-item-container custom-store-${item.rarity}-bg'>
-								<div class='custom-store-large-image-preview' id='large-hover-img-${item.id}' style='display:none'>
+								<div class='custom-store-large-image-preview' id='large-hover-img2-${item.id}' style='display:none'>
 									<c:if test="${item.largeImage == null || item.largeImage == ''}">
 										<p>No large image available.</p>
 									</c:if>
@@ -96,9 +134,8 @@
 										<img src='${item.largeImage}'/>
 									</c:if>
 								</div>
-								<div onmouseenter='$("#large-hover-img-${item.id}").show();' onmouseleave='$("#large-hover-img-${item.id}").hide();' class='custom-store-item-image' style='background-image:url(${item.icon})'></div>
+								<div onmouseenter='$("#large-hover-img2-${item.id}").show();' onmouseleave='$("#large-hover-img2-${item.id}").hide();' class='custom-store-item-image' style='background-image:url(${item.icon})'></div>
 								<div class='custom-store-item-cost'>${item.costFormatted}</div>
-								<button class='custom-store-item-buybutton' onclick='orderCustomStoreItem(event, ${itemId}, ${item.id})'>Buy</button>
 								<c:if test="${item.expiryDateFormatted != null}">
 									<div class='custom-store-item-expiry'>${item.expiryDateFormatted} left</div>
 								</c:if> 
@@ -108,9 +145,7 @@
 				</c:forEach>
 			</div>
 			
-			<div class='tab-pane' id='all-cosmetics' style='display:none;'>
-				<p>Not yet available</p>
-			</div>
+			
 		</div>
 	</c:if>
 		

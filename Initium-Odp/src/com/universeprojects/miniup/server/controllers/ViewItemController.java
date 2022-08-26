@@ -405,18 +405,22 @@ public class ViewItemController extends PageController {
 		if (iconUrl==null)
 		{
 			// Check if we can get the image some other way...
-			iconUrl = GameUtils.getResourceUrl(item.getProperty("GridMapObject:image"));
+			iconUrl = GameUtils.getResourceUrl(item.getProperty("GridMapObject:image")); 
 			if (iconUrl!=null)
 				isGridMapObjectImage = true;
 		}
 		
 		String largeImageUrl = GameUtils.getResourceUrl(item.getProperty("largeImage"));
+		String effectOverlayUrl = GameUtils.getResourceUrl(item.getProperty("effectOverlay"));
+		Double effectOverlayBrightness = (Double) item.getProperty("effectOverlayBrightness");
 		
 		
 		
 		itemMap.put("isGridMapObjectImage", isGridMapObjectImage);
 		itemMap.put("icon", iconUrl);
 		itemMap.put("largeImage", largeImageUrl);
+		itemMap.put("effectOverlay", effectOverlayUrl);
+		itemMap.put("effectOverlayBrightness", effectOverlayBrightness);
 		if (item.getProperty("quantity")!=null)
 			itemMap.put("quantity", GameUtils.formatNumber((Long)item.getProperty("quantity")));
 		

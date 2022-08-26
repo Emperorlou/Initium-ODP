@@ -1692,7 +1692,7 @@ function inspectCellContents()
 		selectedTileY = 500;
 	}
 	
-	miniPagePopup("/odp/gridmapcellcontents?tileX="+selectedTileX+"&tileY="+selectedTileY, "Items Here");	
+	miniPagePopup("/odp/gridmapcellcontents?tileX="+selectedTileX+"&tileY="+selectedTileY, "Items Here", true);	
 }
 
 function isTallTreesDisabled()

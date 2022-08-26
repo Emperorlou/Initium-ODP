@@ -781,7 +781,7 @@ public class MainPageUpdateService extends Service
 			
 			html.append("<div class='global-navigation-button zoom-in standard-button-highlight' onclick='navMapZoomIn(event)'></div>");
 			html.append("<div class='global-navigation-button zoom-out standard-button-highlight' onclick='navMapZoomOut(event)'></div>");
-			html.append("<div class='global-navigation-button local-places standard-button-highlight' onclick='viewLocalNavigation(event)'></div>");
+			//html.append("<div class='global-navigation-button local-places standard-button-highlight' onclick='viewLocalNavigation(event)'></div>");
 			html.append("<script type='text/javascript'>");
 			html.append("$('.global-navigation-map').bind('mousewheel', function(e){");
 			html.append("if(e.originalEvent.wheelDelta /120 > 0) {");

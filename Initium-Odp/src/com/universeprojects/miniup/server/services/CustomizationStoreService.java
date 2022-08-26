@@ -39,7 +39,7 @@ public class CustomizationStoreService extends Service {
 			CachedEntity entry = list.get(i);
 			if (entry.getProperty("saleExpiryDate") != null && ((Date) entry.getProperty("saleExpiryDate")).before(currentDate)) {
 				entry.setProperty("status", "Expired");
-				ds.putOnCommit(entry);
+				ds.put(entry);
 				list.remove(i);
 			}
 		}

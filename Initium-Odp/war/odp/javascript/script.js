@@ -3192,13 +3192,18 @@ function clearMiniPagePopup()
 
 
 
-function miniPagePopup(url, title)
+function miniPagePopup(url, title, noCloseButton)
 {
+	if (noCloseButton == null) noCloseButton = false;
+	clearMiniPagePopup();
+	
 	window.scrollTo(0,0);
+	
+	const closeBtnHtml = noCloseButton == false ? "<a class='mini-page-popup-X' onclick='clearMiniPagePopup()'>X</a>	\r\n" : "";
 	
 	var html = 
 			"<a class='mini-page-popup-reload' onclick='reloadMiniPagePopup()'>&#8635;</a>	\r\n" + 
-			"<a class='mini-page-popup-X' onclick='clearMiniPagePopup()'>X</a>	\r\n" + 
+			closeBtnHtml + 
 			"<h4>"+title+"</h4>\r\n" + 
 			"<div id='mini-page-popup-contents'>\r\n" + 
 			"	<img class='wait' src='/javascript/images/wait.gif' border='0'/>\r\n" + 
@@ -3370,6 +3375,8 @@ function viewGlobeNavigation()
 	if (mapData.length==0) return;
 	html = $(mapData[mapData.length-1]).html();
 	createMapWindow(html);
+	
+	viewLocalNavigation();
 }
 
 function view2DView(forcedMode)
@@ -3382,6 +3389,8 @@ function view2DView(forcedMode)
 		
 		// Call the center function to view the banner centered
 		centerGridOnScreen();
+		
+		inspectCellContents();		
 	}
 
 }
@@ -3648,7 +3657,7 @@ function viewThisLocationWindow()
 
 function viewLocalNavigation(event, showHidden)
 {
-	miniPagePopup("/odp/sublocations?showHidden="+showHidden, "Local Places");
+	miniPagePopup("/odp/sublocations?showHidden="+showHidden, "Local Places", true);
 }
 
 function showLootPopup()

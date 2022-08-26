@@ -42,6 +42,10 @@ public class CommandCustomizationSprite extends Command
 		Long itemId = WebUtils.getLongParam(request, "itemId");
 		CachedEntity item = db.getEntity("Item", itemId);
 		
+		if (item == null)
+			throw new UserErrorMessage("You cannot buy a customization without first selecting an item to apply it to. "
+					+ "Click on an item to customize, and then click on the Customize link at the top to customize it.");
+		
 		if (item.getProperty("quantity")!=null)
 			throw new UserErrorMessage("You cannot customize a stackable item.");
 		
@@ -53,12 +57,18 @@ public class CommandCustomizationSprite extends Command
 		if (customStoreItemDef == null) 
 			throw new UserErrorMessage("The customization you've ordered does not exist.");
 		
+		
+		if (GameUtils.equals(customStoreItemDef.getProperty("status"), "Live") == false)
+			throw new UserErrorMessage("This item is not currently for sale.");
+		
 		// This is mostly just done for tracking purposes
 		doOrderItemSpriteUpdate(db.getCurrentUser(), db.getCurrentCharacter(), item, typeKey);
 		
 		
 		item.setProperty("icon", customStoreItemDef.getProperty("icon"));
 		item.setProperty("largeImage", customStoreItemDef.getProperty("largeImage"));
+		item.setProperty("effectOverlay", customStoreItemDef.getProperty("effectOverlay"));
+		item.setProperty("effectOverlayBrightness", customStoreItemDef.getProperty("effectOverlayBrightness"));
 		
 		db.getDB().put(item);
 

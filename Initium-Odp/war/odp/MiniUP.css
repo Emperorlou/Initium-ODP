@@ -872,6 +872,7 @@ a.main-highlight:HOVER
 }
 .main-item-image-backing
 {
+	position:relative;
 	max-width:34px;
 	max-height:34px;
 	display:inline-block;
@@ -1790,6 +1791,10 @@ a.range-increment {
 	letter-spacing: 0.4px;            
 }
 
+.avatar-effect-overlay {
+    mix-blend-mode: screen;
+}
+
 /* EQUIPMENT AVATAR STYLES 32PX */
 .avatar-equip-silhouette
 {
@@ -2096,10 +2101,21 @@ a.range-increment {
 
 .icon
 {
+	position: relative;
     min-width: 34px;
     min-height: 34px;
     text-align: center;
     vertical-align: top;
+}
+
+.icon-overlay {
+	position: absolute;
+    background-size: contain;
+    mix-blend-mode: screen;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
 }
 
 .icon > img
@@ -3061,9 +3077,19 @@ position: absolute;
 
 /* Minimap */
 
+.minimap-overlay-click-override {
+	position:absolute;
+	top: 0px;
+	bottom: 0px;
+	left:0px;
+	right:0px;
+	z-index: 1;
+	cursor: pointer;
+}
+
 .minimap-container
 {
-	position:fixed;
+	position:fixed; 
 	width:284px;
 	height:283px;
 	right:0px;
@@ -3071,6 +3097,12 @@ position: absolute;
 	transform-origin: 100% 0%;
 	z-index:1000;
 	max-height:55%;
+	transform:scale(0.65);
+}
+
+[bannerstate=location-2d] .minimap-container {
+	opacity: 0;
+	pointer-events: none;
 }
 
 .minimap-locationname
@@ -3215,22 +3247,27 @@ position: absolute;
 
 .mini-page-popup
 {
-	padding-left:7px;
-	background-color:rgba(25,24,23,0.9);
+    padding-left:7px;
+	background-color: rgba(25,24,23,1);
 	display: inline-flex;
-    flex-direction: column;
-    width: 215px;
-    z-index: 10000000;
-    
-    position: absolute;
-    right: 0px;
-    bottom: 0px;
-    max-height: 50%;
-    margin: 0px;
-    border-bottom-width: 0px!important;
-    border-right-width: 0px!important;
-    max-width: 39%;
- }
+	flex-direction: column;
+	width: 215px;
+	z-index: 10000000;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	max-height: 100%;
+	margin: 0px;
+	border-bottom-width: 0px!important;
+	border-right-width: 0px!important;
+	max-width: 39%;
+}
+
+[bannerstate=''] .mini-page-popup {
+	opacity:0;
+	pointer-events: none;
+}
 
 #mini-page-popup-contents
 {
@@ -3305,6 +3342,16 @@ position: absolute;
 	background-color: rgba(0,0,0,0.3);
 	padding-left:4px;
 	overflow-y:auto;
+}
+
+[bannerstate=location-2d] .questPanel {
+	opacity: 0;
+	pointer-events: none;
+}
+
+[bannerstate=globe-navigation] .questPanel {
+	opacity: 0;
+	pointer-events: none;
 }
 
 .questPanel h5
@@ -3451,7 +3498,7 @@ position: absolute;
 {
 	.minimap-container
 	{
-		transform:scale(0.8);
+		transform:scale(0.5);
 		max-height:initial;
 	}		
 	
@@ -3472,7 +3519,7 @@ position: absolute;
 	
 	.minimap-container
 	{
-		transform:scale(0.5);
+		transform:scale(0.4);
 		top:40px;
 		max-height:initial;
 	}	
@@ -5408,7 +5455,7 @@ body
 	}
 	.minimap-container
 	{
-		transform:scale(0.5);
+		transform:scale(0.4);
 		top:40px;
 		max-height:initial;
 	}	
@@ -6020,12 +6067,22 @@ body[longoperation='true'] .long-operation-status
 }
 
 .custom-store-item-image {
+	position:relative;
 	display: inline-block;
 	width: 64px;
 	height: 64px;
 	background-position: center;
 	background-repeat: no-repeat;
-	
+}
+
+.custom-store-item-image-overlay {
+	position: absolute;
+    background-size: contain;
+    mix-blend-mode: screen;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
 }
 
 .custom-store-item-cost {

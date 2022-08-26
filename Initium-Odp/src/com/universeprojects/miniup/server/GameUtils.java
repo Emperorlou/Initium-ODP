@@ -1068,6 +1068,10 @@ public class GameUtils
 			iconUrl = getResourceUrl(item.getProperty("GridMapObject:image"));
 		}
 
+		String effectOverlay = getResourceUrl(item.getProperty("effectOverlay"));
+		Double effectOverlayBrightness = (Double) item.getProperty("effectOverlayBrightness");
+		
+		
 		Long quantity = (Long) item.getProperty("quantity");
 		String quantityDiv = "";
 		if (quantity != null)
@@ -1096,6 +1100,7 @@ public class GameUtils
 					+ "<a class='clue " + qualityClass + "'   " + minitip + " rel='/odp/viewitemmini?proceduralKey=" + proceduralKey + "'>"
 							+ "<div class='main-item-image-backing'>" + quantityDiv + ""
 									+ "<img class='item-icon-img-" + item.getKey().getId() + "' style='max-width:32px; max-height:32px;' src='" + iconUrl + "' border=0/>"
+									+ "<div class='icon-overlay' style='background-image:url("+effectOverlay+"); filter: brightness("+(effectOverlayBrightness == null ? 1d : effectOverlayBrightness)+");'></div>"
 							+ "</div>"
 							+ "<div class='" + lowDurabilityClass + "main-item-name'>" + label + ""
 								+ "<span class='accessible'> " + minitipForAlt + "</span>"
@@ -1107,6 +1112,7 @@ public class GameUtils
 					+ "<a class='" + qualityClass + "'  " + minitip + " onclick='reloadPopup(this, \"" + WebUtils.getFullURL(request) + "\", event)' rel='/odp/viewitemmini?itemId=" + item.getKey().getId() + "'>"
 							+ "<div class='main-item-image-backing'>" + quantityDiv + ""
 									+ "<img class='item-icon-img-" + item.getKey().getId() + "' style='max-width:26px; max-height:26px;' src='" + iconUrl + "' border=0/>"
+									+ "<div class='icon-overlay' style='background-image:url("+effectOverlay+"); filter: brightness("+(effectOverlayBrightness == null ? 1d : effectOverlayBrightness)+");'></div>"
 							+ "</div>"
 							+ "<div class='" + lowDurabilityClass + "main-item-name'>" + label
 								+ "<span class='accessible'> " + minitipForAlt + "</span>"
@@ -1118,6 +1124,7 @@ public class GameUtils
 					+ "<a class='clue " + qualityClass + "'  " + minitip + " rel='/odp/viewitemmini?itemId=" + item.getKey().getId() + "'>"
 							+ "<div class='main-item-image-backing'>" + quantityDiv + ""
 									+ "<img class='item-icon-img-" + item.getKey().getId() + "' style='max-width:32px; max-height:32px;' src='" + iconUrl + "' border=0/>"
+									+ "<div class='icon-overlay' style='background-image:url("+effectOverlay+"); filter: brightness("+(effectOverlayBrightness == null ? 1d : effectOverlayBrightness)+");'></div>"
 							+ "</div>"
 							+ "<div class='" + lowDurabilityClass + "main-item-name'>" + label + ""
 									+ "<span class='accessible'> " + minitipForAlt + "</span>"
@@ -1157,11 +1164,15 @@ public class GameUtils
 		String cssQuality = determineQuality(item.getProperties());
 
 		String iconUrl = getResourceUrl(item.getProperty("icon"));
+		String effectOverlay = getResourceUrl(item.getProperty("effectOverlay"));
 
 		sb.append("		<div class='icon'>");
 		if (item.getProperty("quantity") != null)
 			sb.append("<div class='main-item-quantity-indicator-container'><div class='main-item-quantity-indicator'>" + GameUtils.formatNumber((Long) item.getProperty("quantity")) + "</div></div>");
-		sb.append("<img alt='" + cssQuality.substring(5) + " quality item icon' class='item-icon-img-" + item.getKey().getId() + "' src='" + iconUrl + "' border='0'/></div>\r\n");
+		sb.append("<img alt='" + cssQuality.substring(5) + " quality item icon' class='item-icon-img-" + item.getKey().getId() + "' src='" + iconUrl + "' border='0'/>\r\n");
+		if (effectOverlay!=null)
+			sb.append("<div class='icon-overlay' style='background-image:url("+GameUtils.getResourceUrl(effectOverlay)+")'></div>");
+		sb.append("</div>\r\n");
 		sb.append("		<div style='width:230px'>\r\n");
 
 		String itemName = (String) item.getProperty("name");
@@ -1552,7 +1563,9 @@ public class GameUtils
 
 		if (popupEmbedded)
 			return "<a onclick='reloadPopup(this, \"" + WebUtils.getFullURL(request) + "\", event)' rel='/odp/viewitemmini?itemId=" + collectable.getKey().getId()
-					+ "'><div class='main-item-image-backing'><img src='" + getResourceUrl(collectable.getProperty("icon")) + "' border=0/></div><div class='main-item-name' style='color:#FFFFFF'>"
+					+ "'><div class='main-item-image-backing'>"
+						+ "<img src='" + getResourceUrl(collectable.getProperty("icon")) + "' border=0/>"
+					+ "</div><div class='main-item-name' style='color:#FFFFFF'>"
 					+ collectable.getProperty("name") + "</div></a>";
 		else
 			return "<a rel='/odp/viewitemmini?itemId=" + collectable.getKey().getId() + "'><div class='main-item-image-backing'><img src='" + getResourceUrl(collectable.getProperty("icon"))
@@ -1622,83 +1635,125 @@ public class GameUtils
 		boolean hasInvalidEquipment = false;
 
 		CachedEntity equipmentHelmet = equipment.get(0);
+		String effectOverlayHelmet = null;
 		if (character.getProperty("equipmentHelmet") != null && equipmentHelmet == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentHelmet", null);
 		}
 		String equipmentHelmetUrl = null;
-		if (equipmentHelmet != null) equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty(GameUtils.getItemIconToUseFor("equipmentHelmet", equipmentHelmet)));
+		if (equipmentHelmet != null) {
+			equipmentHelmetUrl = GameUtils.getResourceUrl(equipmentHelmet.getProperty(GameUtils.getItemIconToUseFor("equipmentHelmet", equipmentHelmet)));
+			effectOverlayHelmet = getResourceUrl(equipmentHelmet.getProperty("effectOverlay"));
+		}
 
+		
+		
 		CachedEntity equipmentChest = equipment.get(1);
+		String effectOverlayChest = null;
 		if (character.getProperty("equipmentChest") != null && equipmentChest == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentChest", null);
 		}
 		String equipmentChestUrl = null;
-		if (equipmentChest != null) equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty(GameUtils.getItemIconToUseFor("equipmentChest", equipmentChest)));
-
+		if (equipmentChest != null) {
+			equipmentChestUrl = GameUtils.getResourceUrl(equipmentChest.getProperty(GameUtils.getItemIconToUseFor("equipmentChest", equipmentChest)));
+			effectOverlayChest = getResourceUrl(equipmentChest.getProperty("effectOverlay"));
+		}
+		
+		
 		CachedEntity equipmentLegs = equipment.get(2);
+		String effectOverlayLegs = null;
 		if (character.getProperty("equipmentLegs") != null && equipmentLegs == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentLegs", null);
 		}
 		String equipmentLegsUrl = null;
-		if (equipmentLegs != null) equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty(GameUtils.getItemIconToUseFor("equipmentLegs", equipmentLegs)));
-
+		if (equipmentLegs != null) {
+			equipmentLegsUrl = GameUtils.getResourceUrl(equipmentLegs.getProperty(GameUtils.getItemIconToUseFor("equipmentLegs", equipmentLegs)));
+			effectOverlayLegs = getResourceUrl(equipmentLegs.getProperty("effectOverlay"));
+		}
+		
+		
 		CachedEntity equipmentBoots = equipment.get(3);
+		String effectOverlayBoots = null;
 		if (character.getProperty("equipmentBoots") != null && equipmentBoots == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentBoots", null);
 		}
 		String equipmentBootsUrl = null;
-		if (equipmentBoots != null) equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty(GameUtils.getItemIconToUseFor("equipmentBoots", equipmentBoots)));
-
+		if (equipmentBoots != null) {
+			equipmentBootsUrl = GameUtils.getResourceUrl(equipmentBoots.getProperty(GameUtils.getItemIconToUseFor("equipmentBoots", equipmentBoots)));
+			effectOverlayBoots = getResourceUrl(equipmentBoots.getProperty("effectOverlay"));
+		}
+		
+		
 		CachedEntity equipmentGloves = equipment.get(4);
+		String effectOverlayGloves = null;
 		if (character.getProperty("equipmentGloves") != null && equipmentGloves == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentGloves", null);
 		}
 		String equipmentGlovesUrl = null;
-		if (equipmentGloves != null) equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty(GameUtils.getItemIconToUseFor("equipmentGloves", equipmentGloves)));
+		if (equipmentGloves != null) {
+			equipmentGlovesUrl = GameUtils.getResourceUrl(equipmentGloves.getProperty(GameUtils.getItemIconToUseFor("equipmentGloves", equipmentGloves)));
+			effectOverlayGloves = getResourceUrl(equipmentGloves.getProperty("effectOverlay"));
+		}
 
+		
 		CachedEntity equipmentLeftHand = equipment.get(5);
+		String effectOverlayLeftHand = null;
 		if (character.getProperty("equipmentLeftHand") != null && equipmentLeftHand == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentLeftHand", null);
 		}
 		String equipmentLeftHandUrl = null;
-		if (equipmentLeftHand != null) equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty(GameUtils.getItemIconToUseFor("equipmentLeftHand", equipmentLeftHand)));
-
+		if (equipmentLeftHand != null) {
+			equipmentLeftHandUrl = GameUtils.getResourceUrl(equipmentLeftHand.getProperty(GameUtils.getItemIconToUseFor("equipmentLeftHand", equipmentLeftHand)));
+			effectOverlayLeftHand = getResourceUrl(equipmentLeftHand.getProperty("effectOverlay"));
+		}
+		
+		
 		CachedEntity equipmentRightHand = equipment.get(6);
+		String effectOverlayRightHand = null;
 		if (character.getProperty("equipmentRightHand") != null && equipmentRightHand == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentRightHand", null);
 		}
 		String equipmentRightHandUrl = null;
-		if (equipmentRightHand != null) equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", equipmentRightHand)));
+		if (equipmentRightHand != null) {
+			equipmentRightHandUrl = GameUtils.getResourceUrl(equipmentRightHand.getProperty(GameUtils.getItemIconToUseFor("equipmentRightHand", equipmentRightHand)));
+			effectOverlayRightHand = getResourceUrl(equipmentRightHand.getProperty("effectOverlay"));
+		}
 
+		
 		CachedEntity equipmentShirt = equipment.get(7);
+		String effectOverlayShirt = null;
 		if (character.getProperty("equipmentShirt") != null && equipmentShirt == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentShirt", null);
 		}
 		String equipmentShirtUrl = null;
-		if (equipmentShirt != null) equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty(GameUtils.getItemIconToUseFor("equipmentShirt", equipmentShirt)));
-
+		if (equipmentShirt != null) {
+			equipmentShirtUrl = GameUtils.getResourceUrl(equipmentShirt.getProperty(GameUtils.getItemIconToUseFor("equipmentShirt", equipmentShirt)));
+			effectOverlayShirt = getResourceUrl(equipmentShirt.getProperty("effectOverlay"));
+		}
+		
+		
 		CachedEntity equipmentPet = equipment.get(8);
 		if (character.getProperty("equipmentPet") != null && equipmentPet == null)
 		{
 			hasInvalidEquipment = true;
 			character.setProperty("equipmentPet", null);
 		}
+		
 
 		for (int i = 0; i < equipment.size(); i++)
 		{
@@ -1809,23 +1864,33 @@ public class GameUtils
 			sb.append("<div class='avatar-equip-cloak" + sizePrepend + "' style='background-image:url(\"https://initium-resources.appspot.com/images/ui/newui/avatar-silhouette-male1.png\")'></div>");
 
 			if (equipmentBootsUrl != null) sb.append("<div class='avatar-equip-boots" + sizePrepend + "' style='background-image:url(\"" + equipmentBootsUrl + "\")'></div>");
+			if (effectOverlayBoots != null) sb.append("<div class='avatar-equip-boots" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayBoots + "\")"+getEffectOverlayBrightnessCss(equipmentBoots)+"'></div>");
 			if (equipmentLegsUrl != null) sb.append("<div class='avatar-equip-legs" + sizePrepend + "' style='background-image:url(\"" + equipmentLegsUrl + "\")'></div>");
+			if (effectOverlayLegs != null) sb.append("<div class='avatar-equip-legs" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayLegs + "\")"+getEffectOverlayBrightnessCss(equipmentLegs)+"'></div>");
 			if (equipmentShirtUrl != null) sb.append("<div class='avatar-equip-shirt" + sizePrepend + "' style='background-image:url(\"" + equipmentShirtUrl + "\")'></div>");
+			if (effectOverlayShirt != null) sb.append("<div class='avatar-equip-shirt" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayShirt + "\")"+getEffectOverlayBrightnessCss(equipmentShirt)+"'></div>");
 			if (equipmentChestUrl != null) sb.append("<div class='avatar-equip-chest" + sizePrepend + "' style='background-image:url(\"" + equipmentChestUrl + "\")'></div>");
+			if (effectOverlayChest != null) sb.append("<div class='avatar-equip-chest" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayChest + "\")"+getEffectOverlayBrightnessCss(equipmentChest)+"'></div>");
 			if (equipmentHelmetUrl != null) sb.append("<div class='avatar-equip-helmet" + sizePrepend + "' style='background-image:url(\"" + equipmentHelmetUrl + "\")'></div>");
+			if (effectOverlayHelmet != null) sb.append("<div class='avatar-equip-helmet" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayHelmet + "\")"+getEffectOverlayBrightnessCss(equipmentHelmet)+"'></div>");
 			if (equipmentGlovesUrl != null)
 			{
 				sb.append("<div class='avatar-equip-gloves-left" + sizePrepend + "' style='background-image:url(\"" + equipmentGlovesUrl + "\")'></div>");
+				if (effectOverlayGloves != null) sb.append("<div class='avatar-equip-gloves-left" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayGloves + "\")"+getEffectOverlayBrightnessCss(equipmentGloves)+"'></div>");
 				sb.append("<div class='avatar-equip-gloves-right" + sizePrepend + "' style='background-image:url(\"" + equipmentGlovesUrl + "\")'></div>");
+				if (effectOverlayGloves != null) sb.append("<div class='avatar-equip-gloves-right" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayGloves + "\")"+getEffectOverlayBrightnessCss(equipmentGloves)+"'></div>");
 			}
 			if (is2Handed == false)
 			{
 				if (equipmentLeftHandUrl != null) sb.append("<div class='avatar-equip-leftHand" + sizePrepend + "' style='background-image:url(\"" + equipmentLeftHandUrl + "\")'></div>");
+				if (effectOverlayLeftHand != null) sb.append("<div class='avatar-equip-leftHand" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayLeftHand+ "\")"+getEffectOverlayBrightnessCss(equipmentLeftHand)+"'></div>");
 				if (equipmentRightHandUrl != null) sb.append("<div class='avatar-equip-rightHand" + sizePrepend + "' style='background-image:url(\"" + equipmentRightHandUrl + "\")'></div>");
+				if (effectOverlayRightHand != null) sb.append("<div class='avatar-equip-rightHand" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayRightHand + "\")"+getEffectOverlayBrightnessCss(equipmentRightHand)+"'></div>");
 			}
 			else
 			{
 				if (equipmentRightHandUrl != null) sb.append("<div class='avatar-equip-2hands" + sizePrepend + "' style='background-image:url(\"" + equipmentRightHandUrl + "\")'></div>");
+				if (effectOverlayRightHand!= null) sb.append("<div class='avatar-equip-2hands" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayRightHand+ "\")"+getEffectOverlayBrightnessCss(equipmentRightHand)+"'></div>");
 			}
 		}
 		else
@@ -1875,6 +1940,15 @@ public class GameUtils
 		sb.append("</div>");
 
 		return sb.toString();
+	}
+	
+	private static String getEffectOverlayBrightnessCss(CachedEntity entity) {
+		if (entity.getProperty("effectOverlay") == null || entity.getProperty("effectOverlayBrightness") == null) return "";
+		
+		Double effectOverlayBrightness = (Double) entity.getProperty("effectOverlayBrightness");
+		
+		
+		return "; filter: brightness(" + effectOverlayBrightness + ");";
 	}
 
 	public static String getItemIconToUseFor(String equipmentSlot, CachedEntity itemInSlot)
