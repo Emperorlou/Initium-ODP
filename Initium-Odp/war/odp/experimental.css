@@ -19,6 +19,7 @@
 }	
 .major-banner-links
 {
+	z-index:13000;
 	top:0px;
 	left:50%;
 	margin-left: -125px;
@@ -136,9 +137,13 @@ body[bannerstate='location-2d'] #banner-text-overlay, body[bannerstate='location
 	visibility:hidden;
 }
 
-body[bannerstate='location-2d'] #partyPanel, body[bannerstate='location-2d'] #inBannerCharacterWidget, body[bannerstate='location-2d'] .major-banner-links
+body[bannerstate='location-2d'] #partyPanel, body[bannerstate='location-2d'] #inBannerCharacterWidget
 {
-	z-index:10000;
+	z-index:12000;
+}
+
+body[bannerstate='location-2d'] .major-banner-links {
+	z-index:13000;
 }
 
 body[bannerstate='location-2d'] #twodview-button
@@ -152,7 +157,9 @@ body[bannerstate='combat-2d'] .location-2d
 	visibility:visible;
 }
 
-body[bannerstate='combat-2d'] #immovablesPanel, body[bannerstate='combat-2d'] #gridmap-inspect-button
+body[bannerstate='combat-2d'] #immovablesPanel, 
+body[bannerstate='combat-2d'] #gridmap-inspect-button,
+body[bannerstate='combat-2d'] .mini-page-popup
 {
 	opacity:0;
 	visibility:hidden;

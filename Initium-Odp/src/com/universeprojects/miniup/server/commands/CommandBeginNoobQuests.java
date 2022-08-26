@@ -70,6 +70,8 @@ public class CommandBeginNoobQuests extends Command
 		
 		ds.put(quest.getRawEntity());
 		
+		getMPUS().updateFullPage_shortcut();
+		
 		setJavascriptResponse(JavascriptResponse.ReloadPagePopup);
 		
 		

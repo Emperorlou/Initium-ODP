@@ -37,6 +37,10 @@ public class QuestEntity extends InitiumEntityBase
 		return "Quest";
 	}
 
+	public Key getCharacterKey() {
+		return (Key) entity.getProperty("characterKey");
+	}
+	
 	public QuestStatus getStatus()
 	{
 		if (entity.getProperty("status")==null) return QuestStatus.Active;

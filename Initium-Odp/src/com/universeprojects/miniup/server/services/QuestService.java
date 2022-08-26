@@ -32,6 +32,21 @@ public class QuestService extends Service
 		this.character = character;
 	}
 
+	public void deleteQuest(Key quest) {
+		ds.delete(quest);
+	}
+	
+	public void deleteAllCurrentQuests() {
+		List<QuestEntity> quests = getActiveQuests();
+		
+		List<Key> questsToDelete = new ArrayList<>();
+		for(QuestEntity quest:quests)
+			questsToDelete.add(quest.getQuestDefKey());
+		
+		ds.delete(questsToDelete);
+	}
+	
+	
 	private List<QuestDefEntity> allQuestDefs = null;
 	public List<QuestDefEntity> getAllQuestDefs()
 	{

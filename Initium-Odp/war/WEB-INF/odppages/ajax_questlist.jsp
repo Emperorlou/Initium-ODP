@@ -15,6 +15,8 @@
 	<c:forEach var="quest" items="${activeQuests}">
 		<div class='quest-container' id='questlist-questkey-${quest.key}'>
 			<a onclick='viewQuest("${quest.key}")'>${quest.name}</a>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<p style='display:inline-block'><a onclick='deleteQuest("${quest.key}")' title='End this quest'>Stop Permanently</a></p>
 		</div>
 	</c:forEach>
 </c:if>

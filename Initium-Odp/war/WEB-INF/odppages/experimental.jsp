@@ -579,20 +579,18 @@ Version: ${version}
 						${partyPanel}
 						</div>
 						
+							<!-- 
 						<div class='minimap-container auto-animate'>
 							<div class='minimap-overlay-click-override' onclick='toggleMovementState()'></div>
-							<!-- <div class="minimap-locationname"><span class='v3-window1'>Aera</span></div> // I don't think we want this anymore since we now have the top bar-->
 							<div class='map-contents minimap-contents'>
 								${globalNavigationMap}
 							</div>
 							<div class='minimap-overlay'></div>
-							<!-- 
 							<div class='minimap-button minimap-button-zoom-in' onclick='minimapZoomIn()'></div>
 							<div class='minimap-button minimap-button-zoom-out' onclick='minimapZoomOut()'></div>
 							<div class='minimap-button minimap-button-map' onclick='toggleMovementState()'></div>
 							<div class='minimap-button minimap-button-viewallpaths' onclick='makeIntoPopup(".navigation-box")'></div>
 							<div class='minimap-button minimap-button-localplaces standard-button-highlight' onclick='viewLocalNavigation(event)'></div>
-							 -->
 							<div class='minimap-button minimap-button-cancel standard-button-highlight' onclick='cancelLongOperations(event)' style='display:none'></div>
 							
 							<script type='text/javascript'>
@@ -608,15 +606,16 @@ Version: ${version}
 							</script>
 							
 						</div>
+							 -->
 						
 						<div class='map-contents global-navigation-map auto-animate'>${globalNavigationMap}</div>
 											
 						<div class="path-overlay-link major-banner-links auto-animate">
 						
 							<a id='homebanner-button' class='button-overlay-major' onclick='viewBannerDefault()' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/home-banner1.png'></a>
-							<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>
 							<a id="movement-button" class="button-overlay-major" onclick="toggleMovementState()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
-							<a id="twodview-button" class="button-overlay-major" onclick="view2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
+							<a id="twodview-button" class="button-overlay-major" onclick="toggle2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
+							<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/main-more-button1.png'></a>
 						</div>			
 						
 						<div style='position:absolute;bottom: 26px; width:100%; text-align:center;pointer-events:none;'><div class='path-overlay-link auto-animate' id='monsterCountPanel'>${monsterCountPanel}</div></div>

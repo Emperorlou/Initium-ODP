@@ -144,7 +144,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		GridMapService gridMapService = new GridMapService(db, location);
 		newHtml.append("<div id='viewportcontainer' class='vpcontainer'>");
 		newHtml.append("<div id='viewport' class='vp'>");
-
+		newHtml.append("	<a class='page-popup-X' style='right: 0px;top: -10px;' onclick='toggle2DView()'>X</a>");
 //		newHtml.append("	<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
 		newHtml.append("	<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
 		newHtml.append("	<div class='cursorSubObject' id='gridmap-repeatinvention-button' onclick=''></div>");
@@ -256,12 +256,12 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 			js.append("onCombatBegin();");
 		else if (CommonChecks.checkCharacterIsIncapacitated(character)==false && 
 				CommonChecks.checkLocationIsCombatSite(location))
-			js.append("view2DView(true);");
+			js.append("toggle2DView(true);");
 		else if (CommonChecks.checkCharacterIsIncapacitated(character)==false && 
 				CommonChecks.checkLocationIsCombatSite(location))
-			js.append("view2DView(true);");
+			js.append("toggle2DView(true);");
 		else if (CommonChecks.checkLocationIsNaturalResourceSite(location))
-			js.append("view2DView(true);");
+			js.append("toggle2DView(true);");
 //		else if (CommonChecks.checkCharacterIsInCombat(character)==false)
 //			js.append("ensureNotInCombatView();");
 		else 

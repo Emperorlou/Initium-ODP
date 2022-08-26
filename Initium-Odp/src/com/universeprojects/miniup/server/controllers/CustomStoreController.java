@@ -120,7 +120,7 @@ public class CustomStoreController extends PageController {
 			
 			// Sanitize
 			if (icon == null) continue;
-			if (rarity == null) rarity = "Common";	 
+			if (rarity == null) rarity = "Common";	     
 			rarity = rarity.toLowerCase();
 			
 			// Get the correct category 

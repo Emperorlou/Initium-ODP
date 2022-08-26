@@ -1763,7 +1763,7 @@ a.range-increment {
 }
 .chat-embedded-item .main-item-image-backing
 {
-	position:inherit;
+	/*position:inherit;*/
 }
 
 .chat-embedded-item .main-item-name
@@ -3030,7 +3030,7 @@ position: absolute;
     right: 4px;
     bottom: 2px;
     margin: 0px;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: 1px 1px 2px #000, 0 0 9px black, 0 0 9px black, 0 0 9px black;
     text-align: right;
     font-size:12px;    
 }
@@ -3252,7 +3252,7 @@ position: absolute;
 	display: inline-flex;
 	flex-direction: column;
 	width: 215px;
-	z-index: 10000000;
+	z-index:12000;
 	position: absolute;
 	top: 0px;
 	left: 0px;
@@ -3851,12 +3851,15 @@ position: absolute;
 	}
 	#inBannerCharacterWidget
 	{
-		margin-top:0px;
+		margin-top:50px;
 		margin-left:0px;
+	}
+	#partyPanel {
+		padding-top: 40px;
 	}
 	#inBannerCombatantWidget
 	{
-		margin-top:0px;
+		margin-top:50px;
 		margin-right:0px;
 	}
 	.character-display-box

@@ -2651,6 +2651,10 @@ function viewQuests()
 	pagePopup("/odp/questlist", null, "Available Quests");
 }
 
+function deleteQuest(questId) {
+	doCommand(event, "DeleteQuest", {questId:questId})
+}
+
 function pinQuest(id)
 {
 	doCommand(event, "PinQuest", {questId:id})
@@ -3379,18 +3383,22 @@ function viewGlobeNavigation()
 	viewLocalNavigation();
 }
 
-function view2DView(forcedMode)
+function view2DView() {
+	$("body").attr("bannerstate", "location-2d");
+
+	inspectCellContents();
+	
+	// Call the center function to view the banner centered
+	centerGridOnScreen();
+}
+
+function toggle2DView(forcedMode)
 {
 	if (forcedMode==false || (forcedMode==null && $("body").attr("bannerstate")==="location-2d"))
 		viewBannerDefault();
 	else
 	{
-		$("body").attr("bannerstate", "location-2d");
-		
-		// Call the center function to view the banner centered
-		centerGridOnScreen();
-		
-		inspectCellContents();		
+		view2DView();
 	}
 
 }
@@ -3399,7 +3407,7 @@ function ensureNotInCombatView()
 {
 	var val = $("body").attr("bannerstate");
 	if (val=="combat-2d")
-		$("body").attr("bannerstate", "location-2d");
+		view2DView();
 }
 
 function setBannerSizeMode(mode)
@@ -3657,7 +3665,7 @@ function viewThisLocationWindow()
 
 function viewLocalNavigation(event, showHidden)
 {
-	miniPagePopup("/odp/sublocations?showHidden="+showHidden, "Local Places", true);
+	miniPagePopup("/odp/sublocations?showHidden="+showHidden, "Places Here", true);
 }
 
 function showLootPopup()
