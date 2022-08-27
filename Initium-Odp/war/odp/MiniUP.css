@@ -2831,6 +2831,7 @@ position: absolute;
     color:#EEEEEE;
     z-index:1000101;
     font-size:15px;
+	white-space: nowrap;    
 }
 
 .move-items-column .main-item
@@ -3269,6 +3270,16 @@ position: absolute;
 	pointer-events: none;
 }
 
+[bannerstate='combat-2d'] .mini-page-popup {
+	opacity:0;
+	pointer-events: none;
+}
+
+[bannerstate='combat'] .mini-page-popup {
+	opacity:0;
+	pointer-events: none;
+}
+
 #mini-page-popup-contents
 {
 	overflow-y: auto;
@@ -3349,10 +3360,13 @@ position: absolute;
 	pointer-events: none;
 }
 
-[bannerstate=globe-navigation] .questPanel {
+[bannerstate=globe-navigation] .questPanel
+{
 	opacity: 0;
 	pointer-events: none;
 }
+
+
 
 .questPanel h5
 {
@@ -3860,6 +3874,19 @@ position: absolute;
 	#inBannerCombatantWidget
 	{
 		margin-top:50px;
+		margin-right:0px;
+	}
+	.classic-ui #inBannerCharacterWidget
+	{
+		margin-top:0px;
+		margin-left:0px;
+	}
+	.classic-ui #partyPanel {
+		padding-top: 0px;
+	}
+	.classic-ui #inBannerCombatantWidget
+	{
+		margin-top:0px;
 		margin-right:0px;
 	}
 	.character-display-box
@@ -5191,7 +5218,7 @@ body
     background-image: url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-in1.png);
     width: 43px;
     height: 43px;
-    top: -53px;
+    bottom: -53px;
     right: 61px;
     cursor:pointer;
 }
@@ -5202,7 +5229,7 @@ body
     background-image: url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-out1.png);
     width: 43px;
     height: 43px;
-    top: -53px;
+    bottom: -53px;
     right: 13px;
     cursor:pointer;
 }
@@ -5730,6 +5757,7 @@ body[longoperation='true'] #banner-text-overlay
 	visibility:hidden;
 	opacity:0;	
 	pointer-events: none;
+	z-index:13000;
 }
 
 body[longoperation='true'] .long-operation-status
@@ -5737,6 +5765,12 @@ body[longoperation='true'] .long-operation-status
 	visibility:visible;
 	opacity:1;	
 }
+
+[bannerstate=globe-navigation] #long-operation-status {
+	opacity: 0;
+	pointer-events: none;
+}
+
 
 .long-operation-status-title
 {

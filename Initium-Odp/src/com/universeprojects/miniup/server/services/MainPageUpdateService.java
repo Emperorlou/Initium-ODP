@@ -709,7 +709,7 @@ public class MainPageUpdateService extends Service
 		{
 			html.append("<script type='text/javascript'>");
 			html.append("	viewBannerDefault();");
-			html.append("</script>");
+			html.append("</script>");  
 		}
 		else
 		{

@@ -144,7 +144,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		GridMapService gridMapService = new GridMapService(db, location);
 		newHtml.append("<div id='viewportcontainer' class='vpcontainer'>");
 		newHtml.append("<div id='viewport' class='vp'>");
-		newHtml.append("	<a class='page-popup-X' style='right: 0px;top: -10px;' onclick='toggle2DView()'>X</a>");
+		newHtml.append("	<a id='button-2d-view-X' class='page-popup-X' style='right: 0px;top: -10px;' onclick='onBannerDefaultClicked()'>X</a>");
 //		newHtml.append("	<div class='standard-button-highlight' id='gridmap-inspect-button' onclick='inspectCellContents()'></div>");
 		newHtml.append("	<div class='cursorSubObject' id='gridmap-talltrees-button' onclick='toggleTallTrees(event)'></div>");
 		newHtml.append("	<div class='cursorSubObject' id='gridmap-repeatinvention-button' onclick=''></div>");
@@ -158,7 +158,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 		newHtml.append("	<div id='light-grid'></div>");
 
 		newHtml.append("	<div class='shortcut-overlay-2d'>");
-		newHtml.append("		<div style='position:absolute;top:15.0%;left:50.0%;'><a onclick='doAutoExplore(event);' class='auto-explore-link path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>Explore</a></div>");
+		newHtml.append("		<div style='position:absolute;top:18.0%;left:50.0%;'><a onclick='doAutoExplore(event);' class='auto-explore-link path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>Explore</a></div>");
 //		newHtml.append("		<div style='position:absolute;top:85.0%;left:50.0%;'><a onclick='loadLocationItems(event);' class='path-overlay-link' style='position:relative; margin-left:-50%; margin-top:-50%;'>Nearby Items</a></div>");
 		newHtml.append("	</div>");
 
@@ -236,7 +236,7 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 	{
 		String html = super.updateGlobalNavigationMap();
 		
-		html = "<a class='page-popup-X' onclick='toggleMovementState()'>X</a>"+html;
+		html = "<a class='page-popup-X' onclick='onBannerDefaultClicked()'>X</a>"+html;
 		
 		return updateHtmlContents(".map-contents", html);
 	}
@@ -262,10 +262,13 @@ public class ExperimentalPageUpdateService extends MainPageUpdateService
 			js.append("toggle2DView(true);");
 		else if (CommonChecks.checkLocationIsNaturalResourceSite(location))
 			js.append("toggle2DView(true);");
+		else if (CommonChecks.checkLocationIsTopdownMode(location)) {
+			js.append("viewBannerDefault();");
+		}
 //		else if (CommonChecks.checkCharacterIsInCombat(character)==false)
 //			js.append("ensureNotInCombatView();");
 		else 
-			js.append("viewBannerDefault();");
+			js.append("viewRestoreLastViewState();");
 		
 		if (CommonChecks.checkLocationIsTopdownMode(location))
 			js.append("setBannerSizeMode('contain');");

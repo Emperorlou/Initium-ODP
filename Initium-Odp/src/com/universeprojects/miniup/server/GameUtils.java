@@ -41,7 +41,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils
 {
-	final public static String version = "0.5.9-184";
+	final public static String version = "0.5.9-198";
 
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 

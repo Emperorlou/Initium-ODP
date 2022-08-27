@@ -54,6 +54,7 @@
     left: 0px;
     right: 0px;
     margin: -13px;
+    margin-left: 215px;
 
 }
 
@@ -159,7 +160,8 @@ body[bannerstate='combat-2d'] .location-2d
 
 body[bannerstate='combat-2d'] #immovablesPanel, 
 body[bannerstate='combat-2d'] #gridmap-inspect-button,
-body[bannerstate='combat-2d'] .mini-page-popup
+body[bannerstate='combat-2d'] .mini-page-popup,
+body[bannerstate='combat-2d'] #button-2d-view-X
 {
 	opacity:0;
 	visibility:hidden;
@@ -219,6 +221,10 @@ body[bannerstate='globe-navigation'] .minimap-container
 body[bannerstate='globe-navigation'] #movement-button
 {
 	filter: drop-shadow(0px 0px 12px #FFFFCC) brightness(1.6);
+}
+
+body[bannerstate=''] #homebanner-button {
+    filter: drop-shadow(0px 0px 12px #FFFFCC) brightness(1.6);
 }
 
 

@@ -293,7 +293,7 @@ $(document).bind("keydown",function(e)
     
     if (e.keyCode == 27) 
     {
-    	if (window.viewBannerDefault!=null) viewBannerDefault();
+    	if (window.viewBannerDefault!=null) onBannerDefaultClicked();
     }
 });
 
@@ -3383,8 +3383,10 @@ function viewGlobeNavigation()
 	viewLocalNavigation();
 }
 
+
 function view2DView() {
 	$("body").attr("bannerstate", "location-2d");
+	
 
 	inspectCellContents();
 	
@@ -3392,13 +3394,27 @@ function view2DView() {
 	centerGridOnScreen();
 }
 
+function on2DViewButtonClicked() {
+	localStorage.setItem("lastViewState", toggle2DView());
+}
+
+function ensureWeAreNotInMovementState() {
+	if (localStorage.getItem("lastViewState") == "globe-navigation") {
+		localStorage.setItem("lastViewState", "");
+		viewBannerDefault();
+	}
+}
+
 function toggle2DView(forcedMode)
 {
-	if (forcedMode==false || (forcedMode==null && $("body").attr("bannerstate")==="location-2d"))
+	if (forcedMode==false || (forcedMode==null && $("body").attr("bannerstate")==="location-2d")) {
 		viewBannerDefault();
+		return "";
+	}
 	else
 	{
 		view2DView();
+		return "location-2d";
 	}
 
 }
@@ -4405,6 +4421,7 @@ function doExperiment(event, itemId)
 	if (itemId!=null) checkIds = [itemId];
 	
 	showBannerLoadingIcon();
+	ensureWeAreNotInMovementState();
 	longOperation(event, "InventionExperimentNew", {itemIds:checkedIds}, 
 			function(action) // responseFunction
 			{
@@ -4464,6 +4481,7 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 	}
 	
 	showBannerLoadingIcon();
+	ensureWeAreNotInMovementState();
 	//BeginPrototype
 	longOperation(event, "InventionPrototypeNew", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId, autoStart:autoStart}, 
 			function(action) // responseFunction
@@ -4516,6 +4534,7 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 	closeAllTooltips();
 	
 	showBannerLoadingIcon();
+	ensureWeAreNotInMovementState();
 	//DoSkillConstructItem
 	longOperation(event, "InventionConstructItemSkillNew", {skillName:skillName, constructItemSkillId:skillId,repsUniqueId:repsUniqueId, autoStart:autoStart}, 
 			function(action) // responseFunction
@@ -4555,6 +4574,7 @@ function doCollectCollectable(event, collectableId, userRequestId)
 {
 	clearMakeIntoPopup();
 	showBannerLoadingIcon();
+	ensureWeAreNotInMovementState();
 	longOperation(event, "CollectCollectable", {collectableId:collectableId},  
 			function(action) // responseFunction
 			{
@@ -4635,6 +4655,7 @@ function doExplore(event, ignoreCombatSites, findNaturalResources)
 	if (findNaturalResources==null)
 		findNaturalResources = false;
 	showBannerLoadingIcon();
+	ensureWeAreNotInMovementState();
 	longOperation(event, "Explore", {ignoreCombatSites:ignoreCombatSites, findNaturalResources:findNaturalResources}, 
 			function(action) // responseFunction
 			{
@@ -4663,6 +4684,7 @@ function doExplore(event, ignoreCombatSites, findNaturalResources)
 function doRest()
 {
 	showBannerLoadingIcon();
+	ensureWeAreNotInMovementState();
 	longOperation(null, "Rest", null, 
 			function(action) // responseFunction
 			{
@@ -4691,6 +4713,7 @@ function doRest()
 function doCampDefend()
 {
 	showBannerLoadingIcon();
+	ensureWeAreNotInMovementState();
 	longOperation(null, "CampDefend", null, 
 			function(action) // responseFunction
 			{
@@ -4714,6 +4737,7 @@ function doCampDefend()
 function doCampCreate(campName)
 {
 	showBannerLoadingIcon();
+	ensureWeAreNotInMovementState();
 	longOperation(null, "CampCreate", {"name":campName}, 
 		function(action) // responseFunction
 		{

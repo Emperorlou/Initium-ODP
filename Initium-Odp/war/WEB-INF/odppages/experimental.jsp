@@ -435,9 +435,26 @@ function decrementStackIndex()
 	return currentPopupStackIndex;
 }
 
+function onBannerDefaultClicked() {
+	viewBannerDefault();
+	localStorage.setItem("lastViewState", "");
+}
+
 function viewBannerDefault()
 {
 	$("body").attr("bannerstate", "");
+}
+
+function viewRestoreLastViewState()
+{
+	const lastViewState = localStorage.getItem("lastViewState");
+	if (lastViewState == "location-2d") {
+		
+	} else if (lastViewState == "globe-navigation") {
+		viewMovementState();
+	} else {
+		viewBannerDefault();
+	}
 }
 
 function onCombatBegin()
@@ -456,19 +473,30 @@ function onCombat2DBegin()
 	$("body").attr("bannerstate", "combat-2d");
 }
 
+function viewMovementState() {
+	$("body").attr("bannerstate", "globe-navigation");
+	
+	// A special case of the globe nav map is blank, we'll actually also fire to open the local nav for convenience
+	viewLocalNavigation();
+}
+
+
+function onMovementButtonClicked() {
+	localStorage.setItem("lastViewState", toggleMovementState());
+}
 
 function toggleMovementState()
 {
 	
 	
-	if ($("body").attr("bannerstate")==="globe-navigation")
+	if ($("body").attr("bannerstate")==="globe-navigation") {
 		viewBannerDefault();
+		return "";
+	}
 	else
 	{
-		$("body").attr("bannerstate", "globe-navigation");
-		
-		// A special case of the globe nav map is blank, we'll actually also fire to open the local nav for convenience
-		viewLocalNavigation();
+		viewMovementState();
+		return "globe-navigation";
 	}
 }
 
@@ -612,10 +640,10 @@ Version: ${version}
 											
 						<div class="path-overlay-link major-banner-links auto-animate">
 						
-							<a id='homebanner-button' class='button-overlay-major' onclick='viewBannerDefault()' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/home-banner1.png'></a>
-							<a id="movement-button" class="button-overlay-major" onclick="toggleMovementState()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
-							<a id="twodview-button" class="button-overlay-major" onclick="toggle2DView()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
-							<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/main-more-button1.png'></a>
+							<a id='homebanner-button' class='button-overlay-major' minitip='Open main view' onclick='onBannerDefaultClicked()' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/home-banner1.png'></a>
+							<a id="movement-button" class="button-overlay-major" minitip='Navigation/movement mode' onclick="onMovementButtonClicked()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
+							<a id="twodview-button" class="button-overlay-major" minitip='Open this location`s 2D view' onclick="on2DViewButtonClicked()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
+							<a id='thisLocation-button' class='button-overlay-major' minitip='Other stuff you can do here' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/main-more-button1.png'></a>
 						</div>			
 						
 						<div style='position:absolute;bottom: 26px; width:100%; text-align:center;pointer-events:none;'><div class='path-overlay-link auto-animate' id='monsterCountPanel'>${monsterCountPanel}</div></div>
@@ -626,7 +654,11 @@ Version: ${version}
 							<div class='progress-bar1'>
 						    	<div class='progress-bar-fill auto-animate-1s-linear'></div><div class='progress-bar-text text-shadow'></div>
 						    </div>
-						    <p><a class='text-shadow' style='pointer-events: auto;' onclick='cancelLongOperations(event)'>Cancel</a></p>
+						    <p>
+							    <a class='text-shadow' style='pointer-events: auto;' onclick='cancelLongOperations(event)'>
+							    	<img src="https://initium-resources.appspot.com/images/ui4/button-cancel1.png" alt="Cancel">
+							    </a>
+						    </p>
 						</div>
 
 						<div class='questPanel'>${questPanel}</div>
