@@ -9,7 +9,8 @@
 					<div class='mini-window-header-split'>
 						<a onclick='$(".cluetip").hide(); joinPartyCharacter(event, ${characterIDKey})'>Join Party</a><br><br>
 						<a onclick='$(".cluetip").hide(); setPrivateChatTo("${characterNameStr}", ${characterIDKey})'>Private Chat</a><br><br>
-						<a onclick='$(".cluetip").hide(); ignoreAPlayer(${characterID}, "${characterNameStr}");'>Ignore</a>
+						<a onclick='$(".cluetip").hide(); ignoreAPlayer(${characterID}, "${characterNameStr}");'>Ignore</a><br><br>
+						<a onclick='tipCreditsTo("${characterName}")'>Tip Credits</a>
 					</div>
 				</c:if>
 				

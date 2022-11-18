@@ -1751,6 +1751,21 @@ function refreshInstanceRespawnWarning()
 //	});
 //}
 
+function tipCreditsTo(name)
+{
+	closeAllTooltips();
+	
+	if (name==null) return;
+	
+	promptPopup("Tip Credits to Another Player", "Please specify how much of a tip (in credits) you want to give to " + name + ":", "0", function(credits){
+		confirmPopup("Anonymous tip?", "Do you wish to remain anonymous? The player receiving the tip will not know who gave it to them if you choose yes.", function(){
+			doCommand(null, "TipCreditsToPlayer", {characterName:name, anonymous:true, credits:credits});
+		}, function(){
+			doCommand(null, "TipCreditsToPlayer", {characterName:name, anonymous:false, credits:credits});
+		});
+	});
+}
+
 function giftPremium(name)
 {
 	closeAllTooltips();
@@ -3381,6 +3396,8 @@ function viewGlobeNavigation()
 	createMapWindow(html);
 	
 	viewLocalNavigation();
+	
+	clearMakeIntoPopup();
 }
 
 
@@ -3806,6 +3823,7 @@ function activateWaitGif(eventObject)
 }
 
 window.commandInProgress = false;
+window.commandInProgressName = null;
 function doCommand(eventObject, commandName, parameters, callback, userRequestId)
 {
 	if (window.commandInProgress==true)
@@ -3855,11 +3873,13 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	}
 	
 	window.commandInProgress = true;
+	window.commandInProgressName = commandName;
 	// We need to post, as larger batch operations failed due to URL string being too long
 	$.post(url, parameters)
 	.done(function(data)
 	{
 		window.commandInProgress = false;
+		window.commandInProgressName = null;
 		// Return clicked element back to original state first.
 		// Ajax updates get overwritten if they're not simple updates
 		// on the original element.
@@ -3927,6 +3947,7 @@ function doCommand(eventObject, commandName, parameters, callback, userRequestId
 	.fail(function(data)
 	{
 		window.commandInProgress = false;
+		window.commandInProgressName = null;
 		popupMessage("ERROR", "There was a server error when trying to perform the "+commandName+" command. Feel free to report this on <a href='http://initium.reddit.com'>/r/initium</a>. A log has been generated.");
 		if (eventObject!=null)
 			clickedElement.html(originalText.replace("hasTooltip", ""));
@@ -4008,7 +4029,7 @@ function doTerritorySetDefense(eventObject, line)
 ////////////////////////////////////////////////////////
 // LONG OPERATIONS
 
-
+var longOperationName = null;
 var longOperationCountdownTimer = null;
 function startLongOperationCountdown(data)
 {
@@ -4022,6 +4043,7 @@ function startLongOperationCountdown(data)
 	
 	stopLongOperationCountdown();
 	longOperationCountdownTimer = setInterval(updateLongOperationTimeLeft, 1000);
+	longOperationName = data.longOperationName;
 	
 	showLongOperationProgress();
 	setLongOperationProgress(totalSeconds-timeLeftSeconds/totalSeconds, data.longOperationName, data.longOperationDescription);
@@ -4155,8 +4177,10 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 	else
 	{
 		parameters.v = verifyCode;
-		parameters.selected2DTileX = selectedTileX;
-		parameters.selected2DTileY = selectedTileY;
+		if (parameters.selected2DTileX == null)
+			parameters.selected2DTileX = selectedTileX;
+		if (parameters.selected2DTileY == null)
+			parameters.selected2DTileY = selectedTileY;
 		parameters.uiStyle = uiStyle;
 	}
 	
@@ -4192,10 +4216,12 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 	
 
 	window.commandInProgress=true;
+	window.commandInProgressName = commandName;
 	$.post(url, parameters)
 	.done(function(data)
 	{
 		window.commandInProgress=false;
+		window.commandInProgressName = null;
 		if (clickedElement!=null)
 		{
 			clickedElement.html(originalText);
@@ -4299,6 +4325,7 @@ function longOperation(eventObject, commandName, parameters, responseFunction, r
 	})
 	.fail(function(xhr, textStatus, errorThrown){
 		window.commandInProgress=false;
+		window.commandInProgressName = null;
 		hideBannerLoadingIcon();
 		clearPopupPermanentOverlay();
 		if (errorThrown=="Internal Server Error")
@@ -4333,6 +4360,8 @@ function cancelLongOperations(eventObject)
 			lastLongOperationTimer = null;
 		}
 	});
+	skillQueue.length = 0;
+	prototypeQueue.length = 0;
 }
 
 
@@ -4465,8 +4494,41 @@ function repeatConfirmRequirementsButton(repsUniqueId)
 	return false;
 }
 
-function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId, autoStart)
+
+var lastExecutedPrototypeSettings = null;
+const prototypeQueue = [];
+function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId, autoStart, selected2DTileX, selected2DTileY, isCallback)
 {
+	if (isCallback != true) {
+		lastExecutedPrototypeSettings = {
+				ideaId:ideaId, 
+				ideaName:ideaName, 
+				userRequestId:userRequestId, 
+				repsUniqueId:repsUniqueId, 
+				autoStart:autoStart
+		};
+		lastExecutedSkillSettings = null;
+	}
+	
+	if (selected2DTileX == null) selected2DTileX = selectedTileX;
+	if (selected2DTileY == null) selected2DTileY = selectedTileY;
+	
+	// If we're already doing a skill, store this request in the queue instead'
+	if (longOperationCountdownTimer != null && longOperationName == "Prototyping" && isCallback != true) {
+		prototypeQueue.push({
+			event:event, 
+			ideaId:ideaId, 
+			ideaName:ideaName, 
+			userRequestId:userRequestId, 
+			repsUniqueId:repsUniqueId, 
+			autoStart:autoStart,
+			selected2DTileX: selected2DTileX,
+			selected2DTileY: selected2DTileY
+		});
+		refreshQueueCount();
+		return;
+	}
+	
 	if (autoStart)
 	{
 		var btn = $("#gridmap-repeatinvention-button");
@@ -4474,7 +4536,7 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 		{
 			btn.off("click");
 			btn.on("click", function(event){
-				doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId, autoStart);
+				doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId, autoStart, selected2DTileX, selected2DTileY, true);
 			});
 			btn.show();
 		}
@@ -4483,7 +4545,14 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 	showBannerLoadingIcon();
 	ensureWeAreNotInMovementState();
 	//BeginPrototype
-	longOperation(event, "InventionPrototypeNew", {ideaName:ideaName,ideaId:ideaId,repsUniqueId:repsUniqueId, autoStart:autoStart}, 
+	longOperation(event, "InventionPrototypeNew", {
+			ideaName:ideaName,
+			ideaId:ideaId,
+			repsUniqueId:repsUniqueId, 
+			autoStart:autoStart,
+			selected2DTileX:selected2DTileX,
+			selected2DTileY:selected2DTileY
+		}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
@@ -4502,6 +4571,16 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 						if (isSoundEffectsEnabled()) playAudio("complete1");
 						doSimpleDesktopNotification(ideaName+" prototyping complete.", "");
 					}
+					
+					// Is there a queue? Lets schedule the next job then
+					if (prototypeQueue.length > 0) {
+						const job = prototypeQueue.shift();
+						doCreatePrototype(job.event, job.ideaId, job.ideaName, job.userRequestId, job.repsUniqueId, job.autoStart, job.selected2DTileX, job.selected2DTileY, true);
+					} else if (skillQueue.length > 0) {
+						const job = skillQueue.shift();
+						doConstructItemSkill(job.event, job.skillId, job.skillName, job.userRequestId, job.repsUniqueId, job.autoStart, job.selected2DTileX, job.selected2DTileY, true);
+					}
+					
 				}
 				else
 				{
@@ -4510,14 +4589,71 @@ function doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId,
 			},
 			function()	// recallFunction
 			{
-				doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId);
+				doCreatePrototype(event, ideaId, ideaName, userRequestId, repsUniqueId, null, selected2DTileX, selected2DTileY, true);
 			}, 
 			userRequestId);
 	
 }
 
-function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId, autoStart)
+function doRepeatLastExecutedInvention() {
+	if (lastExecutedSkillSettings == null && lastExecutedPrototypeSettings == null) {
+		popupMessage("ERROR", `This function will repeat the last skill or prototype execution you did, 
+		but allowing you to do it in a different spot in the 2D grid based on your current selection. 
+		You cannot use this feature until you first execute a skill or prototype through invention.`);
+		return;
+	}
+	
+	if (lastExecutedSkillSettings != null) {
+		doConstructItemSkill(null, 
+							lastExecutedSkillSettings.skillId, 
+							lastExecutedSkillSettings.skillName,
+							lastExecutedSkillSettings.userRequestId,
+							lastExecutedSkillSettings.repsUniqueId,
+							lastExecutedSkillSettings.autoStart);
+	} else {
+		doCreatePrototype(event,
+					lastExecutedPrototypeSettings.ideaId,
+					lastExecutedPrototypeSettings.ideaName,
+					lastExecutedPrototypeSettings.userRequestId,
+					lastExecutedPrototypeSettings.repsUniqueId,
+					lastExecutedPrototypeSettings.autoStart);
+	}
+}
+
+var lastExecutedSkillSettings = null;
+const skillQueue = [];
+function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId, autoStart, selected2DTileX, selected2DTileY, isCallback)
 {
+	if (isCallback != true) {
+		lastExecutedSkillSettings = {
+				skillId:skillId, 
+				skillName:skillName, 
+				userRequestId:userRequestId, 
+				repsUniqueId:repsUniqueId, 
+				autoStart:autoStart
+		};
+		lastExecutedPrototypeSettings = null;
+	}
+	
+	if (selected2DTileX == null) selected2DTileX = selectedTileX;
+	if (selected2DTileY == null) selected2DTileY = selectedTileY;
+	
+	// If we're already doing a skill, store this request in the queue instead'
+	if (longOperationCountdownTimer != null && longOperationName == "Performing Skill" && isCallback != true) {
+		skillQueue.push({
+			event:event, 
+			skillId:skillId, 
+			skillName:skillName, 
+			userRequestId:userRequestId, 
+			repsUniqueId:repsUniqueId, 
+			autoStart:autoStart,
+			selected2DTileX:selected2DTileX, 
+			selected2DTileY:selected2DTileY
+		});
+		refreshQueueCount();
+		return;
+	}
+	
 	if (autoStart)
 	{
 		var btn = $("#gridmap-repeatinvention-button");
@@ -4525,7 +4661,7 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 		{
 			btn.off("click");
 			btn.on("click", function(event){
-				doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId, autoStart);
+				doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId, autoStart, selected2DTileX, selected2DTileY, true);
 			});
 			btn.show();
 		}
@@ -4536,12 +4672,21 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 	showBannerLoadingIcon();
 	ensureWeAreNotInMovementState();
 	//DoSkillConstructItem
-	longOperation(event, "InventionConstructItemSkillNew", {skillName:skillName, constructItemSkillId:skillId,repsUniqueId:repsUniqueId, autoStart:autoStart}, 
+	longOperation(event, "InventionConstructItemSkillNew", 
+		{
+			skillName:skillName, 
+			constructItemSkillId:skillId,
+			repsUniqueId:repsUniqueId, 
+			autoStart:autoStart,
+			selected2DTileX:selected2DTileX, 
+			selected2DTileY:selected2DTileY
+		}, 
 			function(action) // responseFunction
 			{
 				if(action.error !== undefined)
 				{
 					clearPopupPermanentOverlay(); 
+					skillActive = false;
 				}
 				else if (action.isComplete)
 				{
@@ -4555,6 +4700,16 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 						if (isSoundEffectsEnabled()) playAudio("complete1");
 						doSimpleDesktopNotification(skillName+" skill complete.", "");
 					}
+					
+					// Is there a queue? Lets schedule the next job then
+					if (skillQueue.length > 0) {
+						const job = skillQueue.shift();
+						doConstructItemSkill(job.event, job.skillId, job.skillName, job.userRequestId, job.repsUniqueId, job.autoStart, job.selected2DTileX, job.selected2DTileY, true);
+					} else if (prototypeQueue.length > 0) {
+						const job = skillQueue.shift();
+						doCreatePrototype(job.event, job.ideaId, job.ideaName, job.userRequestId, job.repsUniqueId, job.autoStart, job.selected2DTileX, job.selected2DTileY, true);
+					}
+					
 				}
 				else
 				{
@@ -4563,7 +4718,7 @@ function doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniq
 			},
 			function()	// recallFunction
 			{
-				doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId);
+				doConstructItemSkill(event, skillId, skillName, userRequestId, repsUniqueId, null, selected2DTileX, selected2DTileY, true);
 			}, 
 			userRequestId);
 	
@@ -4700,7 +4855,7 @@ function doRest()
 				else
 				{
 					hideBannerLoadingIcon();
-					setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
+					setBannerImage("https://storage.googleapis.com/initium-resources/images/hdbanners/Banner---Resting2.jpg");
 					setBannerOverlayText("Resting..", action.description+"<br><span id='long-operation-timeleft'></span>");
 				}
 			},
@@ -4724,7 +4879,7 @@ function doCampDefend()
 				else
 				{
 					hideBannerLoadingIcon();
-					setBannerImage("https://initium-resources.appspot.com/images/action-campsite1.gif");
+					setBannerImage("https://storage.googleapis.com/initium-resources/images/hdbanners/Banner---GuardingCamp1.jpg");
 					setBannerOverlayText("Defending", "Protect the camp!");
 				}
 			},
@@ -4992,9 +5147,11 @@ $(document).keyup(function(event){
 	else if(event.which==65){ // A - aborts the current long operation.
 		cancelLongOperations(); //i tested, and sending this with no parameters DOES work
 	}
-
 	else if(event.which==90){ //Z, loads item filters
 		loadItemFilterList();
+	}
+	else if(event.which==120){ //Z, loads item filters
+		doRepeatLastExecutedInvention();
 	}
 });
 
@@ -6104,3 +6261,14 @@ function navMapZoomOut()
 //
 //	$("#questlist-questkey-${questDefKey}").addClass("quest-complete");
 //}
+
+
+
+
+function doEnterBuilding(event, itemKey)
+{
+	closeAllTooltips();
+	
+	doCommand(event, "BuildingEnter", {itemKey:itemKey});
+}
+

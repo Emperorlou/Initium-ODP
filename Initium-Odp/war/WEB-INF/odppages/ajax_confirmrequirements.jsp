@@ -75,10 +75,10 @@
 </script>
 <div class='center' style='margin-bottom:15px'>
 	<c:if test="${type=='IdeaToPrototype'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' data='startbutton-${ideaId}' onclick='doCreatePrototype(event, ${ideaId}, "<c:out value="${ideaName}"/>", "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Start Prototyping</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' data='startbutton-${ideaId}' onclick='doCreatePrototype(event, ${ideaId}, "<c:out value="${ideaName}"/>", "${userRequestId}", "${repsUniqueId}", null, ${selected2DTileX}, ${selected2DTileY}, true)' class='v3-main-button-half'>Start Prototyping</a>
 	</c:if>
 	<c:if test="${type=='ConstructItemSkill'}">
-		<a id='confirmRequirementsButton-${repsUniqueId}' data='startbutton-${skillId}' onclick='doConstructItemSkill(event, ${skillId}, "<c:out value="${skillName}"/>", "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Begin</a>
+		<a id='confirmRequirementsButton-${repsUniqueId}' data='startbutton-${skillId}' onclick='doConstructItemSkill(event, ${skillId}, "<c:out value="${skillName}"/>", "${userRequestId}", "${repsUniqueId}", null, ${selected2DTileX}, ${selected2DTileY}, true)' class='v3-main-button-half'>Begin</a>
 	</c:if>
 	<c:if test="${type=='CollectCollectable'}">
 		<a id='confirmRequirementsButton-${repsUniqueId}' data='startbutton-${collectableId}' onclick='doCollectCollectable(event, ${collectableId}, "${userRequestId}", "${repsUniqueId}")' class='v3-main-button-half'>Begin</a>

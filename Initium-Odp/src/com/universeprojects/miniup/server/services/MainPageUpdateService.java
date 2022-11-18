@@ -26,6 +26,7 @@ import com.universeprojects.miniup.server.aspects.AspectFireplace;
 import com.universeprojects.miniup.server.dbentities.QuestDefEntity;
 import com.universeprojects.miniup.server.dbentities.QuestEntity;
 import com.universeprojects.miniup.server.dbentities.QuestObjective;
+import com.universeprojects.miniup.server.eventserverimpl.ChatService;
 import com.universeprojects.miniup.server.longoperations.LongOperation;
 
 public class MainPageUpdateService extends Service 
@@ -954,12 +955,14 @@ public class MainPageUpdateService extends Service
 						if (onlyOnePathIndex==null)
 						{
 							onlyOnePathIndex = i;
-						}
-						else
-						{
-							// If we found more than one, then just get out and nevermind.
-							onlyOnePathIndex = null;
-							break;
+						} else {
+							// We used to just throw up the leave link when there is a single path out, but now we do it
+							// for single paths OR parent paths, everywhere
+							if (GameUtils.equals(destLocations.get(onlyOnePathIndex).getKey(), db.getParentLocationKey(ds, location))) {
+								break;
+							} else {
+								onlyOnePathIndex = null;
+							}
 						}
 					}
 				}
@@ -1432,7 +1435,7 @@ public class MainPageUpdateService extends Service
 		}
 		js.append("		window.newChatIdToken= '"+db.getChatToken()+"';");
 		js.append("		$('.chat_messages').html('');");
-		js.append("		messager.reconnect('https://initium-eventserver.universeprojects.com/', window.newChatIdToken);");
+		js.append("		messager.reconnect('https://"+ChatService.EVENT_SERVER_DOMAIN+"/', window.newChatIdToken);");
 	   	
 		
 		if (refreshChat==false)

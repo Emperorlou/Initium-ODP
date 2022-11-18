@@ -1,4 +1,5 @@
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
+<%@page import="com.universeprojects.miniup.server.eventserverimpl.ChatService"%>
 <!doctype html>
 <html>
 <head>
@@ -6,8 +7,8 @@
 		default-src 'self'; 
 		connect-src 'self'
 			https://initium-resources.appspot.com
-			https://initium-eventserver.universeprojects.com
-			wss://initium-eventserver.universeprojects.com
+			https://<%=ChatService.EVENT_SERVER_DOMAIN%>
+			wss://<%=ChatService.EVENT_SERVER_DOMAIN%>
 			https://storage.googleapis.com/initium-resources/ 
 			https://www.google-analytics.com;
 		img-src 'self'
@@ -296,7 +297,7 @@
 	}
 </script>
 
-<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=54'></script>
+<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=${version}'></script>
 
 
 
@@ -475,6 +476,8 @@ function onCombat2DBegin()
 
 function viewMovementState() {
 	$("body").attr("bannerstate", "globe-navigation");
+	
+	clearMakeIntoPopup();
 	
 	// A special case of the globe nav map is blank, we'll actually also fire to open the local nav for convenience
 	viewLocalNavigation();
@@ -715,7 +718,7 @@ Version: ${version}
 					<a onclick='viewReferrals()'>View Active Referral Urls</a> 
 					&#8226; 
 					Players: <span id='activePlayerCount'>${activePlayers}</span>
-					<span id='ping' title='This indicates whether or not you&quot;re connected to the chat server'> &#9679;</span>
+					<span id='ping' title='This indicates whether or not you`re connected to the chat server'> &#9679;</span>
 				</div>
 				<script type="text/javascript">updateMinimizeBox("#chat_box_minimize_button", ".chat_box")</script>
 			</div>

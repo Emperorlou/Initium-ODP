@@ -1,6 +1,8 @@
 var currentUITutorial = null;
 function UITutorial(id)
 {
+	this.debugMode = true;
+	
 	this.timer = null;
 	
 	this.id = id;
@@ -11,10 +13,16 @@ function UITutorial(id)
 	this.currentChapter = 0;
 	this.currentStep = 0;
 	
+	this.log = function(text, obj) {
+		if (this.debugMode == true) {
+			console.log("ui-tutorial.js: " + text, obj);
+		}
+	}
 
 	// Uses the builder pattern
 	this.addStep = function(selector, title, text, multipart, activationSelector, deactivationSelector)
 	{
+		this.log("addStep called. ", [selector, title, text, multipart, activationSelector, deactivationSelector]);
 		if (this.chapters.length==0)
 		{
 			var chapter = new UITutorialChapter(this.id);
@@ -28,6 +36,7 @@ function UITutorial(id)
 	
 	this.addChapter = function(chapter)
 	{
+		this.log("addChapter called. ", chapter);
 		this.chapters.push(chapter);
 		this.chaptersMap[chapter.id] = chapter;
 	}
@@ -35,6 +44,7 @@ function UITutorial(id)
 	
 	this.run = function()
 	{
+		this.log("run called. ");
 		if (currentUITutorial!=null)
 			currentUITutorial.exitTutorial();
 		
@@ -53,9 +63,13 @@ function UITutorial(id)
 	
 	this.update = function(tutorial)
 	{
+		if (tutorial == null) return;
+		
 		// If the quest window is open, don't bother doing this yet
 		if ($(".quest-window-container").length>0) return;
 		if ($("body").hasClass("pace-done")==false) return;
+
+		this.log("update running: ", tutorial);		
 		
 		var chapter = tutorial.getCurrentChapter();
 		
@@ -95,6 +109,8 @@ function UITutorial(id)
 
 	this.exitTutorial = function(event)
 	{
+		this.log("exitTutorial called: ", event);
+				
 		clearInterval(this.timer);
 		this._showAll();
 		$(".revealTutorial-ui").remove();
@@ -127,6 +143,8 @@ function UITutorial(id)
 	
 	this.nextStep = function()
 	{
+		this.log("nextStep called: ", event);
+		
 		if (this.isOnLastStep()==true) return false;
 		var chapter = this.chapters[this.currentChapter];
 		if (this.currentStep>=chapter.getStepCount()-1)

@@ -53,6 +53,11 @@ public abstract class InitiumAspect implements GameAspect<Key>
 		return false;
 	}
 	
+	
+	public String get2DViewOverlayHtml() {
+		return "";
+	}
+	
 
 	@Override
 	public void setProperty(String fieldName, Object value)
@@ -83,6 +88,8 @@ public abstract class InitiumAspect implements GameAspect<Key>
 	{
 		return object;
 	}
+	
+	
 	
 	
 	

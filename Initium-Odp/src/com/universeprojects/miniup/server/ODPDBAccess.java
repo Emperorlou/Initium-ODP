@@ -215,6 +215,7 @@ public class ODPDBAccess
 	
 	public CachedDatastoreService getDB()
 	{
+		final ODPDBAccess that = this;
 		CachedDatastoreService.singlePutMode = true;
 		
 		// Check if we hvae a CDS in the request attributes already
@@ -248,7 +249,7 @@ public class ODPDBAccess
 							GridMapService gms = getGridMapService();
 							if (gms.isStillProceduralEntity(proceduralKey))
 							{
-								gms.convertFromProceduralToDBItem(entity);
+								gms.convertFromProceduralToDBItem(new InitiumObject(that, entity));
 							}
 						}
 					}

@@ -41,7 +41,7 @@ import com.universeprojects.miniup.server.services.ContainerService;
 
 public class GameUtils
 {
-	final public static String version = "0.5.9-198";
+	final public static String version = "0.5.9-212";
 
 	final static Logger log = Logger.getLogger(GameUtils.class.getName());
 
@@ -2558,6 +2558,18 @@ public class GameUtils
 		else
 			throw new IllegalArgumentException("Invalid field value type.");
 
+	}
+	
+	public static boolean isStringNumber(String numberValue) {
+		if (numberValue == null) return false;
+		
+		try {
+			Double.parseDouble(numberValue);
+		} catch (Exception e) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	public static boolean containsKey(Collection<Key> list, Key key)

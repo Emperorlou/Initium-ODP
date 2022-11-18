@@ -32,6 +32,7 @@ import com.universeprojects.miniup.server.aspects.AspectPickable.CommandPickable
 import com.universeprojects.miniup.server.model.GridCell;
 import com.universeprojects.miniup.server.model.GridMap;
 import com.universeprojects.miniup.server.model.GridObject;
+import com.universeprojects.miniup.server.services.GridMapService.ProceduralKeyData;
 
 public class GridMapService {
 	
@@ -770,7 +771,8 @@ public class GridMapService {
 		return "PKA"+locationId+"TX"+tileX+"TY"+tileY+"-"+index;
 	}
 	
-	public ProceduralKeyData getProceduralKeyData(String proceduralKey)
+	
+	public static ProceduralKeyData getProceduralKeyData(String proceduralKey)
 	{
 		if (proceduralKey==null || proceduralKey.matches("PKA\\d+TX\\d+TY\\d+-\\d+")==false)
 			throw new IllegalArgumentException("Invalid procedural key: "+proceduralKey);
@@ -805,6 +807,26 @@ public class GridMapService {
 		
 		return null;
 	}
+	
+	public static CachedEntity generateSingleItemFromProceduralKeyOrUrlSafeKey(ODPDBAccess db, String key) {
+		if (isProceduralKey(key)) {
+			ProceduralKeyData data = GridMapService.getProceduralKeyData(key);
+			CachedEntity location = db.getEntity("Location", data.locationId);
+			return generateSingleItemFromProceduralKey(db, location, key);
+		} else {
+			Key entityKey = KeyFactory.stringToKey(key);
+			return db.getEntity(entityKey);
+		}
+	}
+	
+	public static String determineProceduralKeyOrWebSafeKey(CachedEntity entity) {
+		if (entity.getKey().isComplete()) {
+			return KeyFactory.createKeyString(entity.getKind(), entity.getId());
+		} else {
+			return (String) entity.getAttribute("proceduralKey");
+		}
+	}
+	
 
 	public List<CachedEntity> generateItemsFromProceduralKeys(Collection<String> proceduralKeys, boolean allowNulls)
 	{
@@ -1429,10 +1451,13 @@ public class GridMapService {
 		return GridMapService.generateSingleItemFromProceduralKey(db, location, proceduralKey);
 	}
 	
-	public void convertFromProceduralToDBItem(CachedEntity entity)
+	public void convertFromProceduralToDBItem(InitiumObject item)
 	{
-		// TODO Auto-generated method stub
+		if (item.getProceduralKey() == null) return; // it's already a DB item
 		
+		removeProceduralEntity(item.getProceduralKey());
+		ds.put(item.getEntity());
+		addEntity(item.getEntity());
 	}
 
 }

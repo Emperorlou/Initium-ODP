@@ -93,15 +93,12 @@
 						<div class='custom-store-list-container'>
 							<c:forEach var="item" items="${category.value}">
 								<div class='custom-store-item-container custom-store-${item.rarity}-bg'>
-									<div class='custom-store-large-image-preview' id='large-hover-img-${item.id}' style='display:none'>
-										<c:if test="${item.largeImage == null || item.largeImage == ''}">
-											<p>No large image available.</p>
-										</c:if>
-										<c:if test="${item.largeImage != null && item.largeImage != ''}">
+									<c:if test="${item.largeImage != null && item.largeImage != ''}">
+										<div class='custom-store-large-image-preview' id='large-hover-img-${item.id}' style='display:none'>
 											<i>Large image preview</i>
 											<img src='${item.largeImage}'/>
-										</c:if>
-									</div>
+										</div>
+									</c:if>
 									<div onmouseenter='$("#large-hover-img-${item.id}").show();' onmouseleave='$("#large-hover-img-${item.id}").hide();' class='custom-store-item-image' style='background-image:url(${item.icon})'>
 										<div class='custom-store-item-image-overlay' style='background-image: url(${item.effectOverlay}); filter: brightness(${item.effectOverlayBrightness});'></div>										
 									</div>
@@ -125,15 +122,12 @@
 					<div class='custom-store-list-container'>
 						<c:forEach var="item" items="${category.value}">
 							<div class='custom-store-item-container custom-store-${item.rarity}-bg'>
-								<div class='custom-store-large-image-preview' id='large-hover-img2-${item.id}' style='display:none'>
-									<c:if test="${item.largeImage == null || item.largeImage == ''}">
-										<p>No large image available.</p>
-									</c:if>
-									<c:if test="${item.largeImage != null && item.largeImage != ''}">
+								<c:if test="${item.largeImage != null && item.largeImage != ''}">
+									<div class='custom-store-large-image-preview' id='large-hover-img2-${item.id}' style='display:none'>
 										<i>Large image preview</i>
 										<img src='${item.largeImage}'/>
-									</c:if>
-								</div>
+									</div>
+								</c:if>
 								<div onmouseenter='$("#large-hover-img2-${item.id}").show();' onmouseleave='$("#large-hover-img2-${item.id}").hide();' class='custom-store-item-image' style='background-image:url(${item.icon})'></div>
 								<div class='custom-store-item-cost'>${item.costFormatted}</div>
 								<c:if test="${item.expiryDateFormatted != null}">

@@ -51,6 +51,7 @@
 <div class='tab-content' id='idea-content'>
 	<div class='normal-container'>
 		<div class='title'>Ideas</div>
+		<div class='prototype-queue-label'></div>
 	</div>
 	<div class='normal-container'>
 		<c:if test="${hasIdeas!=true}">
@@ -80,6 +81,7 @@
 <div class='tab-content' id='itemConstruction-content'>
 	<div class='normal-container'>
 		<div class='title'>Object Construction</div>
+		<div class='skill-queue-label'></div>
 	</div>
 	<div class='normal-container'>
 		<c:if test="${hasConstructItemSkills!=true}">
@@ -156,4 +158,9 @@ if(lastTab!=null)
 	changeInventionTab({target:$("#"+lastTab+"-tab")[0]});
 }
 
+function refreshQueueCount() {
+	const queueCount = (skillQueue == null ? 0 : skillQueue.length) + (prototypeQueue == null ? 0 : prototypeQueue.length);
+	$(".skill-queue-label,.prototype-queue-label").text((queueCount) + " queued actions");
+}
+refreshQueueCount();
 </script>

@@ -249,7 +249,7 @@ ${bannerJs}
 	}
 </script>
 
-<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=54'></script>
+<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=${version}'></script>
 
 <script type='text/javascript' src='/odp/javascript/soundeffects.js?v=13'></script>
 <script type='text/javascript'>

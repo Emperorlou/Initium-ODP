@@ -144,7 +144,7 @@ public class GroupController extends PageController {
 			{
 				String output = HtmlComponents.generateGroupMember(character, member, group, inGroup, canDeleteGroup);
 				if (isOnline(member))
-					output = "<span style='float:left; text-shadow:0px 0px 5px;' title='This indicates whether or not you&quot;re connected to the chat server'><span style='color:#00FF00'>&#9679;</span></span>" + output;
+					output = "<span style='float:left; text-shadow:0px 0px 5px;' title='This indicates whether or not you`re connected to the chat server'><span style='color:#00FF00'>&#9679;</span></span>" + output;
 				memberOutput.add(output);
 			}
 			request.setAttribute("groupMembers", memberOutput);

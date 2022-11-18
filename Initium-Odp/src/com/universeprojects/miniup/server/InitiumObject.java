@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.appengine.api.datastore.Key;
+import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.gefcommon.shared.elements.GameAspect;
 import com.universeprojects.gefcommon.shared.elements.GameObject;
-import com.universeprojects.miniup.server.aspects.AspectPet.CommandPetFeed;
 import com.universeprojects.miniup.server.commands.framework.UserErrorMessage;
 import com.universeprojects.miniup.server.services.GridMapService;
 
@@ -382,5 +382,10 @@ public class InitiumObject implements GameObject<Key>
 	@Override
 	public void removeAspect(String aspectName) {
 		aspects.remove(aspectName);
+	}
+
+	public void refetch(CachedDatastoreService ds) {
+		entity.refetch(ds);
+		
 	}
 }

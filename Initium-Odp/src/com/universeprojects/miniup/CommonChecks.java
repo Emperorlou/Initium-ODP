@@ -408,6 +408,12 @@ public abstract class CommonChecks
 		return "TRUE".equals(location.getProperty("isOutside"));
 	}
 
+	public static boolean checkLocationOrPathIsTemplateMode(CachedEntity locationOrPath)
+	{
+		if (locationOrPath.getProperty("templateMode")==null) return false;
+		return Boolean.TRUE.equals(locationOrPath.getProperty("templateMode"));
+	}
+
 	public static boolean isItemImmovable(CachedEntity item)
 	{
 		return Boolean.TRUE.equals(item.getProperty("immovable"));

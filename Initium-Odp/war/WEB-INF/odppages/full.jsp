@@ -1,11 +1,13 @@
+<%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c'%>
+<%@page import="com.universeprojects.miniup.server.eventserverimpl.ChatService"%>
 <html class=" multiplebgs backgroundblendmode backgroundcliptext">
 <head>
 	<meta http-equiv="Content-Security-Policy" content="
 		default-src 'self'; 
 		connect-src 'self'
 			https://initium-resources.appspot.com
-			https://initium-eventserver.universeprojects.com
-			wss://initium-eventserver.universeprojects.com
+			https://<%=ChatService.EVENT_SERVER_DOMAIN%>
+			wss://<%=ChatService.EVENT_SERVER_DOMAIN%>
 			https://storage.googleapis.com/initium-resources/ 
 			https://www.google-analytics.com;
 		img-src 'self'
@@ -304,7 +306,7 @@
 	}
 </script>
 
-<script type="text/javascript" src="/odp/javascript/messager-impl.js?v=54"></script>
+<script type="text/javascript" src="/odp/javascript/messager-impl.js?v=${version}"></script>
 
 
 <script type="text/javascript">
