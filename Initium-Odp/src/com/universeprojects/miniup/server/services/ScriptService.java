@@ -11,15 +11,13 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
 import javax.servlet.http.HttpServletRequest;
-
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Key;
 import com.universeprojects.cacheddatastore.CachedEntity;
-import com.universeprojects.miniup.server.GameUtils;
 import com.universeprojects.miniup.server.ODPDBAccess;
 import com.universeprojects.miniup.server.ODPDBAccess.ScriptType;
 import com.universeprojects.miniup.server.scripting.events.ScriptEvent;
@@ -34,11 +32,16 @@ import com.universeprojects.miniup.server.scripting.wrappers.EntityWrapper;
 import com.universeprojects.miniup.server.scripting.wrappers.Path;
 import com.universeprojects.miniup.server.scripting.wrappers.Quest;
 
+import jdk.nashorn.api.scripting.ClassFilter;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
+
 public class ScriptService extends Service 
 {
 	public final static Logger log = Logger.getLogger(ScriptService.class.getName());
-	private Context jsContext = null;
-	private Scriptable jsScope = null;
+	
+	private static ScriptEngine engine = null;
+	private Map<String, Object> contextObjects = new HashMap<>();
+	
 	private boolean canExecute = false;
 	
 	public static ScriptService getScriptService(ODPDBAccess db)
@@ -52,25 +55,42 @@ public class ScriptService extends Service
 		return service;
 	}
 	
+	/**
+	 * Define what script context is allowed to see.
+	 * @author Evan
+	 *
+	 */
+	private class Filter implements ClassFilter {
+
+		/**
+		 * We only allow java.lang and java.util objects to be exposed
+		 * @return true if the object is allowed, false otherwise.
+		 */
+		@Override
+		public boolean exposeToScripts(String s) {
+			if(s.startsWith("java.lang.")) {
+				return true;
+			}
+			if(s.startsWith("java.util.")) {
+				return true;
+			}
+			return false;
+		}
+	}
+	
 	private ScriptService(ODPDBAccess db, HttpServletRequest request)
 	{
 		super(db);
+
 		
-		try
-		{
-			jsContext = Context.enter();
-			// If we're on the test server, we enable debug output on the errors, otherwise they
-			// must be specified.
-			jsContext.setGeneratingDebug(GameUtils.isTestServer(request));
-			jsScope = jsContext.initStandardObjects();
-			DBAccessor coreFunctions = new DBAccessor(db, request);
-			jsScope.put("core", jsScope, coreFunctions);
-			canExecute = true;
-		}
-		catch(Exception ex)
-		{
-			log.log(Level.WARNING, "Failed to initialize ScriptService", ex);
-		}
+		//initialize the threadsafe ScriptEngine with the filter.
+		if(engine == null) 
+			engine = new NashornScriptEngineFactory().getScriptEngine(new Filter());
+		
+		canExecute = true;
+		
+		//add the core object to the context
+		contextObjects.put("core", new DBAccessor(db, request));
 	}
 	
 	/**
@@ -173,19 +193,18 @@ public class ScriptService extends Service
 	    try
 	    {
 	    	log.log(Level.WARNING, "Executing script: " + scriptName + " (" + scriptEntity.getKey().getId() + ")");
-	    	// Create a new scope for every script execution call.
-	    	Scriptable currentScope = jsContext.newObject(jsScope);
-	    	currentScope.setPrototype(jsScope);
-	    	currentScope.setParentScope(null);
-			// Put the event into scope, so we can use it
-	    	currentScope.put("event", currentScope, Context.toObject(event, currentScope));
-	    	// Recreate the sourceEntity variable on each hit.
-	    	if(sourceEntity != null)
-	    		currentScope.put("sourceEntity", currentScope, Context.toObject(sourceEntity, currentScope));
-	    	// Evaluate the script. We don't need to return anything, everything we need
-	    	// is on the Event object itself.
-	    	jsContext.evaluateString(currentScope, script, scriptName, 0, null);
-	    	currentScope = null;
+	    	
+	    	//add the event and sourcEntity objects to the context
+	    	contextObjects.put("event", event);
+	    	contextObjects.put("sourceEntity", sourceEntity);
+	    	
+	    	//load the Bindings object for the script context
+	    	Bindings bindings = engine.createBindings();
+	    	bindings.putAll(bindings);
+	    	
+	    	//evaluate the script, given the bindings.
+	    	engine.eval(script, bindings);
+	    	
 	    	return true;
 	    }
 	    catch (Exception e)
@@ -193,30 +212,6 @@ public class ScriptService extends Service
 	    	log.log(Level.SEVERE, "Exception during Script exection of " + scriptName, e);
 	    }
 		return false;
-	}
-	
-	/**
-	 * Exits the script context and nulls out the references. Should be called when the 
-	 * ScriptService is no longer needed, but just in case it isn't will be handled by
-	 * the finalizer (when eventually garbage collected).
-	 */
-	public void close()
-	{
-		if(jsContext != null)
-		{
-			jsScope = null;
-			jsContext = null;
-			Context.exit();
-		}
-	}
-	/**
-	 * We need to ensure script context is cleared. Finalizer is called when garbage collected,
-	 * and since we reference Native resources, we need to make sure we exit the context cleanly
-	 * in case the reference is not disposed of properly.
-	 */
-	protected void finalize( ) throws Throwable
-	{
-		close();
 	}
 	
 	/**

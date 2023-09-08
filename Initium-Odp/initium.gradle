@@ -13,6 +13,7 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/javax.servlet/jstl
 	compile group: 'javax.servlet', name: 'jstl', version: '1.2'
+	compile group: 'org.openjdk.nashorn', name: 'nashorn-core', version: '15.0'
 
     compile 'commons-codec:commons-codec:1.6'
 
