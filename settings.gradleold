@@ -1,0 +1,23 @@
+import groovy.io.FileType
+
+rootProject.buildFileName = "initium.gradle"
+
+def path = [] as LinkedList
+
+rootDir.traverse(
+    type: FileType.FILES,
+    nameFilter: ~/.+\.gradle/,
+    excludeFilter   : {
+        return it.parentFile.name  in ['.git']
+    },
+    maxDepth: 1,
+    preDir: { path << it.name },
+    postDir: { path.removeLast() })
+    {
+        if (path) {
+            final String projectName = ':'+path.join(":")
+            println "ProjectName: $projectName"
+            include projectName
+            project(projectName).buildFileName = "initium.gradle"
+        }
+    }
