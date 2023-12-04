@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.common.collect.Lists;
 import com.universeprojects.cacheddatastore.CachedDatastoreService;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;

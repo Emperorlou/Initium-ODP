@@ -134,7 +134,7 @@ public class AspectPet extends ItemAspect
 
 	public List<List<String>> getFieldFilters()
 	{
-		return db.getValueFromFieldTypeFieldFilter2DCollection(entity, "foodMatcher");
+		return db.getValueFromFieldTypeFieldFilter2DCollection(entity.getEntity(), "foodMatcher");
 	}
 
 	public String getDeadImage()

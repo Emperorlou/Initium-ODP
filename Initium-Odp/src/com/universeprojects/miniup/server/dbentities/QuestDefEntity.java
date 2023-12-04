@@ -50,7 +50,7 @@ public class QuestDefEntity extends InitiumEntityBase
 
 	public List<List<String>> getRequiredCharacterFieldFilters()
 	{
-		return db.getValueFromFieldTypeFieldFilter2DCollection(entity, "requiredCharacterFieldValues");
+		return db.getValueFromFieldTypeFieldFilter2DCollection(entity.getEntity(), "requiredCharacterFieldValues");
 	}
 
 	@SuppressWarnings("unchecked")

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.common.collect.Lists;
 import com.universeprojects.cacheddatastore.CachedEntity;
 import com.universeprojects.cacheddatastore.EntityPool;
 import com.universeprojects.miniup.CommonChecks;
@@ -150,8 +149,8 @@ public class LocationService extends Service {
 		
 		// Now create the path and it's connecting location and wire it up properly
 		Key otherTemplateLocationKey = GameUtils.equals(chosenNextPath.getProperty("location1Key"), templateLocation.getKey()) ? 
-				(Key) chosenNextPath.getProperty("location2Key") : 
-					(Key) chosenNextPath.getProperty("location1Key");
+				(Key) chosenNextPath.getProperty("location1Key") : 
+					(Key) chosenNextPath.getProperty("location2Key");
 				
 		if (otherTemplateLocationKey == null) throw new ContentDeveloperException("Invalid location/path template " + templatePath.getKey()+". location1Key or location2Key is invalid.");
 		
