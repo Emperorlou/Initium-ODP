@@ -8164,5 +8164,9 @@ public class ODPDBAccess
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void putToMemcache(String key, Object value) {
+		ds.putToMemcache(key, value);
+	}
 
 }
