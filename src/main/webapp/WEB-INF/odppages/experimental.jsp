@@ -643,10 +643,10 @@ Version: ${version}
 											
 						<div class="path-overlay-link major-banner-links auto-animate">
 						
-							<a id='homebanner-button' class='button-overlay-major' minitip='Open main view' onclick='onBannerDefaultClicked()' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/home-banner1.png'></a>
+							<a id='homebanner-button' class='button-overlay-major' minitip='Open main view' onclick='onBannerDefaultClicked()' style='right:0px;top:0px;'><img alt='Location actions' src='/images/ui/home-banner1.png'></a>
 							<a id="movement-button" class="button-overlay-major" minitip='Navigation/movement mode' onclick="onMovementButtonClicked()" style="right:4px;top:74px;"><img alt="Character navigation" src="/images/ui/movement-icon1.png"></a>
 							<a id="twodview-button" class="button-overlay-major" minitip='Open this location`s 2D view' onclick="on2DViewButtonClicked()" style="right:4px;top:142px;"><img alt="2D View" src="/images/ui/navigation-local-icon2.png"></a>
-							<a id='thisLocation-button' class='button-overlay-major' minitip='Other stuff you can do here' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/main-more-button1.png'></a>
+							<a id='thisLocation-button' class='button-overlay-major' minitip='Other stuff you can do here' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='/images/ui/main-more-button1.png'></a>
 						</div>			
 						
 						<div style='position:absolute;bottom: 26px; width:100%; text-align:center;pointer-events:none;'><div class='path-overlay-link auto-animate' id='monsterCountPanel'>${monsterCountPanel}</div></div>
