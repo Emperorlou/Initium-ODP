@@ -56,7 +56,7 @@ public class PropertiesService extends Service {
 
 			// House = Location, so create that here, with the city as the parent location
 			playerHouse = db.newLocation(ds, 
-					"https://initium-resources.appspot.com/images/special-house2.jpg", 
+					"/images/special-house2.jpg", 
 					houseName, "This is " + character.getProperty("name") + "'s property called '" + houseName + "'! No one can go here unless they have the location shared with them. Feel free to store equipment and cash here!", 
 					-1d, "RestSite", cityLocationEntity, user.getKey(), 7, LocationSubType.PlayerHouse);
 			// Set the starting attributes

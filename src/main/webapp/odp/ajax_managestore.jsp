@@ -86,8 +86,8 @@
 		<br>
 		<center>
 			${toggleStoreButton}
-			<a style='margin-left:15px;' onclick="storeRenameNew(event, '${storeName}')" minitip='Rename your store'><img src='https://initium-resources.appspot.com/images/ui/renameButton1.png' alt='Rename' border='0'/></a>
-			<a style='margin-left:15px;' onclick='storeSetSaleNew(event)' minitip='Set store-wide discounts or price hikes'><img src='https://initium-resources.appspot.com/images/ui/storeDiscountButton1.png' alt='Discount' border='0'/></a>
+			<a style='margin-left:15px;' onclick="storeRenameNew(event, '${storeName}')" minitip='Rename your store'><img src='/images/ui/renameButton1.png' alt='Rename' border='0'/></a>
+			<a style='margin-left:15px;' onclick='storeSetSaleNew(event)' minitip='Set store-wide discounts or price hikes'><img src='/images/ui/storeDiscountButton1.png' alt='Discount' border='0'/></a>
 		</center>
 		<div>
 		</div>

@@ -38,7 +38,7 @@ button {
     border-image-width: 20px 20px 20px 20px;
     border-image-outset: 0px 0px 0px 0px;
     border-image-repeat: stretch stretch;
-    border-image-source: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    border-image-source: url(/images/ui3/small-square-button-red.png);
     border-style: solid;
     font-size: 15px;
 }
@@ -59,9 +59,9 @@ button {
 .marching-ants 
 {
     border: 1px solid transparent!important;
-    -moz-border-image: image-url('https://initium-resources.appspot.com/images/ants1.gif') 1 repeat repeat!important;
-    -webkit-border-image: url('https://initium-resources.appspot.com/images/ants1.gif') 1 repeat repeat!important;
-    border-image: url('https://initium-resources.appspot.com/images/ants1.gif') 1 repeat repeat!important;
+    -moz-border-image: image-url('/images/ants1.gif') 1 repeat repeat!important;
+    -webkit-border-image: url('/images/ants1.gif') 1 repeat repeat!important;
+    border-image: url('/images/ants1.gif') 1 repeat repeat!important;
 }
 .chat-character-fix
 {
@@ -240,7 +240,7 @@ hr:after {
 {
 	width:100%;
 	height:100%;
-	background-image:url('https://initium-resources.appspot.com/images/environment/background.png');
+	background-image:url('/images/environment/background.png');
 }
 .travel-scene
 {
@@ -378,7 +378,7 @@ hr:after {
 
 #mainMoneyIndicator
 {
-	background-image: url(https://initium-resources.appspot.com/images/ui3/header-button-display1.png);
+	background-image: url(/images/ui3/header-button-display1.png);
 	background-size: 100% 35px;
 	background-repeat: no-repeat;
 	min-width: 140px;
@@ -996,10 +996,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	background-color:#191817;
 	border-style: solid;
 	border-width: 10px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 fill repeat;
+	-moz-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+	-webkit-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+	-o-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+	border-image: url(/images/ui3/window3-border.jpg) 10 fill repeat;
 }
 
 .boldbox-green:before
@@ -1061,7 +1061,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 .make-popup-X
 {
 	position: absolute;
-    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    background-image: url(/images/ui3/small-square-button-red.png);
     color: #e2b766;
     width: 57px;
     height: 46px;
@@ -1115,10 +1115,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 {
 	border-style: solid;
 	border-width: 17px 32px 17px 31px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 fill repeat stretch;
+	-moz-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+	-webkit-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+	-o-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+	border-image: url(/images/ui3/button1.jpg) 17 32 17 31 fill repeat stretch;
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
 	max-height:56px;
 	display:inline-block;
@@ -1139,7 +1139,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .main-button-half
 {
-	background-image: url("https://initium-resources.appspot.com/images/main-button-backing-half.jpg");
+	background-image: url("/images/main-button-backing-half.jpg");
 	background-position:center;
 	background-size: 100% 100%;
 	width: 362px;
@@ -1179,10 +1179,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 	background-color: #414d63;
 	border-style: solid;
 	border-width: 17px 32px 17px 31px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 fill repeat stretch;
+	-moz-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+	-webkit-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+	-o-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+	border-image: url(/images/ui3/button1.jpg) 17 32 17 31 fill repeat stretch;
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
 	max-height:56px;
 	display:inline-block;
@@ -1203,7 +1203,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .v3-main-button-half
 {
-    background-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg);
+    background-image: url(/images/ui3/button1.jpg);
     background-position: center;
     background-size: auto 100%;
     background-repeat: no-repeat;
@@ -1243,7 +1243,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 
 .main-textbox
 {
-	background: url("https://initium-resources.appspot.com/images/main-button-backing.jpg") no-repeat center;
+	background: url("/images/main-button-backing.jpg") no-repeat center;
 	width:100%;
 	height: 43px;
 	
@@ -1275,10 +1275,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00160000', e
 {
 	border-style: solid;
 	border-width: 17px 19px 17px 16px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/input1-background.png) 17 19 17 16 stretch;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/input1-background.png) 17 19 17 16 stretch;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/input1-background.png) 17 19 17 16 stretch;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/input1-background.png) 17 19 17 16 fill stretch;
+	-moz-border-image: url(/images/ui3/input1-background.png) 17 19 17 16 stretch;
+	-webkit-border-image: url(/images/ui3/input1-background.png) 17 19 17 16 stretch;
+	-o-border-image: url(/images/ui3/input1-background.png) 17 19 17 16 stretch;
+	border-image: url(/images/ui3/input1-background.png) 17 19 17 16 fill stretch;
 }
 
 .main-textbox input[type=text], .main-textbox input[type=password], .main-textbox input[type=email]
@@ -1387,7 +1387,7 @@ hr.items-separator {
     position: absolute;
 	height:240px;
     /*background-image: url('../images/info-category-title-bar.png');*/
-	background: url("https://initium-resources.appspot.com/images/banner-backing.jpg") no-repeat center;
+	background: url("/images/banner-backing.jpg") no-repeat center;
 	margin:-30px;
 }
 .popup_header {
@@ -1499,10 +1499,10 @@ a.range-increment {
 #chat_submit
 {
 	background-color:#181715;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-    -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-    -moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-    border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 fill repeat;
+	-webkit-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+    -o-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+    -moz-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+    border-image: url(/images/ui3/window3-border.jpg) 10 fill repeat;
     color: white;
     border-style: solid;
     border-width: 4px;
@@ -1521,10 +1521,10 @@ a.range-increment {
 #chat_input
 {
 	background-color:#181715;
-    -webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-    -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-    -moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-    border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 fill repeat;
+    -webkit-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+    -o-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+    -moz-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+    border-image: url(/images/ui3/window3-border.jpg) 10 fill repeat;
     color: #f4f4f4;
     border-width: 4px;
     height: 15px;	
@@ -2177,7 +2177,7 @@ a.range-increment {
     height: 100%;
     top: 0px;
     z-index: 47;
-	background: url("https://initium-resources.appspot.com/images/loading.gif") center no-repeat, rgb(14,11,6);
+	background: url("/images/loading.gif") center no-repeat, rgb(14,11,6);
 }
 
 .smallbox
@@ -2477,7 +2477,7 @@ a.range-increment {
 .page-popup::before
 {
   position:absolute;
-  background:url('https://initium-resources.appspot.com/images/ui/large-popup-top.jpg');
+  background:url('/images/ui/large-popup-top.jpg');
   background-position:center;
   width:100%;
   height:18px;
@@ -2512,7 +2512,7 @@ a.range-increment {
 
 
     /* V3 */
-	background-image: url(https://initium-resources.appspot.com/images/ui3/window1-header.png);
+	background-image: url(/images/ui3/window1-header.png);
     width: 351px;
     height: 48px;
     margin: 0px;
@@ -2558,7 +2558,7 @@ a.range-increment {
 /*
 .page-popup::after
 {
-  background-image:url('https://initium-resources.appspot.com/images/ui/large-popup-bottom.jpg');
+  background-image:url('/images/ui/large-popup-bottom.jpg');
   background-position:center;
 	position:absolute;
   content:" ";
@@ -2598,7 +2598,7 @@ a.range-increment {
 
 .page-popup-X {
 position: absolute;
-    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    background-image: url(/images/ui3/small-square-button-red.png);
     color: #e2b766;
     width: 57px;
     height: 46px;
@@ -2620,7 +2620,7 @@ position: absolute;
     z-index: 1100001;
     font-family: Lucida Sans;
     font-size: 32px;
-    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    background-image: url(/images/ui3/small-square-button-red.png);
     width: 61px;
     height: 48px;
     text-align: center;
@@ -2693,13 +2693,13 @@ position: absolute;
 	background-color:rgba(255,0,0,0.2)
 }
 .low-durability:before {
-	content: url('https://initium-resources.appspot.com/images/ui/equipment-warning1.png');
+	content: url('/images/ui/equipment-warning1.png');
 	position: relative;
 	right: 0.5%;
 	top: -5px;
 }
 .very-low-durability:before {
-	content: url('https://initium-resources.appspot.com/images/ui/equipment-warning2.png');
+	content: url('/images/ui/equipment-warning2.png');
 	position: relative;
 	right: 0.5%;
 	top: -5px;
@@ -2770,23 +2770,23 @@ position: absolute;
 }
 #knowledge-tab
 {
-	background-image:url('https://initium-resources.appspot.com/images/ui/tab-knowledge-button.png');
+	background-image:url('/images/ui/tab-knowledge-button.png');
 }
 #experimentation-tab
 {
-	background-image:url('https://initium-resources.appspot.com/images/ui/tab-experiments-button.png');
+	background-image:url('/images/ui/tab-experiments-button.png');
 }
 #idea-tab
 {
-	background-image:url('https://initium-resources.appspot.com/images/ui/tab-ideas-button.png');
+	background-image:url('/images/ui/tab-ideas-button.png');
 }
 #itemConstruction-tab
 {
-	background-image:url('https://initium-resources.appspot.com/images/ui/tab-builditem-button.png');
+	background-image:url('/images/ui/tab-builditem-button.png');
 }
 #buildingConstruction-tab
 {
-	background-image:url('https://initium-resources.appspot.com/images/ui/tab-buildbuilding-button.png');
+	background-image:url('/images/ui/tab-buildbuilding-button.png');
 }
 .tab-content
 {
@@ -3142,7 +3142,7 @@ position: absolute;
 
 .minimap-overlay
 {
-	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-backing1.png);
+	background-image:url(/images/ui4/minimap-backing1.png);
 	background-position:center;
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -3168,21 +3168,21 @@ position: absolute;
 }
 .minimap-button-viewallpaths
 {
-	background-image:url(https://storage.googleapis.com/initium-resources/images/ui/viewpathsbutton.png);
+	background-image:url(/images/ui/viewpathsbutton.png);
 	bottom:26px;
 	left:26px;
 }
 
 .minimap-button-map
 {
-	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-button-map1.png);
+	background-image:url(/images/ui4/minimap-button-map1.png);
 	top:26px;
 	right:26px;
 }
 
 .minimap-button-zoom-in
 {
-	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-in1.png);
+	background-image:url(/images/ui4/minimap-button-zoom-in1.png);
 	top:18px;
 	left:43px;
 	width:43px;
@@ -3191,7 +3191,7 @@ position: absolute;
 
 .minimap-button-zoom-out
 {
-	background-image:url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-out1.png);
+	background-image:url(/images/ui4/minimap-button-zoom-out1.png);
 	top:55px;
 	left:12px;
 	width:43px;
@@ -3200,7 +3200,7 @@ position: absolute;
 
 .minimap-button-cancel
 {
-	background-image:url(https://initium-resources.appspot.com/images/ui4/button-cancel1.png);
+	background-image:url(/images/ui4/button-cancel1.png);
 	width:122px;
 	height:48px;
 	bottom: -5px;
@@ -3209,7 +3209,7 @@ position: absolute;
 
 .minimap-button-localplaces
 {
-	background-image:url(https://initium-resources.appspot.com/images/ui3/local-places1.png);
+	background-image:url(/images/ui3/local-places1.png);
 	width:122px;
 	height:48px;
 	bottom: -5px;
@@ -3290,7 +3290,7 @@ position: absolute;
 .mini-page-popup-X
 {
 	position: absolute;
-    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    background-image: url(/images/ui3/small-square-button-red.png);
     color: #e2b766;
     width: 57px;
     height: 46px;
@@ -3308,7 +3308,7 @@ position: absolute;
 .mini-page-popup-reload
 {
 	position: absolute;
-    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    background-image: url(/images/ui3/small-square-button-red.png);
     color: #e2b766;
     width: 57px;
     height: 46px;
@@ -3994,7 +3994,7 @@ body
 }
 ::-webkit-scrollbar-thumb
 {
-	background-image:url('https://initium-resources.appspot.com/images/ui/newui/scrollbar1-thumb-bgimage.png');
+	background-image:url('/images/ui/newui/scrollbar1-thumb-bgimage.png');
 	background-position:center center;
 	background-repeat: no-repeat;
 	background-color:#854c30;
@@ -4041,7 +4041,7 @@ body
 
 .header1
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-background.png");
+	background-image:url("/images/ui/newui/header1-background.png");
 	height:27px;
 	min-height:27px;
 	max-height:27px;
@@ -4057,7 +4057,7 @@ body
 .header1-spacer
 {
 	display:table-cell;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-spacer.png");
+	background-image:url("/images/ui/newui/header1-spacer.png");
 	min-width:11px;
 	height:27px;
 	min-height:27px;
@@ -4107,7 +4107,7 @@ body
 {
 	content: '';
 	position:absolute;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-display-left.png");
+	background-image:url("/images/ui/newui/header1-display-left.png");
 	width:4px;
 	height:27px;
 	min-height:27px;
@@ -4119,7 +4119,7 @@ body
 {
 	position:relative;
 	display:table-cell;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-display-middle.png");
+	background-image:url("/images/ui/newui/header1-display-middle.png");
 	height:21px;
 	min-height:27px;
 	padding-top:4px;
@@ -4132,7 +4132,7 @@ body
 {
 	content: '';
 	position:absolute;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-display-right.png");
+	background-image:url("/images/ui/newui/header1-display-right.png");
 	width:4px;
 	height:27px;
 	min-height:27px;
@@ -4153,7 +4153,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-left.png");
+	background-image:url("/images/ui/newui/header1-button-left.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -4166,7 +4166,7 @@ body
 	cursor:pointer;
 	display:table-cell;
 	position:relative;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-middle.png");
+	background-image:url("/images/ui/newui/header1-button-middle.png");
 	height:21px;
 	max-height:21px;
 	min-height:27px;
@@ -4181,7 +4181,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-right.png");
+	background-image:url("/images/ui/newui/header1-button-right.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -4191,15 +4191,15 @@ body
 }
 .header1-button:hover:before, .header1-button.selected:before
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-left-hover.png");
+	background-image:url("/images/ui/newui/header1-button-left-hover.png");
 }
 .header1-button:hover, .header1-button.selected
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-middle-hover.png");
+	background-image:url("/images/ui/newui/header1-button-middle-hover.png");
 }
 .header1-button:hover:after, .header1-button.selected:after
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-right-hover.png");
+	background-image:url("/images/ui/newui/header1-button-right-hover.png");
 }
 
 
@@ -4312,10 +4312,10 @@ body
 
 	border-style: solid;
 	border-width: 0px 7px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 fill round repeat;
+	-moz-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	-webkit-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	-o-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 fill round repeat;
 	
 	padding:1px;
 	
@@ -4328,10 +4328,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 9px 9px 8px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 fill stretch;
+	-moz-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	-webkit-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	-o-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 fill stretch;
 	margin:5px;
 }
 
@@ -4512,10 +4512,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 20px 8px 18px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 fill round repeat;
+	-moz-border-image: url(/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
+	-webkit-border-image: url(/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
+	-o-border-image: url(/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 round repeat;
+	border-image: url(/images/ui/newui/backdrop1-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
 #newui .backdrop1b
@@ -4524,10 +4524,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 20px 8px 18px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 fill round repeat;
+	-moz-border-image: url(/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
+	-webkit-border-image: url(/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
+	-o-border-image: url(/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 round repeat;
+	border-image: url(/images/ui/newui/backdrop1b-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
 #newui .backdrop1c
@@ -4536,10 +4536,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 20px 8px 18px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 fill round repeat;
+	-moz-border-image: url(/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
+	-webkit-border-image: url(/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
+	-o-border-image: url(/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 round repeat;
+	border-image: url(/images/ui/newui/backdrop1c-borderimage.png) 8 20 8 18 fill round repeat;
 }
 
 #newui .backdrop1d
@@ -4548,10 +4548,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 10px 8px 9px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 fill round repeat;
+	-moz-border-image: url(/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
+	-webkit-border-image: url(/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
+	-o-border-image: url(/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 round repeat;
+	border-image: url(/images/ui/newui/backdrop1d-borderimage.png) 8 10 8 9 fill round repeat;
 	
 	margin:8px;
 }
@@ -4562,10 +4562,10 @@ body
 	
 	border-style: solid;
 	border-width: 9px 12px 9px 10px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 fill repeat;
+	-moz-border-image: url(/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
+	-webkit-border-image: url(/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
+	-o-border-image: url(/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 repeat;
+	border-image: url(/images/ui/newui/backdrop2a-borderimage.png) 9 12 9 10 fill repeat;
 }
 
 #newui .backdrop3d
@@ -4574,10 +4574,10 @@ body
 	
 	border-style: solid;
 	border-width: 6px 10px 7px 9px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 fill repeat;	  
+	-moz-border-image: url(/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
+	-webkit-border-image: url(/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
+	-o-border-image: url(/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 repeat;
+	border-image: url(/images/ui/newui/backdrop3d-borderimage.png) 6 10 7 9 fill repeat;	  
 }
 
 /* Old cluetip style */
@@ -4618,20 +4618,20 @@ body
 {
 	border-style: solid;
 	border-width: 4px 6px 6px 4px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 fill repeat;	
+	-moz-border-image: url(/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
+	-webkit-border-image: url(/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
+	-o-border-image: url(/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 repeat;
+	border-image: url(/images/ui/newui/tooltip1-borderimage.png) 4 6 6 4 fill repeat;	
 }
 
 .cluetip-newui2
 {
 	border-style: solid;
 	border-width: 8px 12px 12px 8px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 fill repeat;
+	-moz-border-image: url(/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
+	-webkit-border-image: url(/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
+	-o-border-image: url(/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 repeat;
+	border-image: url(/images/ui/newui/tooltip2-borderimage.png) 8 12 12 8 fill repeat;
 	background-color: #757161;	
 }
 
@@ -4642,7 +4642,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-left.png");
+	background-image:url("/images/ui/newui/button1-left.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -4655,7 +4655,7 @@ body
 	cursor:pointer;
 	display:block;
 	position:relative;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-middle.png");
+	background-image:url("/images/ui/newui/button1-middle.png");
 	height:21px;
 	max-height:21px;
 	padding-top:5px;
@@ -4672,7 +4672,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-right.png");
+	background-image:url("/images/ui/newui/button1-right.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -4682,28 +4682,28 @@ body
 }
 .button1:hover:before
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-left-hover.png");
+	background-image:url("/images/ui/newui/button1-left-hover.png");
 }
 .button1:hover
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-middle-hover.png");
+	background-image:url("/images/ui/newui/button1-middle-hover.png");
 }
 .button1:hover:after
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-right-hover.png");
+	background-image:url("/images/ui/newui/button1-right-hover.png");
 }
 
 .button1.selected:before
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-left-hover.png");
+	background-image:url("/images/ui/newui/button1-left-hover.png");
 }
 .button1.selected
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-middle-hover.png");
+	background-image:url("/images/ui/newui/button1-middle-hover.png");
 }
 .button1.selected:after
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button1-right-hover.png");
+	background-image:url("/images/ui/newui/button1-right-hover.png");
 }
 
 
@@ -4711,7 +4711,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-left.png");
+	background-image:url("/images/ui/newui/button2-left.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -4724,7 +4724,7 @@ body
 	cursor:pointer;
 	display:block;
 	position:relative;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-middle.png");
+	background-image:url("/images/ui/newui/button2-middle.png");
 	height:21px;
 	max-height:21px;
 	padding-top:2px;
@@ -4741,7 +4741,7 @@ body
 {
 	content: ' ';
 	position:absolute;
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-right.png");
+	background-image:url("/images/ui/newui/button2-right.png");
 	min-width:7px;
 	height:27px;
 	min-height:27px;
@@ -4751,15 +4751,15 @@ body
 }
 .button2:hover:before
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-left-hover.png");
+	background-image:url("/images/ui/newui/button2-left-hover.png");
 }
 .button2:hover
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-middle-hover.png");
+	background-image:url("/images/ui/newui/button2-middle-hover.png");
 }
 .button2:hover:after
 {
-	background-image:url("https://initium-resources.appspot.com/images/ui/newui/button2-right-hover.png");
+	background-image:url("/images/ui/newui/button2-right-hover.png");
 }
 
 .button2 img
@@ -4803,10 +4803,10 @@ body
 
 	border-style: solid;
 	border-width: 0px 7px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-borderimage.png) 0 7 fill round repeat;
+	-moz-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	-webkit-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	-o-border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 round repeat;
+	border-image: url(/images/ui/newui/main1-borderimage.png) 0 7 fill round repeat;
 	
 	padding:1px;
 	
@@ -4835,10 +4835,10 @@ body
 	
 	border-style: solid;
 	border-width: 8px 9px 9px 8px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
-	border-image: url(https://initium-resources.appspot.com/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 fill stretch;
+	-moz-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	-webkit-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	-o-border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 stretch;
+	border-image: url(/images/ui/newui/main1-inset-darkgrey-borderimage.png) 8 9 9 8 fill stretch;
 	margin:5px;
 }
 
@@ -4889,10 +4889,10 @@ body
 	background-color:#191817;
 	border-style: solid;
 	border-width: 0px 158px 0px 142px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/header-border1.jpg) 0 158 0 142 repeat stretch;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/header-border1.jpg) 0 158 0 142 repeat stretch;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/header-border1.jpg) 0 158 0 142 repeat stretch;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/header-border1.jpg) 0 158 0 142 fill repeat stretch;
+	-moz-border-image: url(/images/ui3/header-border1.jpg) 0 158 0 142 repeat stretch;
+	-webkit-border-image: url(/images/ui3/header-border1.jpg) 0 158 0 142 repeat stretch;
+	-o-border-image: url(/images/ui3/header-border1.jpg) 0 158 0 142 repeat stretch;
+	border-image: url(/images/ui3/header-border1.jpg) 0 158 0 142 fill repeat stretch;
 }
 
 .v3-header1-flipped
@@ -4900,10 +4900,10 @@ body
 	background-color:#191817;
 	border-style: solid;
 	border-width: 0px 158px 0px 142px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/header-border1-flipped.jpg) 0 158 0 142 repeat stretch;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/header-border1-flipped.jpg) 0 158 0 142 repeat stretch;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/header-border1-flipped.jpg) 0 158 0 142 repeat stretch;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/header-border1-flipped.jpg) 0 158 0 142 fill repeat stretch;
+	-moz-border-image: url(/images/ui3/header-border1-flipped.jpg) 0 158 0 142 repeat stretch;
+	-webkit-border-image: url(/images/ui3/header-border1-flipped.jpg) 0 158 0 142 repeat stretch;
+	-o-border-image: url(/images/ui3/header-border1-flipped.jpg) 0 158 0 142 repeat stretch;
+	border-image: url(/images/ui3/header-border1-flipped.jpg) 0 158 0 142 fill repeat stretch;
 	
 }
 
@@ -4912,20 +4912,20 @@ body
 {
 	border-style: solid;
 	border-width: 30px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window1-border.jpg) 30 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window1-border.jpg) 30 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/window1-border.jpg) 30 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/window1-border.jpg) 30 fill repeat;
+	-moz-border-image: url(/images/ui3/window1-border.jpg) 30 repeat;
+	-webkit-border-image: url(/images/ui3/window1-border.jpg) 30 repeat;
+	-o-border-image: url(/images/ui3/window1-border.jpg) 30 repeat;
+	border-image: url(/images/ui3/window1-border.jpg) 30 fill repeat;
 }
 
 .v3-window1b
 {
 	border-style: solid;
 	border-width: 30px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window1b-border.jpg) 30 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window1b-border.jpg) 30 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/window1b-border.jpg) 30 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/window1b-border.jpg) 30 fill repeat;
+	-moz-border-image: url(/images/ui3/window1b-border.jpg) 30 repeat;
+	-webkit-border-image: url(/images/ui3/window1b-border.jpg) 30 repeat;
+	-o-border-image: url(/images/ui3/window1b-border.jpg) 30 repeat;
+	border-image: url(/images/ui3/window1b-border.jpg) 30 fill repeat;
 }
 
 
@@ -4933,10 +4933,10 @@ body
 {
 	border-style: solid;
 	border-width: 72px 91px 90px 99px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
+	-moz-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+	-webkit-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+	-o-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+	border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
 }
 
 .v3-window3
@@ -4944,20 +4944,20 @@ body
 	background-color:#191817;
 	border-style: solid;
 	border-width: 10px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/window3-border.jpg) 10 fill repeat;
+	-moz-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+	-webkit-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+	-o-border-image: url(/images/ui3/window3-border.jpg) 10 repeat;
+	border-image: url(/images/ui3/window3-border.jpg) 10 fill repeat;
 }
 
 .v3-window4
 {
 	border-style: solid;
 	border-width: 31px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window4-border.jpg) 31 repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window4-border.jpg) 31 repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/window4-border.jpg) 31 repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/window4-border.jpg) 31 fill repeat;
+	-moz-border-image: url(/images/ui3/window4-border.jpg) 31 repeat;
+	-webkit-border-image: url(/images/ui3/window4-border.jpg) 31 repeat;
+	-o-border-image: url(/images/ui3/window4-border.jpg) 31 repeat;
+	border-image: url(/images/ui3/window4-border.jpg) 31 fill repeat;
 }
 
 .quest-window-container
@@ -4972,10 +4972,10 @@ body
 {
 	border-style: solid;
 	border-width: 72px 91px 90px 99px;
-	-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-	-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-	-o-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-	border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
+	-moz-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+	-webkit-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+	-o-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+	border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
 	
     position: relative;
     left: 50%;
@@ -5020,7 +5020,7 @@ body
 
 .quest-window-bottombutton
 {
-	background-image: url(https://initium-resources.appspot.com/images/ui3/button-green.png);
+	background-image: url(/images/ui3/button-green.png);
     bottom: -115px;
     width: 155px;
     height: 40px;
@@ -5078,7 +5078,7 @@ body
 
 .overheadmap-mode .banner-shadowbox
 {
-	background: url(https://initium-resources.appspot.com/images/ui3/mapbackground1.jpg) center center / cover no-repeat !important;	
+	background: url(/images/ui3/mapbackground1.jpg) center center / cover no-repeat !important;	
 }
 
 .overheadmap-mode #immovablesPanel, .overheadmap-mode #banner-text-overlay, .overheadmap-mode #banner-fx, .overheadmap-mode #banner-base
@@ -5100,7 +5100,7 @@ body
 .overheadmap-X
 {
 	position: absolute;
-    background-image: url(https://initium-resources.appspot.com/images/ui3/small-square-button-red.png);
+    background-image: url(/images/ui3/small-square-button-red.png);
     color: #e2b766;
     width: 57px;
     height: 46px;
@@ -5172,10 +5172,10 @@ body
 {
     border-style: solid;
     border-width: 72px 91px 90px 99px;
-    -moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-    -webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-    -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-    border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
+    -moz-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    -webkit-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    -o-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
     position: fixed;
     left: 4%;
     right: 4%;
@@ -5204,7 +5204,7 @@ body
 .global-navigation-button.local-places
 {
 	position: absolute;
-    background-image: url(https://initium-resources.appspot.com/images/ui3/local-places1.png);
+    background-image: url(/images/ui3/local-places1.png);
     width: 122px;
     height: 48px;
     bottom: -56px;
@@ -5215,7 +5215,7 @@ body
 .global-navigation-button.zoom-in
 {
 	position: absolute;
-    background-image: url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-in1.png);
+    background-image: url(/images/ui4/minimap-button-zoom-in1.png);
     width: 43px;
     height: 43px;
     bottom: -53px;
@@ -5226,7 +5226,7 @@ body
 .global-navigation-button.zoom-out
 {
 	position: absolute;
-    background-image: url(https://initium-resources.appspot.com/images/ui4/minimap-button-zoom-out1.png);
+    background-image: url(/images/ui4/minimap-button-zoom-out1.png);
     width: 43px;
     height: 43px;
     bottom: -53px;
@@ -5620,7 +5620,7 @@ body
 #gridmap-inspect-button
 {
 	position:absolute;
-	background-image:url(https://initium-resources.appspot.com/images/ui3/inspectbutton1.png);
+	background-image:url(/images/ui3/inspectbutton1.png);
 	width:122px;
 	height:48px;
 	bottom: -5px;
@@ -5638,7 +5638,7 @@ body
     bottom: 0px;
     z-index: 10000;
     cursor: pointer;
-    background-image:url(https://initium-resources.appspot.com/images/ui/talltrees-enabled.png);
+    background-image:url(/images/ui/talltrees-enabled.png);
 }
 
 #gridmap-repeatinvention-button
@@ -5651,13 +5651,13 @@ body
     cursor: pointer;
 
     bottom: 33px;
-    background-image: url(https://initium-resources.appspot.com/images/ui/begin-icon1.png);
+    background-image: url(/images/ui/begin-icon1.png);
 }
 
 
 #gridmap-talltrees-button.disabled
 {
-    background-image:url(https://initium-resources.appspot.com/images/ui/talltrees-disabled.png);
+    background-image:url(/images/ui/talltrees-disabled.png);
 }
 
 .gridBackground.gridSelected
@@ -5692,7 +5692,7 @@ body
 }
 
 .vpcontainer {
-	background-image: url(https://initium-resources.appspot.com/images/2d/viewport-background1.jpg);	
+	background-image: url(/images/2d/viewport-background1.jpg);	
 	height: 100%;
 	width: 100%;
 	top:0px;left:0px;
@@ -5782,7 +5782,7 @@ body[longoperation='true'] .long-operation-status
 
 .progress-bar1 
 {
-    background-image: url(https://initium-resources.appspot.com/images/ui4/progress-bar1-backing.png);
+    background-image: url(/images/ui4/progress-bar1-backing.png);
 	width: 498px;
 	height: 60px;
 	position: relative;
@@ -5791,7 +5791,7 @@ body[longoperation='true'] .long-operation-status
 
 .progress-bar1 .progress-bar-fill 
 {
-    background-image: url(https://initium-resources.appspot.com/images/ui4/progress-bar1-fill.png);
+    background-image: url(/images/ui4/progress-bar1-fill.png);
     height: 60px;
     width: 2%;
     padding-left: 0px;
@@ -5833,7 +5833,7 @@ body[longoperation='true'] .long-operation-status
     position:relative;
     width:14px;
     height:14px;
-    background-image:url(https://initium-resources.appspot.com/images/ui4/empty-socket1.jpg);
+    background-image:url(/images/ui4/empty-socket1.jpg);
 }
 
 .socket-item

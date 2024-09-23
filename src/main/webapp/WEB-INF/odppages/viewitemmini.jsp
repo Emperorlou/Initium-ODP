@@ -157,17 +157,17 @@
 	
 	<div style='text-align:center'>
 		<c:if test="${itemKey!=null }">
-			<a onclick='doExperiment(event, "${itemKey}")' minitip='Experiment on this item'><img src='https://initium-resources.appspot.com/images/ui/tab-experiments-button.png'/></a>
+			<a onclick='doExperiment(event, "${itemKey}")' minitip='Experiment on this item'><img src='/images/ui/tab-experiments-button.png'/></a>
 		</c:if>
 		<c:if test="${proceduralKey!=null }">
-			<a onclick='doExperiment(event, "${proceduralKey}")' minitip='Experiment on this item'><img src='https://initium-resources.appspot.com/images/ui/tab-experiments-button.png'/></a>
+			<a onclick='doExperiment(event, "${proceduralKey}")' minitip='Experiment on this item'><img src='/images/ui/tab-experiments-button.png'/></a>
 		</c:if>
-		<a onclick='loadRelatedSkills("${itemKey}")' minitip='Show skills that you have that related to this item'><img src='https://initium-resources.appspot.com/images/ui/invention1.png'/></a>
+		<a onclick='loadRelatedSkills("${itemKey}")' minitip='Show skills that you have that related to this item'><img src='/images/ui/invention1.png'/></a>
 		<c:if test="${comparisons != null}">
-			<span id='item-comparison-link'><a onclick='$("#item-comparisons").show(); $("#item-comparison-link").hide();' minitip='Compare with existing equipment'><img src='https://initium-resources.appspot.com/images/ui/compare-equipment1.png'/></a></span>
+			<span id='item-comparison-link'><a onclick='$("#item-comparisons").show(); $("#item-comparison-link").hide();' minitip='Compare with existing equipment'><img src='/images/ui/compare-equipment1.png'/></a></span>
 		</c:if>
 		<c:if test="${reachable}">
-		    <a onclick='addItemFilter(event, "${item.itemId}")' minitip='Flag items with this name and rarity(or lower) to be dropped automatically.'><img src='https://initium-resources.appspot.com/images/ui/storefrontDisabled.png'/></a>
+		    <a onclick='addItemFilter(event, "${item.itemId}")' minitip='Flag items with this name and rarity(or lower) to be dropped automatically.'><img src='/images/ui/storefrontDisabled.png'/></a>
 		</c:if>
 	</div>
 	

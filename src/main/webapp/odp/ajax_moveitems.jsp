@@ -175,7 +175,7 @@
 				out.println("<h5>"+selfSide.getProperty("name")+"</h5>");
 				if (selfSide.getProperty("banner")!=null)
 				{
-					out.println("<img src='https://initium-resources.appspot.com/"+selfSide.getProperty("banner")+"' border=0 style='width:80%'/>");
+					out.println("<img src='/"+selfSide.getProperty("banner")+"' border=0 style='width:80%'/>");
 				}
 			}
 			else if (selfSide.getKey().getKind().equals("Character"))
@@ -196,7 +196,7 @@
 				out.println("<h5>"+otherSide.getProperty("name")+"</h5>");
 				if (otherSide.getProperty("banner")!=null)
 				{
-					out.println("<div class='banner-background-image' style='background-image:url(\"https://initium-resources.appspot.com/"+otherSide.getProperty("banner")+"\")' border=0 style='width:80%'></div>");
+					out.println("<div class='banner-background-image' style='background-image:url(\"/"+otherSide.getProperty("banner")+"\")' border=0 style='width:80%'></div>");
 				}
 				out.println("</div>");
 			}
@@ -222,7 +222,7 @@
 			{
 				out.println("<div style='height:30px;'>");
 				out.println("<span>");
-				out.println("<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' border=0/>"+GameUtils.formatNumber(selfSide.getProperty("dogecoins")));
+				out.println("<img src='/images/dogecoin-18px.png' border=0/>"+GameUtils.formatNumber(selfSide.getProperty("dogecoins")));
 				out.println("</span>");
 				out.println("<div class='main-item-controls' style='float:right;margin:6px; margin-right:39px;'>");
 				out.println("<a onclick='depositDogecoinsToItem("+otherSide.getKey().getId()+", event)'>Deposit&nbsp;gold --></a>");
@@ -278,8 +278,8 @@
 				if (item!=null)
 				{
 					itemName = (String)item.getProperty("name");
-					itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'";
-					itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
+					itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='/viewitemmini?itemId="+item.getKey().getId()+"'";
+					itemIconElement = "<img src='/"+item.getProperty("icon")+"' border=0/>"; 
 				}
 
 				if (CommonChecks.checkItemIsMovable(item))
@@ -294,7 +294,7 @@
 					String closeFirstJs = "";
 					if (isViewingItem)
 						closeFirstJs = "closePagePopup();";
-					out.println("<a onclick='"+closeFirstJs+"pagePopup(\"/odp/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
+					out.println("<a onclick='"+closeFirstJs+"pagePopup(\"/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
 				}
 				out.println("</div>");
 				out.println("</div>");
@@ -334,7 +334,7 @@
 			{
 				out.println("<div style='height:30px;'>");
 				out.println("<span style='float:right'>");
-				out.println("<img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' border=0/>"+GameUtils.formatNumber(otherSide.getProperty("dogecoins")));
+				out.println("<img src='/images/dogecoin-18px.png' border=0/>"+GameUtils.formatNumber(otherSide.getProperty("dogecoins")));
 				out.println("</span>");
 				out.println("<div class='main-item-controls'>");
 				out.println("<a onclick='collectDogecoinsFromItem("+otherSide.getKey().getId()+", event)'><-- Collect&nbsp;gold</a>");
@@ -368,8 +368,8 @@
 				if (item!=null)
 				{
 					itemName = (String)item.getProperty("name");
-					itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='/odp/viewitemmini?itemId="+item.getKey().getId()+"'";
-					itemIconElement = "<img src='https://initium-resources.appspot.com/"+item.getProperty("icon")+"' border=0/>"; 
+					itemPopupAttribute = "class='clue "+GameUtils.determineQuality(item.getProperties())+"' rel='/viewitemmini?itemId="+item.getKey().getId()+"'";
+					itemIconElement = "<img src='/"+item.getProperty("icon")+"' border=0/>"; 
 				}
 
 				if (CommonChecks.checkItemIsMovable(item))
@@ -384,7 +384,7 @@
 					String closeFirstJs = "";
 					if (isViewingItem)
 						closeFirstJs = "closePagePopup();";
-					out.println("<a onclick='"+closeFirstJs+"pagePopup(\"/odp/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
+					out.println("<a onclick='"+closeFirstJs+"pagePopup(\"/ajax_moveitems.jsp?selfSide="+selfSide.getKind()+"_"+selfSide.getId()+"&otherSide=Item_"+item.getId()+"\")'>Open</a>");
 				}
 				out.println("</div>");
 				out.println("</div>");

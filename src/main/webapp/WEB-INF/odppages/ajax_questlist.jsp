@@ -4,7 +4,7 @@
 
 <!-- <div class='paragraph' style='text-align:right'><a onclick='restartNoobQuests()'>Restart Noob Quests</a></div> -->
 
-<center><a class='standard-button-highlight' onclick='viewTrainingQuestLines();'><img alt='Training quests' src='https://initium-resources.appspot.com/images/ui3/quest-banners/button-training-quests1.png'/></a></center>
+<center><a class='standard-button-highlight' onclick='viewTrainingQuestLines();'><img alt='Training quests' src='/images/ui3/quest-banners/button-training-quests1.png'/></a></center>
 
 <h2>Quests</h2>
 <c:if test="${hasActiveQuests!=true && hasFinishedQuests!=true}">

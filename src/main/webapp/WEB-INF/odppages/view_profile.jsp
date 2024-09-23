@@ -18,8 +18,8 @@
 	<br>
 	<div class='paypal-panel'>
 		<a onclick='createUpgradeToPremiumWindow()'>
-			<img src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border="0" alt="PayPal - The safer, easier way to pay online!"/><br> 
-			<img src='https://initium-resources.appspot.com/images/paypal-cards.jpg' border=0 />
+			<img src='/images/ui/paypal-donate-button.png' border="0" alt="PayPal - The safer, easier way to pay online!"/><br> 
+			<img src='/images/paypal-cards.jpg' border=0 />
 		</a>
 		<div class='fineprint'>
 			You <u>do not</u> need a PayPal account when you donate using credit or bank cards.

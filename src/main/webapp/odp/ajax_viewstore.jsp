@@ -51,7 +51,7 @@
     
     if (character.getKey().getId() == characterId)
     {
-        WebUtils.forceRedirectClientTo("/odp/ajax_managestore.jsp", request, response);
+        WebUtils.forceRedirectClientTo("/ajax_managestore.jsp", request, response);
         return;
     }
     

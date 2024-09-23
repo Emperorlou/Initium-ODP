@@ -441,7 +441,7 @@ public class MainPageUpdateService extends Service
 			
 		
 		if (banner!=null && banner.startsWith("http")==false)
-			return "https://initium-resources.appspot.com/"+banner;
+			return "/"+banner;
 		else
 			return banner;
 	}
@@ -841,11 +841,11 @@ public class MainPageUpdateService extends Service
 	{
 		StringBuilder newHtml = new StringBuilder();
 		
-		newHtml.append("<a id='thisLocation-button' class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png' style='max-width:32px'></a>");			
-		newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img alt='Navigation' src='https://initium-resources.appspot.com/images/ui/compass1.png' style='max-width:32px'></a>");			
-		newHtml.append("<a id='globe-navigation-button' class='path-overlay-link' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img alt='Global navigation' src='https://initium-resources.appspot.com/images/ui/navigation-map-icon2.png' style='max-width:32px'></a>");			
-		newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='https://initium-resources.appspot.com/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
-//		newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png' style='max-width:32px'></a>");
+		newHtml.append("<a id='thisLocation-button' class='path-overlay-link' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img alt='Location actions' src='/images/ui/magnifying-glass2.png' style='max-width:32px'></a>");			
+		newHtml.append("<a id='navigation-button' class='path-overlay-link' onclick='makeIntoPopup(\".navigation-box\")' style='right:0px;top:32px;'><img alt='Navigation' src='/images/ui/compass1.png' style='max-width:32px'></a>");			
+		newHtml.append("<a id='globe-navigation-button' class='path-overlay-link' onclick='viewGlobeNavigation()' style='right:4px;top:74px;'><img alt='Global navigation' src='/images/ui/navigation-map-icon2.png' style='max-width:32px'></a>");			
+		newHtml.append("<a id='local-navigation-button' class='path-overlay-link' onclick='viewLocalNavigation()' style='right:4px;top:108px;'><img alt='Local navigation' src='/images/ui/navigation-local-icon1.png' style='max-width:32px'></a>");			
+//		newHtml.append("<a id='guard-button' class='path-overlay-link' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='/images/ui/guardsettings1.png' style='max-width:32px'></a>");
 		
 		return newHtml.toString();
 	}
@@ -1326,7 +1326,7 @@ public class MainPageUpdateService extends Service
 				forgettableCombatSiteList.append(destLocationKeyId+",");
 			}
 			else if ("BlockadeSite".equals(destLocation.getProperty("type")) || defensiveStructureAllowed)
-				newHtml.append("<a href='#' class='main-button-icon' onclick='doGoto(event, "+path.getKey().getId()+", true)'><img src='https://initium-resources.appspot.com/images/ui/attack1.png' title='This button allows you to travel to this location with the intent to attack any player-made defences without a confirmation' border=0/></a><a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='v3-main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
+				newHtml.append("<a href='#' class='main-button-icon' onclick='doGoto(event, "+path.getKey().getId()+", true)'><img src='/images/ui/attack1.png' title='This button allows you to travel to this location with the intent to attack any player-made defences without a confirmation' border=0/></a><a href='#' onclick='doGoto(event, "+path.getKey().getId()+")' class='v3-main-button' "+shortcutPart+" >"+shortcutKeyIndicatorPart+buttonCaption+"</a>");
 			else if ("CollectionSite".equals(location.getProperty("type")))
 			{
 				newHtml.append("<br>");
@@ -1441,11 +1441,11 @@ public class MainPageUpdateService extends Service
 			js.append("}");
 
 		js.append("if (isAnimatedBannersEnabled()==false && bannerUrl.indexOf('.gif')>0)");
-		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+		js.append("bannerUrl = '/images/banner---placeholder.gif';");
 		js.append("else if (isBannersEnabled()==false)");
-		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+		js.append("bannerUrl = '/images/banner---placeholder.gif';");
 		js.append("else if (bannerUrl=='' || bannerUrl == 'null')");
-		js.append("bannerUrl = 'https://initium-resources.appspot.com/images/banner---placeholder.gif';");
+		js.append("bannerUrl = '/images/banner---placeholder.gif';");
 
 		js.append("var isOutside = '"+location.getProperty("isOutside")+"';");
 	
@@ -1508,8 +1508,8 @@ public class MainPageUpdateService extends Service
 		
 		// Here we'll update the button bar
 		//addType1Button(position, imageUrl, shortcut, javascript)
-		js.append("addType1Button(1, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
-		js.append("addType1Button(2, 'https://initium-resources.appspot.com/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
+		js.append("addType1Button(1, '/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
+		js.append("addType1Button(2, '/images/ui/magnifying-glass2.png', 'E', 'viewThisLocationWindow()');");
 		
 		// Here we'll update the "Local Places" mini page if it is open
 		js.append("if (getMiniPagePopupTitle()=='Local Places') viewLocalNavigation();");
@@ -1538,10 +1538,10 @@ public class MainPageUpdateService extends Service
 		RevenueService rs = new RevenueService(db);
 
 		if(rs.anyBuffActive())
-			return updateHtmlContents("#globalBuffIndicator", "<img class='server-wide-buff-indicator buff-enabled' src='https://storage.googleapis.com/initium-resources/images/ui/global-buff1.gif' alt='!!' title='There is a server-wide buff active!'/>");
+			return updateHtmlContents("#globalBuffIndicator", "<img class='server-wide-buff-indicator buff-enabled' src='/images/ui/global-buff1.gif' alt='!!' title='There is a server-wide buff active!'/>");
 
 		else
-			return updateHtmlContents("#globalBuffIndicator", "<img class='server-wide-buff-indicator buff-disabled' src='https://storage.googleapis.com/initium-resources/images/ui/global-buff-inactive1.png' alt='--' title='There is no server-wide buff currently active'/>");
+			return updateHtmlContents("#globalBuffIndicator", "<img class='server-wide-buff-indicator buff-disabled' src='/images/ui/global-buff-inactive1.png' alt='--' title='There is no server-wide buff currently active'/>");
 	}
 	
 	public String updateActivePlayerCount()
@@ -1781,7 +1781,7 @@ public class MainPageUpdateService extends Service
 				if (iconUrl!=null && iconUrl.startsWith("http://"))
 					iconUrl = "https://"+iconUrl.substring(7);
 				else if (iconUrl!=null && iconUrl.startsWith("http")==false)
-					iconUrl = "https://initium-resources.appspot.com/"+iconUrl;
+					iconUrl = "/"+iconUrl;
 				
 				html.append("<div class='clue' rel='/odp/viewitemmini?itemId=").append(item.getKey().getId()).append("'>");
 				html.append("<img src='").append(iconUrl).append("' border=0/>");

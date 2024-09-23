@@ -62,7 +62,7 @@ public class SoundtrackController extends PageController {
 		Map<String,String> result = new HashMap<String,String>();
 		
 		result.put("name", name);
-		result.put("url", "https://initium-resources.appspot.com/music/"+name+".mp3");
+		result.put("url", "/music/"+name+".mp3");
 		
 		return result;
 	}

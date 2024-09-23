@@ -25,26 +25,26 @@
 <script type="text/javascript" src="/javascript/sockjs.min.js"></script>
 <script type="text/javascript" src="/javascript/vertx-eventbus.js"></script>
 
-<script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=82"></script>
+<script type="text/javascript" src="/javascript/seedrandom.js"></script>
+<script type="text/javascript" src="/javascript/script.js?v=82"></script>
 
-<script type="text/javascript" src="/odp/javascript/messager.js?v=22"></script>
+<script type="text/javascript" src="/javascript/messager.js?v=22"></script>
 
-<script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
-<script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
+<script type="text/javascript" src="/javascript/PopupNotifications.js?v=3"></script>
+<script type="text/javascript" src="/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
 
 
 
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=62">
+<link type="text/css" rel="stylesheet" href="/MiniUP.css?v=62">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="/javascript/rangeslider/rangeslider.min.js"></script>
 
-<script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
-<script src='/odp/javascript/map.js?t=6'></script>
+<script src='/javascript/openseadragon/openseadragon.min.js'></script>
+<script src='/javascript/map.js?t=6'></script>
 
 <script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit"></script>
 
@@ -211,7 +211,7 @@
 	});
 </script>
 
-<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=8'></script>
+<script type='text/javascript' src='/javascript/banner-weather.js?v=8'></script>
 <script id='ajaxJs' type='text/javascript'>
 ${bannerJs}
 </script>
@@ -222,36 +222,36 @@ ${bannerJs}
 <script type='text/javascript'>
 	if (isAnimationsEnabled())
 	{
-		$.preload("https://initium-resources.appspot.com/images/anim/walking.gif", 
-				"https://initium-resources.appspot.com/images/anim/props/tree1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree6.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree6.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree7.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass6.gif"
+		$.preload("/images/anim/walking.gif", 
+				"/images/anim/props/tree1.gif",
+				"/images/anim/props/tree2.gif",
+				"/images/anim/props/tree3.gif",
+				"/images/anim/props/tree4.gif",
+				"/images/anim/props/tree5.gif",
+				"/images/anim/props/tree6.gif",
+				"/images/anim/props/shrub1.gif",
+				"/images/anim/props/shrub2.gif",
+				"/images/anim/props/shrub3.gif",
+				"/images/anim/props/baretree1.gif",
+				"/images/anim/props/baretree2.gif",
+				"/images/anim/props/baretree3.gif",
+				"/images/anim/props/baretree4.gif",
+				"/images/anim/props/baretree5.gif",
+				"/images/anim/props/baretree6.gif",
+				"/images/anim/props/baretree7.gif",
+				"/images/anim/props/grass1.gif",
+				"/images/anim/props/grass2.gif",
+				"/images/anim/props/grass3.gif",
+				"/images/anim/props/grass4.gif",
+				"/images/anim/props/grass5.gif",
+				"/images/anim/props/grass6.gif"
 				);
 	}
 </script>
 
-<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=${version}'></script>
+<script type='text/javascript' src='/javascript/messager-impl.js?v=${version}'></script>
 
-<script type='text/javascript' src='/odp/javascript/soundeffects.js?v=13'></script>
+<script type='text/javascript' src='/javascript/soundeffects.js?v=13'></script>
 <script type='text/javascript'>
 	// THIS SECTION IS NEEDED FOR THE SOUND EFFECTS
 	$(document).ready(function(){
@@ -386,8 +386,8 @@ $(function(){
 	});
 </script>
 
-<script type='text/javascript' src='odp/javascript/banner-weather.js?v=6'></script>
-<script type='text/javascript' src='odp/javascript/soundeffects.js?v=13'></script>
+<script type='text/javascript' src='javascript/banner-weather.js?v=6'></script>
+<script type='text/javascript' src='javascript/soundeffects.js?v=13'></script>
 
 <script id='ajaxJs' type='text/javascript'>
 ${bannerJs}
@@ -396,29 +396,29 @@ ${bannerJs}
 <script type='text/javascript'>
 	if (isAnimationsEnabled())
 	{
-		$.preload("https://initium-resources.appspot.com/images/anim/walking.gif", 
-				"https://initium-resources.appspot.com/images/anim/props/tree1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree6.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree6.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree7.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass6.gif"
+		$.preload("/images/anim/walking.gif", 
+				"/images/anim/props/tree1.gif",
+				"/images/anim/props/tree2.gif",
+				"/images/anim/props/tree3.gif",
+				"/images/anim/props/tree4.gif",
+				"/images/anim/props/tree5.gif",
+				"/images/anim/props/tree6.gif",
+				"/images/anim/props/shrub1.gif",
+				"/images/anim/props/shrub2.gif",
+				"/images/anim/props/shrub3.gif",
+				"/images/anim/props/baretree1.gif",
+				"/images/anim/props/baretree2.gif",
+				"/images/anim/props/baretree3.gif",
+				"/images/anim/props/baretree4.gif",
+				"/images/anim/props/baretree5.gif",
+				"/images/anim/props/baretree6.gif",
+				"/images/anim/props/baretree7.gif",
+				"/images/anim/props/grass1.gif",
+				"/images/anim/props/grass2.gif",
+				"/images/anim/props/grass3.gif",
+				"/images/anim/props/grass4.gif",
+				"/images/anim/props/grass5.gif",
+				"/images/anim/props/grass6.gif"
 				);
 	}
 </script>
@@ -468,27 +468,27 @@ http://github.com/Emperorlou/Initium-ODP
 		<div class='header'>
 			<div class='header-location above-page-popup'><a id='locationName' href='main.jsp'>${locationName }</a></div>
 			<div class='header-stats above-page-popup'>
-				<a onclick='viewMap()'><img src='https://initium-resources.appspot.com/images/ui/globe2.png' border=0/></a> 
-				<a onclick='inventory()'><img src='https://initium-resources.appspot.com/images/small/Pixel_Art-Storage-Bags-Bags4.png' border=0/><div class='header-stats-caption'>EQUIP</div></a> 
-				<span><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' border=0/><div class='header-stats-caption-alwayson' id='mainGoldIndicator'>${characterDogecoinsFormatted}</div></span> 
-				<a onclick='viewSettings()'><img src='https://initium-resources.appspot.com/images/ui/settings.gif' border=0 style='max-height:18px'/></a> 
-				<a onclick='toggleEnvironmentSoundEffects()'><img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border=0 style='max-height:18px'/></a>
+				<a onclick='viewMap()'><img src='/images/ui/globe2.png' border=0/></a> 
+				<a onclick='inventory()'><img src='/images/small/Pixel_Art-Storage-Bags-Bags4.png' border=0/><div class='header-stats-caption'>EQUIP</div></a> 
+				<span><img src='/images/dogecoin-18px.png' border=0/><div class='header-stats-caption-alwayson' id='mainGoldIndicator'>${characterDogecoinsFormatted}</div></span> 
+				<a onclick='viewSettings()'><img src='/images/ui/settings.gif' border=0 style='max-height:18px'/></a> 
+				<a onclick='toggleEnvironmentSoundEffects()'><img id='header-mute' src='/images/ui/sound-button1.png' border=0 style='max-height:18px'/></a>
 			</div>
 		</div>
 	</div>
 
 	<div class='main-page'>
-		<img class='main-page-banner-image' src="https://initium-resources.appspot.com/images/banner-backing.jpg" border=0/>
+		<img class='main-page-banner-image' src="/images/banner-backing.jpg" border=0/>
 		<div style="position:absolute; top:27px;z-index:1000100;">
-		<img class='main-page-banner-image' src="https://initium-resources.appspot.com/images/banner-backing.jpg" border=0/>
+		<img class='main-page-banner-image' src="/images/banner-backing.jpg" border=0/>
 		
 		<div class='main-banner' >
-			<img class='main-page-banner-image' src="https://initium-resources.appspot.com/images/banner---placeholder.gif" border=0/>
+			<img class='main-page-banner-image' src="/images/banner---placeholder.gif" border=0/>
 			<c:if test="${isOutside=='TRUE' }">
 				<div class='banner-shadowbox'>
 			</c:if>
 			<c:if test="${isOutside!='TRUE' }">
-				<div class='banner-shadowbox' style="background: url('https://initium-resources.appspot.com/images/banner---placeholder.gif') no-repeat center center; background-size:cover;">
+				<div class='banner-shadowbox' style="background: url('/images/banner---placeholder.gif') no-repeat center center; background-size:cover;">
 			</c:if>
 				
 			
@@ -506,7 +506,7 @@ http://github.com/Emperorlou/Initium-ODP
 		</div>
 		
 		
-		<div style="text-align:right">Check out the progress on the <a href="odp/game">new UI here!</a></div>
+		<div style="text-align:right">Check out the progress on the <a href="game">new UI here!</a></div>
  		<div class='chat_box above-page-popup'>
 			<div class='chat_tab_container'>
 				<span class='chat_tab_button_container'><a id='chat_box_minimize_button' onclick='toggleMinimizeBox(event, ".chat_box");' class='chat_tab_toggle_minimize'>V</a></span><span class='chat_tab_button_container'><a id='GameMessages_tab' class="chat_tab" onclick='changeChatTab("GameMessages")'><span class='chat-button-indicator' id='GameMessages-chat-indicator'></span>!</a></span><span class='chat_tab_button_container'><a id='GlobalChat_tab' class='chat_tab chat_tab_selected' onclick='changeChatTab("GlobalChat")'><span class='chat-button-indicator' id='GlobalChat-chat-indicator'></span>Global</a></span><span class='chat_tab_button_container'><a id='LocationChat_tab' class='chat_tab' onclick='changeChatTab("LocationChat")'><span class='chat-button-indicator' id='LocationChat-chat-indicator'></span>Location</a></span><span class='chat_tab_button_container'><a id='GroupChat_tab' class="chat_tab" onclick='changeChatTab("GroupChat")'><span class='chat-button-indicator' id='GroupChat-chat-indicator'></span>Group</a></span><span class='chat_tab_button_container'><a id='PartyChat_tab' class="chat_tab" onclick='changeChatTab("PartyChat")'><span class='chat-button-indicator' id='PartyChat-chat-indicator'></span>Party</a></span><span class='chat_tab_button_container'><a id='PrivateChat_tab' class="chat_tab" onclick='changeChatTab("PrivateChat")'><span class='chat-button-indicator' id='PrivateChat-chat-indicator'></span>Private</a></span><a onclick='helpPopup();' class='chat_tab_help_button'>?</a>
@@ -531,7 +531,7 @@ http://github.com/Emperorlou/Initium-ODP
 				<div class='chat_messages' id="chat_messages_PrivateChat"></div>
 			</div>
 			<div class='chat_tab_footer'>
-				<a class='clue' rel='/odp/ajax_ignore.jsp' style='float:left'>Ignore Players</a>
+				<a class='clue' rel='/ajax_ignore.jsp' style='float:left'>Ignore Players</a>
 				<span id='ping' title='Your connection speed with the server in milliseconds'>??</span>
 				&#8226; 
 				<c:if test="${usedCustomOrders}">
@@ -591,12 +591,12 @@ http://github.com/Emperorlou/Initium-ODP
 							he initiated the attack. 
 						</p>
 						<p>
-						For more information on defence structures, <a href='odp/mechanics.jsp#defencestructures'>visit the game mechanics page</a>.
+						For more information on defence structures, <a href='mechanics.jsp#defencestructures'>visit the game mechanics page</a>.
 						</p>
 					</div>
 					<script type="text/javascript">updateMinimizeBox("#defenceStructureMinimizeButton", "#defenceStructureBox")</script>
 					<h4><a id='defenceStructureMinimizeButton' onclick='toggleMinimizeBox(event, "#defenceStructureBox");' class=''>&#8711;</a> Defensive Structure
-						<span class='hint' rel='#defencestructures' style='float:right'><img src='https://initium-resources.appspot.com/images/ui/help.png' border=0 style='max-height:19px;'/></span>			
+						<span class='hint' rel='#defencestructures' style='float:right'><img src='/images/ui/help.png' border=0 style='max-height:19px;'/></span>			
 					</h4>
 					<div>Structural Integrity: ${defenceStructureHitpoints}/${defenceStructureMaxHitpoints}</div>
 					<p>${statusDescription}</p>
@@ -723,7 +723,7 @@ http://github.com/Emperorlou/Initium-ODP
 			<div class='main-splitScreen'>
 				<div id='main-merchantlist'>
 					<div class='main-button-half' onclick='loadLocationMerchants()' shortcut='83'>
-	 					<span class='shortcut-key'> (S)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby stores
+	 					<span class='shortcut-key'> (S)</span><img src='/images/ui/magnifying-glass.png' border=0/> Nearby stores
 					</div>
 				</div>
 			</div>
@@ -734,14 +734,14 @@ http://github.com/Emperorlou/Initium-ODP
 			<div class='main-splitScreen'>
 				<div id='main-itemlist'>
 					<div class='main-button-half' onclick='loadLocationItems()' shortcut='86'>
-	 					<span class='shortcut-key'> (V)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby items
+	 					<span class='shortcut-key'> (V)</span><img src='/images/ui/magnifying-glass.png' border=0/> Nearby items
 					</div>
 				</div>
 			</div>
 			<div class='main-splitScreen'>
 				<div id='main-characterlist'>
 					<div class='main-button-half' onclick='loadLocationCharacters()' shortcut='66'>
-	 					<span class='shortcut-key'> (B)</span><img src='https://initium-resources.appspot.com/images/ui/magnifying-glass.png' border=0/> Nearby characters
+	 					<span class='shortcut-key'> (B)</span><img src='/images/ui/magnifying-glass.png' border=0/> Nearby characters
 					</div>
 				</div>
 			</div>

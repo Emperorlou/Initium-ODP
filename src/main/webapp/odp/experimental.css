@@ -23,7 +23,7 @@
 	top:0px;
 	left:50%;
 	margin-left: -125px;
-    background-image: url(https://initium-resources.appspot.com/images/ui3/major-tabs-backing1.png);
+    background-image: url(/images/ui3/major-tabs-backing1.png);
     background-repeat: no-repeat;
     background-size: 100% 100%;
     width: 250px;
@@ -43,10 +43,10 @@
 {
 	border-style: solid;
     border-width: 72px 91px 90px 99px;
-    -moz-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-    -webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-    -o-border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
-    border-image: url(https://initium-resources.appspot.com/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
+    -moz-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    -webkit-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    -o-border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 round repeat;
+    border-image: url(/images/ui3/window2-border.jpg) 72 91 90 99 fill round repeat;
 
 	position:absolute;
 	bottom: 0px;

@@ -1861,7 +1861,7 @@ public class GameUtils
 		{
 			sb.append("<div class='" + lowDurabilityClass + "avatar-equip-backing" + sizePrepend + " v3-window3' style='background-color:none;border-width:6px;'>");
 
-			sb.append("<div class='avatar-equip-cloak" + sizePrepend + "' style='background-image:url(\"https://initium-resources.appspot.com/images/ui/newui/avatar-silhouette-male1.png\")'></div>");
+			sb.append("<div class='avatar-equip-cloak" + sizePrepend + "' style='background-image:url(\"/images/ui/newui/avatar-silhouette-male1.png\")'></div>");
 
 			if (equipmentBootsUrl != null) sb.append("<div class='avatar-equip-boots" + sizePrepend + "' style='background-image:url(\"" + equipmentBootsUrl + "\")'></div>");
 			if (effectOverlayBoots != null) sb.append("<div class='avatar-equip-boots" + sizePrepend + " avatar-effect-overlay' style='background-image:url(\"" + effectOverlayBoots + "\")"+getEffectOverlayBrightnessCss(equipmentBoots)+"'></div>");
@@ -1897,7 +1897,7 @@ public class GameUtils
 		{
 			sb.append("<div class='avatar-equip-backing" + sizePrepend + " v3-window3' style='background-color:none;'>");
 
-			sb.append("<div class='avatar-equip-cloak" + sizePrepend + "' style='background-image:url(\"https://initium-resources.appspot.com/images/cloak1.png\")'></div>");
+			sb.append("<div class='avatar-equip-cloak" + sizePrepend + "' style='background-image:url(\"/images/cloak1.png\")'></div>");
 
 		}
 		sb.append("</div>");
@@ -2055,11 +2055,11 @@ public class GameUtils
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("<div style='text-align:center'>");
-		sb.append("<img class='main-page-banner-image' src='https://initium-resources.appspot.com/images/banner-backing.jpg' border=0 />");
+		sb.append("<img class='main-page-banner-image' src='/images/banner-backing.jpg' border=0 />");
 		// sb.append("<div class='main-banner-container'
 		// style='z-index:1000100'>");
 		// sb.append(" <img class='main-page-banner-image'
-		// src='https://initium-resources.appspot.com/images/banner-backing.jpg'
+		// src='/images/banner-backing.jpg'
 		// border=0 />");
 		// sb.append(" <div class='main-banner'>");
 		// sb.append(" <img class='main-page-banner-image' src='"+bannerUrl+"'
@@ -2320,9 +2320,9 @@ public class GameUtils
 						else
 						{
 							if (formula.length() > 50)
-								formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> " + originalFormula + " = " + jep.getValue() + "";
+								formula = "<img src='/images/dice1.png' border=0/> " + originalFormula + " = " + jep.getValue() + "";
 							else
-								formula = "<img src='https://initium-resources.appspot.com/images/dice1.png' border=0/> " + originalFormula + " = " + formula + " = " + jep.getValue() + "";
+								formula = "<img src='/images/dice1.png' border=0/> " + originalFormula + " = " + formula + " = " + jep.getValue() + "";
 						}
 					}
 				}
@@ -2712,15 +2712,19 @@ public class GameUtils
 
 		if (relativeUrl.startsWith("https://"))
 		{
-			if (relativeUrl.startsWith("https://i.imgur.com") || relativeUrl.startsWith("https://storage.googleapis.com/initium-resources/"))
+			if (relativeUrl.startsWith("https://i.imgur.com")"))
 				return relativeUrl;
+			else if (relativeUrl.startsWith("https://storage.googleapis.com/initium-resources/"))
+				return relativeUrl.substring(48)
+			else if (relativeUrl.startsWith("https://initium-resources.appspot.com/"))
+				return relativeUrl.substring(37)
 			else
 				return "";
 		}
 		else if (relativeUrl.startsWith("/"))
-			return "https://initium-resources.appspot.com" + relativeUrl;
+			return relativeUrl;
 		else
-			return "https://initium-resources.appspot.com/" + relativeUrl;
+			return "/" + relativeUrl;
 	}
 
 	/**

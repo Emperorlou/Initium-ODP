@@ -20,8 +20,8 @@ public class FullPageUpdateService extends ExperimentalPageUpdateService {
 		StringBuilder newHtml = new StringBuilder();
 
 		newHtml.append("<div class='path-overlay-link major-banner-links' style='left:50%; top:15%;'>");
-		newHtml.append("<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img alt='Location actions' src='https://initium-resources.appspot.com/images/ui/magnifying-glass2.png'></a>");			
-		newHtml.append("<a id='guard-button' class='button-overlay-major' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='https://initium-resources.appspot.com/images/ui/guardsettings1.png'></a>");
+		newHtml.append("<a id='thisLocation-button' class='button-overlay-major' onclick='makeIntoPopup(\".this-location-box\")' style='right:0px;top:0px;'><img alt='Location actions' src='/images/ui/magnifying-glass2.png'></a>");			
+		newHtml.append("<a id='guard-button' class='button-overlay-major' onclick='viewGuardSettings()' style='right:4px;top:142px;'><img alt='Guard settings' src='/images/ui/guardsettings1.png'></a>");
 		newHtml.append("</div>");
 		
 		return newHtml.toString();

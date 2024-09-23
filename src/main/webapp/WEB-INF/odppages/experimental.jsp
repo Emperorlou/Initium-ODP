@@ -7,8 +7,8 @@
 		default-src 'self'; 
 		connect-src 'self'
 			https://initium-resources.appspot.com
-			https://<%=ChatService.EVENT_SERVER_DOMAIN%>
-			wss://<%=ChatService.EVENT_SERVER_DOMAIN%>
+			https://eventserver.playinitium.com
+			wss://eventserver.playinitium.com
 			https://storage.googleapis.com/initium-resources/ 
 			https://www.google-analytics.com;
 		img-src 'self'
@@ -57,22 +57,22 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
-<script type="text/javascript" src="/odp/javascript/sockjs.min.js"></script>
-<script type="text/javascript" src="/odp/javascript/vertx-eventbus.js"></script>
-<script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
+<script type="text/javascript" src="/javascript/sockjs.min.js"></script>
+<script type="text/javascript" src="/javascript/vertx-eventbus.js"></script>
+<script type="text/javascript" src="/javascript/seedrandom.js"></script>
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.finger/0.1.6/jquery.finger.min.js"></script>
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=${version}"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">
+<script type="text/javascript" src="/javascript/script.js?v=${version}"></script>
+<link type="text/css" rel="stylesheet" href="/MiniUP.css?v=${version}">
 
 
 <script type="text/javascript" src="https://cdn.rawgit.com/leafo/sticky-kit/v1.1.2/jquery.sticky-kit.min.js"></script>
-<script type="text/javascript" src="/odp/javascript/messager.js?v=70"></script>
+<script type="text/javascript" src="/javascript/messager.js?v=70"></script>
 
-<script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
-<script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
+<script type="text/javascript" src="/javascript/PopupNotifications.js?v=3"></script>
+<script type="text/javascript" src="/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
 
 
 
@@ -81,8 +81,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="/javascript/rangeslider/rangeslider.min.js"></script>
 
-<script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
-<script src='/odp/javascript/map.js?t=6'></script>
+<script src='/javascript/openseadragon/openseadragon.min.js'></script>
+<script src='/javascript/map.js?t=6'></script>
 
 <script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit" async defer></script>
 
@@ -263,41 +263,41 @@
 
 
 
-<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=12'></script>
-<script type='text/javascript' src='/odp/javascript/soundeffects.js?v=13'></script>
+<script type='text/javascript' src='/javascript/banner-weather.js?v=12'></script>
+<script type='text/javascript' src='/javascript/soundeffects.js?v=13'></script>
 
 
 <script type='text/javascript'>
 	if (isAnimationsEnabled())
 	{
-		$.preload("https://initium-resources.appspot.com/images/anim/walking.gif", 
-				"https://initium-resources.appspot.com/images/anim/props/tree1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree6.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree6.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree7.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass6.gif"
+		$.preload("/images/anim/walking.gif", 
+				"/images/anim/props/tree1.gif",
+				"/images/anim/props/tree2.gif",
+				"/images/anim/props/tree3.gif",
+				"/images/anim/props/tree4.gif",
+				"/images/anim/props/tree5.gif",
+				"/images/anim/props/tree6.gif",
+				"/images/anim/props/shrub1.gif",
+				"/images/anim/props/shrub2.gif",
+				"/images/anim/props/shrub3.gif",
+				"/images/anim/props/baretree1.gif",
+				"/images/anim/props/baretree2.gif",
+				"/images/anim/props/baretree3.gif",
+				"/images/anim/props/baretree4.gif",
+				"/images/anim/props/baretree5.gif",
+				"/images/anim/props/baretree6.gif",
+				"/images/anim/props/baretree7.gif",
+				"/images/anim/props/grass1.gif",
+				"/images/anim/props/grass2.gif",
+				"/images/anim/props/grass3.gif",
+				"/images/anim/props/grass4.gif",
+				"/images/anim/props/grass5.gif",
+				"/images/anim/props/grass6.gif"
 				);
 	}
 </script>
 
-<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=${version}'></script>
+<script type='text/javascript' src='/javascript/messager-impl.js?v=${version}'></script>
 
 
 
@@ -349,9 +349,9 @@
 </script>
 
 
-<script type='text/javascript' src='/odp/javascript/reveal-tutorial.js?v=15'></script>
-<script type='text/javascript' src='/odp/javascript/reveal-tutorial-impl.js?v=6'></script>
-<script type='text/javascript' src='/odp/javascript/ui-tutorial.js?v=${version}'></script>
+<script type='text/javascript' src='/javascript/reveal-tutorial.js?v=15'></script>
+<script type='text/javascript' src='/javascript/reveal-tutorial-impl.js?v=6'></script>
+<script type='text/javascript' src='/javascript/ui-tutorial.js?v=${version}'></script>
 
 <!-- Dynamically add style tags that modify -->
 <style id='msw'>
@@ -537,7 +537,7 @@ function popupPermanentOverlay_Walking(locationName)
 </script>
 
 
-<link rel="stylesheet" href="/odp/experimental.css?t=${version}"/>
+<link rel="stylesheet" href="/experimental.css?t=${version}"/>
 
 
 </head>
@@ -563,7 +563,7 @@ Version: ${version}
 	<div class='main-page popupBlurrable'>
 		<div class='header v3-header1'>
 			<div class='header-inner'>
-				<div id='pullout-button' class='header-inner-section'><a onclick='toggleMainPullout()'><img src='https://initium-resources.appspot.com/images/ui3/header-button-options1.png' alt='Pullout menu' height='34px'/></a></div>
+				<div id='pullout-button' class='header-inner-section'><a onclick='toggleMainPullout()'><img src='/images/ui3/header-button-options1.png' alt='Pullout menu' height='34px'/></a></div>
 				<div class='header-inner-section' style='width:100%;vertical-align: middle; text-align: center;'><div style='margin-left:-32px; margin-right:-22px;'><a id='locationName' onclick='location.reload()'>${locationName}</a></div></div>
                 <div id = 'globalBuffIndicator' class = 'header-inner-section' onclick = 'viewGlobalBuffs()'>
                     ${globalBuffIndicator}
@@ -571,9 +571,9 @@ Version: ${version}
 				<div id='mainMoneyIndicator' class='header-inner-section' onclick='viewProfile()'>
 					${mainMoneyIndicator}
 				</div>
-				<!-- <div id='map-button' class='header-inner-section'><a onclick='viewMap()'><img alt='View player-made world map' src='https://initium-resources.appspot.com/images/ui3/header-button-map1.png' height='34px'/></a></div> -->
-				<div id='settings-button' class='header-inner-section'><a onclick='viewSettings()'><img alt='Game settings' src='https://initium-resources.appspot.com/images/ui3/header-button-settings1.png' height='34px'/></a></div>
-				<div id='sound-button' class='header-inner-section'><a onclick='toggleEnvironmentSoundEffects()'><img alt='Sound effects' src='https://initium-resources.appspot.com/images/ui3/header-button-sound-on1.png' height='34px'/></a></div>
+				<!-- <div id='map-button' class='header-inner-section'><a onclick='viewMap()'><img alt='View player-made world map' src='/images/ui3/header-button-map1.png' height='34px'/></a></div> -->
+				<div id='settings-button' class='header-inner-section'><a onclick='viewSettings()'><img alt='Game settings' src='/images/ui3/header-button-settings1.png' height='34px'/></a></div>
+				<div id='sound-button' class='header-inner-section'><a onclick='toggleEnvironmentSoundEffects()'><img alt='Sound effects' src='/images/ui3/header-button-sound-on1.png' height='34px'/></a></div>
 			</div>
 		</div>
 	</div>
@@ -586,7 +586,7 @@ Version: ${version}
 					<div class='banner-shadowbox'>
 				</c:if>
 				<c:if test="${isOutside!='TRUE' }">
-					<div class='banner-shadowbox' style="background: url('https://initium-resources.appspot.com/images/banner---placeholder.gif') no-repeat center center; background-size:cover;">
+					<div class='banner-shadowbox' style="background: url('/images/banner---placeholder.gif') no-repeat center center; background-size:cover;">
 				</c:if>
 					
 				
@@ -644,8 +644,8 @@ Version: ${version}
 						<div class="path-overlay-link major-banner-links auto-animate">
 						
 							<a id='homebanner-button' class='button-overlay-major' minitip='Open main view' onclick='onBannerDefaultClicked()' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/home-banner1.png'></a>
-							<a id="movement-button" class="button-overlay-major" minitip='Navigation/movement mode' onclick="onMovementButtonClicked()" style="right:4px;top:74px;"><img alt="Character navigation" src="https://initium-resources.appspot.com/images/ui/movement-icon1.png"></a>
-							<a id="twodview-button" class="button-overlay-major" minitip='Open this location`s 2D view' onclick="on2DViewButtonClicked()" style="right:4px;top:142px;"><img alt="2D View" src="https://initium-resources.appspot.com/images/ui/navigation-local-icon2.png"></a>
+							<a id="movement-button" class="button-overlay-major" minitip='Navigation/movement mode' onclick="onMovementButtonClicked()" style="right:4px;top:74px;"><img alt="Character navigation" src="/images/ui/movement-icon1.png"></a>
+							<a id="twodview-button" class="button-overlay-major" minitip='Open this location`s 2D view' onclick="on2DViewButtonClicked()" style="right:4px;top:142px;"><img alt="2D View" src="/images/ui/navigation-local-icon2.png"></a>
 							<a id='thisLocation-button' class='button-overlay-major' minitip='Other stuff you can do here' onclick='makeIntoPopup(&quot;.this-location-box&quot;)' style='right:0px;top:0px;'><img alt='Location actions' src='https://storage.googleapis.com/initium-resources/images/ui/main-more-button1.png'></a>
 						</div>			
 						
@@ -659,7 +659,7 @@ Version: ${version}
 						    </div>
 						    <p>
 							    <a class='text-shadow' style='pointer-events: auto;' onclick='cancelLongOperations(event)'>
-							    	<img src="https://initium-resources.appspot.com/images/ui4/button-cancel1.png" alt="Cancel">
+							    	<img src="/images/ui4/button-cancel1.png" alt="Cancel">
 							    </a>
 						    </p>
 						</div>
@@ -681,7 +681,7 @@ Version: ${version}
 		<a onclick="closeClosableMessage('promo-24hr-2x-2')" style="float: left;padding-right: 12px;">X</a>
 		The 2x promo for donation credit has been extended due to popular demand. For the next 24 hours (until mid-day November 4th) for every dollar you donate you will receive 2 dollars donation credit! <a onclick="viewProfile()">Take advantage!</a></div>
 		<script type='text/javascript'>initializeClosableMessage("promo-24hr-2x-1");</script>
-		 <div id='newui-progress-link' style="text-align:right; font-size:13px;margin-bottom:2px">Check out the progress on the <a href="odp/game">new UI here!</a></div> 
+		 <div id='newui-progress-link' style="text-align:right; font-size:13px;margin-bottom:2px">Check out the progress on the <a href="game">new UI here!</a></div> 
 -->
 		<div id='buttonbar' class='v3-header1-flipped'>${buttonBar}</div>
  		<div class='chat_box above-page-popup v3-window1'>
@@ -709,7 +709,7 @@ Version: ${version}
 					<div class='chat_messages' id="chat_messages_PrivateChat"></div>
 				</div>
 				<div class='chat_tab_footer'>
-					<a id='ignore-players' class='clue' rel='/odp/ajax_ignore.jsp' style='float:left'>Ignore Players</a>
+					<a id='ignore-players' class='clue' rel='/ajax_ignore.jsp' style='float:left'>Ignore Players</a>
 					
 					<c:if test="${usedCustomOrders}">
 						<a onclick='customizeItemOrderPage()'>Customs</a> 
@@ -769,12 +769,12 @@ Version: ${version}
 							he initiated the attack. 
 						</p>
 						<p>
-						For more information on defence structures, <a href='odp/mechanics.jsp#defencestructures'>visit the game mechanics page</a>.
+						For more information on defence structures, <a href='mechanics.jsp#defencestructures'>visit the game mechanics page</a>.
 						</p>
 					</div>
 					<script type="text/javascript">updateMinimizeBox("#defenceStructureMinimizeButton", "#defenceStructureBox")</script>
 					<h4><a id='defenceStructureMinimizeButton' onclick='toggleMinimizeBox(event, "#defenceStructureBox");' class=''>&#8711;</a> Defensive Structure
-						<span class='hint' rel='#defencestructures' style='float:right'><img src='https://initium-resources.appspot.com/images/ui/help.png' border=0 style='max-height:19px;'/></span>			
+						<span class='hint' rel='#defencestructures' style='float:right'><img src='/images/ui/help.png' border=0 style='max-height:19px;'/></span>			
 					</h4>
 					<div>Structural Integrity: ${defenceStructureHitpoints}/${defenceStructureMaxHitpoints}</div>
 					<p>${statusDescription}</p>

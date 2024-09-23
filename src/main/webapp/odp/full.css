@@ -216,7 +216,7 @@ body
 
 .banner1-rain-effect1
 {
-	background: url(https://initium-resources.appspot.com/images/effects/hd-light-rain1.gif);
+	background: url(/images/effects/hd-light-rain1.gif);
 	background-size: cover;
     mix-blend-mode: screen;
     position: fixed;
@@ -236,7 +236,7 @@ body
 .main-buttonbar
 {
 	position:relative;
-    background-image: url(https://storage.googleapis.com/initium-resources/images/ui/wow-ui-bottom-bar1.png);
+    background-image: url(/images/ui/wow-ui-bottom-bar1.png);
     width: 485px;
     height: 146px;
     margin-left: -50%;

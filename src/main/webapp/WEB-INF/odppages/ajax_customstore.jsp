@@ -163,7 +163,7 @@
 	
 	
 	
-	$("#custom-nameflavor-preview").load("/odp/viewitemmini?itemId=${itemId}", null, function(){
+	$("#custom-nameflavor-preview").load("/viewitemmini?itemId=${itemId}", null, function(){
 		// Completed
 		$("#item-comparison-link").remove();
 		$("#custom-nameflavor-preview [name=itemName]").removeClass().addClass("item-custom");

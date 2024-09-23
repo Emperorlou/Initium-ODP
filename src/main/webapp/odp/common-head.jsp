@@ -34,22 +34,22 @@
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.browser.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.preload.min.js"></script>
-<script type="text/javascript" src="/odp/javascript/sockjs.min.js"></script>
-<script type="text/javascript" src="/odp/javascript/vertx-eventbus.js"></script>
-<script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
+<script type="text/javascript" src="/javascript/sockjs.min.js"></script>
+<script type="text/javascript" src="/javascript/vertx-eventbus.js"></script>
+<script type="text/javascript" src="/javascript/seedrandom.js"></script>
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.finger/0.1.6/jquery.finger.min.js"></script>
 
-<script type="text/javascript" src="/odp/javascript/script.js?v=${version}"></script>
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=${version}">
+<script type="text/javascript" src="/javascript/script.js?v=${version}"></script>
+<link type="text/css" rel="stylesheet" href="/MiniUP.css?v=${version}">
 
 <script type="text/javascript" src="https://cdn.rawgit.com/leafo/sticky-kit/v1.1.2/jquery.sticky-kit.min.js"></script>
 
-<script type="text/javascript" src="/odp/javascript/messager.js?v=70"></script>
+<script type="text/javascript" src="/javascript/messager.js?v=70"></script>
 
-<script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
-<script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
+<script type="text/javascript" src="/javascript/PopupNotifications.js?v=3"></script>
+<script type="text/javascript" src="/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
 
 
 
@@ -58,8 +58,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="javascript/rangeslider/rangeslider.min.js"></script>
 
-<script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
-<script src='/odp/javascript/map.js?t=5'></script>
+<script src='/javascript/openseadragon/openseadragon.min.js'></script>
+<script src='/javascript/map.js?t=5'></script>
 
 <script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit" async defer></script>
 

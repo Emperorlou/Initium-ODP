@@ -110,7 +110,7 @@
 				out.println("			<a onclick='characterDropItem(event, " + item.getId() +")'>Drop on ground</a>");
 				if (item.getProperty("maxWeight")!=null)
 				{
-					out.println("<a onclick='pagePopup(\"/odp/ajax_moveitems.jsp?selfSide=Character_"+db.getCurrentCharacterKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>");
+					out.println("<a onclick='pagePopup(\"/ajax_moveitems.jsp?selfSide=Character_"+db.getCurrentCharacterKey().getId()+"&otherSide=Item_"+item.getKey().getId()+"\")'>Open</a>");
 				}
 				out.println("		</div>");
 				out.println("	</div>");

@@ -48,7 +48,7 @@
 	<div id="newui" class="character-display-box" style='position:relative; filter:opacity(0.3);width:100%;'>
 		<a class="" rel="" minitip="Create new character">
 			<div class="avatar-equip-backing v3-window3" style="background-color:none;border-width:6px;margin-left:24px;">
-				<div class="avatar-equip-cloak" style="background-image:url(&quot;https://initium-resources.appspot.com/images/ui/newui/avatar-silhouette-male1.png&quot;);font-size: 24px;text-align: center;">+</div>
+				<div class="avatar-equip-cloak" style="background-image:url(&quot;/images/ui/newui/avatar-silhouette-male1.png&quot;);font-size: 24px;text-align: center;">+</div>
 			</div>
 		</a>
 		<div class="character-display-box-info">	

@@ -3,7 +3,7 @@
 <%@page import="com.universeprojects.miniup.server.JspSnippets"%>
 <html>
 <head>
-	<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=45"/>
+	<link type="text/css" rel="stylesheet" href="/MiniUP.css?v=45"/>
 	<style type="text/css" media="screen">
 	    #editor { 
 	        width: 100%;
@@ -12,9 +12,9 @@
 	</style>
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	<script src="/odp/javascript/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/javascript/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 	
-	<script type="text/javascript" src="/odp/javascript/script.js"></script>
+	<script type="text/javascript" src="/javascript/script.js"></script>
 	
 	<title>Initium Game Site</title>
 

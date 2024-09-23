@@ -65,7 +65,7 @@ var myPlaylist = new jPlayerPlaylist({
 		color:#CCCCCC;
 		margin:0px;
 		background-color: #111111;
-		background-image:url("https://initium-resources.appspot.com/images/ui3/background1.jpg");
+		background-image:url("/images/ui3/background1.jpg");
 	}
 	
 	a
@@ -96,7 +96,7 @@ var myPlaylist = new jPlayerPlaylist({
 	}
 	.footer
 	{
-		background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-background.png");
+		background-image:url("/images/ui/newui/header1-background.png");
 		height:27px;
 		min-height:27px;
 		max-height:27px;
@@ -108,7 +108,7 @@ var myPlaylist = new jPlayerPlaylist({
 	{
 		content: ' ';
 		position:absolute;
-		background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-left.png");
+		background-image:url("/images/ui/newui/header1-button-left.png");
 		min-width:7px;
 		height:27px;
 		min-height:27px;
@@ -124,7 +124,7 @@ var myPlaylist = new jPlayerPlaylist({
 		cursor:pointer;
 		display:table-cell;
 		position:relative;
-		background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-middle.png");
+		background-image:url("/images/ui/newui/header1-button-middle.png");
 		height:21px;
 		max-height:21px;
 		min-height:27px;
@@ -139,7 +139,7 @@ var myPlaylist = new jPlayerPlaylist({
 	{
 		content: ' ';
 		position:absolute;
-		background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-right.png");
+		background-image:url("/images/ui/newui/header1-button-right.png");
 		min-width:7px;
 		height:27px;
 		min-height:27px;
@@ -149,21 +149,21 @@ var myPlaylist = new jPlayerPlaylist({
 	}
 	.header1-button:hover:before, .header1-button.selected:before
 	{
-		background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-left-hover.png");
+		background-image:url("/images/ui/newui/header1-button-left-hover.png");
 	}
 	.header1-button:hover, .header1-button.selected
 	{
-		background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-middle-hover.png");
+		background-image:url("/images/ui/newui/header1-button-middle-hover.png");
 	}
 	.header1-button:hover:after, .header1-button.selected:after
 	{
-		background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-button-right-hover.png");
+		background-image:url("/images/ui/newui/header1-button-right-hover.png");
 	}
 	
 	.header1-spacer
 	{
 		display:table-cell;
-		background-image:url("https://initium-resources.appspot.com/images/ui/newui/header1-spacer.png");
+		background-image:url("/images/ui/newui/header1-spacer.png");
 		min-width:11px;
 		height:27px;
 		min-height:27px;
@@ -174,10 +174,10 @@ var myPlaylist = new jPlayerPlaylist({
 	{
 		border-style: solid;
 		border-width: 17px 32px 17px 31px;
-		-moz-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-		-webkit-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-		-o-border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
-		border-image: url(https://initium-resources.appspot.com/images/ui3/button1.jpg) 17 32 17 31 fill repeat stretch;
+		-moz-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+		-webkit-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+		-o-border-image: url(/images/ui3/button1.jpg) 17 32 17 31 repeat stretch;
+		border-image: url(/images/ui3/button1.jpg) 17 32 17 31 fill repeat stretch;
 		text-shadow: 2px 2px 3px rgba(0, 0, 0, 1);
 		max-height:56px;
 		display:inline-block;
@@ -207,7 +207,7 @@ var myPlaylist = new jPlayerPlaylist({
 	<a class='v3-main-button' href='https://www.playinitium.com'>Play the game</a>
 </div>
 <div class='header'>
-	<img src='https://initium-resources.appspot.com/images/ui3/logo3.png' border=0/>
+	<img src='/images/ui3/logo3.png' border=0/>
 	<div class='subtitle'>Official Soundtrack</div>
 </div>
 <div id="jp_container_N" class="jp-video jp-video-270p center" role="application" aria-label="media player">

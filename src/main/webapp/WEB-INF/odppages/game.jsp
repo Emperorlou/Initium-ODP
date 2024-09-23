@@ -28,26 +28,26 @@
 <script type="text/javascript" src="/javascript/sockjs.min.js"></script>
 <script type="text/javascript" src="/javascript/vertx-eventbus.js"></script>
 
-<script type="text/javascript" src="/odp/javascript/seedrandom.js"></script>
-<script type="text/javascript" src="/odp/javascript/script.js?v=82"></script>
+<script type="text/javascript" src="/javascript/seedrandom.js"></script>
+<script type="text/javascript" src="/javascript/script.js?v=82"></script>
 
-<script type="text/javascript" src="/odp/javascript/messager.js?v=22"></script>
+<script type="text/javascript" src="/javascript/messager.js?v=22"></script>
 
-<script type="text/javascript" src="/odp/javascript/PopupNotifications.js?v=3"></script>
-<script type="text/javascript" src="/odp/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
+<script type="text/javascript" src="/javascript/PopupNotifications.js?v=3"></script>
+<script type="text/javascript" src="/javascript/BrowserPopupNotifications-impl.js?v=3"></script>
 
 
 
 <script type="text/javascript" src="/javascript/jquery.cluetip.all.min.js"></script>
 <link type="text/css" rel="stylesheet" href="/javascript/jquery.cluetip.css"/>
 
-<link type="text/css" rel="stylesheet" href="/odp/MiniUP.css?v=62">
+<link type="text/css" rel="stylesheet" href="/MiniUP.css?v=62">
 
 <link type="text/css" rel="stylesheet" href="/javascript/rangeslider/rangeslider.css"/>
 <script src="/javascript/rangeslider/rangeslider.min.js"></script>
 
-<script src='/odp/javascript/openseadragon/openseadragon.min.js'></script>
-<script src='/odp/javascript/map.js?t=6'></script>
+<script src='/javascript/openseadragon/openseadragon.min.js'></script>
+<script src='/javascript/map.js?t=6'></script>
 
 <script src="https://www.google.com/recaptcha/api.js?onload=onCaptchaLoaded&render=explicit"></script>
 
@@ -214,7 +214,7 @@
 	});
 </script>
 
-<script type='text/javascript' src='/odp/javascript/banner-weather.js?v=8'></script>
+<script type='text/javascript' src='/javascript/banner-weather.js?v=8'></script>
 
 
 
@@ -222,36 +222,36 @@
 <script type='text/javascript'>
 	if (isAnimationsEnabled())
 	{
-		$.preload("https://initium-resources.appspot.com/images/anim/walking.gif", 
-				"https://initium-resources.appspot.com/images/anim/props/tree1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/tree6.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/shrub3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree6.gif",
-				"https://initium-resources.appspot.com/images/anim/props/baretree7.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass1.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass2.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass3.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass4.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass5.gif",
-				"https://initium-resources.appspot.com/images/anim/props/grass6.gif"
+		$.preload("/images/anim/walking.gif", 
+				"/images/anim/props/tree1.gif",
+				"/images/anim/props/tree2.gif",
+				"/images/anim/props/tree3.gif",
+				"/images/anim/props/tree4.gif",
+				"/images/anim/props/tree5.gif",
+				"/images/anim/props/tree6.gif",
+				"/images/anim/props/shrub1.gif",
+				"/images/anim/props/shrub2.gif",
+				"/images/anim/props/shrub3.gif",
+				"/images/anim/props/baretree1.gif",
+				"/images/anim/props/baretree2.gif",
+				"/images/anim/props/baretree3.gif",
+				"/images/anim/props/baretree4.gif",
+				"/images/anim/props/baretree5.gif",
+				"/images/anim/props/baretree6.gif",
+				"/images/anim/props/baretree7.gif",
+				"/images/anim/props/grass1.gif",
+				"/images/anim/props/grass2.gif",
+				"/images/anim/props/grass3.gif",
+				"/images/anim/props/grass4.gif",
+				"/images/anim/props/grass5.gif",
+				"/images/anim/props/grass6.gif"
 				);
 	}
 </script>
 
-<script type='text/javascript' src='/odp/javascript/messager-impl.js?v=${version}'></script>
+<script type='text/javascript' src='/javascript/messager-impl.js?v=${version}'></script>
 
-<script type='text/javascript' src='/odp/javascript/soundeffects.js?v=13'></script>
+<script type='text/javascript' src='/javascript/soundeffects.js?v=13'></script>
 <script type='text/javascript'>
 	// THIS SECTION IS NEEDED FOR THE SOUND EFFECTS
 	$(document).ready(function(){
@@ -373,8 +373,8 @@ $(function(){
 </script>
 
 
-<script type='text/javascript' src='/odp/javascript/reveal-tutorial.js?v=14'></script>
-<script type='text/javascript' src='/odp/javascript/reveal-tutorial-impl.js?v=6'></script>
+<script type='text/javascript' src='/javascript/reveal-tutorial.js?v=14'></script>
+<script type='text/javascript' src='/javascript/reveal-tutorial-impl.js?v=6'></script>
 
 </head>
 
@@ -397,19 +397,19 @@ https://github.com/Emperorlou/Initium-ODP
 		<div class='page-upperhalf'>
 			<div id='main-header' class='header1'>
 				<div class='header1-spacer'></div>
-				<div class='header1-display'><span id='locationName'><a href='/odp/game'>${locationName}</a></span></div>
+				<div class='header1-display'><span id='locationName'><a href='/game'>${locationName}</a></span></div>
 				<div class='header1-spacer'></div>
 				<div class='header1-rightchunk'>
 					<div class='header1-button' onclick='viewMap()'>MAP</div>
 					<div class='header1-spacer'></div>
 					<div class='header1-button' onclick='inventory()'>EQUIP</div>
 					<div class='header1-spacer'></div>
-					<div class='header1-display'><img src='https://initium-resources.appspot.com/images/dogecoin-18px.png' border=0/><span id='mainGoldIndicator'>${mainGoldIndicator}</span></div>
+					<div class='header1-display'><img src='/images/dogecoin-18px.png' border=0/><span id='mainGoldIndicator'>${mainGoldIndicator}</span></div>
 					<div class='header1-spacer'></div>
 				</div>
 			</div>
 			<div id='main-banner' class='banner1'>
-				<img id='banner-sizer' src='https://initium-resources.appspot.com/images/banner---placeholder2.png' border=0/>
+				<img id='banner-sizer' src='/images/banner---placeholder2.png' border=0/>
 				<div id='banner-base'></div>
 				<div id='main-viewport-container'></div>							
 				<div id='inBannerCharacterWidget' class='characterWidgetContainer'>
@@ -458,7 +458,7 @@ https://github.com/Emperorlou/Initium-ODP
 				<div class='chat_messages' id="chat_messages_PrivateChat"></div>
 			</div>
 			<div class='chat_tab_footer'>
-				<a class='clue' rel='/odp/ajax_ignore.jsp' style='float:left'>Ignore Players</a>
+				<a class='clue' rel='/ajax_ignore.jsp' style='float:left'>Ignore Players</a>
 				<span id='ping' title='Your connection speed with the server in milliseconds'>??</span>
 				&#8226; 
 				<c:if test="${usedCustomOrders}">

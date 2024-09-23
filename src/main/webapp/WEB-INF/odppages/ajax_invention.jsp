@@ -69,7 +69,7 @@
 						</p>
 					</div>
 					<a class='instant-start-skill-button' onclick="doCreatePrototype(event, ${idea.id}, '<c:out value="${idea.name}"/>', null, null, true);">
-						<img src="https://initium-resources.appspot.com/images/ui/begin-icon1.png">
+						<img src="/images/ui/begin-icon1.png">
 					</a>					
 					<a class='hint' rel='#idea-popup-1-${idea.id}'><span class='skill-icon' style='background-image: url(${idea.icon});'></span> ${idea.name}</a>
 				</div>
@@ -107,7 +107,7 @@
 					</div>
 					<div class='generic-itemlike-container' style='vertical-align:middle;'>
 						<a class='instant-start-skill-button' onclick="doConstructItemSkill(event, ${skill.id}, '<c:out value="${skill.name}"/>', null, null, true);">
-							<img src="https://initium-resources.appspot.com/images/ui/begin-icon1.png">
+							<img src="/images/ui/begin-icon1.png">
 						</a>					
 						<a class='hint' rel='#skill-popup-1-${skill.id}'><span class='skill-icon' style='background-image: url(${skill.icon});'></span> 
 							<div class='generic-itemlike-name-container'>
