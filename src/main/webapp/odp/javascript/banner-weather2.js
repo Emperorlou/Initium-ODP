@@ -149,9 +149,9 @@ function updateDayNightCycle(forceRefresh)
 		
 /*			if (rainStrength>0.9)
 			{
-				var bg=	"url('"+magicallyDetermineAnimationUrl("https://initium-resources.appspot.com/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount, 4)+"') no-repeat center center, ";
-				bg += 	"url('"+magicallyDetermineAnimationUrl("https://initium-resources.appspot.com/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount, 9)+"') no-repeat center center, "; 
-				bg+=	"url('"+magicallyDetermineAnimationUrl("https://initium-resources.appspot.com/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount)+"') no-repeat center center, "; 
+				var bg=	"url('"+magicallyDetermineAnimationUrl("/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount, 4)+"') no-repeat center center, ";
+				bg += 	"url('"+magicallyDetermineAnimationUrl("/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount, 9)+"') no-repeat center center, "; 
+				bg+=	"url('"+magicallyDetermineAnimationUrl("/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount)+"') no-repeat center center, "; 
 				bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 				bg+=	"rgba(30, 43, 83, "+amount+")";
 				banner.css("background", bg);
@@ -159,8 +159,8 @@ function updateDayNightCycle(forceRefresh)
 			}
 			else if (rainStrength>0.7)
 			{
-				var bg=	"url('"+magicallyDetermineAnimationUrl("https://initium-resources.appspot.com/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount, 7)+"') no-repeat center center, ";
-				bg+=	"url('"+magicallyDetermineAnimationUrl("https://initium-resources.appspot.com/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount)+"') no-repeat center center, "; 
+				var bg=	"url('"+magicallyDetermineAnimationUrl("/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount, 7)+"') no-repeat center center, ";
+				bg+=	"url('"+magicallyDetermineAnimationUrl("/images/effects/light-rain1-", ".jpg", rainFps, rainFrameCount)+"') no-repeat center center, "; 
 				bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 				bg+=	"rgba(30, 43, 83, "+amount+")";
 				banner.css("background", bg);
@@ -184,7 +184,7 @@ function updateDayNightCycle(forceRefresh)
 		if (lightning>0)
 		{
 			var rainGif = "hd-light-rain1.gif";
-			var bg=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
+			var bg=	"url('/images/effects/"+rainGif+"') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 			bg+=	"rgba(230, 230, 230, "+lightning+")";
 			banner.css("background", bg);
@@ -222,7 +222,7 @@ function updateDayNightCycle(forceRefresh)
 		if (rainStrength>0.65 && window.biome=="Desert")
 		{
 			var bg=	"";
-			bg+="url('https://initium-resources.appspot.com/images/effects/light-sandstorm1.gif') no-repeat center center, ";
+			bg+="url('/images/effects/light-sandstorm1.gif') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
 			banner.css("background", bg);
@@ -232,7 +232,7 @@ function updateDayNightCycle(forceRefresh)
 		else if (rainStrength>0.65 && window.biome=="Snow")
 		{
 			var bg=	"";
-			bg+="url('https://initium-resources.appspot.com/images/effects/medium-snow1.gif') no-repeat center center, ";
+			bg+="url('/images/effects/medium-snow1.gif') no-repeat center center, ";
 			bg+= 	"url('"+bannerUrl+"') no-repeat center center, "; 
 			bg+=	"rgba("+r+", "+g+", "+b+", "+amount+") ";
 			banner.css("background", bg);
@@ -243,7 +243,7 @@ function updateDayNightCycle(forceRefresh)
 		{
 			var rainGif = "hd-light-rain1.gif";
 
-			var bg=	"url('https://initium-resources.appspot.com/images/effects/"+rainGif+"') no-repeat center center, ";
+			var bg=	"url('/images/effects/"+rainGif+"') no-repeat center center, ";
 			bg+= 	"rgba("+r+", "+g+", "+b+", "+amount+")"; 
 			banner.css("background", bg);
 			banner.css("background-blend-mode", "screen");

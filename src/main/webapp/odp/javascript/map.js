@@ -36,10 +36,10 @@ function createLocalMapViewer(id)
 	var quality = getMapQuality();
     viewer = OpenSeadragon({
         id: id,
-        prefixUrl: "https://initium-resources.appspot.com/images/map/controls/",
+        prefixUrl: "/images/map/controls/",
         springStiffness: 5,
         animationTime: 0.2,
-        tileSources: "https://storage.googleapis.com/initium-resources/images/map/" + quality + ".xml"
+        tileSources: "/images/map/" + quality + ".xml"
         
     });
 }
@@ -48,7 +48,7 @@ function createCommunityMapViewer(id)
 {
     viewer = OpenSeadragon({
         id: id,
-        prefixUrl: "https://initium-resources.appspot.com/images/map/controls/",
+        prefixUrl: "/images/map/controls/",
         springStiffness: 5,
         animationTime: 0.2,
         tileSources: {

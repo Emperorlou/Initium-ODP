@@ -179,14 +179,14 @@ $(window).ready(function(e){
 	// Set the correct image for the header mute button
 	if (isSoundEffectsEnabled())
 	{
-		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
-		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-on1.png");
+		$("#header-mute img").attr("src", "/images/ui/sound-button1.png");
+		$("#sound-button img").attr("src", "/images/ui3/header-button-sound-on1.png");
 		
 	}
 	else
 	{
-		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
-		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-off1.png");
+		$("#header-mute img").attr("src", "/images/ui/sound-button1-mute.png");
+		$("#sound-button img").attr("src", "/images/ui3/header-button-sound-off1.png");
 }
 		
 
@@ -405,7 +405,7 @@ function clearPopupPermanentOverlay()
 function popupPermanentOverlay_Experiment(title, text)
 {
 	$("#banner-text-overlay").hide();
-	setBannerImage("https://initium-resources.appspot.com/images/animated/invention1.gif");
+	setBannerImage("/images/animated/invention1.gif");
 	var content="<div class='travel-scene-text'><h1>"+title+"</h1>"+text+"<p><a class='text-shadow' onclick='cancelLongOperations(event)'>Cancel</a></p></div>";
 
 	$("#banner-base").html(content);
@@ -440,14 +440,14 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	if (isAnimationsEnabled() && uiStyle!="experimental" && uiStyle!="wowlike")
 	{
 	 
-		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+		content = "<div class='travel-scene-container'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 	
 		if (biome=="Dungeon")
 		{
 			// This version uses the new torch walking man
-			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+			//content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='/images/environment/dungeon/walking_torch.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			
-			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
+			content = "<div class='travel-scene-container' style='background-image:none; background-color:#000000;'><div class='travel-scene'><div class='walkingman-container'><img class='walkingman' src='/images/anim/walking.gif' style='bottom:"+(yOffset-13)+"px;left:"+(-windowWidth/2-15)+"px'/>";
 			var grassTiles = 40;
 			// The ground first
 			for(var i = 0; i<grassTiles; i++)
@@ -459,11 +459,11 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 				
 				var y = random(-40, 10);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='/images/environment/dungeon/"+filename+".png' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			// Add the dungeon wall
-			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
+			content+="<img class='walkingman-prop' src='/images/environment/dungeon/wall.jpg' style='bottom:"+(yOffset+20)+"px; left:-"+(width/2-10)+"px;z-index:140001;' />";
 		
 			var torches = random(1,5);
 			var torchXOffset = random(0,100);
@@ -471,7 +471,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 			{
 				
 				var x = torchXOffset;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
+				content+="<img class='walkingman-prop' src='/images/environment/dungeon/torch.gif' style='bottom:"+(yOffset+40)+"px; left:"+(x+(width/torches*i)-(width/2))+"px;z-index:140001;' />";
 			}
 			
 	//		var plants = random(0,10);
@@ -502,7 +502,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 	//	
 	//			var y = random(-60, 60);
 	//			var x = random(width/2*-1,width/2)-100;
-	//			content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+	//			content+="<img class='walkingman-prop' src='/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 	//		}		
 		}
 		else if (biome=="Snow")
@@ -521,7 +521,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -553,7 +553,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='/images/environment/snow/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		else if (biome=="Desert")
@@ -572,7 +572,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -604,7 +604,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='/images/environment/desert/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		else // Temperate by default
@@ -623,7 +623,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-100, 100);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
+				content+="<img class='walkingman-prop' src='/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y)+"px; left:"+x+"px;z-index:"+(100000-y)+";' />";
 			}
 			
 			
@@ -658,7 +658,7 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 		
 				var y = random(-60, 60);
 				var x = random(width/2*-1,width/2)-100;
-				content+="<img class='walkingman-prop' src='https://initium-resources.appspot.com/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
+				content+="<img class='walkingman-prop' src='/images/environment/temperate/"+filename+".gif' style='bottom:"+(yOffset+y-7)+"px; left:"+x+"px;z-index:"+(150000-y)+";' />";
 			}
 		}
 		content+="</div>";
@@ -679,15 +679,15 @@ function popupPermanentOverlay_WalkingBase(title, text) {
 
 //function popupPermanentOverlay_Searching(locationName) {
 //	var title = "Exploring "+locationName;
-//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
+//	var content = "You`re wandering about, looking for anything of interest..<br><br><br><img class='walkingman' src='/images/anim/Pixelman_Walking_by_pfunked.gif'/>";	
 //	popupPermanentOverlay(title, content);
 //	$(".walkingman").animate({left: "+=60px"}, 800, "linear", function()
 //			{
 //				var img = $(this);
-//				img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Ducking_by_pfunked.gif");
+//				img.attr("src", "/images/anim/Pixelman_Ducking_by_pfunked.gif");
 //				img.animate({left: "+=0px"}, 1250, "linear", function(){
 //					var img = $(this);
-//					img.attr("src", "https://initium-resources.appspot.com/images/anim/Pixelman_Walking_by_pfunked.gif");
+//					img.attr("src", "/images/anim/Pixelman_Walking_by_pfunked.gif");
 //					img.animate({left: "+=600px"}, 10000, "linear");
 //				});
 //			});
@@ -2826,13 +2826,13 @@ function createWelcomeWindow()
 	
 	windowHtml+="" +
 			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
-			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
+			"<img id='header-mute' src='/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
 			"Click here to disable sounds" +
 			"</a>";
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +")'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +")'>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='closepopupMessage(" + popupsNum +");viewQuest(\"ag1zfnBsYXlpbml0aXVtchULEghRdWVzdERlZhiAgJD-ncrKCQw\");'>"+
@@ -2859,7 +2859,7 @@ function createWelcomeWindow()
 <input type='hidden' name='currency_code' value='USD'>
 <input type='hidden' name='item_name' value='Initium Development'>
 <input type='hidden' name='tax' value='0'>
-<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'> 
+<input type='image' src='/images/ui/paypal-donate-button.png' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'> 
 <img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>
 </form>
 */
@@ -2902,7 +2902,7 @@ function createDonationWindow()
 			"<input type='hidden' name='currency_code' value='USD'>" +
 			"<input type='hidden' name='item_name' value='Initium Development'>" +
 			"<input type='hidden' name='tax' value='0'>" +
-			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!'>" + 
+			"<input type='image' src='/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!'>" + 
 			"<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>" +
 			"</form>" +
 			"</center>" +
@@ -2913,13 +2913,13 @@ function createDonationWindow()
 	
 	windowHtml+="" +
 			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
-			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
+			"<img id='header-mute' src='/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
 			"Click here to disable sounds" +
 			"</a>";
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='$(\"#donatequick\").submit(); closepopupMessage(" + popupsNum +"); createWelcomeWindow();'>"+
@@ -2994,18 +2994,18 @@ function createUpgradeToPremiumWindow()
 			"<input type='hidden' name='currency_code' value='USD'>" +
 			"<input type='hidden' name='item_name' value='Initium Development'>" +
 			"<input type='hidden' name='tax' value='0'>" +
-			"<input type='image' src='https://initium-resources.appspot.com/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!' style='cursor:pointer;'><br>" + 
+			"<input type='image' src='/images/ui/paypal-donate-button.png' border='0' id='donatequick-submit' name='submit' alt='PayPal - The safer, easier way to pay online!' style='cursor:pointer;'><br>" + 
 			"<img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1'>" +
 			"</form>" +
 			"</center>" +
 			"<a id='header-mute' onclick='toggleEnvironmentSoundEffects()' style='position: absolute;left: -69px;bottom: -43px;text-shadow: 1px 1px 1px #000000;width: 244px;'>" +
-			"<img id='header-mute' src='https://initium-resources.appspot.com/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
+			"<img id='header-mute' src='/images/ui/sound-button1.png' border='0' style='max-height:18px;vertical-align: bottom;-webkit-filter: drop-shadow(1px 1px 0px #000000);filter: drop-shadow(1px 1px 0px #000000);'/> " +
 			"Click here to disable sounds" +
 			"</a>";
 	
 	windowHtml+=
 			"<div class='quest-window-bottombutton-container'>"+
-            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(https://initium-resources.appspot.com/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); '>"+
+            "<div class='quest-window-bottombutton' style='left:-163px; background-image:url(/images/ui3/button-red.png);' onclick='closepopupMessage(" + popupsNum +"); '>"+
             "Skip"+
             "</div>"+
             "<div class='quest-window-bottombutton' style='left:0px' onclick='$(\"#donatequick\").submit(); closepopupMessage(" + popupsNum +"); '>"+
@@ -3472,7 +3472,7 @@ function drawTravelLine(event, startX, startY, x, y, seconds)
 				"<svg class='travel-line-container' style='position:absolute;left:0px; top:0px;bottom:0px;right:0px;width:100%;height:100%;z-index:1;'>" +
 				"	<line class='travel-line' x1='"+startX+"' y1='"+startY+"' x2='"+startX+"' y2='"+startY+"'/>" +
 				"</svg>"
-				).append("<a class='travel-line-cancel-button' onclick='cancelLongOperations(event)'><img src='https://initium-resources.appspot.com/images/ui4/button-cancel1.png' alt='Cancel Travel'/></a>");
+				).append("<a class='travel-line-cancel-button' onclick='cancelLongOperations(event)'><img src='/images/ui4/button-cancel1.png' alt='Cancel Travel'/></a>");
 		
 		
 		map[0].travelLineData = 
@@ -3573,9 +3573,9 @@ function questLineCompletePopup(questLineName)
 			"</p>" +
 			"" +
 			"<h3 id='quest-complete-label' style='position:initial; '>Complete!</h3>" +
-			"<center><a class='standard-button-highlight' onclick='viewTrainingQuestLines();'><img alt='Training quests' src='https://initium-resources.appspot.com/images/ui3/quest-banners/button-training-quests1.png'/></a></center>" +
+			"<center><a class='standard-button-highlight' onclick='viewTrainingQuestLines();'><img alt='Training quests' src='/images/ui3/quest-banners/button-training-quests1.png'/></a></center>" +
 			"");
-	genericOverlayEffect("https://initium-resources.appspot.com/images/ui3/complete-effect.gif?1", 500);
+	genericOverlayEffect("/images/ui3/complete-effect.gif?1", 500);
 }
 
 function beginNoobQuests(questDefId)
@@ -4855,7 +4855,7 @@ function doRest()
 				else
 				{
 					hideBannerLoadingIcon();
-					setBannerImage("https://storage.googleapis.com/initium-resources/images/hdbanners/Banner---Resting2.jpg");
+					setBannerImage("/images/hdbanners/Banner---Resting2.jpg");
 					setBannerOverlayText("Resting..", action.description+"<br><span id='long-operation-timeleft'></span>");
 				}
 			},
@@ -4879,7 +4879,7 @@ function doCampDefend()
 				else
 				{
 					hideBannerLoadingIcon();
-					setBannerImage("https://storage.googleapis.com/initium-resources/images/hdbanners/Banner---GuardingCamp1.jpg");
+					setBannerImage("/images/hdbanners/Banner---GuardingCamp1.jpg");
 					setBannerOverlayText("Defending", "Protect the camp!");
 				}
 			},
@@ -5652,13 +5652,13 @@ function toggleEnvironmentSoundEffects(newState)
 	// Set the correct image for the header mute button
 	if (enabled)
 	{
-		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1-mute.png");
-		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-off1.png");
+		$("#header-mute img").attr("src", "/images/ui/sound-button1-mute.png");
+		$("#sound-button img").attr("src", "/images/ui3/header-button-sound-off1.png");
 	}
 	else
 	{
-		$("#header-mute img").attr("src", "https://initium-resources.appspot.com/images/ui/sound-button1.png");
-		$("#sound-button img").attr("src", "https://initium-resources.appspot.com/images/ui3/header-button-sound-on1.png");
+		$("#header-mute img").attr("src", "/images/ui/sound-button1.png");
+		$("#sound-button img").attr("src", "/images/ui3/header-button-sound-on1.png");
 	}
 	
 }
@@ -6251,7 +6251,7 @@ function navMapZoomOut()
 //	clearQuestCompleteEffect();
 //	
 //	var html = "<div id='questCompleteEffect' style='position: fixed;overflow: visible;mix-blend-mode: color-dodge;width: 0px;height: 0px;left: 50%;top: 30%;z-index: 1000000000;'>"+
-//	"<img src='https://initium-resources.appspot.com/images/ui3/complete-effect.gif' style='position:absolute;margin-left: -250px;margin-top: 0px;float: left;pointer-events: none;transform: scale(2);'>"+
+//	"<img src='/images/ui3/complete-effect.gif' style='position:absolute;margin-left: -250px;margin-top: 0px;float: left;pointer-events: none;transform: scale(2);'>"+
 //	"</div>";
 //	$("body").prepend(html);
 //	
