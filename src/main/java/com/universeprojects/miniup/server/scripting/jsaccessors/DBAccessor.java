@@ -502,6 +502,8 @@ public class DBAccessor {
 			discovery.setProperty("location2Key", path.getLocation2Key());
 			discovery.setProperty("hidden", false);
 			discovery.setProperty("createdDate", new Date());
+			discovery.setProperty("indexCharacterKeyLocation1Key", character.getKey().toString()+path.getLocation1Key().toString());
+			discovery.setProperty("indexCharacterKeyLocation2Key", character.getKey().toString()+path.getLocation2Key().toString());
 		}
 		
 		return new Discovery(discovery, db);

@@ -1360,26 +1360,14 @@ public class ODPDBAccess
 			discovery.setProperty("location2Key", entity.getProperty("location2Key"));
 			discovery.setProperty("hidden", false);
 			discovery.setProperty("createdDate", new Date());
+			discovery.setProperty("indexCharacterKeyLocation1Key", character.getKey().toString()+entity.getProperty("location1Key").toString());
+			discovery.setProperty("indexCharacterKeyLocation2Key", character.getKey().toString()+entity.getProperty("location2Key").toString());
+			
 
 			// Set some default attributes
 
 			db.put(discovery);
 
-			return discovery;
-		}
-		else if (entity.getKind().equals("Character"))
-		{
-			CachedEntity discovery = new CachedEntity("Discovery");
-			// Set the starting attributes
-			discovery.setProperty("characterKey", character.getKey());
-			discovery.setProperty("entityKey", entity.getKey());
-			discovery.setProperty("kind", entity.getKind());
-			discovery.setProperty("hidden", false);
-			discovery.setProperty("createdDate", new Date());
-
-			// Set some default attributes
-
-			db.put(discovery);
 			return discovery;
 		}
 		else
