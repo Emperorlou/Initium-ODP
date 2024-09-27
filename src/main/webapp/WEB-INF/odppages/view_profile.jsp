@@ -185,6 +185,10 @@
 <p>
 	<br> <br> <a class="big-link" href="#" onclick="rediscoverHouses(event)" id="btnRediscoverHouses">Rediscover All Owned Houses</a>
 </p>
+
+<p>
+	<br> <br> <a class="big-link" href="#" onclick="fixDiscoveries(event)" id="btnRediscoverHouses">Fix discoveries for current character</a>
+</p>
 <div class='mobile-spacer'></div>
 
 
